@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 
 @RestController
-public class FastTaxServiceController {
+public class FastTaxController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
