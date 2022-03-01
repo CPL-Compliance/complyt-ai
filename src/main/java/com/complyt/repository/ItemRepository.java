@@ -1,6 +1,6 @@
 package com.complyt.repository;
 
-import com.complyt.model.GroceryItem;
+import com.complyt.entity.GroceryItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

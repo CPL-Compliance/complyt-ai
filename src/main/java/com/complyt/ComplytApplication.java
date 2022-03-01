@@ -1,6 +1,6 @@
 package com.complyt;
 
-import com.complyt.model.GroceryItem;
+import com.complyt.entity.GroceryItem;
 import com.complyt.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@EnableMongoRepositories
+@EnableMongoRepositories("com.complyt.repository")
 public class ComplytApplication  implements CommandLineRunner {
 
 	@Bean
@@ -29,7 +29,5 @@ public class ComplytApplication  implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		itemRepository.deleteAll();
-		itemRepository.save(new GroceryItem("1", "tomato", 1, "veg"));
 	}
 }
