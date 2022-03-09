@@ -1,5 +1,5 @@
-package com.complyt.services;
+package com.complyt.service;
 
-public interface ISalesTaxService {
+public interface SalesTaxService {
     String getSalesTax(String zip, String address, String city, String state);
 }

@@ -1,0 +1,24 @@
+package com.complyt.service;
+
+import com.complyt.entity.Customer;
+import com.complyt.repository.CustomerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomersServices {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    CustomerRepository customerRepository;
+
+    public Customer createCustomer(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
+    public Customer getCustomerByName(String name) {
+        return customerRepository.findByName(name);
+    }
+}

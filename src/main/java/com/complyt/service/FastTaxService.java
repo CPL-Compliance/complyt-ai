@@ -1,4 +1,4 @@
-package com.complyt.services;
+package com.complyt.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 @Service
 @Primary
-public class FastTaxService implements ISalesTaxService{
+public class FastTaxService implements SalesTaxService {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired

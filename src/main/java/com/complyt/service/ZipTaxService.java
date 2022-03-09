@@ -1,20 +1,18 @@
-package com.complyt.services;
+package com.complyt.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class ZipTaxService implements ISalesTaxService {
+public class ZipTaxService implements SalesTaxService {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -28,7 +26,6 @@ public class ZipTaxService implements ISalesTaxService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         List<String> params = Arrays.asList(address, city, state, zip);
         String combinedString = String.join("%20", params);
-        //String completeAddress = combinedString.replace(" ", "%20");
         String uri = UriComponentsBuilder.newInstance()
                 .scheme("https")
                 .host("api.zip-tax.com")
