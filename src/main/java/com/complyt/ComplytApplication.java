@@ -1,6 +1,5 @@
 package com.complyt;
 
-import com.complyt.entity.State;
 import com.complyt.repository.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,8 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @SpringBootApplication
 @EnableMongoRepositories("com.complyt.repository")
