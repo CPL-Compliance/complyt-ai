@@ -3,9 +3,10 @@ package com.complyt.entity;
 public class Address {
     private String city;
     private String country;
+    private String county;
     private String state;
     private String street;
-    private int zip;
+    private String zip;
 
     public String getCity() {
         return city;
@@ -23,11 +24,11 @@ public class Address {
         return street;
     }
 
-    public int getZip() {
+    public String getZip() {
         return zip;
     }
 
-    public Address(String city, String country, String state, String street, int zip) {
+    public Address(String city, String country, String state, String street, String zip) {
         this.city = city;
         this.country = country;
         this.state = state;
