@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/v1")
 public class ComplytController {
@@ -37,12 +39,12 @@ public class ComplytController {
     }
 
     @GetMapping("/getCustomerByName")
-    public Customer getCustomerByName(@RequestParam String name){
+    public List<Customer> getCustomerByName(@RequestParam String name){
         return customersServices.getCustomerByName(name);
     }
 
     @GetMapping("/getClientByName")
-    public Client getClientByName(@RequestParam String name){
+    public List<Client> getClientByName(@RequestParam String name){
         return clientService.getClientByName(name);
     }
 }

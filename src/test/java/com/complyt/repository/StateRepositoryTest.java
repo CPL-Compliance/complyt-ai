@@ -20,8 +20,6 @@ public class StateRepositoryTest {
 
     @Test
     public void testFindByName(){
-        String california = "California";
-        List<State> states = stateRepository.findByName(california);
         
     }
 }

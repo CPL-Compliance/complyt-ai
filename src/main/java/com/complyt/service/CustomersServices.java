@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CustomersServices {
     Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -18,7 +20,7 @@ public class CustomersServices {
         return customerRepository.save(customer);
     }
 
-    public Customer getCustomerByName(String name) {
+    public List<Customer> getCustomerByName(String name) {
         return customerRepository.findByName(name);
     }
 }
