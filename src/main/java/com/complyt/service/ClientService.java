@@ -1,7 +1,9 @@
 package com.complyt.service;
 
 import com.complyt.entity.Client;
+import com.complyt.entity.Customer;
 import com.complyt.repository.ClientRepository;
+import com.complyt.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,6 @@ public class ClientService {
     ClientRepository clientRepository;
 
     public List<Client> getClientByName(String name) {
-        return null;//clientRepository.findByName(name);
+        return clientRepository.findByName(name);
     }
 }

@@ -3,7 +3,7 @@ package com.complyt.controller;
 import com.complyt.entity.Client;
 import com.complyt.entity.Customer;
 import com.complyt.service.ClientService;
-import com.complyt.service.CustomersServices;
+import com.complyt.service.CustomerService;
 import com.complyt.service.SalesTaxService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class ComplytController {
     SalesTaxService salesTaxByAddressService;
 
     @Autowired
-    CustomersServices customersServices;
+    CustomerService customerService;
 
     @Autowired
     ClientService clientService;
@@ -35,12 +35,12 @@ public class ComplytController {
 
     @PostMapping("/createCustomer")
     public Customer createCustomer(@RequestBody Customer customer){
-        return customersServices.createCustomer(customer);
+        return customerService.createCustomer(customer);
     }
 
     @GetMapping("/getCustomerByName")
     public List<Customer> getCustomerByName(@RequestParam String name){
-        return customersServices.getCustomerByName(name);
+        return customerService.getCustomerByName(name);
     }
 
     @GetMapping("/getClientByName")

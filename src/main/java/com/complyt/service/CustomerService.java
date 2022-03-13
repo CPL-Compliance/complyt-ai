@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CustomersServices {
+public class CustomerService {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
