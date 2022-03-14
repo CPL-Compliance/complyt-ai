@@ -1,15 +1,13 @@
 package com.complyt.service;
 
-import com.complyt.entity.Client;
-import com.complyt.entity.Customer;
+import com.complyt.model.Client;
+import com.complyt.model.Order;
 import com.complyt.repository.ClientRepository;
-import com.complyt.repository.CustomerRepository;
+import com.complyt.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ClientService {
@@ -18,7 +16,14 @@ public class ClientService {
     @Autowired
     ClientRepository clientRepository;
 
-    public List<Client> getClientByName(String name) {
-        return clientRepository.findByName(name);
+    @Autowired
+    OrderRepository orderRepository;
+
+    public Client save(Client client) {
+        return clientRepository.save(client);
+    }
+
+    public void addOrderToClient(String name, Order order){
+        clientRepository.addOrderToClient(name, order);
     }
 }

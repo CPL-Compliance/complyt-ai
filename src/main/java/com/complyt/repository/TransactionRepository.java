@@ -1,6 +1,6 @@
 package com.complyt.repository;
 
-import com.complyt.entity.State;
+import com.complyt.model.State;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

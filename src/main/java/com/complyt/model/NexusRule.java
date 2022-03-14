@@ -1,4 +1,4 @@
-package com.complyt.entity;
+package com.complyt.model;
 
 public class NexusRule {
     private String type;

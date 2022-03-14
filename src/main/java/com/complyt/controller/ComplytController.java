@@ -1,9 +1,11 @@
 package com.complyt.controller;
 
-import com.complyt.entity.Client;
-import com.complyt.entity.Customer;
+import com.complyt.model.Client;
+import com.complyt.model.Customer;
+import com.complyt.model.Order;
 import com.complyt.service.ClientService;
 import com.complyt.service.CustomerService;
+import com.complyt.service.OrderService;
 import com.complyt.service.SalesTaxService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,9 @@ public class ComplytController {
     @Autowired
     ClientService clientService;
 
+    @Autowired
+    OrderService orderService;
+
     @GetMapping("/getSalesTax")
     public String getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
                               @RequestParam String state) {
@@ -38,13 +43,24 @@ public class ComplytController {
         return customerService.createCustomer(customer);
     }
 
+    @PostMapping("/createClient")
+    public Client createClient(@RequestBody Client client){
+        if(client.getOrders() != null && client.getOrders().size() > 0){
+            orderService.save(client.getOrders());
+        }
+        
+
+        return clientService.save(client);
+    }
+
     @GetMapping("/getCustomerByName")
     public List<Customer> getCustomerByName(@RequestParam String name){
         return customerService.getCustomerByName(name);
     }
 
-    @GetMapping("/getClientByName")
-    public List<Client> getClientByName(@RequestParam String name){
-        return clientService.getClientByName(name);
+    @PutMapping("/addOrderToClient")
+    public void addOrderToClient(@RequestParam String client, @RequestBody Order order){
+        orderService.save(order);
+        clientService.addOrderToClient(client, order);
     }
 }

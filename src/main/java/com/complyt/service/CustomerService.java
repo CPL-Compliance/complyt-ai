@@ -1,6 +1,6 @@
 package com.complyt.service;
 
-import com.complyt.entity.Customer;
+import com.complyt.model.Customer;
 import com.complyt.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

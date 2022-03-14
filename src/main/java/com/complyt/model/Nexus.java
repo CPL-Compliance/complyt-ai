@@ -1,4 +1,4 @@
-package com.complyt.entity;
+package com.complyt.model;
 
 
 import java.util.List;
