@@ -12,6 +12,7 @@ public class CaliforniaEconomicNexus {
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private int threshold = 0;
+
     @Autowired
     private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
 
