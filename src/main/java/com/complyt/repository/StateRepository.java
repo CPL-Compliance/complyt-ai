@@ -1,12 +1,21 @@
 package com.complyt.repository;
 
 import com.complyt.model.State;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface StateRepository extends MongoRepository<State, String> {
-    List<State> findByName(String name);
+public class StateRepository {
+
+    @Autowired
+    MongoTemplate mongoTemplate;
+
+    List<State> findByName(String name){
+        return mongoTemplate.find(Query.query(Criteria.where("name").is(name)), State.class);
+    }
 }

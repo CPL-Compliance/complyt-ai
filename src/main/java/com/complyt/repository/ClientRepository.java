@@ -20,6 +20,10 @@ public class ClientRepository {
         return mongoTemplate.save(client);
     }
 
+    public Client getClient(String name){
+        return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), Client.class);
+    }
+
     public void addOrderToClient(String name, Order order){
         UpdateResult updateResult = mongoTemplate.updateFirst(Query.query(Criteria.where("name").is(name)), new Update().push("orders", order), Client.class);
     }

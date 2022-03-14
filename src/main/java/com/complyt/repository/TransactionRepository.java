@@ -1,10 +1,11 @@
 package com.complyt.repository;
 
-import com.complyt.model.State;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TransactionRepository extends MongoRepository<State, String> {
-
+public class TransactionRepository {
+    //@Autowired
+    //MongoTemplate mongoTemplate;
 }

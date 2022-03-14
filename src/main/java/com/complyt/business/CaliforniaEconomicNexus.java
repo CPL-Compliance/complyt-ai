@@ -4,21 +4,21 @@ import com.complyt.dao.CaliforniaEconomicNexusDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class CaliforniaEconomicNexus {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     private int threshold = 0;
 
-    @Autowired
-    private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
+    //@Autowired
+    //private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
 
-    public CaliforniaEconomicNexus(CaliforniaEconomicNexusDao californiaEconomicNexusDao){
-        this.californiaEconomicNexusDao = californiaEconomicNexusDao;
-        threshold = californiaEconomicNexusDao.getThreshold();
+    public CaliforniaEconomicNexus(/*CaliforniaEconomicNexusDao californiaEconomicNexusDao*/){
+        //this.californiaEconomicNexusDao = californiaEconomicNexusDao;
+        //threshold = californiaEconomicNexusDao.getThreshold();
     }
 
     public boolean isValueExceeds(int value){

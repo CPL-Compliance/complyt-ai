@@ -49,13 +49,17 @@ public class ComplytController {
             orderService.save(client.getOrders());
         }
 
-
         return clientService.save(client);
     }
 
     @GetMapping("/getCustomerByName")
     public List<Customer> getCustomerByName(@RequestParam String name){
         return customerService.getCustomerByName(name);
+    }
+
+    @GetMapping("/getClientByName")
+    public Client getClientByName(@RequestParam String name){
+        return clientService.getClient(name);
     }
 
     @PutMapping("/addOrderToClient")

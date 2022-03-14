@@ -1,6 +1,5 @@
 package com.complyt.service;
 
-import com.complyt.model.Client;
 import com.complyt.model.Order;
 import com.complyt.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
