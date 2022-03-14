@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-//@EnableMongoRepositories("com.complyt.repository")
 public class ComplytApplication implements CommandLineRunner {
 
 	@Bean
