@@ -18,6 +18,14 @@ public class CustomerRepository {
         return mongoTemplate.find(Query.query(Criteria.where("name").is(name)), Customer.class);
     }
 
+    public Customer findOneByName(String name){
+        return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), Customer.class);
+    }
+
+    public List<Customer> getAllCustomers(){
+        return mongoTemplate.findAll(Customer.class);
+    }
+
     public Customer save(Customer customer){
         return mongoTemplate.save(customer);
     }

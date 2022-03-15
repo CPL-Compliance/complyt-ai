@@ -23,4 +23,16 @@ public class CustomerService {
     public List<Customer> getCustomerByName(String name) {
         return customerRepository.findByName(name);
     }
+
+    public List<Customer> getAllCustomers(){
+        return customerRepository.getAllCustomers();
+    }
+
+    public Customer save(Customer customer) {
+        if(customer == null) {
+            return null;
+        }
+
+        return customerRepository.save(customer);
+    }
 }

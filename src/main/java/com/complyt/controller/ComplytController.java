@@ -62,9 +62,20 @@ public class ComplytController {
         return clientService.getClient(name);
     }
 
-    @PutMapping("/addOrderToClient")
+    @PostMapping("/addOrderToClient")
     public void addOrderToClient(@RequestParam String client, @RequestBody Order order){
+        customerService.save(order.getCustomer());
         orderService.save(order);
         clientService.addOrderToClient(client, order);
+    }
+
+    @GetMapping("/getOrder")
+    public Order addOrderToClient(@RequestParam String orderId){
+        return orderService.getOrderById(orderId);
+    }
+
+    @GetMapping("/getAllCustomers")
+    public List<Customer> getAllCustomers(){
+        return customerService.getAllCustomers();
     }
 }

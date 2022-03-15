@@ -1,13 +1,16 @@
 package com.complyt.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "order")
 public class Order {
     @Id
     private String id;
-    private String customer;
+
+    @DBRef
+    private Customer customer;
     private String type;
     private int units;
     private int price;
@@ -16,7 +19,7 @@ public class Order {
         return id;
     }
 
-    public String getCustomer() {
+    public Customer getCustomer() {
         return customer;
     }
 
@@ -32,7 +35,7 @@ public class Order {
         return price;
     }
 
-    public Order(String customer, String type, int units, int price) {
+    public Order(Customer customer, String type, int units, int price) {
         this.customer = customer;
         this.type = type;
         this.units = units;
