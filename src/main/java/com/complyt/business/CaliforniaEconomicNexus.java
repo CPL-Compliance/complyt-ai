@@ -13,12 +13,12 @@ public class CaliforniaEconomicNexus {
 
     private int threshold = 0;
 
-    //@Autowired
-    //private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
+    @Autowired
+    private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
 
-    public CaliforniaEconomicNexus(/*CaliforniaEconomicNexusDao californiaEconomicNexusDao*/){
-        //this.californiaEconomicNexusDao = californiaEconomicNexusDao;
-        //threshold = californiaEconomicNexusDao.getThreshold();
+    public CaliforniaEconomicNexus(CaliforniaEconomicNexusDao californiaEconomicNexusDao){
+        this.californiaEconomicNexusDao = californiaEconomicNexusDao;
+        threshold = californiaEconomicNexusDao.getThreshold();
     }
 
     public boolean isValueExceeds(int value){

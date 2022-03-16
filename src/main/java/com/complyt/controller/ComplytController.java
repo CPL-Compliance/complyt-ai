@@ -3,10 +3,8 @@ package com.complyt.controller;
 import com.complyt.model.Client;
 import com.complyt.model.Customer;
 import com.complyt.model.Order;
-import com.complyt.service.ClientService;
-import com.complyt.service.CustomerService;
-import com.complyt.service.OrderService;
-import com.complyt.service.SalesTaxService;
+import com.complyt.model.State;
+import com.complyt.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,9 @@ public class ComplytController {
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    StateService stateService;
 
     @GetMapping("/getSalesTax")
     public String getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
@@ -77,5 +78,10 @@ public class ComplytController {
     @GetMapping("/getAllCustomers")
     public List<Customer> getAllCustomers(){
         return customerService.getAllCustomers();
+    }
+
+    @GetMapping("/getState")
+    public State getState(@RequestParam String name){
+        return stateService.getState(name);
     }
 }

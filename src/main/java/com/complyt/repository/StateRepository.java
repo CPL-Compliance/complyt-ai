@@ -15,7 +15,7 @@ public class StateRepository {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    List<State> findByName(String name){
-        return mongoTemplate.find(Query.query(Criteria.where("name").is(name)), State.class);
+    public State findByName(String name){
+        return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), State.class);
     }
 }
