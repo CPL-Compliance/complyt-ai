@@ -9,9 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -29,12 +26,13 @@ public class StateServiceTest {
 
     @Test
     public void getState_ReturnedCalifornia_SearchingForCalifornia() {
-        String stateName = "California";
-        when(stateMock.getName()).thenReturn(stateName);
-        when(stateRepositoryMock.findByName(stateName)).thenReturn(stateMock);
+        String expectedStateName = "California";
+        String actualStateName = "California";
+        when(stateMock.getName()).thenReturn(actualStateName);
+        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
 
-        State state = stateService.getState(stateName);
+        State state = stateService.getState(actualStateName);
 
-        assertEquals(stateName, state.getName());
+        assertEquals(expectedStateName, state.getName());
     }
 }
