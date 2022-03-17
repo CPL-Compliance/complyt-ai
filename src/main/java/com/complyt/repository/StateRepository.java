@@ -1,6 +1,7 @@
 package com.complyt.repository;
 
 import com.complyt.model.State;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Locale;
 
 @Repository
 public class StateRepository {
@@ -15,7 +17,10 @@ public class StateRepository {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    public State findByName(String name){
-        return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), State.class);
+    public State findByName(@NotNull String name){
+        Query query = Query.query(Criteria.where("name").regex(name, "i"));
+        State state = mongoTemplate.findOne(query, State.class);
+
+        return state;
     }
 }

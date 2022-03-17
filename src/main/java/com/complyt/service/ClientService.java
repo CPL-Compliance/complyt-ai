@@ -20,7 +20,7 @@ public class ClientService {
     }
 
     public Client getClient(String name){
-        return clientRepository.getClient(name);
+        return clientRepository.findOne(name);
     }
 
     public void addOrderToClient(String name, Order order){

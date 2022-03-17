@@ -1,6 +1,7 @@
 package com.complyt.repository;
 
 import com.complyt.model.Customer;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,11 +15,11 @@ public class CustomerRepository {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    public List<Customer> findByName(String name){
+    public List<Customer> findByName(@NotNull String name){
         return mongoTemplate.find(Query.query(Criteria.where("name").is(name)), Customer.class);
     }
 
-    public Customer findOneByName(String name){
+    public Customer findOneByName(@NotNull String name){
         return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), Customer.class);
     }
 
@@ -26,7 +27,7 @@ public class CustomerRepository {
         return mongoTemplate.findAll(Customer.class);
     }
 
-    public Customer save(Customer customer){
+    public Customer save(@NotNull Customer customer){
         return mongoTemplate.save(customer);
     }
 }

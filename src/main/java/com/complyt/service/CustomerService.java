@@ -17,7 +17,9 @@ public class CustomerService {
     CustomerRepository customerRepository;
 
     public Customer createCustomer(Customer customer) {
-        return customerRepository.save(customer);
+        Customer customerResult = customerRepository.save(customer);
+
+        return customerResult;
     }
 
     public List<Customer> getCustomerByName(String name) {
@@ -25,7 +27,9 @@ public class CustomerService {
     }
 
     public List<Customer> getAllCustomers(){
-        return customerRepository.getAllCustomers();
+        List<Customer> customers = customerRepository.getAllCustomers();
+
+        return customers;
     }
 
     public Customer save(Customer customer) {

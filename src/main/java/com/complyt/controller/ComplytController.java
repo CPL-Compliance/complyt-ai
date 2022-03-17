@@ -5,21 +5,25 @@ import com.complyt.model.Customer;
 import com.complyt.model.Order;
 import com.complyt.model.State;
 import com.complyt.service.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1")
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ComplytController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    SalesTaxService salesTaxByAddressService;
+    SalesTaxService salesTaxService;
 
     @Autowired
     CustomerService customerService;
@@ -33,19 +37,19 @@ public class ComplytController {
     @Autowired
     StateService stateService;
 
-    @GetMapping("/getSalesTax")
+    @GetMapping("/salesTax")
     public String getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
                               @RequestParam String state) {
-        return salesTaxByAddressService.getSalesTax(zip, address, city, state);
+        return salesTaxService.getSalesTax(zip, address, city, state);
     }
 
-    @PostMapping("/createCustomer")
+    @PostMapping("/customer")
     public Customer createCustomer(@RequestBody Customer customer){
         return customerService.createCustomer(customer);
     }
 
-    @PostMapping("/createClient")
-    public Client createClient(@RequestBody Client client){
+    @PostMapping("/client")
+    public Client createClient(@RequestBody @NotNull Client client){
         if(client.getOrders() != null && client.getOrders().size() > 0){
             orderService.save(client.getOrders());
         }
@@ -53,34 +57,34 @@ public class ComplytController {
         return clientService.save(client);
     }
 
-    @GetMapping("/getCustomerByName")
+    @GetMapping("/customer")
     public List<Customer> getCustomerByName(@RequestParam String name){
         return customerService.getCustomerByName(name);
     }
 
-    @GetMapping("/getClientByName")
+    @GetMapping("/client")
     public Client getClientByName(@RequestParam String name){
         return clientService.getClient(name);
     }
 
-    @PostMapping("/addOrderToClient")
-    public void addOrderToClient(@RequestParam String client, @RequestBody Order order){
+    @PostMapping("/order/addToClient")
+    public void addOrderToClient(@RequestParam String client, @RequestBody @NotNull Order order){
         customerService.save(order.getCustomer());
         orderService.save(order);
         clientService.addOrderToClient(client, order);
     }
 
-    @GetMapping("/getOrder")
+    @GetMapping("/Order")
     public Order addOrderToClient(@RequestParam String orderId){
         return orderService.getOrderById(orderId);
     }
 
-    @GetMapping("/getAllCustomers")
+    @GetMapping("/customer/all")
     public List<Customer> getAllCustomers(){
         return customerService.getAllCustomers();
     }
 
-    @GetMapping("/getState")
+    @GetMapping("/state")
     public State getState(@RequestParam String name){
         return stateService.getState(name);
     }
