@@ -1,10 +1,10 @@
-package com.complyt.controller;
+package com.complyt.v1.controller;
 
-import com.complyt.model.Client;
-import com.complyt.model.Customer;
-import com.complyt.model.Order;
-import com.complyt.model.State;
+import com.complyt.domain.Client;
+import com.complyt.domain.Customer;
+import com.complyt.domain.Order;
 import com.complyt.service.*;
+import com.complyt.v1.model.StateDto;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public class ComplytController {
     }
 
     @GetMapping("/state")
-    public State getState(@RequestParam String name){
+    public StateDto getState(@RequestParam String name){
         return stateService.getState(name);
     }
 }

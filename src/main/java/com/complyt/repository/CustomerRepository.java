@@ -1,6 +1,6 @@
 package com.complyt.repository;
 
-import com.complyt.model.Customer;
+import com.complyt.domain.Customer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

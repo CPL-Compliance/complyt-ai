@@ -1,21 +1,21 @@
 package com.complyt.service;
 
-import com.complyt.model.State;
+import com.complyt.domain.State;
 import com.complyt.repository.StateRepository;
+import com.complyt.v1.mapper.StateMapper;
+import com.complyt.v1.model.StateDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
-import java.util.Locale;
 
 @Service
 public class StateService {
-
     @Autowired
-    StateRepository stateRepository;
+    private StateRepository stateRepository;
 
-    public State getState(String name) {
-        return stateRepository.findByName(name);
+    public StateDto getState(String name) {
+        State state = stateRepository.findByName(name);
+        StateDto stateDto = StateMapper.INSTANCE.stateToStateDto(state);
+
+        return stateDto;
     }
 }

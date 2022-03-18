@@ -1,4 +1,4 @@
-package com.complyt.model;
+package com.complyt.domain;
 
 
 import java.util.List;

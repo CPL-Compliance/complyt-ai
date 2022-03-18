@@ -1,7 +1,7 @@
 package com.complyt.repository;
 
-import com.complyt.model.Client;
-import com.complyt.model.Order;
+import com.complyt.domain.Client;
+import com.complyt.domain.Order;
 import com.mongodb.client.result.UpdateResult;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
-import java.util.Locale;
 
 @Repository
 public class ClientRepository {

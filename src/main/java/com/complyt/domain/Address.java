@@ -1,4 +1,4 @@
-package com.complyt.model;
+package com.complyt.domain;
 
 public class Address {
     private String city;

@@ -1,6 +1,6 @@
 package com.complyt.service;
 
-import com.complyt.model.Order;
+import com.complyt.domain.Order;
 import com.complyt.repository.OrderRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,15 +1,12 @@
 package com.complyt.repository;
 
-import com.complyt.model.State;
+import com.complyt.domain.State;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Locale;
 
 @Repository
 public class StateRepository {

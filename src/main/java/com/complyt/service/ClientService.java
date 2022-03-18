@@ -1,7 +1,7 @@
 package com.complyt.service;
 
-import com.complyt.model.Client;
-import com.complyt.model.Order;
+import com.complyt.domain.Client;
+import com.complyt.domain.Order;
 import com.complyt.repository.ClientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
