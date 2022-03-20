@@ -34,6 +34,6 @@ public class StateServiceTest {
 
         StateDto stateDto = stateService.getState(actualStateName);
 
-        //assertEquals(expectedStateName, stateDto.getName());
+        assertEquals(expectedStateName, stateDto.getName());
     }
 }
