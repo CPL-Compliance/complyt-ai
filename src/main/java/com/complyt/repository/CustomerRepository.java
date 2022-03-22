@@ -16,11 +16,11 @@ public class CustomerRepository {
     MongoTemplate mongoTemplate;
 
     public List<Customer> findByName(@NotNull String name){
-        return mongoTemplate.find(Query.query(Criteria.where("name").is(name)), Customer.class);
+        return mongoTemplate.find(Query.query(Criteria.where("name").is("^" + name)), Customer.class);
     }
 
     public Customer findOneByName(@NotNull String name){
-        return mongoTemplate.findOne(Query.query(Criteria.where("name").is(name)), Customer.class);
+        return mongoTemplate.findOne(Query.query(Criteria.where("name").is("^" + name)), Customer.class);
     }
 
     public List<Customer> getAllCustomers(){

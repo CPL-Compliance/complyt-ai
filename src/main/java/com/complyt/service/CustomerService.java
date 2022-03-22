@@ -26,14 +26,14 @@ public class CustomerService {
         return customerRepository.findByName(name);
     }
 
-    public List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers() {
         List<Customer> customers = customerRepository.getAllCustomers();
 
         return customers;
     }
 
     public Customer save(Customer customer) {
-        if(customer == null) {
+        if (customer == null) {
             return null;
         }
 

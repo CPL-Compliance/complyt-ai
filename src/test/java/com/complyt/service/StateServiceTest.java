@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -27,6 +28,19 @@ public class StateServiceTest {
 
     @Test
     public void getState_ReturnedCalifornia_SearchingForCalifornia() {
+        String expectedStateName = "California";
+        String actualStateName = "California";
+        when(stateMock.getName()).thenReturn(actualStateName);
+        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
+
+        StateDto stateDto = stateService.getState(actualStateName);
+
+        assertNotNull(stateDto);
+        assertEquals(expectedStateName, stateDto.getName());
+    }
+
+    @Test
+    public void getState_ReturnedEmpty_SearchingForNotExistingState() {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);

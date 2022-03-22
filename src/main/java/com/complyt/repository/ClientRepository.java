@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ClientRepository {
 
@@ -24,14 +26,14 @@ public class ClientRepository {
     }
 
     public Client findOne(@NotNull String name){
-        Query query = Query.query(Criteria.where("name").regex(name, "i"));
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
         Client client = mongoTemplate.findOne(query, Client.class);
 
         return client;
     }
 
     public void addOrderToClient(@NotNull String name, @NotNull Order order){
-        Query query = Query.query(Criteria.where("name").regex(name, "i"));
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
         Update update = new Update().push("orders", order);
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Client.class);
     }
