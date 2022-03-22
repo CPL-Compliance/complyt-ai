@@ -19,7 +19,7 @@ class StateMapperTest {
         // Given
         State state = new State( 0.3f, "", "", "", null );
 
-        // Ehen
+        // When
         StateDto stateDto = StateMapper.INSTANCE.stateToStateDto( state );
 
         // Then

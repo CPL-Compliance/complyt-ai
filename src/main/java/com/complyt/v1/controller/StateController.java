@@ -1,7 +1,6 @@
 package com.complyt.v1.controller;
 
 import com.complyt.facade.StateFacade;
-import com.complyt.service.StateService;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
 import com.complyt.v1.model.StateDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class StateController {
     @GetMapping("")
     public StateDto getState(@RequestParam String name) {
         try {
-            return stateFacade.getState(name);
+            return stateFacade.getStateByName(name);
         } catch (ResourceNotFoundException exc) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, name + " state Not Found", exc);
         }

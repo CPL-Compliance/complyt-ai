@@ -12,7 +12,7 @@ public class StateService {
     @Autowired
     private StateRepository stateRepository;
 
-    public StateDto getState(String name) {
+    public StateDto getStateByName(String name) {
         State state = stateRepository.findByName(name);
         StateDto stateDto = StateMapper.INSTANCE.stateToStateDto(state);
 

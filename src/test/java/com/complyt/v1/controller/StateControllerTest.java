@@ -1,28 +1,32 @@
 package com.complyt.v1.controller;
 
 import com.complyt.facade.StateFacade;
-import com.complyt.service.StateService;
 import com.complyt.v1.RestResponseEntityExceptionHandler;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
+import com.complyt.v1.model.StateDto;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StateControllerTest {
 
     @InjectMocks
@@ -33,20 +37,48 @@ class StateControllerTest {
 
     MockMvc mockMvc;
 
-    @BeforeEach
+    private static final String NAME_PARAM = "name";
+
+    @BeforeAll
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(stateController)
                 .setControllerAdvice(new RestResponseEntityExceptionHandler())
                 .build();
     }
 
     @Test
-    void getState_lala_throws_exception_is_not_found() throws Exception {
-        when(stateFacade.getState(anyString())).thenThrow(ResourceNotFoundException.class);
+    void getState_StateNotExists_ThrowsExceptionIsNotFound() throws Exception {
+        // Given
+        String stateNameNotExists = "Israel";
+        when(stateFacade.getStateByName(anyString())).thenThrow(ResourceNotFoundException.class);
 
-        mockMvc.perform(get(StateController.BASE_URL).param("name", "lala")
-                .contentType(MediaType.APPLICATION_JSON))
+        // When
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL).
+                param(NAME_PARAM, stateNameNotExists).
+                contentType(MediaType.APPLICATION_JSON);
+
+        //Then
+        mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getState_StateExists_StatusIsOkAndEquals() throws Exception {
+        // Given
+        String stateName = "California";
+        double salesTax = 0.6;
+        StateDto stateDto = new StateDto(stateName, salesTax);
+        when(stateFacade.getStateByName(stateName)).thenReturn(stateDto);
+
+        // When
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL)
+                .param(NAME_PARAM, stateName)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // Then
+        mockMvc.perform(mockHttpServletRequestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", equalTo(stateName)))
+                .andExpect(jsonPath("$.salesTaxRate", equalTo(salesTax)));
     }
 }

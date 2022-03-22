@@ -33,7 +33,7 @@ public class StateServiceTest {
         when(stateMock.getName()).thenReturn(actualStateName);
         when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
 
-        StateDto stateDto = stateService.getState(actualStateName);
+        StateDto stateDto = stateService.getStateByName(actualStateName);
 
         assertNotNull(stateDto);
         assertEquals(expectedStateName, stateDto.getName());
@@ -46,7 +46,7 @@ public class StateServiceTest {
         when(stateMock.getName()).thenReturn(actualStateName);
         when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
 
-        StateDto stateDto = stateService.getState(actualStateName);
+        StateDto stateDto = stateService.getStateByName(actualStateName);
 
         assertEquals(expectedStateName, stateDto.getName());
     }

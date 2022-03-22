@@ -11,7 +11,7 @@ public class StateFacade {
     @Autowired
     StateService stateService;
 
-    public StateDto getState(String name) {
-        return stateService.getState(name);
+    public StateDto getStateByName(String name) {
+        return stateService.getStateByName(name);
     }
 }
