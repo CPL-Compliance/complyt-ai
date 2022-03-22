@@ -9,15 +9,13 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface StateMapper {
 
-    StateMapper INSTANCE = Mappers.getMapper( StateMapper.class );
+    StateMapper INSTANCE = Mappers.getMapper(StateMapper.class);
 
     @Mapping(source = "salesTaxRate", target = "salesTaxRate")
     @Mapping(source = "name", target = "name")
     StateDto stateToStateDto(State state);
 
-//    @Mappings({
-//            @Mapping(target="name", source="stateDto.name"),
-//            @Mapping(target="salesTaxRate", source="stateDto.salesTaxRate")
-//    })
-//    State employeeDTOtoEmployee(StateDto stateDto);
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "salesTaxRate", source = "salesTaxRate")
+    State stateDtoToState(StateDto stateDto);
 }

@@ -13,10 +13,10 @@ public interface ClientMapper {
     @Mapping(source = "address", target = "address")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "orders", target = "orders")
-    Client clientToClientDto(ClientDto clientDto);
+    Client clientDtoToClient(ClientDto clientDto);
 
     @Mapping(source = "address", target = "address")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "orders", target = "orders")
-    ClientDto clientDtoToClient(Client client);
+    ClientDto clientToClientDto(Client client);
 }

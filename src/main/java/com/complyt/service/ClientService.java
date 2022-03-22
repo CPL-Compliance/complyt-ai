@@ -18,15 +18,15 @@ public class ClientService {
     ClientRepository clientRepository;
 
     public ClientDto save(ClientDto clientDto) {
-        Client client = ClientMapper.INSTANCE.clientToClientDto(clientDto);
+        Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Client result = clientRepository.save(client);
 
-        return ClientMapper.INSTANCE.clientDtoToClient(client);
+        return ClientMapper.INSTANCE.clientToClientDto(client);
     }
 
     public ClientDto getClient(String name) {
         Client client = clientRepository.findOne(name);
-        ClientDto clientDto = ClientMapper.INSTANCE.clientDtoToClient(client);
+        ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);
 
         return clientDto;
     }
