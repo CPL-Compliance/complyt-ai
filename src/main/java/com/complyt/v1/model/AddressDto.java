@@ -1,11 +1,11 @@
-package com.complyt.domain;
+package com.complyt.v1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class Address {
+public class AddressDto {
     private String city;
     private String country;
     private String county;

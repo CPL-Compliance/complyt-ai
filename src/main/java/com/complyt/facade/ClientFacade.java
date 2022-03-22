@@ -1,8 +1,8 @@
 package com.complyt.facade;
 
-import com.complyt.domain.Client;
 import com.complyt.service.ClientService;
 import com.complyt.service.OrderService;
+import com.complyt.v1.model.ClientDto;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,15 +16,15 @@ public class ClientFacade {
     @Autowired
     private ClientService clientService;
 
-    public Client createClient(@NotNull Client client){
-        if(client.getOrders() != null && client.getOrders().size() > 0){
-            orderService.save(client.getOrders());
+    public ClientDto createClient(@NotNull ClientDto clientDto) {
+        if (clientDto.getOrders() != null && clientDto.getOrders().size() > 0) {
+            orderService.save(clientDto.getOrders());
         }
 
-        return clientService.save(client);
+        return clientService.save(clientDto);
     }
 
-    public Client getClient(String name){
+    public ClientDto getClient(String name) {
         return clientService.getClient(name);
     }
 }

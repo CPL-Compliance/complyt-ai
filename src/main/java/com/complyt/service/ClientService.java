@@ -3,6 +3,8 @@ package com.complyt.service;
 import com.complyt.domain.Client;
 import com.complyt.domain.Order;
 import com.complyt.repository.ClientRepository;
+import com.complyt.v1.mapper.ClientMapper;
+import com.complyt.v1.model.ClientDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +17,21 @@ public class ClientService {
     @Autowired
     ClientRepository clientRepository;
 
-    public Client save(Client client) {
-        return clientRepository.save(client);
+    public ClientDto save(ClientDto clientDto) {
+        Client client = ClientMapper.INSTANCE.clientToClientDto(clientDto);
+        Client result = clientRepository.save(client);
+
+        return ClientMapper.INSTANCE.clientDtoToClient(client);
     }
 
-    public Client getClient(String name){
-        return clientRepository.findOne(name);
+    public ClientDto getClient(String name) {
+        Client client = clientRepository.findOne(name);
+        ClientDto clientDto = ClientMapper.INSTANCE.clientDtoToClient(client);
+
+        return clientDto;
     }
 
-    public void addOrderToClient(String name, Order order){
+    public void addOrderToClient(String name, Order order) {
         clientRepository.addOrderToClient(name, order);
     }
 }

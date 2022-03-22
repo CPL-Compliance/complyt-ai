@@ -1,7 +1,7 @@
 package com.complyt.v1.controller;
 
-import com.complyt.domain.Client;
 import com.complyt.facade.ClientFacade;
+import com.complyt.v1.model.ClientDto;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +21,12 @@ public class ClientController {
     ClientFacade clientFacade;
 
     @PostMapping("")
-    public Client createClient(@RequestBody @NotNull Client client){
-        return clientFacade.createClient(client);
+    public ClientDto createClient(@RequestBody @NotNull ClientDto clientDto){
+        return clientFacade.createClient(clientDto);
     }
 
     @GetMapping("")
-    public Client getClientByName(@RequestParam String name){
+    public ClientDto getClientByName(@RequestParam String name){
         return clientFacade.getClient(name);
     }
 
