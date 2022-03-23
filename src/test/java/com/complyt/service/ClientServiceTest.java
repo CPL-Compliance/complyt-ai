@@ -2,9 +2,7 @@ package com.complyt.service;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Client;
-import com.complyt.domain.State;
 import com.complyt.repository.ClientRepository;
-import com.complyt.repository.StateRepository;
 import com.complyt.v1.model.ClientDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)

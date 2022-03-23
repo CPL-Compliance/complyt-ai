@@ -11,11 +11,6 @@ public interface StateMapper {
 
     StateMapper INSTANCE = Mappers.getMapper(StateMapper.class);
 
-    @Mapping(source = "salesTaxRate", target = "salesTaxRate")
-    @Mapping(source = "name", target = "name")
     StateDto stateToStateDto(State state);
-
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "salesTaxRate", source = "salesTaxRate")
     State stateDtoToState(StateDto stateDto);
 }

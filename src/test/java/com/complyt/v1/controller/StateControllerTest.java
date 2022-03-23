@@ -1,5 +1,6 @@
 package com.complyt.v1.controller;
 
+import com.complyt.domain.Nexus;
 import com.complyt.facade.StateFacade;
 import com.complyt.v1.RestResponseEntityExceptionHandler;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
@@ -16,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -65,20 +68,24 @@ class StateControllerTest {
     @Test
     void getState_StateExists_StatusIsOkAndEquals() throws Exception {
         // Given
-        String stateName = "California";
-        double salesTax = 0.6;
-        StateDto stateDto = new StateDto(stateName, salesTax);
-        when(stateFacade.getStateByName(stateName)).thenReturn(stateDto);
+        double salesTaxRate = 0.6;
+        String abbreviation = "Abbreviation";
+        String code = "08";
+        String name = "California";
+        List<Nexus> nexuses = null;
+
+        StateDto stateDto = new StateDto(salesTaxRate, abbreviation, code, name, nexuses);
+        when(stateFacade.getStateByName(name)).thenReturn(stateDto);
 
         // When
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL)
-                .param(NAME_PARAM, stateName)
+                .param(NAME_PARAM, name)
                 .contentType(MediaType.APPLICATION_JSON);
 
         // Then
         mockMvc.perform(mockHttpServletRequestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", equalTo(stateName)))
-                .andExpect(jsonPath("$.salesTaxRate", equalTo(salesTax)));
+                .andExpect(jsonPath("$.name", equalTo(name)))
+                .andExpect(jsonPath("$.salesTaxRate", equalTo(salesTaxRate)));
     }
 }
