@@ -18,20 +18,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class StateServiceTest {
     @InjectMocks
-    public StateService stateService;
+    StateService stateService;
 
     @Mock
-    public StateRepository stateRepositoryMock;
+    StateRepository stateRepositoryMock;
 
     @Mock
-    public State stateMock;
+    State stateMock;
 
     @Test
-    public void getState_ReturnedCalifornia_SearchingForCalifornia() {
+    void getState_ReturnedCalifornia_SearchingForCalifornia() {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findStateByName(expectedStateName)).thenReturn(stateMock);
 
         StateDto stateDto = stateService.getStateByName(actualStateName);
 
@@ -40,11 +40,11 @@ public class StateServiceTest {
     }
 
     @Test
-    public void getState_ReturnedEmpty_SearchingForNotExistingState() {
+    void getState_ReturnedEmpty_SearchingForNotExistingState() {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findStateByName(expectedStateName)).thenReturn(stateMock);
 
         StateDto stateDto = stateService.getStateByName(actualStateName);
 

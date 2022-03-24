@@ -14,8 +14,8 @@ public class StateRepository {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    public State findByName(@NotNull String name){
-        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+    public State findStateByName(@NotNull String stateName) {
+        Query query = Query.query(Criteria.where("name").regex("^" + stateName, "i"));
         State state = mongoTemplate.findOne(query, State.class);
 
         return state;

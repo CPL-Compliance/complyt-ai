@@ -1,23 +1,89 @@
 package com.complyt.repository;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@AutoConfigureDataMongo
+import com.complyt.domain.Nexus;
+import com.complyt.domain.State;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class StateRepositoryTest {
 
-    @Autowired
-    StateRepository stateRepository;
+    @InjectMocks
+    private StateRepository stateRepository;
+
+    @Mock
+    private MongoTemplate mongoTemplate;
+
+    private State state;
+
+    @BeforeEach
+    public void setUp() {
+        String id = UUID.randomUUID().toString();
+        double salesTaxRate = 0.6;
+        String abbreviation = "CA";
+        String code = "08";
+        String name = "California";
+        List<Nexus> nexuses = null;
+
+        state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
+    }
 
     @Test
-    public void testFindByName(){
-        //
-        
+    public void findByName_NameIsCalifornia_ReturnsCaliforniaState() {
+        // Given
+        String name = "California";
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+
+        // When
+        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
+        State actualState = stateRepository.findStateByName(name);
+
+        // Then
+        assertEquals(state, actualState);
+    }
+
+    @Test
+    public void findByName_NameIscalifornia_ReturnsCaliforniaState() {
+        // Given
+        String name = "california";
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+
+        // When
+        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
+        State actualState = stateRepository.findStateByName(name);
+
+        // Then
+        assertEquals(state, actualState);
+    }
+
+    @Test
+    public void findByName_NameDoesntExistInDB_ExpectsNull() {
+        // Given
+        String name = "Stam";
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+
+        // When
+        when(mongoTemplate.findOne(query, State.class)).thenReturn(null);
+        State actualState = stateRepository.findStateByName(name);
+
+        // Then
+        assertNull(actualState);
     }
 }

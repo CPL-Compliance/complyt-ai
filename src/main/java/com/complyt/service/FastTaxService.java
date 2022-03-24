@@ -12,7 +12,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 
 @Service
-@Primary
 public class FastTaxService implements SalesTaxService {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 

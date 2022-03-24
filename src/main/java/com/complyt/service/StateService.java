@@ -13,7 +13,7 @@ public class StateService {
     private StateRepository stateRepository;
 
     public StateDto getStateByName(String name) {
-        State state = stateRepository.findByName(name);
+        State state = stateRepository.findStateByName(name);
         StateDto stateDto = StateMapper.INSTANCE.stateToStateDto(state);
 
         return stateDto;
