@@ -4,7 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Client;
 import com.complyt.repository.ClientRepository;
 import com.complyt.v1.model.ClientDto;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ class ClientServiceTest {
 
     private ClientDto clientDto;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
         String id = UUID.randomUUID().toString();
         String name = "Client";

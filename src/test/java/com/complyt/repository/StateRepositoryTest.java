@@ -3,8 +3,9 @@ package com.complyt.repository;
 
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StateRepositoryTest {
 
     @InjectMocks
@@ -33,7 +35,7 @@ public class StateRepositoryTest {
 
     private State state;
 
-    @BeforeEach
+    @BeforeAll
     public void setUp() {
         String id = UUID.randomUUID().toString();
         double salesTaxRate = 0.6;
