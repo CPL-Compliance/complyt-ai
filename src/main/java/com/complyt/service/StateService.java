@@ -4,12 +4,12 @@ import com.complyt.domain.State;
 import com.complyt.repository.StateRepository;
 import com.complyt.v1.mapper.StateMapper;
 import com.complyt.v1.model.StateDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class StateService {
-    @Autowired
     private StateRepository stateRepository;
 
     public StateDto getStateByName(String name) {

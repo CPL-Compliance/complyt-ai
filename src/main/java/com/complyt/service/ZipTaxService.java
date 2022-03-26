@@ -1,8 +1,6 @@
 package com.complyt.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,11 +12,11 @@ import java.util.List;
 
 @Service
 @Primary
+@AllArgsConstructor
 public class ZipTaxService implements SalesTaxService {
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    //Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
     private RestTemplate restTemplate;
 
     @Override

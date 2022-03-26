@@ -2,21 +2,21 @@ package com.complyt.v1.controller;
 
 import com.complyt.domain.Customer;
 import com.complyt.facade.CustomerFacade;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(CustomerController.BASE_URL)
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class CustomerController {
     public static final String BASE_URL = "/v1/customer";
 
-    @Autowired
-    CustomerFacade customerfacade;
+    private final CustomerFacade customerfacade;
 
     @PostMapping("")
     public Customer createCustomer(@RequestBody Customer customer){

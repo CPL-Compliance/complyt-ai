@@ -2,19 +2,17 @@ package com.complyt.service;
 
 import com.complyt.domain.Customer;
 import com.complyt.repository.CustomerRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class CustomerService {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    //private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     public Customer createCustomer(Customer customer) {
         Customer customerResult = customerRepository.save(customer);

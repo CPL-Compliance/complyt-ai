@@ -5,17 +5,15 @@ import com.complyt.domain.Order;
 import com.complyt.repository.ClientRepository;
 import com.complyt.v1.mapper.ClientMapper;
 import com.complyt.v1.model.ClientDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class ClientService {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    //private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    ClientRepository clientRepository;
+    private ClientRepository clientRepository;
 
     public ClientDto save(ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);

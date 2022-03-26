@@ -1,9 +1,6 @@
 package com.complyt.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,10 +9,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 
 @Service
+@AllArgsConstructor
 public class FastTaxService implements SalesTaxService {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    //private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
     private RestTemplate restTemplate;
 
     @Override
@@ -35,7 +32,7 @@ public class FastTaxService implements SalesTaxService {
                 .queryParam("licensekey", "WS19-KRF3-JGD1")
                 .build().toUriString();
 
-        logger.info(uri);
+        //logger.info(uri);
         ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 
         return responseEntity.getBody();

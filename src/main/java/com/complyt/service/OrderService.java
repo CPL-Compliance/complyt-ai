@@ -2,16 +2,15 @@ package com.complyt.service;
 
 import com.complyt.domain.Order;
 import com.complyt.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class OrderService {
-
-    @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
     public void save(List<Order> orders){
         orderRepository.insertAll(orders);
