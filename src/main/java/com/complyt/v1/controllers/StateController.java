@@ -25,9 +25,8 @@ public class StateController {
     @GetMapping("")
     public StateDto getState(@RequestParam String name) {
         try {
-            StateDto stateDto = stateFacade.findByName(name);
 
-            return stateDto;
+            return stateFacade.findByName(name);
         } catch (ResourceNotFoundException exc) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, name + " state Not Found", exc);
         }

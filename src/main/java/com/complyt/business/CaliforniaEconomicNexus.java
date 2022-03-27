@@ -14,7 +14,7 @@ public class CaliforniaEconomicNexus {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    private int threshold = 0;
+    private int threshold;
 
     @Qualifier("CaliforniaEconomicNexusDao")
     @NonNull
@@ -26,8 +26,7 @@ public class CaliforniaEconomicNexus {
     }
 
     public boolean isValueExceeds(int value){
-        boolean isExceeds = value > threshold;
 
-        return isExceeds;
+        return value > threshold;
     }
 }

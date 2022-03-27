@@ -19,14 +19,13 @@ public class ClientServiceImpl implements ClientService {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Client result = clientRepository.save(client);
 
-        return ClientMapper.INSTANCE.clientToClientDto(client);
+        return ClientMapper.INSTANCE.clientToClientDto(result);
     }
 
     public ClientDto findByName(String name) {
         Client client = clientRepository.findOne(name);
-        ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);
 
-        return clientDto;
+        return ClientMapper.INSTANCE.clientToClientDto(client);
     }
 
     public void addOrderToClient(String name, Order order) {

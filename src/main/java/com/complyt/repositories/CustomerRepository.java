@@ -17,27 +17,23 @@ public class CustomerRepository {
 
     public List<Customer> findByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
-        List<Customer> customers = mongoTemplate.find(query, Customer.class);
 
-        return customers;
+        return mongoTemplate.find(query, Customer.class);
     }
 
     public Customer findOneByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").is("^" + name));
-        Customer customer = mongoTemplate.findOne(query, Customer.class);
 
-        return customer;
+        return mongoTemplate.findOne(query, Customer.class);
     }
 
     public List<Customer> getAllCustomers() {
-        List<Customer> customers =  mongoTemplate.findAll(Customer.class);
 
-        return customers;
+        return mongoTemplate.findAll(Customer.class);
     }
 
     public Customer save(@NonNull Customer customer) {
-        Customer returnedCustomer = mongoTemplate.save(customer);
 
-        return returnedCustomer;
+        return mongoTemplate.save(customer);
     }
 }

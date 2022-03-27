@@ -16,8 +16,7 @@ public class StateRepository {
 
     public State findStateByName(@NonNull String stateName) {
         Query query = Query.query(Criteria.where("name").regex("^" + stateName, "i"));
-        State state = mongoTemplate.findOne(query, State.class);
 
-        return state;
+        return mongoTemplate.findOne(query, State.class);
     }
 }

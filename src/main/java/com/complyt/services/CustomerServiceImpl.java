@@ -15,9 +15,8 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     public Customer createCustomer(Customer customer) {
-        Customer customerResult = customerRepository.save(customer);
 
-        return customerResult;
+        return customerRepository.save(customer);
     }
 
     public List<Customer> getCustomerByName(String name) {
@@ -25,9 +24,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public List<Customer> getAllCustomers() {
-        List<Customer> customers = customerRepository.getAllCustomers();
 
-        return customers;
+        return customerRepository.getAllCustomers();
     }
 
     public Customer save(Customer customer) {
