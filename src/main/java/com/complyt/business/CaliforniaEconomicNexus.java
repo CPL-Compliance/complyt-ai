@@ -12,21 +12,9 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class CaliforniaEconomicNexus {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    //private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    private int threshold;
-
-    @Qualifier("CaliforniaEconomicNexusDao")
+    @Qualifier("californiaEconomicNexusDao")
     @NonNull
     private CaliforniaEconomicNexusDao californiaEconomicNexusDao;
-
-    public CaliforniaEconomicNexus(CaliforniaEconomicNexusDao californiaEconomicNexusDao){
-        this.californiaEconomicNexusDao = californiaEconomicNexusDao;
-        threshold = californiaEconomicNexusDao.getThreshold();
-    }
-
-    public boolean isValueExceeds(int value){
-
-        return value > threshold;
-    }
 }

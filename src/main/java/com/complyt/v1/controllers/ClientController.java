@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -19,13 +20,12 @@ public class ClientController {
     private ClientFacade clientFacade;
 
     @PostMapping("")
-    public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto){
+    public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
         return clientFacade.createClient(clientDto);
     }
 
     @GetMapping("")
-    public ClientDto getClientByName(@RequestParam String name){
+    public ClientDto getClientByName(@RequestParam String name, Model model) {
         return clientFacade.findByName(name);
     }
-
 }
