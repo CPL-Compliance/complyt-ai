@@ -1,6 +1,6 @@
 package com.complyt.dao;
 
-import com.complyt.repository.StateRepository;
+import com.complyt.repositories.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

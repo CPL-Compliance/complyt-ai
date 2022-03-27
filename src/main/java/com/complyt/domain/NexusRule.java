@@ -1,27 +1,15 @@
 package com.complyt.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class NexusRule {
     private String type;
     private int value;
-
-    public String getType() {
-        return type;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public NexusRule(String type, int value) {
-        this.type = type;
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "NexusRule{" +
-                "type='" + type + '\'' +
-                ", value=" + value +
-                '}';
-    }
 }
