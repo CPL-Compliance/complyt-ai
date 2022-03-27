@@ -4,6 +4,7 @@ import com.complyt.facade.StateFacade;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
@@ -20,12 +21,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class StateController {
     public static final String BASE_URL = "/v1/state";
 
-    private final StateFacade stateFacade;
+    private StateFacade stateFacade;
 
     @GetMapping("")
     public StateDto getState(@RequestParam String name) {
         try {
-            return stateFacade.getStateByName(name);
+            StateDto stateDto = stateFacade.getStateByName(name);
+
+            return stateDto;
         } catch (ResourceNotFoundException exc) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, name + " state Not Found", exc);
         }

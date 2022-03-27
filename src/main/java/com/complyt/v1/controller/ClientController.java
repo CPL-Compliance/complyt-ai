@@ -16,7 +16,7 @@ public class ClientController {
     //private Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final String BASE_URL = "/v1/client";
 
-    private final ClientFacade clientFacade;
+    private ClientFacade clientFacade;
 
     @PostMapping("")
     public ClientDto createClient(@RequestBody @NotNull ClientDto clientDto){

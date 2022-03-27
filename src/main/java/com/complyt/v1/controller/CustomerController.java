@@ -16,7 +16,7 @@ import java.util.List;
 public class CustomerController {
     public static final String BASE_URL = "/v1/customer";
 
-    private final CustomerFacade customerfacade;
+    private CustomerFacade customerfacade;
 
     @PostMapping("")
     public Customer createCustomer(@RequestBody Customer customer){

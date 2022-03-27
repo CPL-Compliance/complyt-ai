@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SalesTaxController {
     public static final String BASE_URL = "/v1/salesTax";
 
-    private final SalesTaxFacade salesTaxFacade;
+    private SalesTaxFacade salesTaxFacade;
 
     @GetMapping("")
     public String getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
