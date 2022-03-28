@@ -24,4 +24,8 @@ public class StateRepository {
     public State save(@NonNull State state) {
         return mongoTemplate.save(state);
     }
+
+    public State findById(String id) {
+        return mongoTemplate.findById(id, State.class);
+    }
 }

@@ -16,6 +16,7 @@ public class StateServiceImpl implements StateService {
     public StateDto save(StateDto stateDto) {
         State state = StateMapper.INSTANCE.stateDtoToState(stateDto);
         State returnedState = stateRepository.save(state);
+
         return StateMapper.INSTANCE.stateToStateDto(returnedState);
     }
 
@@ -27,6 +28,8 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public StateDto findById(String id) {
-        State state = stateRepository.findById(name);
+        State state = stateRepository.findById(id);
+
+        return StateMapper.INSTANCE.stateToStateDto(state);
     }
 }
