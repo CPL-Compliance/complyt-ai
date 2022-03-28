@@ -55,7 +55,7 @@ public class StateRepositoryTest {
 
         // When
         when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findStateByName(name);
+        State actualState = stateRepository.findByName(name);
 
         // Then
         assertEquals(state, actualState);
@@ -69,7 +69,7 @@ public class StateRepositoryTest {
 
         // When
         when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findStateByName(name);
+        State actualState = stateRepository.findByName(name);
 
         // Then
         assertEquals(state, actualState);
@@ -83,7 +83,7 @@ public class StateRepositoryTest {
 
         // When
         when(mongoTemplate.findOne(query, State.class)).thenReturn(null);
-        State actualState = stateRepository.findStateByName(name);
+        State actualState = stateRepository.findByName(name);
 
         // Then
         assertNull(actualState);

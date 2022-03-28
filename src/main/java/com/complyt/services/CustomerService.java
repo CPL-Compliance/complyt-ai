@@ -7,9 +7,9 @@ import java.util.List;
 public interface CustomerService {
     Customer createCustomer(Customer customer);
 
-    List<Customer> getCustomerByName(String name);
+    List<Customer> findByName(String name);
 
-    List<Customer> getAllCustomers();
+    List<Customer> findAll();
 
     Customer save(Customer customer);
 }

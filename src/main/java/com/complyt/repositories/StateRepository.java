@@ -1,22 +1,27 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@AllArgsConstructor
 public class StateRepository {
 
-    @Autowired
+    @NonNull
     MongoTemplate mongoTemplate;
 
-    public State findStateByName(@NonNull String stateName) {
+    public State findByName(@NonNull String stateName) {
         Query query = Query.query(Criteria.where("name").regex("^" + stateName, "i"));
 
         return mongoTemplate.findOne(query, State.class);
+    }
+
+    public State save(@NonNull State state) {
+        return mongoTemplate.save(state);
     }
 }

@@ -15,6 +15,7 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientRepository clientRepository;
 
+    @Override
     public ClientDto save(ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Client result = clientRepository.save(client);
@@ -22,12 +23,19 @@ public class ClientServiceImpl implements ClientService {
         return ClientMapper.INSTANCE.clientToClientDto(result);
     }
 
+    @Override
     public ClientDto findByName(String name) {
         Client client = clientRepository.findOne(name);
 
         return ClientMapper.INSTANCE.clientToClientDto(client);
     }
 
+    @Override
+    public ClientDto findById(String s) {
+        return null;
+    }
+
+    @Override
     public void addOrderToClient(String name, Order order) {
         clientRepository.addOrderToClient(name, order);
     }

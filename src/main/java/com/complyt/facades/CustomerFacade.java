@@ -22,10 +22,10 @@ public class CustomerFacade {
     }
 
     public List<Customer> getCustomerByName(String name) {
-        return customerService.getCustomerByName(name);
+        return customerService.findByName(name);
     }
 
     public List<Customer> getAllCustomers() {
-        return customerService.getAllCustomers();
+        return customerService.findAll();
     }
 }

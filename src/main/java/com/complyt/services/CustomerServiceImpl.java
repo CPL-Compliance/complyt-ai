@@ -19,11 +19,11 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    public List<Customer> getCustomerByName(String name) {
+    public List<Customer> findByName(String name) {
         return customerRepository.findByName(name);
     }
 
-    public List<Customer> getAllCustomers() {
+    public List<Customer> findAll() {
 
         return customerRepository.getAllCustomers();
     }

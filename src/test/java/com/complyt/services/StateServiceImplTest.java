@@ -31,7 +31,7 @@ public class StateServiceImplTest {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findStateByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
 
         StateDto stateDto = stateServiceImpl.findByName(actualStateName);
 
@@ -44,7 +44,7 @@ public class StateServiceImplTest {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findStateByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
 
         StateDto stateDto = stateServiceImpl.findByName(actualStateName);
 

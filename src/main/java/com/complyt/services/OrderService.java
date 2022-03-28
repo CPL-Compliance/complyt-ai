@@ -4,10 +4,6 @@ import com.complyt.domain.Order;
 
 import java.util.List;
 
-public interface OrderService {
+public interface OrderService extends CrudService<Order, String> {
     void save(List<Order> orders);
-
-    Order save(Order order);
-
-    Order findById(String id);
 }

@@ -12,10 +12,21 @@ import org.springframework.stereotype.Service;
 public class StateServiceImpl implements StateService {
     private StateRepository stateRepository;
 
-    public StateDto findByName(String name) {
-        State state = stateRepository.findStateByName(name);
-        StateDto stateDto = StateMapper.INSTANCE.stateToStateDto(state);
+    @Override
+    public StateDto save(StateDto stateDto) {
+        State state = StateMapper.INSTANCE.stateDtoToState(stateDto);
+        State returnedState = stateRepository.save(state);
+        return StateMapper.INSTANCE.stateToStateDto(returnedState);
+    }
 
-        return stateDto;
+    public StateDto findByName(String name) {
+        State state = stateRepository.findByName(name);
+
+        return StateMapper.INSTANCE.stateToStateDto(state);
+    }
+
+    @Override
+    public StateDto findById(String id) {
+        State state = stateRepository.findById(name);
     }
 }
