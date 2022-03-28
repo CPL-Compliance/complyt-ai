@@ -1,7 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Client;
 import com.complyt.domain.Order;
 import com.complyt.v1.model.ClientDto;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-class ClientMapperTest {
+class ClientDtoMapperTest {
 
     @Test
     void clientToclientDto_ValidClient_ValidClientDto() {
@@ -24,7 +23,7 @@ class ClientMapperTest {
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
         List<Order> orders = null;
-        Client client = new Client(id, name, address, orders);
+        com.complyt.domain.Client client = new com.complyt.domain.Client(id, name, address, orders);
 
         // When
         ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);
@@ -45,7 +44,7 @@ class ClientMapperTest {
         ClientDto clientDto = new ClientDto(name, address, orders);
 
         // When
-        Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
+        com.complyt.domain.Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
 
         // Then
         assertThat(client).isNotNull();
@@ -61,7 +60,7 @@ class ClientMapperTest {
         ClientDto clientDto = null;
 
         // When
-        Client client = ClientMapper.INSTANCE.clientDtoToClient(null);
+        com.complyt.domain.Client client = ClientMapper.INSTANCE.clientDtoToClient(null);
 
         // Then
         assertThat(client).isNull();
@@ -70,7 +69,7 @@ class ClientMapperTest {
     @Test
     void clientToclientDto_ClientIsNull_ClientDtoIsNull() {
         // Given
-        Client client = null;
+        com.complyt.domain.Client client = null;
 
         // When
         ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);

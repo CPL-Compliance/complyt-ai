@@ -23,12 +23,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order findByName(String name) {
-        return null;
+    public Order findOneByName(String name) {
+        return orderRepository.findOneByName(name);
+    }
+
+    @Override
+    public List<Order> findByName(String name) {
+        return orderRepository.findByName(name);
     }
 
     @Override
     public Order findById(String id) {
         return orderRepository.findById(id);
+    }
+
+    @Override
+    public List<Order> findAll() {
+        return null;
     }
 }

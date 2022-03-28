@@ -2,7 +2,6 @@ package com.complyt.services;
 
 import com.complyt.domain.State;
 import com.complyt.repositories.StateRepository;
-import com.complyt.v1.model.StateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,12 +30,12 @@ public class StateServiceImplTest {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(stateMock);
 
-        StateDto stateDto = stateServiceImpl.findByName(actualStateName);
+        State state = stateServiceImpl.findOneByName(actualStateName);
 
-        assertNotNull(stateDto);
-        assertEquals(expectedStateName, stateDto.getName());
+        assertNotNull(state);
+        assertEquals(expectedStateName, state.getName());
     }
 
     @Test
@@ -44,10 +43,10 @@ public class StateServiceImplTest {
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(stateMock);
 
-        StateDto stateDto = stateServiceImpl.findByName(actualStateName);
+        State state = stateServiceImpl.findOneByName(actualStateName);
 
-        assertEquals(expectedStateName, stateDto.getName());
+        assertEquals(expectedStateName, state.getName());
     }
 }

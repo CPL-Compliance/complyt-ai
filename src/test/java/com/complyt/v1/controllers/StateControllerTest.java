@@ -2,10 +2,10 @@ package com.complyt.v1.controllers;
 
 
 import com.complyt.domain.Nexus;
+import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
 import com.complyt.v1.RestResponseEntityExceptionHandler;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
-import com.complyt.v1.model.StateDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,14 +70,15 @@ class StateControllerTest {
     @Test
     void getState_StateExists_StatusIsOkAndEquals() throws Exception {
         // Given
+        String id = UUID.randomUUID().toString();
         double salesTaxRate = 0.6;
         String abbreviation = "Abbreviation";
         String code = "08";
         String name = "California";
         List<Nexus> nexuses = null;
 
-        StateDto stateDto = new StateDto(salesTaxRate, abbreviation, code, name, nexuses);
-        when(stateFacade.findByName(name)).thenReturn(stateDto);
+        State state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
+        when(stateFacade.findByName(name)).thenReturn(state);
 
         // When
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL)

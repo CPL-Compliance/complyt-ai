@@ -1,8 +1,8 @@
 package com.complyt.facades;
 
+import com.complyt.domain.Client;
 import com.complyt.services.ClientService;
 import com.complyt.services.OrderService;
-import com.complyt.v1.model.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,15 +20,15 @@ public class ClientFacade {
     @NonNull
     private ClientService clientService;
 
-    public ClientDto createClient(@NonNull ClientDto clientDto) {
-        if (clientDto.getOrders().size() > 0) {
-            orderService.save(clientDto.getOrders());
+    public Client createClient(@NonNull Client client) {
+        if (client.getOrders().size() > 0) {
+            orderService.save(client.getOrders());
         }
 
-        return clientService.save(clientDto);
+        return clientService.save(client);
     }
 
-    public ClientDto findByName(String name) {
-        return clientService.findByName(name);
+    public Client findByName(String name) {
+        return clientService.findOneByName(name);
     }
 }

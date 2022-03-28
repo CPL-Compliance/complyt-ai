@@ -1,7 +1,10 @@
 package com.complyt.v1.controllers;
 
+
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.v1.mappers.CustomerMapper;
+import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -19,17 +22,25 @@ public class CustomerController {
     private CustomerFacade customerfacade;
 
     @PostMapping("")
-    public Customer createCustomer(@RequestBody Customer customer){
-        return customerfacade.createCustomer(customer);
+    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+
+        Customer createdCustomer = customerfacade.createCustomer(customer);
+
+        return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
     }
 
     @GetMapping("")
-    public List<Customer> getCustomerByName(@RequestParam String name){
-        return customerfacade.getCustomerByName(name);
+    public List<CustomerDto> getCustomerByName(@RequestParam String name) {
+        List<Customer> customers = customerfacade.findByName(name);
+
+        return CustomerMapper.INSTANCE.customersToCustomerDtos(customers);
     }
 
     @GetMapping("/all")
-    public List<Customer> getAllCustomers(){
-        return customerfacade.getAllCustomers();
+    public List<CustomerDto> getAllCustomers() {
+        List<Customer> customers = customerfacade.getAllCustomers();
+
+        return CustomerMapper.INSTANCE.customersToCustomerDtos(customers);
     }
 }

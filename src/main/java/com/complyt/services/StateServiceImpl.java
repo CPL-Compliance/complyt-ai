@@ -2,10 +2,10 @@ package com.complyt.services;
 
 import com.complyt.domain.State;
 import com.complyt.repositories.StateRepository;
-import com.complyt.v1.mappers.StateMapper;
-import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -13,23 +13,26 @@ public class StateServiceImpl implements StateService {
     private StateRepository stateRepository;
 
     @Override
-    public StateDto save(StateDto stateDto) {
-        State state = StateMapper.INSTANCE.stateDtoToState(stateDto);
-        State returnedState = stateRepository.save(state);
-
-        return StateMapper.INSTANCE.stateToStateDto(returnedState);
+    public State save(State state) {
+        return stateRepository.save(state);
     }
 
-    public StateDto findByName(String name) {
-        State state = stateRepository.findByName(name);
-
-        return StateMapper.INSTANCE.stateToStateDto(state);
+    public State findOneByName(String name) {
+        return stateRepository.findOneByName(name);
     }
 
     @Override
-    public StateDto findById(String id) {
-        State state = stateRepository.findById(id);
+    public List<State> findByName(String name) {
+        return stateRepository.findByName(name);
+    }
 
-        return StateMapper.INSTANCE.stateToStateDto(state);
+    @Override
+    public State findById(String id) {
+        return stateRepository.findById(id);
+    }
+
+    @Override
+    public List<State> findAll() {
+        return null;
     }
 }

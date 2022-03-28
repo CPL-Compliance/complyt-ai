@@ -2,7 +2,7 @@ package com.complyt.facades;
 
 import org.junit.jupiter.api.Test;
 
-class ClientFacadeTest {
+class ClientDtoFacadeTest {
 
     @Test
     void createClient() {

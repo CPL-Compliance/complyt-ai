@@ -18,10 +18,10 @@ public class CustomerFacade {
     private CustomerService customerService;
 
     public Customer createCustomer(Customer customer) {
-        return customerService.createCustomer(customer);
+        return customerService.create(customer);
     }
 
-    public List<Customer> getCustomerByName(String name) {
+    public List<Customer> findByName(String name) {
         return customerService.findByName(name);
     }
 

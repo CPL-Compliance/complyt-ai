@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class OrderRepository {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    public Order save(@NonNull Order order){
+    public Order save(@NonNull Order order) {
         return mongoTemplate.save(order);
     }
 
@@ -26,8 +27,19 @@ public class OrderRepository {
 
     public Order findById(@NonNull String orderId) {
         Query query = Query.query(Criteria.where("_id").is(orderId));
-        Order order = mongoTemplate.findOne(query, Order.class);
 
-        return order;
+        return mongoTemplate.findOne(query, Order.class);
+    }
+
+    public Order findOneByName(String name) {
+        Query query = Query.query(Criteria.where("name").is("^" + name));
+
+        return mongoTemplate.findOne(query, Order.class);
+    }
+
+    public List<Order> findByName(String name) {
+        Query query = Query.query(Criteria.where("name").is("^" + name));
+
+        return mongoTemplate.find(query, Order.class);
     }
 }

@@ -4,12 +4,10 @@ import com.complyt.domain.Customer;
 
 import java.util.List;
 
-public interface CustomerService {
-    Customer createCustomer(Customer customer);
+public interface CustomerService extends CrudService<Customer, String> {
+    Customer create(Customer customer);
 
-    List<Customer> findByName(String name);
+    Customer findOneByName(String name);
 
     List<Customer> findAll();
-
-    Customer save(Customer customer);
 }

@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,25 +15,32 @@ public class CustomerServiceImpl implements CustomerService {
 
     private CustomerRepository customerRepository;
 
-    public Customer createCustomer(Customer customer) {
-
+    @Override
+    public Customer create(@NonNull Customer customer) {
         return customerRepository.save(customer);
     }
 
-    public List<Customer> findByName(String name) {
-        return customerRepository.findByName(name);
+    public Customer findOneByName(String name) {
+        return customerRepository.findOneByName(name);
     }
 
-    public List<Customer> findAll() {
+    @Override
+    public List<Customer> findByName(String name) {
+        return null;
+    }
 
+    @Override
+    public Customer findById(String id) {
+        return null;
+    }
+
+    @Override
+    public List<Customer> findAll() {
         return customerRepository.getAllCustomers();
     }
 
-    public Customer save(Customer customer) {
-        if (customer == null) {
-            return null;
-        }
-
+    @Override
+    public Customer save(@NonNull Customer customer) {
         return customerRepository.save(customer);
     }
 }

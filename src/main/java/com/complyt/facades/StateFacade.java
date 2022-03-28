@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
+import com.complyt.domain.State;
 import com.complyt.services.StateService;
-import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,7 +15,7 @@ public class StateFacade {
     @NonNull
     private StateService stateService;
 
-    public StateDto findByName(String name) {
-        return stateService.findByName(name);
+    public State findByName(String name) {
+        return stateService.findOneByName(name);
     }
 }

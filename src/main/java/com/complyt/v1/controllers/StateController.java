@@ -1,7 +1,9 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
 import com.complyt.v1.exceptions.ResourceNotFoundException;
+import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -25,8 +27,9 @@ public class StateController {
     @GetMapping("")
     public StateDto getState(@RequestParam String name) {
         try {
+            State state = stateFacade.findByName(name);
 
-            return stateFacade.findByName(name);
+            return StateMapper.INSTANCE.stateToStateDto(state);
         } catch (ResourceNotFoundException exc) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, name + " state Not Found", exc);
         }

@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @AllArgsConstructor
 public class StateRepository {
@@ -15,8 +17,8 @@ public class StateRepository {
     @NonNull
     MongoTemplate mongoTemplate;
 
-    public State findByName(@NonNull String stateName) {
-        Query query = Query.query(Criteria.where("name").regex("^" + stateName, "i"));
+    public State findOneByName(@NonNull String name) {
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
         return mongoTemplate.findOne(query, State.class);
     }
@@ -27,5 +29,11 @@ public class StateRepository {
 
     public State findById(String id) {
         return mongoTemplate.findById(id, State.class);
+    }
+
+    public List<State> findByName(String name) {
+        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+
+        return mongoTemplate.find(query, State.class);
     }
 }
