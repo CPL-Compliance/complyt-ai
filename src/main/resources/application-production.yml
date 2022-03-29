@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:complytAtM0ngODb@cluster0.tlaie.mongodb.net/complyt
+server:
+  port: ${PORT:9898}

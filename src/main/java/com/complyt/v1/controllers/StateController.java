@@ -6,8 +6,6 @@ import com.complyt.v1.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 @AllArgsConstructor
 @RestController
 @RequestMapping(StateController.BASE_URL)
-@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class StateController {
     public static final String BASE_URL = "/v1/state";
 

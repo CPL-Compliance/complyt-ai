@@ -6,15 +6,11 @@ import com.complyt.v1.mappers.ClientMapper;
 import com.complyt.v1.model.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping(ClientController.BASE_URL)
-@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ClientController {
     //private Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final String BASE_URL = "/v1/client";
