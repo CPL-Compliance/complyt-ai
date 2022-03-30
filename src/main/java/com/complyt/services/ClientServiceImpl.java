@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ClientServiceImpl implements ClientService {
-    //private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private ClientRepository clientRepository;
 

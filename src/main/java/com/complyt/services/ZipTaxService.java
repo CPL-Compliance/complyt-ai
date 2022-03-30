@@ -15,7 +15,7 @@ public class ZipTaxService implements SalesTaxService {
 
     //Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private RestTemplate restTemplate;
+    private RestTemplate zipTaxRestTemplate;
 
     @Override
     public String findByAddress(String zip, String address, String city, String state) {
@@ -33,7 +33,7 @@ public class ZipTaxService implements SalesTaxService {
                 .build().toUriString();
         System.out.println(uri);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> responseEntity = zipTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 
         return responseEntity.getBody();
     }

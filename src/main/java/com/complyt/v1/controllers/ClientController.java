@@ -6,13 +6,14 @@ import com.complyt.v1.mappers.ClientMapper;
 import com.complyt.v1.model.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping(ClientController.BASE_URL)
 public class ClientController {
-    //private Logger logger = LoggerFactory.getLogger(this.getClass());
     public static final String BASE_URL = "/v1/client";
 
     private ClientFacade clientFacade;
@@ -21,7 +22,7 @@ public class ClientController {
     public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Client createdClient = clientFacade.createClient(client);
-
+        log.debug("This is a testy");
         return ClientMapper.INSTANCE.clientToClientDto(createdClient);
     }
 
