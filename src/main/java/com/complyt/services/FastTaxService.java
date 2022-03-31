@@ -1,21 +1,23 @@
 package com.complyt.services;
 
-import lombok.AllArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
+import com.complyt.domain.FastTaxData;
+import com.complyt.domain.SalesTaxData;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 
-@Service
-@AllArgsConstructor
-public class FastTaxService implements SalesTaxService {
+public class FastTaxService extends SalesTaxBase implements SalesTaxService {
 
-    private RestTemplate fastTaxRestTemplate;
+    public FastTaxService(RestTemplate restTemplate) {
+        super(restTemplate);
+    }
 
     @Override
-    public String findByAddress(String zip, String address, String city, String state) {
+    public SalesTaxData findByAddress(String zip, String address, String city, String state) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -31,9 +33,9 @@ public class FastTaxService implements SalesTaxService {
                 .queryParam("licensekey", "WS19-KRF3-JGD1")
                 .build().toUriString();
 
-        //logger.info(uri);
-        ResponseEntity<String> responseEntity = fastTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        FastTaxData fastTaxData = restTemplate.getForObject(uri, FastTaxData.class);
+        //fastTaxData responseEntity = fastTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, FastTaxData.class);
 
-        return responseEntity.getBody();
+        return fastTaxData;
     }
 }

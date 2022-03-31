@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.SalesTaxData;
 import com.complyt.facades.SalesTaxFacade;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,8 @@ public class SalesTaxController {
     private SalesTaxFacade salesTaxFacade;
 
     @GetMapping("")
-    public String getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
-                              @RequestParam String state) {
+    public SalesTaxData getSalesTax(@RequestParam String zip, @RequestParam String address, @RequestParam String city,
+                                    @RequestParam String state) {
         return salesTaxFacade.findByAddress(zip, address, city, state);
     }
 }

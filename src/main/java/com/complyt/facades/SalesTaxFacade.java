@@ -1,5 +1,6 @@
 package com.complyt.facades;
 
+import com.complyt.domain.SalesTaxData;
 import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -13,7 +14,7 @@ public class SalesTaxFacade {
     @NonNull
     private SalesTaxService salesTaxService;
 
-    public String findByAddress(String zip, String address, String city, String state) {
+    public SalesTaxData findByAddress(String zip, String address, String city, String state) {
         return salesTaxService.findByAddress(zip, address, city, state);
     }
 }

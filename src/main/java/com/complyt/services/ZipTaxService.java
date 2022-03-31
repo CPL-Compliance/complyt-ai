@@ -1,24 +1,24 @@
 package com.complyt.services;
 
-import lombok.AllArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
+import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.ZipTaxData;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Service
-@AllArgsConstructor
-public class ZipTaxService implements SalesTaxService {
+public class ZipTaxService extends SalesTaxBase implements SalesTaxService {
 
-    //Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private RestTemplate zipTaxRestTemplate;
+    public ZipTaxService(RestTemplate restTemplate) {
+        super(restTemplate);
+    }
 
     @Override
-    public String findByAddress(String zip, String address, String city, String state) {
+    public SalesTaxData findByAddress(String zip, String address, String city, String state) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -33,8 +33,10 @@ public class ZipTaxService implements SalesTaxService {
                 .build().toUriString();
         System.out.println(uri);
 
-        ResponseEntity<String> responseEntity = zipTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        ZipTaxData zipTaxData = restTemplate.getForObject(uri, ZipTaxData.class);
 
-        return responseEntity.getBody();
+        //ResponseEntity<String> responseEntity = zipTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+
+        return zipTaxData;
     }
 }

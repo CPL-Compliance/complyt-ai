@@ -9,12 +9,12 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
 
     @Bean
-    public RestTemplate fastTaxRestTemplate(RestTemplateBuilder restTemplateBuilder){
+    public RestTemplate fastTaxRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder.build();
     }
 
     @Bean
-    public RestTemplate zipTaxRestTemplate(RestTemplateBuilder restTemplateBuilder){
+    public RestTemplate zipTaxRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder.build();
     }
 }

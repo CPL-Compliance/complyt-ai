@@ -1,5 +1,7 @@
 package com.complyt.services;
 
+import com.complyt.domain.SalesTaxData;
+
 public interface SalesTaxService {
-    String findByAddress(String zip, String address, String city, String state);
+    SalesTaxData findByAddress(String zip, String address, String city, String state);
 }
