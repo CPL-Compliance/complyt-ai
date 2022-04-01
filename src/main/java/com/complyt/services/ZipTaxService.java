@@ -33,10 +33,6 @@ public class ZipTaxService extends SalesTaxBase implements SalesTaxService {
                 .build().toUriString();
         System.out.println(uri);
 
-        ZipTaxData zipTaxData = restTemplate.getForObject(uri, ZipTaxData.class);
-
-        //ResponseEntity<String> responseEntity = zipTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
-
-        return zipTaxData;
+        return restTemplate.getForObject(uri, ZipTaxData.class);
     }
 }

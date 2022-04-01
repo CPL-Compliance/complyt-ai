@@ -33,9 +33,8 @@ public class FastTaxService extends SalesTaxBase implements SalesTaxService {
                 .queryParam("licensekey", "WS19-KRF3-JGD1")
                 .build().toUriString();
 
-        FastTaxData fastTaxData = restTemplate.getForObject(uri, FastTaxData.class);
-        //fastTaxData responseEntity = fastTaxRestTemplate.exchange(uri, HttpMethod.GET, entity, FastTaxData.class);
+        //ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
 
-        return fastTaxData;
+        return restTemplate.getForObject(uri, FastTaxData.class);
     }
 }
