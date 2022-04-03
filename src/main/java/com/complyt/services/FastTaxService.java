@@ -13,10 +13,7 @@ import java.net.URI;
 
 public class FastTaxService extends SalesTaxBase implements SalesTaxService {
 
-    public FastTaxService(RestTemplate restTemplate,
-                          String scheme,
-                          String host,
-                          String path,
+    public FastTaxService(RestTemplate restTemplate, String scheme, String host, String path,
                           Pair<String, String> licenseKey) {
         super(restTemplate, scheme, host, path, licenseKey);
     }
@@ -24,32 +21,23 @@ public class FastTaxService extends SalesTaxBase implements SalesTaxService {
     @Override
     public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
         URI uri = buildUri(zip, address, city, state);
+        Mono<SalesTaxData> mono = WebClient.create().get().uri(uri).accept(MediaType.APPLICATION_JSON)
+                .retrieve().bodyToMono(FastTaxData.class).cast(SalesTaxData.class);
+
+        mono.subscribe(System.out::println);
 
         return getSalesTaxDataMono(uri);
     }
 
     private Mono<SalesTaxData> getSalesTaxDataMono(URI uri) {
-        return WebClient
-                .create()
-                .get()
-                .uri(uri)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(FastTaxData.class)
-                .cast(SalesTaxData.class);
+        return WebClient.create().get().uri(uri).accept(MediaType.APPLICATION_JSON)
+                .retrieve().bodyToMono(FastTaxData.class).cast(SalesTaxData.class);
     }
 
     private URI buildUri(String zip, String address, String city, String state) {
-        return UriComponentsBuilder.newInstance()
-                .path(path)
-                .host(host)
-                .scheme(scheme)
-                .queryParam(licenseKey.getValue0(), licenseKey.getValue1())
-                .queryParam("address", address)
-                .queryParam("city", city)
-                .queryParam("state", state)
-                .queryParam("zip", zip)
-                .queryParam("taxtype", "sales")
-                .build().toUri();
+        return UriComponentsBuilder.newInstance().path(path).host(host).scheme(scheme)
+                .queryParam(licenseKey.getValue0(), licenseKey.getValue1()).queryParam("address", address)
+                .queryParam("city", city).queryParam("state", state).queryParam("zip", zip)
+                .queryParam("taxtype", "sales").build().toUri();
     }
 }
