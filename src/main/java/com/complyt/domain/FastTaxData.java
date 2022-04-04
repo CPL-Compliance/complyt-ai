@@ -1,7 +1,10 @@
 package com.complyt.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -9,7 +12,6 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class FastTaxData implements SalesTaxData {
     private String matchLevel;
@@ -20,7 +22,6 @@ public class FastTaxData implements SalesTaxData {
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 class TaxInfoItem {
     private String city;
@@ -45,7 +46,6 @@ class TaxInfoItem {
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 class InformationComponent {
     private String name;
