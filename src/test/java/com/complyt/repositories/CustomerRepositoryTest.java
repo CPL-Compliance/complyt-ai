@@ -37,9 +37,10 @@ class CustomerRepositoryTest {
     @BeforeAll
     void setUp() {
         String id = UUID.randomUUID().toString();
+        String externalId = "1001";
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, name, address);
+        customer = new Customer(id, externalId, name, address);
     }
 
     @Test
