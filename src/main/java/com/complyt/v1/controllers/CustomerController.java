@@ -24,12 +24,12 @@ public class CustomerController {
     private CustomerFacade customerfacade;
 
     @PutMapping("")
-    public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.upsert(customer);
+            Mono<Customer> customerMono = customerfacade.upsert(customer);
 
-            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
         } catch (OperationFailedException operationFailedException) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
         }
@@ -39,7 +39,7 @@ public class CustomerController {
     public Mono<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Mono<Customer> customerMono = customerfacade.createCustomer(customer);
+            Mono<Customer> customerMono = customerfacade.save(customer);
 
             return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
         } catch (OperationFailedException operationFailedException) {

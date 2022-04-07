@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 public interface CustomerService extends CrudService<Customer, String> {
     Mono<Customer> save(@NonNull Customer customer);
 
-    Customer upsert(@NonNull Customer customer);
+    Mono<Customer> upsert(@NonNull Customer customer);
 
     Mono<Customer> findOneByName(String name);
 

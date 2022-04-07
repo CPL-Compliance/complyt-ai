@@ -19,7 +19,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    public Customer upsert(@NonNull Customer customer){
+    public Mono<Customer> upsert(@NonNull Customer customer){
         return customerRepository.upsert(customer);
     }
 
