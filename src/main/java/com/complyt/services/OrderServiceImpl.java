@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,8 +16,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Override
-    public void save(List<Order> orders) {
-        orderRepository.insertAll(orders);
+    public void save(List<ObjectId> orders) {
+        return;//orderRepository.insertAll(orders);
     }
 
     @Override
