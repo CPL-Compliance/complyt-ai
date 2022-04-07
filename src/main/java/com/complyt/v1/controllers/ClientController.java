@@ -2,11 +2,11 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Client;
 import com.complyt.facades.ClientFacade;
+import com.complyt.v1.mappers.ClientMapper;
 import com.complyt.v1.model.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -19,21 +19,19 @@ public class ClientController {
 
     private ClientFacade clientFacade;
 
-    @NonNull
-    private ModelMapper modelMapper;
 
     @PostMapping("")
     public Mono<ClientDto> createClient(@RequestBody @NonNull ClientDto clientDto) {
-        Client client = modelMapper.map(clientDto, Client.class);
+        Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Mono<Client> clientMono = clientFacade.createClient(client);
 
-        return clientMono.map(clientItem -> modelMapper.map(clientItem, ClientDto.class));
+        return clientMono.map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem));
     }
 
     @GetMapping("")
     public Mono<ClientDto> getClientByName(@RequestParam String name) {
         Mono<Client> clientMono = clientFacade.findByName(name);
 
-        return clientMono.map(clientItem -> modelMapper.map(clientItem, ClientDto.class));
+        return clientMono.map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem));
     }
 }

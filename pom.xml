@@ -18,12 +18,15 @@
         <maven.test.skip>true</maven.test.skip>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.lombok.version>1.18.22</org.lombok.version>
-        <org.modelMapper.version>2.4.4</org.modelMapper.version>
         <org.webFlux.version>2.6.5</org.webFlux.version>
         <org.javaTuples.version>1.2</org.javaTuples.version>
         <org.springBootStarterWeb.version>2.6.4</org.springBootStarterWeb.version>
-        <org.springBootStarterDataMongodbReactive.com>2.6.5</org.springBootStarterDataMongodbReactive.com>
-        <org.springBootDevtools.com>2.6.5</org.springBootDevtools.com>
+        <org.springBootStarterDataMongodbReactive.version>2.6.5</org.springBootStarterDataMongodbReactive.version>
+        <org.springBootDevtools.version>2.6.5</org.springBootDevtools.version>
+        <org.springBootStarterTest.version>2.6.5</org.springBootStarterTest.version>
+        <org.springBootStarterAop.version>2.6.5</org.springBootStarterAop.version>
+        <org.mockitoJunitJupiter.version>4.3.1</org.mockitoJunitJupiter.version>
+        <org.jUnit.version>4.13.2</org.jUnit.version>
     </properties>
     <dependencies>
         <dependency>
@@ -39,33 +42,35 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-            <version>${org.springBootStarterDataMongodbReactive.com}</version>
+            <version>${org.springBootStarterDataMongodbReactive.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${org.springBootDevtools.com}</version>
+            <version>${org.springBootDevtools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>${org.springBootStarterTest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${org.springBootStarterAop.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
-            <version>4.0.0</version>
+            <version>${org.mockitoJunitJupiter.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-            <version>4.13.2</version>
+            <version>${org.jUnit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -77,11 +82,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>${org.modelMapper.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

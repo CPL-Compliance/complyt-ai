@@ -7,7 +7,6 @@ import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,28 +20,25 @@ public class CustomerController {
     @NonNull
     private CustomerFacade customerfacade;
 
-    @NonNull
-    private ModelMapper modelMapper;
-
     @PostMapping("")
     public Mono<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
-        Customer customer = modelMapper.map(customerDto, Customer.class);
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Mono<Customer> customerMono = customerfacade.createCustomer(customer);
-        customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-        return customerMono.map(customerItem -> modelMapper.map(customerItem, CustomerDto.class));
+
+        return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
     }
 
     @GetMapping("")
     public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
         Flux<Customer> customers = customerfacade.findByName(name);
 
-        return customers.map(item -> modelMapper.map(item, CustomerDto.class));
+        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
     @GetMapping("/all")
     public Flux<CustomerDto> getAllCustomers() {
         Flux<Customer> customers = customerfacade.getAllCustomers();
 
-        return customers.map(item -> modelMapper.map(item, CustomerDto.class));
+        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 }
