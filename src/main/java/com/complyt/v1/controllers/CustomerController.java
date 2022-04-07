@@ -25,7 +25,7 @@ public class CustomerController {
     public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.save(customer);
+            Customer createdCustomer = customerfacade.upsert(customer);
 
             return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
         } catch (OperationFailedException operationFailedException) {
