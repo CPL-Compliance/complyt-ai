@@ -34,6 +34,18 @@ public class CustomerController {
         }
     }
 
+    @PostMapping("")
+    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            Customer createdCustomer = customerfacade.save(customer);
+
+            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+        } catch (OperationFailedException operationFailedException) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
+        }
+    }
+
     @GetMapping("")
     public List<CustomerDto> getCustomerByName(@RequestParam String name) {
         List<Customer> customers = customerfacade.findByName(name);
