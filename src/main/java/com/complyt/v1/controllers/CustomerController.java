@@ -3,11 +3,14 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -20,12 +23,28 @@ public class CustomerController {
     @NonNull
     private CustomerFacade customerfacade;
 
+    @PutMapping("")
+    public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            Customer createdCustomer = customerfacade.upsert(customer);
+
+            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+        } catch (OperationFailedException operationFailedException) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
+        }
+    }
+
     @PostMapping("")
     public Mono<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        Mono<Customer> customerMono = customerfacade.createCustomer(customer);
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            Mono<Customer> customerMono = customerfacade.createCustomer(customer);
 
-        return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
+            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
+        } catch (OperationFailedException operationFailedException) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
+        }
     }
 
     @GetMapping("")

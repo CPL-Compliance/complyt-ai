@@ -1,6 +1,6 @@
-package com.complyt.v1;
+package com.complyt.v1.exceptions;
 
-import com.complyt.v1.exceptions.ResourceNotFoundException;
+import com.complyt.services.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

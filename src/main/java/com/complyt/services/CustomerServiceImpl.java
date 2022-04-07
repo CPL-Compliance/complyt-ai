@@ -15,21 +15,25 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Mono<Customer> create(@NonNull Customer customer) {
+    public Mono<Customer> save(@NonNull Customer customer) {
         return customerRepository.save(customer);
     }
 
-    public Mono<Customer> findOneByName(String name) {
+    public Customer upsert(@NonNull Customer customer){
+        return customerRepository.upsert(customer);
+    }
+
+    public Mono<Customer> findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }
 
     @Override
-    public Flux<Customer> findByName(String name) {
+    public Flux<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
     }
 
     @Override
-    public Mono<Customer> findById(String id) {
+    public Mono<Customer> findById(@NonNull String id) {
         return customerRepository.findById(id);
     }
 
@@ -38,8 +42,4 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.getAllCustomers();
     }
 
-    @Override
-    public Mono<Customer> save(@NonNull Customer customer) {
-        return customerRepository.save(customer);
-    }
 }

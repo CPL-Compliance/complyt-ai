@@ -1,13 +1,14 @@
 package com.complyt.services;
 
 import com.complyt.domain.Customer;
+import lombok.NonNull;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface CustomerService extends CrudService<Customer, String> {
-    Mono<Customer> create(Customer customer);
+    Mono<Customer> save(@NonNull Customer customer);
+
+    Customer upsert(@NonNull Customer customer);
 
     Mono<Customer> findOneByName(String name);
 

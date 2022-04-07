@@ -17,8 +17,12 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Mono<Customer> createCustomer(Customer customer) {
-        return customerService.create(customer);
+    public Mono<Customer> save(Customer customer) {
+        return customerService.save(customer);
+    }
+
+    public Mono<Customer> upsert(Customer customer) {
+        return customerService.upsert(customer);
     }
 
     public Flux<Customer> findByName(String name) {
