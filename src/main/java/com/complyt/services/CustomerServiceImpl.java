@@ -2,7 +2,6 @@ package com.complyt.services;
 
 import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
-import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;

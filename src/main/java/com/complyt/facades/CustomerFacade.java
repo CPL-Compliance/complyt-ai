@@ -2,7 +2,6 @@ package com.complyt.facades;
 
 import com.complyt.domain.Customer;
 import com.complyt.services.CustomerService;
-import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
