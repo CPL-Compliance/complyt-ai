@@ -3,7 +3,8 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.v1.exceptions.ResourceNotFoundException;
+import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.services.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,18 @@ public class CustomerController {
             return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
         } catch (ResourceNotFoundException exc) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, customerDto.toString(), exc);
+        }
+    }
+
+    @PutMapping("")
+    public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            Customer createdCustomer = customerfacade.save(customer);
+
+            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+        } catch (OperationFailedException operationFailedException) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
         }
     }
 

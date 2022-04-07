@@ -21,7 +21,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Customer upsert(@NonNull Customer customer){
-        return null;
+        return customerRepository.upsert(customer);
     }
 
     public Customer findOneByName(String name) {

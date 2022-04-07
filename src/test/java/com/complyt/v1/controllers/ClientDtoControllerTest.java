@@ -1,7 +1,7 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.facades.ClientFacade;
-import com.complyt.v1.RestResponseEntityExceptionHandler;
+import com.complyt.v1.exceptions.RestResponseEntityExceptionHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

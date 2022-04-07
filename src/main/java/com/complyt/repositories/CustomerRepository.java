@@ -1,8 +1,12 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Customer;
+import com.complyt.repositories.exceptions.OperationFailedException;
+import com.mongodb.MongoWriteConcernException;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,6 +19,7 @@ import java.util.List;
 
 
 @Repository
+@Slf4j
 public class CustomerRepository {
     @Autowired
     MongoTemplate mongoTemplate;
@@ -36,28 +41,33 @@ public class CustomerRepository {
         return mongoTemplate.findAll(Customer.class);
     }
 
-    public Customer save(@NonNull Customer customer){
+    public Customer save(@NonNull Customer customer) {
         return mongoTemplate.save(customer);
     }
 
-    public UpdateResult update(@NonNull Customer customer){
-        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
-        Update update = new Update()
-                .set("address", customer.getAddress())
-                .set("name", customer.getName());
-
-        return mongoTemplate.updateFirst(query,update,Customer.class);
-    }
-
-    public UpdateResult upsert(@NonNull Customer customer) {
-        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
+    public Customer upsert(@NonNull Customer customer) {
+        String externalId = customer.getExternalId();
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
 
         Update update = new Update()
                 .set("externalId", customer.getExternalId())
                 .set("address", customer.getAddress())
                 .set("name", customer.getName());
 
-        return mongoTemplate.upsert(query, update, Customer.class);
+        UpdateResult updateResult = mongoTemplate.upsert(query, update, Customer.class);
+
+        if(!updateResult.wasAcknowledged()){
+            log.error("");
+            throw new OperationFailedException("Could not update customer, ");
+        }
+
+        return findByExternalId(externalId);
+    }
+
+    public Customer findByExternalId(String externalId){
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        return mongoTemplate.findOne(query, Customer.class);
     }
 
     public Customer findById(BsonValue upsertedId) {
