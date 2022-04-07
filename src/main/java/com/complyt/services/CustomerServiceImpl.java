@@ -20,11 +20,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    @Override
-    public UpdateResult update(Customer customer) {
-        return customerRepository.update(customer);
-    }
-
     public Customer upsert(@NonNull Customer customer){
         return null;
     }

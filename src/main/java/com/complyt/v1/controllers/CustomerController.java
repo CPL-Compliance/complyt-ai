@@ -33,18 +33,6 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("")
-    public CustomerDto updateCustomer(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            customerfacade.update(customer);
-
-            return customerDto;
-        } catch (ResourceNotFoundException exc) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, customerDto.toString(), exc);
-        }
-    }
-
     @GetMapping("")
     public List<CustomerDto> getCustomerByName(@RequestParam String name) {
         List<Customer> customers = customerfacade.findByName(name);

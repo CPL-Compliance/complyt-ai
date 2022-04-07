@@ -22,10 +22,6 @@ public class CustomerFacade {
         return customerService.save(customer);
     }
 
-    public UpdateResult update(Customer customer) {
-        return customerService.update(customer);
-    }
-
     public List<Customer> findByName(String name) {
         return customerService.findByName(name);
     }
