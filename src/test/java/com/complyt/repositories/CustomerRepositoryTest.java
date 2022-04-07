@@ -39,7 +39,7 @@ class CustomerRepositoryTest {
     @BeforeAll
     void setUp() {
         String id = UUID.randomUUID().toString();
-        String externalId = "1001";
+        String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         customer = new Customer(id, externalId, name, address);
@@ -131,7 +131,22 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void save_NoExternalIdExists_InsertsNewCustomer() {
+    void save_NexCustomer_CustomerSaved(){
+        // When
+        String mongoId = UUID.randomUUID().toString();
+        Customer dbCustomer = customer.withId(mongoId);
+        when(mongoTemplate.save(customer)).thenReturn(dbCustomer);
+
+        // Given
+        Customer savedCustomer = customerRepository.save(customer);
+
+        // Then
+        Assertions.assertNotNull(savedCustomer);
+        assertEquals(savedCustomer, dbCustomer);
+    }
+
+    @Test
+    void upsert_NoExternalIdExists_InsertsNewCustomer() {
         // Given
         String externalId = "1000";
 
