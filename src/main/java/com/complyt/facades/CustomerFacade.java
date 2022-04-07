@@ -17,8 +17,12 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Customer createCustomer(Customer customer) {
-        return customerService.create(customer);
+    public Customer save(Customer customer) {
+        return customerService.save(customer);
+    }
+
+    public Customer upsert(Customer customer) {
+        return customerService.upsert(customer);
     }
 
     public List<Customer> findByName(String name) {

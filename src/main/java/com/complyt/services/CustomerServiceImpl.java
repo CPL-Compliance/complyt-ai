@@ -15,21 +15,25 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Customer create(@NonNull Customer customer) {
+    public Customer save(@NonNull Customer customer) {
         return customerRepository.save(customer);
     }
 
-    public Customer findOneByName(String name) {
+    public Customer upsert(@NonNull Customer customer){
+        return customerRepository.upsert(customer);
+    }
+
+    public Customer findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }
 
     @Override
-    public List<Customer> findByName(String name) {
+    public List<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
     }
 
     @Override
-    public Customer findById(String id) {
+    public Customer findById(@NonNull String id) {
         return null;
     }
 
@@ -38,8 +42,4 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.getAllCustomers();
     }
 
-    @Override
-    public Customer save(@NonNull Customer customer) {
-        return customerRepository.save(customer);
-    }
 }

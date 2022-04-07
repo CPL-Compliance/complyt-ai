@@ -2,7 +2,7 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
-import com.complyt.v1.exceptions.ResourceNotFoundException;
+import com.complyt.services.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
