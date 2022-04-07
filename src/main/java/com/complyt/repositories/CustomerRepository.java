@@ -46,7 +46,6 @@ public class CustomerRepository {
     }
 
     public Customer upsert(@NonNull Customer customer) {
-
         String externalId = customer.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
@@ -59,7 +58,7 @@ public class CustomerRepository {
 
         if(!updateResult.wasAcknowledged())
         {
-            log.error("Failed to write customer into the data base");
+            log.error(String.format("Failed to write customer into the data base, %s",customer.toString()));
             throw new OperationFailedException(String.format("Could not update customer, %s",customer.toString()));
         }
 

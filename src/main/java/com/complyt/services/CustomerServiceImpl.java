@@ -23,17 +23,17 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.upsert(customer);
     }
 
-    public Customer findOneByName(String name) {
+    public Customer findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }
 
     @Override
-    public List<Customer> findByName(String name) {
+    public List<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
     }
 
     @Override
-    public Customer findById(String id) {
+    public Customer findById(@NonNull String id) {
         return null;
     }
 

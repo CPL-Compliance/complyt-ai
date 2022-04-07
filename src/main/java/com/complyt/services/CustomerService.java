@@ -7,7 +7,7 @@ import lombok.NonNull;
 import java.util.List;
 
 public interface CustomerService extends CrudService<Customer, String> {
-    Customer save(Customer customer);
+    Customer save(@NonNull Customer customer);
 
     public Customer upsert(@NonNull Customer customer);
 
