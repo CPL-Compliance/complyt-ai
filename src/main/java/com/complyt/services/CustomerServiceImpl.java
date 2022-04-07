@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
+import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,17 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Customer create(@NonNull Customer customer) {
+    public Customer save(@NonNull Customer customer) {
         return customerRepository.save(customer);
+    }
+
+    @Override
+    public UpdateResult update(Customer customer) {
+        return customerRepository.update(customer);
+    }
+
+    public Customer upsert(@NonNull Customer customer){
+        return null;
     }
 
     public Customer findOneByName(String name) {
@@ -38,8 +48,4 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.getAllCustomers();
     }
 
-    @Override
-    public Customer save(@NonNull Customer customer) {
-        return customerRepository.save(customer);
-    }
 }

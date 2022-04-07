@@ -3,10 +3,13 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.v1.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,11 +23,26 @@ public class CustomerController {
 
     @PostMapping("")
     public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            Customer createdCustomer = customerfacade.save(customer);
 
-        Customer createdCustomer = customerfacade.createCustomer(customer);
+            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+        } catch (ResourceNotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, customerDto.toString(), exc);
+        }
+    }
 
-        return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+    @PutMapping("")
+    public CustomerDto updateCustomer(@RequestBody CustomerDto customerDto) {
+        try {
+            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+            customerfacade.update(customer);
+
+            return customerDto;
+        } catch (ResourceNotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, customerDto.toString(), exc);
+        }
     }
 
     @GetMapping("")

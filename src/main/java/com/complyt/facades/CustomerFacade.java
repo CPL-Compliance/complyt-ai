@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.Customer;
 import com.complyt.services.CustomerService;
+import com.mongodb.client.result.UpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,8 +18,12 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Customer createCustomer(Customer customer) {
-        return customerService.create(customer);
+    public Customer save(Customer customer) {
+        return customerService.save(customer);
+    }
+
+    public UpdateResult update(Customer customer) {
+        return customerService.update(customer);
     }
 
     public List<Customer> findByName(String name) {
