@@ -22,18 +22,6 @@ public class CustomerController {
 
     private CustomerFacade customerfacade;
 
-    @PostMapping("")
-    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.save(customer);
-
-            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
-        } catch (ResourceNotFoundException exc) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, customerDto.toString(), exc);
-        }
-    }
-
     @PutMapping("")
     public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {

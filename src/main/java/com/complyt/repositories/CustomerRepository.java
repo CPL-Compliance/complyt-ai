@@ -46,6 +46,7 @@ public class CustomerRepository {
     }
 
     public Customer upsert(@NonNull Customer customer) {
+
         String externalId = customer.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
@@ -56,9 +57,10 @@ public class CustomerRepository {
 
         UpdateResult updateResult = mongoTemplate.upsert(query, update, Customer.class);
 
-        if(!updateResult.wasAcknowledged()){
-            log.error("");
-            throw new OperationFailedException("Could not update customer, ");
+        if(!updateResult.wasAcknowledged())
+        {
+            log.error("Failed to write customer into the data base");
+            throw new OperationFailedException(String.format("Could not update customer, %s",customer.toString()));
         }
 
         return findByExternalId(externalId);

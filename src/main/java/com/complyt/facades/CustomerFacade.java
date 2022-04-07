@@ -22,6 +22,10 @@ public class CustomerFacade {
         return customerService.save(customer);
     }
 
+    public Customer upsert(Customer customer) {
+        return customerService.upsert(customer);
+    }
+
     public List<Customer> findByName(String name) {
         return customerService.findByName(name);
     }
