@@ -2,12 +2,13 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Client;
 import com.complyt.facades.ClientFacade;
-import com.complyt.v1.mappers.ClientMapper;
 import com.complyt.v1.model.ClientDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @RestController
@@ -18,17 +19,21 @@ public class ClientController {
 
     private ClientFacade clientFacade;
 
+    @NonNull
+    private ModelMapper modelMapper;
+
     @PostMapping("")
-    public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
-        Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
-        Client createdClient = clientFacade.createClient(client);
-        log.debug("This is a testy");
-        return ClientMapper.INSTANCE.clientToClientDto(createdClient);
+    public Mono<ClientDto> createClient(@RequestBody @NonNull ClientDto clientDto) {
+        Client client = modelMapper.map(clientDto, Client.class);
+        Mono<Client> clientMono = clientFacade.createClient(client);
+
+        return clientMono.map(clientItem -> modelMapper.map(clientItem, ClientDto.class));
     }
 
     @GetMapping("")
-    public ClientDto getClientByName(@RequestParam String name) {
-        Client client = clientFacade.findByName(name);
-        return ClientMapper.INSTANCE.clientToClientDto(client);
+    public Mono<ClientDto> getClientByName(@RequestParam String name) {
+        Mono<Client> clientMono = clientFacade.findByName(name);
+
+        return clientMono.map(clientItem -> modelMapper.map(clientItem, ClientDto.class));
     }
 }

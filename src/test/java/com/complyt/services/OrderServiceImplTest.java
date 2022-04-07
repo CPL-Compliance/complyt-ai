@@ -16,32 +16,32 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
-    @InjectMocks
-    OrderServiceImpl orderServiceImpl;
-
-    @Mock
-    OrderRepository orderRepositoryTested;
-
-    @Mock
-    Order orderMock;
-
-    @Test
-    void save() {
-    }
-
-    @Test
-    void testSave() {
-    }
-
-    @Test
-    void getOrderById() {
-        String id = UUID.randomUUID().toString();
-
-        Mockito.when(orderMock.getId()).thenReturn(id);
-        Mockito.when(orderRepositoryTested.findById(id)).thenReturn(orderMock);
-
-        Order order = orderServiceImpl.findById(id);
-
-        Assertions.assertEquals(id, order.getId());
-    }
+//    @InjectMocks
+//    OrderServiceImpl orderServiceImpl;
+//
+//    @Mock
+//    OrderRepository orderRepositoryTested;
+//
+//    @Mock
+//    Order orderMock;
+//
+//    @Test
+//    void save() {
+//    }
+//
+//    @Test
+//    void testSave() {
+//    }
+//
+//    @Test
+//    void getOrderById() {
+//        String id = UUID.randomUUID().toString();
+//
+//        Mockito.when(orderMock.getId()).thenReturn(id);
+//        Mockito.when(orderRepositoryTested.findById(id)).thenReturn(orderMock);
+//
+//        Order order = orderServiceImpl.findById(id);
+//
+//        Assertions.assertEquals(id, order.getId());
+//    }
 }

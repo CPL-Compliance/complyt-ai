@@ -19,46 +19,46 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClientServiceImplTest {
-    @InjectMocks
-    public ClientServiceImpl clientServiceImpl;
-
-    @Mock
-    ClientRepository clientRepositoryMock;
-
-    private Client client;
-
-    private ClientDto clientDto;
-
-    @BeforeAll
-    void setUp() {
-        String id = UUID.randomUUID().toString();
-        String name = "Client";
-        String city = "City";
-        String country = "Country";
-        String county = "County";
-        String state = "State";
-        String street = "Street";
-        String zip = "Zip";
-
-        Address address = new Address(city, country, county, state, street, zip);
-        client = new Client(id, name, address, null);
-
-        clientDto = new ClientDto(name, address, null);
-    }
-
-    @Test
-    void save_ValidClient_ClientDto() {
-        //when(clientRepositoryMock.save(client)).thenReturn(client);
-
-        //clientService.save(clientDto);
-    }
-
-    @Test
-    void getClient() {
-
-    }
-
-    @Test
-    void addOrderToClient() {
-    }
+//    @InjectMocks
+//    public ClientServiceImpl clientServiceImpl;
+//
+//    @Mock
+//    ClientRepository clientRepositoryMock;
+//
+//    private Client client;
+//
+//    private ClientDto clientDto;
+//
+//    @BeforeAll
+//    void setUp() {
+//        String id = UUID.randomUUID().toString();
+//        String name = "Client";
+//        String city = "City";
+//        String country = "Country";
+//        String county = "County";
+//        String state = "State";
+//        String street = "Street";
+//        String zip = "Zip";
+//
+//        Address address = new Address(city, country, county, state, street, zip);
+//        client = new Client(id, name, address, null);
+//
+//        clientDto = new ClientDto(name, address, null);
+//    }
+//
+//    @Test
+//    void save_ValidClient_ClientDto() {
+//        //when(clientRepositoryMock.save(client)).thenReturn(client);
+//
+//        //clientService.save(clientDto);
+//    }
+//
+//    @Test
+//    void getClient() {
+//
+//    }
+//
+//    @Test
+//    void addOrderToClient() {
+//    }
 }

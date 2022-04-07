@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -77,7 +78,7 @@ class StateControllerTest {
         String name = "California";
         List<Nexus> nexuses = null;
 
-        State state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
+        Mono<State> state = Mono.just(new State(id, salesTaxRate, abbreviation, code, name, nexuses));
         when(stateFacade.findByName(name)).thenReturn(state);
 
         // When

@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
@@ -17,15 +17,15 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Customer createCustomer(Customer customer) {
+    public Mono<Customer> createCustomer(Customer customer) {
         return customerService.create(customer);
     }
 
-    public List<Customer> findByName(String name) {
+    public Flux<Customer> findByName(String name) {
         return customerService.findByName(name);
     }
 
-    public List<Customer> getAllCustomers() {
+    public Flux<Customer> getAllCustomers() {
         return customerService.findAll();
     }
 }

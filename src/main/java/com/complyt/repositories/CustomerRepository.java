@@ -3,38 +3,40 @@ package com.complyt.repositories;
 import com.complyt.domain.Customer;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @Repository
 public class CustomerRepository {
     @Autowired
-    MongoTemplate mongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public List<Customer> findByName(@NonNull String name) {
+    public Flux<Customer> findByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        return mongoTemplate.find(query, Customer.class);
+        return reactiveMongoTemplate.find(query, Customer.class);
     }
 
-    public Customer findOneByName(@NonNull String name) {
+    public Mono<Customer> findOneByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").is("^" + name));
 
-        return mongoTemplate.findOne(query, Customer.class);
+        return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 
-    public List<Customer> getAllCustomers() {
-
-        return mongoTemplate.findAll(Customer.class);
+    public Flux<Customer> getAllCustomers() {
+        return reactiveMongoTemplate.findAll(Customer.class);
     }
 
-    public Customer save(@NonNull Customer customer) {
+    public Mono<Customer> save(@NonNull Customer customer) {
+        return reactiveMongoTemplate.save(customer);
+    }
 
-        return mongoTemplate.save(customer);
+    public Mono<Customer> findById(String id) {
+        return reactiveMongoTemplate.findById(id, Customer.class);
     }
 }

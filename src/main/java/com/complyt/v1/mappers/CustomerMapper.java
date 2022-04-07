@@ -3,6 +3,7 @@ package com.complyt.v1.mappers;
 import com.complyt.domain.Customer;
 import com.complyt.v1.model.CustomerDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 

@@ -3,37 +3,41 @@ package com.complyt.repositories;
 import com.complyt.domain.State;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 @AllArgsConstructor
 public class StateRepository {
 
     @NonNull
-    MongoTemplate mongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public State findOneByName(@NonNull String name) {
+    public Mono<State> findOneByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        return mongoTemplate.findOne(query, State.class);
+        return reactiveMongoTemplate.findOne(query, State.class);
     }
 
-    public State save(@NonNull State state) {
-        return mongoTemplate.save(state);
+    public Mono<State> save(@NonNull State state) {
+        return reactiveMongoTemplate.save(state);
     }
 
-    public State findById(String id) {
-        return mongoTemplate.findById(id, State.class);
+    public Mono<State> findById(String id) {
+        return reactiveMongoTemplate.findById(id, State.class);
     }
 
-    public List<State> findByName(String name) {
+    public Flux<State> findByName(String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        return mongoTemplate.find(query, State.class);
+        return reactiveMongoTemplate.find(query, State.class);
+    }
+
+    public Flux<State> findAll() {
+        return reactiveMongoTemplate.findAll(State.class);
     }
 }

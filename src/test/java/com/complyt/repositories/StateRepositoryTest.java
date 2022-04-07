@@ -26,66 +26,66 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class StateRepositoryTest {
-
-    @InjectMocks
-    private StateRepository stateRepository;
-
-    @Mock
-    private MongoTemplate mongoTemplate;
-
-    private State state;
-
-    @BeforeAll
-    public void setUp() {
-        String id = UUID.randomUUID().toString();
-        double salesTaxRate = 0.6;
-        String abbreviation = "CA";
-        String code = "08";
-        String name = "California";
-        List<Nexus> nexuses = null;
-
-        state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
-    }
-
-    @Test
-    public void findByName_NameIsCalifornia_ReturnsCaliforniaState() {
-        // Given
-        String name = "California";
-        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
-
-        // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findOneByName(name);
-
-        // Then
-        assertEquals(state, actualState);
-    }
-
-    @Test
-    public void findByName_NameIscalifornia_ReturnsCaliforniaState() {
-        // Given
-        String name = "california";
-        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
-
-        // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findOneByName(name);
-
-        // Then
-        assertEquals(state, actualState);
-    }
-
-    @Test
-    public void findByName_NameDoesntExistInDB_ExpectsNull() {
-        // Given
-        String name = "Stam";
-        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
-
-        // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(null);
-        State actualState = stateRepository.findOneByName(name);
-
-        // Then
-        assertNull(actualState);
-    }
+//
+//    @InjectMocks
+//    private StateRepository stateRepository;
+//
+//    @Mock
+//    private MongoTemplate mongoTemplate;
+//
+//    private State state;
+//
+//    @BeforeAll
+//    public void setUp() {
+//        String id = UUID.randomUUID().toString();
+//        double salesTaxRate = 0.6;
+//        String abbreviation = "CA";
+//        String code = "08";
+//        String name = "California";
+//        List<Nexus> nexuses = null;
+//
+//        state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
+//    }
+//
+//    @Test
+//    public void findByName_NameIsCalifornia_ReturnsCaliforniaState() {
+//        // Given
+//        String name = "California";
+//        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+//
+//        // When
+//        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
+//        State actualState = stateRepository.findOneByName(name);
+//
+//        // Then
+//        assertEquals(state, actualState);
+//    }
+//
+//    @Test
+//    public void findByName_NameIscalifornia_ReturnsCaliforniaState() {
+//        // Given
+//        String name = "california";
+//        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+//
+//        // When
+//        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
+//        State actualState = stateRepository.findOneByName(name);
+//
+//        // Then
+//        assertEquals(state, actualState);
+//    }
+//
+//    @Test
+//    public void findByName_NameDoesntExistInDB_ExpectsNull() {
+//        // Given
+//        String name = "Stam";
+//        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+//
+//        // When
+//        when(mongoTemplate.findOne(query, State.class)).thenReturn(null);
+//        State actualState = stateRepository.findOneByName(name);
+//
+//        // Then
+//        assertNull(actualState);
+//    }
 }

@@ -4,6 +4,8 @@ import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,27 +20,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order save(Order order) {
+    public Mono<Order> save(Order order) {
         return orderRepository.save(order);
     }
 
     @Override
-    public Order findOneByName(String name) {
+    public Mono<Order> findOneByName(String name) {
         return orderRepository.findOneByName(name);
     }
 
     @Override
-    public List<Order> findByName(String name) {
+    public Flux<Order> findByName(String name) {
         return orderRepository.findByName(name);
     }
 
     @Override
-    public Order findById(String id) {
+    public Mono<Order> findById(String id) {
         return orderRepository.findById(id);
     }
 
     @Override
-    public List<Order> findAll() {
+    public Flux<Order> findAll() {
         return null;
     }
 }
