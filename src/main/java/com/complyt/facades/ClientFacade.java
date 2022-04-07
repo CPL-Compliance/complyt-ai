@@ -21,7 +21,7 @@ public class ClientFacade {
     @NonNull
     private ClientService clientService;
 
-    public Mono<Client> createClient(@NonNull Client client) {
+    public Client createClient(@NonNull Client client) {
         if (client.getOrders().size() > 0) {
             orderService.save(client.getOrders());
         }

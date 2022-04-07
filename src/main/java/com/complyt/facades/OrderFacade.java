@@ -31,7 +31,7 @@ public class OrderFacade {
         clientService.addOrderToClient(client, order);
     }
 
-    public Mono<Order> create(Order order) {
+    public Order create(Order order) {
         return orderService.save(order);
     }
 }

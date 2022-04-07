@@ -18,12 +18,12 @@ public class OrderRepository {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Order> save(@NonNull Order order) {
-        return reactiveMongoTemplate.save(order);
+    public Order save(@NonNull Order order) {
+        return reactiveMongoTemplate.save(order).block();
     }
 
     public void insertAll(List<Order> orders) {
-        reactiveMongoTemplate.insertAll(orders);
+        reactiveMongoTemplate.insertAll(orders).blockLast();
     }
 
     public Mono<Order> findById(@NonNull String orderId) {

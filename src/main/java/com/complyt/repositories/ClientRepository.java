@@ -18,8 +18,8 @@ public class ClientRepository {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Client> save(@NonNull Client client) {
-        return reactiveMongoTemplate.save(client);
+    public Client save(@NonNull Client client) {
+        return reactiveMongoTemplate.save(client).block();
     }
 
     public Mono<Client> findOneByName(@NonNull String name) {

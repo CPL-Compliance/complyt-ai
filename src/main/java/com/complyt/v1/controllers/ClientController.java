@@ -21,11 +21,11 @@ public class ClientController {
 
 
     @PostMapping("")
-    public Mono<ClientDto> createClient(@RequestBody @NonNull ClientDto clientDto) {
+    public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
-        Mono<Client> clientMono = clientFacade.createClient(client);
+        Client createdClient = clientFacade.createClient(client);
 
-        return clientMono.map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem));
+        return ClientMapper.INSTANCE.clientToClientDto(createdClient);
     }
 
     @GetMapping("")

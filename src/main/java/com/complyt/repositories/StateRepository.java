@@ -23,8 +23,8 @@ public class StateRepository {
         return reactiveMongoTemplate.findOne(query, State.class);
     }
 
-    public Mono<State> save(@NonNull State state) {
-        return reactiveMongoTemplate.save(state);
+    public State save(@NonNull State state) {
+        return reactiveMongoTemplate.save(state).block();
     }
 
     public Mono<State> findById(String id) {
