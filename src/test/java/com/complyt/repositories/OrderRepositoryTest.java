@@ -8,16 +8,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class OrderRepositoryTest {
-//
-//    @Test
-//    void save() {
-//    }
-//
-//    @Test
-//    void insertAll() {
-//    }
-//
-//    @Test
-//    void findById() {
-//    }
+
+    @Test
+    void save() {
+    }
+
+    @Test
+    void insertAll() {
+    }
+
+    @Test
+    void findById() {
+    }
 }
