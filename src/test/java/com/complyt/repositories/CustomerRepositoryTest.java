@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.BsonValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -132,12 +133,12 @@ class CustomerRepositoryTest {
 
     @Test
     void save_NexCustomer_CustomerSaved(){
-        // When
+        // Given
         String mongoId = UUID.randomUUID().toString();
         Customer dbCustomer = customer.withId(mongoId);
         when(mongoTemplate.save(customer)).thenReturn(dbCustomer);
 
-        // Given
+        // When
         Customer savedCustomer = customerRepository.save(customer);
 
         // Then
@@ -146,7 +147,30 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void upsert_NoExternalIdExists_InsertsNewCustomer() {
+    void upsert_ExternalIdDoesntExist_InsertsNewCustomer() {
+        // Given
+        String externalId = "1001";
+        Customer dbCostumer = customer.withExternalId(externalId);
+
+        // When
+        Query query = Query.query(Criteria.where("externalId").is(dbCostumer.getExternalId()));
+        Update update = new Update()
+                .set("externalId", dbCostumer.getExternalId())
+                .set("address", customer.getAddress())
+                .set("name", customer.getName());
+
+        UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
+        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
+        when(customerRepository.findByExternalId(dbCostumer.getExternalId())).thenReturn(dbCostumer);
+        customerRepository.upsert(dbCostumer);
+        Customer dbCostumer2 = customerRepository.findByExternalId(externalId);
+        // Then
+        Assertions.assertNotNull(dbCostumer2);
+
+    }
+
+    @Test
+    void upsert_ExternalIdExists_UpdateExistingCustomer() {
         // Given
         String externalId = "1000";
 
