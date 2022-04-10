@@ -171,48 +171,48 @@ class CustomerRepositoryTest {
     void upsert_ExternalIdDoesntExist_InsertsNewCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        Customer dbCostumer = customer.withExternalId(externalId);
+        Customer customerWithNewExternalId = customer.withExternalId(externalId);
 
-        Query query = Query.query(Criteria.where("externalId").is(dbCostumer.getExternalId()));
+        Query query = Query.query(Criteria.where("externalId").is(customerWithNewExternalId.getExternalId()));
 
         Update update = new Update()
-                .set("externalId", dbCostumer.getExternalId())
+                .set("externalId", customerWithNewExternalId.getExternalId())
                 .set("address", customer.getAddress())
                 .set("name", customer.getName());
         UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
         when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
-        when(customerRepository.findByExternalId(dbCostumer.getExternalId())).thenReturn(dbCostumer);
-        Customer insertedCustomer = customerRepository.upsert(dbCostumer);
+        when(customerRepository.findByExternalId(customerWithNewExternalId.getExternalId())).thenReturn(customerWithNewExternalId);
+        Customer insertedCustomer = customerRepository.upsert(customerWithNewExternalId);
 
         // Then
         assertNotEquals(customer.getExternalId(), insertedCustomer.getExternalId());
         Assertions.assertNotNull(insertedCustomer);
-        assertEquals(dbCostumer, insertedCustomer);
+        assertEquals(customerWithNewExternalId, insertedCustomer);
     }
 
     @Test
     void upsert_ExternalIdExists_UpdateExistingCustomer() {
         // Given
         String newName = "newName";
-        Customer dbCustomer = customer.withExternalId(customer.getExternalId()).withName(newName);
-        Query query = Query.query(Criteria.where("externalId").is(dbCustomer.getExternalId()));
+        Customer existingCustomerWithNewName = customer.withExternalId(customer.getExternalId()).withName(newName);
+        Query query = Query.query(Criteria.where("externalId").is(existingCustomerWithNewName.getExternalId()));
 
         Update update = new Update()
-                .set("externalId", dbCustomer.getExternalId())
-                .set("address", dbCustomer.getAddress())
-                .set("name", dbCustomer.getName());
+                .set("externalId", existingCustomerWithNewName.getExternalId())
+                .set("address", existingCustomerWithNewName.getAddress())
+                .set("name", existingCustomerWithNewName.getName());
         UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
         when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedResult);
-        when(customerRepository.findByExternalId(dbCustomer.getExternalId())).thenReturn(dbCustomer);
-        Customer insertedCustomer = customerRepository.upsert(dbCustomer);
+        when(customerRepository.findByExternalId(existingCustomerWithNewName.getExternalId())).thenReturn(existingCustomerWithNewName);
+        Customer insertedCustomer = customerRepository.upsert(existingCustomerWithNewName);
 
         // Then
         Assertions.assertNotNull(insertedCustomer);
-        Assertions.assertEquals(dbCustomer,insertedCustomer);
+        Assertions.assertEquals(existingCustomerWithNewName,insertedCustomer);
         Assertions.assertEquals(newName,insertedCustomer.getName());
     }
 
