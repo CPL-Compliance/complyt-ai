@@ -6,6 +6,7 @@ import com.complyt.services.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 public class StateController {
     public static final String BASE_URL = "/v1/state";
 
+    @NonNull
     private StateFacade stateFacade;
 
     @GetMapping("")

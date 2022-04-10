@@ -1,8 +1,8 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Order;
 import com.complyt.v1.model.ClientDto;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,7 +22,7 @@ class ClientDtoMapperTest {
         String id = UUID.randomUUID().toString();
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        List<Order> orders = null;
+        List<ObjectId> orders = null;
         com.complyt.domain.Client client = new com.complyt.domain.Client(id, name, address, orders);
 
         // When
@@ -40,8 +40,11 @@ class ClientDtoMapperTest {
         // Given
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        List<Order> orders = null;
-        ClientDto clientDto = new ClientDto(name, address, orders);
+        List<ObjectId> orders = null;
+        ClientDto clientDto = new ClientDto();
+        clientDto.setAddress(address);
+        clientDto.setName(name);
+        clientDto.setOrders_id(orders);
 
         // When
         com.complyt.domain.Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
@@ -50,7 +53,7 @@ class ClientDtoMapperTest {
         assertThat(client).isNotNull();
         assertThat(ObjectUtils.isEmpty(client.getId())).isEqualTo(true);
         assertThat(client.getName()).isEqualTo(name);
-        assertThat(client.getOrders()).isEqualTo(orders);
+        assertThat(client.getOrders_id()).isEqualTo(orders);
         assertThat(client.getAddress()).isEqualTo(address);
     }
 

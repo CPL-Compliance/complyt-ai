@@ -4,68 +4,52 @@ package com.complyt.v1.controllers;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
-import com.complyt.v1.exceptions.RestResponseEntityExceptionHandler;
-import com.complyt.services.exceptions.ResourceNotFoundException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StateControllerTest {
+@WebFluxTest(StateController.class)
+public class StateControllerTest {
 
-    @InjectMocks
-    StateController stateController;
+    @MockBean
+    private StateFacade stateFacade;
 
-    @Mock
-    StateFacade stateFacade;
+    @Autowired
+    private WebTestClient webTestClient;
 
-    MockMvc mockMvc;
-
-    private static final String NAME_PARAM = "name";
-
-    @BeforeAll
-    public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(stateController)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler())
-                .build();
-    }
+    private final String NAME_PARAM = "name";
 
     @Test
     void getState_StateNotExists_ThrowsExceptionIsNotFound() throws Exception {
         // Given
         String stateNameNotExists = "Israel";
-        when(stateFacade.findByName(anyString())).thenThrow(ResourceNotFoundException.class);
+        when(stateFacade.findByName(stateNameNotExists)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, stateNameNotExists + " state Not Found"));
 
-        // When
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL).
-                param(NAME_PARAM, stateNameNotExists).
-                contentType(MediaType.APPLICATION_JSON);
-
-        //Then
-        mockMvc.perform(mockHttpServletRequestBuilder)
-                .andExpect(status().isNotFound());
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(StateController.BASE_URL)
+                        .queryParam(NAME_PARAM, stateNameNotExists)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -81,15 +65,18 @@ class StateControllerTest {
         Mono<State> state = Mono.just(new State(id, salesTaxRate, abbreviation, code, name, nexuses));
         when(stateFacade.findByName(name)).thenReturn(state);
 
-        // When
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(StateController.BASE_URL)
-                .param(NAME_PARAM, name)
-                .contentType(MediaType.APPLICATION_JSON);
-
-        // Then
-        mockMvc.perform(mockHttpServletRequestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", equalTo(name)))
-                .andExpect(jsonPath("$.salesTaxRate", equalTo(salesTaxRate)));
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(StateController.BASE_URL)
+                        .queryParam(NAME_PARAM, name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(State.class)
+                .value(stateItem -> stateItem.getName(), equalTo(name))
+                .value(stateItem -> stateItem.getSalesTaxRate(), equalTo(salesTaxRate));
     }
 }
