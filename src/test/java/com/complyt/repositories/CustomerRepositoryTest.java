@@ -208,12 +208,12 @@ class CustomerRepositoryTest {
         // When
         when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedResult);
         when(customerRepository.findByExternalId(existingCustomerWithNewName.getExternalId())).thenReturn(existingCustomerWithNewName);
-        Customer insertedCustomer = customerRepository.upsert(existingCustomerWithNewName);
+        Customer updatedCustomer = customerRepository.upsert(existingCustomerWithNewName);
 
         // Then
-        Assertions.assertNotNull(insertedCustomer);
-        Assertions.assertEquals(existingCustomerWithNewName,insertedCustomer);
-        Assertions.assertEquals(newName,insertedCustomer.getName());
+        Assertions.assertNotNull(updatedCustomer);
+        Assertions.assertEquals(existingCustomerWithNewName,updatedCustomer);
+        Assertions.assertEquals(newName,updatedCustomer.getName());
     }
 
 }
