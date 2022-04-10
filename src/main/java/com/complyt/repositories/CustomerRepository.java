@@ -2,8 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Customer;
 import com.complyt.repositories.exceptions.OperationFailedException;
-import com.mongodb.MongoWriteConcernException;
-import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +34,7 @@ public class CustomerRepository {
         return mongoTemplate.findOne(query, Customer.class);
     }
 
-    public List<Customer> getAllCustomers() {
+    public List<Customer> getAll() {
 
         return mongoTemplate.findAll(Customer.class);
     }

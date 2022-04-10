@@ -126,7 +126,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void getAllCustomers() {
+    void getAllCustomers_RetrievingAllCustomersInDB_ExpectingTwoCustomers() {
         // Given
         String id1 = UUID.randomUUID().toString();
         String id2 = UUID.randomUUID().toString();
@@ -143,7 +143,7 @@ class CustomerRepositoryTest {
 
         //When
         when(mongoTemplate.findAll(Customer.class)).thenReturn(customers);
-        List<Customer> retrievedCustomers = customerRepository.getAllCustomers();
+        List<Customer> retrievedCustomers = customerRepository.getAll();
 
         //Then
         assertNotNull(retrievedCustomers);
@@ -181,11 +181,10 @@ class CustomerRepositoryTest {
 
         // When
         when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
-        when(customerRepository.findByExternalId(customerWithNewExternalId.getExternalId())).thenReturn(customerWithNewExternalId);
+        when(mongoTemplate.findOne(query,Customer.class)).thenReturn(customerWithNewExternalId);
         Customer insertedCustomer = customerRepository.upsert(customerWithNewExternalId);
 
         // Then
-        assertNotEquals(customer.getExternalId(), insertedCustomer.getExternalId());
         Assertions.assertNotNull(insertedCustomer);
         assertEquals(customerWithNewExternalId, insertedCustomer);
     }
