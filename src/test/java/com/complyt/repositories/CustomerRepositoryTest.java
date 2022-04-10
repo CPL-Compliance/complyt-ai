@@ -43,8 +43,6 @@ class CustomerRepositoryTest {
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         customer = new Customer(id, externalId, name, address);
-        when(mongoTemplate.save(customer)).thenReturn(customer);
-        customerRepository.save(customer);
     }
 
     @Test
