@@ -145,11 +145,11 @@ class CustomerRepositoryTest {
 
         //When
         when(mongoTemplate.findAll(Customer.class)).thenReturn(customers);
-        List<Customer> customers2 = customerRepository.getAllCustomers();
+        List<Customer> retrievedCustomers = customerRepository.getAllCustomers();
 
         //Then
-        assertNotNull(customers2);
-        assertEquals(customers,customers2);
+        assertNotNull(retrievedCustomers);
+        assertEquals(retrievedCustomers,customers);
     }
 
     @Test
