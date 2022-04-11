@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,26 +28,34 @@ public class StateServiceImplTest {
 
     @Test
     void getState_ReturnedCalifornia_SearchingForCalifornia() {
+        // Given
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(Mono.just(stateMock));
 
-        State state = stateServiceImpl.findOneByName(actualStateName);
+        // When
+        Mono<State> monoState = stateServiceImpl.findOneByName(actualStateName);
+        State state = monoState.block();
 
+        // Then
         assertNotNull(state);
         assertEquals(expectedStateName, state.getName());
     }
 
     @Test
     void getState_ReturnedEmpty_SearchingForNotExistingState() {
+        // Given
         String expectedStateName = "California";
         String actualStateName = "California";
         when(stateMock.getName()).thenReturn(actualStateName);
-        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(stateMock);
+        when(stateRepositoryMock.findOneByName(expectedStateName)).thenReturn(Mono.just(stateMock));
 
-        State state = stateServiceImpl.findOneByName(actualStateName);
+        // When
+        Mono<State> monoState = stateServiceImpl.findOneByName(actualStateName);
+        State state = monoState.block();
 
+        // Then
         assertEquals(expectedStateName, state.getName());
     }
 }

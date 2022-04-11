@@ -43,7 +43,7 @@ class ClientServiceImplTest {
         Address address = new Address(city, country, county, state, street, zip);
         client = new Client(id, name, address, null);
 
-        clientDto = new ClientDto(name, address, null);
+        clientDto = new ClientDto(id, name, address, null);
     }
 
     @Test

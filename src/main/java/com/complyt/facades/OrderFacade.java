@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
@@ -25,8 +26,12 @@ public class OrderFacade {
     private OrderService orderService;
 
     public void addOrderToClient(String client, @NonNull Order order) {
-        customerService.save(order.getCustomer());
+        //customerService.save(order.getCustomerId());
         orderService.save(order);
         clientService.addOrderToClient(client, order);
+    }
+
+    public Order create(Order order) {
+        return orderService.save(order);
     }
 }

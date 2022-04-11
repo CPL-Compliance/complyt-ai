@@ -5,6 +5,8 @@ import com.complyt.domain.Order;
 import com.complyt.repositories.ClientRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -20,22 +22,22 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client findOneByName(String name) {
+    public Mono<Client> findOneByName(String name) {
         return clientRepository.findOneByName(name);
     }
 
     @Override
-    public List<Client> findByName(String name) {
+    public Flux<Client> findByName(String name) {
         return clientRepository.findByName(name);
     }
 
     @Override
-    public Client findById(String id) {
+    public Mono<Client> findById(String id) {
         return clientRepository.findOneById(id);
     }
 
     @Override
-    public List<Client> findAll() {
+    public Flux<Client> findAll() {
         return null;
     }
 

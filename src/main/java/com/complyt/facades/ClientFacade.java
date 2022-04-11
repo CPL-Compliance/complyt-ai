@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 @AllArgsConstructor
@@ -21,14 +22,14 @@ public class ClientFacade {
     private ClientService clientService;
 
     public Client createClient(@NonNull Client client) {
-        if (client.getOrders().size() > 0) {
-            orderService.save(client.getOrders());
+        if (client.getOrdersId().size() > 0) {
+            orderService.save(client.getOrdersId());
         }
 
         return clientService.save(client);
     }
 
-    public Client findByName(String name) {
+    public Mono<Client> findByName(String name) {
         return clientService.findOneByName(name);
     }
 }

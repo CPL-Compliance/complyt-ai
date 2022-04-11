@@ -4,8 +4,8 @@ import com.complyt.domain.State;
 import com.complyt.repositories.StateRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
@@ -17,22 +17,22 @@ public class StateServiceImpl implements StateService {
         return stateRepository.save(state);
     }
 
-    public State findOneByName(String name) {
+    public Mono<State> findOneByName(String name) {
         return stateRepository.findOneByName(name);
     }
 
     @Override
-    public List<State> findByName(String name) {
+    public Flux<State> findByName(String name) {
         return stateRepository.findByName(name);
     }
 
     @Override
-    public State findById(String id) {
+    public Mono<State> findById(String id) {
         return stateRepository.findById(id);
     }
 
     @Override
-    public List<State> findAll() {
-        return null;
+    public Flux<State> findAll() {
+        return stateRepository.findAll();
     }
 }

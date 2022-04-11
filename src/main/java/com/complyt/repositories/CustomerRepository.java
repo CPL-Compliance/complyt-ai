@@ -7,43 +7,46 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonValue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @Repository
 @Slf4j
 public class CustomerRepository {
     @Autowired
-    MongoTemplate mongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public List<Customer> findByName(@NonNull String name) {
+    public Flux<Customer> findByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        return mongoTemplate.find(query, Customer.class);
+        return reactiveMongoTemplate.find(query, Customer.class);
     }
 
-    public Customer findOneByName(@NonNull String name) {
+    public Mono<Customer> findOneByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").is("^" + name));
 
-        return mongoTemplate.findOne(query, Customer.class);
+        return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 
-    public List<Customer> getAll() {
-
-        return mongoTemplate.findAll(Customer.class);
+    public Flux<Customer> getAllCustomers() {
+        return reactiveMongoTemplate.findAll(Customer.class);
     }
 
     public Customer save(@NonNull Customer customer) {
-        return mongoTemplate.save(customer);
+        return reactiveMongoTemplate.save(customer).block();
     }
 
-    public Customer upsert(@NonNull Customer customer) {
+    public Mono<Customer> findById(String id) {
+        return reactiveMongoTemplate.findById(id, Customer.class);
+    }
+
+    public Mono<Customer> upsert(@NonNull Customer customer) {
         String externalId = customer.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
@@ -52,7 +55,7 @@ public class CustomerRepository {
                 .set("address", customer.getAddress())
                 .set("name", customer.getName());
 
-        UpdateResult updateResult = mongoTemplate.upsert(query, update, Customer.class);
+        UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
 
         if(!updateResult.wasAcknowledged())
         {
@@ -63,14 +66,14 @@ public class CustomerRepository {
         return findByExternalId(externalId);
     }
 
-    public Customer findByExternalId(String externalId){
+    public Mono<Customer> findByExternalId(String externalId){
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
-        return mongoTemplate.findOne(query, Customer.class);
+        return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 
-    public Customer findById(BsonValue upsertedId) {
-        return mongoTemplate.findById(upsertedId, Customer.class);
+    public Mono<Customer> findById(BsonValue upsertedId) {
+        return reactiveMongoTemplate.findById(upsertedId, Customer.class);
     }
 }
 

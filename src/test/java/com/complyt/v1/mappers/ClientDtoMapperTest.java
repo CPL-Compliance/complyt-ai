@@ -1,8 +1,9 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Order;
+import com.complyt.domain.Client;
 import com.complyt.v1.model.ClientDto;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,8 +23,8 @@ class ClientDtoMapperTest {
         String id = UUID.randomUUID().toString();
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        List<Order> orders = null;
-        com.complyt.domain.Client client = new com.complyt.domain.Client(id, name, address, orders);
+        List<ObjectId> orders = null;
+        Client client = new Client(id, name, address, orders);
 
         // When
         ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);
@@ -32,7 +33,7 @@ class ClientDtoMapperTest {
         assertThat(clientDto).isNotNull();
         assertThat(clientDto.getName()).isEqualTo(name);
         assertThat(clientDto.getAddress()).isEqualTo(address);
-        assertThat(clientDto.getOrders()).isEqualTo(orders);
+        assertThat(clientDto.getOrdersId()).isEqualTo(orders);
     }
 
     @Test
@@ -40,8 +41,11 @@ class ClientDtoMapperTest {
         // Given
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        List<Order> orders = null;
-        ClientDto clientDto = new ClientDto(name, address, orders);
+        List<ObjectId> orders = null;
+        ClientDto clientDto = new ClientDto();
+        clientDto.setAddress(address);
+        clientDto.setName(name);
+        clientDto.setOrdersId(orders);
 
         // When
         com.complyt.domain.Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
@@ -50,7 +54,7 @@ class ClientDtoMapperTest {
         assertThat(client).isNotNull();
         assertThat(ObjectUtils.isEmpty(client.getId())).isEqualTo(true);
         assertThat(client.getName()).isEqualTo(name);
-        assertThat(client.getOrders()).isEqualTo(orders);
+        assertThat(client.getOrdersId()).isEqualTo(orders);
         assertThat(client.getAddress()).isEqualTo(address);
     }
 

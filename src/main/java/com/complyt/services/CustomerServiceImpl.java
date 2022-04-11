@@ -5,8 +5,8 @@ import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
@@ -19,27 +19,27 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    public Customer upsert(@NonNull Customer customer){
+    public Mono<Customer> upsert(@NonNull Customer customer){
         return customerRepository.upsert(customer);
     }
 
-    public Customer findOneByName(@NonNull String name) {
+    public Mono<Customer> findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }
 
     @Override
-    public List<Customer> findByName(@NonNull String name) {
+    public Flux<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
     }
 
     @Override
-    public Customer findById(@NonNull String id) {
-        return null;
+    public Mono<Customer> findById(@NonNull String id) {
+        return customerRepository.findById(id);
     }
 
     @Override
-    public List<Customer> findAll() {
-        return customerRepository.getAll();
+    public Flux<Customer> findAll() {
+        return customerRepository.getAllCustomers();
     }
 
 }

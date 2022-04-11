@@ -10,10 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class StateRepositoryTest {
     private StateRepository stateRepository;
 
     @Mock
-    private MongoTemplate mongoTemplate;
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     private State state;
 
@@ -54,8 +55,9 @@ public class StateRepositoryTest {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
         // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findOneByName(name);
+        when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.just(state));
+        Mono<State> monoState = stateRepository.findOneByName(name);
+        State actualState = monoState.block();
 
         // Then
         assertEquals(state, actualState);
@@ -68,8 +70,9 @@ public class StateRepositoryTest {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
         // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(state);
-        State actualState = stateRepository.findOneByName(name);
+        when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.just(state));
+        Mono<State> monoState = stateRepository.findOneByName(name);
+        State actualState = monoState.block();
 
         // Then
         assertEquals(state, actualState);
@@ -82,8 +85,9 @@ public class StateRepositoryTest {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
         // When
-        when(mongoTemplate.findOne(query, State.class)).thenReturn(null);
-        State actualState = stateRepository.findOneByName(name);
+        when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.empty());
+        Mono<State> monoState = stateRepository.findOneByName(name);
+        State actualState = monoState.block();
 
         // Then
         assertNull(actualState);
