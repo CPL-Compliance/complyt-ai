@@ -2,7 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
-import com.mongodb.client.result.UpdateResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -11,13 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ class CustomerRepositoryTest {
     CustomerRepository customerRepository;
 
     @Mock
-    MongoTemplate mongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
     Customer customer;
 
@@ -53,13 +54,12 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(mongoTemplate.find(query, Customer.class)).thenReturn(new ArrayList<Customer>() {{
-            add(customer);
-        }});
-        List<Customer> customers = customerRepository.findByName(name);
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        Flux<Customer> fluxCustomers = customerRepository.findByName(name);
+        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        Assertions.assertNotNull(customers);
+        Assertions.assertNotNull(fluxCustomers);
         assertEquals(customers.size(), 1);
         assertEquals(customers.get(0), customer);
     }
@@ -72,8 +72,9 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(mongoTemplate.find(query, Customer.class)).thenReturn(new ArrayList<>());
-        List<Customer> customers = customerRepository.findByName(name);
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList()));
+        Flux<Customer> fluxCustomers = customerRepository.findByName(name);
+        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
         Assertions.assertNotNull(customers);
@@ -88,10 +89,9 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(mongoTemplate.find(query, Customer.class)).thenReturn(new ArrayList<Customer>() {{
-            add(customer);
-        }});
-        List<Customer> customers = customerRepository.findByName(name);
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        Flux<Customer> fluxCustomers = customerRepository.findByName(name);
+        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
         Assertions.assertNotNull(customers);
@@ -107,11 +107,9 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
         Customer customer2 = customer.withName("Existing Customer 2");
-        when(mongoTemplate.find(query, Customer.class)).thenReturn(new ArrayList<Customer>() {{
-            add(customer);
-            add(customer2);
-        }});
-        List<Customer> customers = customerRepository.findByName(name);
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer, customer2)));
+        Flux<Customer> fluxCustomers = customerRepository.findByName(name);
+        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
         Assertions.assertNotNull(customers);
@@ -131,11 +129,11 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void save_NexCustomer_CustomerSaved(){
+    void save_NexCustomer_CustomerSaved() {
         // When
         String mongoId = UUID.randomUUID().toString();
         Customer dbCustomer = customer.withId(mongoId);
-        when(mongoTemplate.save(customer)).thenReturn(dbCustomer);
+        when(reactiveMongoTemplate.save(customer)).thenReturn(Mono.just(dbCustomer));
 
         // Given
         Customer savedCustomer = customerRepository.save(customer);
@@ -170,5 +168,4 @@ class CustomerRepositoryTest {
         // Then
 
     }
-
 }

@@ -1,11 +1,8 @@
 package com.complyt.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "order")
@@ -13,12 +10,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 @AllArgsConstructor
 @ToString
+@Setter
+@NoArgsConstructor
 public class Order {
     @Id
     private String id;
 
-    @DBRef
-    private Customer customer;
+    private ObjectId customerId;
     private String type;
     private int units;
     private int price;

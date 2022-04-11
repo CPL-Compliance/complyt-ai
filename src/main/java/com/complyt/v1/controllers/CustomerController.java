@@ -7,11 +7,12 @@ import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @RestController
@@ -19,15 +20,16 @@ import java.util.List;
 public class CustomerController {
     public static final String BASE_URL = "/v1/customer";
 
+    @NonNull
     private CustomerFacade customerfacade;
 
     @PutMapping("")
-    public CustomerDto upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.upsert(customer);
+            Mono<Customer> customerMono = customerfacade.upsert(customer);
 
-            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
         } catch (OperationFailedException operationFailedException) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
         }
@@ -46,16 +48,16 @@ public class CustomerController {
     }
 
     @GetMapping("")
-    public List<CustomerDto> getCustomerByName(@RequestParam String name) {
-        List<Customer> customers = customerfacade.findByName(name);
+    public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
+        Flux<Customer> customers = customerfacade.findByName(name);
 
-        return CustomerMapper.INSTANCE.customersToCustomerDtos(customers);
+        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
     @GetMapping("/all")
-    public List<CustomerDto> getAllCustomers() {
-        List<Customer> customers = customerfacade.getAllCustomers();
+    public Flux<CustomerDto> getAllCustomers() {
+        Flux<Customer> customers = customerfacade.getAllCustomers();
 
-        return CustomerMapper.INSTANCE.customersToCustomerDtos(customers);
+        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 }

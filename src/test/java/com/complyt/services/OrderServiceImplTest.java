@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -38,10 +39,11 @@ class OrderServiceImplTest {
         String id = UUID.randomUUID().toString();
 
         Mockito.when(orderMock.getId()).thenReturn(id);
-        Mockito.when(orderRepositoryTested.findById(id)).thenReturn(orderMock);
+        Mockito.when(orderRepositoryTested.findById(id)).thenReturn(Mono.just(orderMock));
 
-        Order order = orderServiceImpl.findById(id);
+        Mono<Order> monoOrder = orderServiceImpl.findById(id);
+        Order actualOrder = monoOrder.block();
 
-        Assertions.assertEquals(id, order.getId());
+        Assertions.assertEquals(id, actualOrder.getId());
     }
 }

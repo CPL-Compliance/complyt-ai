@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @RestController
@@ -18,17 +19,19 @@ public class ClientController {
 
     private ClientFacade clientFacade;
 
+
     @PostMapping("")
     public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
         Client createdClient = clientFacade.createClient(client);
-        log.debug("This is a testy");
+
         return ClientMapper.INSTANCE.clientToClientDto(createdClient);
     }
 
     @GetMapping("")
-    public ClientDto getClientByName(@RequestParam String name) {
-        Client client = clientFacade.findByName(name);
-        return ClientMapper.INSTANCE.clientToClientDto(client);
+    public Mono<ClientDto> getClientByName(@RequestParam String name) {
+        Mono<Client> clientMono = clientFacade.findByName(name);
+
+        return clientMono.map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem));
     }
 }
