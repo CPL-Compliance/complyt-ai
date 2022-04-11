@@ -23,7 +23,7 @@ public class OrderController {
     @PutMapping("")
     public Order createOrder(@RequestBody OrderDto orderDto) {
         Order createdOPrder = orderFacade.create(OrderMapper.INSTANCE.orderDtoToOrder(orderDto));
-        System.out.println(createdOPrder.toString());
-        return createdOPrder;//OrderMapper.INSTANCE.orderToOrderDto(createdOPrder);
+
+        return createdOPrder;
     }
 }

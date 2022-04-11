@@ -1,7 +1,6 @@
 package com.complyt.v1.model;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Order;
 import lombok.*;
 import org.bson.types.ObjectId;
 
@@ -16,5 +15,5 @@ public class ClientDto {
     private String id;
     private String name;
     private Address address;
-    private List<ObjectId> orders_id;
+    private List<ObjectId> ordersId;
 }

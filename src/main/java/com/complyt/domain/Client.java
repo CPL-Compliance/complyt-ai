@@ -20,5 +20,5 @@ public class Client {
     private String id;
     private String name;
     private Address address;
-    private List<ObjectId> orders_id;
+    private List<ObjectId> ordersId;
 }

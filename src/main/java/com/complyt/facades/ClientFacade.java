@@ -22,8 +22,8 @@ public class ClientFacade {
     private ClientService clientService;
 
     public Client createClient(@NonNull Client client) {
-        if (client.getOrders_id().size() > 0) {
-            orderService.save(client.getOrders_id());
+        if (client.getOrdersId().size() > 0) {
+            orderService.save(client.getOrdersId());
         }
 
         return clientService.save(client);

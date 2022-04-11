@@ -1,6 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.Client;
 import com.complyt.v1.model.ClientDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class ClientDtoMapperTest {
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
-        com.complyt.domain.Client client = new com.complyt.domain.Client(id, name, address, orders);
+        Client client = new Client(id, name, address, orders);
 
         // When
         ClientDto clientDto = ClientMapper.INSTANCE.clientToClientDto(client);
@@ -32,7 +33,7 @@ class ClientDtoMapperTest {
         assertThat(clientDto).isNotNull();
         assertThat(clientDto.getName()).isEqualTo(name);
         assertThat(clientDto.getAddress()).isEqualTo(address);
-        assertThat(clientDto.getOrders_id()).isEqualTo(orders);
+        assertThat(clientDto.getOrdersId()).isEqualTo(orders);
     }
 
     @Test
@@ -44,7 +45,7 @@ class ClientDtoMapperTest {
         ClientDto clientDto = new ClientDto();
         clientDto.setAddress(address);
         clientDto.setName(name);
-        clientDto.setOrders_id(orders);
+        clientDto.setOrdersId(orders);
 
         // When
         com.complyt.domain.Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
@@ -53,7 +54,7 @@ class ClientDtoMapperTest {
         assertThat(client).isNotNull();
         assertThat(ObjectUtils.isEmpty(client.getId())).isEqualTo(true);
         assertThat(client.getName()).isEqualTo(name);
-        assertThat(client.getOrders_id()).isEqualTo(orders);
+        assertThat(client.getOrdersId()).isEqualTo(orders);
         assertThat(client.getAddress()).isEqualTo(address);
     }
 

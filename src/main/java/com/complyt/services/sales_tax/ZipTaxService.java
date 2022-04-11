@@ -1,7 +1,7 @@
 package com.complyt.services.sales_tax;
 
-import com.complyt.domain.FastTaxData;
 import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.ZipTaxData;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ public class ZipTaxService extends SalesTaxBase implements SalesTaxService {
         return webClient
                 .get()
                 .retrieve()
-                .bodyToMono(FastTaxData.class)
+                .bodyToMono(ZipTaxData.class)
                 .cast(SalesTaxData.class);
     }
 

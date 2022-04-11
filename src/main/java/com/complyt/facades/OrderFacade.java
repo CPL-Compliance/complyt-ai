@@ -26,7 +26,7 @@ public class OrderFacade {
     private OrderService orderService;
 
     public void addOrderToClient(String client, @NonNull Order order) {
-//        customerService.save(order.getCustomer());
+        //customerService.save(order.getCustomerId());
         orderService.save(order);
         clientService.addOrderToClient(client, order);
     }
