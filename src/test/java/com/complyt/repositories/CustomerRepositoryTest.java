@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.mongodb.client.result.UpdateResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -59,7 +62,7 @@ class CustomerRepositoryTest {
         List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        Assertions.assertNotNull(fluxCustomers);
+        assertNotNull(fluxCustomers);
         assertEquals(customers.size(), 1);
         assertEquals(customers.get(0), customer);
     }
@@ -77,7 +80,7 @@ class CustomerRepositoryTest {
         List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        Assertions.assertNotNull(customers);
+        assertNotNull(customers);
         assertEquals(customers.size(), 0);
     }
 
@@ -94,7 +97,7 @@ class CustomerRepositoryTest {
         List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        Assertions.assertNotNull(customers);
+        assertNotNull(customers);
         assertEquals(customers.size(), 1);
         assertEquals(customers.get(0), customer);
     }
@@ -112,7 +115,7 @@ class CustomerRepositoryTest {
         List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        Assertions.assertNotNull(customers);
+        assertNotNull(customers);
         assertEquals(customers.size(), 2);
         assertEquals(customers.get(0), customer);
         assertEquals(customers.get(1), customer2);
@@ -124,48 +127,92 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void getAllCustomers() {
+    void getAllCustomers_RetrievingAllCustomersInDB_ExpectingTwoCustomers() {
+        // Given
+        String id1 = UUID.randomUUID().toString();
+        String id2 = UUID.randomUUID().toString();
+        String externalId1 = UUID.randomUUID().toString();
+        String externalId2 = UUID.randomUUID().toString();
 
+        Customer customer1 = customer.withId(id1).withExternalId(externalId1);
+        Customer customer2 = customer.withId(id2).withExternalId(externalId2);
+
+        List<Customer> customers = new ArrayList<Customer>() {{
+            add(customer1);
+            add(customer2);
+        }};
+
+        //When
+        when(reactiveMongoTemplate.findAll(Customer.class)).thenReturn(Flux.fromIterable(customers));
+        Flux<Customer> fluxCustomers = customerRepository.getAll();
+        List<Customer> retrievedCustomers = fluxCustomers.collectList().block();
+        //Then
+        assertNotNull(retrievedCustomers);
+        assertEquals(retrievedCustomers,customers);
     }
 
     @Test
     void save_NexCustomer_CustomerSaved() {
-        // When
+        // Given
         String mongoId = UUID.randomUUID().toString();
         Customer dbCustomer = customer.withId(mongoId);
         when(reactiveMongoTemplate.save(customer)).thenReturn(Mono.just(dbCustomer));
 
-        // Given
+        // When
         Customer savedCustomer = customerRepository.save(customer);
 
         // Then
-        Assertions.assertNotNull(savedCustomer);
+        assertNotNull(savedCustomer);
         assertEquals(savedCustomer, dbCustomer);
     }
 
     @Test
-    void upsert_NoExternalIdExists_InsertsNewCustomer() {
+    void upsert_ExternalIdDoesntExist_InsertsNewCustomer() {
         // Given
-        String externalId = "1000";
+        String externalId = UUID.randomUUID().toString();
+        Customer customerWithNewExternalId = customer.withExternalId(externalId);
+
+        Query query = Query.query(Criteria.where("externalId").is(customerWithNewExternalId.getExternalId()));
+
+        Update update = new Update()
+                .set("externalId", customerWithNewExternalId.getExternalId())
+                .set("address", customer.getAddress())
+                .set("name", customer.getName());
+        UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
-        Query query = Query.query(Criteria.where("externalId").is(externalId));
-        Customer customer2 = customer.withExternalId(externalId);
-
-        //UpdateResult updateresult = customerRepository.upsert(customer2);
+        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
+        when(reactiveMongoTemplate.findOne(query,Customer.class)).thenReturn(Mono.just(customerWithNewExternalId));
+        Mono<Customer> monoCustomer = customerRepository.upsert(customerWithNewExternalId);
+        Customer insertedCustomer = monoCustomer.block();
 
         // Then
-        //Assertions.assertNotNull(updateresult.getUpsertedId());
-
+        assertNotNull(insertedCustomer);
+        assertEquals(customerWithNewExternalId, insertedCustomer);
     }
 
     @Test
-    void save_ExternalIdExists_UpdatesExistingCustomer() {
+    void upsert_ExternalIdExists_UpdateExistingCustomer() {
         // Given
+        String newName = "newName";
+        Customer existingCustomerWithNewName = customer.withExternalId(customer.getExternalId()).withName(newName);
+        Query query = Query.query(Criteria.where("externalId").is(existingCustomerWithNewName.getExternalId()));
+
+        Update update = new Update()
+                .set("externalId", existingCustomerWithNewName.getExternalId())
+                .set("address", existingCustomerWithNewName.getAddress())
+                .set("name", existingCustomerWithNewName.getName());
+        UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
+        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedResult));
+        when(customerRepository.findByExternalId(existingCustomerWithNewName.getExternalId())).thenReturn(Mono.just(existingCustomerWithNewName));
+        Mono<Customer> monoCustomer = customerRepository.upsert(existingCustomerWithNewName);
+        Customer updatedCustomer = monoCustomer.block();
 
         // Then
-
+        assertNotNull(updatedCustomer);
+        Assertions.assertEquals(existingCustomerWithNewName,updatedCustomer);
+        Assertions.assertEquals(newName,updatedCustomer.getName());
     }
 }
