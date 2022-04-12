@@ -35,17 +35,17 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("")
-    public Mono<CustomerDto> getCustomerByExternalId(@RequestParam String externalId) {
-        try {
-            Mono<Customer> customerMono = customerfacade.findByfindByExternalId(externalId);
-
-            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-        } catch (OperationFailedException operationFailedException) {
-            String reason = String.format("Customer with External id of %s cannot be found",externalId);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping("")
+//    public Mono<CustomerDto> getCustomerByExternalId(@RequestParam String externalId) {
+//        try {
+//            Mono<Customer> customerMono = customerfacade.findByfindByExternalId(externalId);
+//
+//            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
+//        } catch (OperationFailedException operationFailedException) {
+//            String reason = String.format("Customer with External id of %s cannot be found",externalId);
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     @PostMapping("")
     public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
