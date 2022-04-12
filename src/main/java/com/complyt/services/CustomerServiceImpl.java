@@ -2,14 +2,17 @@ package com.complyt.services;
 
 import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private CustomerRepository customerRepository;
@@ -29,7 +32,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> findByExternalId(String externalId) {
-        return customerRepository.findByExternalId(externalId);
+        Mono<Customer> monoCustomer = customerRepository.findByExternalId(externalId);
+        if(monoCustomer == null)
+        {
+            log.error(String.format("Failed to find customer from the data base, %s",externalId));
+            throw new OperationFailedException(String.format("Could not update customer, %s",externalId));
+        }
+        return monoCustomer;
     }
 
     @Override
