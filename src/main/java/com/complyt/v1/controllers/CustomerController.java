@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping(CustomerController.BASE_URL)
 public class CustomerController {
-    public static final String BASE_URL = "/v1/customer";
+    public static final String BASE_URL = "/v1/customers";
 
     @NonNull
     private CustomerFacade customerfacade;
@@ -35,17 +35,17 @@ public class CustomerController {
         }
     }
 
-//    @GetMapping("")
-//    public Mono<CustomerDto> getCustomerByExternalId(@RequestParam String externalId) {
-//        try {
-//            Mono<Customer> customerMono = customerfacade.findByfindByExternalId(externalId);
-//
-//            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-//        } catch (OperationFailedException operationFailedException) {
-//            String reason = String.format("Customer with External id of %s cannot be found",externalId);
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    @GetMapping("findByExternalId")
+    public Mono<CustomerDto> getCustomerByExternalId(@RequestParam String externalId) {
+        try {
+            Mono<Customer> customerMono = customerfacade.findByfindByExternalId(externalId);
+
+            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
+        } catch (OperationFailedException operationFailedException) {
+            String reason = String.format("Customer with External id of %s cannot be found",externalId);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("")
     public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
@@ -59,7 +59,7 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("findByName")
     public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
         Flux<Customer> customers = customerfacade.findByName(name);
 
