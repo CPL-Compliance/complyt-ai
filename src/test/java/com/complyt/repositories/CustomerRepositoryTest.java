@@ -37,7 +37,7 @@ class CustomerRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
-
+ 
     Customer customer;
 
     @BeforeAll

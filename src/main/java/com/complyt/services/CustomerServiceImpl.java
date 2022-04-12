@@ -28,6 +28,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Mono<Customer> findByExternalId(String externalId) {
+        return customerRepository.findByExternalId(externalId);
+    }
+
+    @Override
     public Flux<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
     }

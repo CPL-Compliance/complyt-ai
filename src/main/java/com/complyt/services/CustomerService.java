@@ -12,5 +12,7 @@ public interface CustomerService extends CrudService<Customer, String> {
 
     Mono<Customer> findOneByName(String name);
 
+    Mono<Customer> findByExternalId(String externalId);
+
     Flux<Customer> findAll();
 }
