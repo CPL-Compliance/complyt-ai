@@ -1,18 +1,16 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
-import com.complyt.services.exceptions.ResourceNotFoundException;
 import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -25,13 +23,9 @@ public class StateController {
     private StateFacade stateFacade;
 
     @GetMapping("")
-    public Mono<StateDto> getState(@RequestParam String name) {
-        try {
-            Mono<State> stateMono = stateFacade.findByName(name);
-
-            return stateMono.map(stateItem -> StateMapper.INSTANCE.stateToStateDto(stateItem));
-        } catch (ResourceNotFoundException exc) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, name + " state Not Found", exc);
-        }
+    public Mono<ResponseEntity<StateDto>> getState(@RequestParam String name) {
+        return stateFacade.findByName(name)
+                .map(customerItem -> new ResponseEntity<>(StateMapper.INSTANCE.stateToStateDto(customerItem), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND)).onErrorReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }

@@ -18,26 +18,22 @@
         <maven.test.skip>true</maven.test.skip>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.lombok.version>1.18.22</org.lombok.version>
-        <org.webFlux.version>2.6.5</org.webFlux.version>
+        <org.webFlux.version>2.6.6</org.webFlux.version>
         <org.javaTuples.version>1.2</org.javaTuples.version>
         <org.springBootStarterWeb.version>2.6.4</org.springBootStarterWeb.version>
-        <org.springBootStarterDataMongodbReactive.version>2.6.5</org.springBootStarterDataMongodbReactive.version>
-        <org.springBootDevtools.version>2.6.5</org.springBootDevtools.version>
-        <org.springBootStarterTest.version>2.6.5</org.springBootStarterTest.version>
-        <org.springBootStarterAop.version>2.6.5</org.springBootStarterAop.version>
-        <org.mockitoJunitJupiter.version>4.3.1</org.mockitoJunitJupiter.version>
+        <org.springBootStarterDataMongodbReactive.version>2.6.6</org.springBootStarterDataMongodbReactive.version>
+        <org.springBootDevtools.version>2.6.6</org.springBootDevtools.version>
+        <org.springBootStarterTest.version>2.6.6</org.springBootStarterTest.version>
+        <org.springBootStarterAop.version>2.6.6</org.springBootStarterAop.version>
+        <org.mockitoJunitJupiter.version>4.4.0</org.mockitoJunitJupiter.version>
         <org.jUnit.version>4.13.2</org.jUnit.version>
+        <org.springfox-swagger.version>3.0.0</org.springfox-swagger.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
             <version>${org.javaTuples.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>${org.springBootStarterWeb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,6 +93,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
             <version>${org.webFlux.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${org.springfox-swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${org.springfox-swagger.version}</version>
         </dependency>
     </dependencies>
     <build>
