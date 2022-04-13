@@ -1,5 +1,6 @@
 package com.complyt.facades;
 
+import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.services.ClientService;
 import com.complyt.services.CustomerService;
@@ -24,6 +25,10 @@ public class OrderFacade {
     @Qualifier("orderServiceImpl")
     @NonNull
     private OrderService orderService;
+
+    public Mono<Order> upsert(Order order) {
+        return orderService.upsert(order);
+    }
 
     public void addOrderToClient(String client, @NonNull Order order) {
         //customerService.save(order.getCustomerId());

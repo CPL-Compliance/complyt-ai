@@ -1,11 +1,16 @@
 package com.complyt.repositories;
 
+import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
+import com.complyt.repositories.exceptions.OperationFailedException;
+import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class OrderRepository {
 
     @Autowired
@@ -42,5 +48,32 @@ public class OrderRepository {
         Query query = Query.query(Criteria.where("name").is("^" + name));
 
         return reactiveMongoTemplate.find(query, Order.class);
+    }
+
+    public Mono<Order> upsert(@NonNull Order order) {
+        String externalId = order.getExternalId();
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        Update update = new Update()
+                .set("externalId", order.getExternalId())
+                .set("billingAddress", order.getBillingAddress())
+                .set("shippingAddress", order.getShippingAddress())
+                .set("customerId", order.getCustomerId());
+
+        UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).block();
+
+        if(!updateResult.wasAcknowledged())
+        {
+            log.error(String.format("Failed to write order into the data base, %s",order));
+            throw new OperationFailedException(String.format("Could not update order, %s",order));
+        }
+
+        return findByExternalId(externalId);
+    }
+
+    public Mono<Order> findByExternalId(String externalId){
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        return reactiveMongoTemplate.findOne(query, Order.class);
     }
 }

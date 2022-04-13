@@ -59,8 +59,8 @@ public class CustomerRepository {
 
         if(!updateResult.wasAcknowledged())
         {
-            log.error(String.format("Failed to write customer into the data base, %s",customer.toString()));
-            throw new OperationFailedException(String.format("Could not update customer, %s",customer.toString()));
+            log.error(String.format("Failed to write customer into the data base, %s",customer));
+            throw new OperationFailedException(String.format("Could not update customer, %s",customer));
         }
 
         return findByExternalId(externalId);

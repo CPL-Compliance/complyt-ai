@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -39,6 +40,8 @@ public class OrderServiceImpl implements OrderService {
     public Mono<Order> findById(String id) {
         return orderRepository.findById(id);
     }
+
+    public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
 
     @Override
     public Flux<Order> findAll() {
