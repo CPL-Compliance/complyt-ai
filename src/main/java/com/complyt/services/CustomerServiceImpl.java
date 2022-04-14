@@ -34,13 +34,6 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> findByExternalId(String externalId) {
         return customerRepository.findByExternalId(externalId);
 
-//        monoCustomer.switchIfEmpty()
-//        if(monoCustomer == null)
-//        {
-//            log.error(String.format("Failed to find customer from the data base, %s",externalId));
-//            throw new OperationFailedException(String.format("Could not update customer, %s",externalId));
-//        }
-//        return monoCustomer;
     }
 
     @Override
