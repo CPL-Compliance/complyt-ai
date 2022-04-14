@@ -38,16 +38,9 @@ public class CustomerController {
 
     @GetMapping("findByExternalId")
     public Mono<ResponseEntity<CustomerDto>> getCustomerByExternalId(@RequestParam String externalId) {
-//        try {
-            return customerfacade.findByfindByExternalId(externalId)
-                    .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
-                    .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-
-            //return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-//        } catch (OperationFailedException operationFailedException) {
-//            String reason = String.format("Customer with External id of %s cannot be found",externalId);
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        return customerfacade.findByfindByExternalId(externalId)
+                .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("")

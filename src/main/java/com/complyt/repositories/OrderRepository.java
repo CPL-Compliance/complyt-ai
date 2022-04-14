@@ -58,7 +58,8 @@ public class OrderRepository {
                 .set("externalId", order.getExternalId())
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
-                .set("customerId", order.getCustomerId());
+                .set("customerId", order.getCustomerId())
+                .set("items", order.getItems());
 
         UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).block();
 

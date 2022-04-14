@@ -1,6 +1,7 @@
 package com.complyt.v1.model;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.Item;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
@@ -16,5 +17,5 @@ public class OrderDto {
     private Address billingAddress;
     private Address shippingAddress;
     private ObjectId customerId;
-
+    private Item[] items;
 }

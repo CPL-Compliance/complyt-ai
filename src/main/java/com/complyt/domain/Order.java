@@ -16,6 +16,7 @@ public class Order {
     @Id
     private String id;
     private String externalId;
+    private Item[] items;
     private Address billingAddress;
     private Address shippingAddress;
     private ObjectId customerId;
