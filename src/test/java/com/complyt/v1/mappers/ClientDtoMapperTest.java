@@ -2,6 +2,7 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Client;
+import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ClientDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,10 @@ class ClientDtoMapperTest {
     void clientDtoToclient_ValidClientDto_ValidClient() {
         // Given
         String name = "Name";
-        Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
+        AddressDto AddressDto = new AddressDto("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
         ClientDto clientDto = new ClientDto();
-        clientDto.setAddress(address);
+        clientDto.setAddress(AddressDto);
         clientDto.setName(name);
         clientDto.setOrdersId(orders);
 
@@ -55,7 +56,7 @@ class ClientDtoMapperTest {
         assertThat(ObjectUtils.isEmpty(client.getId())).isEqualTo(true);
         assertThat(client.getName()).isEqualTo(name);
         assertThat(client.getOrdersId()).isEqualTo(orders);
-        assertThat(client.getAddress()).isEqualTo(address);
+        assertThat(client.getAddress()).isEqualTo(AddressDto);
     }
 
     @Test
