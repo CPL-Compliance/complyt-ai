@@ -28,15 +28,8 @@ public class OrderController {
     @NonNull
     private OrderFacade orderFacade;
 
-//    @PutMapping("")
-//    public Order createOrder(@RequestBody OrderDto orderDto) {
-//        Order createdOPrder = orderFacade.create(OrderMapper.INSTANCE.orderDtoToOrder(orderDto));
-//
-//        return createdOPrder;
-//    }
-
     @PutMapping("")
-    public Mono<ResponseEntity<OrderDto>> upsert(@RequestBody OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> update(@RequestBody OrderDto orderDto) {
         Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
         Mono<Order> orderMono = orderFacade.upsert(order);
 
