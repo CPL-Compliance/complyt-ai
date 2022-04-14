@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 import org.bson.types.ObjectId;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,8 +16,9 @@ import org.bson.types.ObjectId;
 @NoArgsConstructor
 public class OrderDto {
     private String externalId;
-    private Address billingAddress;
-    private Address shippingAddress;
+    private List<ItemDto> items;
+    private AddressDto billingAddress;
+    private AddressDto shippingAddress;
     private ObjectId customerId;
-    private Item[] items;
+
 }

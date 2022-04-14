@@ -11,6 +11,7 @@ import com.complyt.v1.model.OrderDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,14 +36,11 @@ public class OrderController {
 //    }
 
     @PutMapping("")
-    public Mono<OrderDto> upsert(@RequestBody OrderDto orderDto) {
-        try {
-            Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
-            Mono<Order> orderMono = orderFacade.upsert(order);
+    public Mono<ResponseEntity<OrderDto>> upsert(@RequestBody OrderDto orderDto) {
+        Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
+        Mono<Order> orderMono = orderFacade.upsert(order);
 
-            return orderMono.map(orderItem -> OrderMapper.INSTANCE.orderToOrderDto(orderItem));
-        } catch (OperationFailedException operationFailedException) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, orderDto.toString(), operationFailedException);
-        }
+        return orderMono.map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
+                .onErrorReturn(new ResponseEntity<>(orderDto, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }

@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.v1.model;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import lombok.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @ToString
-public class Item {
+public class ItemDto {
     private String price;
     private String quantity;
     private String description;

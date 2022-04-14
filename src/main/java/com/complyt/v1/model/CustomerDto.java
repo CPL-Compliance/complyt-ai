@@ -14,5 +14,5 @@ public class CustomerDto {
     private String id;
     private String externalId;
     private String name;
-    private Address address;
+    private AddressDto address;
 }
