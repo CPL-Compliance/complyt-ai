@@ -1,0 +1,2 @@
+- name: Trigger CircleCI Pipeline
+  uses: CircleCI-Public/trigger-circleci-pipeline-action@v1.0.4
