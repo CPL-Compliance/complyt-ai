@@ -6,6 +6,8 @@ import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Api("This is the Customer controller")
 @AllArgsConstructor
 @RestController
 @RequestMapping(CustomerController.BASE_URL)
@@ -24,6 +27,8 @@ public class CustomerController {
     private CustomerFacade customerfacade;
 
     @PutMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer", notes = "Some note")
     public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
@@ -36,6 +41,7 @@ public class CustomerController {
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
@@ -48,6 +54,7 @@ public class CustomerController {
     }
 
     @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
         Flux<Customer> customers = customerfacade.findByName(name);
 
@@ -55,6 +62,7 @@ public class CustomerController {
     }
 
     @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAllCustomers() {
         Flux<Customer> customers = customerfacade.getAllCustomers();
 

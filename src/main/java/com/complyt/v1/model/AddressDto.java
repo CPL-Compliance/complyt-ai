@@ -1,5 +1,6 @@
 package com.complyt.v1.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@ApiModel("Address")
 public class AddressDto {
     private String city;
     private String country;
