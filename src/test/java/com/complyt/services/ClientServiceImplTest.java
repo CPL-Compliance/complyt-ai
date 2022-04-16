@@ -19,7 +19,7 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ClientServiceImplTest {
+class ClientServiceImplTest
     @InjectMocks
     public ClientServiceImpl clientServiceImpl;
 
