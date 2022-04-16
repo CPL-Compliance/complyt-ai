@@ -1,7 +1,0 @@
-- name: Trigger CircleCI Pipeline
-  # You may pin to the exact commit or the version.
-  # uses: CircleCI-Public/trigger-circleci-pipeline-action@7b29cee65087ada6e38e57bd5dd086e4e3fe2e0e
-  uses: CircleCI-Public/trigger-circleci-pipeline-action@v1.0.4
-  with:
-    # An optional additional metadata parameter. Will be available on the CircleCI pipeline as GHA_Meta
-    GHA_Meta: # optional
