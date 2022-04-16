@@ -15,7 +15,7 @@
     <description>Complyt</description>
     <properties>
         <java.version>8</java.version>
-        <maven.test.skip>true</maven.test.skip>
+        <maven.test.skip>false</maven.test.skip>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.lombok.version>1.18.22</org.lombok.version>
         <org.web-flux.version>2.6.6</org.web-flux.version>

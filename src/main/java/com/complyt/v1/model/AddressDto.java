@@ -1,15 +1,14 @@
 package com.complyt.v1.model;
 
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@With
+@EqualsAndHashCode
 @ApiModel("Address")
 public class AddressDto {
     private String city;
