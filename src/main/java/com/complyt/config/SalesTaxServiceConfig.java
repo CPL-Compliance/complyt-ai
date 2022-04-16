@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class SalesTaxServiceConfig {
+public class SalesTaxServiceConfig
 
     @Profile({"zipTax", "default"})
     @Bean("salesTaxService")
