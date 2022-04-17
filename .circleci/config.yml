@@ -3,7 +3,7 @@
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.2.5
+  codecov: codecov/codecov@1.0.2
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -14,7 +14,7 @@ jobs:
     # Be sure to update the Docker image tag below to openjdk version of your application.
     # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
     docker:
-      - image: 'cimg/node:13.12-browsers'
+      - image: cimg/openjdk:11.0
       # - image: cimg/openjdk:11.0
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
@@ -22,8 +22,6 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       # Use mvn clean and package as the standard maven build phase
-      - browser-tools/install-browser-tools:
-          firefox-version: 99.0.1
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
@@ -31,8 +29,8 @@ jobs:
       - run:
           name: Test
           command: mvn test
-      - store_artifacts:
-          path:  /target
+      - codecov/upload:
+          file: target/jacoco-targets/jacoco.xml
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
