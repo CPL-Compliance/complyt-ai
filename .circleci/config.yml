@@ -22,7 +22,7 @@ jobs:
       - checkout
       # Use mvn clean and package as the standard maven build phase
       - browser-tools/install-browser-tools:
-          firefox-version: 80.0.1
+          firefox-version: 99.0.1
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
