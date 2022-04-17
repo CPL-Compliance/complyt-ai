@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;

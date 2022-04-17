@@ -57,6 +57,19 @@ class OrderRepositoryTest {
     }
 
     @Test
+    void findOneById_IdDoesNotExist_ReturnsNull(){
+        // Given
+        Query query = Query.query(Criteria.where("_id").is(order.getExternalId()));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(null);
+        Mono<Order> monoOrder = orderRepository.findById(order.getExternalId());
+
+        // Then
+        Assert.assertEquals(monoOrder,null);
+    }
+
+    @Test
     void findByExternalId_ExternalIdExists_ReturnsOneOrder(){
         // Given
         String orderExternalId = UUID.randomUUID().toString();

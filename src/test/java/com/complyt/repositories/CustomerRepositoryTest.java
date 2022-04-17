@@ -2,7 +2,9 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.domain.Order;
 import com.mongodb.client.result.UpdateResult;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -66,6 +68,20 @@ class CustomerRepositoryTest {
         assertEquals(customers.size(), 1);
         assertEquals(customers.get(0), customer);
     }
+
+    @Test
+    void findOneById_IdDoesNotExist_ReturnsNull(){
+        // Given
+
+
+        // When
+        when(reactiveMongoTemplate.findById(customer.getExternalId(), Customer.class)).thenReturn(null);
+        Mono<Customer> monoCustomer = customerRepository.findById(customer.getExternalId());
+
+        // Then
+        Assert.assertEquals(monoCustomer,null);
+    }
+
 
     @Test
     void findByName_NameDoesntExist_ReturnsEmptyList() {
