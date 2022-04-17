@@ -195,7 +195,7 @@ class CustomerRepositoryTest {
     void upsert_ExternalIdExists_UpdateExistingCustomer() {
         // Given
         String newName = "newName";
-        Customer existingCustomerWithNewName = customer.withExternalId(customer.getExternalId()).withName(newName);
+        Customer existingCustomerWithNewName = customer.withName(newName);
         Query query = Query.query(Criteria.where("externalId").is(existingCustomerWithNewName.getExternalId()));
 
         Update update = new Update()
@@ -207,6 +207,7 @@ class CustomerRepositoryTest {
         // When
         when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedResult));
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(existingCustomerWithNewName));
+
         Mono<Customer> monoCustomer = customerRepository.upsert(existingCustomerWithNewName);
         Customer updatedCustomer = monoCustomer.block();
 

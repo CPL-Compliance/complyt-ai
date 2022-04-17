@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.mongodb.client.result.UpdateResult;
@@ -75,9 +74,9 @@ class OrderRepositoryTest {
     @Test
     void upsert_ExternalIdExists_UpdateExistingOrder(){
         // Given
-        String existingExternalId = UUID.randomUUID().toString();
+
         Address newBillingAddress = new Address("newCity","newCountry","newCounty","newState","newStreet","newZip");
-        Order existingOrderWithNewAddress = order.withExternalId(order.getExternalId()).withBillingAddress(newBillingAddress);
+        Order existingOrderWithNewAddress = order.withBillingAddress(newBillingAddress);
         Query query = Query.query(Criteria.where("externalId").is(existingOrderWithNewAddress.getExternalId()));
 
         Update update = new Update()
@@ -91,6 +90,7 @@ class OrderRepositoryTest {
         // When
         when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(existingOrderWithNewAddress));
+
         Mono<Order> monoOrder = orderRepository.upsert(existingOrderWithNewAddress);
         Order updatedOrder = monoOrder.block();
 
@@ -98,6 +98,33 @@ class OrderRepositoryTest {
         assertNotNull(updatedOrder);
         Assertions.assertEquals(existingOrderWithNewAddress,updatedOrder);
         Assertions.assertEquals(newBillingAddress,updatedOrder.getBillingAddress());
+    }
+
+    @Test
+    void upsert_ExternalIdDoesNotExist_InsertNewOrder(){
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order newOrder = order.withExternalId(externalId);
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        Update update = new Update()
+                .set("externalId", externalId)
+                .set("billingAddress", order.getBillingAddress())
+                .set("shippingAddress", order.getShippingAddress())
+                .set("customerId", order.getCustomerId())
+                .set("items", order.getItems());
+        UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
+
+        // When
+        when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(newOrder));
+
+        Mono<Order> monoOrder = orderRepository.upsert(newOrder);
+        Order insertedOrder = monoOrder.block();
+
+        // Then
+        assertNotNull(insertedOrder);
+        Assertions.assertEquals(newOrder,insertedOrder);
     }
 
     @Test
