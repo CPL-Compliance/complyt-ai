@@ -30,7 +30,6 @@ jobs:
           command: mvn test
       - codecov/upload:
           file: '/target/jacoco-reports/jacoco.xml'
-          #token: env_var_name '3679358c-a0c4-402c-89cf-6f677c297c83'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
