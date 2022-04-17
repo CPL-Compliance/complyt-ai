@@ -15,44 +15,40 @@
     <description>Complyt</description>
     <properties>
         <java.version>8</java.version>
-        <maven.test.skip>true</maven.test.skip>
+        <maven.test.skip>false</maven.test.skip>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <org.lombok.version>1.18.22</org.lombok.version>
-        <org.webFlux.version>2.6.5</org.webFlux.version>
-        <org.javaTuples.version>1.2</org.javaTuples.version>
-        <org.springBootStarterWeb.version>2.6.4</org.springBootStarterWeb.version>
-        <org.springBootStarterDataMongodbReactive.version>2.6.5</org.springBootStarterDataMongodbReactive.version>
-        <org.springBootDevtools.version>2.6.5</org.springBootDevtools.version>
-        <org.springBootStarterTest.version>2.6.5</org.springBootStarterTest.version>
-        <org.springBootStarterAop.version>2.6.5</org.springBootStarterAop.version>
-        <org.mockitoJunitJupiter.version>4.3.1</org.mockitoJunitJupiter.version>
+        <org.web-flux.version>2.6.6</org.web-flux.version>
+        <org.java-tuples.version>1.2</org.java-tuples.version>
+        <org.spring-boot-starter-web.version>2.6.4</org.spring-boot-starter-web.version>
+        <org.spring-boot-starter-data-mongodb-reactive.version>2.6.6</org.spring-boot-starter-data-mongodb-reactive.version>
+        <org.spring-boot-dev-tools.version>2.6.6</org.spring-boot-dev-tools.version>
+        <org.spring-boot-starter-test.version>2.6.6</org.spring-boot-starter-test.version>
+        <org.spring-boot-starter-aop.version>2.6.6</org.spring-boot-starter-aop.version>
+        <org.mockito-junit-jupiter.version>4.4.0</org.mockito-junit-jupiter.version>
         <org.jUnit.version>4.13.2</org.jUnit.version>
+        <org.springfox-boot-starter.version>3.0.0</org.springfox-boot-starter.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
-            <version>${org.javaTuples.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>${org.springBootStarterWeb.version}</version>
+            <version>${org.java-tuples.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-            <version>${org.springBootStarterDataMongodbReactive.version}</version>
+            <version>${org.spring-boot-starter-data-mongodb-reactive.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${org.springBootDevtools.version}</version>
+            <version>${org.spring-boot-dev-tools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${org.springBootStarterTest.version}</version>
+            <version>${org.spring-boot-starter-test.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -68,13 +64,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${org.springBootStarterAop.version}</version>
+            <version>${org.spring-boot-starter-aop.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
-            <version>${org.mockitoJunitJupiter.version}</version>
+            <version>${org.mockito-junit-jupiter.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -96,7 +92,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${org.webFlux.version}</version>
+            <version>${org.web-flux.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>${org.springfox-boot-starter.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -137,6 +138,45 @@
                             <version>0.2.0</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+
+                            <dataFile>target/jacoco.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>target/jacoco-reports</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+<!--                    <systemPropertyVariables>-->
+<!--                        <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>-->
+<!--                    </systemPropertyVariables>-->
                 </configuration>
             </plugin>
         </plugins>

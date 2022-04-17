@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.Nexus;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@ApiModel("State")
 public class StateDto {
     private double salesTaxRate;
     private String abbreviation;
     private String code;
     private String name;
-    private List<Nexus> nexuses;
+    private List<NexusDto> nexuses;
 }

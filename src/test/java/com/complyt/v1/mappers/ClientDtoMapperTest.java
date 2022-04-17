@@ -2,6 +2,7 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Client;
+import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ClientDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ class ClientDtoMapperTest {
         String id = UUID.randomUUID().toString();
         String name = "Name";
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
+        AddressDto addressDto = new AddressDto("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
         Client client = new Client(id, name, address, orders);
 
@@ -32,7 +34,7 @@ class ClientDtoMapperTest {
         // Then
         assertThat(clientDto).isNotNull();
         assertThat(clientDto.getName()).isEqualTo(name);
-        assertThat(clientDto.getAddress()).isEqualTo(address);
+        assertThat(clientDto.getAddress()).isEqualTo(addressDto);
         assertThat(clientDto.getOrdersId()).isEqualTo(orders);
     }
 
@@ -40,15 +42,16 @@ class ClientDtoMapperTest {
     void clientDtoToclient_ValidClientDto_ValidClient() {
         // Given
         String name = "Name";
+        AddressDto addressDto = new AddressDto("City", "Country", "County", "State", "Street", "ZIP");
         Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
         ClientDto clientDto = new ClientDto();
-        clientDto.setAddress(address);
+        clientDto.setAddress(addressDto);
         clientDto.setName(name);
         clientDto.setOrdersId(orders);
 
         // When
-        com.complyt.domain.Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
+        Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);
 
         // Then
         assertThat(client).isNotNull();

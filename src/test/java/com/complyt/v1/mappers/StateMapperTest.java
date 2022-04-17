@@ -2,6 +2,7 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
+import com.complyt.v1.model.NexusDto;
 import com.complyt.v1.model.StateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ class StateMapperTest {
         String code = "Code";
         String name = "Name";
         List<Nexus> nexuses = null;
+        List<NexusDto> nexuseDtos = null;
 
         // Given
         State state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
@@ -38,7 +40,7 @@ class StateMapperTest {
         assertThat(stateDto.getSalesTaxRate()).isEqualTo(salesTaxRate);
         assertThat(stateDto.getAbbreviation()).isEqualTo(abbreviation);
         assertThat(stateDto.getCode()).isEqualTo(code);
-        assertThat(stateDto.getNexuses()).isEqualTo(nexuses);
+        assertThat(stateDto.getNexuses()).isEqualTo(nexuseDtos);
     }
 
     @Test
@@ -48,8 +50,8 @@ class StateMapperTest {
         double salesTaxRate = 0.5;
         String abbreviation = "Abbreviation";
         String code = "Code";
-        List<Nexus> nexuses = null;
-        StateDto stateDto = new StateDto(salesTaxRate, abbreviation, code, name, nexuses);
+        List<NexusDto> nexusDtos = null;
+        StateDto stateDto = new StateDto(salesTaxRate, abbreviation, code, name, nexusDtos);
 
         // When
         State state = StateMapper.INSTANCE.stateDtoToState(stateDto);

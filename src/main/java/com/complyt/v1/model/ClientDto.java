@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.Address;
+import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.bson.types.ObjectId;
 
@@ -11,9 +11,10 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Setter
+@ApiModel("Client")
 public class ClientDto {
     private String id;
     private String name;
-    private Address address;
+    private AddressDto address;
     private List<ObjectId> ordersId;
 }
