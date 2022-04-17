@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Setter
+@With
 @NoArgsConstructor
 public class Order {
     @Id

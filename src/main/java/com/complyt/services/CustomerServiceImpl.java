@@ -2,7 +2,6 @@ package com.complyt.services;
 
 import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
-import com.complyt.repositories.exceptions.OperationFailedException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

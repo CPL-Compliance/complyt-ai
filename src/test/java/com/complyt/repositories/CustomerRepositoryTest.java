@@ -206,7 +206,7 @@ class CustomerRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedResult));
-        when(customerRepository.findByExternalId(existingCustomerWithNewName.getExternalId())).thenReturn(Mono.just(existingCustomerWithNewName));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(existingCustomerWithNewName));
         Mono<Customer> monoCustomer = customerRepository.upsert(existingCustomerWithNewName);
         Customer updatedCustomer = monoCustomer.block();
 
