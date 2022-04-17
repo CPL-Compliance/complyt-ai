@@ -38,6 +38,18 @@ public class OrderRepository {
         return reactiveMongoTemplate.findOne(query, Order.class);
     }
 
+    public Mono<Order> findOneByName(String name) {
+        Query query = Query.query(Criteria.where("name").is("^" + name));
+
+        return reactiveMongoTemplate.findOne(query, Order.class);
+    }
+
+    public Flux<Order> findByName(String name) {
+        Query query = Query.query(Criteria.where("name").is("^" + name));
+
+        return reactiveMongoTemplate.find(query, Order.class);
+    }
+
     public Mono<Order> upsert(@NonNull Order order) {
         String externalId = order.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
