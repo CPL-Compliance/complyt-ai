@@ -29,7 +29,7 @@ public class CustomerFacade {
         return customerService.findByName(name);
     }
 
-    public Mono<Customer> findByfindByExternalId(String externalId) {
+    public Mono<Customer> findByExternalId(String externalId) {
         return customerService.findByExternalId(externalId);
     }
 

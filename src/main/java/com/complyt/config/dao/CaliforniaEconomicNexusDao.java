@@ -1,4 +1,4 @@
-package com.complyt.dao;
+package com.complyt.config.dao;
 
 import com.complyt.repositories.StateRepository;
 import lombok.AllArgsConstructor;

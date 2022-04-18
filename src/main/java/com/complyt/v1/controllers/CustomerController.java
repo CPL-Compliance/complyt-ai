@@ -43,7 +43,7 @@ public class CustomerController {
 
     @GetMapping("findByExternalId")
     public Mono<ResponseEntity<CustomerDto>> getCustomerByExternalId(@RequestParam String externalId) {
-        return customerfacade.findByfindByExternalId(externalId)
+        return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

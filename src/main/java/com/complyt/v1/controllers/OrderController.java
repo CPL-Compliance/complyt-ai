@@ -3,7 +3,7 @@ package com.complyt.v1.controllers;
 import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
-import com.complyt.repositories.exceptions.OperationFailedException;
+
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.CustomerDto;
@@ -12,11 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -35,5 +32,20 @@ public class OrderController {
 
         return orderMono.map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .onErrorReturn(new ResponseEntity<>(orderDto, HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @GetMapping("findByExternalId")
+    public Mono<ResponseEntity<OrderDto>> getOrderByExternalId(@RequestParam String externalId) {
+        return orderFacade.findByExternalId(externalId)
+                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/all")
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<OrderDto> getAllOrders() {
+        Flux<Order> orders = orderFacade.getAllOrders();
+
+        return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
     }
 }

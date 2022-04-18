@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -26,17 +27,25 @@ public class OrderFacade {
     @NonNull
     private OrderService orderService;
 
+    public Order save(Order order) {
+        return orderService.save(order);
+    }
+
     public Mono<Order> upsert(Order order) {
         return orderService.upsert(order);
     }
 
-    public void addOrderToClient(String client, @NonNull Order order) {
-        //customerService.save(order.getCustomerId());
-        orderService.save(order);
-        clientService.addOrderToClient(client, order);
+//    public void addOrderToClient(String client, @NonNull Order order) {
+//        //customerService.save(order.getCustomerId());
+//        orderService.save(order);
+//        clientService.addOrderToClient(client, order);
+//    }
+
+    public Mono<Order> findByExternalId(String externalId) {
+        return orderService.findByExternalId(externalId);
     }
 
-    public Order create(Order order) {
-        return orderService.save(order);
+    public Flux<Order> getAllOrders() {
+        return orderService.findAll();
     }
 }

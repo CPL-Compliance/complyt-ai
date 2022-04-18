@@ -37,6 +37,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Mono<Order> findByExternalId(String externalId) {
+        return orderRepository.findByExternalId(externalId);
+    }
+
+    @Override
     public Mono<Order> findById(String id) {
         return orderRepository.findById(id);
     }

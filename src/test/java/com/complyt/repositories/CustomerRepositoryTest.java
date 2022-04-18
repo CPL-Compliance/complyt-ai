@@ -2,7 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
-import com.complyt.domain.Order;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
