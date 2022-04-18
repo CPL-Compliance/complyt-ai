@@ -39,8 +39,7 @@ jobs:
       #         find . -type f -regex ".*/target/.*jar" -exec cp {} ~/artifacts/ \;
       #       when: always
       - store_artifacts:
-          path: '/target/'
-          destination: "*.jar"
+          path: '/target/complyt-0.0.4-SNAPSHOT.jar'
       - store_test_results:
             path: '~/test-results/'
       - codecov/upload:
