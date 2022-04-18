@@ -41,10 +41,11 @@ class ClientServiceImplTest {
         String street = "Street";
         String zip = "Zip";
 
-        Address address = new Address(city, country, county, state, street, zip);
-        client = new Client(id, name, address, null);
-
         AddressDto addressDto = new AddressDto(city, country, county, state, street, zip);
+        Address address = new Address(city, country, county, state, street, zip);
+
+
+        client = new Client(id, name, address, null);
         clientDto = new ClientDto(id, name, addressDto, null);
     }
 

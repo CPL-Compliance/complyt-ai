@@ -1,8 +1,7 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.Address;
+import io.swagger.annotations.ApiModel;
 import lombok.*;
-import lombok.ToString;
 
 @Getter
 @Setter
@@ -10,6 +9,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor
 @ToString
+@ApiModel("Customer")
 public class CustomerDto {
     private String id;
     private String externalId;

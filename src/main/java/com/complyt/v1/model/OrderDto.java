@@ -1,12 +1,8 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.bson.types.ObjectId;
-
 import java.util.List;
 
 @Getter
@@ -14,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor
+@ApiModel("Order")
 public class OrderDto {
     private String externalId;
     private List<ItemDto> items;

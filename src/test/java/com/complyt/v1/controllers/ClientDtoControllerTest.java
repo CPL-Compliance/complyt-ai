@@ -1,7 +1,6 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.facades.ClientFacade;
-import com.complyt.v1.exceptions.RestResponseEntityExceptionHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -11,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -27,9 +25,9 @@ public class ClientDtoControllerTest {
 
     @BeforeAll
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(clientController)
-                .setControllerAdvice(new RestResponseEntityExceptionHandler())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(clientController)
+//                .setControllerAdvice(new RestResponseEntityExceptionHandler())
+//                .build();
     }
 
     @Test
