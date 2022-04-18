@@ -8,6 +8,7 @@ jobs:
     docker:
       - image: cimg/openjdk:11.0
     steps:
+      - checkout
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
@@ -15,6 +16,7 @@ jobs:
       docker: 
         - image: cimg/openjdk:11.0
       steps:
+      - checkout
       - run:
           name: Test
           command: mvn test
