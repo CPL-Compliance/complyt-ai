@@ -12,6 +12,10 @@ jobs:
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
   test:
       docker: 
         - image: cimg/openjdk:11.0
@@ -20,12 +24,7 @@ jobs:
       - run:
           name: Test
           command: mvn test
-  code_coverage:
-      docker: 
-        - image: cimg/openjdk:11.0
-      steps:
-        - checkout
-        - codecov/upload:
+      - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
 
@@ -36,6 +35,3 @@ workflows:
       - test:
           requires:
           - build
-      - code_coverage:
-          requires:
-          - test
