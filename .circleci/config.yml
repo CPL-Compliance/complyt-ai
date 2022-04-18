@@ -81,12 +81,12 @@ workflows:
       - test:
           requires:
           - build
-      - store-artifacts:
-          requires:
-          - build
+      # - store-artifacts:
+      #     requires:
+      #     - build
       - deploy-code-coverage-report-to-codecov:
           requires:
           - test
-      # - store-test-results:
-      #     requires:
-      #     - test
+      - store-test-results:
+          requires:
+          - test
