@@ -16,6 +16,7 @@ jobs:
           root: .
           paths:
             - .
+            
   test:
       docker: 
         - image: cimg/openjdk:11.0
@@ -25,28 +26,22 @@ jobs:
       - run:
           name: Test
           command: mvn test
-      - persist_to_workspace:
-                  root: .
-                  paths:
-                      - .
-      
-  deploy-code-coverage-report:
-      docker:
-        - image: cimg/openjdk:11.0
-      steps:
-        - attach_workspace:
-            at: .
-        - codecov/upload:
+      - run:
+            name: Save test results
+            command: |
+              mkdir -p ~/test-results/
+              find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+            when: always
+      - store_test_results:
+            path: '~/test-results/'
+      - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
 
 workflows:
-  build-test-code-coverage:
+  build-test:
     jobs:
       - build
       - test:
           requires:
           - build
-      - deploy-code-coverage-report:
-          requires:
-          - test
