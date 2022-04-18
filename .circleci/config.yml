@@ -54,7 +54,7 @@ jobs:
               find . -type f -regex "/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
             when: always
         - store_test_results:
-            path: '/test-results/'
+            path: '~/test-results/'
         - persist_to_workspace:
             root: .
             paths:
