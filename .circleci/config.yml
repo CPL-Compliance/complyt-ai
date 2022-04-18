@@ -25,7 +25,14 @@ jobs:
       - run:
           name: Test
           command: mvn test
-      - codecov/upload:
+      
+  deploy_code_coverage_report:
+      docker:
+        - image: cimg/openjdk:11.0
+      steps:
+        - attach_workspace:
+            at: .
+        - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
 
@@ -36,3 +43,6 @@ workflows:
       - test:
           requires:
           - build
+      - deploy_code_coverage_report:
+          requires:
+          - test
