@@ -25,8 +25,12 @@ jobs:
       - run:
           name: Test
           command: mvn test
+      - persist_to_workspace:
+                  root: .
+                  paths:
+                      - .
       
-  deploy_code_coverage_report:
+  deploy-code-coverage-report:
       docker:
         - image: cimg/openjdk:11.0
       steps:
@@ -37,12 +41,12 @@ jobs:
             token: CODECOV_TOKEN
 
 workflows:
-  build-test-code_coverage:
+  build-test-code-coverage:
     jobs:
       - build
       - test:
           requires:
           - build
-      - deploy_code_coverage_report:
+      - deploy-code-coverage-report:
           requires:
           - test
