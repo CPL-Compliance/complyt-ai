@@ -31,15 +31,24 @@ jobs:
                   paths:
                       - .
   
-  # store-artifacts:
-  #   docker:
-  #     - image: cimg/openjdk:11.0
-  #   steps:
-  #     - attach_workspace:
-  #         at: .
-  #     - store_artifacts:
-  #         path: /target
-  #         destination: "*.jar"
+  store-artifacts:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+            name: Save artifacts results
+            command: |
+              mkdir -p ~/artifacts/
+              find . -type f -regex ".*/target/.*jar" -exec cp {} ~/artifacts/ \;
+            when: always
+      - store_artifacts:
+          path: '~/test-results/'
+      - persist_to_workspace:
+            root: .
+            paths:
+              - .
 
   store-test-results:
       docker:
@@ -81,9 +90,9 @@ workflows:
       - test:
           requires:
           - build
-      # - store-artifacts:
-      #     requires:
-      #     - build
+      - store-artifacts:
+          requires:
+          - test
       - deploy-code-coverage-report-to-codecov:
           requires:
           - test
