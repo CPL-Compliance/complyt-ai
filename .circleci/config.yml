@@ -31,15 +31,15 @@ jobs:
                   paths:
                       - .
   
-  store-artifacts:
-    docker:
-      - image: cimg/openjdk:11.0
-    steps:
-      - attach_workspace:
-          at: .
-      - store_artifacts:
-          path: /target
-          destination: "*.jar"
+  # store-artifacts:
+  #   docker:
+  #     - image: cimg/openjdk:11.0
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - store_artifacts:
+  #         path: /target
+  #         destination: "*.jar"
 
   store-test-results:
       docker:
@@ -87,6 +87,6 @@ workflows:
       - deploy-code-coverage-report-to-codecov:
           requires:
           - test
-      - store-test-results:
-          requires:
-          - test
+      # - store-test-results:
+      #     requires:
+      #     - test
