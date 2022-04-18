@@ -40,6 +40,7 @@ jobs:
       #       when: always
       - store_artifacts:
           path: '/target/'
+          destination: "*.jar"
       - store_test_results:
             path: '~/test-results/'
       - codecov/upload:
@@ -103,7 +104,7 @@ jobs:
   #             - .
 
 workflows:
-  build-test-code-coverage:
+  build-test:
     jobs:
       - build
       - test:
