@@ -1,7 +1,6 @@
 package com.complyt.v1.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.swagger.annotations.ApiModel;
 import lombok.*;
 import org.bson.types.ObjectId;
 
@@ -10,6 +9,7 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor
+@ApiModel("Order")
 public class OrderDto {
     private String id;
     private ObjectId customer_id;

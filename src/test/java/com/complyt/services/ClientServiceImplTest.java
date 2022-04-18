@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Address;
 import com.complyt.domain.Client;
 import com.complyt.repositories.ClientRepository;
+import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ClientDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -40,10 +41,11 @@ class ClientServiceImplTest {
         String street = "Street";
         String zip = "Zip";
 
+        AddressDto addressDto = new AddressDto(city, country, county, state, street, zip);
         Address address = new Address(city, country, county, state, street, zip);
-        client = new Client(id, name, address, null);
 
-        clientDto = new ClientDto(id, name, address, null);
+        client = new Client(id, name, address, null);
+        clientDto = new ClientDto(id, name, addressDto, null);
     }
 
     @Test

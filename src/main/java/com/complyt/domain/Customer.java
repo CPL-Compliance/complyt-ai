@@ -1,6 +1,7 @@
 package com.complyt.domain;
 
 import lombok.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

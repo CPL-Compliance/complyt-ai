@@ -34,7 +34,7 @@ public class CustomerRepository {
         return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 
-    public Flux<Customer> getAllCustomers() {
+    public Flux<Customer> getAll() {
         return reactiveMongoTemplate.findAll(Customer.class);
     }
 
