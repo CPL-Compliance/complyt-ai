@@ -36,7 +36,7 @@ jobs:
         - attach_workspace:
             at: .
         - store_test_results:
-            path: '/target/jacoco-reports/jacoco.xml'
+            path: '/target/jacoco-reports'
         - persist_to_workspace:
             root: .
             paths:
