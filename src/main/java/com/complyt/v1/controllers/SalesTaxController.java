@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @RestController
 @RequestMapping(SalesTaxController.BASE_URL)
-public class SalesTaxController {
+public class SalesTaxController 
     public static final String BASE_URL = "/v1/salesTax";
 
     private SalesTaxFacade salesTaxFacade;
