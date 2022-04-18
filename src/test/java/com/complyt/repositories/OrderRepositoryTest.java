@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.LinkedList;
@@ -81,7 +82,7 @@ class OrderRepositoryTest {
         Order order = monoOrder.block();
 
         // Then
-        Assert.assertNotNull(order);
+        assertNotNull(order);
     }
 
     @Test
@@ -141,10 +142,36 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void insertAll() {
+    void insertAll_InsertsAll_ReturnsAll() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        Order secondOrder = order.withExternalId(id);
+        List<Order> allOrders = new LinkedList<>();
+        allOrders.add(order);
+        allOrders.add(secondOrder);
+
+        // When
+        when(reactiveMongoTemplate.insertAll(allOrders)).thenReturn(Flux.fromIterable(allOrders));
+        List<Order> returnedOrders = orderRepository.insertAll(allOrders).collectList().block();
+
+        // Then
+        assertNotNull(returnedOrders);
+        Assertions.assertEquals(returnedOrders.size(),2);
+        Assertions.assertEquals(returnedOrders,allOrders);
     }
 
     @Test
-    void findById() {
+    void saveOrder_OrderSaved_OrderReturned() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        Order newOrder = order.withExternalId(id);
+
+        // When
+        when(reactiveMongoTemplate.save(newOrder)).thenReturn(Mono.just(newOrder));
+        Order returnedOrder = orderRepository.save(newOrder);
+
+        // Then
+        assertNotNull(returnedOrder);
+        Assertions.assertEquals(returnedOrder,newOrder);
     }
 }

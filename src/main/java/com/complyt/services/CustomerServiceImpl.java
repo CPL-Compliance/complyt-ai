@@ -47,7 +47,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Flux<Customer> findAll() {
-        return customerRepository.getAll();
+        return customerRepository.findAll();
     }
 
 }

@@ -27,8 +27,8 @@ public class OrderRepository {
         return reactiveMongoTemplate.save(order).block();
     }
 
-    public void insertAll(List<Order> orders) {
-        reactiveMongoTemplate.insertAll(orders).blockLast();
+    public Flux<Order> insertAll(List<Order> orders) {
+        return reactiveMongoTemplate.insertAll(orders);
     }
 
     public Mono<Order> findById(@NonNull String orderId) {
