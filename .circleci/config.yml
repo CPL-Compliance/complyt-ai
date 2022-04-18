@@ -29,8 +29,14 @@ jobs:
                   root: .
                   paths:
                       - .
+  store-test-results:
+      docker:
+        - image: cimg/openjdk:11.0
+      steps:
+        - store_test_results:
+            path: '/target/jacoco-reports/jacoco.xml'
       
-  deploy-code-coverage-report:
+  deploy-code-coverage-report-to-codecov:
       docker:
         - image: cimg/openjdk:11.0
       steps:
@@ -47,6 +53,9 @@ workflows:
       - test:
           requires:
           - build
-      - deploy-code-coverage-report:
+      - deploy-code-coverage-report-to-codecov:
+          requires:
+          - test
+      - store-test-results:
           requires:
           - test
