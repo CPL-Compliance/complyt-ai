@@ -31,5 +31,9 @@ workflows:
   build-test-code_coverage:
     jobs:
       - build
-      - test
-      - code_coverage
+      - test:
+          requires:
+          - build
+      - code_coverage:
+          requires:
+          - test
