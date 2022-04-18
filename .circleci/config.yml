@@ -37,6 +37,10 @@ jobs:
             at: .
         - store_test_results:
             path: '/target/jacoco-reports/jacoco.xml'
+        - persist_to_workspace:
+            root: .
+            paths:
+              - .
       
   deploy-code-coverage-report-to-codecov:
       docker:
@@ -47,6 +51,10 @@ jobs:
         - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
+        - persist_to_workspace:
+            root: .
+            paths:
+              - .
 
 workflows:
   build-test-code-coverage:
