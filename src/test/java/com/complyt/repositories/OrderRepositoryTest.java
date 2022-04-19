@@ -80,7 +80,7 @@ class OrderRepositoryTest {
         Query query = Query.query(Criteria.where("externalId").is(orderExternalId));
 
         // When
-        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(new Order()));
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order.withExternalId(orderExternalId)));
         Mono<Order> monoOrder = orderRepository.findByExternalId(orderExternalId);
         Order order = monoOrder.block();
 

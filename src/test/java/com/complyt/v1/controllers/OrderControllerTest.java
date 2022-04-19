@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.config.JacksonConfig;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -8,21 +9,24 @@ import com.complyt.facades.OrderFacade;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +37,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest(OrderController.class)
+@Import(JacksonConfig.class)
 public class OrderControllerTest {
 
     @MockBean
@@ -43,27 +48,34 @@ public class OrderControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    Order order;
+    Order orderWithId;
+
     OrderDto orderDto;
 
-    @BeforeAll
-    void setUp() {
+    @BeforeEach
+    void cleanUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new LinkedList<Item>();
-        items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
-        orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item("price", "quantity", "description", "name", "taxCode"));
+            }
+        };
+
+        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId);
+
     }
 
     @Test
     void update_OrderCreated() {
         // Given
-        when(orderFacade.upsert(any())).thenReturn(Mono.just(order));
-
+        OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
+        Order orderNoId = orderWithId.withId(null);
+        when(orderFacade.upsert(orderNoId)).thenReturn(Mono.just(orderWithId));
+        System.out.println(orderDto);
         // When + Then
         webTestClient
                 .put()
@@ -73,7 +85,6 @@ public class OrderControllerTest {
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .
                 .expectStatus().isOk();
     }
 //

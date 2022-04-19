@@ -9,12 +9,10 @@ import java.util.List;
 
 @Document(collection = "order")
 @Getter
-@EqualsAndHashCode
 @AllArgsConstructor
-@ToString
-@Setter
+@EqualsAndHashCode
 @With
-@NoArgsConstructor
+@ToString
 public class Order {
     @Id
     private String id;

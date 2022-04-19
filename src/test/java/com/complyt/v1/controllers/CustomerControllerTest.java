@@ -156,5 +156,4 @@ class CustomerControllerTest {
                 .exchange()
                 .expectStatus().isOk();
     }
-
 }

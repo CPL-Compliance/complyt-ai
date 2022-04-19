@@ -6,11 +6,10 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @EqualsAndHashCode
-@NoArgsConstructor
 @ToString
+@With
 @ApiModel("Order")
 public class OrderDto {
     private String externalId;
