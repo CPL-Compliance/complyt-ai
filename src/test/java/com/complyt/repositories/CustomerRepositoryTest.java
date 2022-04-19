@@ -225,7 +225,7 @@ class CustomerRepositoryTest {
         // When
         when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
 
-        Exception exception = assertThrows(OperationFailedException.class, () -> {
+        OperationFailedException exception = assertThrows(OperationFailedException.class, () -> {
             customerRepository.upsert(customer).block();
         });
 
@@ -315,7 +315,7 @@ class CustomerRepositoryTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.upsert(customer);
+            customerRepository.upsert(customer).block();
         });
 
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");

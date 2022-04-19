@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -48,8 +49,7 @@ public class OrderServiceImpl implements OrderService {
 
     public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
 
-    @Override
     public Flux<Order> findAll() {
-        return null;
+        return orderRepository.findAll();
     }
 }

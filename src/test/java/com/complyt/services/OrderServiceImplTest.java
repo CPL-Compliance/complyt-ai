@@ -106,4 +106,24 @@ class OrderServiceImplTest {
         assertEquals(returnedOrder,orderToSearchFor);
     }
 
+    @Test
+    void findAll_returnsAll() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order secondOrder = order.withExternalId(externalId);
+        List<Order> allOrders = new ArrayList<Order>() {{
+            add(order);
+            add(secondOrder);
+        }};
+
+        //When
+        when(orderRepository.findAll()).thenReturn(Flux.fromIterable(allOrders));
+        List<Order> returnedOrders = orderRepository.findAll().collectList().block();
+
+        //Then
+        assertNotNull(returnedOrders);
+        assertEquals(returnedOrders,allOrders);
+    }
+
+
 }

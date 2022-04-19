@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -217,5 +219,24 @@ class OrderRepositoryTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
+    void findAll_returnsAll() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order secondOrder = order.withExternalId(externalId);
+        List<Order> allOrders = new ArrayList<Order>() {{
+            add(order);
+            add(secondOrder);
+        }};
+
+        //When
+        when(reactiveMongoTemplate.findAll(Order.class)).thenReturn(Flux.fromIterable(allOrders));
+        List<Order> returnedOrders = orderRepository.findAll().collectList().block();
+
+        //Then
+        assertNotNull(returnedOrders);
+        assertEquals(returnedOrders,allOrders);
     }
 }

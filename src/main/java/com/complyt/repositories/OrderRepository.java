@@ -76,4 +76,8 @@ public class OrderRepository {
 
         return reactiveMongoTemplate.findOne(query, Order.class);
     }
+
+    public Flux<Order> findAll() {
+        return reactiveMongoTemplate.findAll(Order.class);
+    }
 }
