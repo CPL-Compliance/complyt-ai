@@ -30,7 +30,7 @@ public class CustomerController {
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer", notes = "Some note")
-    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<CustomerDto> update(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
             Mono<Customer> customerMono = customerfacade.upsert(customer);
