@@ -120,7 +120,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerByName_NameDoesExist_ReturnsEmptyList() {
+    void getCustomerByName_NameDoesNotExist_ReturnsEmptyList() {
         // Given
         String name = "name";
 
