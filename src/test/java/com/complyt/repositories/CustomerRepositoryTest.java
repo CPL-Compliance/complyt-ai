@@ -2,7 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
-import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.Assert;
@@ -277,4 +276,18 @@ class CustomerRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 
+    @Test
+    void findByName_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String name = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.findByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
+    }
 }
