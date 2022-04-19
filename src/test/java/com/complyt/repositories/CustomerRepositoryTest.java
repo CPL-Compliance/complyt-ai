@@ -290,4 +290,34 @@ class CustomerRepositoryTest {
 
         assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
     }
+
+    @Test
+    void findOneByName_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String name = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.findOneByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
+    }
+
+    @Test
+    void upsert_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Customer customer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.upsert(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
 }
