@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -25,8 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -210,6 +210,32 @@ class CustomerRepositoryTest {
         assertNotNull(insertedCustomer);
         assertEquals(customerWithNewExternalId, insertedCustomer);
     }
+
+    @Test
+    void upsert_UpsertNotAcknowledgedExist_ThrowsAnError() {
+        // Given
+
+        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
+        Update update = new Update()
+                .set("externalId", customer.getExternalId())
+                .set("address", customer.getAddress())
+                .set("name", customer.getName());
+        UpdateResult expectedUpdateResult = UpdateResult.unacknowledged();
+
+        // When
+        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
+
+        Exception exception = assertThrows(OperationFailedException.class, () -> {
+            customerRepository.upsert(customer).block();
+        });
+
+        String expectedMessage = "Could not update customer";
+        String actualMessage = exception.getMessage();
+
+        // Then
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
 
     @Test
     void upsert_ExternalIdExists_UpdateExistingCustomer() {

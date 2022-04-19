@@ -1,8 +1,10 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -26,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -139,6 +141,34 @@ class OrderRepositoryTest {
         // Then
         assertNotNull(insertedOrder);
         Assertions.assertEquals(newOrder,insertedOrder);
+    }
+
+    @Test
+    void upsert_UpsertNotAcknowledgedExist_ThrowsAnError() {
+        // Given
+
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+
+        Update update = new Update()
+                .set("externalId", order.getExternalId())
+                .set("billingAddress", order.getBillingAddress())
+                .set("shippingAddress", order.getShippingAddress())
+                .set("customerId", order.getCustomerId())
+                .set("items", order.getItems());
+        UpdateResult expectedResult = UpdateResult.unacknowledged();
+
+        // When
+        when(reactiveMongoTemplate.upsert(query,update, Order.class)).thenReturn(Mono.just(expectedResult));
+
+        Exception exception = assertThrows(OperationFailedException.class, () -> {
+            orderRepository.upsert(order).block();
+        });
+
+        String expectedMessage = "Could not update order";
+        String actualMessage = exception.getMessage();
+
+        // Then
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
