@@ -239,4 +239,34 @@ class OrderRepositoryTest {
         assertNotNull(returnedOrders);
         assertEquals(returnedOrders,allOrders);
     }
+
+    @Test
+    void upsert_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Order order = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderRepository.upsert(order).block();
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
+    void findById_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String nullId = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderRepository.findById(nullId).block();
+        });
+
+        assertEquals(nullPointerException.getMessage(), "orderId is marked non-null but is null");
+    }
 }
