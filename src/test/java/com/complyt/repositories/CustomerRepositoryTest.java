@@ -4,6 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -319,5 +320,20 @@ class CustomerRepositoryTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
+
+    @Test
+    void findById_NullGiven_ThrowsNullPointerException() {
+        // Given
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
+
+        // When
+        when(reactiveMongoTemplate.findById(customerId,Customer.class)).thenReturn(Mono.just(customer));
+        Customer returnedCustomer = customerRepository.findById(customerId).block();
+
+        // Then
+        assertNotNull(returnedCustomer);
+        Assertions.assertEquals(returnedCustomer,customer);
+
     }
 }

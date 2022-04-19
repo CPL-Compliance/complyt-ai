@@ -6,6 +6,7 @@ import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonValue;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -72,7 +73,7 @@ public class CustomerRepository {
         return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 
-    public Mono<Customer> findById(BsonValue upsertedId) {
+    public Mono<Customer> findById(ObjectId upsertedId) {
         return reactiveMongoTemplate.findById(upsertedId, Customer.class);
     }
 }
