@@ -204,4 +204,19 @@ class OrderRepositoryTest {
         assertNotNull(returnedOrder);
         Assertions.assertEquals(returnedOrder,newOrder);
     }
+
+    @Test
+    void saveOrder_Null_OrderReturned() {
+        // Given
+        Order order = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderRepository.save(order);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
 }
