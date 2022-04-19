@@ -35,12 +35,6 @@ public class OrderFacade {
         return orderService.upsert(order);
     }
 
-//    public void addOrderToClient(String client, @NonNull Order order) {
-//        //customerService.save(order.getCustomerId());
-//        orderService.save(order);
-//        clientService.addOrderToClient(client, order);
-//    }
-
     public Mono<Order> findByExternalId(String externalId) {
         return orderService.findByExternalId(externalId);
     }
