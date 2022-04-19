@@ -16,8 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -151,5 +150,65 @@ class CustomerServiceImplTest {
         assertNotNull(returnedCustomers);
         assertEquals(returnedCustomers.size(),2);
         assertEquals(returnedCustomers,allCustomers);
+    }
+
+    @Test
+    void save_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.save(nullCustomer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
+
+    @Test
+    void upsert_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.upsert(nullCustomer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
+
+    @Test
+    void findOneByName_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String nullName = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.findOneByName(nullName);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
+    }
+
+    @Test
+    void findById_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String nullId = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.findById(nullId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 }
