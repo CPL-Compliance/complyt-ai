@@ -25,19 +25,18 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.upsert(customer);
     }
 
-    public Mono<Customer> findOneByName(@NonNull String name) {
-        return customerRepository.findOneByName(name);
-    }
-
     @Override
     public Mono<Customer> findByExternalId(String externalId) {
         return customerRepository.findByExternalId(externalId);
-
     }
 
     @Override
     public Flux<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
+    }
+
+    public Mono<Customer> findOneByName(@NonNull String name) {
+        return customerRepository.findOneByName(name);
     }
 
     @Override

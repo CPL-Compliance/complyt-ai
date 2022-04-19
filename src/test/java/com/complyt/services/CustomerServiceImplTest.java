@@ -198,6 +198,21 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void findByName_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String nullName = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.findByName(nullName);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
+    }
+
+    @Test
     void findById_NullGiven_ThrowsNullPointerException() {
         // Given
         String nullId = null;
