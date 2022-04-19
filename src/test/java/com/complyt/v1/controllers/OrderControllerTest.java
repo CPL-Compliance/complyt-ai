@@ -66,13 +66,13 @@ public class OrderControllerTest {
         };
 
         orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId);
-
+        orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 
     @Test
     void update_OrderCreated() {
         // Given
-        OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
+
         Order orderNoId = orderWithId.withId(null);
         when(orderFacade.upsert(orderNoId)).thenReturn(Mono.just(orderWithId));
         System.out.println(orderDto);
@@ -93,7 +93,7 @@ public class OrderControllerTest {
     @Test
     void update_UpdateFails_Returns5xxServerError() {
         // Given
-        when(orderFacade.upsert(order)).thenThrow(OperationFailedException.class);
+        when(orderFacade.upsert(orderWithId)).thenThrow(OperationFailedException.class);
 
         // When + Then
         webTestClient
@@ -101,7 +101,7 @@ public class OrderControllerTest {
                 .uri(uriBuilder -> uriBuilder
                         .path(OrderController.BASE_URL)
                         .build())
-                .bodyValue(order)
+                .bodyValue(orderWithId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -111,7 +111,7 @@ public class OrderControllerTest {
     void getOrderByExternalId_FindsOrder_ReturnsOrder() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(order));
+        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
 
         // When + Then
         webTestClient
@@ -148,7 +148,7 @@ public class OrderControllerTest {
     @Test
     void getAllOrders_ReturnsAllOrdersFound() {
         // Given
-        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new LinkedList<>()));
+        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new ArrayList<>()));
 
         // When + Then
         webTestClient
