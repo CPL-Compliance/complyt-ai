@@ -4,12 +4,14 @@ import com.complyt.domain.Client;
 import com.complyt.facades.ClientFacade;
 import com.complyt.v1.mappers.ClientMapper;
 import com.complyt.v1.model.ClientDto;
+import io.swagger.annotations.Api;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+@Api("This is the Client controller")
 @AllArgsConstructor
 @RestController
 @Slf4j
