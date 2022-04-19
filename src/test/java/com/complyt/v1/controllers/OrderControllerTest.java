@@ -1,131 +1,175 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.Address;
+import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
+
 import com.complyt.v1.mappers.OrderMapper;
-import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.ItemDto;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Flux;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
+@WebFluxTest(OrderController.class)
 public class OrderControllerTest {
 
-    @InjectMocks
-    OrderController orderController;
+    @MockBean
+    private OrderFacade orderFacade;
 
-    @Mock
-    OrderFacade orderFacade;
+    @MockBean
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private WebTestClient webTestClient;
 
     Order order;
     OrderDto orderDto;
 
     @BeforeAll
     void setUp() {
+        String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId orderId = new ObjectId("5399aba6e4b0ae375bfdca88");
-        AddressDto billingAddress = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        AddressDto shippingAddress = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        List<ItemDto> items = new LinkedList<>();
-
-        items.add(new ItemDto("price","quantity","description","name","taxCode"));
-
-        orderDto = new OrderDto(externalId, items, billingAddress,shippingAddress,orderId);
-        order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        List<Item> items = new LinkedList<Item>();
+        items.add(new Item("price","quantity","description","name","taxCode"));
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
+        orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
     }
 
     @Test
-    void upsertOrder_OrderCreated() {
+    void update_OrderCreated() {
         // Given
-
-        // When
+        when(orderMapper.INSTANCE.orderDtoToOrder(orderDto)).thenReturn(order);
         when(orderFacade.upsert(order)).thenReturn(Mono.just(order));
-        ResponseEntity<OrderDto> returnedDto = orderController.update(orderDto).block();
 
-        // Then
-        Assertions.assertNotNull(returnedDto);
+        // When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL)
+                        .build())
+                .bodyValue(orderDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+
     }
-
-    @Test
-    void upsertOrder_OrderCreationFailed() {
-        // Given
-
-        // When
-        when(orderFacade.upsert(order)).thenReturn(Mono.empty());
-        ResponseEntity<OrderDto> returnedDto = orderController.update(orderDto).block();
-
-        // Then
-        Assertions.assertNull(returnedDto);
-    }
-
-    @Test
-    void getOrderByExternalId_OrderFound_ReturnsOrder(){
-        // Given
-        String id = UUID.randomUUID().toString();
-
-        // When
-        when(orderFacade.findByExternalId(id)).thenReturn(Mono.just(order));
-        ResponseEntity<OrderDto> returnedDto = orderController.getOrderByExternalId(id).block();
-
-        // Then
-        Assertions.assertNotNull(returnedDto);
-        assertThat(returnedDto.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void getOrderByExternalId_OrderNotFound_ReturnsError(){
-        // Given
-        String id = UUID.randomUUID().toString();
-
-        // When
-        when(orderFacade.findByExternalId(id)).thenReturn(Mono.empty());
-        ResponseEntity<OrderDto> returnedDto = orderController.getOrderByExternalId(id).block();
-
-        // Then
-        Assertions.assertNotNull(returnedDto);
-        assertThat(returnedDto.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void getAllOrders_ReturnsAllOrders() {
-        // Given
-        String id = UUID.randomUUID().toString();
-        Order order2 = order. withExternalId(id);
-        List<Order> allOrders = new LinkedList<>();
-        allOrders.add(order);
-        allOrders.add(order2);
-
-        // When
-        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(allOrders));
-        List<OrderDto> orders = orderController.getAllOrders().collectList().block();
-
-        // Then
-        Assertions.assertNotNull(orders);
-        Assertions.assertEquals(orders.size(), 2);
-    }
-
+//
+//    @Test
+//    void update_UpdateFails_Returns5xxServerError() {
+//        // Given
+//        when(orderFacade.upsert(order)).thenThrow(OperationFailedException.class);
+//
+//        // When + Then
+//        webTestClient
+//                .put()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL)
+//                        .build())
+//                .bodyValue(order)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().is5xxServerError();
+//
+//    }
+//
+//    @Test
+//    void getCustomerByExternalId_FindsCustomer_ReturnsCustomer() {
+//        // Given
+//        String externalId = UUID.randomUUID().toString();
+//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(order));
+//
+//        // When + Then
+//        webTestClient
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL + "/findByExternalId")
+//                        .queryParam("externalId", externalId)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk();
+//    }
+//
+//    @Test
+//    void getCustomerByExternalId_FindsCustomer_Returns4xxNotFound() {
+//        // Given
+//        String externalId = UUID.randomUUID().toString();
+//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+//
+//        // When + Then
+//        webTestClient
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL + "/findByExternalId")
+//                        .queryParam("externalId", externalId)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isNotFound();
+//    }
+//
+//    @Test
+//    void getCustomerByName_FindsCustomer_ReturnsCustomer() {
+//        // Given
+//        String name = "name";
+//        when(orderFacade.findByName(name)).thenReturn(Flux.fromIterable(Arrays.asList(order)));
+//
+//        // When + Then
+//        webTestClient
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL)
+//                        .queryParam("name", name)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk();
+//    }
+//
+//    @Test
+//    void getAllCustomers_ReturnsAllCustomersFound() {
+//        // Given
+//        when(orderFacade.getAllCustomers()).thenReturn(Flux.fromIterable(new LinkedList<>()));
+//
+//        // When + Then
+//        webTestClient
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL + "/all")
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk();
+//    }
 }
+
+
+
+
+
+
+

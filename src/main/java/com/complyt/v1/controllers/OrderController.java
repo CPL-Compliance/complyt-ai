@@ -1,12 +1,9 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 
-import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.mappers.OrderMapper;
-import com.complyt.v1.model.CustomerDto;
 import com.complyt.v1.model.OrderDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
