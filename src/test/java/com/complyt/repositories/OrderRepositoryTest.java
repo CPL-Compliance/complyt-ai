@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
@@ -206,7 +205,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void saveOrder_Null_OrderReturned() {
+    void saveOrder_Null_ThrowsNullPointerException() {
         // Given
         Order order = null;
 

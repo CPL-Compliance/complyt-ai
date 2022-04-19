@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.junit.Assert;
@@ -259,6 +260,21 @@ class CustomerRepositoryTest {
         assertNotNull(updatedCustomer);
         Assertions.assertEquals(existingCustomerWithNewName,updatedCustomer);
         Assertions.assertEquals(newName,updatedCustomer.getName());
+    }
+
+    @Test
+    void saveCustomer_Null_ThrowsNullPointerException() {
+        // Given
+        Customer customer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.save(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 
 }
