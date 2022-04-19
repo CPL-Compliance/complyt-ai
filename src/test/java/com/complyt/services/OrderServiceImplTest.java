@@ -140,5 +140,34 @@ class OrderServiceImplTest {
         assertEquals(returnedOrders,allOrders);
     }
 
+    @Test
+    void saveOrders_NullGiven_ThrowsException(){
+        // Given
+        List<ObjectId> nullOrders = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderServiceImpl.save(nullOrders);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "orders is marked non-null but is null");
+
+    }
+
+    @Test
+    void saveOrders_OrdersListGiven_ThrowsUnsupportedOperationException(){
+        // Given
+        List<ObjectId> orders = new LinkedList<>();
+
+        // When
+
+        // Then
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            orderServiceImpl.save(orders);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "save isn't implemented yet");
+
+    }
 
 }

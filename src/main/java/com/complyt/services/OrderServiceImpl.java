@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Override
-    public void save(List<ObjectId> orders) {
-        return;//orderRepository.insertAll(orders);
+    public void save(@NonNull List<ObjectId> orders) {
+        throw new UnsupportedOperationException("save isn't implemented yet");
     }
 
     @Override
