@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -37,8 +38,7 @@ public class OrderControllerTest {
     @MockBean
     private OrderFacade orderFacade;
 
-    @MockBean
-    private OrderMapper orderMapper;
+    private OrderMapper orderMapper = OrderMapper.INSTANCE;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -62,8 +62,7 @@ public class OrderControllerTest {
     @Test
     void update_OrderCreated() {
         // Given
-        when(orderMapper.INSTANCE.orderDtoToOrder(orderDto)).thenReturn(order);
-        when(orderFacade.upsert(order)).thenReturn(Mono.just(order));
+        when(orderFacade.upsert(any())).thenReturn(Mono.just(order));
 
         // When + Then
         webTestClient
@@ -74,8 +73,8 @@ public class OrderControllerTest {
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
+                .
                 .expectStatus().isOk();
-
     }
 //
 //    @Test
