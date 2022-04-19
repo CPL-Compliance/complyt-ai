@@ -19,8 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -77,6 +76,22 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void upsertOrder_NullGiven_NullPointerExceptionThrown(){
+        // Given
+        Order order = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderServiceImpl.upsert(order);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+
+    }
+
+    @Test
     void findByExternalId_OrderFound_ReturnsOrder() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -118,7 +133,7 @@ class OrderServiceImplTest {
 
         //When
         when(orderRepository.findAll()).thenReturn(Flux.fromIterable(allOrders));
-        List<Order> returnedOrders = orderRepository.findAll().collectList().block();
+        List<Order> returnedOrders = orderServiceImpl.findAll().collectList().block();
 
         //Then
         assertNotNull(returnedOrders);
