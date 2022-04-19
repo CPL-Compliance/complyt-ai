@@ -14,8 +14,6 @@ public interface CustomerMapper {
 
     Customer customerDtoToCustomer(CustomerDto customerDto);
     CustomerDto customerToCustomerDto(Customer customer);
-
     List<CustomerDto> customersToCustomerDtos(List<Customer> customers);
-
     List<Customer> customerDtosToCustomers(List<CustomerDto> customerDtos);
 }

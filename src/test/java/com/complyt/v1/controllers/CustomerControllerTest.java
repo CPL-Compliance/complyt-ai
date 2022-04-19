@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -66,7 +67,9 @@ class CustomerControllerTest {
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(customerItem -> customerItem, equalTo(customerDto));;
     }
 
     @Test
@@ -84,7 +87,6 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
-
     }
 
     @Test
@@ -102,7 +104,9 @@ class CustomerControllerTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(customerItem -> customerItem, equalTo(customerDto));
     }
 
     @Test
@@ -144,7 +148,12 @@ class CustomerControllerTest {
     @Test
     void getAllCustomers_ReturnsAllCustomersFound() {
         // Given
-        when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(new LinkedList<>()));
+        String id = UUID.randomUUID().toString();
+        Customer secondCustomer = customer.withExternalId(id);
+        when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(new LinkedList<Customer>() {{
+            add(customer);
+            add(secondCustomer);
+        }}));
 
         // When + Then
         webTestClient

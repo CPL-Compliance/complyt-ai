@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -39,9 +40,6 @@ public class OrderControllerTest {
     @MockBean
     private OrderFacade orderFacade;
 
-    @MockBean
-    private OrderMapper orderMapper;
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -52,7 +50,7 @@ public class OrderControllerTest {
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new LinkedList<Item>();
@@ -64,7 +62,7 @@ public class OrderControllerTest {
     @Test
     void update_OrderCreated() {
         // Given
-        when(orderFacade.upsert(order)).thenReturn(Mono.just(order));
+        when(orderFacade.upsert(any())).thenReturn(Mono.just(order));
 
         // When + Then
         webTestClient
@@ -76,7 +74,8 @@ public class OrderControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
-
+//                .expectBody(OrderDto.class)
+//                .value(orderDtoItem -> orderDtoItem.getCustomerId(), equalTo(orderDto.getCustomerId()));
     }
 
     @Test
@@ -94,7 +93,6 @@ public class OrderControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
-
     }
 
     @Test
@@ -113,6 +111,8 @@ public class OrderControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
+//                .expectBody(OrderDto.class)
+//                .value(orderItem -> orderItem,equalTo(orderDto));
     }
 
     @Test
