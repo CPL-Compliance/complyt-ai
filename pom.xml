@@ -140,6 +140,10 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.7</version>
@@ -164,18 +168,12 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <!-- Sets the path to the file which contains the execution data. -->
-
                             <dataFile>target/jacoco.exec</dataFile>
-                            <!-- Sets the output directory for the code coverage report. -->
                             <outputDirectory>target/jacoco-reports</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
                 <configuration>
-<!--                    <systemPropertyVariables>-->
-<!--                        <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>-->
-<!--                    </systemPropertyVariables>-->
                 </configuration>
             </plugin>
         </plugins>
