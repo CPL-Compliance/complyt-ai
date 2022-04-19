@@ -5,6 +5,7 @@ import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.LinkedList;
@@ -62,7 +64,6 @@ public class OrderControllerTest {
     @Test
     void update_OrderCreated() {
         // Given
-        when(orderMapper.INSTANCE.orderDtoToOrder(orderDto)).thenReturn(order);
         when(orderFacade.upsert(order)).thenReturn(Mono.just(order));
 
         // When + Then
@@ -77,99 +78,75 @@ public class OrderControllerTest {
                 .expectStatus().isOk();
 
     }
-//
-//    @Test
-//    void update_UpdateFails_Returns5xxServerError() {
-//        // Given
-//        when(orderFacade.upsert(order)).thenThrow(OperationFailedException.class);
-//
-//        // When + Then
-//        webTestClient
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL)
-//                        .build())
-//                .bodyValue(order)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().is5xxServerError();
-//
-//    }
-//
-//    @Test
-//    void getCustomerByExternalId_FindsCustomer_ReturnsCustomer() {
-//        // Given
-//        String externalId = UUID.randomUUID().toString();
-//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(order));
-//
-//        // When + Then
-//        webTestClient
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL + "/findByExternalId")
-//                        .queryParam("externalId", externalId)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk();
-//    }
-//
-//    @Test
-//    void getCustomerByExternalId_FindsCustomer_Returns4xxNotFound() {
-//        // Given
-//        String externalId = UUID.randomUUID().toString();
-//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
-//
-//        // When + Then
-//        webTestClient
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL + "/findByExternalId")
-//                        .queryParam("externalId", externalId)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isNotFound();
-//    }
-//
-//    @Test
-//    void getCustomerByName_FindsCustomer_ReturnsCustomer() {
-//        // Given
-//        String name = "name";
-//        when(orderFacade.findByName(name)).thenReturn(Flux.fromIterable(Arrays.asList(order)));
-//
-//        // When + Then
-//        webTestClient
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL)
-//                        .queryParam("name", name)
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk();
-//    }
-//
-//    @Test
-//    void getAllCustomers_ReturnsAllCustomersFound() {
-//        // Given
-//        when(orderFacade.getAllCustomers()).thenReturn(Flux.fromIterable(new LinkedList<>()));
-//
-//        // When + Then
-//        webTestClient
-//                .get()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL + "/all")
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk();
-//    }
+
+    @Test
+    void update_UpdateFails_Returns5xxServerError() {
+        // Given
+        when(orderFacade.upsert(order)).thenThrow(OperationFailedException.class);
+
+        // When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL)
+                        .build())
+                .bodyValue(order)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+
+    }
+
+    @Test
+    void getOrderByExternalId_FindsOrder_ReturnsOrder() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(order));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/findByExternalId")
+                        .queryParam("externalId", externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void getCustomerByExternalId_FindsCustomer_Returns4xxNotFound() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/findByExternalId")
+                        .queryParam("externalId", externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void getAllOrders_ReturnsAllOrdersFound() {
+        // Given
+        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new LinkedList<>()));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/all")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+    }
 }
-
-
-
-
-
-
 
