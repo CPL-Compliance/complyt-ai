@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -21,7 +22,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping(CustomerController.BASE_URL)
 public class CustomerController {
-    public static final String BASE_URL = "/v1/customer";
+    public static final String BASE_URL = "/v1/customers";
 
     @NonNull
     private CustomerFacade customerfacade;
@@ -41,9 +42,16 @@ public class CustomerController {
     }
 
     @ApiOperation(value = "This will create a customer")
+    @GetMapping("findByExternalId")
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
+        return customerfacade.findByExternalId(externalId)
+                .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
+                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
+    public CustomerDto create(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
             Customer createdCustomer = customerfacade.save(customer);
@@ -57,7 +65,7 @@ public class CustomerController {
     @ApiOperation(value = "This will get all the customers by name")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
+    public Flux<CustomerDto> getByName(@RequestParam String name) {
         Flux<Customer> customers = customerfacade.findByName(name);
 
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
@@ -66,7 +74,7 @@ public class CustomerController {
     @ApiOperation(value = "This will get all the customers in the system")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getAllCustomers() {
+    public Flux<CustomerDto> getAll() {
         Flux<Customer> customers = customerfacade.getAllCustomers();
 
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));

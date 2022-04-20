@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -16,8 +17,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @Override
-    public void save(List<ObjectId> orders) {
-        return;//orderRepository.insertAll(orders);
+    public void save(@NonNull List<ObjectId> orders) {
+        throw new UnsupportedOperationException("save isn't implemented yet");
     }
 
     @Override
@@ -26,13 +27,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> findOneByName(String name) {
-        return orderRepository.findOneByName(name);
+    public Flux<Order> findByName(String name) {
+        throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     @Override
-    public Flux<Order> findByName(String name) {
-        return orderRepository.findByName(name);
+    public Mono<Order> findOneByName(String name) {
+        throw new UnsupportedOperationException("findOneByName isn't implemented");
+    }
+
+    @Override
+    public Mono<Order> findByExternalId(String externalId) {
+        return orderRepository.findByExternalId(externalId);
     }
 
     @Override
@@ -40,8 +46,9 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(id);
     }
 
-    @Override
+    public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
+
     public Flux<Order> findAll() {
-        return null;
+        return orderRepository.findAll();
     }
 }

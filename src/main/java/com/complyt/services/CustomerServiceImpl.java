@@ -4,12 +4,14 @@ import com.complyt.domain.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private CustomerRepository customerRepository;
@@ -23,13 +25,18 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.upsert(customer);
     }
 
-    public Mono<Customer> findOneByName(@NonNull String name) {
-        return customerRepository.findOneByName(name);
+    @Override
+    public Mono<Customer> findByExternalId(String externalId) {
+        return customerRepository.findByExternalId(externalId);
     }
 
     @Override
     public Flux<Customer> findByName(@NonNull String name) {
         return customerRepository.findByName(name);
+    }
+
+    public Mono<Customer> findOneByName(@NonNull String name) {
+        return customerRepository.findOneByName(name);
     }
 
     @Override
@@ -39,7 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Flux<Customer> findAll() {
-        return customerRepository.getAll();
+        return customerRepository.findAll();
     }
 
 }

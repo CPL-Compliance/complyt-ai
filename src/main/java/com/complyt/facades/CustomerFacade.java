@@ -29,6 +29,10 @@ public class CustomerFacade {
         return customerService.findByName(name);
     }
 
+    public Mono<Customer> findByExternalId(String externalId) {
+        return customerService.findByExternalId(externalId);
+    }
+
     public Flux<Customer> getAllCustomers() {
         return customerService.findAll();
     }

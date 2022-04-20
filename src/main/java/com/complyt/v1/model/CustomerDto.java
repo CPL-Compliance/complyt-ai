@@ -9,6 +9,7 @@ import lombok.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @ToString
+@With
 @ApiModel("Customer")
 public class CustomerDto {
     private String id;

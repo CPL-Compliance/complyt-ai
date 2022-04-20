@@ -42,11 +42,12 @@ class ClientDtoMapperTest {
     void clientDtoToclient_ValidClientDto_ValidClient() {
         // Given
         String name = "Name";
+
         AddressDto addressDto = new AddressDto("City", "Country", "County", "State", "Street", "ZIP");
-        Address address = new Address("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
         ClientDto clientDto = new ClientDto();
         clientDto.setAddress(addressDto);
+
         clientDto.setName(name);
         clientDto.setOrdersId(orders);
 
@@ -58,7 +59,6 @@ class ClientDtoMapperTest {
         assertThat(ObjectUtils.isEmpty(client.getId())).isEqualTo(true);
         assertThat(client.getName()).isEqualTo(name);
         assertThat(client.getOrdersId()).isEqualTo(orders);
-        assertThat(client.getAddress()).isEqualTo(address);
     }
 
     @Test
