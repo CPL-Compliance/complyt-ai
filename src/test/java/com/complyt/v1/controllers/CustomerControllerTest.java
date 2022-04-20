@@ -70,7 +70,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void updateCustomer_NewCustomerCreated_SavesCustomer() {
+    void update_NewCustomerCreated_SavesCustomer() {
         // Given
         when(customerFacade.upsert(customer)).thenReturn(Mono.just(customer));
 
@@ -106,7 +106,43 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerByExternalId_FindsCustomer_ReturnsCustomer() {
+    void create_NewCustomerCreated_SavesCustomer() {
+        // Given
+        when(customerFacade.save(customer)).thenReturn(customer);
+
+        // When + Then
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerController.BASE_URL)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(CustomerDto.class)
+                .value(customerItem -> customerItem, equalTo(customerDto));
+    }
+
+    @Test
+    void create_CreateFails_Returns5xxServerError() {
+        // Given
+        when(customerFacade.save(customer)).thenThrow(OperationFailedException.class);
+
+        // When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerController.BASE_URL)
+                        .build())
+                .bodyValue(customer)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.just(customer));
@@ -126,7 +162,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerByExternalId_OperationFails_Returns4xxNotFound() {
+    void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
@@ -144,7 +180,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerByName_FindsCustomer_ReturnsCustomer() {
+    void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
         List<Customer> customersFoundByName = new ArrayList<Customer> (){{
@@ -167,7 +203,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
+    void getAll_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);

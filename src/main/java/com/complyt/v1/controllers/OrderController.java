@@ -37,7 +37,7 @@ public class OrderController {
 
     @ApiOperation(value = "This will return the order if found by externalId, otherwise it will throw an error")
     @GetMapping("findByExternalId")
-    public Mono<ResponseEntity<OrderDto>> getOrderByExternalId(@RequestParam String externalId) {
+    public Mono<ResponseEntity<OrderDto>> getByExternalId(@RequestParam String externalId) {
         return orderFacade.findByExternalId(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -46,8 +46,8 @@ public class OrderController {
     @ApiOperation(value = "This will return all the orders found in the collection")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<OrderDto> getAllOrders() {
-        Flux<Order> orders = orderFacade.getAllOrders();
+    public Flux<OrderDto> getAll() {
+        Flux<Order> orders = orderFacade.getAll();
 
         return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
     }

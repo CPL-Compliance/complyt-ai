@@ -124,7 +124,7 @@ public class OrderFacadeTest {
 
         // When
         when(orderService.findAll()).thenReturn(Flux.fromIterable(allOrders));
-        List<Order> returnedCustomers = orderFacade.getAllOrders().collectList().block();
+        List<Order> returnedCustomers = orderFacade.getAll().collectList().block();
 
         // Then
         assertNotNull(returnedCustomers);

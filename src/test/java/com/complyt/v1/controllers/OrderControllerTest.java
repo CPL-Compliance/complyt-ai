@@ -82,7 +82,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void updateOrder_NewOrderCreated_SavesOrder() {
+    void update_NewOrderCreated_SavesOrder() {
         // Given
 
         Order orderNoId = orderWithId.withId(null);
@@ -120,7 +120,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getOrderByExternalId_FindsOrder_ReturnsOrder() {
+    void getByExternalId_FindsOrder_ReturnsOrder() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
@@ -140,7 +140,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getOrderByExternalId_OperationFails_Returns4xxNotFound() {
+    void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
@@ -158,7 +158,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getAllOrders_ExpectTwoOrders_ReturnsTwoOrders() {
+    void getAll_ExpectTwoOrders_ReturnsTwoOrders() {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
@@ -173,7 +173,7 @@ public class OrderControllerTest {
             add(secondOrderNoId);
         }};
 
-        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new ArrayList<Order>() {{
+        when(orderFacade.getAll()).thenReturn(Flux.fromIterable(new ArrayList<Order>() {{
             add(firstOrder);
             add(secondOrder);
         }}));

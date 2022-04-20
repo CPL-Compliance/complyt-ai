@@ -39,7 +39,7 @@ public class OrderFacade {
         return orderService.findByExternalId(externalId);
     }
 
-    public Flux<Order> getAllOrders() {
+    public Flux<Order> getAll() {
         return orderService.findAll();
     }
 }

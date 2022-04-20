@@ -42,7 +42,7 @@ public class CustomerController {
     }
 
     @GetMapping("findByExternalId")
-    public Mono<ResponseEntity<CustomerDto>> getCustomerByExternalId(@RequestParam String externalId) {
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
         return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -50,7 +50,7 @@ public class CustomerController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
+    public CustomerDto create(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
             Customer createdCustomer = customerfacade.save(customer);
@@ -63,7 +63,7 @@ public class CustomerController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
+    public Flux<CustomerDto> getByName(@RequestParam String name) {
         Flux<Customer> customers = customerfacade.findByName(name);
 
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
@@ -71,7 +71,7 @@ public class CustomerController {
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getAllCustomers() {
+    public Flux<CustomerDto> getAll() {
         Flux<Customer> customers = customerfacade.getAllCustomers();
 
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
