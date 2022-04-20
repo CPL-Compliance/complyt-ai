@@ -266,4 +266,32 @@ class OrderRepositoryTest {
 
         assertEquals(nullPointerException.getMessage(), "orderId is marked non-null but is null");
     }
+
+    @Test
+    void findByName_NameGiven_ThrowsUnsupportedOperationException(){
+        // Given
+        String name = "name";
+        // When
+
+        // Then
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            orderRepository.findByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
+    }
+
+    @Test
+    void findOneByName_NameGiven_ThrowsUnsupportedOperationException(){
+        // Given
+        String name = "name";
+        // When
+
+        // Then
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            orderRepository.findOneByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
+    }
 }

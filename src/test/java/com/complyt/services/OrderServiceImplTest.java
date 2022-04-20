@@ -175,7 +175,33 @@ class OrderServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "save isn't implemented yet");
-
     }
 
+    @Test
+    void findByName_NameGiven_ThrowsUnsupportedOperationException(){
+        // Given
+        String name = "name";
+        // When
+
+        // Then
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            orderServiceImpl.findByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
+    }
+
+    @Test
+    void findOneByName_NameGiven_ThrowsUnsupportedOperationException(){
+        // Given
+        String name = "name";
+        // When
+
+        // Then
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            orderServiceImpl.findOneByName(name);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
+    }
 }

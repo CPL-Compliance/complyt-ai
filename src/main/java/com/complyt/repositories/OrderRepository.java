@@ -38,15 +38,11 @@ public class OrderRepository {
     }
 
     public Mono<Order> findOneByName(String name) {
-        Query query = Query.query(Criteria.where("name").is("^" + name));
-
-        return reactiveMongoTemplate.findOne(query, Order.class);
+        throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     public Flux<Order> findByName(String name) {
-        Query query = Query.query(Criteria.where("name").is("^" + name));
-
-        return reactiveMongoTemplate.find(query, Order.class);
+        throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     public Mono<Order> upsert(@NonNull Order order) {

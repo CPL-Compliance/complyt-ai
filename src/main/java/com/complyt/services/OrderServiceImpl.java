@@ -27,13 +27,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> findOneByName(String name) {
-        return orderRepository.findOneByName(name);
+    public Flux<Order> findByName(String name) {
+        throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     @Override
-    public Flux<Order> findByName(String name) {
-        return orderRepository.findByName(name);
+    public Mono<Order> findOneByName(String name) {
+        throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     @Override

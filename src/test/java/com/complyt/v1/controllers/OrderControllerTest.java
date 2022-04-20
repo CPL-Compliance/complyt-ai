@@ -144,20 +144,22 @@ public class OrderControllerTest {
     @Test
     void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
         // Given
-        Order orderNoId = orderWithId.withId(null);
-        Order secondOrderNoId = orderWithId.withId(null);
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        OrderDto orderNoId = orderDto.withExternalId(firstId);
+        OrderDto secondOrderNoId = orderDto.withExternalId(secondId);
 
-        String id = UUID.randomUUID().toString();
-        Order secondOrderWithId = orderWithId.withId(id);
+        Order firstOrder = orderWithId.withExternalId(firstId);
+        Order secondOrder = orderWithId.withExternalId(secondId);
 
-        List<Order> allOrdersWithNoId = new ArrayList<Order>() {{
+        List<OrderDto> allOrdersWithNoId = new ArrayList<OrderDto>() {{
             add(orderNoId);
             add(secondOrderNoId);
         }};
 
         when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new ArrayList<Order>() {{
-            add(orderWithId);
-            add(secondOrderWithId);
+            add(firstOrder);
+            add(secondOrder);
         }}));
 
         // When + Then
@@ -169,7 +171,7 @@ public class OrderControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Order.class)
+                .expectBodyList(OrderDto.class)
                 .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
     }
 }
