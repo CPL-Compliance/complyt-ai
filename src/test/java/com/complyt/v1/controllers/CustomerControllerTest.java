@@ -131,7 +131,7 @@ class CustomerControllerTest {
 
         // When + Then
         webTestClient
-                .put()
+                .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerController.BASE_URL)
                         .build())
