@@ -46,7 +46,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void saveCustomer_CustomerSavedAndReturned(){
+    void saveCustomer_CustomerSaved_CustomerReturned(){
         // Given
 
         // When
@@ -59,7 +59,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void upsertCustomer_TheInsertedCustomerReturned() {
+    void upsertCustomer_CustomerInserted_CustomerReturned() {
         // Given
 
         // When
@@ -68,10 +68,11 @@ class CustomerFacadeTest {
 
         // Then
         assertNotNull(returnedCustomer);
+        assertEquals(customer,returnedCustomer);
     }
 
     @Test
-    void getCustomerByName_CustomerFoundAndReturned() {
+    void getCustomerByName_CustomerFound_CustomerReturned() {
         // Given
         String name = "NameToSearchFor";
 
@@ -85,7 +86,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void getCustomerByExternalId_CustomerFoundAndReturned() {
+    void getCustomerByExternalId_CustomerFound_CustomerReturned() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);
@@ -97,10 +98,11 @@ class CustomerFacadeTest {
         // Then
         assertNotNull(returnedCustomer);
         assertEquals(returnedCustomer.getExternalId(),id);
+        assertEquals(customerToSearchFor,returnedCustomer);
     }
 
     @Test
-    void getAllCustomers_AllCustomersReturned() {
+    void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);

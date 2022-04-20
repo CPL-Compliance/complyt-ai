@@ -54,7 +54,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void update_CustomerCreated() {
+    void updateCustomer_NewCustomerCreated_SavesCustomer() {
         // Given
         when(customerFacade.upsert(customer)).thenReturn(Mono.just(customer));
 
@@ -110,7 +110,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerByExternalId_FindsCustomer_Returns4xxNotFound() {
+    void getCustomerByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
@@ -146,7 +146,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getAllCustomers_ReturnsAllCustomersFound() {
+    void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);

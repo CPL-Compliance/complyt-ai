@@ -39,12 +39,16 @@ class OrderServiceImplTest {
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId orderId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new LinkedList<Item>();
-        items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,orderId);
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item("price", "quantity", "description", "name", "taxCode"));
+            }
+        };
+
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
     }
 
     @Test
@@ -122,7 +126,7 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void findAll_returnsAll() {
+    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         Order secondOrder = order.withExternalId(externalId);

@@ -27,6 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,7 +69,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void update_OrderCreated() {
+    void updateOrder_NewOrderCreated_SavesOrder() {
         // Given
 
         Order orderNoId = orderWithId.withId(null);
@@ -126,7 +127,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getCustomerByExternalId_FindsCustomer_Returns4xxNotFound() {
+    void getOrderByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
@@ -144,9 +145,14 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getAllOrders_ReturnsAllOrdersFound() {
+    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
         // Given
-        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new ArrayList<>()));
+        String id = UUID.randomUUID().toString();
+        Order secondOrder = orderWithId.withExternalId(id);
+        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new LinkedList<Order>() {{
+            add(orderWithId);
+            add(secondOrder);
+        }}));
 
         // When + Then
         webTestClient

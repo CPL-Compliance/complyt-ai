@@ -49,18 +49,17 @@ public class OrderFacadeTest {
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId orderId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new LinkedList<Item>();
         items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,orderId);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
     }
 
     @Test
-    public void saveOrder_OrderSavedAndReturned(){
+    public void saveOrder_OrderSaved_OrderReturned(){
         // Given
-        String name = "name";
 
         // When
         when(orderService.save(order)).thenReturn(order);
@@ -72,7 +71,7 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void upsertOrder_TheInsertedOrderReturned() {
+    void upsertOrder_OrderInserted_OrderReturned() {
         // Given
 
         // When
@@ -81,10 +80,11 @@ public class OrderFacadeTest {
 
         // Then
         assertNotNull(returnedOrder);
+        assertEquals(order,returnedOrder);
     }
 
     @Test
-    void addOrderToClient_OrderaddedToClient() {
+    void addOrderToClient_OrderAddedToClient_OrderReturned() {
         // Given
 
         // When
@@ -93,11 +93,12 @@ public class OrderFacadeTest {
 
         // Then
         assertNotNull(returnedOrder);
+        assertEquals(order,returnedOrder);
     }
 
 
     @Test
-    void getOrderByExternalId_OrderFoundAndReturned() {
+    void getOrderByExternalId_OrderFound_OrderReturned() {
         // Given
         String id = UUID.randomUUID().toString();
         Order orderToSearchFor = order.withExternalId(id);
@@ -109,10 +110,11 @@ public class OrderFacadeTest {
         // Then
         assertNotNull(returnedCustomer);
         assertEquals(returnedCustomer.getExternalId(),id);
+        assertEquals(returnedCustomer,orderToSearchFor);
     }
 
     @Test
-    void getAllOrders_AllOrdersReturned() {
+    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
         // Given
         String id = UUID.randomUUID().toString();
         Order secondOrder = order.withExternalId(id);
