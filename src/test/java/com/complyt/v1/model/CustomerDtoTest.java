@@ -35,12 +35,12 @@ public class CustomerDtoTest {
     }
 
     @Test
-    void equals_IdenticalStates_Equal() {
+    void equals_IdenticalCustomers_Equal() {
         assertEquals(customerDto, anotherCustomerDto);
     }
 
     @Test
-    void hashCode_IdenticalStates_Equal() {
+    void hashCode_IdenticalCustomers_Equal() {
         assertEquals(customerDto.hashCode(), anotherCustomerDto.hashCode());
     }
 

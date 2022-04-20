@@ -90,6 +90,7 @@ class OrderRepositoryTest {
         // Given
 
         Address newBillingAddress = new Address("newCity","newCountry","newCounty","newState","newStreet","newZip");
+        Address newShippingAddress = new Address("newCity","newCountry","newCounty","newState","newStreet","newZip");
         Order existingOrderWithNewAddress = order.withBillingAddress(newBillingAddress);
         Query query = Query.query(Criteria.where("externalId").is(existingOrderWithNewAddress.getExternalId()));
 
@@ -112,6 +113,7 @@ class OrderRepositoryTest {
         assertNotNull(updatedOrder);
         Assertions.assertEquals(existingOrderWithNewAddress,updatedOrder);
         Assertions.assertEquals(newBillingAddress,updatedOrder.getBillingAddress());
+        Assertions.assertEquals(newShippingAddress,updatedOrder.getShippingAddress());
     }
 
     @Test
