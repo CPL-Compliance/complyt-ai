@@ -14,7 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -104,7 +106,7 @@ class CustomerServiceImplTest {
     void findByName_TwoCustomersFound_ReturnsTwoCustomers() {
         // Given
         Customer secondCustomer = customer.withName(customer.getName());
-        List<Customer> customersWithSameName = new LinkedList<>();
+        List<Customer> customersWithSameName = new ArrayList<>();
         customersWithSameName.add(customer);
         customersWithSameName.add(secondCustomer);
 

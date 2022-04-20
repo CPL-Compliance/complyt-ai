@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.repositories.OrderRepository;
@@ -17,7 +16,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -161,7 +162,10 @@ class OrderServiceImplTest {
     @Test
     void saveOrders_OrdersListGiven_ThrowsUnsupportedOperationException(){
         // Given
-        List<ObjectId> orders = new LinkedList<>();
+        List<ObjectId> orders = new ArrayList<ObjectId>(){{
+            add(new ObjectId());
+            add(new ObjectId());
+        }};
 
         // When
 

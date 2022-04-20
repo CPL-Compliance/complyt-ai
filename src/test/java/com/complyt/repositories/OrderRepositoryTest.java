@@ -1,13 +1,11 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,7 +23,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +48,7 @@ class OrderRepositoryTest {
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new LinkedList<Item>();
+        List<Item> items = new ArrayList<>();
         items.add(new Item("price","quantity","description","name","taxCode"));
         order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
     }
@@ -70,7 +67,7 @@ class OrderRepositoryTest {
         Mono<Order> monoOrder = orderRepository.findById(order.getExternalId());
 
         // Then
-        Assert.assertEquals(monoOrder,null);
+        assertNull(monoOrder);
     }
 
     @Test
@@ -177,7 +174,7 @@ class OrderRepositoryTest {
         // Given
         String id = UUID.randomUUID().toString();
         Order secondOrder = order.withExternalId(id);
-        List<Order> allOrders = new LinkedList<>();
+        List<Order> allOrders = new ArrayList<>();
         allOrders.add(order);
         allOrders.add(secondOrder);
 

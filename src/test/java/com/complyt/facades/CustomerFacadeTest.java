@@ -14,8 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -106,7 +106,7 @@ class CustomerFacadeTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);
-        List<Customer> allCustomers = new LinkedList<>();
+        List<Customer> allCustomers = new ArrayList<>();
         allCustomers.add(customer);
         allCustomers.add(secondCustomer);
 

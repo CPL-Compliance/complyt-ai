@@ -20,10 +20,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
@@ -69,7 +68,7 @@ class CustomerControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CustomerDto.class)
-                .value(customerItem -> customerItem, equalTo(customerDto));;
+                .value(customerItem -> customerItem, equalTo(customerDto));
     }
 
     @Test
@@ -131,7 +130,10 @@ class CustomerControllerTest {
     void getCustomerByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
-        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        List<Customer> customersFoundByName = new ArrayList<Customer> (){{
+            add(customer);
+        }};
+        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
         // When + Then
         webTestClient
@@ -142,18 +144,23 @@ class CustomerControllerTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk().
+                 expectBodyList(Customer.class)
+                .value(customers -> customers , equalTo(customersFoundByName));
     }
 
     @Test
     void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
-        Customer secondCustomer = customer.withExternalId(id);
-        when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(new LinkedList<Customer>() {{
+        Customer secondCustomer = customer.withId(id);
+
+        List<Customer> allCustomers = new ArrayList<Customer>() {{
             add(customer);
             add(secondCustomer);
-        }}));
+        }};
+
+        when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(allCustomers));
 
         // When + Then
         webTestClient
@@ -163,6 +170,8 @@ class CustomerControllerTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBodyList(Customer.class)
+                .value(customers -> customers , equalTo(allCustomers));
     }
 }

@@ -5,7 +5,6 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
-
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,7 +25,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -147,11 +144,20 @@ public class OrderControllerTest {
     @Test
     void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
         // Given
+        Order orderNoId = orderWithId.withId(null);
+        Order secondOrderNoId = orderWithId.withId(null);
+
         String id = UUID.randomUUID().toString();
-        Order secondOrder = orderWithId.withExternalId(id);
-        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new LinkedList<Order>() {{
+        Order secondOrderWithId = orderWithId.withId(id);
+
+        List<Order> allOrdersWithNoId = new ArrayList<Order>() {{
+            add(orderNoId);
+            add(secondOrderNoId);
+        }};
+
+        when(orderFacade.getAllOrders()).thenReturn(Flux.fromIterable(new ArrayList<Order>() {{
             add(orderWithId);
-            add(secondOrder);
+            add(secondOrderWithId);
         }}));
 
         // When + Then
@@ -162,7 +168,9 @@ public class OrderControllerTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBodyList(Order.class)
+                .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
     }
 }
 
