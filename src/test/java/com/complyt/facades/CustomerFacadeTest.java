@@ -3,6 +3,7 @@ package com.complyt.facades;
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
 import com.complyt.services.CustomerService;
+import com.complyt.v1.controllers.CustomerController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -19,8 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -43,6 +43,20 @@ class CustomerFacadeTest {
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         customer = new Customer(id, externalId, name, address);
+    }
+
+    @Test
+    void initFacade_NullServiceInstanceGiven_ThrowsNullPointerException(){
+        // Given
+        CustomerService service = null;
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            CustomerFacade controller = new CustomerFacade(service);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
     }
 
     @Test
