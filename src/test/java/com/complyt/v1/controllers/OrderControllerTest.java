@@ -142,7 +142,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
+    void getAllOrders_ExpectTwoOrders_ReturnsTwoOrders() {
         // Given
         Order orderNoId = orderWithId.withId(null);
         Order secondOrderNoId = orderWithId.withId(null);
