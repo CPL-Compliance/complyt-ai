@@ -2,6 +2,7 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -50,6 +53,20 @@ class CustomerControllerTest {
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
         customerDto = new CustomerDto(id, externalId, name, address);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+    }
+
+    @Test
+    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException(){
+        // Given
+        CustomerFacade facade = null;
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            CustomerController controller = new CustomerController(facade);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customerfacade is marked non-null but is null");
     }
 
     @Test
