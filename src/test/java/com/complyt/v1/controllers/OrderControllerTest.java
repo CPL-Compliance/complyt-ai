@@ -142,7 +142,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
+    void getAllOrders_ExpectTwoOrders_ReturnsTwoOrders() {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
