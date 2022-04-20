@@ -53,7 +53,7 @@ class CustomerFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerFacade controller = new CustomerFacade(service);
+            CustomerFacade facade = new CustomerFacade(service);
         });
 
         assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
