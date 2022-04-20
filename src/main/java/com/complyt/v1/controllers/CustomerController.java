@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -27,10 +26,10 @@ public class CustomerController {
     @NonNull
     private CustomerFacade customerfacade;
 
+    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer", notes = "Some note")
-    public Mono<CustomerDto> update(@RequestBody CustomerDto customerDto) {
+    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
             Mono<Customer> customerMono = customerfacade.upsert(customer);
@@ -41,6 +40,7 @@ public class CustomerController {
         }
     }
 
+    @ApiOperation(value = "This will create a customer")
     @GetMapping("findByExternalId")
     public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
         return customerfacade.findByExternalId(externalId)
@@ -61,6 +61,7 @@ public class CustomerController {
         }
     }
 
+    @ApiOperation(value = "This will get all the customers by name")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getByName(@RequestParam String name) {
@@ -69,6 +70,7 @@ public class CustomerController {
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
+    @ApiOperation(value = "This will get all the customers in the system")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
