@@ -16,13 +16,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -32,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -75,7 +73,7 @@ public class OrderControllerTest {
 
         Order orderNoId = orderWithId.withId(null);
         when(orderFacade.upsert(orderNoId)).thenReturn(Mono.just(orderWithId));
-        System.out.println(orderDto);
+
         // When + Then
         webTestClient
                 .put()
@@ -85,9 +83,9 @@ public class OrderControllerTest {
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
-//                .expectBody(OrderDto.class)
-//                .value(orderDtoItem -> orderDtoItem.getCustomerId(), equalTo(orderDto.getCustomerId()));
+                .expectStatus().isOk()
+                .expectBody(OrderDto.class)
+                .value(orderDtoItem -> orderDtoItem, equalTo(orderDto));
     }
 
     @Test
@@ -122,9 +120,9 @@ public class OrderControllerTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
-//                .expectBody(OrderDto.class)
-//                .value(orderItem -> orderItem,equalTo(orderDto));
+                .expectStatus().isOk()
+                .expectBody(OrderDto.class)
+                .value(orderItem -> orderItem,equalTo(orderDto));
     }
 
     @Test
