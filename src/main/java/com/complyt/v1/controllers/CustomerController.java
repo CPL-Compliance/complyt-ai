@@ -26,9 +26,9 @@ public class CustomerController {
     @NonNull
     private CustomerFacade customerfacade;
 
+    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer", notes = "Some note")
     public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
         try {
             Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
@@ -40,6 +40,7 @@ public class CustomerController {
         }
     }
 
+    @ApiOperation(value = "This will create a customer")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDto createCustomer(@RequestBody CustomerDto customerDto) {
@@ -53,6 +54,7 @@ public class CustomerController {
         }
     }
 
+    @ApiOperation(value = "This will get all the customers by name")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getCustomerByName(@RequestParam String name) {
@@ -61,6 +63,7 @@ public class CustomerController {
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
+    @ApiOperation(value = "This will get all the customers in the system")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAllCustomers() {
