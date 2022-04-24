@@ -28,7 +28,7 @@ class AddressTest {
     }
 
     @Test
-    void testEquals_EqualAddressValues_Equal() {
+    void equals_EqualAddressValues_Equal() {
         assertTrue(address.equals(referenceAddress));
     }
 
@@ -73,14 +73,14 @@ class AddressTest {
     }
 
     @Test
-    void testToString_SameStrings_Equal() {
+    void toString_SameStrings_Equal() {
         String referenceString = "Address(city=" + city + ", country=" + country + ", county=" + county + ", state=" + state + ", street=" + street + ", zip=" + zip + ")";
 
         assertEquals(referenceString, address.toString());
     }
 
     @Test
-    void withCity_() {
+    void withCity_SameValue_Equal() {
         String newCity = "New City";
         referenceAddress = address.withCity(newCity);
 
@@ -88,7 +88,7 @@ class AddressTest {
     }
 
     @Test
-    void withCountry() {
+    void withCountry_SameValue_Equal() {
         String newCountry = "New Country";
         referenceAddress = address.withCountry(newCountry);
 
@@ -96,7 +96,7 @@ class AddressTest {
     }
 
     @Test
-    void withCounty() {
+    void withCounty_SameValue_Equal() {
         String newCounty = "New County";
         referenceAddress = address.withCounty(newCounty);
 
@@ -104,7 +104,7 @@ class AddressTest {
     }
 
     @Test
-    void withState() {
+    void withState_SameValue_Equal() {
         String newState = "New State";
         referenceAddress = address.withState(newState);
 
@@ -112,7 +112,7 @@ class AddressTest {
     }
 
     @Test
-    void withStreet() {
+    void withStreet_SameValue_Equal() {
         String newStreet = "New Street";
         referenceAddress = address.withStreet(newStreet);
 
@@ -120,7 +120,7 @@ class AddressTest {
     }
 
     @Test
-    void withZip() {
+    void withZip_SameValue_Equal() {
         String newZip = "New ZIP";
         referenceAddress = address.withZip(newZip);
 
