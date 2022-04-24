@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
     @Bean
-    public OpenAPI springShopOpenAPI() {
+    public OpenAPI openAPIConfiguration() {
         return new OpenAPI()
                 .info(new Info().title("Complyt API")
                         .description("Complyt API")
