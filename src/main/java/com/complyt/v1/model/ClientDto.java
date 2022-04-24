@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.bson.types.ObjectId;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Setter
-@ApiModel("Client")
+@Schema(name = "Client")
 public class ClientDto {
     private String id;
     private String name;

@@ -1,8 +1,9 @@
 package com.complyt.v1.model;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.bson.types.ObjectId;
+
 import java.util.List;
 
 @Getter
@@ -10,7 +11,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @With
-@ApiModel("Order")
+@Schema(name = "Order")
 public class OrderDto {
     private String externalId;
     private List<ItemDto> items;

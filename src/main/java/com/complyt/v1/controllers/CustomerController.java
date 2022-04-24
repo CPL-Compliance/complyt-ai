@@ -6,8 +6,8 @@ import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Api("This is the Customer controller")
+@Tag(name = "Customer", description = "This is the Customer controller")
 @AllArgsConstructor
 @RestController
 @RequestMapping(CustomerController.BASE_URL)
@@ -27,7 +27,7 @@ public class CustomerController {
     @NonNull
     private CustomerFacade customerfacade;
 
-    @ApiOperation(value = "This will update the customer if found by externalId, otherwise it will create the customer")
+    @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
@@ -41,7 +41,7 @@ public class CustomerController {
         }
     }
 
-    @ApiOperation(value = "This will create a customer")
+    @Operation(summary = "Gets customer by externalId")
     @GetMapping("findByExternalId")
     public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
         return customerfacade.findByExternalId(externalId)
@@ -49,6 +49,7 @@ public class CustomerController {
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @Operation(summary = "This will create a customer")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDto create(@RequestBody CustomerDto customerDto) {
@@ -62,7 +63,7 @@ public class CustomerController {
         }
     }
 
-    @ApiOperation(value = "This will get all the customers by name")
+    @Operation(summary = "Gets all matching customers by name")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getByName(@RequestParam String name) {
@@ -71,7 +72,7 @@ public class CustomerController {
         return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
-    @ApiOperation(value = "This will get all the customers in the system")
+    @Operation(summary = "Gets all the customers")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
