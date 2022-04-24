@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +23,7 @@ public class OrderController {
     public static final String BASE_URL = "/v1/orders";
 
     @NonNull
-    private OrderFacade orderFacade;
+    private final OrderFacade orderFacade;
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create the customer")
     @PutMapping("")
@@ -32,8 +33,7 @@ public class OrderController {
         Mono<Order> orderMono = orderFacade.upsert(order);
 
         return orderMono
-                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
-                .onErrorReturn(new ResponseEntity<>(orderDto, HttpStatus.INTERNAL_SERVER_ERROR));
+                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
     }
 
     @Operation(summary = "Gets order by externalId")
@@ -42,7 +42,7 @@ public class OrderController {
     public Mono<ResponseEntity<OrderDto>> getByExternalId(@RequestParam String externalId) {
         return orderFacade.findByExternalId(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
     @Operation(summary = "Gets all the orders")

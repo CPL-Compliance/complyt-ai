@@ -3,7 +3,6 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,7 @@ import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,20 +24,16 @@ public class CustomerController {
     public static final String BASE_URL = "/v1/customers";
 
     @NonNull
-    private CustomerFacade customerfacade;
+    private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Mono<Customer> customerMono = customerfacade.upsert(customer);
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Mono<Customer> customerMono = customerfacade.upsert(customer);
 
-            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-        } catch (OperationFailedException operationFailedException) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
-        }
+        return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
     }
 
     @Operation(summary = "Gets customer by externalId")
@@ -46,30 +41,27 @@ public class CustomerController {
     public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
         return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
     @Operation(summary = "This will create a customer")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerDto create(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.save(customer);
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Customer createdCustomer = customerfacade.save(customer);
 
-            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
-        } catch (OperationFailedException operationFailedException) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
-        }
+        return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
     }
 
     @Operation(summary = "Gets all matching customers by name")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getByName(@RequestParam String name) {
-        Flux<Customer> customers = customerfacade.findByName(name);
-
-        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
+        return customerfacade
+                .findByName(name)
+                .map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item))
+                .switchIfEmpty(Flux.error(new NotFoundException(name)));
     }
 
     @Operation(summary = "Gets all the customers")

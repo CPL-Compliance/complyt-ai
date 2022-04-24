@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 @Tag(name = "Client", description = "This is the Client controller")
@@ -20,8 +21,7 @@ import reactor.core.publisher.Mono;
 public class ClientController {
     public static final String BASE_URL = "/v1/client";
 
-    private ClientFacade clientFacade;
-
+    private final ClientFacade clientFacade;
 
     @Operation(summary = "Creates client")
     @PostMapping("")
@@ -37,6 +37,8 @@ public class ClientController {
     public Mono<ClientDto> getClientByName(@RequestParam String name) {
         Mono<Client> clientMono = clientFacade.findByName(name);
 
-        return clientMono.map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem));
+        return clientMono
+                .map(clientItem -> ClientMapper.INSTANCE.clientToClientDto(clientItem))
+                .switchIfEmpty(Mono.error(new NotFoundException(name)));
     }
 }

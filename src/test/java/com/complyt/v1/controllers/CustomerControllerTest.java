@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -38,7 +39,6 @@ class CustomerControllerTest {
 
     @MockBean
     private CustomerFacade customerFacade;
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -59,6 +59,7 @@ class CustomerControllerTest {
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException(){
         // Given
         CustomerFacade facade = null;
+
         // When
 
         // Then
