@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@ApiModel("Nexus")
+@Schema(name = "Nexus")
 public class NexusDto {
     private String type;
     private List<NexusRuleDto> rules;
