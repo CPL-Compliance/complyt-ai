@@ -1,4 +1,4 @@
 package com.complyt.domain.sales_tax;
 
-public abstract class SalesTaxData {
+public interface SalesTaxData {
 }

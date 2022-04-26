@@ -40,13 +40,8 @@ public class OrderController {
     @PutMapping("{id}/salesTax")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable String id) {
-        Mono<Order> orderMono = orderFacade.setSalesTax(id);
-        Order order = orderMono.block();
-        OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
-        
-        return orderMono
-                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
-                .onErrorReturn(new ResponseEntity<>(orderDto, HttpStatus.INTERNAL_SERVER_ERROR));
+        return orderFacade.updateSalesTax(id)
+                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
     }
 
     @Operation(summary = "Gets order by externalId")

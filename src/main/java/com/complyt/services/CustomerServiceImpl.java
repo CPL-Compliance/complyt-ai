@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
+    @NonNull
     private CustomerRepository customerRepository;
 
     @Override

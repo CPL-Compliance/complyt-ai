@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.ExecutionException;
+
 @Component
 @AllArgsConstructor
 public class OrderFacade {
@@ -32,7 +34,6 @@ public class OrderFacade {
     @NonNull
     private SalesTaxService salesTaxService;
 
-
     public Order save(Order order) {
         return orderService.save(order);
     }
@@ -49,10 +50,18 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> setSalesTax(String id) {
-        Order order = orderService.findByExternalId(id).block();
-        SalesTax salesTax = salesTaxService.getSalesTax(order.getShippingAddress(),order.getItems());
+    public Mono<Order> updateSalesTax(String id) {
+        Order order = null;
+        try {
+            order = orderService.findByExternalId(id).toFuture().get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        SalesTax salesTax = salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems());
         Order orderWithSalesTax = order.withSalesTax(salesTax);
+
         return orderService.update(orderWithSalesTax);
     }
 }

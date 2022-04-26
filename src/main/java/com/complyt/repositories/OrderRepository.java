@@ -89,12 +89,12 @@ public class OrderRepository {
                 .set("items", order.getItems())
                 .set("salesTax",order.getSalesTax());
 
-        UpdateResult updateResult = reactiveMongoTemplate.updateFirst(query,update,Order.class).block();
-        if(!updateResult.wasAcknowledged())
-        {
-            log.error(String.format("Failed to write order into the data base, %s",order));
-            throw new OperationFailedException(String.format("Could not update order, %s",order));
-        }
+        Mono<UpdateResult> updateResult = reactiveMongoTemplate.updateFirst(query,update,Order.class);
+//        if(!updateResult.wasAcknowledged())
+//        {
+//            log.error(String.format("Failed to write order into the data base, %s",order));
+//            throw new OperationFailedException(String.format("Could not update order, %s",order));
+//        }
 
         return findByExternalId(externalId);
     }

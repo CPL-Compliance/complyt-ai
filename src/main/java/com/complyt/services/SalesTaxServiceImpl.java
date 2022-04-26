@@ -7,11 +7,12 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.mappers.SalesTaxDataMapper;
+import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapperImpl;
+import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -25,21 +26,22 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    SalesTaxCalculator salesTaxCalculator;
+    SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
 
     @NonNull
-    @Autowired
-    @Qualifier("fastTaxDataMapper")
-    SalesTaxDataMapper salesTaxDataMapper;
+    SalesTaxCalculator salesTaxCalculator;
 
     @Override
     public SalesTax getSalesTax(Address address, List<Item> items) {
-        Mono<SalesTaxData> monoSalesTaxData = salesTaxWebClientWrapper
-                .findByAddress(address.getZip(),address.getStreet(), address.getCity(), address.getState());
+        Mono<SalesTaxData> monoSalesTaxData = null;
+        try {
+            monoSalesTaxData = salesTaxWebClientWrapper.findByAddress(address);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        SalesTaxData salesTaxData = monoSalesTaxData.block();
-        SalesTaxRate salesTaxRate = SalesTaxDataMapper.INSTANCE.salesTaxDataToSalesTaxRate(salesTaxData);
-        return salesTaxCalculator.calculate(salesTaxRate,items);
+        Mono<SalesTaxRate> monoSalesTaxRate = monoSalesTaxData.map(item -> salesTaxDataToSalesTaxRateMapper.map(item));
 
+        return salesTaxCalculator.calculate(monoSalesTaxRate, items);
     }
 }

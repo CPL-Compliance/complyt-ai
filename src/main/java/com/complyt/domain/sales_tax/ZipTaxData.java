@@ -9,7 +9,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class ZipTaxData extends SalesTaxData {
+public class ZipTaxData implements SalesTaxData {
     private String version;
     private long rCode;
     private List<Result> results;
