@@ -43,6 +43,9 @@ public class OrderFacadeTest {
     @Mock
     ClientService clientService;
 
+    @Mock
+    SalesTaxService salesTaxService;
+
     Order order;
 
     @BeforeAll
@@ -54,10 +57,7 @@ public class OrderFacadeTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
-        OrderService orderService = new OrderServiceImpl(new OrderRepository());
-        CustomerService customerService = new CustomerServiceImpl(new CustomerRepository());
-        ClientService clientService = new ClientServiceImpl(new ClientRepository());
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
+            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
@@ -82,7 +82,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
+            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "clientService is marked non-null but is null");
@@ -96,10 +96,24 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
+            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
+    }
+
+    @Test
+    void initFacade_NullSalesTaxServiceInstanceGiven_ThrowsNullPointerException(){
+        // Given
+        salesTaxService = null;
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
     }
 
     @Test

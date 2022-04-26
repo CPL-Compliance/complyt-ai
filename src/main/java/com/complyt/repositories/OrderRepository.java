@@ -76,4 +76,26 @@ public class OrderRepository {
     public Flux<Order> findAll() {
         return reactiveMongoTemplate.findAll(Order.class);
     }
+
+    public Mono<Order> update(Order order) {
+        String externalId = order.getExternalId();
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        Update update = new Update()
+                .set("externalId", order.getExternalId())
+                .set("billingAddress", order.getBillingAddress())
+                .set("shippingAddress", order.getShippingAddress())
+                .set("customerId", order.getCustomerId())
+                .set("items", order.getItems())
+                .set("salesTax",order.getSalesTax());
+
+        UpdateResult updateResult = reactiveMongoTemplate.updateFirst(query,update,Order.class).block();
+        if(!updateResult.wasAcknowledged())
+        {
+            log.error(String.format("Failed to write order into the data base, %s",order));
+            throw new OperationFailedException(String.format("Could not update order, %s",order));
+        }
+
+        return findByExternalId(externalId);
+    }
 }

@@ -50,7 +50,7 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.domain.sales_tax;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class ZipTaxData implements SalesTaxData {
+public class ZipTaxData extends SalesTaxData {
     private String version;
     private long rCode;
     private List<Result> results;

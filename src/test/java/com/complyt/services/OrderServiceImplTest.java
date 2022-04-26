@@ -49,7 +49,7 @@ class OrderServiceImplTest {
             }
         };
 
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
     }
 
     @Test

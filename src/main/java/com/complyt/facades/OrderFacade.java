@@ -1,10 +1,11 @@
 package com.complyt.facades;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.services.ClientService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.OrderService;
+import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +28,11 @@ public class OrderFacade {
     @NonNull
     private OrderService orderService;
 
+    @Qualifier("salesTaxServiceImpl")
+    @NonNull
+    private SalesTaxService salesTaxService;
+
+
     public Order save(Order order) {
         return orderService.save(order);
     }
@@ -41,5 +47,12 @@ public class OrderFacade {
 
     public Flux<Order> getAll() {
         return orderService.findAll();
+    }
+
+    public Mono<Order> setSalesTax(String id) {
+        Order order = orderService.findByExternalId(id).block();
+        SalesTax salesTax = salesTaxService.getSalesTax(order.getShippingAddress(),order.getItems());
+        Order orderWithSalesTax = order.withSalesTax(salesTax);
+        return orderService.update(orderWithSalesTax);
     }
 }

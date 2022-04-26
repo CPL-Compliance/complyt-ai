@@ -14,4 +14,6 @@ public interface OrderService extends CrudService<Order, String> {
     Mono<Order> findByExternalId(@NonNull String externalId);
 
     Mono<Order> upsert(@NonNull Order order);
+
+    Mono<Order> update(@NonNull Order order);
 }

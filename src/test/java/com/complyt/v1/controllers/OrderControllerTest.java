@@ -63,7 +63,7 @@ public class OrderControllerTest {
             }
         };
 
-        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId);
+        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null);
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 

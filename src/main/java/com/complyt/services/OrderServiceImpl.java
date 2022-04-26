@@ -48,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
 
     public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
 
+    public Mono<Order> update(@NonNull Order order){ return orderRepository.update(order);}
+
     public Flux<Order> findAll() {
         return orderRepository.findAll();
     }

@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.sales_tax.SalesTax;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -21,4 +22,5 @@ public class Order {
     private Address billingAddress;
     private Address shippingAddress;
     private ObjectId customerId;
+    private SalesTax salesTax;
 }
