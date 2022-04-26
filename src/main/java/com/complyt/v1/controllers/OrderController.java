@@ -37,10 +37,10 @@ public class OrderController {
     }
 
 
-    @PutMapping("{id}/salesTax")
+    @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable String id) {
-        return orderFacade.updateSalesTax(id)
+    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") String externalId) {
+        return orderFacade.updateSalesTax(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
     }
 

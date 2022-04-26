@@ -2,6 +2,10 @@ package com.complyt.config;
 
 import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.ZipTaxWebClientWrapper;
+import com.complyt.domain.sales_tax.SalesTaxCalculator;
+import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.services.SalesTaxService;
+import com.complyt.services.SalesTaxServiceImpl;
 import org.javatuples.Pair;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class SalesTaxServiceConfig {
+public class WebClientWrapperConfig {
 
     @Profile({"zipTax", "default"})
     @Bean("salesTaxWebClientWrapper")

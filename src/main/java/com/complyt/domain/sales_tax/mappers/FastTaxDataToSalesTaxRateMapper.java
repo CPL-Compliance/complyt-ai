@@ -10,8 +10,8 @@ import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public abstract class FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
-    public static FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
+public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
+    FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
 
     @Mapping(target = "cityDistrictRate", source = "cityDistrictRate")
     @Mapping(target = "cityRate", source = "cityRate")
@@ -19,9 +19,10 @@ public abstract class FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSale
     @Mapping(target = "countyRate", source = "countyRate")
     @Mapping(target = "countyDistrictRate", source = "countyDistrictRate")
     @Mapping(target = "stateRate", source = "stateRate")
-    public abstract SalesTaxRate map(TaxInfoItem taxInfoItem);
+    SalesTaxRate map(TaxInfoItem taxInfoItem);
 
-    public SalesTaxRate map(SalesTaxData salesTaxData) {
+    @Override
+    default SalesTaxRate map(SalesTaxData salesTaxData) {
         FastTaxData fastTaxData = ((FastTaxData) salesTaxData);
         TaxInfoItem taxInfoItem = fastTaxData.getTaxInfoItems().get(0);
         SalesTaxRate salesTaxRate = map(taxInfoItem);

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Component
 public class SalesTaxCalculator {
-    public SalesTax calculate(Mono<SalesTaxRate> salesTaxRate, List<Item> items){
+    public SalesTax calculate(SalesTaxRate salesTaxRate, List<Item> items){
         return null;
     }
 }

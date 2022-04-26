@@ -6,6 +6,7 @@ import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -33,8 +34,9 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implem
                 .cast(SalesTaxData.class);
     }
 
+    @SneakyThrows
     @Override
-    public Mono<SalesTaxData> findByAddress(Address address) throws JsonProcessingException {
+    public Mono<SalesTaxData> findByAddress(Address address) {
         String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": [{\"City\": \"Englewood\",\"CityDistrictRate\": \"0\",\"CityRate\": \"0.035\",\"County\": \"Arapahoe\",\"CountyDistrictRate\": \"0.011\",\"CountyRate\": \"0.0025\",\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}],\"NotesCodes\": \"1\",\"NotesDesc\": \"IsUnincorporated\",\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\",\"StateName\": \"Colorado\",\"StateRate\": \"0.029\",\"TaxRate\": \"0.0775\",\"TotalTaxExempt\": \"LABOR/SERVICES\",\"Zip\": \"80112\"}]}";
         ObjectMapper objectMapper = new ObjectMapper();
         return Mono.just(objectMapper.readValue(json, FastTaxData.class)).cast(SalesTaxData.class);

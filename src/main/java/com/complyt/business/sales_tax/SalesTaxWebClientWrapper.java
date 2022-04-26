@@ -9,5 +9,5 @@ import reactor.core.publisher.Mono;
 public interface SalesTaxWebClientWrapper {
     Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state);
 
-    Mono<SalesTaxData> findByAddress(@NonNull final Address address) throws JsonProcessingException;
+    Mono<SalesTaxData> findByAddress(@NonNull final Address address);
 }

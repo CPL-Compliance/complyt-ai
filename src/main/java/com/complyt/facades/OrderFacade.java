@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.OrderService;
@@ -50,18 +51,12 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> updateSalesTax(String id) {
-        Order order = null;
-        try {
-            order = orderService.findByExternalId(id).toFuture().get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-        SalesTax salesTax = salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems());
-        Order orderWithSalesTax = order.withSalesTax(salesTax);
+    public Mono<Order> updateSalesTax(String externalId) {
+        return orderService.findByExternalId(externalId)
+                .map((item) -> {
+                    Mono<SalesTax> monoSalesTax = salesTaxService.getSalesTax(item.getShippingAddress(), item.getItems());
 
-        return orderService.update(orderWithSalesTax);
+                    return item.withSalesTax(monoSalesTax.toFuture().join());
+                });
     }
 }
