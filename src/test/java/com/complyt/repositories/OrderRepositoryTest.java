@@ -196,7 +196,8 @@ class OrderRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.save(newOrder)).thenReturn(Mono.just(newOrder));
-        Order returnedOrder = orderRepository.save(newOrder);
+        Mono<Order> monoOrder = orderRepository.save(newOrder);
+        Order returnedOrder = monoOrder.block();
 
         // Then
         assertNotNull(returnedOrder);

@@ -48,8 +48,10 @@ class CustomerServiceImplTest {
         // Given
 
         // When
-        when(customerRepository.save(customer)).thenReturn(customer);
-        Customer returnedCustomer = customerServiceImpl.save(customer);
+        when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
+        Mono<Customer> monoCustomer = customerServiceImpl.save(customer);
+
+        Customer returnedCustomer = monoCustomer.block();
 
         // Then
         assertNotNull(returnedCustomer);

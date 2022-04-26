@@ -16,6 +16,8 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+
 @Tag(name = "Customer", description = "This is the Customer controller")
 @AllArgsConstructor
 @RestController
@@ -29,16 +31,14 @@ public class CustomerController {
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@RequestBody CustomerDto customerDto) {
         Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        Mono<Customer> customerMono = customerfacade.upsert(customer);
-
-        return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
+        return null;//customerfacade.upsert(customer).map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 
     @Operation(summary = "Gets customer by externalId")
-    @GetMapping("findByExternalId")
-    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
+    @GetMapping("{externalId}")
+    public Mono<ResponseEntity<CustomerDto>> getClient(@PathVariable("externalId") String externalId) {
         return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
@@ -47,11 +47,13 @@ public class CustomerController {
     @Operation(summary = "This will create a customer")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDto create(@RequestBody CustomerDto customerDto) {
+    public Mono<ResponseEntity<CustomerDto>> create(@RequestBody CustomerDto customerDto) {
         Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        Customer createdCustomer = customerfacade.save(customer);
 
-        return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
+        return customerfacade.save(customer)
+                .map(item -> ResponseEntity
+                        .created(URI.create(BASE_URL + "/" + item.getExternalId()))
+                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets all matching customers by name")

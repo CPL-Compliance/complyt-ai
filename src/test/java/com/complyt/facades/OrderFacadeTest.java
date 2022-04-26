@@ -107,8 +107,10 @@ public class OrderFacadeTest {
         // Given
 
         // When
-        when(orderService.save(order)).thenReturn(order);
-        Order returnedOrder = orderFacade.save(order);
+        when(orderService.save(order)).thenReturn(Mono.just(order));
+        Mono<Order> monoOrder = orderFacade.save(order);
+        Order returnedOrder = monoOrder.block();
+
 
         // Then
         assertNotNull(returnedOrder);

@@ -27,9 +27,9 @@ public class ClientController {
     @PostMapping("")
     public ClientDto createClient(@RequestBody @NonNull ClientDto clientDto) {
         Client client = ClientMapper.INSTANCE.clientDtoToClient(clientDto);
-        Client createdClient = clientFacade.createClient(client);
+        Mono<Client> createdClient = clientFacade.createClient(client);
 
-        return ClientMapper.INSTANCE.clientToClientDto(createdClient);
+        return null;//ClientMapper.INSTANCE.clientToClientDto(createdClient);
     }
 
     @Operation(summary = "Gets client by name")
