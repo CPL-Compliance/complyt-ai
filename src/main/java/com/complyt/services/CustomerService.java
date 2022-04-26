@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CustomerService extends CrudService<Customer, String> {
-    Customer save(@NonNull Customer customer);
+    Mono<Customer> save(@NonNull Customer customer);
 
     Mono<Customer> upsert(@NonNull Customer customer);
 

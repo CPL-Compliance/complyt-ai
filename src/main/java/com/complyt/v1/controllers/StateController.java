@@ -20,7 +20,7 @@ public class StateController {
     public static final String BASE_URL = "/v1/state";
 
     @NonNull
-    private StateFacade stateFacade;
+    private final StateFacade stateFacade;
 
     @Operation(summary = "Gets state by name")
     @GetMapping("")

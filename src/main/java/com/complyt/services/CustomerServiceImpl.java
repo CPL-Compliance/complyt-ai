@@ -17,7 +17,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
-    public Customer save(@NonNull Customer customer) {
+    public Mono<Customer> save(@NonNull Customer customer) {
         return customerRepository.save(customer);
     }
 

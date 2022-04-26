@@ -27,7 +27,7 @@ public class OrderFacade {
     @NonNull
     private OrderService orderService;
 
-    public Order save(Order order) {
+    public Mono<Order> save(Order order) {
         return orderService.save(order);
     }
 

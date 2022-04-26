@@ -57,8 +57,9 @@ class OrderServiceImplTest {
         // Given
 
         // When
-        when(orderRepository.save(order)).thenReturn(order);
-        Order returnedOrder = orderServiceImpl.save(order);
+        when(orderRepository.save(order)).thenReturn(Mono.just(order));
+        Mono<Order> monoOrder = orderServiceImpl.save(order);
+        Order returnedOrder = monoOrder.block();
 
         // Then
         assertNotNull(returnedOrder);

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 @Tag(name = "SalesTax", description = "This is the Sales Tax controller")
@@ -18,7 +19,7 @@ import reactor.core.publisher.Mono;
 public class SalesTaxController {
     public static final String BASE_URL = "/v1/salesTax";
 
-    private SalesTaxFacade salesTaxFacade;
+    private final SalesTaxFacade salesTaxFacade;
 
     @Operation(summary = "Gets the sales tax of the given address")
     @GetMapping("")
@@ -26,6 +27,8 @@ public class SalesTaxController {
                                           @RequestParam String address,
                                           @RequestParam String city,
                                           @RequestParam String state) {
-        return salesTaxFacade.findByAddress(zip, address, city, state);
+        return salesTaxFacade.findByAddress(zip, address, city, state)
+                .switchIfEmpty(Mono.error(new NotFoundException(String.format(
+                        "ZIP: " + zip + ", Address: " + address + ", City: " + city + ", State: " + state))));
     }
 }
