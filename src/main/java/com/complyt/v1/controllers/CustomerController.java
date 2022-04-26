@@ -33,14 +33,19 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@RequestBody CustomerDto customerDto) {
         Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        return null;//customerfacade.upsert(customer).map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
+
+        return customerfacade
+                .upsert(customer)
+                .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets customer by externalId")
     @GetMapping("{externalId}")
-    public Mono<ResponseEntity<CustomerDto>> getClient(@PathVariable("externalId") String externalId) {
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@PathVariable("externalId") String externalId) {
         return customerfacade.findByExternalId(externalId)
-                .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
+                .map(customerItem -> ResponseEntity
+                        .ok()
+                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
@@ -57,9 +62,9 @@ public class CustomerController {
     }
 
     @Operation(summary = "Gets all matching customers by name")
-    @GetMapping("")
+    @GetMapping("name/{name}")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getByName(@RequestParam String name) {
+    public Flux<CustomerDto> getByName(@PathVariable("name") String name) {
         return customerfacade
                 .findByName(name)
                 .map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item))
@@ -67,7 +72,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "Gets all the customers")
-    @GetMapping("/all")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
         Flux<Customer> customers = customerfacade.getAllCustomers();

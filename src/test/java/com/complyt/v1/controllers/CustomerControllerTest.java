@@ -2,7 +2,6 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -108,21 +106,21 @@ class CustomerControllerTest {
 
     @Test
     void create_NewCustomerCreated_SavesCustomer() {
-//        // Given
-//        when(customerFacade.save(customer)).thenReturn(Mono.just(customer));
-//
-//        // When + Then
-//        webTestClient
-//                .post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(CustomerController.BASE_URL)
-//                        .build())
-//                .bodyValue(customerDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isCreated()
-//                .expectBody(CustomerDto.class)
-//                .value(customerItem -> customerItem, equalTo(customerDto));
+        // Given
+        when(customerFacade.save(customer)).thenReturn(Mono.just(customer));
+
+        // When + Then
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerController.BASE_URL)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(CustomerDto.class)
+                .value(customerItem -> customerItem, equalTo(customerDto));
     }
 
     @Test
@@ -152,8 +150,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -172,8 +169,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -193,8 +189,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
-                        .queryParam("name", name)
+                        .path(CustomerController.BASE_URL + "/name/" + name)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -220,7 +215,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/all")
+                        .path(CustomerController.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

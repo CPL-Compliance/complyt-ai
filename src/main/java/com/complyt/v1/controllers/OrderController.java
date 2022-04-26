@@ -37,16 +37,16 @@ public class OrderController {
     }
 
     @Operation(summary = "Gets order by externalId")
-    @GetMapping("findByExternalId")
+    @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> getByExternalId(@RequestParam String externalId) {
+    public Mono<ResponseEntity<OrderDto>> getByExternalId(@PathVariable("externalId") String externalId) {
         return orderFacade.findByExternalId(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
     @Operation(summary = "Gets all the orders")
-    @GetMapping("/all")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
         Flux<Order> orders = orderFacade.getAll();
