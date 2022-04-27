@@ -3,15 +3,13 @@ package com.complyt.domain;
 import lombok.*;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @EqualsAndHashCode
-@NoArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class Item {
-    private String price;
-    private String quantity;
-    private String description;
-    private String name;
-    private String taxCode;
+    private final String price;
+    private final String quantity;
+    private final String description;
+    private final String name;
+    private final String taxCode;
 }

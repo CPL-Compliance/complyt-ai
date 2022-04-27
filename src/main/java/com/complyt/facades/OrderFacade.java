@@ -8,6 +8,7 @@ import com.complyt.services.OrderService;
 import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -49,12 +50,15 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> updateSalesTax(String externalId) {
-        return orderService.findByExternalId(externalId)
-                .map((item) -> {
-                    Mono<SalesTax> monoSalesTax = salesTaxService.getSalesTax(item.getShippingAddress(), item.getItems());
-
-                    return item.withSalesTax(monoSalesTax.toFuture().join());
-                });
+    // orderService.findByExternalId(externalId)
+    // getSalesTax(order.getShippingAddress(), order.getItems()
+    // order.withSalesTax(salesTax)
+    // orderService.update(orderWitSalesTax)
+    @SneakyThrows
+    public Order updateSalesTaxSync(String externalId) {
+        Order order = orderService.findByExternalIdSync(externalId);
+        SalesTax salesTax = salesTaxService.getSalesTaxSync(order.getShippingAddress(), order.getItems());
+        Order orderWitSalesTax = order.withSalesTax(salesTax);
+        return orderService.updateSync(orderWitSalesTax);
     }
 }

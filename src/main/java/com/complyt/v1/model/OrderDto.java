@@ -18,4 +18,5 @@ public class OrderDto {
     private AddressDto billingAddress;
     private AddressDto shippingAddress;
     private ObjectId customerId;
+    private SalesTaxDto salesTax;
 }

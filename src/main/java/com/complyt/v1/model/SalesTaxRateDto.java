@@ -1,12 +1,13 @@
-package com.complyt.domain.sales_tax;
+package com.complyt.v1.model;
 
 import lombok.*;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class SalesTaxRate {
+@With
+public class SalesTaxRateDto {
     private final float cityDistrictRate;
     private final float cityRate;
     private final float countyDistrictRate;

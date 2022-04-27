@@ -20,7 +20,7 @@
         <web-flux.version>2.6.6</web-flux.version>
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
-        <spring-boot-starter-data-mongodb-reactive.version>2.6.6</spring-boot-starter-data-mongodb-reactive.version>
+        <spring-boot-starter-data-mongodb-reactive.version>2.6.7</spring-boot-starter-data-mongodb-reactive.version>
         <spring-boot-dev-tools.version>2.6.6</spring-boot-dev-tools.version>
         <spring-boot-starter-test.version>2.6.6</spring-boot-starter-test.version>
         <spring-boot-starter-aop.version>2.6.6</spring-boot-starter-aop.version>
@@ -43,6 +43,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
             <version>${spring-boot-starter-data-mongodb-reactive.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <version>2.6.7</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -13,7 +12,10 @@ public interface OrderService extends CrudService<Order, String> {
 
     Mono<Order> findByExternalId(@NonNull String externalId);
 
+    Order findByExternalIdSync(@NonNull String externalId);
+
+
     Mono<Order> upsert(@NonNull Order order);
 
-    Mono<Order> update(@NonNull Order order);
+    Order updateSync(@NonNull Order order);
 }

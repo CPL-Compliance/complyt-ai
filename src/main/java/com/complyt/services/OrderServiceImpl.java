@@ -42,13 +42,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Order findByExternalIdSync(@NonNull String externalId) {
+        return orderRepository.findByExternalIdSync(externalId);
+    }
+
+    @Override
     public Mono<Order> findById(String id) {
         return orderRepository.findById(id);
     }
 
     public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
 
-    public Mono<Order> update(@NonNull Order order){ return orderRepository.update(order);}
+    public Mono<Order> update(@NonNull Order order){
+        return orderRepository.update(order);
+    }
+
+    public Order updateSync(@NonNull Order order){
+        return orderRepository.updateSync(order);
+    }
 
     public Flux<Order> findAll() {
         return orderRepository.findAll();

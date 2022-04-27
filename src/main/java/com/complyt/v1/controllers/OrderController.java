@@ -39,9 +39,10 @@ public class OrderController {
 
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") String externalId) {
-        return orderFacade.updateSalesTax(externalId)
-                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
+    public ResponseEntity<OrderDto> updateSalesTax(@PathVariable("externalId") String externalId) {
+        Order order = orderFacade.updateSalesTaxSync(externalId);
+
+        return new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(order), HttpStatus.OK);
     }
 
     @Operation(summary = "Gets order by externalId")

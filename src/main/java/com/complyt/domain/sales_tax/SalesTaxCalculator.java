@@ -9,6 +9,13 @@ import java.util.List;
 @Component
 public class SalesTaxCalculator {
     public SalesTax calculate(SalesTaxRate salesTaxRate, List<Item> items){
-        return null;
+        float taxRate = salesTaxRate.getTaxRate() , amount = 0;
+        for(Item item : items){
+            amount += taxRate * Float.parseFloat(item.getPrice()) * Float.parseFloat(item.getQuantity());
+        }
+
+        SalesTax salesTax = new SalesTax(salesTaxRate, amount);
+
+        return salesTax;
     }
 }

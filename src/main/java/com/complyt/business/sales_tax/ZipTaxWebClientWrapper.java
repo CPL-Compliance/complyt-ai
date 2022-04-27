@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.ZipTaxData;
+import lombok.NonNull;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +35,11 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase impleme
 
     @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
+        return null;
+    }
+
+    @Override
+    public SalesTaxData findByAddressSync(@NonNull Address address) {
         return null;
     }
 

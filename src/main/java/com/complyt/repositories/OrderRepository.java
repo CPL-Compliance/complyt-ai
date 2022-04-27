@@ -6,6 +6,7 @@ import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,6 +23,9 @@ public class OrderRepository {
 
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     public Mono<Order> save(@NonNull Order order) {
         return reactiveMongoTemplate.save(order);
@@ -55,21 +59,21 @@ public class OrderRepository {
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
                 .set("items", order.getItems());
-
-        UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).block();
-
-        if(!updateResult.wasAcknowledged())
-        {
-            log.error(String.format("Failed to write order into the data base, %s",order));
-            throw new OperationFailedException(String.format("Could not update order, %s",order));
+        try {
+            UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).toFuture().get();
+            if (!updateResult.wasAcknowledged()) {
+                log.error(String.format("Failed to write order into the data base, %s", order));
+                throw new OperationFailedException(String.format("Could not update order, %s", order));
+            }
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
         }
 
         return findByExternalId(externalId);
     }
 
-    public Mono<Order> findByExternalId(String externalId){
+    public Mono<Order> findByExternalId(String externalId) {
         Query query = Query.query(Criteria.where("externalId").is(externalId));
-
         return reactiveMongoTemplate.findOne(query, Order.class);
     }
 
@@ -77,25 +81,44 @@ public class OrderRepository {
         return reactiveMongoTemplate.findAll(Order.class);
     }
 
+    public Order updateSync(Order order) {
+        String externalId = order.getExternalId();
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        Update update = new Update()
+                .set("externalId", externalId)
+                .set("billingAddress", order.getBillingAddress())
+                .set("shippingAddress", order.getShippingAddress())
+                .set("customerId", order.getCustomerId())
+                .set("items", order.getItems())
+                .set("salesTax", order.getSalesTax());
+
+
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Order.class);
+
+        return findByExternalIdSync(externalId);
+    }
+
     public Mono<Order> update(Order order) {
         String externalId = order.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
         Update update = new Update()
-                .set("externalId", order.getExternalId())
+                .set("externalId", externalId)
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
                 .set("items", order.getItems())
-                .set("salesTax",order.getSalesTax());
+                .set("salesTax", order.getSalesTax());
 
-        Mono<UpdateResult> updateResult = reactiveMongoTemplate.updateFirst(query,update,Order.class);
-//        if(!updateResult.wasAcknowledged())
-//        {
-//            log.error(String.format("Failed to write order into the data base, %s",order));
-//            throw new OperationFailedException(String.format("Could not update order, %s",order));
-//        }
+
+        UpdateResult updateResult = reactiveMongoTemplate.updateFirst(query, update, Order.class).block();
 
         return findByExternalId(externalId);
+    }
+
+    public Order findByExternalIdSync(String externalId) {
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+        return mongoTemplate.findOne(query, Order.class);
     }
 }
