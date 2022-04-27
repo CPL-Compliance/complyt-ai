@@ -37,7 +37,8 @@ define(['N/record', 'N/https'], function (record, https) {
                 headers: header,
                 body: JSON.stringify(body)
             });
-            return JSON.parse(res.body);
+            const invoiceWithSalesTax = JSON.parse(res.body);
+            return invoiceWithSalesTax;
         }
         catch(e)
         {
@@ -63,7 +64,8 @@ define(['N/record', 'N/https'], function (record, https) {
                 headers: header,
                 body: JSON.stringify(body)
             });
-            return JSON.parse(res.body);
+            const invoice = JSON.parse(res.body);
+            return invoice;
         }
         catch(e)
         {
