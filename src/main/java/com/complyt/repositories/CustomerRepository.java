@@ -39,8 +39,8 @@ public class CustomerRepository {
         return reactiveMongoTemplate.findAll(Customer.class);
     }
 
-    public Customer save(@NonNull Customer customer) {
-        return reactiveMongoTemplate.save(customer).block();
+    public Mono<Customer> save(@NonNull Customer customer) {
+        return reactiveMongoTemplate.save(customer);
     }
 
     public Mono<Customer> findById(String id) {

@@ -13,7 +13,7 @@ public class StateServiceImpl implements StateService {
     private StateRepository stateRepository;
 
     @Override
-    public State save(State state) {
+    public Mono<State> save(State state) {
         return stateRepository.save(state);
     }
 

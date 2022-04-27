@@ -23,8 +23,8 @@ public class OrderRepository {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Order save(@NonNull Order order) {
-        return reactiveMongoTemplate.save(order).block();
+    public Mono<Order> save(@NonNull Order order) {
+        return reactiveMongoTemplate.save(order);
     }
 
     public Flux<Order> insertAll(List<Order> orders) {

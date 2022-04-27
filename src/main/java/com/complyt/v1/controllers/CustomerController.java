@@ -3,7 +3,6 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,9 +12,11 @@ import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 @Tag(name = "Customer", description = "This is the Customer controller")
 @AllArgsConstructor
@@ -25,55 +26,53 @@ public class CustomerController {
     public static final String BASE_URL = "/v1/customers";
 
     @NonNull
-    private CustomerFacade customerfacade;
+    private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<CustomerDto> upsertCustomer(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Mono<Customer> customerMono = customerfacade.upsert(customer);
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@RequestBody CustomerDto customerDto) {
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
-            return customerMono.map(customerItem -> CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-        } catch (OperationFailedException operationFailedException) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
-        }
+        return customerfacade
+                .upsert(customer)
+                .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets customer by externalId")
-    @GetMapping("findByExternalId")
-    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@RequestParam String externalId) {
+    @GetMapping("{externalId}")
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@PathVariable("externalId") String externalId) {
         return customerfacade.findByExternalId(externalId)
-                .map(customerItem -> new ResponseEntity<>(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem), HttpStatus.OK))
-                .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(customerItem -> ResponseEntity
+                        .ok()
+                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
+                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
     @Operation(summary = "This will create a customer")
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDto create(@RequestBody CustomerDto customerDto) {
-        try {
-            Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-            Customer createdCustomer = customerfacade.save(customer);
+    public Mono<ResponseEntity<CustomerDto>> create(@RequestBody CustomerDto customerDto) {
+        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
-            return CustomerMapper.INSTANCE.customerToCustomerDto(createdCustomer);
-        } catch (OperationFailedException operationFailedException) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, customerDto.toString(), operationFailedException);
-        }
+        return customerfacade.save(customer)
+                .map(item -> ResponseEntity
+                        .created(URI.create(BASE_URL + "/" + item.getExternalId()))
+                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets all matching customers by name")
-    @GetMapping("")
+    @GetMapping("name/{name}")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getByName(@RequestParam String name) {
-        Flux<Customer> customers = customerfacade.findByName(name);
-
-        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
+    public Flux<CustomerDto> getByName(@PathVariable("name") String name) {
+        return customerfacade
+                .findByName(name)
+                .map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item))
+                .switchIfEmpty(Flux.error(new NotFoundException(name)));
     }
 
     @Operation(summary = "Gets all the customers")
-    @GetMapping("/all")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
         Flux<Customer> customers = customerfacade.getAllCustomers();

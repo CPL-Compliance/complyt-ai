@@ -17,7 +17,7 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Customer save(Customer customer) {
+    public Mono<Customer> save(Customer customer) {
         return customerService.save(customer);
     }
 

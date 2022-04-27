@@ -36,6 +36,7 @@ public class OrderFacade {
     private SalesTaxService salesTaxService;
 
     public Order save(Order order) {
+    public Mono<Order> save(Order order) {
         return orderService.save(order);
     }
 

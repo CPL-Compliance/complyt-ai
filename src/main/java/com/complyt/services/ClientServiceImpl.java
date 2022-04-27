@@ -17,7 +17,7 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Override
-    public Client save(Client client) {
+    public Mono<Client> save(Client client) {
         return clientRepository.save(client);
     }
 

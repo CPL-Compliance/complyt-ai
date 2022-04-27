@@ -129,8 +129,7 @@ public class OrderControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(OrderController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -149,8 +148,7 @@ public class OrderControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(OrderController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -182,7 +180,7 @@ public class OrderControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/all")
+                        .path(OrderController.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
