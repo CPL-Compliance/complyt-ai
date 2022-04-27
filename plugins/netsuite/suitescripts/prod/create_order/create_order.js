@@ -21,9 +21,28 @@ define(['N/record', 'N/https'], function (record, https) {
         var shippingAddress = getAddress(shippingAddrRecord);
         var items = getItems(invoiceRecord);
         
-        log.debug('items',items)
 
-        createInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
+        const invoice = createInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
+        const invoiceWithSalesTax = createInvoiceWithSalesTax(invoice);
+    }
+
+    function createInvoiceWithSalesTax(invoice){
+        var header={'Content-Type':'application/json', 'Accept':'application/json'};
+        var url='https://complyt-test.herokuapp.com/v1/orders/' + invoice.externalId + '/salesTax';
+        var body = {};
+        try
+        {
+            var res = https.put({
+                url: url,
+                headers: header,
+                body: JSON.stringify(body)
+            });
+            return JSON.parse(res.body);
+        }
+        catch(e)
+        {
+            log.error('ERROR',JSON.stringify(e));
+        }
     }
 
     function createInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items){
