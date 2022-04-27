@@ -2,7 +2,6 @@ package com.complyt.facades;
 
 import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.OrderService;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ExecutionException;
 
 @Component
 @AllArgsConstructor
@@ -35,7 +33,6 @@ public class OrderFacade {
     @NonNull
     private SalesTaxService salesTaxService;
 
-    public Order save(Order order) {
     public Mono<Order> save(Order order) {
         return orderService.save(order);
     }
