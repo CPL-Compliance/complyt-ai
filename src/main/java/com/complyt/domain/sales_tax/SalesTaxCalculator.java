@@ -2,7 +2,6 @@ package com.complyt.domain.sales_tax;
 
 import com.complyt.domain.Item;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -14,8 +13,6 @@ public class SalesTaxCalculator {
             amount += taxRate * Float.parseFloat(item.getPrice()) * Float.parseFloat(item.getQuantity());
         }
 
-        SalesTax salesTax = new SalesTax(salesTaxRate, amount);
-
-        return salesTax;
+        return new SalesTax(salesTaxRate, amount);
     }
 }
