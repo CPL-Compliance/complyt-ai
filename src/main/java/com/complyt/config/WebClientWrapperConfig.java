@@ -10,6 +10,7 @@ import org.javatuples.Pair;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -22,8 +23,8 @@ public class WebClientWrapperConfig {
         String host = "api.zip-tax.com";
         String path = "request/v40";
         Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-
-        return new ZipTaxWebClientWrapper(zipTaxWebClient, scheme, host, path, key);
+        RestTemplate restTemplate = new RestTemplate();
+        return new ZipTaxWebClientWrapper(restTemplate,zipTaxWebClient, scheme, host, path, key);
     }
 
     @Profile("fastTax")
@@ -33,7 +34,7 @@ public class WebClientWrapperConfig {
         String host = "trial.serviceobjects.com";
         String path = "ft/web.svc/JSON/GetBestMatch";
         Pair<String, String> key = new Pair<>("licensekey", "WS19-KRF3-JGD1");
-
-        return new FastTaxWebClientWrapper(fastTaxWebClient, scheme, host, path, key);
+        RestTemplate restTemplate = new RestTemplate();
+        return new FastTaxWebClientWrapper(restTemplate,fastTaxWebClient, scheme, host, path, key);
     }
 }

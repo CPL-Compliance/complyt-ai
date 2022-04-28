@@ -42,6 +42,7 @@ public class OrderController {
     public ResponseEntity<OrderDto> updateSalesTax(@PathVariable("externalId") String externalId) {
         Order order = orderFacade.updateSalesTaxSync(externalId);
 
+        //return ResponseEntity.noContent().build();
         return new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(order), HttpStatus.OK);
     }
 

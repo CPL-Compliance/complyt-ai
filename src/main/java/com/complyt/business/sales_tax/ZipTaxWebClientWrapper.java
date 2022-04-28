@@ -4,9 +4,11 @@ import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.ZipTaxData;
 import lombok.NonNull;
+import org.apache.commons.lang3.NotImplementedException;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -17,8 +19,8 @@ import java.util.List;
 
 public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
-    public ZipTaxWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
-        super(webClient, scheme, host, path, key);
+    public ZipTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
+        super(restTemplate, webClient, scheme, host, path, key);
     }
 
     @Override
@@ -31,6 +33,11 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase impleme
                 .retrieve()
                 .bodyToMono(ZipTaxData.class)
                 .cast(SalesTaxData.class);
+    }
+
+    @Override
+    public SalesTaxData findByAddressSync(String zip, String address, String city, String state) {
+        throw new NotImplementedException();
     }
 
     @Override
