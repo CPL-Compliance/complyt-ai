@@ -5,5 +5,5 @@ spring:
       - fastTax
 logging:
   level:
-    root: INFO
-    web: INFO
+    root: DEBUG
+    web: DEBUG
