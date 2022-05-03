@@ -16,6 +16,8 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+
 @AllArgsConstructor
 @Log
 @Tag(name = "Order", description = "This is the Order controller")
@@ -69,10 +71,7 @@ public class OrderController {
     @Operation(summary = "Marks the order as cancelled")
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<ResponseEntity> delete(@PathVariable("id") String orderId) {
-        orderFacade.delete(orderId);
-
-        return null;
-        //return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
+    public Mono<ResponseEntity> delete(@PathVariable("externalId") String externalId) {
+        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
     }
 }

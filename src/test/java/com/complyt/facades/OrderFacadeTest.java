@@ -10,11 +10,13 @@ import com.complyt.repositories.OrderRepository;
 import com.complyt.services.*;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -39,18 +41,13 @@ public class OrderFacadeTest {
     OrderService orderService;
 
     @Mock
-    CustomerService customerService;
-
-    @Mock
-    ClientService clientService;
-
-    @Mock
     SalesTaxService salesTaxService;
 
     Order order;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -62,42 +59,15 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void initFacade_NullCustomerServiceInstanceGiven_ThrowsNullPointerException(){
-        // Given
-        customerService = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
-    }
-
-    @Test
-    void initFacade_NullClientServiceInstanceGiven_ThrowsNullPointerException(){
-        // Given
-        clientService = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "clientService is marked non-null but is null");
-    }
-
-    @Test
     void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException(){
         // Given
         orderService = null;
+
         // When
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
@@ -107,11 +77,12 @@ public class OrderFacadeTest {
     void initFacade_NullSalesTaxServiceInstanceGiven_ThrowsNullPointerException(){
         // Given
         salesTaxService = null;
+
         // When
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService,salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");

@@ -73,7 +73,7 @@ class OrderServiceImplTest {
         // Given
 
         // When
-        when(orderRepository.upsert(order)).thenReturn(Mono.just(order));
+        when(orderRepository.upsertSync(order)).thenReturn(Mono.just(order));
         Order returnedOrder = orderServiceImpl.upsert(order).block();
 
         // Then

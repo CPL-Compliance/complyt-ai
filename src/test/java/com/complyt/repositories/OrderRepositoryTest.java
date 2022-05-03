@@ -6,12 +6,8 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
-import lombok.SneakyThrows;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,9 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -49,7 +43,7 @@ class OrderRepositoryTest {
 
     Order order;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -71,11 +65,11 @@ class OrderRepositoryTest {
         Query query = Query.query(Criteria.where("_id").is(order.getExternalId()));
 
         // When
-        when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(null);
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.empty());
         Mono<Order> monoOrder = orderRepository.findById(order.getExternalId());
 
         // Then
-        assertNull(monoOrder);
+        assertEquals(monoOrder, Mono.empty());
     }
 
     @Test
@@ -115,7 +109,7 @@ class OrderRepositoryTest {
         when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(existingOrderWithNewAddress));
 
-        Mono<Order> monoOrder = orderRepository.upsert(existingOrderWithNewAddress);
+        Mono<Order> monoOrder = orderRepository.upsertSync(existingOrderWithNewAddress);
         Order updatedOrder = monoOrder.block();
 
         // Then
@@ -146,7 +140,7 @@ class OrderRepositoryTest {
         when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(newOrder));
 
-        Mono<Order> monoOrder = orderRepository.upsert(newOrder);
+        Mono<Order> monoOrder = orderRepository.upsertSync(newOrder);
         Order insertedOrder = monoOrder.block();
 
         // Then
@@ -175,7 +169,7 @@ class OrderRepositoryTest {
         when(mongoTemplate.upsert(query, update, Order.class)).thenReturn(expectedResult);
 
         Exception exception = assertThrows(OperationFailedException.class, () -> {
-            orderRepository.upsert(order);
+            orderRepository.upsertSync(order);
         });
 
         String expectedMessage = "Could not update order";
@@ -263,7 +257,7 @@ class OrderRepositoryTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderRepository.upsert(order).block();
+            orderRepository.upsertSync(order).block();
         });
 
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");

@@ -53,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Mono<Order> upsert(@NonNull Order order) {
-        return orderRepository.upsert(order);
+        return orderRepository.upsertSync(order);
     }
 
     public Mono<Order> update(@NonNull Order order) {
@@ -65,12 +65,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void delete(String orderId) {
+    public Mono<Order> markAsCancelled(String orderId) {
         Order order = orderRepository.findByExternalIdSync(orderId);
         Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
-        orderRepository.updateSync(cancelledOrder);
 
-        return;
+        return Mono.just(orderRepository.updateSync(cancelledOrder));
     }
 
     public Flux<Order> findAll() {
