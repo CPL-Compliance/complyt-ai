@@ -6,6 +6,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import lombok.SneakyThrows;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -25,7 +27,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -39,6 +43,9 @@ class OrderRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Mock
+    MongoTemplate mongoTemplate;
 
     Order order;
 
@@ -99,11 +106,13 @@ class OrderRepositoryTest {
                 .set("billingAddress", newBillingAddress)
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
+                .set("salesTax", order.getSalesTax())
+                .set("orderStatus", order.getOrderStatus())
                 .set("items", order.getItems());
         UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(existingOrderWithNewAddress));
 
         Mono<Order> monoOrder = orderRepository.upsert(existingOrderWithNewAddress);
@@ -127,11 +136,14 @@ class OrderRepositoryTest {
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
+                .set("salesTax", order.getSalesTax())
+                .set("orderStatus", order.getOrderStatus())
                 .set("items", order.getItems());
+
         UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(newOrder));
 
         Mono<Order> monoOrder = orderRepository.upsert(newOrder);
@@ -153,14 +165,17 @@ class OrderRepositoryTest {
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
-                .set("items", order.getItems());
+                .set("orderStatus", order.getOrderStatus())
+                .set("items", order.getItems())
+                .set("salesTax", order.getSalesTax());
+
         UpdateResult expectedResult = UpdateResult.unacknowledged();
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update, Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query, update, Order.class)).thenReturn(expectedResult);
 
         Exception exception = assertThrows(OperationFailedException.class, () -> {
-            orderRepository.upsert(order).block();
+            orderRepository.upsert(order);
         });
 
         String expectedMessage = "Could not update order";

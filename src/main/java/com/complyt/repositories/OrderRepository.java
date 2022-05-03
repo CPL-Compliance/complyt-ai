@@ -54,15 +54,10 @@ public class OrderRepository {
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
         Update update = buildUpdateCommand(order);
-
-        try {
-            UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).toFuture().get();
-            if (!updateResult.wasAcknowledged()) {
-                log.error(String.format("Failed to write order into the data base, %s", order));
-                throw new OperationFailedException(String.format("Could not update order, %s", order));
-            }
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
+        UpdateResult updateResult = mongoTemplate.upsert(query, update, Order.class);
+        if (!updateResult.wasAcknowledged()) {
+            log.error(String.format("Failed to write order into the data base, %s", order));
+            throw new OperationFailedException(String.format("Could not update order, %s", order));
         }
 
         return findByExternalId(externalId);
