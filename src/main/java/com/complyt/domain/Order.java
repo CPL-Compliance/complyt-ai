@@ -5,6 +5,7 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @EqualsAndHashCode
 @With
 @ToString
+@Builder
 public class Order {
     @Id
     private String id;
@@ -23,4 +25,5 @@ public class Order {
     private Address shippingAddress;
     private ObjectId customerId;
     private SalesTax salesTax;
+    private OrderStatus orderStatus;
 }

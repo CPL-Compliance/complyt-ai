@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
@@ -50,7 +51,7 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null, OrderStatus.ACTIVE);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.complyt.config.JacksonConfig;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
@@ -63,7 +64,7 @@ public class OrderControllerTest {
             }
         };
 
-        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null);
+        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null, OrderStatus.ACTIVE);
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 

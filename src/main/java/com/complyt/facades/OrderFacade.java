@@ -61,4 +61,9 @@ public class OrderFacade {
         Order orderWitSalesTax = order.withSalesTax(salesTax);
         return orderService.updateSync(orderWitSalesTax);
     }
+
+    public void delete(String orderId) {
+        orderService.delete(orderId);
+        return;
+    }
 }

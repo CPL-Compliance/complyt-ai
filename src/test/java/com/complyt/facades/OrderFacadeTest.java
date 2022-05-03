@@ -3,6 +3,7 @@ package com.complyt.facades;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.ClientRepository;
 import com.complyt.repositories.CustomerRepository;
 import com.complyt.repositories.OrderRepository;
@@ -57,7 +58,7 @@ public class OrderFacadeTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null, OrderStatus.ACTIVE);
     }
 
     @Test

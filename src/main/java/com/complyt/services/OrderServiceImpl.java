@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -51,14 +52,25 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(id);
     }
 
-    public Mono<Order> upsert(@NonNull Order order){ return orderRepository.upsert(order);}
+    public Mono<Order> upsert(@NonNull Order order) {
+        return orderRepository.upsert(order);
+    }
 
-    public Mono<Order> update(@NonNull Order order){
+    public Mono<Order> update(@NonNull Order order) {
         return orderRepository.update(order);
     }
 
-    public Order updateSync(@NonNull Order order){
+    public Order updateSync(@NonNull Order order) {
         return orderRepository.updateSync(order);
+    }
+
+    @Override
+    public void delete(String orderId) {
+        Order order = orderRepository.findByExternalIdSync(orderId);
+        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
+        orderRepository.updateSync(cancelledOrder);
+
+        return;
     }
 
     public Flux<Order> findAll() {

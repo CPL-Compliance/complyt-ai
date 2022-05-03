@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,7 +50,7 @@ class OrderServiceImplTest {
             }
         };
 
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null);
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null, OrderStatus.ACTIVE);
     }
 
     @Test

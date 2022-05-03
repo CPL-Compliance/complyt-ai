@@ -19,4 +19,5 @@ public class OrderDto {
     private AddressDto shippingAddress;
     private ObjectId customerId;
     private SalesTaxDto salesTax;
+    private OrderStatusDto orderStatus;
 }

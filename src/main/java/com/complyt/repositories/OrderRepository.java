@@ -53,12 +53,8 @@ public class OrderRepository {
         String externalId = order.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
-        Update update = new Update()
-                .set("externalId", order.getExternalId())
-                .set("billingAddress", order.getBillingAddress())
-                .set("shippingAddress", order.getShippingAddress())
-                .set("customerId", order.getCustomerId())
-                .set("items", order.getItems());
+        Update update = buildUpdateCommand(order);
+
         try {
             UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Order.class).toFuture().get();
             if (!updateResult.wasAcknowledged()) {
@@ -81,22 +77,24 @@ public class OrderRepository {
         return reactiveMongoTemplate.findAll(Order.class);
     }
 
-    public Order updateSync(Order order) {
-        String externalId = order.getExternalId();
-        Query query = Query.query(Criteria.where("externalId").is(externalId));
+    public Order updateSync(@NonNull Order order) {
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = buildUpdateCommand(order);
 
-        Update update = new Update()
-                .set("externalId", externalId)
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Order.class);
+
+        return findByExternalIdSync(order.getExternalId());
+    }
+
+    private Update buildUpdateCommand(Order order) {
+        return new Update()
+                .set("externalId", order.getExternalId())
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
                 .set("items", order.getItems())
+                .set("orderStatus", order.getOrderStatus())
                 .set("salesTax", order.getSalesTax());
-
-
-        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, Order.class);
-
-        return findByExternalIdSync(externalId);
     }
 
     public Mono<Order> update(Order order) {

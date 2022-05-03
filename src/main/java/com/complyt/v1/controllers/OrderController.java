@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
+@Log
 @Tag(name = "Order", description = "This is the Order controller")
 @RestController
 @RequestMapping(OrderController.BASE_URL)
@@ -29,13 +31,13 @@ public class OrderController {
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> update(@RequestBody OrderDto orderDto) {
+        log.info(orderDto.toString());
         Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
+        log.info(order.toString());
         Mono<Order> orderMono = orderFacade.upsert(order);
 
-        return orderMono
-                .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
+        return orderMono.map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
     }
-
 
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
@@ -62,5 +64,15 @@ public class OrderController {
         Flux<Order> orders = orderFacade.getAll();
 
         return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
+    }
+
+    @Operation(summary = "Marks the order as cancelled")
+    @DeleteMapping("{externalId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<ResponseEntity> delete(@PathVariable("id") String orderId) {
+        orderFacade.delete(orderId);
+
+        return null;
+        //return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
     }
 }
