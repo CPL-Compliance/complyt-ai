@@ -58,7 +58,6 @@ define(['N/record', 'N/https'], (record, https) => {
                 log.debug('Line was removed ', name + " at line " + i);
             }
         }
-        // rec.save();
     }
 
     const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec) => {
