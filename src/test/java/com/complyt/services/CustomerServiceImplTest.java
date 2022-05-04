@@ -64,7 +64,7 @@ class CustomerServiceImplTest {
         // Given
 
         // When
-        when(customerRepository.upsert(customer)).thenReturn(Mono.just(customer));
+        when(customerRepository.upsertSync(customer)).thenReturn(Mono.just(customer));
         Customer returnedCustomer = customerServiceImpl.upsert(customer).block();
 
         // Then
