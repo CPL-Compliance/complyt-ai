@@ -23,7 +23,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Mono<Customer> upsert(@NonNull Customer customer){
-        return customerRepository.upsert(customer);
+        return customerRepository.upsertSync(customer);
     }
 
     @Override
