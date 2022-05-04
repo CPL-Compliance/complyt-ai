@@ -2,45 +2,45 @@
 *@NApiVersion 2.0
 *@NScriptType UserEventScript
 */
-define(['N/https'], function (https) {
+define(['N/https', 'N/encode'], function (https, encode) {
 
     function afterSubmit(context) {
         
-        var customerRecord = context.newRecord;
+        const customerRecord = context.newRecord;
         
-        var externalId = customerRecord.id;
+        const externalId = customerRecord.id;
         
-        var name = customerRecord.getValue({
+        const name = customerRecord.getValue({
             fieldId: 'companyname'
         });
 
-        var addressObj = customerRecord.getSublistSubrecord({
+        const addressObj = customerRecord.getSublistSubrecord({
             sublistId: 'addressbook',
             fieldId: 'addressbookaddress',
             line: 0
         });
         
-        var city = addressObj.getValue({
+        const city = addressObj.getValue({
             fieldId: 'city'
         });
         
-        var state = addressObj.getValue({
+        const state = addressObj.getValue({
             fieldId: 'dropdownstate'
         });
 
-        var country = addressObj.getValue({
+        const country = addressObj.getValue({
             fieldId: 'country'
         });
 
-        var street = addressObj.getValue({
+        const street = addressObj.getValue({
             fieldId: 'addr1'
         });
 
-        var zip = addressObj.getValue({
+        const zip = addressObj.getValue({
             fieldId: 'zip'
         });
 
-        var address = {
+        const address = {
             city:city,
             country:country,
             state:state,
@@ -51,22 +51,33 @@ define(['N/https'], function (https) {
     }
 
     function createCustomer(externalId, name, address){
+        const stringInput = "admin:admin";
+		const base64EncodedString = encode.convert({
+			string: stringInput,
+			inputEncoding: encode.Encoding.UTF_8,
+			outputEncoding: encode.Encoding.BASE_64
+		});
 
-        var header={'Content-Type':'application/json', 'Accept':'application/json'};
-        var url='https://complyt-test.herokuapp.com/v1/customer';
-        var body = {
+		const authHeader = 'Basic ' + base64EncodedString;
+        const header = {
+            'Content-Type':'application/json',
+             'Accept':'application/json',
+             'Authorization' : authHeader
+        };
+        
+        const url='https://complyt-test.herokuapp.com/v1/customer';
+        const body = {
             externalId:externalId,
             name:name, 
             address:address
         };
         try
         {
-            var res = https.put({
+            const res = https.put({
                 url:url,
                 headers:header,
                 body:JSON.stringify(body)
             });
-            log.debug(res.body);
         }
         catch(e)
         {

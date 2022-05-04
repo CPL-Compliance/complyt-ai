@@ -2,9 +2,9 @@
 *@NApiVersion 2.1
 *@NScriptType UserEventScript
 */
-define(['N/record', 'N/https'], (record, https) => {
+define(['N/record', 'N/https', 'N/encode'], (record, https, encode) => {
 
-    const setInvoice = context => {
+    const afterSubmit = context => {
         const invoiceRecord = context.newRecord;
         const invoiceExternalId = invoiceRecord.id;
         
@@ -14,37 +14,26 @@ define(['N/record', 'N/https'], (record, https) => {
             isDynamic: true
         });
         
-        deleteSalesTaxFromItems(rec);
+        removeSalesTaxFromItems(rec);
         const itemsLength = rec.getLineCount({ sublistId : 'item' });
+        const authHeader = getAuthHeader(encode);
         
-        const invoice = createInvoice(invoiceRecord, invoiceExternalId, itemsLength, rec);
+        const invoice = createInvoice(invoiceRecord, invoiceExternalId, itemsLength, rec, authHeader);
         
-        const invoiceWithSalesTax = setSalesTax(invoice);
+        const invoiceWithSalesTax = setSalesTax(invoice, authHeader);
         const salesTaxAmount = invoiceWithSalesTax.salesTax.amount;
 
         insertSalesTaxAsItem(rec, itemsLength, salesTaxAmount);
     }
 
-
-    const deleteSalesTaxFromItems = rec => {
-
-        const itemsLength = rec.getLineCount({ sublistId : 'item' });
-        const salesTaxAsString = "Sales Tax";
-
-        for (var i = itemsLength - 1 ; i >= 0 ; i--) 
-        {
-            const name = rec.getSublistText({ sublistId: "item", fieldId: "item",line:i });
-
-            if(name === salesTaxAsString)
-            {
-                rec.removeLine({ sublistId: "item", line: i });
-                log.debug('Line was removed ', name + " at line " + i);
-            }
-        }
-    }
-
-    const setSalesTax = invoice => {
-        var header={'Content-Type':'application/json', 'Accept':'application/json'};
+    const setSalesTax = (invoice, authHeader) => {
+        
+        const header = {
+            'Content-Type':'application/json',
+             'Accept':'application/json',
+             'Authorization' : authHeader
+        };
+        
         var url='https://complyt-test.herokuapp.com/v1/orders/' + invoice.externalId + '/salesTax';
         try
         {
@@ -61,10 +50,26 @@ define(['N/record', 'N/https'], (record, https) => {
         }
     }
 
-    const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec) => {
+    const removeSalesTaxFromItems = rec => {
+
+        const itemsLength = rec.getLineCount({ sublistId : 'item' });
+        const salesTaxAsString = "Sales Tax";
+
+        for (var i = itemsLength - 1 ; i >= 0 ; i--) 
+        {
+            const name = rec.getSublistText({ sublistId: "item", fieldId: "item",line:i });
+
+            if(name === salesTaxAsString)
+            {
+                rec.removeLine({ sublistId: "item", line: i });
+                log.debug('Line was removed ', name + " at line " + i);
+            }
+        }
+    }
+
+    const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec, authHeader) => {
         const customerExternalId = invoiceRecord.getValue({ fieldId: 'entity' });
-        const customer = validateCustomer(customerExternalId);
-        
+        const customer = validateCustomer(customerExternalId, authHeader);
         const customerId = customer.id;
         
         const billingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'billingaddress' });
@@ -73,12 +78,18 @@ define(['N/record', 'N/https'], (record, https) => {
         const shippingAddress = getAddress(shippingAddrRecord);
 
         const items = getItems(rec, itemsLength);
-        const invoice = sendInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
+        const invoice = sendInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items, authHeader);
         return invoice;
     }
 
-    const sendInvoice = (invoiceExternalId, customerId, billingAddress, shippingAddress, items) => {
-        const header = {'Content-Type':'application/json', 'Accept':'application/json'};
+    const sendInvoice = (invoiceExternalId, customerId, billingAddress, shippingAddress, items, authHeader) => {
+        
+        const header = {
+            'Content-Type':'application/json',
+             'Accept':'application/json',
+             'Authorization' : authHeader
+        };
+        
         const url = 'https://complyt-test.herokuapp.com/v1/orders/';
         const body = 
         {
@@ -111,7 +122,7 @@ define(['N/record', 'N/https'], (record, https) => {
 
         for (let i = 0; i < numItemLines; i++) 
         {
-                
+            
                 const name = rec.getSublistText({
                     sublistId: 'item',
                     fieldId: 'item',
@@ -182,8 +193,15 @@ define(['N/record', 'N/https'], (record, https) => {
         return address;
     }
 
-    const validateCustomer = customerId => {
-        const header = {'Content-Type':'application/json', 'Accept':'application/json'};
+    const validateCustomer = (customerId, authHeader) => {
+        log.debug('in validate customer')
+        
+
+        const header = {
+            'Content-Type':'application/json',
+             'Accept':'application/json',
+             'Authorization' : authHeader
+        };
         const url = 'https://complyt-test.herokuapp.com/v1/customers/' + customerId;
         
         try
@@ -192,12 +210,25 @@ define(['N/record', 'N/https'], (record, https) => {
                 url:url,
                 headers:header
             });
+            
             return JSON.parse(res.body);
         }
         catch(e)
         {
             log.error('ERROR',JSON.stringify(e));
         }
+    }
+
+    const getAuthHeader = encode => {
+        const stringInput = "admin:admin";
+		const base64EncodedString = encode.convert({
+			string: stringInput,
+			inputEncoding: encode.Encoding.UTF_8,
+			outputEncoding: encode.Encoding.BASE_64
+		});
+
+		const authHeader = 'Basic ' + base64EncodedString;
+        return authHeader;
     }
 
     const insertSalesTaxAsItem = (rec, itemsLength, salesTaxAmount) => {
@@ -210,9 +241,6 @@ define(['N/record', 'N/https'], (record, https) => {
     }
 
     return {
-        afterSubmit: setInvoice
+        afterSubmit: afterSubmit
     }
 });
-
-
-
