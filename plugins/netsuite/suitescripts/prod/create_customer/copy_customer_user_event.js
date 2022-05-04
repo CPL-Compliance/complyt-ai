@@ -65,7 +65,7 @@ define(['N/https', 'N/encode'], function (https, encode) {
              'Authorization' : authHeader
         };
         
-        const url='https://complyt-test.herokuapp.com/v1/customer';
+        const url='https://complyt-test.herokuapp.com/v1/customers';
         const body = {
             externalId:externalId,
             name:name, 
