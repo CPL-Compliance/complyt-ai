@@ -32,6 +32,9 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <springdoc-openapi-webflux-ui.version>1.6.7</springdoc-openapi-webflux-ui.version>
+        <spring-boot-starter-security.version>2.6.7</spring-boot-starter-security.version>
+        <spring-security-test.version>5.6.3</spring-security-test.version>
+        <spring-boot-starter-data-mongodb.version>2.6.7</spring-boot-starter-data-mongodb.version>
     </properties>
     <dependencies>
         <dependency>
@@ -47,7 +50,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <version>2.6.7</version>
+            <version>${spring-boot-starter-data-mongodb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,6 +110,17 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
             <version>${springdoc-openapi-webflux-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot-starter-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+            <version>${spring-security-test.version}</version>
         </dependency>
     </dependencies>
     <build>
