@@ -46,6 +46,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest(OrderController.class)
 @Import(JacksonConfig.class)
+@WithMockUser(username = "mock", password = "mock")
 public class OrderControllerTest {
 
     @MockBean
@@ -104,7 +105,6 @@ public class OrderControllerTest {
                         .path(OrderController.BASE_URL)
                         .build())
                 .bodyValue(orderDto)
-                .header(HttpHeaders.AUTHORIZATION, setBasicAuthentication("admin", "admin"))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -119,6 +119,7 @@ public class OrderControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(OrderController.BASE_URL)

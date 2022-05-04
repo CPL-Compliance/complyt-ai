@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -28,11 +29,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(CustomerController.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithMockUser(username = "mock", password = "mock")
 class CustomerControllerTest {
 
     @MockBean
@@ -75,6 +78,7 @@ class CustomerControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerController.BASE_URL)
@@ -94,6 +98,7 @@ class CustomerControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerController.BASE_URL)
@@ -111,6 +116,7 @@ class CustomerControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerController.BASE_URL)
@@ -130,6 +136,7 @@ class CustomerControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerController.BASE_URL)
