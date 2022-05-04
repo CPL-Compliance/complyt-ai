@@ -14,7 +14,7 @@ define(['N/record', 'N/https'], (record, https) => {
             isDynamic: true
         });
         
-        removeSalesTaxFromItems(rec);
+        deleteSalesTaxFromItems(rec);
         const itemsLength = rec.getLineCount({ sublistId : 'item' });
         
         const invoice = createInvoice(invoiceRecord, invoiceExternalId, itemsLength, rec);
@@ -23,6 +23,24 @@ define(['N/record', 'N/https'], (record, https) => {
         const salesTaxAmount = invoiceWithSalesTax.salesTax.amount;
 
         insertSalesTaxAsItem(rec, itemsLength, salesTaxAmount);
+    }
+
+
+    const deleteSalesTaxFromItems = rec => {
+
+        const itemsLength = rec.getLineCount({ sublistId : 'item' });
+        const salesTaxAsString = "Sales Tax";
+
+        for (var i = itemsLength - 1 ; i >= 0 ; i--) 
+        {
+            const name = rec.getSublistText({ sublistId: "item", fieldId: "item",line:i });
+
+            if(name === salesTaxAsString)
+            {
+                rec.removeLine({ sublistId: "item", line: i });
+                log.debug('Line was removed ', name + " at line " + i);
+            }
+        }
     }
 
     const setSalesTax = invoice => {
@@ -43,26 +61,10 @@ define(['N/record', 'N/https'], (record, https) => {
         }
     }
 
-    const removeSalesTaxFromItems = rec => {
-
-        const itemsLength = rec.getLineCount({ sublistId : 'item' });
-        const salesTaxAsString = "Sales Tax";
-
-        for (var i = itemsLength - 1 ; i >= 0 ; i--) 
-        {
-            const name = rec.getSublistText({ sublistId: "item", fieldId: "item",line:i });
-
-            if(name === salesTaxAsString)
-            {
-                rec.removeLine({ sublistId: "item", line: i });
-                log.debug('Line was removed ', name + " at line " + i);
-            }
-        }
-    }
-
     const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec) => {
         const customerExternalId = invoiceRecord.getValue({ fieldId: 'entity' });
         const customer = validateCustomer(customerExternalId);
+        
         const customerId = customer.id;
         
         const billingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'billingaddress' });
@@ -84,7 +86,8 @@ define(['N/record', 'N/https'], (record, https) => {
             customerId: customerId,
             billingAddress: billingAddress,
             shippingAddress: shippingAddress,
-            items: items
+            items: items,
+            orderStatus:'ACTIVE'
         };
         
         try
@@ -114,9 +117,9 @@ define(['N/record', 'N/https'], (record, https) => {
                     fieldId: 'item',
                     line: i
                 });
-                const amount = rec.getSublistValue({
+                const rate = rec.getSublistValue({
                     sublistId : 'item',
-                    fieldId : 'amount',
+                    fieldId : 'rate',
                     line : i
                 });
                 
@@ -125,6 +128,9 @@ define(['N/record', 'N/https'], (record, https) => {
                     fieldId : 'quantity',
                     line : i
                 });
+
+                const amount = quantity * rate;
+
                 const description = rec.getSublistValue({
                     sublistId : 'item',
                     fieldId : 'description',
