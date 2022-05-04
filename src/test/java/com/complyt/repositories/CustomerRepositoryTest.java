@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -39,6 +40,9 @@ class CustomerRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Mock
+    MongoTemplate mongoTemplate;
  
     Customer customer;
 
@@ -205,9 +209,9 @@ class CustomerRepositoryTest {
         UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
+        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
         when(reactiveMongoTemplate.findOne(query,Customer.class)).thenReturn(Mono.just(customerWithNewExternalId));
-        Customer insertedCustomer = customerRepository.upsert(customerWithNewExternalId).block();
+        Customer insertedCustomer = customerRepository.upsertSync(customerWithNewExternalId).block();
 
         // Then
         assertNotNull(insertedCustomer);
