@@ -9,13 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-@Document(collection = "order")
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 @With
 @ToString
 @Builder
+@Document(collection = "order")
 public class Order {
     @Id
     private String id;

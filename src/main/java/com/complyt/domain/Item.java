@@ -4,12 +4,13 @@ import lombok.*;
 
 @Getter
 @EqualsAndHashCode
-@RequiredArgsConstructor
 @ToString
+@AllArgsConstructor
 public class Item {
-    private final String price;
-    private final String quantity;
-    private final String description;
-    private final String name;
-    private final String taxCode;
+    private String unitPrice;
+    private String quantity;
+    private String totalPrice;
+    private String description;
+    private String name;
+    private String taxCode;
 }

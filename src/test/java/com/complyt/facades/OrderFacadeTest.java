@@ -54,8 +54,9 @@ public class OrderFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId,null, OrderStatus.ACTIVE);
+        items.add(new Item("price","quantity", "totalPrice", "description","name","taxCode"));
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId, null, OrderStatus.ACTIVE);
+        ClientService clientService = new ClientServiceImpl(new ClientRepository());
     }
 
     @Test
