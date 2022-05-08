@@ -3,7 +3,6 @@
 *@NScriptType UserEventScript
 */
 define(['N/record', 'N/https', 'N/encode'], (record, https, encode) => {
-
     const afterSubmit = context => {
         const invoiceRecord = context.newRecord;
         const invoiceExternalId = invoiceRecord.id;
@@ -13,7 +12,7 @@ define(['N/record', 'N/https', 'N/encode'], (record, https, encode) => {
             id: invoiceExternalId,
             isDynamic: true
         });
-        
+
         removeSalesTaxFromItems(rec);
         const itemsLength = rec.getLineCount({ sublistId : 'item' });
         const authHeader = getAuthHeader(encode);

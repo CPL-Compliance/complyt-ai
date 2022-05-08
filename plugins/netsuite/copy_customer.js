@@ -1,15 +1,12 @@
 /**
-*@NApiVersion 2.0
+*@NApiVersion 2.1
 *@NScriptType UserEventScript
 */
 define(['N/https', 'N/encode'], function (https, encode) {
 
-    function afterSubmit(context) {
-        
+    const afterSubmit = context => {
         const customerRecord = context.newRecord;
-        
         const externalId = customerRecord.id;
-        
         const name = customerRecord.getValue({
             fieldId: 'companyname'
         });
@@ -47,10 +44,11 @@ define(['N/https', 'N/encode'], function (https, encode) {
             street:street,
             zip:zip
         };
+
         createCustomer(externalId, name, address);   
     }
 
-    function createCustomer(externalId, name, address){
+    const createCustomer = (externalId, name, address) => {
         const stringInput = "admin:admin";
 		const base64EncodedString = encode.convert({
 			string: stringInput,
