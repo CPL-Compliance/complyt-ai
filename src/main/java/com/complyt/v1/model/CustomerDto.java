@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @With
-@ApiModel("Customer")
+@Schema(name = "Customer")
 public class CustomerDto {
     private String id;
     private String externalId;

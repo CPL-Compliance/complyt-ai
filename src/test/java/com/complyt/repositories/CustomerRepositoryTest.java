@@ -181,7 +181,9 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.save(customer)).thenReturn(Mono.just(dbCustomer));
 
         // When
-        Customer savedCustomer = customerRepository.save(customer);
+        Mono<Customer> monoSavedCustomer = customerRepository.save(customer);
+
+        Customer savedCustomer = monoSavedCustomer.block();
 
         // Then
         assertNotNull(savedCustomer);

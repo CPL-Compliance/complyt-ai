@@ -64,8 +64,9 @@ class CustomerFacadeTest {
         // Given
 
         // When
-        when(customerService.save(customer)).thenReturn(customer);
-        Customer returnedCustomer = customerFacade.save(customer);
+        when(customerService.save(customer)).thenReturn(Mono.just(customer));
+        Mono<Customer> monoCustomer = customerFacade.save(customer);
+        Customer returnedCustomer = monoCustomer.block();
 
         // Then
         assertNotNull(returnedCustomer);

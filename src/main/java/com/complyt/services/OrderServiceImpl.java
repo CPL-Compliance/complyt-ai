@@ -22,7 +22,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order save(Order order) {
+    public Mono<Order> save(Order order) {
         return orderRepository.save(order);
     }
 

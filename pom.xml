@@ -15,39 +15,45 @@
     <properties>
         <java.version>8</java.version>
         <maven.test.skip>false</maven.test.skip>
-        <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <org.lombok.version>1.18.22</org.lombok.version>
-        <org.web-flux.version>2.6.6</org.web-flux.version>
-        <org.java-tuples.version>1.2</org.java-tuples.version>
-        <org.spring-boot-starter-web.version>2.6.4</org.spring-boot-starter-web.version>
-        <org.spring-boot-starter-data-mongodb-reactive.version>2.6.6</org.spring-boot-starter-data-mongodb-reactive.version>
-        <org.spring-boot-dev-tools.version>2.6.6</org.spring-boot-dev-tools.version>
-        <org.spring-boot-starter-test.version>2.6.6</org.spring-boot-starter-test.version>
-        <org.spring-boot-starter-aop.version>2.6.6</org.spring-boot-starter-aop.version>
-        <org.mockito-junit-jupiter.version>4.4.0</org.mockito-junit-jupiter.version>
-        <org.jUnit.version>4.13.2</org.jUnit.version>
-        <org.springfox-boot-starter.version>3.0.0</org.springfox-boot-starter.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <lombok.version>1.18.22</lombok.version>
+        <web-flux.version>2.6.6</web-flux.version>
+        <java-tuples.version>1.2</java-tuples.version>
+        <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
+        <spring-boot-starter-data-mongodb-reactive.version>2.6.6</spring-boot-starter-data-mongodb-reactive.version>
+        <spring-boot-dev-tools.version>2.6.6</spring-boot-dev-tools.version>
+        <spring-boot-starter-test.version>2.6.6</spring-boot-starter-test.version>
+        <spring-boot-starter-aop.version>2.6.6</spring-boot-starter-aop.version>
+        <mockito-junit-jupiter.version>4.4.0</mockito-junit-jupiter.version>
+        <jUnit.version>4.13.2</jUnit.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <springdoc-openapi-webflux-ui.version>1.6.7</springdoc-openapi-webflux-ui.version>
+        <spring-boot-starter-actuator.version>2.6.7</spring-boot-starter-actuator.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
-            <version>${org.java-tuples.version}</version>
+            <version>${java-tuples.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-            <version>${org.spring-boot-starter-data-mongodb-reactive.version}</version>
+            <version>${spring-boot-starter-data-mongodb-reactive.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${org.spring-boot-dev-tools.version}</version>
+            <version>${spring-boot-dev-tools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${org.spring-boot-starter-test.version}</version>
+            <version>${spring-boot-starter-test.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -63,40 +69,45 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${org.spring-boot-starter-aop.version}</version>
+            <version>${spring-boot-starter-aop.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
-            <version>${org.mockito-junit-jupiter.version}</version>
+            <version>${mockito-junit-jupiter.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-            <version>${org.jUnit.version}</version>
+            <version>${jUnit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${org.lombok.version}</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${org.mapstruct.version}</version>
+            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${org.web-flux.version}</version>
+            <version>${web-flux.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${org.springfox-boot-starter.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <version>${springdoc-openapi-webflux-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot-starter-actuator.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -104,6 +115,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
                 <configuration>
                     <goals>install</goals>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
@@ -112,11 +124,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
@@ -124,12 +137,12 @@
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
-                            <version>${org.mapstruct.version}</version>
+                            <version>${mapstruct.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${org.lombok.version}</version>
+                            <version>${lombok.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -142,11 +155,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>${jacoco-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>

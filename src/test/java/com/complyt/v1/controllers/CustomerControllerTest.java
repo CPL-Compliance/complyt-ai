@@ -2,7 +2,6 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
-import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
@@ -38,7 +37,6 @@ class CustomerControllerTest {
 
     @MockBean
     private CustomerFacade customerFacade;
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -59,6 +57,7 @@ class CustomerControllerTest {
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException(){
         // Given
         CustomerFacade facade = null;
+
         // When
 
         // Then
@@ -108,7 +107,7 @@ class CustomerControllerTest {
     @Test
     void create_NewCustomerCreated_SavesCustomer() {
         // Given
-        when(customerFacade.save(customer)).thenReturn(customer);
+        when(customerFacade.save(customer)).thenReturn(Mono.just(customer));
 
         // When + Then
         webTestClient
@@ -151,8 +150,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -171,8 +169,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/findByExternalId")
-                        .queryParam("externalId", externalId)
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -192,8 +189,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
-                        .queryParam("name", name)
+                        .path(CustomerController.BASE_URL + "/name/" + name)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -219,7 +215,7 @@ class CustomerControllerTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/all")
+                        .path(CustomerController.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

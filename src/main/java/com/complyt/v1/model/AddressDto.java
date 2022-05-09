@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @With
 @EqualsAndHashCode
-@ApiModel("Address")
+@Schema(name = "Address")
 public class AddressDto {
     private String city;
     private String country;
