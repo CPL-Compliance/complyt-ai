@@ -5,7 +5,6 @@ import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.BsonValue;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -57,7 +56,6 @@ public class CustomerRepository {
                 .set("name", customer.getName());
 
         UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
-
         if(!updateResult.wasAcknowledged())
         {
             log.error(String.format("Failed to write customer into the data base, %s",customer));
