@@ -16,7 +16,7 @@ define(['/SuiteScripts/Utils/httpUtil.js', 'customerConfiguration'], (httpUtil, 
             log.debug('successfully created customer', customer);  
         }
         catch(err){
-            log.debug('Could not create new customer', errr);
+            log.debug('Could not create new customer', err);
         }
     }
 
