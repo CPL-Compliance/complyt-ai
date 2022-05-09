@@ -5,6 +5,7 @@ import lombok.*;
 @Getter
 @EqualsAndHashCode
 @ToString
+@With
 @AllArgsConstructor
 public class Item {
     private String unitPrice;

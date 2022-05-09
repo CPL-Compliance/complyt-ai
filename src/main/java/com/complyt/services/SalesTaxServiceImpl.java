@@ -42,37 +42,5 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
         return salesTaxCalculator.calculate(salesTaxRate, items);
     }
-    // salesTaxWebClientWrapper.findByAddress(address)
-    // SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
-    // salesTaxCalculator.calculate(salesTaxRate, items)
-
-//        orderMono.doOnNext(order -> {
-//            salesTaxWebClientWrapper.findByAddress(order.getShippingAddress()).map(salesTaxData -> salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).map(salesTaxRate -> salesTaxCalculator.calculate(salesTaxRate, order.getItems())))
-//        });
-//        return salesTaxWebClientWrapper.findByAddress(address)
-//                .map(salesTaxData -> salesTaxDataToSalesTaxRateMapper.map(salesTaxData))
-//                .map(salesTaxRate -> salesTaxCalculator.calculate(salesTaxRate, items));
-//        return salesTaxWebClientWrapper.findByAddress(address)
-//                .doOnNext(salesTaxData -> {
-//                    System.out.println("In SalesTaxServiceImpl::getSalesTax::map");
-//                    System.out.println(salesTaxData);
-//                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
-//                    System.out.println(salesTaxRate);
-//                    return salesTaxCalculator.calculate(salesTaxRate, items);
-//                }).map();
-//        Mono<SalesTax> r = salesTaxWebClientWrapper.findByAddress(address)
-//                .subscribeOn(Schedulers.immediate())
-//                .map(salesTaxData -> salesTaxDataToSalesTaxRateMapper.map(salesTaxData));
-
-
-
-                //.doOnNext(salesTaxRate -> salesTaxCalculator.calculate(salesTaxRate, items));
-//        return salesTaxWebClientWrapper
-//                .findByAddress(address)
-//                .doOnNext(salesTaxData -> {
-//                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
-//                    System.out.println("In SalesTaxServiceImpl::getSalesTax 2");
-//                    return salesTaxCalculator.calculate(salesTaxRate, items);
-//                });
-    //}
+    
 }
