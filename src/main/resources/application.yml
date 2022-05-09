@@ -3,7 +3,14 @@ spring:
     active:
       - production
       - zipTax
+
 logging:
   level:
     root: INFO
     web: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
