@@ -32,6 +32,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <springdoc-openapi-webflux-ui.version>1.6.7</springdoc-openapi-webflux-ui.version>
+        <spring-boot-starter-actuator.version>2.6.7</spring-boot-starter-actuator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -102,6 +103,11 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
             <version>${springdoc-openapi-webflux-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot-starter-actuator.version}</version>
         </dependency>
     </dependencies>
     <build>
