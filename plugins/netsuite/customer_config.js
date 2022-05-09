@@ -1,3 +1,3 @@
 var customerSettings = {
-    BASE_URL : "https://complyt-test.herokuapp.com/v1/customers/",
+    BASE_URL : "http://demo.complyt.io/v1/customers/",
 }
