@@ -76,7 +76,6 @@ public class CustomerRepository {
                 .set("name", customer.getName());
 
         UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
-
         if(!updateResult.wasAcknowledged())
         {
             log.error(String.format("Failed to write customer into the data base, %s",customer));
