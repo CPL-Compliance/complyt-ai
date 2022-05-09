@@ -1,7 +1,7 @@
 /**
 * @NApiVersion 2.1
 * @NScriptType UserEventScript
-* @NAmdConfig /SuiteScripts/Libraries/config.json
+* @NAmdConfig /SuiteScripts/Config/config.json
 */
 define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], (record, httpUtil, invoiceConfiguration) => {
 
@@ -55,7 +55,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const sendInvoice = (invoiceExternalId, customerId, billingAddress, shippingAddress, items) => {
         
-        const url = invoiceConfiguration.BASE_URL;
+        const url = invoiceConfiguration.ORDER_URL;
         const body = JSON.stringify
         ({
             externalId: invoiceExternalId,
@@ -75,7 +75,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const setSalesTax = invoice => {
         
-        const url = invoiceConfiguration.BASE_URL + '/' + invoice.externalId + '/salesTax';
+        const url = invoiceConfiguration.ORDER_URL + '/' + invoice.externalId + '/salesTax';
         const body = {};
         const errorMessage = 'Could not update invoice with sales tax';
 
@@ -162,7 +162,8 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const validateCustomer = (customerId) => {
         
-        const url = invoiceConfiguration.CUSTOMER_BASE_URL + customerId;
+        const url = invoiceConfiguration.CUSTOMER_URL + customerId;
+        // log.debug('url',url)
         const errorMessage = 'No customer with id ' + customerId + ' was found';
 
         const customer = httpUtil.sendGetRequest(url, errorMessage);

@@ -1,7 +1,7 @@
 /**
 * @NApiVersion 2.1
 * @NScriptType UserEventScript
-* @NAmdConfig /SuiteScripts/Libraries/config.json
+* @NAmdConfig /SuiteScripts/Config/config.json
 */
 define(['/SuiteScripts/Utils/httpUtil.js', 'customerConfiguration'], (httpUtil, customerConfiguration) => {
 
@@ -59,7 +59,7 @@ define(['/SuiteScripts/Utils/httpUtil.js', 'customerConfiguration'], (httpUtil, 
 
     const createCustomer = (externalId, name, address) => {
         
-        const url = customerConfiguration.BASE_URL;
+        const url = customerConfiguration.CUSTOMER_URL;
         const body = JSON.stringify({
             externalId:externalId,
             name:name, 

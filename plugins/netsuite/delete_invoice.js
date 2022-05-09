@@ -1,7 +1,7 @@
 /**
 *@NApiVersion 2.1
 *@NScriptType UserEventScript
-* @NAmdConfig /SuiteScripts/Libraries/config.json
+* @NAmdConfig /SuiteScripts/Config/config.json
 */
 define(['/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], (httpUtil, invoiceConfiguration) => {
 
@@ -13,7 +13,7 @@ define(['/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], (httpUtil, i
     }
 
     const deleteInvoice = (invoiceExternalId) => {
-        const url = invoiceConfiguration.BASE_URL + '/' + invoiceExternalId;
+        const url = invoiceConfiguration.ORDER_URL + '/' + invoiceExternalId;
         const errorMessage = 'Could not delete invoice with Id ' + invoiceExternalId;
 
         httpUtil.sendDeleteRequest(url, errorMessage);
