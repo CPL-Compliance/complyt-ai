@@ -4,7 +4,7 @@
 */
 define(['N/https', 'N/encode', 'httpConfiguration'], (https, encode, httpConfiguration) => {
 
-    const baseUrl = 'https://complyt-test.herokuapp.com';
+    const baseUrl = 'http://demo.complyt.io/';
 
     const sendGetRequest = (subDomain, errorMessage) => {
         const url = baseUrl + subDomain;
