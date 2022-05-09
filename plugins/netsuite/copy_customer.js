@@ -1,16 +1,26 @@
 /**
-*@NApiVersion 2.1
-*@NScriptType UserEventScript
+* @NApiVersion 2.1
+* @NScriptType UserEventScript
+* @NAmdConfig /SuiteScripts/Libraries/config.json
 */
-define(['N/https', 'N/encode'], function (https, encode) {
+define(['/SuiteScripts/Utils/httpUtil.js', 'customerConfiguration'], (httpUtil, customerConfiguration) => {
 
     const afterSubmit = context => {
-        const customerRecord = context.newRecord;
-        const externalId = customerRecord.id;
-        const name = customerRecord.getValue({
-            fieldId: 'companyname'
-        });
+        try {
+            const customerRecord = context.newRecord;
+            const externalId = customerRecord.id;
+            const name = customerRecord.getValue({ fieldId: 'companyname' });
+            const address = getAddress(customerRecord);
 
+            const customer = createCustomer(externalId, name, address); 
+            log.debug('successfully created customer', customer);  
+        }
+        catch(err){
+            log.debug('Could not create new customer', errr);
+        }
+    }
+
+    const getAddress = customerRecord => {
         const addressObj = customerRecord.getSublistSubrecord({
             sublistId: 'addressbook',
             fieldId: 'addressbookaddress',
@@ -44,44 +54,20 @@ define(['N/https', 'N/encode'], function (https, encode) {
             street:street,
             zip:zip
         };
-
-        createCustomer(externalId, name, address);   
+        return address;
     }
 
     const createCustomer = (externalId, name, address) => {
-        const stringInput = "admin:admin";
-		const base64EncodedString = encode.convert({
-			string: stringInput,
-			inputEncoding: encode.Encoding.UTF_8,
-			outputEncoding: encode.Encoding.BASE_64
-		});
-
-		const authHeader = 'Basic ' + base64EncodedString;
-        const header = {
-            'Content-Type':'application/json',
-             'Accept':'application/json',
-             'Authorization' : authHeader
-        };
         
-        const url='https://complyt-test.herokuapp.com/v1/customers';
-        const body = {
+        const url = customerConfiguration.BASE_URL;
+        const body = JSON.stringify({
             externalId:externalId,
             name:name, 
             address:address
-        };
-        try
-        {
-            const res = https.put({
-                url:url,
-                headers:header,
-                body:JSON.stringify(body)
-            });
-        }
-        catch(e)
-        {
-          log.error('ERROR',JSON.stringify(e));
-        }
-
+        });
+        const errorMessage = 'Could not create customer with Id ' + externalId;
+        const customer = httpUtil.sendPutRequest(url, body, errorMessage);
+        return customer;
     }
 
     return {

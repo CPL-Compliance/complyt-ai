@@ -1,44 +1,22 @@
 /**
 *@NApiVersion 2.1
 *@NScriptType UserEventScript
+* @NAmdConfig /SuiteScripts/Libraries/config.json
 */
-define(['N/record', 'N/https', 'N/encode'], (record, https, encode) => {
+define(['/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], (httpUtil, invoiceConfiguration) => {
 
     const beforeSubmit = context => {
         const invoiceRecord = context.newRecord;
         const invoiceExternalId = invoiceRecord.id;
 
-        deleteInvoice(invoiceExternalId,encode);
+        deleteInvoice(invoiceExternalId);
     }
 
-    const deleteInvoice = (invoiceExternalId,encode) => {
-        const stringInput = "admin:admin";
-		const base64EncodedString = encode.convert({
-			string: stringInput,
-			inputEncoding: encode.Encoding.UTF_8,
-			outputEncoding: encode.Encoding.BASE_64
-		});
+    const deleteInvoice = (invoiceExternalId) => {
+        const url = invoiceConfiguration.BASE_URL + '/' + invoiceExternalId;
+        const errorMessage = 'Could not delete invoice with Id ' + invoiceExternalId;
 
-		const auth = 'Basic ' + base64EncodedString;
-
-        const header = {
-            'Content-Type':'application/json',
-             'Accept':'application/json',
-             'Authorization' : auth
-        };
-
-        var url='https://complyt-test.herokuapp.com/v1/orders/' + invoiceExternalId;
-        try
-        {
-            https.delete({
-                url: url,
-                headers: header
-            });
-        }
-        catch(e)
-        {
-            log.error('ERROR',JSON.stringify(e));
-        }
+        httpUtil.sendDeleteRequest(url, errorMessage);
     }
 
     return {
