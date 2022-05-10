@@ -42,5 +42,5 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
         return salesTaxCalculator.calculate(salesTaxRate, items);
     }
-    
+
 }

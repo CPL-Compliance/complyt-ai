@@ -4,6 +4,8 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.repositories.ClientRepository;
 import com.complyt.repositories.CustomerRepository;
 import com.complyt.repositories.OrderRepository;
@@ -165,4 +167,24 @@ public class OrderFacadeTest {
         assertEquals(returnedCustomers.size(),2);
     }
 
+    @Test
+    void updateSalesTaxSync_ValidExternalIdGiven_UpdatesOrder(){
+        // Given
+        String externalId = order.getExternalId();
+        SalesTax salesTax = new SalesTax(
+                new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f, 0.5f),
+                1000);
+        Order orderWithSalesTax = order.withSalesTax(salesTax);
+
+        // When
+        when(orderService.findByExternalIdSync(externalId)).thenReturn(order);
+        when(salesTaxService.getSalesTaxSync(order.getShippingAddress(),order.getItems())).thenReturn(salesTax);
+        when(orderService.updateSync(orderWithSalesTax)).thenReturn(orderWithSalesTax);
+
+        Order updatedOrder = orderFacade.updateSalesTaxSync(externalId);
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(updatedOrder,orderWithSalesTax);
+    }
 }
