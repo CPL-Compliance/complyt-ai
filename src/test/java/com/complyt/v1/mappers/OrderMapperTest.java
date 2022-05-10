@@ -25,7 +25,7 @@ class OrderMapperTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item("price", "quantity", "totalPrice","description", "name", "taxCode"));
+                add(new Item(2000,4,8000,"description","name","taxCode"));
             }
         };
 

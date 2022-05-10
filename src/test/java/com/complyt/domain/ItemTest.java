@@ -20,7 +20,7 @@ class ItemTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        item = new Item("unitPrice","quantity","totalPrice","description","name","taxCode");
+        item = new Item(2000,4,8000,"description","name","taxCode");
         anotherItem = item.withName("anotherName");
     }
 

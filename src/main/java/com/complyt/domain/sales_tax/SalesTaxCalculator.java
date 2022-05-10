@@ -10,7 +10,7 @@ public class SalesTaxCalculator {
     public SalesTax calculate(SalesTaxRate salesTaxRate, List<Item> items){
         float taxRate = salesTaxRate.getTaxRate() , amount = 0;
         for(Item item : items){
-            amount += taxRate * Float.parseFloat(item.getUnitPrice()) * Float.parseFloat(item.getQuantity());
+            amount += taxRate * item.getUnitPrice() * item.getQuantity();
         }
 
         return new SalesTax(salesTaxRate, amount);

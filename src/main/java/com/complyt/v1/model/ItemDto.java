@@ -9,9 +9,9 @@ import lombok.*;
 @ToString
 @Schema(name = "Item")
 public class ItemDto {
-    private String unitPrice;
-    private String quantity;
-    private String totalPrice;
+    private float unitPrice;
+    private int quantity;
+    private float totalPrice;
     private String description;
     private String name;
     private String taxCode;
