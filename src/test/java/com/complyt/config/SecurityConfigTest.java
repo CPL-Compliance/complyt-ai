@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -22,10 +23,10 @@ public class SecurityConfigTest {
 
     @Test
     void securityFilterChain_CreatesChain_ReturnsChain(){
-        // Given
-
+//        // Given
 //        SecurityWebFilterChain securityWebFilterChain = http
-//                .csrf().disable()
+//                .csrf()
+//                .disable()
 //                .authorizeExchange()
 //                .pathMatchers("/").permitAll()
 //                .anyExchange().authenticated()
@@ -36,7 +37,7 @@ public class SecurityConfigTest {
 //                .build();
 //
 //        SecurityWebFilterChain returnedSecurityWebFilterChain = securityConfig.securityFilterChain(http);
-//
+
 //        // Then
 //        Assertions.assertEquals(securityWebFilterChain,returnedSecurityWebFilterChain);
     }

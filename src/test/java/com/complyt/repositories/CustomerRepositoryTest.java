@@ -230,6 +230,25 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void upsertSync_UpdateWasNotAcknowledged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
+
+        Update update = customerRepository.buildUpdateCommand(customer);
+        UpdateResult expectedUpdateResult = UpdateResult.unacknowledged();
+
+        // When
+        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
+
+        // Then
+        OperationFailedException nullPointerException = assertThrows(OperationFailedException.class, () -> {
+            customerRepository.upsertSync(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "Could not update customer, " + customer);
+    }
+
+    @Test
     void upsertSync_NullCustomerGiven_ThrowsException(){
         // Given
         customer = null;
