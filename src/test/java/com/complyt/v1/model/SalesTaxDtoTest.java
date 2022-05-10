@@ -48,6 +48,16 @@ public class SalesTaxDtoTest {
         assertEquals(salesTaxDto.hashCode(), anotherSalesTaxDto.hashCode());
     }
 
+    @Test
+    void hashCode_NotIdenticalSalesTax_NotEqual() {
+        // Given
+        float newAmount = salesTaxDto.getAmount() - 1;
+        anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
+
+        // Then
+        assertNotEquals(salesTaxDto.hashCode(), anotherSalesTaxDto.hashCode());
+    }
+
 
     @Test
     void toString_StringMatches_Equal(){
