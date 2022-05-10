@@ -130,6 +130,20 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void findByExternalIdSync_NullExternalIdGiven_ThrowsException(){
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderServiceImpl.findByExternalIdSync(nullExternalId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+        
+    }
+
+    @Test
     void findById_OrderFound_ReturnsOrder() {
         // Given
         String id = UUID.randomUUID().toString();
