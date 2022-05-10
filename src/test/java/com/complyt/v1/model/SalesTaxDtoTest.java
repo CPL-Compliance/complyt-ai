@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +21,10 @@ public class SalesTaxDtoTest {
 
     @BeforeEach
     void setUp(){
+        // Given
         salesTaxDto = new SalesTaxDto(new SalesTaxRateDto(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),5000);
+
+        // Then
         anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getSalesTaxRate(), salesTaxDto.getAmount());
     }
 
@@ -28,6 +32,22 @@ public class SalesTaxDtoTest {
     void equals_IdenticalCustomers_Equal() {
         assertEquals(salesTaxDto,anotherSalesTaxDto);
     }
+
+    @Test
+    void equals_NotIdenticalCustomers_NotEqual() {
+        // Given
+        float newAmount = salesTaxDto.getAmount() - 1;
+        anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
+
+        // Then
+        assertNotEquals(salesTaxDto,anotherSalesTaxDto);
+    }
+
+    @Test
+    void hashCode_IdenticalSalesTax_Equal() {
+        assertEquals(salesTaxDto.hashCode(), anotherSalesTaxDto.hashCode());
+    }
+
 
     @Test
     void toString_StringMatches_Equal(){
