@@ -6,7 +6,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +37,7 @@ class OrderServiceImplTest {
 
     Order order;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -114,6 +114,22 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void findByExternalIdSync_OrderFound_ReturnsOrder(){
+        // Given
+        String id = UUID.randomUUID().toString();
+        Order orderToSearchFor = order.withExternalId(id);
+
+        // When
+        when(orderRepository.findByExternalIdSync(id)).thenReturn(orderToSearchFor);
+        Order returnedOrder = orderServiceImpl.findByExternalIdSync(id);
+
+        // Then
+        assertNotNull(returnedOrder);
+        assertEquals(returnedOrder, orderToSearchFor);
+
+    }
+
+    @Test
     void findById_OrderFound_ReturnsOrder() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -145,6 +161,79 @@ class OrderServiceImplTest {
         //Then
         assertNotNull(returnedOrders);
         assertEquals(returnedOrders,allOrders);
+    }
+
+    @Test
+    void update_OrderUpdated_OrderReturned() {
+        // Given
+
+        // When
+        when(orderRepository.update(order)).thenReturn(Mono.just(order));
+        Mono<Order> monoOrder = orderServiceImpl.update(order);
+
+        // Then
+        assertNotNull(monoOrder);
+        assertEquals(monoOrder.block(), order);
+
+    }
+
+    @Test
+    void update_NullOrderGiven_ThrowsException() {
+        // Given
+        order = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderServiceImpl.update(order);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+
+    }
+
+    @Test
+    void updateSync_OrderUpdated_OrderReturned() {
+        // Given
+
+        // When
+        when(orderRepository.updateSync(order)).thenReturn(order);
+        Order returnedOrder = orderServiceImpl.updateSync(order);
+
+        // Then
+        assertNotNull(returnedOrder);
+        assertEquals(returnedOrder, order);
+
+    }
+
+    @Test
+    void updateSync_NullOrderGiven_ThrowsException() {
+        // Given
+        order = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderServiceImpl.updateSync(order);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+
+    }
+
+    @Test
+    void markAsCancelled_ChangesOrdersStatus_ReturnsUpdatedOrder() {
+        // Given
+        Order cancelledOrderWithId = order.withOrderStatus(OrderStatus.CANCELLED).withId(order.getId());
+
+        // When
+        when(orderRepository.findByExternalIdSync(order.getExternalId())).thenReturn(order);
+        when(orderRepository.updateSync(cancelledOrderWithId)).thenReturn(cancelledOrderWithId);
+
+        Mono<Order> updatedOrder = orderServiceImpl.markAsCancelled(order.getExternalId());
+
+        //
+        assertNotNull(updatedOrder);
+        assertEquals(updatedOrder.block(), cancelledOrderWithId);
+        assertEquals(updatedOrder.block().getId(),cancelledOrderWithId.getId());
     }
 
     @Test

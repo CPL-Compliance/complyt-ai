@@ -7,17 +7,22 @@ import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SalesTaxFacadeTest {
+
+    @InjectMocks
+    SalesTaxFacade salesTaxFacade;
 
     @Mock
     FastTaxWebClientWrapper fastTaxWebClientWrapper;
@@ -52,6 +57,11 @@ class SalesTaxFacadeTest {
 
     @Test
     void findByAddress_FindsByAddress_ReturnsSalesTaxData(){
+        // Given
+
+        // When
+//        when(fastTaxWebClientWrapper.findByAddress())
+        // Then
 
     }
 
