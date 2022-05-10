@@ -56,6 +56,32 @@ class OrderRepositoryTest {
     }
 
     @Test
+    void init_NullReactiveMongoTemplateGiven_ThrowsException(){
+        // Given
+        reactiveMongoTemplate = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate,mongoTemplate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
+    }
+
+    @Test
+    void init_NullMongoTemplate_ThrowsException(){
+        // Given
+        mongoTemplate = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate,mongoTemplate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
+    }
+
+    @Test
     void save() {
     }
 

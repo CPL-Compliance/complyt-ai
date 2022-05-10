@@ -140,7 +140,7 @@ class OrderServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
-        
+
     }
 
     @Test
