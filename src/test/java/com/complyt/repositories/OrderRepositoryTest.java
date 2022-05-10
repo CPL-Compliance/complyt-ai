@@ -6,6 +6,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.BsonNumber;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,31 +82,39 @@ class OrderRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
     }
 
-//    @Test
-//    void updateSync_UpdatingOrder_ReturnsUpdatedOrder(){
-//        // Given
-//        Order orderNoId = order.withId(null);
-//
-//        // When
-//        when(mongoTemplate.updateFirst())
-//
-//        // Then
-//        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
-//
-//    }
+    @Test
+    void updateSync_UpdatingOrder_ReturnsUpdatedOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
 
-//    @Test
-//    void updateSync_UpdateWasNotAcknowledged_ThrowsException(){
-//        // Given
-//        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
-//        Update update = orderRepository.
-//        // Then
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            orderRepository.updateSync(nullOrder);
-//        });
-//
-//        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
-//    }
+        // When
+        when(mongoTemplate.updateFirst(query,update,Order.class)).thenReturn(UpdateResult.acknowledged(1, null,null));
+        when(mongoTemplate.findOne(query,Order.class)).thenReturn(order);
+        Order updatedOrder = orderRepository.updateSync(order);
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(order,updatedOrder);
+    }
+
+    @Test
+    void updateSync_UpdateWasNotAcknowledged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+
+        // When
+        when(mongoTemplate.updateFirst(query,update,Order.class)).thenReturn(UpdateResult.unacknowledged());
+
+        // Then
+        OperationFailedException operationFailedException = assertThrows(OperationFailedException.class, () -> {
+            orderRepository.updateSync(order);
+        });
+
+        assertEquals(operationFailedException.getMessage(), "Could not update order, " + order);
+
+    }
 
     @Test
     void updateSync_NullOrderGiven_ThrowsException(){

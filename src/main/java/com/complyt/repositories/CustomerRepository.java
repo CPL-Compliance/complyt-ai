@@ -82,7 +82,7 @@ public class CustomerRepository {
         return findByExternalId(externalId);
     }
 
-    private Update buildUpdateCommand(Customer customer) {
+    public Update buildUpdateCommand(Customer customer) {
         Update update = new Update()
                 .set("externalId", customer.getExternalId())
                 .set("address", customer.getAddress())

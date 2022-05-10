@@ -106,7 +106,7 @@ public class OrderRepository {
         return mongoTemplate.findOne(query, Order.class);
     }
 
-    private Update buildUpdateCommand(Order order) {
+    public Update buildUpdateCommand(Order order) {
         return new Update()
                 .set("externalId", order.getExternalId())
                 .set("billingAddress", order.getBillingAddress())
