@@ -1,7 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapper;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +26,6 @@ public class MappersConfigTest {
         FastTaxDataToSalesTaxRateMapper secondFastTaxDataToSalesTaxRateMapper = mappersConfig.fastTaxDataToSalesTaxRateMapper();
 
         // Then
-        Assert.assertEquals(fastTaxDataToSalesTaxRateMapper,secondFastTaxDataToSalesTaxRateMapper);
+        Assertions.assertEquals(fastTaxDataToSalesTaxRateMapper, secondFastTaxDataToSalesTaxRateMapper);
     }
 }
