@@ -6,6 +6,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import org.aspectj.weaver.ast.Or;
 import org.bson.BsonNumber;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.*;
@@ -175,6 +176,41 @@ class OrderRepositoryTest {
 
         // Then
         assertNotNull(order);
+    }
+
+    @Test
+    void update_UpdateWasNotAcknowleged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+        UpdateResult expectedResult = UpdateResult.unacknowledged();
+
+        // When
+        when(reactiveMongoTemplate.updateFirst(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+
+        // Then
+        OperationFailedException operationFailedException = assertThrows(OperationFailedException.class, () -> {
+            orderRepository.update(order);
+        });
+
+        assertEquals(operationFailedException.getMessage(), "Could not update order, " + order);
+    }
+
+    @Test
+    void update_UpdatesOrder_ReturnsOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+        UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
+
+        // When
+        when(reactiveMongoTemplate.updateFirst(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
+        Order updatedOrder = orderRepository.update(order).block();
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(updatedOrder,order);
     }
 
     @Test
