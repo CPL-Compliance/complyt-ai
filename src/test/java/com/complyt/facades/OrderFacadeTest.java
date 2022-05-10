@@ -187,4 +187,20 @@ public class OrderFacadeTest {
         assertNotNull(updatedOrder);
         assertEquals(updatedOrder,orderWithSalesTax);
     }
+
+    @Test
+    void markAsCancelled_orderIdGiven_ChangesOrderStatus(){
+        // Given
+        String orderId = order.getId();
+        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
+
+        // When
+        when(orderService.markAsCancelled(orderId)).thenReturn(Mono.just(cancelledOrder));
+        Mono<Order> orderWithCancelledStatus = orderFacade.markAsCancelled(orderId);
+
+        // Then
+        assertNotNull(orderWithCancelledStatus);
+        assertEquals(orderWithCancelledStatus.block(),cancelledOrder);
+
+    }
 }
