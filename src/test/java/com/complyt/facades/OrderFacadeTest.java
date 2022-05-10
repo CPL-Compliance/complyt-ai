@@ -58,7 +58,6 @@ public class OrderFacadeTest {
         List<Item> items = new ArrayList<>();
         items.add(new Item(1000,3, 3000, "description","name","taxCode"));
         order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId, null, OrderStatus.ACTIVE);
-        ClientService clientService = new ClientServiceImpl(new ClientRepository());
     }
 
     @Test

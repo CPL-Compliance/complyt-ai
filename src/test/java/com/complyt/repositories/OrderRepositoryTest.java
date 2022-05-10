@@ -81,6 +81,61 @@ class OrderRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
     }
 
+//    @Test
+//    void updateSync_UpdatingOrder_ReturnsUpdatedOrder(){
+//        // Given
+//        Order orderNoId = order.withId(null);
+//
+//        // When
+//        when(mongoTemplate.updateFirst())
+//
+//        // Then
+//        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+//
+//    }
+
+//    @Test
+//    void updateSync_UpdateWasNotAcknowledged_ThrowsException(){
+//        // Given
+//        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+//        Update update = orderRepository.
+//        // Then
+//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+//            orderRepository.updateSync(nullOrder);
+//        });
+//
+//        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+//    }
+
+    @Test
+    void updateSync_NullOrderGiven_ThrowsException(){
+        // Given
+        Order nullOrder = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderRepository.updateSync(nullOrder);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
+    void findByExternalIdSync_FindsOrder_ReturnsOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+
+        // When
+        when(mongoTemplate.findOne(query,Order.class)).thenReturn(order);
+        Order returnedOrder = orderRepository.findByExternalIdSync(order.getExternalId());
+
+        // Then
+        assertNotNull(returnedOrder);
+        assertEquals(returnedOrder,order);
+    }
+
+
+
     @Test
     void save() {
     }
