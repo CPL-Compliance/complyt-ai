@@ -6,10 +6,7 @@ import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -46,7 +43,7 @@ class CustomerRepositoryTest {
  
     Customer customer;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -216,6 +213,21 @@ class CustomerRepositoryTest {
         // Then
         assertNotNull(insertedCustomer);
         assertEquals(customerWithNewExternalId, insertedCustomer);
+    }
+
+    @Test
+    void upsertSync_NullCustomerGiven_ThrowsException(){
+        // Given
+        customer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.upsertSync(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 
     @Test

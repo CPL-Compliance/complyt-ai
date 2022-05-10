@@ -70,10 +70,7 @@ public class CustomerRepository {
         String externalId = customer.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
-        Update update = new Update()
-                .set("externalId", customer.getExternalId())
-                .set("address", customer.getAddress())
-                .set("name", customer.getName());
+        Update update = buildUpdateCommand(customer);
 
         UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
         if(!updateResult.wasAcknowledged())

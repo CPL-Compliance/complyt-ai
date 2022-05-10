@@ -194,5 +194,27 @@ public class OrderControllerTest {
                 .expectBodyList(OrderDto.class)
                 .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
     }
+
+//    @Test
+//    void updateSalesTax_UpdatesOrder_ReturnsStatus200(){
+//        // Given
+////        String externalId = UUID.randomUUID().toString();
+////        Order order = orderWithId.withExternalId(externalId);
+//
+//        // When + Then
+//        when(orderFacade.updateSalesTaxSync(orderWithId.getExternalId())).thenReturn(orderWithId);
+//        webTestClient
+//                .mutateWith(csrf())
+//                .put()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBodyList(OrderDto.class)
+//                .value(orderDto -> orderDto , equalTo(orderDto));
+//
+//    }
 }
 

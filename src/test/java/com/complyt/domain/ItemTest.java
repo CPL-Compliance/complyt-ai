@@ -1,7 +1,6 @@
 package com.complyt.domain;
 
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
