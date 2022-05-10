@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -13,7 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MappersConfigTest {
 
-    MappersConfig mappersConfig = new MappersConfig();
+    @InjectMocks
+    MappersConfig mappersConfig;
 
     @Test
     void fastTaxDataToSalesTaxRateMapper_CreatesMapperInstance_ReturnsMapperInstance(){
