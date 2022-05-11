@@ -29,7 +29,6 @@ public class WebClientWrapperConfigTest {
     @Mock
     WebClient fastTaxWebClient;
 
-
     @Test
     void zipTaxWebClientWrapper_SetInstance_ReturnInstance(){
         String scheme = "https";
