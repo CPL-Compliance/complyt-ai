@@ -45,7 +45,10 @@ public class FastTaxWebClientWrapperTest {
 
     @Test
     void equals_EqualAddressValues_Equal() {
-        assertTrue(fastTaxWebClientWrapper.equals(anotherFastTaxWebClientWrapper));
+        assertTrue(
+       fastTaxWebClientWrapper.equals(anotherFastTaxWebClientWrapper) &&
+                anotherFastTaxWebClientWrapper.equals(fastTaxWebClientWrapper)
+        );
     }
 
     @Test
