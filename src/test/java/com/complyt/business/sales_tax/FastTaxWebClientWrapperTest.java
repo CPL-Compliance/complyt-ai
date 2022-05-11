@@ -50,20 +50,6 @@ public class FastTaxWebClientWrapperTest {
         );
     }
 
-    @Test
-    void equals_SameObject_Equal() {
-        anotherFastTaxWebClientWrapper = fastTaxWebClientWrapper;
-        assertTrue(
-                fastTaxWebClientWrapper.equals(anotherFastTaxWebClientWrapper) &&
-                        anotherFastTaxWebClientWrapper.equals(fastTaxWebClientWrapper)
-        );
-    }
-
-    @Test
-    void equals_DifferentType_NotEqual() {
-        String differentInstance = "Im not a fastTax client wrapper";
-        assertNotEquals(fastTaxWebClientWrapper,differentInstance);
-    }
 
     @Test
     void hashCode_IdenticalAddresses_Equal() {
