@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -197,26 +195,45 @@ public class OrderControllerTest {
                 .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
     }
 
-//    @Test
-//    void updateSalesTax_UpdatesOrder_ReturnsStatus200(){
-//        // Given
-//        String externalId = UUID.randomUUID().toString();
-//        Order order = orderWithId.withExternalId(externalId);
-//
-//        // When + Then
-//        when(orderFacade.updateSalesTaxSync(orderWithId.getExternalId())).thenReturn(orderWithId);
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
-//                        .build())
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBodyList(OrderDto.class)
-//                .value(orderDto -> orderDto , equalTo(orderDto));
-//
-//    }
+    @Test
+    void updateSalesTax_UpdatesOrder_ReturnsStatus200(){
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order order = orderWithId.withExternalId(externalId);
+
+        // When + Then
+        when(orderFacade.updateSalesTaxSync(orderWithId.getExternalId())).thenReturn(orderWithId);
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(OrderDto.class)
+                .value(orderDto -> orderDto , equalTo(orderDto));
+
+    }
+
+    @Test
+    void markAsCancelled_CancelsOrder_OrderStatusChanges(){
+        // Given
+        Order cancelledOrdered = orderWithId.withOrderStatus(OrderStatus.CANCELLED);
+
+        // When + Then
+        when(orderFacade.markAsCancelled(orderWithId.getExternalId())).thenReturn(Mono.just(cancelledOrdered));
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+
+    }
 }
 
