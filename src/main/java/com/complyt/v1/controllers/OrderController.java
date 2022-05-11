@@ -16,8 +16,6 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-
 @AllArgsConstructor
 @Log
 @Tag(name = "Order", description = "This is the Order controller")
@@ -43,11 +41,9 @@ public class OrderController {
 
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<OrderDto> updateSalesTax(@PathVariable("externalId") String externalId) {
-        Order order = orderFacade.updateSalesTaxSync(externalId);
-
-        //return ResponseEntity.noContent().build();
-        return new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(order), HttpStatus.OK);
+    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") String externalId) {
+        return orderFacade.updateSalesTax(externalId)
+                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
 
     @Operation(summary = "Gets order by externalId")

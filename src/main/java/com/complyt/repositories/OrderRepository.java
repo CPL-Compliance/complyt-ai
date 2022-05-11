@@ -79,21 +79,46 @@ public class OrderRepository {
     }
 
     public Mono<Order> update(Order order) {
-        String externalId = order.getExternalId();
-        Query query = Query.query(Criteria.where("externalId").is(externalId));
-        Update update = buildUpdateCommand(order);
+//        String externalId = order.getExternalId();
+//        Query query = Query.query(Criteria.where("externalId").is(externalId));
+//        Update update = buildUpdateCommand(order);
+        return Mono.just(order).flatMap(item -> {
+            String externalId = item.getExternalId();
+            Query query = Query.query(Criteria.where("externalId").is(externalId));
+            Update update = buildUpdateCommand(item);
 
-        UpdateResult updateResult = reactiveMongoTemplate.updateFirst(query, update, Order.class).block();
-        if (!updateResult.wasAcknowledged()) {
-            log.error(String.format("Failed to write order into the data base, %s", order));
-            throw new OperationFailedException(String.format("Could not update order, %s", order));
-        }
-
-        return findByExternalId(externalId);
+            return reactiveMongoTemplate.findAndModify(query, update, Order.class);
+        });
+//        Mono.just(order).flatMap(item ->
+//        {
+//            String externalId = order.getExternalId();
+//            Query query = Query.query(Criteria.where("externalId").is(externalId));
+//            Update update = buildUpdateCommand(order);
+//
+//            return reactiveMongoTemplate.updateFirst(query, update, Order.class);
+//        }).map(updateResult -> {
+//            if (!updateResult.wasAcknowledged()) {
+//                log.error(String.format("Failed to write order into the data base, %s", order));
+//                throw new OperationFailedException(String.format("Could not update order, %s", order));
+//            }
+//
+//            return externalId;
+//        });
+//        return reactiveMongoTemplate.updateFirst(query, update, Order.class)
+//                .map(updateResult -> {
+//                    if (!updateResult.wasAcknowledged()) {
+//                        log.error(String.format("Failed to write order into the data base, %s", order));
+//                        throw new OperationFailedException(String.format("Could not update order, %s", order));
+//                    }
+//
+//                    return externalId;
+//                })
+//                .flatMap(this::findByExternalId);
     }
 
     public Mono<Order> findByExternalId(String externalId) {
         Query query = Query.query(Criteria.where("externalId").is(externalId));
+
         return reactiveMongoTemplate.findOne(query, Order.class);
     }
 

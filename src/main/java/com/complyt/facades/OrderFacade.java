@@ -41,12 +41,14 @@ public class OrderFacade {
     }
 
     @SneakyThrows
-    public Order updateSalesTaxSync(String externalId) {
-        Order order = orderService.findByExternalIdSync(externalId);
-        SalesTax salesTax = salesTaxService.getSalesTaxSync(order.getShippingAddress(), order.getItems());
-        Order orderWitSalesTax = order.withSalesTax(salesTax);
+    public Mono<Order> updateSalesTax(String externalId) {
+        return orderService
+                .findByExternalId(externalId)
+                .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems()))
+                .flatMap();
 
-        return orderService.updateSync(orderWitSalesTax);
+        salesTax -> orderService.update(order.withSalesTax(salesTax))
+//                .doOnNext(order -> orderService.update(order));
     }
 
     public Mono<Order> markAsCancelled(String orderId) {

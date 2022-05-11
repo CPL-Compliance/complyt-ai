@@ -27,7 +27,6 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implem
     public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
         URI uri = buildUri(zip, address, city, state);
         WebClient webClient = buildWebClient(uri);
-        RestTemplate restTemplate = new RestTemplate();
 
         return webClient
                 .get()

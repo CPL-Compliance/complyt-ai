@@ -6,12 +6,8 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.repositories.ClientRepository;
-import com.complyt.repositories.CustomerRepository;
-import com.complyt.repositories.OrderRepository;
 import com.complyt.services.*;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -177,10 +173,10 @@ public class OrderFacadeTest {
 
         // When
         when(orderService.findByExternalIdSync(externalId)).thenReturn(order);
-        when(salesTaxService.getSalesTaxSync(order.getShippingAddress(),order.getItems())).thenReturn(salesTax);
+        when(salesTaxService.getSalesTax(order.getShippingAddress(),order.getItems())).thenReturn(salesTax);
         when(orderService.updateSync(orderWithSalesTax)).thenReturn(orderWithSalesTax);
 
-        Order updatedOrder = orderFacade.updateSalesTaxSync(externalId);
+        Mono<Order> updatedOrder = orderFacade.updateSalesTax(externalId);
 
         // Then
         assertNotNull(updatedOrder);

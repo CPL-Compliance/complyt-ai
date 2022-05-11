@@ -202,7 +202,7 @@ public class OrderControllerTest {
         Order order = orderWithId.withExternalId(externalId);
 
         // When + Then
-        when(orderFacade.updateSalesTaxSync(orderWithId.getExternalId())).thenReturn(orderWithId);
+        when(orderFacade.updateSalesTax(orderWithId.getExternalId())).thenReturn(Mono.just(orderWithId));
         webTestClient
                 .mutateWith(csrf())
                 .put()

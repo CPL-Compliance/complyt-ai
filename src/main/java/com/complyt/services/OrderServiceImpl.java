@@ -6,6 +6,9 @@ import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -57,7 +60,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Mono<Order> update(@NonNull Order order) {
-        return orderRepository.update(order);
+        return orderRepository.findByExternalId(order.getExternalId())
+                .map(orderInfo -> orderInfo.withExternalId(order.getExternalId())
+                            .withBillingAddress(order.getBillingAddress())
+                            .withShippingAddress(order.getShippingAddress())
+                            .withCustomerId(order.getCustomerId())
+                            .withItems(order.getItems())
+                            .withOrderStatus(order.getOrderStatus())
+                            .withSalesTax(order.getSalesTax()))
+                .flatMap(orderRepository::save);
     }
 
     public Order updateSync(@NonNull Order order) {
