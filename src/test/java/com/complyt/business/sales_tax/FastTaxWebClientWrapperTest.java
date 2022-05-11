@@ -13,8 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +48,21 @@ public class FastTaxWebClientWrapperTest {
        fastTaxWebClientWrapper.equals(anotherFastTaxWebClientWrapper) &&
                 anotherFastTaxWebClientWrapper.equals(fastTaxWebClientWrapper)
         );
+    }
+
+    @Test
+    void equals_SameObject_Equal() {
+        anotherFastTaxWebClientWrapper = fastTaxWebClientWrapper;
+        assertTrue(
+                fastTaxWebClientWrapper.equals(anotherFastTaxWebClientWrapper) &&
+                        anotherFastTaxWebClientWrapper.equals(fastTaxWebClientWrapper)
+        );
+    }
+
+    @Test
+    void equals_DifferentType_NotEqual() {
+        String differentInstance = "Im not a fastTax client wrapper";
+        assertNotEquals(fastTaxWebClientWrapper,differentInstance);
     }
 
     @Test
