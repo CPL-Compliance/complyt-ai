@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
-import com.complyt.domain.SalesTaxData;
-import com.complyt.services.sales_tax.SalesTaxService;
+import com.complyt.domain.sales_tax.SalesTaxData;
+import com.complyt.business.sales_tax.SalesTaxWebClientWrapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -11,9 +11,9 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class SalesTaxFacade {
     @NonNull
-    private SalesTaxService salesTaxService;
+    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
-        return salesTaxService.findByAddress(zip, address, city, state);
+        return salesTaxWebClientWrapper.findByAddress(zip, address, city, state);
     }
 }

@@ -3,10 +3,12 @@ package com.complyt.repositories;
 import com.complyt.domain.Customer;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,9 +20,13 @@ import reactor.core.publisher.Mono;
 
 @Repository
 @Slf4j
+@AllArgsConstructor
 public class CustomerRepository {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @NonNull
+    private MongoTemplate mongoTemplate;
 
     public Flux<Customer> findByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
@@ -46,14 +52,25 @@ public class CustomerRepository {
         return reactiveMongoTemplate.findById(id, Customer.class);
     }
 
+    public Mono<Customer> upsertSync(@NonNull Customer customer) {
+        String externalId = customer.getExternalId();
+        Query query = Query.query(Criteria.where("externalId").is(externalId));
+
+        Update update = buildUpdateCommand(customer);
+        UpdateResult updateResult = mongoTemplate.upsert(query, update, Customer.class);
+        if (!updateResult.wasAcknowledged()) {
+            log.error(String.format("Failed to write customer into the data base, %s", customer));
+            throw new OperationFailedException(String.format("Could not update customer, %s", customer));
+        }
+
+        return findByExternalId(externalId);
+    }
+
     public Mono<Customer> upsert(@NonNull Customer customer) {
         String externalId = customer.getExternalId();
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
-        Update update = new Update()
-                .set("externalId", customer.getExternalId())
-                .set("address", customer.getAddress())
-                .set("name", customer.getName());
+        Update update = buildUpdateCommand(customer);
 
         UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
         if(!updateResult.wasAcknowledged())
@@ -63,6 +80,14 @@ public class CustomerRepository {
         }
 
         return findByExternalId(externalId);
+    }
+
+    public Update buildUpdateCommand(Customer customer) {
+        Update update = new Update()
+                .set("externalId", customer.getExternalId())
+                .set("address", customer.getAddress())
+                .set("name", customer.getName());
+        return update;
     }
 
     public Mono<Customer> findByExternalId(String externalId){

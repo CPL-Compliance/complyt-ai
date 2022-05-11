@@ -6,14 +6,12 @@ import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -39,16 +37,33 @@ class CustomerRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Mock
+    MongoTemplate mongoTemplate;
  
     Customer customer;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         customer = new Customer(id, externalId, name, address);
+    }
+
+    @Test
+    void init_NullMongoTemplateGiven_ThrowsException(){
+        // Given
+        mongoTemplate = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            CustomerRepository customerRepository = new CustomerRepository(reactiveMongoTemplate,mongoTemplate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
+
     }
 
     @Test
@@ -205,13 +220,47 @@ class CustomerRepositoryTest {
         UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
+        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
         when(reactiveMongoTemplate.findOne(query,Customer.class)).thenReturn(Mono.just(customerWithNewExternalId));
-        Customer insertedCustomer = customerRepository.upsert(customerWithNewExternalId).block();
+        Customer insertedCustomer = customerRepository.upsertSync(customerWithNewExternalId).block();
 
         // Then
         assertNotNull(insertedCustomer);
         assertEquals(customerWithNewExternalId, insertedCustomer);
+    }
+
+    @Test
+    void upsertSync_UpdateWasNotAcknowledged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
+
+        Update update = customerRepository.buildUpdateCommand(customer);
+        UpdateResult expectedUpdateResult = UpdateResult.unacknowledged();
+
+        // When
+        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
+
+        // Then
+        OperationFailedException nullPointerException = assertThrows(OperationFailedException.class, () -> {
+            customerRepository.upsertSync(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "Could not update customer, " + customer);
+    }
+
+    @Test
+    void upsertSync_NullCustomerGiven_ThrowsException(){
+        // Given
+        customer = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerRepository.upsertSync(customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 
     @Test

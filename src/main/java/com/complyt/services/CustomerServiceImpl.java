@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
+    @NonNull
     private CustomerRepository customerRepository;
 
     @Override
@@ -22,7 +23,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Mono<Customer> upsert(@NonNull Customer customer){
-        return customerRepository.upsert(customer);
+        return customerRepository.upsertSync(customer);
     }
 
     @Override

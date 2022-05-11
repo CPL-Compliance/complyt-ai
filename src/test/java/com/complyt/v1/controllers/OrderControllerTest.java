@@ -4,6 +4,7 @@ import com.complyt.config.JacksonConfig;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -32,12 +34,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest(OrderController.class)
 @Import(JacksonConfig.class)
+@WithMockUser(username = "mock", password = "mock")
 public class OrderControllerTest {
 
     @MockBean
@@ -59,11 +63,11 @@ public class OrderControllerTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item("price", "quantity", "description", "name", "taxCode"));
+                add(new Item(2000,4,8000,"description","name","taxCode"));
             }
         };
 
-        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId);
+        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null, OrderStatus.ACTIVE);
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 
@@ -90,6 +94,7 @@ public class OrderControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(OrderController.BASE_URL)
@@ -109,6 +114,7 @@ public class OrderControllerTest {
 
         // When + Then
         webTestClient
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(OrderController.BASE_URL)
@@ -187,6 +193,47 @@ public class OrderControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(OrderDto.class)
                 .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
+    }
+
+    @Test
+    void updateSalesTax_UpdatesOrder_ReturnsStatus200(){
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order order = orderWithId.withExternalId(externalId);
+
+        // When + Then
+        when(orderFacade.updateSalesTaxSync(orderWithId.getExternalId())).thenReturn(orderWithId);
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(OrderDto.class)
+                .value(orderDto -> orderDto , equalTo(orderDto));
+
+    }
+
+    @Test
+    void markAsCancelled_CancelsOrder_OrderStatusChanges(){
+        // Given
+        Order cancelledOrdered = orderWithId.withOrderStatus(OrderStatus.CANCELLED);
+
+        // When + Then
+        when(orderFacade.markAsCancelled(orderWithId.getExternalId())).thenReturn(Mono.just(cancelledOrdered));
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+
     }
 }
 

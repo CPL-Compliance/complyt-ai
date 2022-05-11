@@ -1,10 +1,14 @@
-package com.complyt.services.sales_tax;
+package com.complyt.business.sales_tax;
 
-import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.ZipTaxData;
+import com.complyt.domain.Address;
+import com.complyt.domain.sales_tax.SalesTaxData;
+import com.complyt.domain.sales_tax.ZipTaxData;
+import lombok.NonNull;
+import org.apache.commons.lang3.NotImplementedException;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -13,10 +17,10 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-public class ZipTaxService extends SalesTaxBase implements SalesTaxService {
+public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
-    public ZipTaxService(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
-        super(webClient, scheme, host, path, key);
+    public ZipTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
+        super(restTemplate, webClient, scheme, host, path, key);
     }
 
     @Override
@@ -29,6 +33,21 @@ public class ZipTaxService extends SalesTaxBase implements SalesTaxService {
                 .retrieve()
                 .bodyToMono(ZipTaxData.class)
                 .cast(SalesTaxData.class);
+    }
+
+    @Override
+    public SalesTaxData findByAddressSync(String zip, String address, String city, String state) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public Mono<SalesTaxData> findByAddress(Address address) {
+        return null;
+    }
+
+    @Override
+    public SalesTaxData findByAddressSync(@NonNull Address address) {
+        return null;
     }
 
     private WebClient buildWebClient(URI uri) {

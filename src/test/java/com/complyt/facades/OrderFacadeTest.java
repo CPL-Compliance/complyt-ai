@@ -3,17 +3,22 @@ package com.complyt.facades;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.repositories.ClientRepository;
 import com.complyt.repositories.CustomerRepository;
 import com.complyt.repositories.OrderRepository;
 import com.complyt.services.*;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -38,68 +43,51 @@ public class OrderFacadeTest {
     OrderService orderService;
 
     @Mock
-    CustomerService customerService;
-
-    @Mock
-    ClientService clientService;
+    SalesTaxService salesTaxService;
 
     Order order;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
-        OrderService orderService = new OrderServiceImpl(new OrderRepository());
-        CustomerService customerService = new CustomerServiceImpl(new CustomerRepository());
-        ClientService clientService = new ClientServiceImpl(new ClientRepository());
-    }
-
-    @Test
-    void initFacade_NullCustomerServiceInstanceGiven_ThrowsNullPointerException(){
-        // Given
-        customerService = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
-    }
-
-    @Test
-    void initFacade_NullClientServiceInstanceGiven_ThrowsNullPointerException(){
-        // Given
-        clientService = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "clientService is marked non-null but is null");
+        items.add(new Item(1000,3, 3000, "description","name","taxCode"));
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId, null, OrderStatus.ACTIVE);
     }
 
     @Test
     void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException(){
         // Given
         orderService = null;
+
         // When
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(customerService, clientService, orderService);
+            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
+    }
+
+    @Test
+    void initFacade_NullSalesTaxServiceInstanceGiven_ThrowsNullPointerException(){
+        // Given
+        salesTaxService = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
     }
 
     @Test
@@ -178,4 +166,40 @@ public class OrderFacadeTest {
         assertEquals(returnedCustomers.size(),2);
     }
 
+    @Test
+    void updateSalesTaxSync_ValidExternalIdGiven_UpdatesOrder(){
+        // Given
+        String externalId = order.getExternalId();
+        SalesTax salesTax = new SalesTax(
+                new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f, 0.5f),
+                1000);
+        Order orderWithSalesTax = order.withSalesTax(salesTax);
+
+        // When
+        when(orderService.findByExternalIdSync(externalId)).thenReturn(order);
+        when(salesTaxService.getSalesTaxSync(order.getShippingAddress(),order.getItems())).thenReturn(salesTax);
+        when(orderService.updateSync(orderWithSalesTax)).thenReturn(orderWithSalesTax);
+
+        Order updatedOrder = orderFacade.updateSalesTaxSync(externalId);
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(updatedOrder,orderWithSalesTax);
+    }
+
+    @Test
+    void markAsCancelled_orderIdGiven_ChangesOrderStatus(){
+        // Given
+        String orderId = order.getId();
+        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
+
+        // When
+        when(orderService.markAsCancelled(orderId)).thenReturn(Mono.just(cancelledOrder));
+        Mono<Order> orderWithCancelledStatus = orderFacade.markAsCancelled(orderId);
+
+        // Then
+        assertNotNull(orderWithCancelledStatus);
+        assertEquals(orderWithCancelledStatus.block(),cancelledOrder);
+
+    }
 }

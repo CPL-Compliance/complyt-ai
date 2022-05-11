@@ -1,6 +1,6 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.facades.SalesTaxFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

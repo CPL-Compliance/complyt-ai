@@ -3,17 +3,18 @@ package com.complyt.repositories;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.mongodb.client.result.UpdateResult;
+import org.aspectj.weaver.ast.Or;
+import org.bson.BsonNumber;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -39,9 +40,12 @@ class OrderRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @Mock
+    MongoTemplate mongoTemplate;
+
     Order order;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -49,9 +53,98 @@ class OrderRepositoryTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        items.add(new Item("price","quantity","description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId);
+        items.add(new Item(2000,4,8000,"description","name","taxCode"));
+        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId, null, OrderStatus.ACTIVE);
     }
+
+    @Test
+    void init_NullReactiveMongoTemplateGiven_ThrowsException(){
+        // Given
+        reactiveMongoTemplate = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate,mongoTemplate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
+    }
+
+    @Test
+    void init_NullMongoTemplate_ThrowsException(){
+        // Given
+        mongoTemplate = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate,mongoTemplate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
+    }
+
+    @Test
+    void updateSync_UpdatingOrder_ReturnsUpdatedOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+
+        // When
+        when(mongoTemplate.updateFirst(query,update,Order.class)).thenReturn(UpdateResult.acknowledged(1, null,null));
+        when(mongoTemplate.findOne(query,Order.class)).thenReturn(order);
+        Order updatedOrder = orderRepository.updateSync(order);
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(order,updatedOrder);
+    }
+
+    @Test
+    void updateSync_UpdateWasNotAcknowledged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+
+        // When
+        when(mongoTemplate.updateFirst(query,update,Order.class)).thenReturn(UpdateResult.unacknowledged());
+
+        // Then
+        OperationFailedException operationFailedException = assertThrows(OperationFailedException.class, () -> {
+            orderRepository.updateSync(order);
+        });
+
+        assertEquals(operationFailedException.getMessage(), "Could not update order, " + order);
+
+    }
+
+    @Test
+    void updateSync_NullOrderGiven_ThrowsException(){
+        // Given
+        Order nullOrder = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderRepository.updateSync(nullOrder);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
+    void findByExternalIdSync_FindsOrder_ReturnsOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+
+        // When
+        when(mongoTemplate.findOne(query,Order.class)).thenReturn(order);
+        Order returnedOrder = orderRepository.findByExternalIdSync(order.getExternalId());
+
+        // Then
+        assertNotNull(returnedOrder);
+        assertEquals(returnedOrder,order);
+    }
+
+
 
     @Test
     void save() {
@@ -63,11 +156,11 @@ class OrderRepositoryTest {
         Query query = Query.query(Criteria.where("_id").is(order.getExternalId()));
 
         // When
-        when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(null);
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.empty());
         Mono<Order> monoOrder = orderRepository.findById(order.getExternalId());
 
         // Then
-        assertNull(monoOrder);
+        assertEquals(monoOrder, Mono.empty());
     }
 
     @Test
@@ -86,6 +179,41 @@ class OrderRepositoryTest {
     }
 
     @Test
+    void update_UpdateWasNotAcknowleged_ThrowsException(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+        UpdateResult expectedResult = UpdateResult.unacknowledged();
+
+        // When
+        when(reactiveMongoTemplate.updateFirst(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+
+        // Then
+        OperationFailedException operationFailedException = assertThrows(OperationFailedException.class, () -> {
+            orderRepository.update(order);
+        });
+
+        assertEquals(operationFailedException.getMessage(), "Could not update order, " + order);
+    }
+
+    @Test
+    void update_UpdatesOrder_ReturnsOrder(){
+        // Given
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
+        Update update = orderRepository.buildUpdateCommand(order);
+        UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
+
+        // When
+        when(reactiveMongoTemplate.updateFirst(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
+        Order updatedOrder = orderRepository.update(order).block();
+
+        // Then
+        assertNotNull(updatedOrder);
+        assertEquals(updatedOrder,order);
+    }
+
+    @Test
     void upsert_ExternalIdExists_UpdateExistingOrder(){
         // Given
 
@@ -98,14 +226,16 @@ class OrderRepositoryTest {
                 .set("billingAddress", newBillingAddress)
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
+                .set("salesTax", order.getSalesTax())
+                .set("orderStatus", order.getOrderStatus())
                 .set("items", order.getItems());
         UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(existingOrderWithNewAddress));
 
-        Mono<Order> monoOrder = orderRepository.upsert(existingOrderWithNewAddress);
+        Mono<Order> monoOrder = orderRepository.upsertSync(existingOrderWithNewAddress);
         Order updatedOrder = monoOrder.block();
 
         // Then
@@ -126,14 +256,17 @@ class OrderRepositoryTest {
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
+                .set("salesTax", order.getSalesTax())
+                .set("orderStatus", order.getOrderStatus())
                 .set("items", order.getItems());
+
         UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update,Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query,update,Order.class)).thenReturn(expectedResult);
         when(reactiveMongoTemplate.findOne(query,Order.class)).thenReturn(Mono.just(newOrder));
 
-        Mono<Order> monoOrder = orderRepository.upsert(newOrder);
+        Mono<Order> monoOrder = orderRepository.upsertSync(newOrder);
         Order insertedOrder = monoOrder.block();
 
         // Then
@@ -152,14 +285,17 @@ class OrderRepositoryTest {
                 .set("billingAddress", order.getBillingAddress())
                 .set("shippingAddress", order.getShippingAddress())
                 .set("customerId", order.getCustomerId())
-                .set("items", order.getItems());
+                .set("orderStatus", order.getOrderStatus())
+                .set("items", order.getItems())
+                .set("salesTax", order.getSalesTax());
+
         UpdateResult expectedResult = UpdateResult.unacknowledged();
 
         // When
-        when(reactiveMongoTemplate.upsert(query,update, Order.class)).thenReturn(Mono.just(expectedResult));
+        when(mongoTemplate.upsert(query, update, Order.class)).thenReturn(expectedResult);
 
         Exception exception = assertThrows(OperationFailedException.class, () -> {
-            orderRepository.upsert(order).block();
+            orderRepository.upsertSync(order);
         });
 
         String expectedMessage = "Could not update order";
@@ -247,7 +383,7 @@ class OrderRepositoryTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderRepository.upsert(order).block();
+            orderRepository.upsertSync(order).block();
         });
 
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
