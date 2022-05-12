@@ -7,6 +7,7 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 @ToString
+@With
 @AllArgsConstructor
 public class ZipTaxData implements SalesTaxData {
     private String version;
