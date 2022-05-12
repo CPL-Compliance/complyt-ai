@@ -45,11 +45,7 @@ class ClientDtoMapperTest {
 
         AddressDto addressDto = new AddressDto("City", "Country", "County", "State", "Street", "ZIP");
         List<ObjectId> orders = null;
-        ClientDto clientDto = new ClientDto();
-        clientDto.setAddress(addressDto);
-
-        clientDto.setName(name);
-        clientDto.setOrdersId(orders);
+        ClientDto clientDto = new ClientDto(null,name,addressDto,orders);
 
         // When
         Client client = ClientMapper.INSTANCE.INSTANCE.clientDtoToClient(clientDto);

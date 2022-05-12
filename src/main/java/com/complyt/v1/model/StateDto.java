@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Schema(name = "State")
 public class StateDto {
     private double salesTaxRate;

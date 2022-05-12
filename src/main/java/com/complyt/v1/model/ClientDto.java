@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor
-@Setter
 @Schema(name = "Client")
 public class ClientDto {
     private String id;
