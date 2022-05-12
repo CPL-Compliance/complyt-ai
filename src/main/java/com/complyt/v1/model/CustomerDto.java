@@ -6,7 +6,6 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-@NoArgsConstructor
 @ToString
 @With
 @Schema(name = "Customer")

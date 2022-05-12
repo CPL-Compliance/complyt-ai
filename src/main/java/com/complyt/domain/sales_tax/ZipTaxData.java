@@ -8,7 +8,6 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 public class ZipTaxData implements SalesTaxData {
     private String version;
     private long rCode;
@@ -19,7 +18,6 @@ public class ZipTaxData implements SalesTaxData {
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 class Result {
     private String geoPostalCode;
     private String geoCity;

@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-@NoArgsConstructor
 @Schema(name = "Client")
 public class ClientDto {
     private String id;

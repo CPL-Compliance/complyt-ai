@@ -5,7 +5,6 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @With
 @EqualsAndHashCode
 @Schema(name = "Address")
