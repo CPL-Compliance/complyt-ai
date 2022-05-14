@@ -1,11 +1,8 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -36,27 +33,8 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implem
     }
 
     @Override
-    public SalesTaxData findByAddressSync(String zip, String address, String city, String state) {
-        URI uri = buildUri(zip, address, city, state);
-
-        return restTemplate.getForObject(uri, FastTaxData.class);
-    }
-
-    @SneakyThrows
-    @Override
-    public SalesTaxData findByAddressSync(@NonNull Address address) {
-        return findByAddressSync(address.getZip(),address.getStreet(),address.getCity(),address.getState());
-    }
-
-    @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
-        return Mono.fromCallable(() -> {
-            String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": [{\"City\": \"Englewood\",\"CityDistrictRate\": \"0\",\"CityRate\": \"0.035\",\"County\": \"Arapahoe\",\"CountyDistrictRate\": \"0.011\",\"CountyRate\": \"0.0025\",\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}],\"NotesCodes\": \"1\",\"NotesDesc\": \"IsUnincorporated\",\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\",\"StateName\": \"Colorado\",\"StateRate\": \"0.029\",\"TaxRate\": \"0.0775\",\"TotalTaxExempt\": \"LABOR/SERVICES\",\"Zip\": \"80112\"}]}";
-            ObjectMapper objectMapper = new ObjectMapper();
-            FastTaxData fastTaxData = objectMapper.readValue(json, FastTaxData.class);
-
-            return fastTaxData;
-        });
+        return findByAddress(address.getZip(), address.getStreet(), address.getCity(), address.getState());
     }
 
 

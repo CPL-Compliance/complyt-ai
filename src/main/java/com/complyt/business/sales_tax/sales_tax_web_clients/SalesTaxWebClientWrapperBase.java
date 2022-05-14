@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;

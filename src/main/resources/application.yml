@@ -3,13 +3,20 @@ spring:
     active:
       - production
       - fastTax
+
 logging:
   level:
     root: INFO
     web: INFO
+    reactor:
+      netty:
+        http: TRACE
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+
+

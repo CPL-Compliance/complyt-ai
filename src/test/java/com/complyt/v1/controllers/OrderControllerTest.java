@@ -19,10 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -88,16 +90,16 @@ public class OrderControllerTest {
     @Test
     void update_NewOrderCreated_SavesOrder() {
         // Given
-
         Order orderNoId = orderWithId.withId(null);
-        when(orderFacade.upsert(orderNoId)).thenReturn(Mono.just(orderWithId));
+        String externalId = orderNoId.getExternalId();
+        when(orderFacade.update(externalId, orderNoId)).thenReturn(Mono.just(orderWithId));
 
         // When + Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL)
+                        .path(OrderController.BASE_URL + "/" + externalId)
                         .build())
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -110,14 +112,15 @@ public class OrderControllerTest {
     @Test
     void update_UpdateFails_Returns5xxServerError() {
         // Given
-        when(orderFacade.upsert(orderWithId)).thenThrow(OperationFailedException.class);
+        String externalId = orderWithId.getExternalId();
+        when(orderFacade.update(externalId, orderWithId)).thenThrow(OperationFailedException.class);
 
         // When + Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL)
+                        .path(OrderController.BASE_URL + "/" + externalId)
                         .build())
                 .bodyValue(orderWithId)
                 .accept(MediaType.APPLICATION_JSON)

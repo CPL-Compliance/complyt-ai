@@ -1,9 +1,7 @@
 package com.complyt.facades;
 
-import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax.SalesTaxWebClientWrapper;
-import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)

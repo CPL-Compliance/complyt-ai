@@ -3,7 +3,6 @@ package com.complyt.facades;
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
 import com.complyt.services.CustomerService;
-import com.complyt.v1.controllers.CustomerController;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

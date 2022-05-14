@@ -1,11 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax.ZipTaxWebClientWrapper;
-import com.complyt.domain.sales_tax.SalesTaxCalculator;
-import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
-import com.complyt.services.SalesTaxService;
-import com.complyt.services.SalesTaxServiceImpl;
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import org.javatuples.Pair;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

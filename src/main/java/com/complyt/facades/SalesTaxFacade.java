@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.business.sales_tax.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

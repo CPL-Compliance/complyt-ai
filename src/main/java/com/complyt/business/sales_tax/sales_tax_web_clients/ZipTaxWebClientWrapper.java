@@ -1,10 +1,8 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.ZipTaxData;
-import lombok.NonNull;
-import org.apache.commons.lang3.NotImplementedException;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -36,17 +34,7 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase impleme
     }
 
     @Override
-    public SalesTaxData findByAddressSync(String zip, String address, String city, String state) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
-        return null;
-    }
-
-    @Override
-    public SalesTaxData findByAddressSync(@NonNull Address address) {
         return null;
     }
 
