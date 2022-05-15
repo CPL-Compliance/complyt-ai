@@ -11,6 +11,7 @@ define(['N/ui/dialog'], function (dialog) {
             const street = shippingAddrRecord.getValue({
             fieldId: 'addr1'
             });
+
             const city = shippingAddrRecord.getValue({
             fieldId: 'city'
             });
@@ -51,22 +52,22 @@ define(['N/ui/dialog'], function (dialog) {
                 throw new Error('Please add street for the shipping address');
             }
 
-            const cityValid = street != null && city.trim() !== '';
+            const cityValid = city != null && city.trim() !== '';
             if(!cityValid) {
                 throw new Error('Please add city for the shipping address');
             }
 
-            const stateValid = street != null && state.trim() !== '';
+            const stateValid = state != null && state.trim() !== '';
             if(!stateValid) {
                 throw new Error('Please add state for the shipping address');
             }
 
-            const zipValid = street != null && zip.trim() !== '';
+            const zipValid = zip != null && zip.trim() !== '';
             if(!zipValid) {
                 throw new Error('Please add zip for the shipping address');
             }
             
-            const countryValid = street != null && country.trim() !== '';
+            const countryValid = country != null && country.trim() !== '';
             if(!countryValid) {
                 throw new Error('Please add country for the shipping address');
             }

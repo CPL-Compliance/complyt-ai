@@ -163,7 +163,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
     const validateCustomer = (customerId) => {
         
         const url = invoiceConfiguration.CUSTOMER_URL + customerId;
-        log.debug(url);
+
         const errorMessage = 'No customer with id ' + customerId + ' was found';
 
         const customer = httpUtil.sendGetRequest(url, errorMessage);
