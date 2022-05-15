@@ -49,27 +49,27 @@ define(['N/ui/dialog'], function (dialog) {
         const validateAddress = (street, city, state, zip, country) => {
             const streetValid = street != null && street.trim() !== '';
             if(!streetValid) {
-                throw new Error('Please add street for the shipping address');
+                throw new Error('Please add street to the shipping address');
             }
 
             const cityValid = city != null && city.trim() !== '';
             if(!cityValid) {
-                throw new Error('Please add city for the shipping address');
+                throw new Error('Please add city to the shipping address');
             }
 
             const stateValid = state != null && state.trim() !== '';
             if(!stateValid) {
-                throw new Error('Please add state for the shipping address');
+                throw new Error('Please add state to the shipping address');
             }
 
             const zipValid = zip != null && zip.trim() !== '';
             if(!zipValid) {
-                throw new Error('Please add zip for the shipping address');
+                throw new Error('Please add zip to the shipping address');
             }
             
             const countryValid = country != null && country.trim() !== '';
             if(!countryValid) {
-                throw new Error('Please add country for the shipping address');
+                throw new Error('Please add country to the shipping address');
             }
         }
 
