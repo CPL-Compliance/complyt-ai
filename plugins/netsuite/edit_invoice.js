@@ -17,8 +17,6 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const invoice = createInvoice(invoiceRecord, invoiceExternalId, itemsLength, rec);
         const invoiceWithSalesTax = setSalesTax(invoice);
         const salesTaxAmount = invoiceWithSalesTax.salesTax.amount;
-
-
         const salesTaxRate = invoiceWithSalesTax.salesTax.salesTaxRate.taxRate;
         insertSalesTaxAsItem(rec, itemsLength, salesTaxAmount,salesTaxRate);
     }
@@ -80,8 +78,12 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const url = invoiceConfiguration.ORDER_URL + '/' + invoice.externalId + '/salesTax';
         const body = {};
         const errorMessage = 'Could not update invoice with sales tax';
-
+ 
         const invoiceWithSalesTax = httpUtil.sendPutRequest(url, body, errorMessage);
+        if(!invoiceWithSalesTax.salesTax)
+        {
+            throw new Error('Could not get sales tax for this transaction. Please check the inserted shipping address')
+        }
         return invoiceWithSalesTax;
     }
 
@@ -162,23 +164,33 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         return address;
     }
 
-    const getCustomerId = (customerId) => {
-        const url = invoiceConfiguration.CUSTOMER_URL + customerId;
+    const getCustomerId = (customerId) => {        
+        try
+        {
+            const url = invoiceConfiguration.CUSTOMER_URL + customerId;
 
-        const errorMessage = 'No customer with id ' + customerId + ' was found';
+            const errorMessage = 'No customer with id ' + customerId + ' was found';
 
-        const customer = httpUtil.sendGetRequest(url, errorMessage);
-        return customer.id;
+            const customer = httpUtil.sendGetRequest(url, errorMessage);
+            return customer.id;
+        }
+        catch(err)
+        {
+            throw new Error('Customer does not exist in the system');
+        }
     }
 
     const insertSalesTaxAsItem = (rec, itemsLength, salesTaxAmount, salesTaxRate) => {
-        const salesTaxRateAsPercentage = (+salesTaxRate * 100);
-        const rateDescription = "Sales Tax rate:  " + salesTaxRateAsPercentage + "%";
+        const salesTaxRateAsPercentage = (parseFloat(salesTaxRate) * 100).toFixed(3);
+        const rateDescription = "Sales Tax rate : " + salesTaxRateAsPercentage + "%";
+
         rec.insertLine({ sublistId: "item", line: itemsLength });
+
         rec.setCurrentSublistText({ sublistId: "item", fieldId: "item", text: "Sales Tax" });
         rec.setCurrentSublistValue({sublistId: "item", fieldId: "quantity", value: 1 });
         rec.setCurrentSublistValue({ sublistId: "item", fieldId: "amount", value: salesTaxAmount });
         rec.setCurrentSublistValue({ sublistId: "item", fieldId: "description", value: rateDescription });
+
         rec.commitLine({ sublistId: 'item' });
         rec.save();
     }
