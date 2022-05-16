@@ -31,7 +31,9 @@ public class CustomerController {
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
+            , @RequestBody @NonNull CustomerDto customerDto) {
+
         Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
         return customerfacade
@@ -39,20 +41,14 @@ public class CustomerController {
                 .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
-//    @Operation(summary = "Gets customer by externalId")
-//    @GetMapping("{externalId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Mono<EntityModel<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
-//        return customerfacade.findByExternalId(externalId)
-//                .map(customerItem -> {
-//                    EntityModel<CustomerDto> entityModel = EntityModel.of(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem));
-//                    Link link = WebMvcLinkBuilder.linkTo(methodOn(CustomerController.class).getAll()).withSelfRel();
-//                    entityModel.add(link);
-//
-//                    return entityModel;
-//                })
-//                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
-//    }
+    @Operation(summary = "Gets customer by externalId")
+    @GetMapping("{externalId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
+        return customerfacade.findByExternalId(externalId)
+                .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
+                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build()));
+    }
 
     @Operation(summary = "This will create a customer")
     @PostMapping("")

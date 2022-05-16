@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,12 +52,8 @@ class CustomerServiceImplTest {
         when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
         Mono<Customer> monoCustomer = customerServiceImpl.save(customer);
 
-        Customer returnedCustomer = monoCustomer.block();
-
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer, customer);
-
+        StepVerifier.create(monoCustomer).expectNext(customer).verifyComplete();
     }
 
     @Test
@@ -65,12 +62,10 @@ class CustomerServiceImplTest {
 
         // When
         when(customerRepository.upsertSync(customer)).thenReturn(Mono.just(customer));
-        Customer returnedCustomer = customerServiceImpl.upsert(customer).block();
+        Mono<Customer> customerMono = customerServiceImpl.upsert(customer);
 
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer, customer);
-
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
@@ -81,12 +76,10 @@ class CustomerServiceImplTest {
 
         // When
         when(customerRepository.findOneByName(name)).thenReturn(Mono.just(customerToSearchFor));
-        Customer returnedCustomer = customerServiceImpl.findOneByName(name).block();
+        Mono<Customer> customerMono = customerServiceImpl.findOneByName(name);
 
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer, customerToSearchFor);
-
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
     @Test
@@ -97,28 +90,23 @@ class CustomerServiceImplTest {
 
          // When
         when(customerRepository.findByExternalId(id)).thenReturn(Mono.just(customerToSearchFor));
-        Customer returnedCustomer = customerServiceImpl.findByExternalId(id).block();
+        Mono<Customer> customerMono = customerServiceImpl.findByExternalId(id);
 
          // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer, customerToSearchFor);
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
     @Test
     void findByName_TwoCustomersFound_ReturnsTwoCustomers() {
         // Given
         Customer secondCustomer = customer.withName(customer.getName());
-        List<Customer> customersWithSameName = new ArrayList<>();
-        customersWithSameName.add(customer);
-        customersWithSameName.add(secondCustomer);
 
         // When
-        when(customerRepository.findByName(customer.getName())).thenReturn(Flux.fromIterable(customersWithSameName));
-        List<Customer> returnedCustomers = customerServiceImpl.findByName(customer.getName()).collectList().block();
+        when(customerRepository.findByName(customer.getName())).thenReturn(Flux.just(customer, secondCustomer));
+        Flux<Customer> customerFlux = customerServiceImpl.findByName(customer.getName());
 
         // Then
-        assertNotNull(returnedCustomers);
-        assertEquals(returnedCustomers,customersWithSameName);
+        StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 
     @Test
@@ -129,11 +117,10 @@ class CustomerServiceImplTest {
 
          // When
          when(customerRepository.findById(id)).thenReturn(Mono.just(customerToSearchFor));
-         Customer returnedCustomer = customerServiceImpl.findById(id).block();
+         Mono<Customer> customerMono = customerServiceImpl.findById(id);
 
          // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer,customerToSearchFor);
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
     @Test
@@ -141,19 +128,13 @@ class CustomerServiceImplTest {
          // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);
-        List<Customer> allCustomers = new ArrayList<Customer>() {{
-            add(customer);
-            add(secondCustomer);
-        }};
 
         // When
-        when(customerRepository.findAll()).thenReturn(Flux.fromIterable(allCustomers));
-        List<Customer> returnedCustomers = customerServiceImpl.findAll().collectList().block();
+        when(customerRepository.findAll()).thenReturn(Flux.just(customer, secondCustomer));
+        Flux<Customer> customerFlux = customerServiceImpl.findAll();
 
         // Then
-        assertNotNull(returnedCustomers);
-        assertEquals(returnedCustomers.size(),2);
-        assertEquals(returnedCustomers,allCustomers);
+        StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 
     @Test

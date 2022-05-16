@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +120,7 @@ public class OrderFacadeTest {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.update(order)).thenReturn(Mono.just(order));
+        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
         orderFacade.update(externalId, order)
                 .subscribe(returnedOrder -> {
                     orderAtomicReference.set(returnedOrder);
@@ -135,13 +136,12 @@ public class OrderFacadeTest {
     @Test
     void addOrderToClient_OrderAddedToClient_OrderReturned() throws InterruptedException {
         // Given
+        String externalId = order.getExternalId();
         CountDownLatch countDownLatch = new CountDownLatch(1);
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
-        String externalId = order.getExternalId();
-
         // When
-        when(orderService.update(order)).thenReturn(Mono.just(order));
+        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
         orderFacade.update(externalId, order).subscribe(returnedOrder -> {
             orderAtomicReference.set(returnedOrder);
             countDownLatch.countDown();
@@ -154,19 +154,25 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void getOrderByExternalId_OrderFound_OrderReturned() {
+    void getOrderByExternalId_OrderFound_OrderReturned() throws InterruptedException {
         // Given
         String id = UUID.randomUUID().toString();
         Order orderToSearchFor = order.withExternalId(id);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
         // When
         when(orderService.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        Order returnedCustomer = orderFacade.findByExternalId(id).block();
+        orderFacade.findByExternalId(id).subscribe(returnedOrder -> {
+            orderAtomicReference.set(returnedOrder);
+            countDownLatch.countDown();
+        });
 
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer.getExternalId(), id);
-        assertEquals(returnedCustomer, orderToSearchFor);
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(orderAtomicReference.get().getExternalId(), id);
+        assertEquals(orderToSearchFor, orderAtomicReference.get());
     }
 
     @Test
@@ -180,15 +186,14 @@ public class OrderFacadeTest {
 
         // When
         when(orderService.findAll()).thenReturn(Flux.fromIterable(allOrders));
-        List<Order> returnedCustomers = orderFacade.getAll().collectList().block();
+        Flux<Order> returnedCustomers = orderFacade.getAll();
 
         // Then
-        assertNotNull(returnedCustomers);
-        assertEquals(returnedCustomers.size(), 2);
+        StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
 
     @Test
-    void updateSalesTaxSync_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
+    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
         // Given
         String externalId = order.getExternalId();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
@@ -200,7 +205,7 @@ public class OrderFacadeTest {
         // When
         when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
         when(salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())).thenReturn(Mono.just(salesTax));
-        when(orderService.update(orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
+        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
         orderFacade.updateSalesTax(externalId).subscribe(returnedOrder -> {
             orderAtomicReference.set(returnedOrder);

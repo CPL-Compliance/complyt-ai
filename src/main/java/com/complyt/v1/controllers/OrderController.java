@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -34,29 +35,22 @@ public class OrderController {
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
-//    @Operation(summary = "Gets all orders")
-//    @GetMapping("")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Flux<EntityModel<OrderDto>> getAll() {
-//        return orderFacade.getAll()
-//                .map(order -> {
-//                    EntityModel<OrderDto> entityModel = EntityModel.of(OrderMapper.INSTANCE.orderToOrderDto(order));
-//                    Link link = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getAll()).withSelfRel();
-//                    entityModel.add(link);
-//
-//                    return entityModel;
-//                });
-//    }
+    @Operation(summary = "Gets all orders")
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<OrderDto> getAll() {
+        return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+    }
 
-    @Operation(summary = "This will update the order if found by externalId")
+    @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId, @RequestBody @NonNull OrderDto orderDto) {
-        return Mono.just(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                .flatMap(order -> orderFacade.upsert(externalId, order))
+        return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
 
+    @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
@@ -68,6 +62,7 @@ public class OrderController {
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
+        return orderFacade.markAsCancelled(externalId)
+                .map(order -> ResponseEntity.noContent().build());
     }
 }

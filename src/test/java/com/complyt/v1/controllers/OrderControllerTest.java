@@ -14,17 +14,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,12 +39,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebFluxTest(OrderController.class)
+@ExtendWith(MockitoExtension.class)
 @Import(JacksonConfig.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WithMockUser(username = "mock", password = "mock")
-public class OrderControllerTest {
+class OrderControllerTest {
 
     @MockBean
     private OrderFacade orderFacade;
@@ -58,6 +58,7 @@ public class OrderControllerTest {
 
     @BeforeEach
     void cleanUp() {
+        MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -65,16 +66,16 @@ public class OrderControllerTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000,4,8000,"description","name","taxCode"));
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode"));
             }
         };
 
-        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null, OrderStatus.ACTIVE);
+        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 
     @Test
-    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException(){
+    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
         OrderFacade facade = null;
         // When
@@ -92,7 +93,7 @@ public class OrderControllerTest {
         // Given
         Order orderNoId = orderWithId.withId(null);
         String externalId = orderNoId.getExternalId();
-        when(orderFacade.update(externalId, orderNoId)).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.upsert(externalId, orderNoId)).thenReturn(Mono.just(orderWithId));
 
         // When + Then
         webTestClient
@@ -144,7 +145,7 @@ public class OrderControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(OrderDto.class)
-                .value(orderItem -> orderItem,equalTo(orderDto));
+                .value(orderItem -> orderItem, equalTo(orderDto));
     }
 
     @Test
@@ -171,21 +172,17 @@ public class OrderControllerTest {
         String secondId = UUID.randomUUID().toString();
         OrderDto orderNoId = orderDto.withExternalId(firstId);
         OrderDto secondOrderNoId = orderDto.withExternalId(secondId);
-
         Order firstOrder = orderWithId.withExternalId(firstId);
         Order secondOrder = orderWithId.withExternalId(secondId);
-
         List<OrderDto> allOrdersWithNoId = new ArrayList<OrderDto>() {{
             add(orderNoId);
             add(secondOrderNoId);
         }};
 
-        when(orderFacade.getAll()).thenReturn(Flux.fromIterable(new ArrayList<Order>() {{
-            add(firstOrder);
-            add(secondOrder);
-        }}));
+        // When
+        when(orderFacade.getAll()).thenReturn(Flux.just(firstOrder, secondOrder));
 
-        // When + Then
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -195,11 +192,11 @@ public class OrderControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(OrderDto.class)
-                .value(orderDtos -> orderDtos , equalTo(allOrdersWithNoId));
+                .value(orderDtos -> orderDtos, equalTo(allOrdersWithNoId));
     }
 
     @Test
-    void updateSalesTax_UpdatesOrder_ReturnsStatus200(){
+    void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
         // Given
         String externalId = UUID.randomUUID().toString();
         Order order = orderWithId.withExternalId(externalId);
@@ -216,12 +213,12 @@ public class OrderControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(OrderDto.class)
-                .value(orderDto -> orderDto , equalTo(orderDto));
+                .value(orderDto -> orderDto, equalTo(orderDto));
 
     }
 
     @Test
-    void markAsCancelled_CancelsOrder_OrderStatusChanges(){
+    void markAsCancelled_CancelsOrder_OrderStatusChanges() {
         // Given
         Order cancelledOrdered = orderWithId.withOrderStatus(OrderStatus.CANCELLED);
 

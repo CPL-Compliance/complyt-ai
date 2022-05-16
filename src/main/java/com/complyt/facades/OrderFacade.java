@@ -32,7 +32,7 @@ public class OrderFacade {
     }
 
     public Mono<Order> update(@NonNull String externalId, Order order) {
-        return orderService.update(order);
+        return orderService.update(externalId, order);
     }
 
     public Mono<Order> findByExternalId(String externalId) {
@@ -49,7 +49,7 @@ public class OrderFacade {
                 .findByExternalId(externalId)
                 .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
                         .map(salesTax -> order.withSalesTax(salesTax)))
-                .flatMap(order -> orderService.update(order));
+                .flatMap(order -> orderService.update(externalId, order));
     }
 
     public Mono<Order> markAsCancelled(String orderId) {

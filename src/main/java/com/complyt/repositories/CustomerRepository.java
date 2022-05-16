@@ -66,22 +66,6 @@ public class CustomerRepository {
         return findByExternalId(externalId);
     }
 
-    public Mono<Customer> upsert(@NonNull Customer customer) {
-        String externalId = customer.getExternalId();
-        Query query = Query.query(Criteria.where("externalId").is(externalId));
-
-        Update update = buildUpdateCommand(customer);
-
-        UpdateResult updateResult = reactiveMongoTemplate.upsert(query, update, Customer.class).block();
-        if(!updateResult.wasAcknowledged())
-        {
-            log.error(String.format("Failed to write customer into the data base, %s",customer));
-            throw new OperationFailedException(String.format("Could not update customer, %s",customer));
-        }
-
-        return findByExternalId(externalId);
-    }
-
     public Update buildUpdateCommand(Customer customer) {
         Update update = new Update()
                 .set("externalId", customer.getExternalId())
