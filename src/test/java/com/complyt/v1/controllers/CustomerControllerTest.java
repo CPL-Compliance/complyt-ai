@@ -81,7 +81,7 @@ class CustomerControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
+                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -101,7 +101,7 @@ class CustomerControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
+                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
                         .build())
                 .bodyValue(customer)
                 .accept(MediaType.APPLICATION_JSON)

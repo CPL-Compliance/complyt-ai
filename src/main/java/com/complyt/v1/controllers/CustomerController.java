@@ -29,7 +29,7 @@ public class CustomerController {
     private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
-    @PutMapping("")
+    @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
             , @RequestBody @NonNull CustomerDto customerDto) {
