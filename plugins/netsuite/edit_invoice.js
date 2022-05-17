@@ -41,15 +41,18 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec) => {
         const customerExternalId = invoiceRecord.getValue({ fieldId: 'entity' });
+        log.debug('Looking for customer with external id',customerExternalId);
         const customerId = getCustomerId(customerExternalId);
         
         const billingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'billingaddress' });
         const shippingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'shippingaddress' });
         const billingAddress = getAddress(billingAddrRecord);
         const shippingAddress = getAddress(shippingAddrRecord);
-
+        
         const items = getItems(rec, itemsLength);
         const invoice = sendInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
+        log.debug('Invoice created');
+        log.debug('Invoice details',invoice);
         return invoice;
     }
 
@@ -78,12 +81,15 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const url = invoiceConfiguration.ORDER_URL + '/' + invoice.externalId + '/salesTax';
         const body = {};
         const errorMessage = 'Could not update invoice with sales tax';
- 
+
+        log.info('Calculating sales tax for invoice');
+
         const invoiceWithSalesTax = httpUtil.sendPutRequest(url, body, errorMessage);
         if(!invoiceWithSalesTax.salesTax)
         {
             throw new Error('Could not get sales tax for this transaction. Please check the inserted shipping address')
         }
+        log.debug('Sales tax details',invoiceWithSalesTax.salesTax);
         return invoiceWithSalesTax;
     }
 
@@ -183,7 +189,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
     const insertSalesTaxAsItem = (rec, itemsLength, salesTaxAmount, salesTaxRate) => {
         const salesTaxRateAsPercentage = (parseFloat(salesTaxRate) * 100).toFixed(3);
         const rateDescription = "Sales Tax rate : " + salesTaxRateAsPercentage + "%";
-
+        log.info('Inserting Sales tax to items sublist');
         rec.insertLine({ sublistId: "item", line: itemsLength });
 
         rec.setCurrentSublistText({ sublistId: "item", fieldId: "item", text: "Sales Tax" });
