@@ -1,7 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
