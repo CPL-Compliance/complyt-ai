@@ -1,9 +1,9 @@
 {
     "paths": 
     {
-        "invoiceConfiguration": "/SuiteScripts/Conf/invoice_config.js",
-        "customerConfiguration": "/SuiteScripts/Conf/customer_config.js",
-        "httpConfiguration": "/SuiteScripts/Conf/http_config.js"
+        "invoiceConfiguration": "/SuiteScripts/Config/invoice_config.js",
+        "customerConfiguration": "/SuiteScripts/Config/customer_config.js",
+        "httpConfiguration": "/SuiteScripts/Config/http_config.js"
     },
     "shim":
     {

@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.ZipTaxData;
+import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+@EqualsAndHashCode
 public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
     public ZipTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {

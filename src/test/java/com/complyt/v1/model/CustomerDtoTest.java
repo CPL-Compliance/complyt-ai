@@ -17,8 +17,6 @@ public class CustomerDtoTest {
     private CustomerDto customerDto;
     private CustomerDto anotherCustomerDto;
 
-
-
     @BeforeEach
     void setUp() {
         String id = UUID.randomUUID().toString();

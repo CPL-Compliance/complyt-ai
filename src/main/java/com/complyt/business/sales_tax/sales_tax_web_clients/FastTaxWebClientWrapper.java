@@ -1,8 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.SalesTaxData;
+import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,9 +12,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-
 import java.net.URI;
 
+@EqualsAndHashCode
 public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
     public FastTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {

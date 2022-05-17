@@ -7,7 +7,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -17,17 +16,16 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@Getter
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    private final SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
+    private final SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
 
     @NonNull
-    SalesTaxCalculator salesTaxCalculator;
+    private final SalesTaxCalculator salesTaxCalculator;
 
     @Override
     public Mono<SalesTax> getSalesTax(Address address, List<Item> items) {
