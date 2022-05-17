@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 @ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class TaxInfoItem {
