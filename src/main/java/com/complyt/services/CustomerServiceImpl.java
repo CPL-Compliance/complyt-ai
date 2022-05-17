@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.domain.Customer;
+import com.complyt.domain.Order;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
@@ -22,8 +25,11 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    public Mono<Customer> upsert(@NonNull Customer customer){
-        return customerRepository.upsertSync(customer);
+    public Mono<Customer> upsert(@NonNull Customer customer) {
+        return customerRepository.findByExternalId(customer.getExternalId())
+                .switchIfEmpty(customerRepository.save(customer))
+                .map(createUpdateCustomerFunction(customer))
+                .flatMap(customerRepository::save);
     }
 
     @Override
@@ -50,4 +56,9 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findAll();
     }
 
+    private Function<Customer, Customer> createUpdateCustomerFunction(@NonNull final Customer customer) {
+        return customerInfo -> customerInfo.withExternalId(customer.getExternalId())
+                .withAddress(customer.getAddress())
+                .withName(customer.getName());
+    }
 }

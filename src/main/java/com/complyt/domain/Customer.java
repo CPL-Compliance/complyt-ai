@@ -1,7 +1,6 @@
 package com.complyt.domain;
 
 import lombok.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,10 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @With
 @ToString
 public class Customer {
-
     @Id
-    private String id;
-    private String externalId;
-    private String name;
-    private Address address;
+    private final String id;
+    private final String externalId;
+    private final String name;
+    private final Address address;
 }

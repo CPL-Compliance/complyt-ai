@@ -61,7 +61,8 @@ class CustomerServiceImplTest {
         // Given
 
         // When
-        when(customerRepository.upsertSync(customer)).thenReturn(Mono.just(customer));
+        when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.just(customer));
+        when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerServiceImpl.upsert(customer);
 
         // Then

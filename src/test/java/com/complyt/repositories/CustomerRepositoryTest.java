@@ -49,20 +49,6 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void init_NullMongoTemplateGiven_ThrowsException() {
-        // Given
-        mongoTemplate = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerRepository customerRepository = new CustomerRepository(reactiveMongoTemplate, mongoTemplate);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
-
-    }
-
-    @Test
     void findByName_NameExistsInTheCollection_ReturnsOneCustomer() {
         // Given
         String name = "Existing Customer";
