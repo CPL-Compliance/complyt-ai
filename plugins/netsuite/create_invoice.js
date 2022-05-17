@@ -41,8 +41,9 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const createInvoice = (invoiceRecord, invoiceExternalId, itemsLength, rec) => {
         const customerExternalId = invoiceRecord.getValue({ fieldId: 'entity' });
+        log.debug('Looking for customer with external id',customerExternalId);
         const customerId = getCustomerId(customerExternalId);
-        
+
         const billingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'billingaddress' });
         const shippingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'shippingaddress' });
         const billingAddress = getAddress(billingAddrRecord);
@@ -50,11 +51,13 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
         const items = getItems(rec, itemsLength);
         const invoice = sendInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
+        log.audit('Invoice created');
+        log.debug('Invoice details',invoice);
         return invoice;
     }
 
     const sendInvoice = (invoiceExternalId, customerId, billingAddress, shippingAddress, items) => {
-        
+
         const url = invoiceConfiguration.ORDER_URL;
         const body = JSON.stringify
         ({
@@ -70,40 +73,49 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const invoice = httpUtil.sendPutRequest(url, body, errorMessage);
 
         return invoice;
-        
+
     }
 
     const setSalesTax = invoice => {
-        
+
         const url = invoiceConfiguration.ORDER_URL + '/' + invoice.externalId + '/salesTax';
         const body = {};
         const errorMessage = 'Could not update invoice with sales tax';
- 
+
+        log.audit('Calculating sales tax for invoice');
+
         const invoiceWithSalesTax = httpUtil.sendPutRequest(url, body, errorMessage);
         if(!invoiceWithSalesTax.salesTax)
         {
             throw new Error('Could not get sales tax for this transaction. Please check the inserted shipping address')
         }
+        log.debug('Sales tax details',invoiceWithSalesTax.salesTax);
         return invoiceWithSalesTax;
     }
 
     const getItems = (rec, numItemLines) => {
         const items = [];
 
-        for (let i = 0; i < numItemLines; i++) 
+        for (let i = 0; i < numItemLines; i++)
         {
-            
+
             const name = rec.getSublistText({
                 sublistId: 'item',
                 fieldId: 'item',
                 line: i
             });
+
+            let taxable = false;
+            if(name === 'HW Installation Services'){
+                taxable = true;
+            }
+
             const amount = rec.getSublistValue({
                 sublistId : 'item',
                 fieldId : 'amount',
                 line : i
             });
-            
+
             const quantity = rec.getSublistValue({
                 sublistId : 'item',
                 fieldId : 'quantity',
@@ -124,10 +136,11 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 name: name,
                 quantity: quantity,
                 description: description,
-                taxCode:"TBD"
+                taxCode:"",
+                taxable:taxable
             }
     }
-            
+
         return items;
     }
 
@@ -135,24 +148,24 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const city = addressRecord.getValue({
             fieldId: 'city'
         });
-        
+
         const country = addressRecord.getValue({
             fieldId: 'country'
         });
-        
+
         const state = addressRecord.getValue({
             fieldId: 'state'
         });
-        
+
         const street = addressRecord.getValue({
             fieldId: 'addr1'
         });
-        
+
         const zip = addressRecord.getValue({
             fieldId: 'zip'
         });
 
-        const address = 
+        const address =
         {
             city:city,
             country:country,
@@ -164,7 +177,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         return address;
     }
 
-    const getCustomerId = (customerId) => {        
+    const getCustomerId = (customerId) => {
         try
         {
             const url = invoiceConfiguration.CUSTOMER_URL + customerId;
@@ -183,7 +196,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
     const insertSalesTaxAsItem = (rec, itemsLength, salesTaxAmount, salesTaxRate) => {
         const salesTaxRateAsPercentage = (parseFloat(salesTaxRate) * 100).toFixed(3);
         const rateDescription = "Sales Tax rate : " + salesTaxRateAsPercentage + "%";
-
+        log.audit('Inserting Sales tax to items sublist');
         rec.insertLine({ sublistId: "item", line: itemsLength });
 
         rec.setCurrentSublistText({ sublistId: "item", fieldId: "item", text: "Sales Tax" });
