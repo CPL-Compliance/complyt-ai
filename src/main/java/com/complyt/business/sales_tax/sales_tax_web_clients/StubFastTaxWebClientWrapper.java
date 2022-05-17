@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_web_clients;
 
+import com.complyt.annotations.Generated;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
+@Generated
 public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
     public StubFastTaxWebClientWrapper() {
         super(null, null, null, null, null, null);
