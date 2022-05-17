@@ -47,29 +47,34 @@ define(['N/ui/dialog'], function (dialog) {
         }
 
         const validateAddress = (street, city, state, zip, country) => {
-            const streetValid = street != null && street.trim() !== '';
-            if(!streetValid) {
-                throw new Error('Please add street to the shipping address');
+            const invalidFields = [];
+            const streetValid = street != undefined && street.trim() !== '';
+            if(!streetValid){
+                invalidFields.push('street');
             }
 
-            const cityValid = city != null && city.trim() !== '';
-            if(!cityValid) {
-                throw new Error('Please add city to the shipping address');
+            const cityValid = city && city.trim() !== '';
+            if(!cityValid){
+                invalidFields.push('city');
             }
 
-            const stateValid = state != null && state.trim() !== '';
-            if(!stateValid) {
-                throw new Error('Please add state to the shipping address');
+            const stateValid = state && state.trim() !== '';
+            if(!stateValid){
+                invalidFields.push('state');
             }
 
-            const zipValid = zip != null && zip.trim() !== '';
-            if(!zipValid) {
-                throw new Error('Please add zip to the shipping address');
+            const zipValid = zip && zip.trim() !== '';
+            if(!zipValid){
+                invalidFields.push('zip');
             }
             
-            const countryValid = country != null && country.trim() !== '';
-            if(!countryValid) {
-                throw new Error('Please add country to the shipping address');
+            const countryValid = country && country.trim() !== '';
+            if(!countryValid){
+                invalidFields.push('country');
+            }
+            
+            if(invalidFields.length !== 0){
+                throw new Error('Please add ' + invalidFields.toString());
             }
         }
 
