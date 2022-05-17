@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 @Repository
 @AllArgsConstructor
 public class StateRepository {
-
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 

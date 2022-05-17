@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CustomerRepositoryTest {
     @InjectMocks
     CustomerRepository customerRepository;
