@@ -10,9 +10,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-public class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
-    public StubFastTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> licenseKey) {
-        super(restTemplate, webClient, scheme, host, path, licenseKey);
+public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
+    public StubFastTaxWebClientWrapper() {
+        super(null, null, null, null, null, null);
     }
 
     @Override

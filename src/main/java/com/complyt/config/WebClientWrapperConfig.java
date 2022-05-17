@@ -1,6 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import org.javatuples.Pair;
 import org.springframework.context.annotation.Bean;
@@ -32,5 +33,11 @@ public class WebClientWrapperConfig {
         Pair<String, String> key = new Pair<>("licensekey", "WS19-KRF3-JGD1");
         RestTemplate restTemplate = new RestTemplate();
         return new FastTaxWebClientWrapper(restTemplate,fastTaxWebClient, scheme, host, path, key);
+    }
+
+    @Profile("stubFastTax")
+    @Bean("salesTaxWebClientWrapper")
+    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper() {
+        return new StubFastTaxWebClientWrapper();
     }
 }
