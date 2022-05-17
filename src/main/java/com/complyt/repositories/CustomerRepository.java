@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,8 +17,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 public class CustomerRepository {
-    @Autowired
-    ReactiveMongoTemplate reactiveMongoTemplate;
+    @NonNull
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Flux<Customer> findByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));

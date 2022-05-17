@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.Client;
 import com.complyt.domain.Order;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,8 +14,8 @@ import reactor.core.publisher.Mono;
 @Repository
 public class ClientRepository {
 
-    @Autowired
-    ReactiveMongoTemplate reactiveMongoTemplate;
+    @NonNull
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<Client> save(@NonNull Client client) {
         return reactiveMongoTemplate.save(client);

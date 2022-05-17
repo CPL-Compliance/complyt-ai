@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class StateRepository {
 
     @NonNull
-    ReactiveMongoTemplate reactiveMongoTemplate;
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<State> findOneByName(@NonNull String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
