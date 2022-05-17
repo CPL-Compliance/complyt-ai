@@ -9,7 +9,6 @@ define(['N/https', 'N/encode', 'httpConfiguration'], (https, encode, httpConfigu
     const sendGetRequest = (subDomain, errorMessage) => {
         const url = baseUrl + subDomain;
         
-        log.debug('url',url)
         const authHeader = getAuthHeader();
         const headers = {
             'Content-Type': httpConfiguration.CONTENT_TYPE,
