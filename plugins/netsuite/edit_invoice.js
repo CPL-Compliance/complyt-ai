@@ -43,12 +43,12 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const customerExternalId = invoiceRecord.getValue({ fieldId: 'entity' });
         log.debug('Looking for customer with external id',customerExternalId);
         const customerId = getCustomerId(customerExternalId);
-        
+
         const billingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'billingaddress' });
         const shippingAddrRecord = invoiceRecord.getSubrecord({ fieldId: 'shippingaddress' });
         const billingAddress = getAddress(billingAddrRecord);
         const shippingAddress = getAddress(shippingAddrRecord);
-        
+
         const items = getItems(rec, itemsLength);
         const invoice = sendInvoice(invoiceExternalId, customerId, billingAddress, shippingAddress, items);
         log.audit('Invoice created');
@@ -105,11 +105,6 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 line: i
             });
 
-            let taxable = false;
-            if(name === 'HW Installation Services'){
-                taxable = true;
-            }
-
             const amount = rec.getSublistValue({
                 sublistId : 'item',
                 fieldId : 'amount',
@@ -136,8 +131,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 name: name,
                 quantity: quantity,
                 description: description,
-                taxCode:"",
-                taxable:taxable
+                taxCode:""
             }
     }
 

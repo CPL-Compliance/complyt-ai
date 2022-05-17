@@ -105,11 +105,6 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 line: i
             });
 
-            let taxable = false;
-            if(name === 'HW Installation Services'){
-                taxable = true;
-            }
-
             const amount = rec.getSublistValue({
                 sublistId : 'item',
                 fieldId : 'amount',
@@ -136,8 +131,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 name: name,
                 quantity: quantity,
                 description: description,
-                taxCode:"",
-                taxable:taxable
+                taxCode:""
             }
     }
 
