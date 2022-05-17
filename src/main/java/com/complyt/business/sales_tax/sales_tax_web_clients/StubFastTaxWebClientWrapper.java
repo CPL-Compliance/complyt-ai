@@ -5,9 +5,6 @@ import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
-import org.javatuples.Pair;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
