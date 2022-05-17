@@ -4,6 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.javatuples.Pair;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@EqualsAndHashCode
 public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
     public FastTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {

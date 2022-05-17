@@ -4,7 +4,7 @@
 */
 define(['N/https', 'N/encode', 'httpConfiguration'], (https, encode, httpConfiguration) => {
 
-    const baseUrl = 'http://demo.complyt.io/';
+    const baseUrl = 'https://demo.complyt.io';
 
     const sendGetRequest = (subDomain, errorMessage) => {
         const url = baseUrl + subDomain;
