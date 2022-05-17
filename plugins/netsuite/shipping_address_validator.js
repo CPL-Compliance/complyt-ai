@@ -37,7 +37,7 @@ define(['N/ui/dialog'], function (dialog) {
             {
                 dialog.alert(
                     {
-                        title: 'Invalid address',
+                        title: 'Invalid shipping address',
                         message: error.message 
                     }
                 );
