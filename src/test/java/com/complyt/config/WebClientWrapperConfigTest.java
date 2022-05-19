@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,10 +21,7 @@ public class WebClientWrapperConfigTest {
     WebClientWrapperConfig webClientWrapperConfig;
 
     @Mock
-    WebClient zipTaxWebClient;
-
-    @Mock
-    WebClient fastTaxWebClient;
+    WebClient webClient;
 
     @Test
     void zipTaxWebClientWrapper_SetInstance_ReturnInstance(){
@@ -33,13 +29,12 @@ public class WebClientWrapperConfigTest {
         String host = "api.zip-tax.com";
         String path = "request/v40";
         Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-        RestTemplate restTemplate = new RestTemplate();
 
         ZipTaxWebClientWrapper expectedZipTaxWebClientWrapper =
-                new ZipTaxWebClientWrapper(restTemplate,zipTaxWebClient, scheme, host, path, key);
+                new ZipTaxWebClientWrapper(webClient, scheme, host, path, key);
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
-                webClientWrapperConfig.zipTaxWebClientWrapper(zipTaxWebClient);
+                webClientWrapperConfig.zipTaxWebClientWrapper(webClient);
 
         assertEquals(expectedZipTaxWebClientWrapper,actualZipTaxWebClientWrapper);
     }
@@ -50,15 +45,13 @@ public class WebClientWrapperConfigTest {
         String host = "api.zip-tax.com";
         String path = "request/v40";
         Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-        RestTemplate restTemplate = new RestTemplate();
 
         FastTaxWebClientWrapper expectedFastTaxWebClientWrapper =
-                new FastTaxWebClientWrapper(restTemplate,fastTaxWebClient, scheme, host, path, key);
+                new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
 
         FastTaxWebClientWrapper actualFastTaxWebClientWrapper =
-                webClientWrapperConfig.fastTaxWebClientWrapper(fastTaxWebClient);
+                webClientWrapperConfig.fastTaxWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxWebClientWrapper,actualFastTaxWebClientWrapper);
-
     }
 }

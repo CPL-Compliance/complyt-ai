@@ -8,6 +8,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,7 +25,7 @@ public class FastTaxWebClientWrapperTest {
     FastTaxWebClientWrapper anotherFastTaxWebClientWrapper;
 
     @Mock
-    WebClient fastTaxWebClient;
+    WebClient webClient;
 
     @BeforeEach
     void setUp() {
@@ -33,9 +35,10 @@ public class FastTaxWebClientWrapperTest {
         Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
         RestTemplate restTemplate = new RestTemplate();
 
-        fastTaxWebClientWrapper = new FastTaxWebClientWrapper(restTemplate, fastTaxWebClient, scheme, host, path, key);
+        fastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
 
-        anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(restTemplate, fastTaxWebClient, scheme, host, path, key);
+//        webClient = WebClient.builder().baseUrl(uri.toString()).defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE).build();
+        anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
     }
 
     @Test
@@ -47,5 +50,9 @@ public class FastTaxWebClientWrapperTest {
     @Test
     void hashCode_IdenticalAddresses_Equal() {
         assertEquals(fastTaxWebClientWrapper.hashCode(), anotherFastTaxWebClientWrapper.hashCode());
+    }
+
+    void findByAddress_validAddress_ReturnsSalesTaxData() {
+
     }
 }

@@ -19,8 +19,8 @@ import java.util.List;
 @EqualsAndHashCode
 public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
-    public ZipTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
-        super(restTemplate, webClient, scheme, host, path, key);
+    public ZipTaxWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
+        super(webClient, scheme, host, path, key);
     }
 
     @Override

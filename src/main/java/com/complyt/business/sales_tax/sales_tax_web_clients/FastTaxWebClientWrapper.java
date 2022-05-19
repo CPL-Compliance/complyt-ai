@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -17,17 +16,18 @@ import java.net.URI;
 @EqualsAndHashCode
 public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
 
-    public FastTaxWebClientWrapper(RestTemplate restTemplate, WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
-        super(restTemplate, webClient, scheme, host, path, key);
+    public FastTaxWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
+        super(webClient, scheme, host, path, key);
     }
 
     @Override
     public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
         URI uri = buildUri(zip, address, city, state);
-        WebClient webClient = buildWebClient(uri);
 
         return webClient
                 .get()
+                .uri(uri)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(FastTaxData.class)
                 .cast(SalesTaxData.class);
@@ -36,15 +36,6 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implem
     @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
         return findByAddress(address.getZip(), address.getStreet(), address.getCity(), address.getState());
-    }
-
-
-    private WebClient buildWebClient(URI uri) {
-        return WebClient
-                .builder()
-                .baseUrl(uri.toString())
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
     }
 
     protected URI buildUri(String zip, String address, String city, String state) {

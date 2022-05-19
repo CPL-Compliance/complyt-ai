@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @Generated
 public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
     public StubFastTaxWebClientWrapper() {
-        super(null, null, null, null, null, null);
+        super(null, null, null, null, null);
     }
 
     @Override
