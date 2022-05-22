@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,8 +33,18 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FastTaxWebClientWrapperTest {
+    @InjectMocks
     FastTaxWebClientWrapper fastTaxWebClientWrapper;
     FastTaxWebClientWrapper anotherFastTaxWebClientWrapper;
+
+    @Mock
+    WebClient webClient;
+    @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
+    @Mock
+    private WebClient.ResponseSpec responseSpecMock;
 
     @BeforeEach
     void setUp() {
@@ -41,6 +53,7 @@ public class FastTaxWebClientWrapperTest {
         String path = "request/v40";
         Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
 
+        MockitoAnnotations.openMocks(this);
         fastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
 
         anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
@@ -57,14 +70,6 @@ public class FastTaxWebClientWrapperTest {
         assertEquals(fastTaxWebClientWrapper.hashCode(), anotherFastTaxWebClientWrapper.hashCode());
     }
 
-    @Mock
-    WebClient webClient;
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
-    @Mock
-    private WebClient.ResponseSpec responseSpecMock;
     @Test
     void findByAddress_validAddress_ReturnsSalesTaxData() {
         // Given

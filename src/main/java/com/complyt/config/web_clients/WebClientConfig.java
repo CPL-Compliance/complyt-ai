@@ -1,4 +1,4 @@
-package com.complyt.config;
+package com.complyt.config.web_clients;
 
 import com.complyt.annotations.Generated;
 import io.netty.handler.logging.LogLevel;
