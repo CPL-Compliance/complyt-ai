@@ -1,5 +1,6 @@
 package com.complyt.domain.sales_tax;
 
+import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.Item;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

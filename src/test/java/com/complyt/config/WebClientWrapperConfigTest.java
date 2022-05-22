@@ -1,15 +1,16 @@
 package com.complyt.config;
 
-import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax.ZipTaxWebClientWrapper;
-import org.javatuples.Pair;
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.config.web_clients.FastTaxWebClientWrapperProperties;
+import com.complyt.config.web_clients.WebClientWrapperConfig;
+import com.complyt.config.web_clients.ZipTaxWebClientWrapperProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,43 +23,33 @@ public class WebClientWrapperConfigTest {
     WebClientWrapperConfig webClientWrapperConfig;
 
     @Mock
-    WebClient zipTaxWebClient;
-
-    @Mock
-    WebClient fastTaxWebClient;
+    WebClient webClient;
 
     @Test
-    void zipTaxWebClientWrapper_SetInstance_ReturnInstance(){
-        String scheme = "https";
-        String host = "api.zip-tax.com";
-        String path = "request/v40";
-        Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-        RestTemplate restTemplate = new RestTemplate();
-
-        ZipTaxWebClientWrapper expectedZipTaxWebClientWrapper =
-                new ZipTaxWebClientWrapper(restTemplate,zipTaxWebClient, scheme, host, path, key);
+    void zipTaxWebClientWrapper_SetInstance_ReturnInstance() {
+        ZipTaxWebClientWrapper expectedZipTaxWebClientWrapper = new ZipTaxWebClientWrapper(webClient,
+                ZipTaxWebClientWrapperProperties.SCHEME,
+                ZipTaxWebClientWrapperProperties.HOST,
+                ZipTaxWebClientWrapperProperties.PATH,
+                ZipTaxWebClientWrapperProperties.KEY);
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
-                webClientWrapperConfig.zipTaxWebClientWrapper(zipTaxWebClient);
+                webClientWrapperConfig.zipTaxWebClientWrapper(webClient);
 
-        assertEquals(expectedZipTaxWebClientWrapper,actualZipTaxWebClientWrapper);
+        assertEquals(expectedZipTaxWebClientWrapper, actualZipTaxWebClientWrapper);
     }
 
     @Test
-    void fastTaxWebClientWrapper_SetInstance_ReturnInstance(){
-        String scheme = "https";
-        String host = "api.zip-tax.com";
-        String path = "request/v40";
-        Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-        RestTemplate restTemplate = new RestTemplate();
-
-        FastTaxWebClientWrapper expectedFastTaxWebClientWrapper =
-                new FastTaxWebClientWrapper(restTemplate,fastTaxWebClient, scheme, host, path, key);
+    void fastTaxWebClientWrapper_SetInstance_ReturnInstance() {
+        FastTaxWebClientWrapper expectedFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
+                FastTaxWebClientWrapperProperties.SCHEME,
+                FastTaxWebClientWrapperProperties.HOST,
+                FastTaxWebClientWrapperProperties.PATH,
+                FastTaxWebClientWrapperProperties.KEY);
 
         FastTaxWebClientWrapper actualFastTaxWebClientWrapper =
-                webClientWrapperConfig.fastTaxWebClientWrapper(fastTaxWebClient);
+                webClientWrapperConfig.fastTaxWebClientWrapper(webClient);
 
-        assertEquals(expectedFastTaxWebClientWrapper,actualFastTaxWebClientWrapper);
-
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
 }

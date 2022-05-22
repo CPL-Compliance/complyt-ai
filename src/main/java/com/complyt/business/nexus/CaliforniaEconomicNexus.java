@@ -1,4 +1,4 @@
-package com.complyt.business;
+package com.complyt.business.nexus;
 
 import com.complyt.config.dao.CaliforniaEconomicNexusDao;
 import lombok.AllArgsConstructor;

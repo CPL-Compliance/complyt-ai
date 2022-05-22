@@ -1,3 +1,3 @@
 var customerSettings = {
-    CUSTOMER_URL : "/v1/customers/",
+    CUSTOMER_URL : "/v1/customers",
 }

@@ -1,8 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.SalesTaxWebClientWrapper;
-import com.complyt.domain.sales_tax.SalesTaxCalculator;
-import com.complyt.domain.sales_tax.SalesTaxCalculatorTest;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

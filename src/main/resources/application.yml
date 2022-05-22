@@ -2,14 +2,24 @@ spring:
   profiles:
     active:
       - production
+      # fastTax - to use FastTax service
+      # stubFastTax - to use stub method of FastTax
+      # zipTax - to use Zip Tax Service
       - fastTax
+
 logging:
   level:
     root: INFO
-    web: INFO
+    web: DEBUG
+    reactor:
+      netty:
+        http: TRACE
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+
+
+

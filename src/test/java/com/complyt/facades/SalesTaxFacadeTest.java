@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
-import com.complyt.business.sales_tax.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;

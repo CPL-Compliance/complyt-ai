@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
@@ -7,7 +7,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @AllArgsConstructor
 public abstract class SalesTaxWebClientWrapperBase {
-    protected final RestTemplate restTemplate;
     protected final WebClient webClient;
     protected final String scheme;
     protected final String host;

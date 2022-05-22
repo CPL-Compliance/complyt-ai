@@ -1,7 +1,6 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Order;
-import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.services.OrderService;
 import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
@@ -28,8 +27,12 @@ public class OrderFacade {
         return orderService.save(order);
     }
 
-    public Mono<Order> upsert(Order order) {
-        return orderService.upsert(order);
+    public Mono<Order> upsert(@NonNull String externalId, Order order) {
+        return orderService.upsert(externalId, order);
+    }
+
+    public Mono<Order> update(@NonNull String externalId, Order order) {
+        return orderService.update(externalId, order);
     }
 
     public Mono<Order> findByExternalId(String externalId) {
@@ -41,12 +44,12 @@ public class OrderFacade {
     }
 
     @SneakyThrows
-    public Order updateSalesTaxSync(String externalId) {
-        Order order = orderService.findByExternalIdSync(externalId);
-        SalesTax salesTax = salesTaxService.getSalesTaxSync(order.getShippingAddress(), order.getItems());
-        Order orderWitSalesTax = order.withSalesTax(salesTax);
-
-        return orderService.updateSync(orderWitSalesTax);
+    public Mono<Order> updateSalesTax(String externalId) {
+        return orderService
+                .findByExternalId(externalId)
+                .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
+                        .map(salesTax -> order.withSalesTax(salesTax)))
+                .flatMap(order -> orderService.update(externalId, order));
     }
 
     public Mono<Order> markAsCancelled(String orderId) {

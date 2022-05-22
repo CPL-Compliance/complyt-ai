@@ -2,35 +2,30 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
-import com.complyt.repositories.exceptions.OperationFailedException;
-import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CustomerRepositoryTest {
     @InjectMocks
     CustomerRepository customerRepository;
@@ -38,32 +33,16 @@ class CustomerRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @Mock
-    MongoTemplate mongoTemplate;
- 
     Customer customer;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         customer = new Customer(id, externalId, name, address);
-    }
-
-    @Test
-    void init_NullMongoTemplateGiven_ThrowsException(){
-        // Given
-        mongoTemplate = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerRepository customerRepository = new CustomerRepository(reactiveMongoTemplate,mongoTemplate);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "mongoTemplate is marked non-null but is null");
-
     }
 
     @Test
@@ -74,45 +53,42 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer));
         Flux<Customer> fluxCustomers = customerRepository.findByName(name);
-        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        assertNotNull(fluxCustomers);
-        assertEquals(customers.size(), 1);
-        assertEquals(customers.get(0), customer);
+        StepVerifier.create(fluxCustomers)
+                .expectNext(customer)
+                .verifyComplete();
     }
 
     @Test
-    void findOneById_IdDoesNotExist_ReturnsNull(){
+    void findById_IdDoesNotExist_ReturnsEmpty() {
         // Given
 
 
         // When
-        when(reactiveMongoTemplate.findById(customer.getExternalId(), Customer.class)).thenReturn(null);
+        when(reactiveMongoTemplate.findById(customer.getExternalId(), Customer.class)).thenReturn(Mono.empty());
         Mono<Customer> monoCustomer = customerRepository.findById(customer.getExternalId());
 
         // Then
-        Assert.assertEquals(monoCustomer,null);
+        StepVerifier.create(monoCustomer).expectNextCount(0).verifyComplete();
     }
 
 
     @Test
-    void findByName_NameDoesntExist_ReturnsEmptyList() {
+    void findByName_NameDoesntExist_ReturnsEmpty() {
         // Given
         String name = "Existing Customer";
 
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList()));
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.empty());
         Flux<Customer> fluxCustomers = customerRepository.findByName(name);
-        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        assertNotNull(customers);
-        assertEquals(customers.size(), 0);
+        StepVerifier.create(fluxCustomers).expectNextCount(0).verifyComplete();
     }
 
     @Test
@@ -123,33 +99,26 @@ class CustomerRepositoryTest {
         // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer));
         Flux<Customer> fluxCustomers = customerRepository.findByName(name);
-        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        assertNotNull(customers);
-        assertEquals(customers.size(), 1);
-        assertEquals(customers.get(0), customer);
+        StepVerifier.create(fluxCustomers).expectNext(customer).verifyComplete();
     }
 
     @Test
     void findByName_NameExists_ReturnsTwoCustomers() {
         // Given
         String name = "Existing Customer";
-
-        // When
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
         Customer secondCustomer = customer.withName("SecondCustomer");
-        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.fromIterable(Arrays.asList(customer, secondCustomer)));
+
+        // When
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
         Flux<Customer> fluxCustomers = customerRepository.findByName(name);
-        List<Customer> customers = fluxCustomers.collectList().block();
 
         // Then
-        assertNotNull(customers);
-        assertEquals(customers.size(), 2);
-        assertEquals(customers.get(0), customer);
-        assertEquals(customers.get(1), secondCustomer);
+        StepVerifier.create(fluxCustomers).expectNext(customer, secondCustomer).verifyComplete();
     }
 
     @Test
@@ -160,12 +129,11 @@ class CustomerRepositoryTest {
         Query query = Query.query(Criteria.where("name").is("^" + nameToSearchFor));
 
         // When
-        when(reactiveMongoTemplate.findOne(query,Customer.class)).thenReturn(Mono.just(customerToSearchFor));
-        Customer returnedCustomer = customerRepository.findOneByName(nameToSearchFor).block();
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerRepository.findOneByName(nameToSearchFor);
 
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer, customerToSearchFor);
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
     @Test
@@ -174,18 +142,13 @@ class CustomerRepositoryTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id).withExternalId(externalId);
-        List<Customer> customers = new ArrayList<Customer>() {{
-            add(customer);
-            add(secondCustomer);
-        }};
 
         //When
-        when(reactiveMongoTemplate.findAll(Customer.class)).thenReturn(Flux.fromIterable(customers));
-        List<Customer> returnedCustomers = customerRepository.findAll().collectList().block();
+        when(reactiveMongoTemplate.findAll(Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
+        Flux<Customer> customerFlux = customerRepository.findAll();
 
         //Then
-        assertNotNull(returnedCustomers);
-        assertEquals(returnedCustomers,customers);
+        StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 
     @Test
@@ -198,119 +161,8 @@ class CustomerRepositoryTest {
         // When
         Mono<Customer> monoSavedCustomer = customerRepository.save(customer);
 
-        Customer savedCustomer = monoSavedCustomer.block();
-
         // Then
-        assertNotNull(savedCustomer);
-        assertEquals(savedCustomer, dbCustomer);
-    }
-
-    @Test
-    void upsert_ExternalIdDoesntExist_InsertsNewCustomer() {
-        // Given
-        String externalId = UUID.randomUUID().toString();
-        Customer customerWithNewExternalId = customer.withExternalId(externalId);
-
-        Query query = Query.query(Criteria.where("externalId").is(customerWithNewExternalId.getExternalId()));
-
-        Update update = new Update()
-                .set("externalId", customerWithNewExternalId.getExternalId())
-                .set("address", customer.getAddress())
-                .set("name", customer.getName());
-        UpdateResult expectedUpdateResult = UpdateResult.acknowledged(0, null, null);
-
-        // When
-        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
-        when(reactiveMongoTemplate.findOne(query,Customer.class)).thenReturn(Mono.just(customerWithNewExternalId));
-        Customer insertedCustomer = customerRepository.upsertSync(customerWithNewExternalId).block();
-
-        // Then
-        assertNotNull(insertedCustomer);
-        assertEquals(customerWithNewExternalId, insertedCustomer);
-    }
-
-    @Test
-    void upsertSync_UpdateWasNotAcknowledged_ThrowsException(){
-        // Given
-        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
-
-        Update update = customerRepository.buildUpdateCommand(customer);
-        UpdateResult expectedUpdateResult = UpdateResult.unacknowledged();
-
-        // When
-        when(mongoTemplate.upsert(query,update,Customer.class)).thenReturn(expectedUpdateResult);
-
-        // Then
-        OperationFailedException nullPointerException = assertThrows(OperationFailedException.class, () -> {
-            customerRepository.upsertSync(customer);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "Could not update customer, " + customer);
-    }
-
-    @Test
-    void upsertSync_NullCustomerGiven_ThrowsException(){
-        // Given
-        customer = null;
-
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.upsertSync(customer);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
-    }
-
-    @Test
-    void upsert_UpsertNotAcknowledgedExist_ThrowsAnError() {
-        // Given
-
-        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId()));
-        Update update = new Update()
-                .set("externalId", customer.getExternalId())
-                .set("address", customer.getAddress())
-                .set("name", customer.getName());
-        UpdateResult expectedUpdateResult = UpdateResult.unacknowledged();
-
-        // When
-        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedUpdateResult));
-
-        OperationFailedException exception = assertThrows(OperationFailedException.class, () -> {
-            customerRepository.upsert(customer).block();
-        });
-
-        String expectedMessage = "Could not update customer";
-        String actualMessage = exception.getMessage();
-
-        // Then
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-
-    @Test
-    void upsert_ExternalIdExists_UpdateExistingCustomer() {
-        // Given
-        String newName = "newName";
-        Customer existingCustomerWithNewName = customer.withName(newName);
-        Query query = Query.query(Criteria.where("externalId").is(existingCustomerWithNewName.getExternalId()));
-
-        Update update = new Update()
-                .set("externalId", existingCustomerWithNewName.getExternalId())
-                .set("address", existingCustomerWithNewName.getAddress())
-                .set("name", existingCustomerWithNewName.getName());
-        UpdateResult expectedResult = UpdateResult.acknowledged(1,null,null);
-
-        // When
-        when(reactiveMongoTemplate.upsert(query,update,Customer.class)).thenReturn(Mono.just(expectedResult));
-        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(existingCustomerWithNewName));
-        Customer updatedCustomer = customerRepository.upsert(existingCustomerWithNewName).block();
-
-        // Then
-        assertNotNull(updatedCustomer);
-        Assertions.assertEquals(existingCustomerWithNewName,updatedCustomer);
-        Assertions.assertEquals(newName,updatedCustomer.getName());
+        StepVerifier.create(monoSavedCustomer).expectNext(dbCustomer).verifyComplete();
     }
 
     @Test
@@ -359,32 +211,15 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void upsert_NullGiven_ThrowsNullPointerException() {
-        // Given
-        Customer customer = null;
-
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.upsert(customer).block();
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
-    }
-
-    @Test
-    void findById_NullGiven_ThrowsNullPointerException() {
+    void findById_IdExists_ReturnsCustomerWithId() {
         // Given
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
 
         // When
-        when(reactiveMongoTemplate.findById(customerId,Customer.class)).thenReturn(Mono.just(customer));
-        Customer returnedCustomer = customerRepository.findById(customerId).block();
+        when(reactiveMongoTemplate.findById(customerId, Customer.class)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerRepository.findById(customerId);
 
         // Then
-        assertNotNull(returnedCustomer);
-        Assertions.assertEquals(returnedCustomer,customer);
-
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 }

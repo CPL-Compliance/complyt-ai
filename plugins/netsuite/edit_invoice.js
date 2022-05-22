@@ -58,7 +58,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
 
     const sendInvoice = (invoiceExternalId, customerId, billingAddress, shippingAddress, items) => {
 
-        const url = invoiceConfiguration.ORDER_URL;
+        const url = invoiceConfiguration.ORDER_URL + '/' + invoiceExternalId;
         const body = JSON.stringify
         ({
             externalId: invoiceExternalId,
@@ -174,7 +174,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
     const getCustomerId = (customerId) => {
         try
         {
-            const url = invoiceConfiguration.CUSTOMER_URL + customerId;
+            const url = invoiceConfiguration.CUSTOMER_URL + '/' + customerId;
 
             const errorMessage = 'No customer with id ' + customerId + ' was found';
 

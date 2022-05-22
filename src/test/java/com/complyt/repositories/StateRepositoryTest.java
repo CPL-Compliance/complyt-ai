@@ -15,12 +15,11 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -57,10 +56,9 @@ public class StateRepositoryTest {
         // When
         when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.just(state));
         Mono<State> monoState = stateRepository.findOneByName(name);
-        State actualState = monoState.block();
 
         // Then
-        assertEquals(state, actualState);
+        StepVerifier.create(monoState).expectNext(state).verifyComplete();
     }
 
     @Test
@@ -72,14 +70,13 @@ public class StateRepositoryTest {
         // When
         when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.just(state));
         Mono<State> monoState = stateRepository.findOneByName(name);
-        State actualState = monoState.block();
 
         // Then
-        assertEquals(state, actualState);
+        StepVerifier.create(monoState).expectNext(state).verifyComplete();
     }
 
     @Test
-    public void findByName_NameDoesntExistInDB_ExpectsNull() {
+    public void findByName_NameDoesntExistInDB_ExpectsEmpty() {
         // Given
         String name = "Stam";
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
@@ -87,9 +84,8 @@ public class StateRepositoryTest {
         // When
         when(reactiveMongoTemplate.findOne(query, State.class)).thenReturn(Mono.empty());
         Mono<State> monoState = stateRepository.findOneByName(name);
-        State actualState = monoState.block();
 
         // Then
-        assertNull(actualState);
+        StepVerifier.create(monoState).expectNextCount(0).verifyComplete();
     }
 }

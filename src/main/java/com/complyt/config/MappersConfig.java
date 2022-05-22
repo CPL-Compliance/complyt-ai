@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class MappersConfig {
 
-    @Profile({"fastTax", "default"})
+    @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("salesTaxDataToSalesTaxRateMapper")
     public FastTaxDataToSalesTaxRateMapper fastTaxDataToSalesTaxRateMapper() {
         return FastTaxDataToSalesTaxRateMapper.INSTANCE;

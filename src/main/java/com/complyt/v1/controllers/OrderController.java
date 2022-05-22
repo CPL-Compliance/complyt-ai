@@ -1,6 +1,5 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
@@ -16,8 +15,6 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-
 @AllArgsConstructor
 @Log
 @Tag(name = "Order", description = "This is the Order controller")
@@ -29,49 +26,43 @@ public class OrderController {
     @NonNull
     private final OrderFacade orderFacade;
 
-    @Operation(summary = "This will update the order if found by externalId, otherwise it will create the customer")
-    @PutMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> update(@RequestBody OrderDto orderDto) {
-        log.info(orderDto.toString());
-        Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
-        log.info(order.toString());
-        Mono<Order> orderMono = orderFacade.upsert(order);
-
-        return orderMono.map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK));
-    }
-
-    @PutMapping("{externalId}/salesTax")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<OrderDto> updateSalesTax(@PathVariable("externalId") String externalId) {
-        Order order = orderFacade.updateSalesTaxSync(externalId);
-
-        //return ResponseEntity.noContent().build();
-        return new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(order), HttpStatus.OK);
-    }
-
     @Operation(summary = "Gets order by externalId")
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> getByExternalId(@PathVariable("externalId") String externalId) {
+    public Mono<ResponseEntity<OrderDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
         return orderFacade.findByExternalId(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
-    @Operation(summary = "Gets all the orders")
+    @Operation(summary = "Gets all orders")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
-        Flux<Order> orders = orderFacade.getAll();
+        return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+    }
 
-        return orders.map(item -> OrderMapper.INSTANCE.orderToOrderDto(item));
+    @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
+    @PutMapping("{externalId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId, @RequestBody @NonNull OrderDto orderDto) {
+        return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
+    }
+
+    @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
+    @PutMapping("{externalId}/salesTax")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
+        return orderFacade.updateSalesTax(externalId)
+                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
 
     @Operation(summary = "Marks the order as cancelled")
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<ResponseEntity> delete(@PathVariable("externalId") String externalId) {
-        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
+    public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
+        return orderFacade.markAsCancelled(externalId)
+                .map(order -> ResponseEntity.noContent().build());
     }
 }

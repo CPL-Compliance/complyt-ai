@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.6.3</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <groupId>com.complyt</groupId>
     <artifactId>complyt</artifactId>
@@ -16,26 +18,27 @@
         <java.version>8</java.version>
         <maven.test.skip>false</maven.test.skip>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <lombok.version>1.18.22</lombok.version>
-        <web-flux.version>2.6.6</web-flux.version>
+        <lombok.version>1.18.24</lombok.version>
+        <web-flux.version>2.6.7</web-flux.version>
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
         <spring-boot-starter-data-mongodb-reactive.version>2.6.7</spring-boot-starter-data-mongodb-reactive.version>
-        <spring-boot-dev-tools.version>2.6.6</spring-boot-dev-tools.version>
-        <spring-boot-starter-test.version>2.6.6</spring-boot-starter-test.version>
-        <spring-boot-starter-aop.version>2.6.6</spring-boot-starter-aop.version>
-        <mockito-junit-jupiter.version>4.4.0</mockito-junit-jupiter.version>
+        <spring-boot-dev-tools.version>2.6.7</spring-boot-dev-tools.version>
+        <spring-boot-starter-test.version>2.6.7</spring-boot-starter-test.version>
+        <spring-boot-starter-aop.version>2.6.7</spring-boot-starter-aop.version>
+        <mockito-junit-jupiter.version>4.5.1</mockito-junit-jupiter.version>
         <jUnit.version>4.13.2</jUnit.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <springdoc-openapi-webflux-ui.version>1.6.7</springdoc-openapi-webflux-ui.version>
+        <springdoc-openapi-webflux-ui.version>1.6.8</springdoc-openapi-webflux-ui.version>
         <spring-boot-starter-security.version>2.6.7</spring-boot-starter-security.version>
         <spring-security-test.version>5.6.3</spring-security-test.version>
         <spring-boot-starter-data-mongodb.version>2.6.7</spring-boot-starter-data-mongodb.version>
         <spring-boot-starter-actuator.version>2.6.7</spring-boot-starter-actuator.version>
+        <spring-boot-starter-hateoas.version>2.6.7</spring-boot-starter-hateoas.version>
     </properties>
     <dependencies>
         <dependency>
@@ -111,6 +114,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
             <version>${springdoc-openapi-webflux-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+            <version>3.4.17</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

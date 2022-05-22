@@ -29,9 +29,11 @@ public class CustomerController {
     private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
-    @PutMapping("")
+    @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@RequestBody CustomerDto customerDto) {
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
+            , @RequestBody @NonNull CustomerDto customerDto) {
+
         Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
         return customerfacade
@@ -41,12 +43,11 @@ public class CustomerController {
 
     @Operation(summary = "Gets customer by externalId")
     @GetMapping("{externalId}")
-    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@PathVariable("externalId") String externalId) {
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
         return customerfacade.findByExternalId(externalId)
-                .map(customerItem -> ResponseEntity
-                        .ok()
-                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
-                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+                .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
+                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build()));
     }
 
     @Operation(summary = "This will create a customer")

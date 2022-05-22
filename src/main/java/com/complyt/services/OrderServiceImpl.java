@@ -7,24 +7,64 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
+    @NonNull
     private OrderRepository orderRepository;
-
-    @Override
-    public void save(@NonNull List<ObjectId> orders) {
-        throw new UnsupportedOperationException("save isn't implemented yet");
-    }
 
     @Override
     public Mono<Order> save(Order order) {
         return orderRepository.save(order);
+    }
+
+    @Override
+    public Mono<Order> findByExternalId(@NonNull String externalId) {
+        return orderRepository.findByExternalId(externalId);
+    }
+
+    @Override
+    public Mono<Order> upsert(@NonNull String externalId, @NonNull Order order) {
+        return orderRepository.findByExternalId(externalId)
+                .switchIfEmpty(orderRepository.save(order))
+                .map(createUpdateOrderFunction(order))
+                .flatMap(orderRepository::save);
+    }
+
+    public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
+            return orderRepository.findByExternalId(order.getExternalId())
+                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId" + externalId)))
+                .map(createUpdateOrderFunction(order))
+                .flatMap(orderRepository::save);
+    }
+
+    @Override
+    public Mono<Order> findById(String id) {
+        return orderRepository.findById(id);
+    }
+
+    @Override
+    public Mono<Order> markAsCancelled(String externalId) {
+        return orderRepository
+                .findByExternalId(externalId)
+                .map(order -> order.withOrderStatus(OrderStatus.CANCELLED))
+                .flatMap(orderRepository::save);
+    }
+
+    public Flux<Order> findAll() {
+        return orderRepository.findAll();
+    }
+
+    @Override
+    public void save(@NonNull List<ObjectId> orders) {
+        throw new UnsupportedOperationException("save isn't implemented yet");
     }
 
     @Override
@@ -37,42 +77,13 @@ public class OrderServiceImpl implements OrderService {
         throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
-    @Override
-    public Mono<Order> findByExternalId(String externalId) {
-        return orderRepository.findByExternalId(externalId);
-    }
-
-    @Override
-    public Order findByExternalIdSync(@NonNull String externalId) {
-        return orderRepository.findByExternalIdSync(externalId);
-    }
-
-    @Override
-    public Mono<Order> findById(String id) {
-        return orderRepository.findById(id);
-    }
-
-    public Mono<Order> upsert(@NonNull Order order) {
-        return orderRepository.upsertSync(order);
-    }
-
-    public Mono<Order> update(@NonNull Order order) {
-        return orderRepository.update(order);
-    }
-
-    public Order updateSync(@NonNull Order order) {
-        return orderRepository.updateSync(order);
-    }
-
-    @Override
-    public Mono<Order> markAsCancelled(String orderId) {
-        Order order = orderRepository.findByExternalIdSync(orderId);
-        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
-
-        return Mono.just(orderRepository.updateSync(cancelledOrder));
-    }
-
-    public Flux<Order> findAll() {
-        return orderRepository.findAll();
+    private Function<Order, Order> createUpdateOrderFunction(@NonNull final Order order) {
+        return orderInfo -> orderInfo.withExternalId(order.getExternalId())
+                .withBillingAddress(order.getBillingAddress())
+                .withShippingAddress(order.getShippingAddress())
+                .withCustomerId(order.getCustomerId())
+                .withItems(order.getItems())
+                .withOrderStatus(order.getOrderStatus())
+                .withSalesTax(order.getSalesTax());
     }
 }

@@ -6,7 +6,8 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.services.*;
+import com.complyt.services.OrderService;
+import com.complyt.services.SalesTaxService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -52,12 +56,12 @@ public class OrderFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        items.add(new Item(1000,3, 3000, "description","name","taxCode"));
-        order = new Order(id, externalId, items, billingAddress,shippingAddress,customerId, null, OrderStatus.ACTIVE);
+        items.add(new Item(1000, 3, 3000, "description", "name", "taxCode"));
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
     }
 
     @Test
-    void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException(){
+    void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException() {
         // Given
         orderService = null;
 
@@ -65,14 +69,14 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
     }
 
     @Test
-    void initFacade_NullSalesTaxServiceInstanceGiven_ThrowsNullPointerException(){
+    void initFacade_NullSalesTaxServiceInstanceGiven_ThrowsNullPointerException() {
         // Given
         salesTaxService = null;
 
@@ -80,68 +84,95 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService,salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
     }
 
     @Test
-    public void saveOrder_OrderSaved_OrderReturned(){
+    public void saveOrder_OrderSaved_OrderReturned() throws InterruptedException {
         // Given
 
         // When
         when(orderService.save(order)).thenReturn(Mono.just(order));
-        Mono<Order> monoOrder = orderFacade.save(order);
-        Order returnedOrder = monoOrder.block();
-
-
-        // Then
-        assertNotNull(returnedOrder);
-        assertEquals(order,returnedOrder);
-    }
-
-    @Test
-    void upsertOrder_OrderInserted_OrderReturned() {
-        // Given
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.upsert(order)).thenReturn(Mono.just(order));
-        Order returnedOrder = orderFacade.upsert(order).block();
+        orderFacade.save(order)
+                .subscribe(returnedOrder -> {
+                    orderAtomicReference.set(returnedOrder);
+                    countDownLatch.countDown();
+                });
 
         // Then
-        assertNotNull(returnedOrder);
-        assertEquals(order,returnedOrder);
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(order, orderAtomicReference.get());
     }
 
     @Test
-    void addOrderToClient_OrderAddedToClient_OrderReturned() {
+    void upsertOrder_OrderInserted_OrderReturned() throws InterruptedException {
         // Given
+        String externalId = order.getExternalId();
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.upsert(order)).thenReturn(Mono.just(order));
-        Order returnedOrder = orderFacade.upsert(order).block();
+        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
+        orderFacade.update(externalId, order)
+                .subscribe(returnedOrder -> {
+                    orderAtomicReference.set(returnedOrder);
+                    countDownLatch.countDown();
+                });
 
         // Then
-        assertNotNull(returnedOrder);
-        assertEquals(order,returnedOrder);
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(order, orderAtomicReference.get());
     }
 
+    @Test
+    void addOrderToClient_OrderAddedToClient_OrderReturned() throws InterruptedException {
+        // Given
+        String externalId = order.getExternalId();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+
+        // When
+        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
+        orderFacade.update(externalId, order).subscribe(returnedOrder -> {
+            orderAtomicReference.set(returnedOrder);
+            countDownLatch.countDown();
+        });
+
+        // Then
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(order, orderAtomicReference.get());
+    }
 
     @Test
-    void getOrderByExternalId_OrderFound_OrderReturned() {
+    void getOrderByExternalId_OrderFound_OrderReturned() throws InterruptedException {
         // Given
         String id = UUID.randomUUID().toString();
         Order orderToSearchFor = order.withExternalId(id);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
         // When
         when(orderService.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        Order returnedCustomer = orderFacade.findByExternalId(id).block();
+        orderFacade.findByExternalId(id).subscribe(returnedOrder -> {
+            orderAtomicReference.set(returnedOrder);
+            countDownLatch.countDown();
+        });
 
         // Then
-        assertNotNull(returnedCustomer);
-        assertEquals(returnedCustomer.getExternalId(),id);
-        assertEquals(returnedCustomer,orderToSearchFor);
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(orderAtomicReference.get().getExternalId(), id);
+        assertEquals(orderToSearchFor, orderAtomicReference.get());
     }
 
     @Test
@@ -155,36 +186,40 @@ public class OrderFacadeTest {
 
         // When
         when(orderService.findAll()).thenReturn(Flux.fromIterable(allOrders));
-        List<Order> returnedCustomers = orderFacade.getAll().collectList().block();
+        Flux<Order> returnedCustomers = orderFacade.getAll();
 
         // Then
-        assertNotNull(returnedCustomers);
-        assertEquals(returnedCustomers.size(),2);
+        StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
 
     @Test
-    void updateSalesTaxSync_ValidExternalIdGiven_UpdatesOrder(){
+    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
         // Given
         String externalId = order.getExternalId();
-        SalesTax salesTax = new SalesTax(
-                new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f, 0.5f),
-                1000);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        SalesTax salesTax = new SalesTax(salesTaxRate, 1000);
         Order orderWithSalesTax = order.withSalesTax(salesTax);
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.findByExternalIdSync(externalId)).thenReturn(order);
-        when(salesTaxService.getSalesTaxSync(order.getShippingAddress(),order.getItems())).thenReturn(salesTax);
-        when(orderService.updateSync(orderWithSalesTax)).thenReturn(orderWithSalesTax);
+        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
+        when(salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())).thenReturn(Mono.just(salesTax));
+        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
-        Order updatedOrder = orderFacade.updateSalesTaxSync(externalId);
+        orderFacade.updateSalesTax(externalId).subscribe(returnedOrder -> {
+            orderAtomicReference.set(returnedOrder);
+            countDownLatch.countDown();
+        });
 
         // Then
-        assertNotNull(updatedOrder);
-        assertEquals(updatedOrder,orderWithSalesTax);
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(orderWithSalesTax, orderAtomicReference.get());
     }
 
     @Test
-    void markAsCancelled_orderIdGiven_ChangesOrderStatus(){
+    void markAsCancelled_orderIdGiven_ChangesOrderStatus() {
         // Given
         String orderId = order.getId();
         Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
@@ -195,7 +230,6 @@ public class OrderFacadeTest {
 
         // Then
         assertNotNull(orderWithCancelledStatus);
-        assertEquals(orderWithCancelledStatus.block(),cancelledOrder);
-
+        assertEquals(orderWithCancelledStatus.block(), cancelledOrder);
     }
 }

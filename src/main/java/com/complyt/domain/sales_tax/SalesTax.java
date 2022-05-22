@@ -10,5 +10,4 @@ import lombok.*;
 public class SalesTax {
     private final SalesTaxRate salesTaxRate;
     private float amount;
-
 }
