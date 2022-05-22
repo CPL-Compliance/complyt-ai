@@ -1,6 +1,7 @@
 package com.complyt.business.sales_tax;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.config.web_clients.FastTaxWebClientWrapperProperties;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
@@ -48,15 +49,18 @@ public class FastTaxWebClientWrapperTest {
 
     @BeforeEach
     void setUp() {
-        String scheme = "https";
-        String host = "api.zip-tax.com";
-        String path = "request/v40";
-        Pair<String, String> key = new Pair<>("key", "jkRvcDF9MVB5pxtm");
-
         MockitoAnnotations.openMocks(this);
-        fastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
+        fastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
+                FastTaxWebClientWrapperProperties.SCHEME,
+                FastTaxWebClientWrapperProperties.HOST,
+                FastTaxWebClientWrapperProperties.PATH,
+                FastTaxWebClientWrapperProperties.KEY);
 
-        anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient, scheme, host, path, key);
+        anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
+                FastTaxWebClientWrapperProperties.SCHEME,
+                FastTaxWebClientWrapperProperties.HOST,
+                FastTaxWebClientWrapperProperties.PATH,
+                FastTaxWebClientWrapperProperties.KEY);
     }
 
     @Test
