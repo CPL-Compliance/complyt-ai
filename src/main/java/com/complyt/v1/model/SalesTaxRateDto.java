@@ -7,6 +7,7 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 @With
+@Schema(name = "SalesTaxRate")
 public class SalesTaxRateDto {
     private final float cityDistrictRate;
     private final float cityRate;
