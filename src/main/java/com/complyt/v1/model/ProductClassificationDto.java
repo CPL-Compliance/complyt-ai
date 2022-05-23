@@ -1,8 +1,8 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.sales_tax.product_classification.StateRules;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
@@ -12,11 +12,11 @@ import java.util.List;
 @With
 @ToString
 @Builder
-@Document(collection = "ProductClassification")
+@Schema(name = "ProductClassification")
 public class ProductClassificationDto {
         private String id;
         private final String taxCode;
         private final String description;
         private final String title;
-        private final List<StateRules> statesRules;
+        private final List<JurisdictionalSalesTaxRules> statesRules;
 }

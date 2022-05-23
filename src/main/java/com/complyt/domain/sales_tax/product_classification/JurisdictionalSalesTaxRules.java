@@ -1,20 +1,21 @@
-package com.complyt.v1.model;
+package com.complyt.domain.sales_tax.product_classification;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-@ToString
 @With
-@Schema(name = "StateRules")
-public class StateRulesDto {
+@ToString
+@Builder
+public class JurisdictionalSalesTaxRules {
+    @Id
     private final String id;
     private final String name;
     private final String abbreviation;
     private final boolean taxable;
     private final boolean specialTreatment;
-    private boolean isOverride;
-    private final float value;
+    private final boolean isOverride;
+    private final Rates rates;
 }

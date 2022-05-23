@@ -19,5 +19,5 @@ public class ProductClassification {
     private final String taxCode;
     private final String description;
     private final String title;
-    private final List<StateRules> statesRules;
+    private final List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
 }
