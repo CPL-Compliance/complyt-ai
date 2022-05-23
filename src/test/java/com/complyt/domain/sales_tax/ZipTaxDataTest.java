@@ -1,5 +1,7 @@
 package com.complyt.domain.sales_tax;
 
+import com.complyt.domain.sales_tax.zip_tax.Result;
+import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
