@@ -7,10 +7,11 @@ import lombok.*;
 @EqualsAndHashCode
 @With
 @ToString
-@Builder
 public class Rates {
-    private final float stateRate;
+    private final float cityDistrictRate;
     private final float cityRate;
+    private final float countyDistrictRate;
     private final float countyRate;
-    private final float localRate;
+    private final float stateRate;
+    private final float taxRate;
 }

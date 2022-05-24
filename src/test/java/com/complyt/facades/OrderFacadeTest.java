@@ -7,6 +7,7 @@ import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.OrderService;
+import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ public class OrderFacadeTest {
     @Mock
     SalesTaxService salesTaxService;
 
+    @Mock
+    ProductClassificationService productClassificationService;
+
     Order order;
 
     @BeforeEach
@@ -69,7 +73,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
@@ -84,10 +88,25 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
+            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
+    }
+
+    @Test
+    void initFacade_NullProductClassificationServiceInstanceGiven_ThrowsNullPointerException() {
+        // Given
+        productClassificationService = null;
+
+        // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "productClassificationService is marked non-null but is null");
     }
 
     @Test

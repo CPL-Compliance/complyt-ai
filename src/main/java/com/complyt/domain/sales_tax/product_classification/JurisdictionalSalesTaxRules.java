@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 @EqualsAndHashCode
 @With
 @ToString
-@Builder
 public class JurisdictionalSalesTaxRules {
     @Id
     private final String id;
@@ -16,6 +15,7 @@ public class JurisdictionalSalesTaxRules {
     private final String abbreviation;
     private final boolean taxable;
     private final boolean specialTreatment;
-    private final boolean isOverride;
-    private final Rates rates;
+    private final CalculationType calculationType;
+    private final String description;
+    private final float calculationValue;
 }

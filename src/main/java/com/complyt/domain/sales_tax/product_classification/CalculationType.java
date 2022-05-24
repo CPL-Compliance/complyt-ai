@@ -4,4 +4,3 @@ public enum CalculationType {
     FIXED,
     PERCENTAGE
 }
-

@@ -11,7 +11,6 @@ import java.util.List;
 @EqualsAndHashCode
 @With
 @ToString
-@Builder
 @Document(collection = "Product_Classification")
 public class ProductClassification {
     @Id

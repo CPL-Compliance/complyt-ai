@@ -1,7 +1,9 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Order;
+import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
+import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -22,6 +24,10 @@ public class OrderFacade {
     @Qualifier("salesTaxServiceImpl")
     @NonNull
     private SalesTaxService salesTaxService;
+    
+    @Qualifier("productClassificationServiceImpl")
+    @NonNull
+    private ProductClassificationService productClassificationService;
 
     public Mono<Order> save(Order order) {
         return orderService.save(order);
@@ -48,8 +54,13 @@ public class OrderFacade {
         return orderService
                 .findByExternalId(externalId)
                 .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
-                        .map(salesTax -> order.withSalesTax(salesTax)))
+                        .map(order::withSalesTax))
                 .flatMap(order -> orderService.update(externalId, order));
+    }
+
+    @SneakyThrows
+    public Mono<ProductClassification> getClassification(String taxCode) {
+        return productClassificationService.findOneByTaxCode(taxCode);
     }
 
     public Mono<Order> markAsCancelled(String orderId) {
