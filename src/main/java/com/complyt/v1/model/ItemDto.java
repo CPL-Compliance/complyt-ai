@@ -15,4 +15,5 @@ public class ItemDto {
     private String description;
     private String name;
     private String taxCode;
+    private SalesTaxRateDto salesTaxRate;
 }

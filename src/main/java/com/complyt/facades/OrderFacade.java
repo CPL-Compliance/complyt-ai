@@ -1,5 +1,6 @@
 package com.complyt.facades;
 
+import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
@@ -12,6 +13,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 
 @Component
@@ -51,12 +58,24 @@ public class OrderFacade {
 
     @SneakyThrows
     public Mono<Order> updateSalesTax(String externalId) {
+//        return orderService
+//                .findByExternalId(externalId)
+//                .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
+//                        .map(salesTax -> order.withSalesTax(salesTax)))
+//                .flatMap(order -> orderService.update(externalId, order));
         return orderService
                 .findByExternalId(externalId)
+                .map(order -> {
+                    Set<String> taxCodes = order.getItems().stream().map(Item::getTaxCode).collect(toSet());
+                    productClassificationService.findByTaxCodes(taxCodes);
+                    return order;
+                })
+                .log()
                 .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
-                        .map(order::withSalesTax))
+                .map(order::withSalesTax))
                 .flatMap(order -> orderService.update(externalId, order));
     }
+
 
     @SneakyThrows
     public Mono<ProductClassification> getClassification(String taxCode) {
@@ -66,4 +85,5 @@ public class OrderFacade {
     public Mono<Order> markAsCancelled(String orderId) {
         return orderService.markAsCancelled(orderId);
     }
+
 }

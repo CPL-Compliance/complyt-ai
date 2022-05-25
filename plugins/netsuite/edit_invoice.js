@@ -73,7 +73,6 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
         const invoice = httpUtil.sendPutRequest(url, body, errorMessage);
 
         return invoice;
-
     }
 
     const setSalesTax = invoice => {

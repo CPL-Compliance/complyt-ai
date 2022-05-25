@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import lombok.*;
 
 @Getter
@@ -14,4 +15,5 @@ public class Item {
     private String description;
     private String name;
     private String taxCode;
+    private SalesTaxRate salesTaxRate;
 }

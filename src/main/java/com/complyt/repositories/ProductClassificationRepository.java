@@ -5,10 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Repository
 @Slf4j
@@ -22,5 +26,10 @@ public class ProductClassificationRepository {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
 
         return reactiveMongoTemplate.findOne(query, ProductClassification.class);
+    }
+
+    public Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes) {
+        BasicQuery query = new BasicQuery("{ taxCode: { $in: " + taxCodes + "}}");
+        return reactiveMongoTemplate.find(query,ProductClassification.class);
     }
 }

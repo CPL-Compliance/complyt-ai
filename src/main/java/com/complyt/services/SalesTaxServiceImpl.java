@@ -31,6 +31,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public Mono<SalesTax> getSalesTax(Address address, List<Item> items) {
         return salesTaxWebClientWrapper.findByAddress(address)
                 .map(salesTaxData -> salesTaxDataToSalesTaxRateMapper.map(salesTaxData))
+
                 .map(salesTaxRate -> salesTaxCalculator.calculate(salesTaxRate, items));
     }
 }

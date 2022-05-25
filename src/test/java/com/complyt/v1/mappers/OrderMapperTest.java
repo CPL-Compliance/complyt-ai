@@ -4,6 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,9 @@ class OrderMapperTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000,4,8000,"description","name","taxCode"));
+                add(new Item(2000,4,8000,"description","name","taxCode",
+                        new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+                ));
             }
         };
 

@@ -6,9 +6,12 @@ import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -46,6 +49,12 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     @Override
     public Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode) {
         return productClassificationRepository.findOneByTaxCode(taxCode);
+    }
+
+    @Override
+    public Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes) {
+
+        return productClassificationRepository.findByTaxCodes(taxCodes);
     }
 
 }

@@ -118,6 +118,14 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 line : i
             });
 
+            const tax_code = rec.getSublistValue({
+                sublistId : 'item',
+                fieldId : 'custcol_tax_code',
+                line : i
+                
+            });
+            
+
             const rate = amount / quantity;
 
             const description = rec.getSublistValue({
@@ -132,7 +140,7 @@ define(['N/record', '/SuiteScripts/Utils/httpUtil.js', 'invoiceConfiguration'], 
                 name: name,
                 quantity: quantity,
                 description: description,
-                taxCode:""
+                taxCode: tax_code
             }
     }
 

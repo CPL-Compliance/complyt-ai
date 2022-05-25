@@ -66,11 +66,4 @@ public class OrderController {
                 .map(order -> ResponseEntity.noContent().build());
     }
 
-//    @Operation(summary = "Marks the order as cancelled")
-//    @GetMapping("{taxCode}/taxCode")
-//    @ResponseStatus(HttpStatus.OK)
-//    public Mono<ResponseEntity> getClassification(@PathVariable("taxCode") @NonNull String taxCode) {
-//        return orderFacade.getClassification(taxCode)
-//                .map(classification -> ResponseEntity.ok().body(classification));
-//    }
 }
