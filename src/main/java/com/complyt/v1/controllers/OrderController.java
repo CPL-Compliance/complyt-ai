@@ -49,7 +49,7 @@ public class OrderController {
         return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-
+    
     @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
