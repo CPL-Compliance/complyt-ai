@@ -6,10 +6,6 @@ spring:
       # stubFastTax - to use stub method of FastTax
       # zipTax - to use Zip Tax Service
       - fastTax
-  security:
-    user:
-      name: complyt
-      password: "$2a$10$nhBTPIQr1O6NJHPJKpVA5eQp3kYFojjbi09CAmT9xd7GW7v2tGlaS"
 
 logging:
   level:
