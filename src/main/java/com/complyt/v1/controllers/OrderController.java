@@ -10,6 +10,7 @@ import lombok.NonNull;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -36,6 +37,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Gets all orders")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
