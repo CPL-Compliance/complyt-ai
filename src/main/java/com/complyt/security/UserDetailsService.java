@@ -32,10 +32,8 @@ public class UserDetailsService implements ReactiveUserDetailsService {
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userRepository
-                .findByName(username)
-                .flatMap(user -> Flux
-                        .fromIterable(user.getAuthorityIds())
+        return userRepository.findByName(username)
+                .flatMap(user -> Flux.fromIterable(user.getAuthorityIds())
                         .flatMap(authorityRepository::findById)
                         .collectList()
                         .map(authorities -> new org.springframework.security.core.userdetails.User(

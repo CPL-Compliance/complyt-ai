@@ -53,7 +53,7 @@ class OrderServiceImplTest {
             }
         };
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE);
     }
 
     @Test

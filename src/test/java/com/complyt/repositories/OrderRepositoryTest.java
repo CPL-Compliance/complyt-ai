@@ -48,7 +48,7 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode"));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE);
     }
 
     @Test
@@ -65,7 +65,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void findByExternalIdSync_FindsOrder_ReturnsOrder() throws InterruptedException {
+    void findByExternalId_FindsOrder_ReturnsOrder() throws InterruptedException {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
         CountDownLatch countDownLatch = new CountDownLatch(1);
