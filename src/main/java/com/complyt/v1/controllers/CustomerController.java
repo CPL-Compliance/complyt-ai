@@ -3,6 +3,9 @@ package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.security.permissions.customer.CustomerCreatePermission;
+import com.complyt.security.permissions.customer.CustomerReadPermission;
+import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +32,7 @@ public class CustomerController {
     private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
+    @CustomerUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
@@ -42,6 +46,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "Gets customer by externalId")
+    @CustomerReadPermission
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
@@ -51,6 +56,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "This will create a customer")
+    @CustomerCreatePermission
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ResponseEntity<CustomerDto>> create(@RequestBody CustomerDto customerDto) {
@@ -63,6 +69,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "Gets all matching customers by name")
+    @CustomerReadPermission
     @GetMapping("name/{name}")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getByName(@PathVariable("name") String name) {
@@ -73,6 +80,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "Gets all the customers")
+    @CustomerReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {

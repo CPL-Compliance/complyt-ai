@@ -39,15 +39,10 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByName(username)
                 .flatMap(user -> Flux.fromIterable(user.getRoleIds())
-                        .log()
                         .flatMap(roleRepository::findById)
-                        .log()
                         .flatMapIterable(role -> role.getAuthorityIds())
-                        .log()
                         .flatMap(authorityId -> authorityRepository.findById(authorityId))
-                        .log()
                         .collect(Collectors.toList())
-                        .log()
                         .map(authorities -> new org.springframework.security.core.userdetails.User(
                                 user.getUsername(),
                                 user.getPassword(),
