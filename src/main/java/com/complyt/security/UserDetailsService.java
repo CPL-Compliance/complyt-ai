@@ -2,6 +2,7 @@ package com.complyt.security;
 
 import com.complyt.domain.security.Authority;
 import com.complyt.repositories.security.AuthorityRepository;
+import com.complyt.repositories.security.RoleRepository;
 import com.complyt.repositories.security.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -30,12 +32,22 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     @NonNull
     private final AuthorityRepository authorityRepository;
 
+    @NonNull
+    private final RoleRepository roleRepository;
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByName(username)
-                .flatMap(user -> Flux.fromIterable(user.getAuthorityIds())
-                        .flatMap(authorityRepository::findById)
-                        .collectList()
+                .flatMap(user -> Flux.fromIterable(user.getRoleIds())
+                        .log()
+                        .flatMap(roleRepository::findById)
+                        .log()
+                        .flatMapIterable(role -> role.getAuthorityIds())
+                        .log()
+                        .flatMap(authorityId -> authorityRepository.findById(authorityId))
+                        .log()
+                        .collect(Collectors.toList())
+                        .log()
                         .map(authorities -> new org.springframework.security.core.userdetails.User(
                                 user.getUsername(),
                                 user.getPassword(),
@@ -49,7 +61,7 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     private Collection<? extends GrantedAuthority> convertToSpringAuthorities(List<Authority> authorities) {
         if (authorities != null && authorities.size() > 0) {
             return authorities.stream()
-                    .map(Authority::getRole)
+                    .map(Authority::getPermission)
                     .map(SimpleGrantedAuthority::new)
                     .collect(toSet());
         } else {

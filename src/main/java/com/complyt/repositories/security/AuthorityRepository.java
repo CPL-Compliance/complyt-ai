@@ -3,7 +3,6 @@ package com.complyt.repositories.security;
 import com.complyt.domain.security.Authority;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -19,7 +18,6 @@ import java.util.Collection;
 @Repository
 @Slf4j
 @AllArgsConstructor
-@ToString
 public class AuthorityRepository {
     @NonNull
     private final ReactiveMongoTemplate reactiveMongoTemplate;

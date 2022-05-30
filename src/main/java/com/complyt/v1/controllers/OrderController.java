@@ -37,7 +37,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Gets all orders")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('order.read')")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {

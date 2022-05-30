@@ -24,6 +24,5 @@ public class User {
     private Boolean accountNonLocked;
     private Boolean credentialsNonExpired;
     private Boolean enabled;
-    private Set<ObjectId> authorityIds;
-    private Set<Authority> authorities;
+    private Set<ObjectId> roleIds;
 }
