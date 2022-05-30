@@ -1,9 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.annotations.Generated;
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -27,7 +25,7 @@ public class SecurityConfig {
         return http
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/login", "/logout", "/").permitAll()
-                        .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("ADMIN")
+                        .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasRole("ADMIN")
                         .anyExchange().authenticated())
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults())

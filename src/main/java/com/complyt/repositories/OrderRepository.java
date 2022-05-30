@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.domain.Customer;
 import com.complyt.domain.Order;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -37,10 +38,18 @@ public class OrderRepository {
     public Mono<Order> findByExternalId(String externalId) {
         Query query = Query.query(Criteria.where("externalId").is(externalId));
 
-        return reactiveMongoTemplate.findOne(query, Order.class);
+        return reactiveMongoTemplate
+                .findOne(query, Order.class).log()
+                .flatMap(order -> reactiveMongoTemplate
+                        .findById(order.getCustomerId(), Customer.class)
+                        .map(order::withCustomer).log());
     }
 
     public Flux<Order> findAll() {
-        return reactiveMongoTemplate.findAll(Order.class);
+        return reactiveMongoTemplate
+                .findAll(Order.class).log()
+                .flatMap(order -> reactiveMongoTemplate
+                        .findById(order.getCustomerId(), Customer.class)
+                        .map(order::withCustomer).log());
     }
 }

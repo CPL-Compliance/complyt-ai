@@ -23,6 +23,7 @@ public class Order {
     private Address billingAddress;
     private Address shippingAddress;
     private ObjectId customerId;
+    private Customer customer;
     private SalesTax salesTax;
     private OrderStatus orderStatus;
 }

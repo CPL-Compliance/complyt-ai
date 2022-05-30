@@ -1,6 +1,7 @@
 package com.complyt.security;
 
 import com.complyt.domain.security.Authority;
+import com.complyt.repositories.security.AuthorityRepository;
 import com.complyt.repositories.security.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -10,12 +11,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
+
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -24,25 +27,33 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     @NonNull
     private final UserRepository userRepository;
 
+    @NonNull
+    private final AuthorityRepository authorityRepository;
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userRepository.findByName(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        user.getEnabled(),
-                        user.getAccountNonExpired(),
-                        user.getCredentialsNonExpired(),
-                        user.getAccountNonLocked(),
-                        convertToSpringAuthorities(user.getAuthorities())));
+        return userRepository
+                .findByName(username)
+                .flatMap(user -> Flux
+                        .fromIterable(user.getAuthorityIds())
+                        .flatMap(authorityRepository::findById)
+                        .collectList()
+                        .map(authorities -> new org.springframework.security.core.userdetails.User(
+                                user.getUsername(),
+                                user.getPassword(),
+                                user.getEnabled(),
+                                user.getAccountNonExpired(),
+                                user.getCredentialsNonExpired(),
+                                user.getAccountNonLocked(),
+                                convertToSpringAuthorities(authorities))));
     }
 
-    private Collection<? extends GrantedAuthority> convertToSpringAuthorities(Set<Authority> authorities) {
+    private Collection<? extends GrantedAuthority> convertToSpringAuthorities(List<Authority> authorities) {
         if (authorities != null && authorities.size() > 0) {
             return authorities.stream()
                     .map(Authority::getRole)
                     .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
         } else {
             return new HashSet<>();
         }
