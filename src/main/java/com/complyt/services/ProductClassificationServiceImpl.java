@@ -6,7 +6,6 @@ import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,6 +54,11 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     public Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes) {
 
         return productClassificationRepository.findByTaxCodes(taxCodes);
+    }
+
+    public Flux<ProductClassification> getAll() {
+
+        return productClassificationRepository.findAll();
     }
 
 }

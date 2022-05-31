@@ -61,7 +61,7 @@ public class OrderFacadeTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item(1000, 3, 3000, "description", "name", "taxCode",
-                new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+                null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
                 ));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
     }
@@ -217,8 +217,7 @@ public class OrderFacadeTest {
     void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
         // Given
         String externalId = order.getExternalId();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
-        SalesTax salesTax = new SalesTax(salesTaxRate, 1000);
+        SalesTax salesTax = new SalesTax(1000);
         Order orderWithSalesTax = order.withSalesTax(salesTax);
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);

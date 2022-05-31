@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class CaliforniaEconomicNexus {
 
-    //private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
     @Qualifier("californiaEconomicNexusDao")
     @NonNull
     private CaliforniaEconomicNexusDao californiaEconomicNexusDao;

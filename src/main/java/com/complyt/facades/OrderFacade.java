@@ -1,7 +1,9 @@
 package com.complyt.facades;
 
 import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -14,8 +16,11 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 
@@ -57,25 +62,29 @@ public class OrderFacade {
     public Mono<Order> updateSalesTax(String externalId) {
         return orderService
                 .findByExternalId(externalId)
-                .flatMap(order -> {
-                    OrderProductClassificationInjector orderProductClassificationModifier = new OrderProductClassificationInjector(order);
-                    Set<String> taxCodes = order.getItems().stream()
-                            .map(item -> item.getTaxCode())
-                            .collect(toSet());
 
-                    Flux<ProductClassification> productClassificationFlux = productClassificationService.findByTaxCodes(taxCodes);
+                .map(OrderProductClassificationInjector::new)
 
-                    return orderProductClassificationModifier.act(productClassificationFlux);
-                })
+                .flatMap(orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector
+                                .getOrder()
+                                .getItems())
+                        .flatMap(item -> getClassification(item.getTaxCode()))
+                        .distinct()
+                        .collectList()
+                        .flatMap(orderProductClassificationInjector::act))
+
                 .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
                         .map(order::withSalesTax))
                 .flatMap(order -> orderService.update(externalId, order));
     }
 
-
     @SneakyThrows
     public Mono<ProductClassification> getClassification(String taxCode) {
         return productClassificationService.findOneByTaxCode(taxCode);
+    }
+
+    public Flux<ProductClassification> getAllpcs() {
+        return productClassificationService.getAll();
     }
 
     public Mono<Order> markAsCancelled(String orderId) {

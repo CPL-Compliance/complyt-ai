@@ -8,6 +8,5 @@ import lombok.*;
 @ToString
 @With
 public class SalesTax {
-    private final SalesTaxRate salesTaxRate;
     private float amount;
 }

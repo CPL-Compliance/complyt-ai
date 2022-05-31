@@ -50,7 +50,7 @@ class OrderRepositoryTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
 
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",salesTaxRate));
+        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
     }
 

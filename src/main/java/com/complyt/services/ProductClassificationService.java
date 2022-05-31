@@ -11,4 +11,5 @@ import java.util.Set;
 public interface ProductClassificationService extends CrudService<Order, String> {
     Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode);
     Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes);
+    Flux<ProductClassification> getAll() ;
 }

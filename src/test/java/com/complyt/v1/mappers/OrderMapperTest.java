@@ -27,7 +27,7 @@ class OrderMapperTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode",
-                        new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
                 ));
             }
         };

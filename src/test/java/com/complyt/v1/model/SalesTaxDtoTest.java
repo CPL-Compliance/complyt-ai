@@ -22,10 +22,10 @@ public class SalesTaxDtoTest {
     @BeforeEach
     void setUp(){
         // Given
-        salesTaxDto = new SalesTaxDto(new SalesTaxRateDto(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),5000);
+        salesTaxDto = new SalesTaxDto(5000);
 
         // Then
-        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getSalesTaxRate(), salesTaxDto.getAmount());
+        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getAmount());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class SalesTaxDtoTest {
 
     @Test
     void toString_StringMatches_Equal(){
-        String salesTaxDtoToString = "SalesTaxDto(salesTaxRate=" + salesTaxDto.getSalesTaxRate() + ", amount=" + salesTaxDto.getAmount() + ")";;
+        String salesTaxDtoToString = "SalesTaxDto(amount=" + salesTaxDto.getAmount() + ")";;
         assertEquals(salesTaxDtoToString,salesTaxDto.toString());
     }
 

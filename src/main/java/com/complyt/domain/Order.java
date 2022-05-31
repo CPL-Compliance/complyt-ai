@@ -19,6 +19,7 @@ public class Order {
     @Id
     private String id;
     private String externalId;
+    @Singular
     private List<Item> items;
     private Address billingAddress;
     private Address shippingAddress;

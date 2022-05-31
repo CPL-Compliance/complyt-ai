@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
+import com.complyt.business.tax_reliefs.JurisdictionalSalesTaxController;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,8 @@ public class SalesTaxServiceImplTest {
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
     @Mock
     SalesTaxCalculator salesTaxCalculator;
+    @Mock
+    JurisdictionalSalesTaxController jurisdictionalSalesTaxController;
 
     @BeforeEach
     void setUp(){
@@ -39,7 +42,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void initService_AllFieldsAreValid_InstantiatingService(){
         // Given
-        SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator);
+        SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
 
         // Then
         Assertions.assertNotNull(salesTaxServiceImpl);
@@ -52,7 +55,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator);
+            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxWebClientWrapper is marked non-null but is null");
@@ -66,7 +69,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator);
+            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxDataToSalesTaxRateMapper is marked non-null but is null");
@@ -79,7 +82,19 @@ public class SalesTaxServiceImplTest {
         salesTaxCalculator = null;
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator);
+            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxCalculator is marked non-null but is null");
+    }
+
+    @Test
+    void initService_NullJurisdictionalSalesTaxController_ThrowsException(){
+        // Given
+        jurisdictionalSalesTaxController = null;
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxCalculator is marked non-null but is null");

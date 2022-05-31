@@ -1,5 +1,6 @@
 package com.complyt.v1.model;
 
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -15,5 +16,6 @@ public class ItemDto {
     private String description;
     private String name;
     private String taxCode;
+    private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRateDto salesTaxRate;
 }
