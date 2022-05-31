@@ -4,6 +4,9 @@ import com.complyt.business.order.OrderProductClassificationInjector;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxData;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -73,8 +76,16 @@ public class OrderFacade {
                         .collectList()
                         .flatMap(orderProductClassificationInjector::act))
 
-                .flatMap(order -> salesTaxService.getSalesTax(order.getShippingAddress(), order.getItems())
-                        .map(order::withSalesTax))
+                .flatMap(order -> {
+                    return salesTaxService.findByAddress(order.getShippingAddress())
+                            .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
+                            .map(salesTaxRate -> salesTaxService.getRulesForItems(order.getItems(),salesTaxRate))
+                            .map(updatedItems -> order.withItems(updatedItems))
+                            .map(orderWithUpdatedItems-> {
+                                SalesTax salesTax = salesTaxService.calculateSalesTax(orderWithUpdatedItems.getItems());
+                                return orderWithUpdatedItems.withSalesTax(salesTax);
+                            });
+                })
                 .flatMap(order -> orderService.update(externalId, order));
     }
 
