@@ -97,7 +97,7 @@ public class SalesTaxServiceImplTest {
             SalesTaxServiceImpl salesTaxServiceImpl = new SalesTaxServiceImpl(salesTaxWebClientWrapper,salesTaxDataToSalesTaxRateMapper,salesTaxCalculator,jurisdictionalSalesTaxController);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxCalculator is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxController is marked non-null but is null");
     }
 
 
