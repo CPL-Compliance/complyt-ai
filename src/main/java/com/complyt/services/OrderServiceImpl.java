@@ -58,8 +58,13 @@ public class OrderServiceImpl implements OrderService {
                 .flatMap(orderRepository::save);
     }
 
+    @Override
+    public Flux<Order> find(ObjectId clientId) {
+        return orderRepository.find(clientId);
+    }
+
     public Flux<Order> findAll() {
-        return orderRepository.findAll();
+        return orderRepository.find();
     }
 
     @Override

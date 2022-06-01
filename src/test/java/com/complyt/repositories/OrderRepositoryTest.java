@@ -182,7 +182,7 @@ class OrderRepositoryTest {
 
         //When
         when(reactiveMongoTemplate.findAll(Order.class)).thenReturn(Flux.fromIterable(allOrders));
-        Flux<Order> orderFlux = orderRepository.findAll();
+        Flux<Order> orderFlux = orderRepository.find();
 
         //Then
         StepVerifier.create(orderFlux).expectNextCount(2).verifyComplete();

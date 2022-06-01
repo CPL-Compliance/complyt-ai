@@ -159,7 +159,7 @@ class OrderServiceImplTest {
         Order secondOrder = order.withExternalId(externalId);
 
         //When
-        when(orderRepository.findAll()).thenReturn(Flux.just(order, secondOrder));
+        when(orderRepository.find()).thenReturn(Flux.just(order, secondOrder));
         Flux<Order> orderFlux = orderServiceImpl.findAll();
 
         //Then

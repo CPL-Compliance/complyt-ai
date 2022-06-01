@@ -6,6 +6,7 @@ import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -54,5 +55,9 @@ public class OrderFacade {
 
     public Mono<Order> markAsCancelled(String orderId) {
         return orderService.markAsCancelled(orderId);
+    }
+
+    public Flux<Order> getAll(ObjectId clientId) {
+        return orderService.find(clientId);
     }
 }

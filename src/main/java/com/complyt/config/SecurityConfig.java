@@ -15,6 +15,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableReactiveMethodSecurity
 @Generated
 public class SecurityConfig {
+//    @Bean
+//    public SecurityEvaluationContextExtension securityEvaluationContextExtension(){
+//        return new SecurityEvaluationContextExtension();
+//    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
