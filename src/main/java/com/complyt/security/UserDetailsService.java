@@ -18,8 +18,8 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
@@ -36,21 +36,15 @@ public class UserDetailsService implements ReactiveUserDetailsService {
     private final RoleRepository roleRepository;
 
     @Override
-    public Mono<UserDetails> findByUsername(String username) {
+    public Mono<UserDetails> findByUsername(final String username) {
         return userRepository.findByName(username)
                 .flatMap(user -> Flux.fromIterable(user.getRoleIds())
                         .flatMap(roleRepository::findById)
                         .flatMapIterable(role -> role.getAuthorityIds())
-                        .flatMap(authorityId -> authorityRepository.findById(authorityId))
-                        .collect(Collectors.toList())
-                        .map(authorities -> new org.springframework.security.core.userdetails.User(
-                                user.getUsername(),
-                                user.getPassword(),
-                                user.getEnabled(),
-                                user.getAccountNonExpired(),
-                                user.getCredentialsNonExpired(),
-                                user.getAccountNonLocked(),
-                                convertToSpringAuthorities(authorities))));
+                        .flatMap(authorityRepository::findById)
+                        .collect(toList())
+                        .map(this::convertToSpringAuthorities)
+                        .map(user::withAuthorities));
     }
 
     private Collection<? extends GrantedAuthority> convertToSpringAuthorities(List<Authority> authorities) {
