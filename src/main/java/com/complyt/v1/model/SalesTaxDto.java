@@ -11,4 +11,5 @@ import lombok.*;
 @Schema(name = "SalesTax")
 public class SalesTaxDto {
     private float amount;
+    private SalesTaxRateDto salesTaxRate;
 }

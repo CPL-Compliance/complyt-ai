@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -56,7 +57,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
     @Override
-    public SalesTax calculateSalesTax(List<Item> items){
+    public float calculateSalesTaxAmount(List<Item> items){
         return salesTaxCalculator.calculate(items);
     }
 

@@ -3,9 +3,7 @@ package com.complyt.facades;
 import com.complyt.business.order.OrderProductClassificationInjector;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
@@ -20,11 +18,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 
 @Component
@@ -65,9 +58,7 @@ public class OrderFacade {
     public Mono<Order> updateSalesTax(String externalId) {
         return orderService
                 .findByExternalId(externalId)
-
                 .map(OrderProductClassificationInjector::new)
-
                 .flatMap(orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector
                                 .getOrder()
                                 .getItems())
@@ -75,17 +66,15 @@ public class OrderFacade {
                         .distinct()
                         .collectList()
                         .flatMap(orderProductClassificationInjector::act))
-
-                .flatMap(order -> {
-                    return salesTaxService.findByAddress(order.getShippingAddress())
-                            .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
-                            .map(salesTaxRate -> salesTaxService.getRulesForItems(order.getItems(),salesTaxRate))
-                            .map(updatedItems -> order.withItems(updatedItems))
-                            .map(orderWithUpdatedItems-> {
-                                SalesTax salesTax = salesTaxService.calculateSalesTax(orderWithUpdatedItems.getItems());
-                                return orderWithUpdatedItems.withSalesTax(salesTax);
-                            });
-                })
+                .flatMap(order -> salesTaxService.findByAddress(order.getShippingAddress())
+                        .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
+                        .map(salesTaxRate -> {
+                            List<Item> updatedItems = salesTaxService.getRulesForItems(order.getItems(),salesTaxRate);
+                            Order orderWithUpdatedItems = order.withItems(updatedItems);
+                            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithUpdatedItems.getItems());
+                            SalesTax salesTax = new SalesTax(salesTaxAmount,salesTaxRate);
+                            return orderWithUpdatedItems.withSalesTax(salesTax);
+                        }))
                 .flatMap(order -> orderService.update(externalId, order));
     }
 

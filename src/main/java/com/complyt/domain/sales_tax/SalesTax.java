@@ -1,5 +1,6 @@
 package com.complyt.domain.sales_tax;
 
+import com.complyt.v1.model.SalesTaxRateDto;
 import lombok.*;
 
 @Getter
@@ -9,4 +10,5 @@ import lombok.*;
 @With
 public class SalesTax {
     private float amount;
+    private SalesTaxRate salesTaxRate;
 }
