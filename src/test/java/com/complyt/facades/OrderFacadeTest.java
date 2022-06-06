@@ -155,6 +155,20 @@ public class OrderFacadeTest {
     }
 
     @Test
+    void update_NullExternalIdGiven_ThrowsException(){
+        // Given
+        String externalId = null;
+
+        // When + Then
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderFacade.update(externalId,order);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
     void addOrderToClient_OrderAddedToClient_OrderReturned() throws InterruptedException {
         // Given
         String externalId = order.getExternalId();
@@ -217,7 +231,7 @@ public class OrderFacadeTest {
 //    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
 //        // Given
 //        String externalId = order.getExternalId();
-//        SalesTax salesTax = new SalesTax(1000);
+//        SalesTax salesTax = new SalesTax(1000,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f));
 //        Order orderWithSalesTax = order.withSalesTax(salesTax);
 //        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 //        CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -225,15 +239,15 @@ public class OrderFacadeTest {
 //        // When
 //        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
 //        when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(null));
-//        when(salesTaxService.getRulesForItems(order.getItems(),null)).thenReturn(null);
-//        when(salesTaxService.calculateSalesTax(order.getItems())).thenReturn(salesTax);
+//        when(salesTaxService.getSalesTaxRatesForItems(order.getItems(),null)).thenReturn(null);
+//        when(salesTaxService.calculateSalesTaxAmount(order.getItems())).thenReturn(salesTax.getAmount());
 //        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 //
 //        orderFacade.updateSalesTax(externalId).subscribe(returnedOrder -> {
 //            orderAtomicReference.set(returnedOrder);
 //            countDownLatch.countDown();
 //        });
-
+//
 //        // Then
 //        countDownLatch.await();
 //        assertNotNull(orderAtomicReference.get());
