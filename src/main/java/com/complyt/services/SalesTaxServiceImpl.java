@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -47,13 +48,10 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
     @Override
-    public List<Item> getRulesForItems(List<Item> items, SalesTaxRate salesTaxRate){
-        List<Item> itemsWithRates = new ArrayList<>();
-        for(Item item: items){
-            SalesTaxRate salesTaxRateForItem = jurisdictionalSalesTaxController.getRateByRules(item.getJurisdictionalSalesTaxRules(),salesTaxRate,item);
-            itemsWithRates.add(item.withSalesTaxRate(salesTaxRateForItem));
-        }
-        return itemsWithRates;
+    public List<Item> getSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate){
+        return items.stream()
+                .map(item -> item.withSalesTaxRate(jurisdictionalSalesTaxController.getRateByRules(item.getJurisdictionalSalesTaxRules(),salesTaxRate,item)))
+                .collect(Collectors.toList());
     }
 
     @Override

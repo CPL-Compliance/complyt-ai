@@ -12,5 +12,5 @@ public interface SalesTaxService {
     public Mono<SalesTaxData> findByAddress(Address address);
     public SalesTaxRate mapSalesTaxDataToRate(SalesTaxData salesTaxData);
     public float calculateSalesTaxAmount(List<Item> items);
-    public List<Item> getRulesForItems(List<Item> items, SalesTaxRate salesTaxRate);
+    public List<Item> getSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate);
 }

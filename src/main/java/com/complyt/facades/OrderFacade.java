@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.Function;
 
 
 @Component
@@ -59,23 +60,33 @@ public class OrderFacade {
         return orderService
                 .findByExternalId(externalId)
                 .map(OrderProductClassificationInjector::new)
-                .flatMap(orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector
-                                .getOrder()
-                                .getItems())
-                        .flatMap(item -> getClassification(item.getTaxCode()))
-                        .distinct()
-                        .collectList()
-                        .flatMap(orderProductClassificationInjector::act))
-                .flatMap(order -> salesTaxService.findByAddress(order.getShippingAddress())
-                        .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
-                        .map(salesTaxRate -> {
-                            List<Item> updatedItems = salesTaxService.getRulesForItems(order.getItems(),salesTaxRate);
-                            Order orderWithUpdatedItems = order.withItems(updatedItems);
-                            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithUpdatedItems.getItems());
-                            SalesTax salesTax = new SalesTax(salesTaxAmount,salesTaxRate);
-                            return orderWithUpdatedItems.withSalesTax(salesTax);
-                        }))
+                .flatMap(injectRulesToOrderItems())
+                .flatMap(setSalesTaxToOrder())
                 .flatMap(order -> orderService.update(externalId, order));
+    }
+
+    private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
+        return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
+                .flatMap(item -> getClassification(item.getTaxCode()))
+                .distinct()
+                .collectList()
+                .flatMap(orderProductClassificationInjector::act);
+    }
+
+    private Function<Order, Mono<Order>> setSalesTaxToOrder() {
+        return order -> salesTaxService.findByAddress(order.getShippingAddress())
+                .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
+                .map(injectSalesTaxToOrder(order));
+    }
+
+    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
+        return salesTaxRate -> {
+            List<Item> itemsWithRates = salesTaxService.getSalesTaxRatesForItems(order.getItems(), salesTaxRate);
+            Order orderWithUpdatedItems = order.withItems(itemsWithRates);
+            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithUpdatedItems.getItems());
+            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+            return orderWithUpdatedItems.withSalesTax(salesTax);
+        };
     }
 
     @SneakyThrows
