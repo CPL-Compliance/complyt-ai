@@ -6,6 +6,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
@@ -267,5 +268,21 @@ public class OrderFacadeTest {
         // Then
         assertNotNull(orderWithCancelledStatus);
         assertEquals(orderWithCancelledStatus.block(), cancelledOrder);
+    }
+
+    @Test
+    void getClassification_ClassificationFound_Classification_returned(){
+        // Given
+        String taxCode = "C1S1";
+        ProductClassification productClassification = new ProductClassification("id","C1S1","description",
+                "title",null);
+
+        // When
+        when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> productClassificationMono = orderFacade.getClassification(taxCode);
+
+        // Then
+        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+
     }
 }

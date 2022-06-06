@@ -68,11 +68,4 @@ public class OrderController {
                 .map(order -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/getpcs")
-    @ResponseStatus(HttpStatus.OK)
-    public Flux<ProductClassification> getAllpcs() {
-        return orderFacade.getAllpcs();
-    }
-
-
 }

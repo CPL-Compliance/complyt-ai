@@ -94,10 +94,6 @@ public class OrderFacade {
         return productClassificationService.findOneByTaxCode(taxCode);
     }
 
-    public Flux<ProductClassification> getAllpcs() {
-        return productClassificationService.getAll();
-    }
-
     public Mono<Order> markAsCancelled(String orderId) {
         return orderService.markAsCancelled(orderId);
     }
