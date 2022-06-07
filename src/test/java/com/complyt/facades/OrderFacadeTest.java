@@ -188,7 +188,7 @@ public class OrderFacadeTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.update(nullExternalId,order);
+            orderFacade.upsert(nullExternalId,order);
         });
 
         // Then
