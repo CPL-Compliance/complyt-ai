@@ -1,11 +1,15 @@
 package com.complyt.facades;
 
+import com.complyt.business.order.OrderProductClassificationInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -29,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -59,10 +64,10 @@ public class OrderFacadeTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        items.add(new Item(1000, 3, 3000, "description", "name", "taxCode",
-                null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
+                null, null
                 ));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
     }
@@ -228,32 +233,56 @@ public class OrderFacadeTest {
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
 
-//    @Test
-//    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
-//        // Given
-//        String externalId = order.getExternalId();
-//        SalesTax salesTax = new SalesTax(1000,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f));
-//        Order orderWithSalesTax = order.withSalesTax(salesTax);
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//        // When
-//        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
-//        when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(null));
-//        when(salesTaxService.getSalesTaxRatesForItems(order.getItems(),null)).thenReturn(null);
-//        when(salesTaxService.calculateSalesTaxAmount(order.getItems())).thenReturn(salesTax.getAmount());
-//        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
-//
-//        orderFacade.updateSalesTax(externalId).subscribe(returnedOrder -> {
-//            orderAtomicReference.set(returnedOrder);
-//            countDownLatch.countDown();
-//        });
-//
-//        // Then
-//        countDownLatch.await();
-//        assertNotNull(orderAtomicReference.get());
-//        assertEquals(orderWithSalesTax, orderAtomicReference.get());
-//    }
+    @Test
+    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
+        // Given
+        String externalId = order.getExternalId();
+        FastTaxData fastTaxData = new FastTaxData();
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f,0.1f,0.1f,0.1f,0.1f,0.5f);
+        SalesTax salesTax = new SalesTax(1000,salesTaxRate);
+        String taxCode = "C1S1";
+
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("id","California",
+                "CA",true,false, CalculationType.FIXED,"description",0);
+        List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new ArrayList<JurisdictionalSalesTaxRules>(){{
+            add(jurisdictionalSalesTaxRules);
+        }};
+        ProductClassification productClassification = new ProductClassification("id",taxCode,"description",
+                "title",jurisdictionalSalesTaxRulesList);
+
+        Item itemWithRule = order.getItems().get(0).withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
+        List<Item> itemsWithRules = new ArrayList<Item>() {{
+            add(itemWithRule);
+        }};
+
+        Item itemWithRate = itemWithRule.withSalesTaxRate(salesTaxRate);
+        List<Item> itemsWithRates = new ArrayList<Item>() {{
+            add(itemWithRate);
+        }};
+
+        Order orderWithSalesTax = order.withSalesTax(salesTax).withItems(itemsWithRates);
+
+        // When
+        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
+
+        when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+
+        when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+
+        when(salesTaxService.mapSalesTaxDataToRate(fastTaxData)).thenReturn(salesTaxRate);
+
+        when(salesTaxService.getSalesTaxRatesForItems(itemsWithRules,salesTaxRate)).thenReturn(itemsWithRates);
+
+        when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
+
+        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
+
+        Mono<Order> orderMono = orderFacade.updateSalesTax(externalId);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
+
+    }
 
     @Test
     void markAsCancelled_orderIdGiven_ChangesOrderStatus() {
