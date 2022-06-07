@@ -64,7 +64,7 @@ public class OrderFacadeTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null
@@ -140,7 +140,7 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void upsertOrder_OrderInserted_OrderReturned() throws InterruptedException {
+    void updateOrder_OrderInserted_OrderReturned() throws InterruptedException {
         // Given
         String externalId = order.getExternalId();
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
@@ -158,6 +158,42 @@ public class OrderFacadeTest {
         countDownLatch.await();
         assertNotNull(orderAtomicReference.get());
         assertEquals(order, orderAtomicReference.get());
+    }
+
+    @Test
+    void upsertOrder_Orderupserted_OrderReturned() throws InterruptedException {
+        // Given
+        String externalId = order.getExternalId();
+        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        // When
+        when(orderService.upsert(externalId, order)).thenReturn(Mono.just(order));
+        orderFacade.upsert(externalId, order)
+                .subscribe(returnedOrder -> {
+                    orderAtomicReference.set(returnedOrder);
+                    countDownLatch.countDown();
+                });
+
+        // Then
+        countDownLatch.await();
+        assertNotNull(orderAtomicReference.get());
+        assertEquals(order, orderAtomicReference.get());
+    }
+
+    @Test
+    void upsertOrder_NullExternalIdGiven_ThrowsException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderFacade.update(nullExternalId,order);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+
     }
 
     @Test
@@ -243,7 +279,7 @@ public class OrderFacadeTest {
         String taxCode = "C1S1";
 
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("id","California",
-                "CA",true,false, CalculationType.FIXED,"description",0);
+                order.getShippingAddress().getState(),true,false, CalculationType.FIXED,"description",0);
         List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new ArrayList<JurisdictionalSalesTaxRules>(){{
             add(jurisdictionalSalesTaxRules);
         }};
