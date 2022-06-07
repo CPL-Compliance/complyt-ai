@@ -133,7 +133,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void getByExternalId_FindsOrder_ReturnsOrder() {
+    void getOne_FindsOrder_ReturnsOrder() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
@@ -152,7 +152,41 @@ class OrderControllerTest {
     }
 
     @Test
-    void getByExternalId_OperationFails_Returns4xxNotFound() {
+    void getOne_NullExternalIdGiven_InternalServerError() {
+        // Given
+        String nullExternalId = null;
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + nullExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void update_NullExternalIdGiven_InternalServerError() {
+        // Given
+        String nullExternalId = null;
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + nullExternalId)
+                        .build())
+                .bodyValue(orderDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void getOne_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
