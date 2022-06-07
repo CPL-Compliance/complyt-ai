@@ -27,10 +27,6 @@ public class ProductClassificationRepository {
         return reactiveMongoTemplate.findOne(query, ProductClassification.class);
     }
 
-    public Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes) {
-        return null;
-    }
-
     public Flux<ProductClassification> findAll() {
         return reactiveMongoTemplate.findAll(ProductClassification.class);
     }

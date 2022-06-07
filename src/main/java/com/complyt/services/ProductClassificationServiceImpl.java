@@ -50,13 +50,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return productClassificationRepository.findOneByTaxCode(taxCode);
     }
 
-    @Override
-    public Flux<ProductClassification> findByTaxCodes(Set<String> taxCodes) {
-        return productClassificationRepository.findByTaxCodes(taxCodes);
-    }
-
     public Flux<ProductClassification> getAll() {
-
         return productClassificationRepository.findAll();
     }
 
