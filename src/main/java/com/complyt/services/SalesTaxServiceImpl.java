@@ -58,6 +58,4 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public float calculateSalesTaxAmount(List<Item> items){
         return salesTaxCalculator.calculate(items);
     }
-
-
 }

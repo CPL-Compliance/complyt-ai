@@ -82,10 +82,10 @@ public class OrderFacade {
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
         return salesTaxRate -> {
             List<Item> itemsWithRates = salesTaxService.getSalesTaxRatesForItems(order.getItems(), salesTaxRate);
-            Order orderWithUpdatedItems = order.withItems(itemsWithRates);
-            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithUpdatedItems.getItems());
+            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
-            return orderWithUpdatedItems.withSalesTax(salesTax);
+            return orderWithItemsWithRates.withSalesTax(salesTax);
         };
     }
 
