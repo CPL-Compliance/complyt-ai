@@ -11,7 +11,7 @@ import java.util.List;
 @EqualsAndHashCode
 @With
 @ToString
-@Document(collection = "Product_Classification")
+@Document(collection = "product_classification")
 public class ProductClassification {
     @Id
     private String id;
