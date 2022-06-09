@@ -19,10 +19,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.test.context.TestSecurityContextHolder;
-import org.springframework.security.test.context.support.ReactorContextTestExecutionListener;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
+import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -42,13 +41,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-//@TestExecutionListeners(WithSecurityContextTestExecutionListener.class)
 class OrderRepositoryTest {
-//    @Mock
-//    private Authentication authentication;
-
-//    private TestExecutionListener reactorContextTestExecutionListener = new ReactorContextTestExecutionListener();
-
     @InjectMocks
     OrderRepository orderRepository;
 
@@ -61,12 +54,8 @@ class OrderRepositoryTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ObjectId clientId = new ObjectId("1234");
+        ObjectId clientId = new ObjectId();
         user = User.builder().username("user").password("1234").clientId(clientId).build();
-
-//        when(authentication.getPrincipal()).thenReturn(user);
-//        TestSecurityContextHolder.setAuthentication(authentication);
-//        reactorContextTestExecutionListener.beforeTestMethod(null);
 
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -76,11 +65,6 @@ class OrderRepositoryTest {
         List<Item> items = new ArrayList<>();
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode"));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-//        reactorContextTestExecutionListener.afterTestMethod(null);
     }
 
     @Test
@@ -131,15 +115,12 @@ class OrderRepositoryTest {
         StepVerifier.create(orderMono).expectNextCount(0).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findByExternalId_ExternalIdExists_ReturnsOneOrder() {
         // Given
         String orderExternalId = UUID.randomUUID().toString();
-//        Query query = Query.query(Criteria.where("externalId").is(orderExternalId));
-//        Order returnedOrder = order.withExternalId(orderExternalId);
         Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()).and("clientId").is(user.getClientId()));
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
         // When
         when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));

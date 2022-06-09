@@ -40,21 +40,18 @@ public class OrderRepository {
     }
 
     public Mono<Order> findByExternalId(String externalId) {
-        return ReactiveSecurityContextHolder
-                .getContext().log()
-                .map(securityContext -> (User) securityContext
-                        .getAuthentication()
-                        .getPrincipal()).log()
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
                             .and("clientId").is(user.getClientId()));
 
                     return reactiveMongoTemplate
-                            .findOne(query, Order.class).log()
+                            .findOne(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate
                                     .findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer).log());
-                }).log();
+                                    .map(order::withCustomer));
+                });
     }
 
     public Flux<Order> find() {
