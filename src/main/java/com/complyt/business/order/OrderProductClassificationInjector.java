@@ -21,6 +21,10 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
     @NonNull
     private final Order order;
 
+    /** finds each of the order's item's  jurisdictional Sales Tax Rules and injects it to the item
+     * @param mapTaxCodesToClassifications - hashmap of tax code to its product classification representation
+     * @return - order with items with the corresponding jurisdictional Sales Tax Rules in each one of them
+     */
     @Override
     public Mono<Order> act(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
