@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ public class SalesTaxRateCalculator {
      * @param originalSalesTaxRate - Sales tax rate given by external resource for the current order's address
      * @return
      */
-    public SalesTaxRate calculateSalesTaxRate(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, SalesTaxRate originalSalesTaxRate) {
+    public SalesTaxRate calculateSalesTaxRate(@NonNull final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull final SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
             log.info("None taxable rule - setting sales tax rate to 0");
             return new SalesTaxRate(0, 0, 0, 0, 0, 0);
