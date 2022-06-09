@@ -28,9 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -280,8 +278,8 @@ public class OrderFacadeTest {
 
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("id","California",
                 order.getShippingAddress().getState(),true,false, CalculationType.FIXED,"description",0);
-        List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new ArrayList<JurisdictionalSalesTaxRules>(){{
-            add(jurisdictionalSalesTaxRules);
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+            put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
         ProductClassification productClassification = new ProductClassification("id",taxCode,"description",
                 "title",jurisdictionalSalesTaxRulesList);

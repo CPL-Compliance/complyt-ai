@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
@@ -21,27 +23,17 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
     private final Order order;
 
     @Override
-    public Mono<Order> act(List<ProductClassification> productClassifications) {
+    public Mono<Order> act(Map<String,ProductClassification> productClassifications) {
         return Mono.fromCallable(() -> {
 
-            List<Item> itemsWithRules = new ArrayList<>();
-            for (Item item : order.getItems()) {
+            String state = order.getShippingAddress().getState();
+            List<Item> itemsWithRules = order.getItems().stream().map(item -> {
+                ProductClassification productClassification = productClassifications.get(item.getTaxCode());
+                JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
+                return item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
+            })
+                    .collect(Collectors.toList());
 
-                for (ProductClassification productClassification : productClassifications) {
-
-                    if (productClassification.getTaxCode().equals(item.getTaxCode())) {
-
-                        for (JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules : productClassification.getJurisdictionalSalesTaxRules()) {
-
-                            if (jurisdictionalSalesTaxRules.getAbbreviation().equals(order.getShippingAddress().getState())) {
-                                itemsWithRules.add(item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules));
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
             return order.withItems(itemsWithRules);
         });
     }

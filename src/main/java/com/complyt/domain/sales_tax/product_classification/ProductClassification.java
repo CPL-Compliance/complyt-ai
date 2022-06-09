@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @AllArgsConstructor
@@ -18,5 +19,5 @@ public class ProductClassification {
     private final String taxCode;
     private final String description;
     private final String title;
-    private final List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
+    private final Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
 }

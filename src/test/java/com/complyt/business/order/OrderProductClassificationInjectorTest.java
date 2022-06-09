@@ -18,16 +18,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OrderProductClassificationInjectorTest {
-
-    OrderProductClassificationInjector orderProductClassificationInjector;
 
     Order order;
 
@@ -47,7 +43,6 @@ public class OrderProductClassificationInjectorTest {
         };
 
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
-        orderProductClassificationInjector = new OrderProductClassificationInjector(order);
     }
 
     @Test
@@ -65,18 +60,18 @@ public class OrderProductClassificationInjectorTest {
         JurisdictionalSalesTaxRules rule2 = new JurisdictionalSalesTaxRules("rule2","rule2","CA",true,false,
                 CalculationType.FIXED,"rule2",0);
 
-        List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new ArrayList<JurisdictionalSalesTaxRules>(){{
-            add(rule1);
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+            put(rule1.getAbbreviation(),rule1);
         }};
-        List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new ArrayList<JurisdictionalSalesTaxRules>(){{
-            add(rule2);
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+            put(rule2.getAbbreviation(),rule2);
         }};
         ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1);
         ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2);
 
-        List<ProductClassification> productClassifications = new ArrayList<ProductClassification>(){{
-            add(productClassification1);
-            add(productClassification2);
+        Map<String,ProductClassification> productClassifications = new HashMap<String,ProductClassification>(){{
+            put(productClassification1.getTaxCode(),productClassification1);
+            put(productClassification2.getTaxCode(),productClassification2);
         }};
 
         Item item1WithRule = item1NoRule.withJurisdictionalSalesTaxRules(rule1);

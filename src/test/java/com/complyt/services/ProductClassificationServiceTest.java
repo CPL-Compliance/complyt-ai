@@ -18,7 +18,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,8 +42,8 @@ public class ProductClassificationServiceTest {
     void setUp(){
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("id","California",
                 "CA",true,false, CalculationType.FIXED,"description",0);
-        List<JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new ArrayList<JurisdictionalSalesTaxRules>(){{
-            add(jurisdictionalSalesTaxRules);
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+            put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
         productClassification = new ProductClassification("id","C1S1","description",
                 "title",jurisdictionalSalesTaxRulesList);

@@ -68,8 +68,7 @@ public class OrderFacade {
     private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
         return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
-                .distinct()
-                .collectList()
+                .collectMap(productClassification->productClassification.getTaxCode(),productClassification-> productClassification)
                 .flatMap(orderProductClassificationInjector::act);
     }
 
