@@ -11,27 +11,27 @@ import org.springframework.stereotype.Component;
 public class SalesTaxRateCalculator {
     public SalesTaxRate calculateSalesTaxRate(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
-            log.debug("None taxable rule - setting sales tax rate to 0");
+            log.info("None taxable rule - setting sales tax rate to 0");
             return new SalesTaxRate(0, 0, 0, 0, 0, 0);
         }
 
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
-            log.debug("None special treatment for rule - setting sales tax rate to original rate");
+            log.info("None special treatment for rule - setting sales tax rate to original rate");
             return originalSalesTaxRate;
         }
 
         if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
-            log.debug("setting sales tax rate to fixed rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
+            log.info("setting sales tax rate to fixed rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
             return modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
         }
-        log.debug("setting sales tax rate to percentage rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
+        log.info("setting sales tax rate to percentage rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
         return modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
     }
 
     private SalesTaxRate modifyRateByFixedTreatment(float jurisdictionalRuleStateRate, SalesTaxRate salesTaxRate) {
         float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + jurisdictionalRuleStateRate;
         SalesTaxRate calculatedRate = salesTaxRate.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
-        log.debug("Sales tax rate after fixed modification : " + calculatedRate);
+        log.info("Sales tax rate after fixed modification : " + calculatedRate);
         return calculatedRate;
     }
 
@@ -39,7 +39,7 @@ public class SalesTaxRateCalculator {
         float newStateRate = salesTaxRate.getStateRate() * jurisdictionalRuleCalculationValue;
         float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + newStateRate;
         SalesTaxRate calculatedRate = salesTaxRate.withStateRate(newStateRate).withTaxRate(newTaxRate);
-        log.debug("Sales tax rate after percentage modification : " + calculatedRate);
+        log.info("Sales tax rate after percentage modification : " + calculatedRate);
         return calculatedRate;
     }
 }
