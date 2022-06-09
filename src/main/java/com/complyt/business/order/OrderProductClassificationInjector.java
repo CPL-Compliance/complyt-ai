@@ -25,16 +25,16 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
     @Override
     public Mono<Order> act(Map<String,ProductClassification> productClassifications) {
         return Mono.fromCallable(() -> {
-
             String state = order.getShippingAddress().getState();
-            List<Item> itemsWithRules = order.getItems().stream().map(item -> {
+            List<Item> itemsWithRules = new ArrayList<>();
+
+            for(Item item: order.getItems()) {
                 ProductClassification productClassification = productClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
-                return item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
-            })
-                    .collect(Collectors.toList());
-
+                itemsWithRules.add(item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules));
+            }
             return order.withItems(itemsWithRules);
+
         });
     }
 }
