@@ -11,7 +11,7 @@ import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class OrderFacade {
     @Qualifier("orderServiceImpl")
     @NonNull
@@ -68,28 +69,31 @@ public class OrderFacade {
     private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
         return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
-                .collectMap(productClassification->productClassification.getTaxCode(),productClassification-> productClassification)
+                .collectMap(productClassification -> productClassification.getTaxCode(), productClassification -> productClassification)
                 .flatMap(orderProductClassificationInjector::act);
     }
 
     private Function<Order, Mono<Order>> setSalesTaxToOrder() {
         return order -> salesTaxService.findByAddress(order.getShippingAddress())
-                .map(salesTaxData -> salesTaxService.mapSalesTaxDataToRate(salesTaxData))
+                .map(salesTaxData -> salesTaxService.salesTaxDataToSalesTaxRate(salesTaxData))
                 .map(injectSalesTaxToOrder(order));
     }
 
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
         return salesTaxRate -> {
-            List<Item> itemsWithRates = salesTaxService.getSalesTaxRatesForItems(order.getItems(), salesTaxRate);
+            log.info("Setting sales tax rates for order's items");
+            List<Item> itemsWithRates = salesTaxService.setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
             Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+            log.info("Calculating total sales tax amount for order");
             float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+            log.debug("Order's sales tax : " + salesTax);
             return orderWithItemsWithRates.withSalesTax(salesTax);
         };
     }
 
-    @SneakyThrows
     public Mono<ProductClassification> getClassification(String taxCode) {
+        log.debug("Searching for product classification for tax code : " + taxCode);
         return productClassificationService.findOneByTaxCode(taxCode);
     }
 

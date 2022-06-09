@@ -22,27 +22,27 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
 
     @Override
     public Mono<Order> save(Order object) {
-        return null;
+        throw new UnsupportedOperationException("save isn't implemented");
     }
 
     @Override
     public Mono<Order> findOneByName(@NonNull String name) {
-        return null;
+        throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     @Override
     public Flux<Order> findByName(@NonNull String name) {
-        return null;
+        throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     @Override
     public Mono<Order> findById(@NonNull String id) {
-        return null;
+        throw new UnsupportedOperationException("findById isn't implemented");
     }
 
     @Override
     public Flux<Order> findAll() {
-        return null;
+        throw new UnsupportedOperationException("findAll isn't implemented");
     }
 
     @Override

@@ -1,23 +1,19 @@
 package com.complyt.services;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.tax_reliefs.JurisdictionalSalesTaxController;
+import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
-import com.complyt.v1.model.ItemDto;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -35,7 +31,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private final SalesTaxCalculator salesTaxCalculator;
 
     @NonNull
-    private final JurisdictionalSalesTaxController jurisdictionalSalesTaxController;
+    private final SalesTaxRateCalculator jurisdictionalSalesTaxController;
 
     @Override
     public Mono<SalesTaxData> findByAddress(Address address){
@@ -43,14 +39,14 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
     @Override
-    public SalesTaxRate mapSalesTaxDataToRate(SalesTaxData salesTaxData){
+    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData){
         return salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
     }
 
     @Override
-    public List<Item> getSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate){
+    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate){
         return items.stream()
-                .map(item -> item.withSalesTaxRate(jurisdictionalSalesTaxController.getRateByRules(item.getJurisdictionalSalesTaxRules(),salesTaxRate,item)))
+                .map(item -> item.withSalesTaxRate(jurisdictionalSalesTaxController.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(),salesTaxRate)))
                 .collect(Collectors.toList());
     }
 

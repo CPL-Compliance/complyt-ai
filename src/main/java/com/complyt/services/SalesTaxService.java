@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface SalesTaxService {
     public Mono<SalesTaxData> findByAddress(Address address);
-    public SalesTaxRate mapSalesTaxDataToRate(SalesTaxData salesTaxData);
+    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData);
     public float calculateSalesTaxAmount(List<Item> items);
-    public List<Item> getSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate);
+    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate);
 }

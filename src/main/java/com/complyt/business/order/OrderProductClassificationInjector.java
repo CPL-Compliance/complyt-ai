@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
@@ -23,18 +22,21 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
     private final Order order;
 
     @Override
-    public Mono<Order> act(Map<String,ProductClassification> productClassifications) {
+    public Mono<Order> act(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
+            log.info("Setting jurisdictional sales tax rules to order's items");
             String state = order.getShippingAddress().getState();
             List<Item> itemsWithRules = new ArrayList<>();
-
-            for(Item item: order.getItems()) {
-                ProductClassification productClassification = productClassifications.get(item.getTaxCode());
+            Item itemWithRules;
+            for (Item item : order.getItems()) {
+                ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
-                itemsWithRules.add(item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules));
+                itemWithRules = item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
+                log.debug("Inserting new item with rules : " + itemWithRules);
+                itemsWithRules.add(itemWithRules);
             }
-            return order.withItems(itemsWithRules);
 
+            return order.withItems(itemsWithRules);
         });
     }
 }

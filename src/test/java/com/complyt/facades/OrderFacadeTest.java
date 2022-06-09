@@ -1,6 +1,5 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderProductClassificationInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -31,7 +30,6 @@ import reactor.test.StepVerifier;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -276,7 +274,7 @@ public class OrderFacadeTest {
         SalesTax salesTax = new SalesTax(1000,salesTaxRate);
         String taxCode = "C1S1";
 
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("id","California",
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 order.getShippingAddress().getState(),true,false, CalculationType.FIXED,"description",0);
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
@@ -303,9 +301,9 @@ public class OrderFacadeTest {
 
         when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
 
-        when(salesTaxService.mapSalesTaxDataToRate(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxService.salesTaxDataToSalesTaxRate(fastTaxData)).thenReturn(salesTaxRate);
 
-        when(salesTaxService.getSalesTaxRatesForItems(itemsWithRules,salesTaxRate)).thenReturn(itemsWithRates);
+        when(salesTaxService.setSalesTaxRatesForItems(itemsWithRules,salesTaxRate)).thenReturn(itemsWithRates);
 
         when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
 

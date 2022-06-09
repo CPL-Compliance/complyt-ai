@@ -2,9 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
-import com.complyt.business.tax_reliefs.JurisdictionalSalesTaxController;
-import com.complyt.domain.Item;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +32,7 @@ public class SalesTaxServiceImplTest {
     @Mock
     SalesTaxCalculator salesTaxCalculator;
     @Mock
-    JurisdictionalSalesTaxController jurisdictionalSalesTaxController;
+    SalesTaxRateCalculator jurisdictionalSalesTaxController;
 
     @BeforeEach
     void setUp(){

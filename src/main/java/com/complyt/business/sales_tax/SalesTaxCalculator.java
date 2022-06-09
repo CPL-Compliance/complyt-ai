@@ -1,7 +1,6 @@
 package com.complyt.business.sales_tax;
 
 import com.complyt.domain.Item;
-import com.complyt.domain.sales_tax.SalesTax;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

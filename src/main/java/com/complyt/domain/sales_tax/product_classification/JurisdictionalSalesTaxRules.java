@@ -9,8 +9,6 @@ import org.springframework.data.annotation.Id;
 @With
 @ToString
 public class JurisdictionalSalesTaxRules {
-    @Id
-    private final String id;
     private final String name;
     private final String abbreviation;
     private final boolean taxable;
