@@ -5,6 +5,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.OrderFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
@@ -66,7 +67,9 @@ class OrderControllerTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode"));
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+                    ));
             }
         };
 
@@ -130,7 +133,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void getByExternalId_FindsOrder_ReturnsOrder() {
+    void getOne_FindsOrder_ReturnsOrder() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
@@ -149,7 +152,41 @@ class OrderControllerTest {
     }
 
     @Test
-    void getByExternalId_OperationFails_Returns4xxNotFound() {
+    void getOne_NullExternalIdGiven_InternalServerError() {
+        // Given
+        String nullExternalId = null;
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + nullExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void update_NullExternalIdGiven_InternalServerError() {
+        // Given
+        String nullExternalId = null;
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + nullExternalId)
+                        .build())
+                .bodyValue(orderDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void getOne_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());

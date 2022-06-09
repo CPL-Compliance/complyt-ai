@@ -28,8 +28,8 @@ public class SalesTaxCalculatorTest {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         List<Item> items = new ArrayList<Item>(){{
-                add(new Item(1000,2,2000,"description","name","taxCode"));
-                add(new Item(3000,3,9000,"description","name","taxCode"));
+                add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate));
+                add(new Item(3000,3,9000,"description","name","taxCode",null, salesTaxRate));
         }};
         float amount = 0;
 
@@ -37,12 +37,11 @@ public class SalesTaxCalculatorTest {
         for(Item item : items){
             amount += salesTaxRate.getTaxRate() * item.getUnitPrice() * item.getQuantity();
         }
-        SalesTax salesTax = new SalesTax(salesTaxRate,amount);
-        SalesTax salesTaxReturnedFromCalculation = salesTaxCalculator.calculate(salesTaxRate,items);
+        SalesTax salesTax = new SalesTax(amount,salesTaxRate);
+        float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
 
         // Then
-        assertNotNull(salesTaxReturnedFromCalculation);
-        assertEquals(salesTax,salesTaxReturnedFromCalculation);
+        assertEquals(salesTax.getAmount(),salesTaxAmountReturnedFromCalculation);
 
     }
 

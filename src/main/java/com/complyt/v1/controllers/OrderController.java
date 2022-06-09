@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.facades.OrderFacade;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
@@ -49,13 +50,14 @@ public class OrderController {
         return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-
+    
     @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
         return orderFacade.updateSalesTax(externalId)
-                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
+                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
+                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
 
     @Operation(summary = "Marks the order as cancelled")
@@ -65,4 +67,5 @@ public class OrderController {
         return orderFacade.markAsCancelled(externalId)
                 .map(order -> ResponseEntity.noContent().build());
     }
+
 }
