@@ -26,4 +26,5 @@ public class Order {
     private Customer customer;
     private SalesTax salesTax;
     private OrderStatus orderStatus;
+    private ObjectId clientId;
 }

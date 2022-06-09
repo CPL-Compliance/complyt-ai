@@ -21,13 +21,14 @@ class OrderMapperTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        ObjectId clientId = new ObjectId("1234");
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode"));
             }
         };
 
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE);
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId);
         OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
 
     }

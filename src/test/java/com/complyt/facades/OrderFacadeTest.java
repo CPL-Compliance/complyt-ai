@@ -56,8 +56,9 @@ public class OrderFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
+        ObjectId clientId = new ObjectId("1234");
         items.add(new Item(1000, 3, 3000, "description", "name", "taxCode"));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
     }
 
     @Test

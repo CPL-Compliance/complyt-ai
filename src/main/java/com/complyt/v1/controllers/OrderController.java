@@ -1,6 +1,5 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.security.User;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
@@ -12,13 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -46,16 +40,17 @@ public class OrderController {
     }
 
     @Operation(summary = "Gets all orders")
-//    @OrderReadPermission
-    @PreAuthorize("hasAuthority('order.read') AND @orderAuthenticationManager.clientIdMatches(authentication, #clientId)")
+    @OrderReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<OrderDto> getAll(@AuthenticationPrincipal User user) {
-        if(user.getClientId() != null){
-            return orderFacade.getAll(user.getClientId()).map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
-        } else{
-            return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
-        }
+//    public Flux<OrderDto> getAll(@AuthenticationPrincipal User user) {
+    public Flux<OrderDto> getAll() {
+        return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+//        if (user.getClientId() != null) {
+//            return orderFacade.getAll(user.getClientId()).map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+//        } else {
+//            return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+//        }
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
