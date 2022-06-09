@@ -55,17 +55,6 @@ public class OrderRepository {
                                     .findById(order.getCustomerId(), Customer.class)
                                     .map(order::withCustomer).log());
                 });
-
-//        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        Query query = Query.query(Criteria.where("externalId").is(externalId)
-//                .and("clientId").is(principal.getClientId()));
-//        Query query = Query.query(Criteria.where("externalId").is(externalId));
-//        return Mono.zip(ReactiveSecurityContextHolder.getContext(), )
-//        return reactiveMongoTemplate
-//                .findOne(query, Order.class).log()
-//                .flatMap(order -> reactiveMongoTemplate
-//                        .findById(order.getCustomerId(), Customer.class)
-//                        .map(order::withCustomer).log());
     }
 
     public Flux<Order> find() {
