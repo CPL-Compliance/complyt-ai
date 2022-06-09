@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OrderFacadeTest {
 
     @InjectMocks
@@ -56,7 +55,7 @@ public class OrderFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        ObjectId clientId = new ObjectId("1234");
+        ObjectId clientId = new ObjectId();
         items.add(new Item(1000, 3, 3000, "description", "name", "taxCode"));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
     }
@@ -70,7 +69,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
+            new OrderFacade(orderService, salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
@@ -85,7 +84,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService);
+            new OrderFacade(orderService, salesTaxService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");

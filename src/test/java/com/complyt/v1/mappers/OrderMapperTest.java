@@ -21,7 +21,7 @@ class OrderMapperTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        ObjectId clientId = new ObjectId("1234");
+        ObjectId clientId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode"));
