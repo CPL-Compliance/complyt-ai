@@ -1,6 +1,10 @@
 package com.complyt.config;
 
 import com.complyt.annotations.Generated;
+import com.complyt.repositories.security.AuthorityRepository;
+import com.complyt.repositories.security.RoleRepository;
+import com.complyt.repositories.security.UserRepository;
+import com.complyt.security.UserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -15,11 +19,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableReactiveMethodSecurity
 @Generated
 public class SecurityConfig {
-//    @Bean
-//    public SecurityEvaluationContextExtension securityEvaluationContextExtension(){
-//        return new SecurityEvaluationContextExtension();
-//    }
 
+    @Bean
+    UserDetailsService userDetailsService(UserRepository userRepository,
+                                          AuthorityRepository authorityRepository,
+                                          RoleRepository roleRepository){
+        return new UserDetailsService(userRepository, authorityRepository, roleRepository);
+    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

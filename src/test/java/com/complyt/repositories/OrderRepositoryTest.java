@@ -1,29 +1,21 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.*;
 import com.complyt.domain.security.User;
+import com.complyt.security.UserDetailsServiceMock;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.test.context.TestSecurityContextHolder;
-import org.springframework.security.test.context.support.*;
-import org.springframework.test.context.TestExecutionListener;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,12 +28,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class OrderRepositoryTest {
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public UserDetailsServiceMock userDetailsService() {
+            return new UserDetailsServiceMock();
+        }
+
+    }
     @InjectMocks
     OrderRepository orderRepository;
 
@@ -50,12 +49,14 @@ class OrderRepositoryTest {
 
     Order order;
 
+    Customer customer;
+
     User user;
 
     @BeforeEach
     void setUp() throws Exception {
-        ObjectId clientId = new ObjectId();
-        user = User.builder().username("user").password("1234").clientId(clientId).build();
+        ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
+        user = User.builder().username("user").password("password").clientId(clientId).build();
 
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -65,6 +66,7 @@ class OrderRepositoryTest {
         List<Item> items = new ArrayList<>();
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode"));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        customer = new Customer(id, externalId, "customer", shippingAddress);
     }
 
     @Test
@@ -124,10 +126,12 @@ class OrderRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
-        Mono<Order> orderMono = orderRepository.findByExternalId(orderExternalId);
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+
+        Mono<Order> orderMono = orderRepository.findByExternalId(order.getExternalId());
 
         // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+        StepVerifier.create(orderMono).expectNext(order.withCustomer(customer)).verifyComplete();
     }
 
     @Test

@@ -23,7 +23,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Slf4j
-@Service
 @AllArgsConstructor
 public class UserDetailsService implements ReactiveUserDetailsService {
     @NonNull
