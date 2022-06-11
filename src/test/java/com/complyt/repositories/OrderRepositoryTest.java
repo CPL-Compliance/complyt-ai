@@ -1,8 +1,8 @@
 package com.complyt.repositories;
 
+import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
 import com.complyt.domain.security.User;
-import com.complyt.security.UserDetailsServiceMock;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,15 +31,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
+@Import(SecurityConfigMockTest.class)
 class OrderRepositoryTest {
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public UserDetailsServiceMock userDetailsService() {
-            return new UserDetailsServiceMock();
-        }
-
-    }
     @InjectMocks
     OrderRepository orderRepository;
 
@@ -82,30 +74,23 @@ class OrderRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void findByExternalId_FindsOrder_ReturnsOrder() throws InterruptedException {
+    void findByExternalId_FindsOrder_ReturnsOrder() {
         // Given
-        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()).and("clientId").is(user.getClientId()));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         Mono<Order> orderMono = orderRepository.findByExternalId(order.getExternalId());
-//        orderRepository.findByExternalId(order.getExternalId()).subscribe(returnedOrder -> {
-//            orderAtomicReference.set(returnedOrder);
-//            countDownLatch.countDown();
-//        });
 
         // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
-//        countDownLatch.await();
-//        assertNotNull(orderAtomicReference.get());
-//        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order.withCustomer(customer)).verifyComplete();
     }
 
     @Test
-    void findOneById_IdDoesNotExist_ReturnsNull() throws InterruptedException {
+    void findOneById_IdDoesNotExist_ReturnsNull() {
         // Given
         Query query = Query.query(Criteria.where("_id").is(order.getId()));
 
@@ -121,7 +106,6 @@ class OrderRepositoryTest {
     @Test
     void findByExternalId_ExternalIdExists_ReturnsOneOrder() {
         // Given
-        String orderExternalId = UUID.randomUUID().toString();
         Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()).and("clientId").is(user.getClientId()));
 
         // When
@@ -188,10 +172,11 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void findAll_returns2Orders() {
+    void findAll_twoOrdersMatch_returnsTwoOrders() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        Order secondOrder = order.withExternalId(externalId);
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        Order secondOrder = order.withExternalId(externalId).withCustomerId(customerId);
         List<Order> allOrders = new ArrayList<Order>() {{
             add(order);
             add(secondOrder);
@@ -199,6 +184,9 @@ class OrderRepositoryTest {
 
         //When
         when(reactiveMongoTemplate.findAll(Order.class)).thenReturn(Flux.fromIterable(allOrders));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+
         Flux<Order> orderFlux = orderRepository.find();
 
         //Then

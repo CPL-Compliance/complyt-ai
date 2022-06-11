@@ -55,11 +55,9 @@ public class OrderRepository {
     }
 
     public Flux<Order> find() {
-        return reactiveMongoTemplate
-                .findAll(Order.class).log()
-                .flatMap(order -> reactiveMongoTemplate
-                        .findById(order.getCustomerId(), Customer.class)
-                        .map(order::withCustomer).log());
+        return reactiveMongoTemplate.findAll(Order.class)
+                .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
+                        .map(order::withCustomer));
     }
 
     public Flux<Order> find(ObjectId clientId) {
