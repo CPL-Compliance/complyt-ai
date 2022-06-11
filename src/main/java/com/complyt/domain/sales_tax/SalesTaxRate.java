@@ -5,6 +5,7 @@ import lombok.*;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
+@With
 @ToString
 public class SalesTaxRate {
     private final float cityDistrictRate;

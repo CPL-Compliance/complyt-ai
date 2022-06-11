@@ -1,25 +1,16 @@
-package com.complyt.domain.sales_tax;
+package com.complyt.domain.sales_tax.zip_tax;
 
-import lombok.*;
 
-import java.util.List;
-
-@Getter
-@EqualsAndHashCode
-@ToString
-@With
-@AllArgsConstructor
-public class ZipTaxData implements SalesTaxData {
-    private String version;
-    private long rCode;
-    private List<Result> results;
-}
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-class Result {
+public class Result {
     private String geoPostalCode;
     private String geoCity;
     private String geoCounty;

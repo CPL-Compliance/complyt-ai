@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,9 @@ class ItemTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        item = new Item(2000,4,8000,"description","name","taxCode");
+        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate);
         anotherItem = item.withName("anotherName");
     }
 
