@@ -1,5 +1,6 @@
 package com.complyt.domain.security;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.bson.types.ObjectId;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Set;
 
 @Getter
+@AllArgsConstructor
 @ToString
 @Document(collection = "role")
 public class Role {

@@ -1,9 +1,6 @@
 package com.complyt.domain.security;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,6 +15,7 @@ import java.util.Set;
 @Builder
 @ToString
 @With
+@EqualsAndHashCode
 @Document(collection = "user")
 public class User implements UserDetails, CredentialsContainer {
     @Id

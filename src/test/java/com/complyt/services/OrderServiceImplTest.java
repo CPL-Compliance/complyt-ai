@@ -302,4 +302,23 @@ class OrderServiceImplTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
     }
+
+    @Test
+    void find_findsAllOrdersWithClientId_ReturnsAllOrders() {
+        // Given
+        String anotherOrderId = UUID.randomUUID().toString();
+        Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
+        List<Order> orders = new ArrayList<Order>() {{
+            add(order);
+            add(anotherOrderWithSameClientId);
+        }};
+
+        // When
+        when(orderRepository.find(order.getClientId())).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderServiceImpl.find(order.getClientId());
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
+
+    }
 }

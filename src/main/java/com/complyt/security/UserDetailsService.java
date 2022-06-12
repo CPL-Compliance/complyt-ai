@@ -11,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,13 +25,13 @@ import static java.util.stream.Collectors.toSet;
 @AllArgsConstructor
 public class UserDetailsService implements ReactiveUserDetailsService {
     @NonNull
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     @NonNull
-    private final AuthorityRepository authorityRepository;
+    private AuthorityRepository authorityRepository;
 
     @NonNull
-    private final RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Override
     public Mono<UserDetails> findByUsername(final String username) {
