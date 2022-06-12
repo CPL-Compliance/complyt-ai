@@ -215,7 +215,7 @@ class OrderControllerTest {
                 .expectStatus().isNotFound();
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void getAll_ExpectTwoOrders_ReturnsTwoOrders() {
         // Given
