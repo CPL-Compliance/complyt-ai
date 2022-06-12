@@ -34,6 +34,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
+                .csrf().disable()
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/login", "/logout", "/").permitAll()
                         .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasRole("ADMIN")
