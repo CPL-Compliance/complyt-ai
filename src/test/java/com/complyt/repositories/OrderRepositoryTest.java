@@ -59,7 +59,7 @@ class OrderRepositoryTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
-        customer = new Customer(id, externalId, "customer", shippingAddress);
+        customer = new Customer(id, externalId, "customer", shippingAddress,clientId);
     }
 
     @Test

@@ -37,12 +37,13 @@ class CustomerRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
         MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address);
+        customer = new Customer(id, externalId, name, address,clientId);
     }
 
     @Test

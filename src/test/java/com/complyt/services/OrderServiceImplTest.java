@@ -9,7 +9,6 @@ import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -314,8 +313,8 @@ class OrderServiceImplTest {
         }};
 
         // When
-        when(orderRepository.find(order.getClientId())).thenReturn(Flux.fromIterable(orders));
-        Flux<Order> orderFlux = orderServiceImpl.find(order.getClientId());
+        when(orderRepository.find()).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderServiceImpl.findAll();
 
         // Then
         StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
