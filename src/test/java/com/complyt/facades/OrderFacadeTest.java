@@ -344,4 +344,23 @@ public class OrderFacadeTest {
         StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
 
     }
+
+    @Test
+    void getAll_findsAllOrdersWithClientId_ReturnsAllOrders() {
+        // Given
+        String anotherOrderId = UUID.randomUUID().toString();
+        Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
+        List<Order> orders = new ArrayList<Order>() {{
+           add(order);
+           add(anotherOrderWithSameClientId);
+        }};
+
+        // When
+        when(orderService.find(order.getClientId())).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderFacade.getAll(order.getClientId());
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
+
+    }
 }
