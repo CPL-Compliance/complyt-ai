@@ -20,13 +20,13 @@ import java.util.Collection;
 @AllArgsConstructor
 public class AuthorityRepository {
     @NonNull
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Authority> findById(ObjectId objectId){
+    public Mono<Authority> findById(ObjectId objectId) {
         return reactiveMongoTemplate.findById(objectId, Authority.class);
     }
 
-    public Flux<Authority> find(Collection<ObjectId> objectIds){
+    public Flux<Authority> find(Collection<ObjectId> objectIds) {
         Query query = Query.query(Criteria.where("_id").in(objectIds));
         return reactiveMongoTemplate.find(query, Authority.class);
     }
