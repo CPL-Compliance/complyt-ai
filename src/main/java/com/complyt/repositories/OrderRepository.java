@@ -6,7 +6,6 @@ import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -81,17 +80,6 @@ public class OrderRepository {
                     return reactiveMongoTemplate.find(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
                                     .map(order::withCustomer));
-                });
-    }
-
-    public Flux<Order> find(ObjectId clientId) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMapMany(user -> {
-                    Query query = Query.query(Criteria.where("clientId").is(clientId)
-                            .and("clientId").is(user.getClientId()));
-
-                    return reactiveMongoTemplate.find(query, Order.class);
                 });
     }
 }
