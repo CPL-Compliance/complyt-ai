@@ -14,8 +14,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 public class UserRepository {
+
     @NonNull
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<User> findByName(String name) {
         Query query = Query.query(Criteria.where("username").is(name));
