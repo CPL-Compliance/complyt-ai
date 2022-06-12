@@ -330,11 +330,11 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void getClassification_ClassificationFound_Classification_returned(){
+    void getClassification_ClassificationFound_Classification_returned() {
         // Given
         String taxCode = "C1S1";
-        ProductClassification productClassification = new ProductClassification("id","C1S1","description",
-                "title",null);
+        ProductClassification productClassification = new ProductClassification("id", "C1S1", "description",
+                "title", null);
 
         // When
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
@@ -351,16 +351,16 @@ public class OrderFacadeTest {
         String anotherOrderId = UUID.randomUUID().toString();
         Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
         List<Order> orders = new ArrayList<Order>() {{
-           add(order);
-           add(anotherOrderWithSameClientId);
+            add(order);
+            add(anotherOrderWithSameClientId);
         }};
 
         // When
-        when(orderService.find(order.getClientId())).thenReturn(Flux.fromIterable(orders));
-        Flux<Order> orderFlux = orderFacade.getAll(order.getClientId());
+        when(orderService.findAll()).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderFacade.getAll();
 
         // Then
-        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
+        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
 
     }
 }
