@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize("hasAuthority('state.read') OR hasAuthority('customer.state.read') OR hasAuthority('user.state.read')")
-public @interface StateReadPermission { 
+public @interface StateReadPermission {
 }
