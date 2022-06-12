@@ -7,6 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('order.create')")
+@PreAuthorize("hasAuthority('order.create') OR hasAuthority('customer.order.create')")
 public @interface OrderCreatePermission {
 }
