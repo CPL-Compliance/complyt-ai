@@ -1,6 +1,5 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
@@ -44,25 +43,20 @@ public class OrderController {
     @OrderReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-//    public Flux<OrderDto> getAll(@AuthenticationPrincipal User user) {
     public Flux<OrderDto> getAll() {
         return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
-//        if (user.getClientId() != null) {
-//            return orderFacade.getAll(user.getClientId()).map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
-//        } else {
-//            return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
-//        }
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
     @OrderUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId, @RequestBody @NonNull OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
+                                                 @RequestBody @NonNull OrderDto orderDto) {
         return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-    
+
     @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
     @OrderUpdatePermission
     @PutMapping("{externalId}/salesTax")
@@ -78,8 +72,6 @@ public class OrderController {
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.markAsCancelled(externalId)
-                .map(order -> ResponseEntity.noContent().build());
+        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
     }
-
 }

@@ -1,7 +1,6 @@
 package com.complyt.v1.controllers;
 
 
-import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerCreatePermission;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
@@ -35,13 +34,9 @@ public class CustomerController {
     @CustomerUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
-            , @RequestBody @NonNull CustomerDto customerDto) {
-
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-
-        return customerfacade
-                .upsert(customer)
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId,
+                                                            @RequestBody @NonNull CustomerDto customerDto) {
+        return customerfacade.upsert(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
                 .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
@@ -59,12 +54,9 @@ public class CustomerController {
     @CustomerCreatePermission
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ResponseEntity<CustomerDto>> create(@RequestBody CustomerDto customerDto) {
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-
-        return customerfacade.save(customer)
-                .map(item -> ResponseEntity
-                        .created(URI.create(BASE_URL + "/" + item.getExternalId()))
+    public Mono<ResponseEntity<CustomerDto>> create(@NonNull @RequestBody CustomerDto customerDto) {
+        return customerfacade.save(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
+                .map(item -> ResponseEntity.created(URI.create(BASE_URL + "/" + item.getExternalId()))
                         .body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
@@ -72,9 +64,8 @@ public class CustomerController {
     @CustomerReadPermission
     @GetMapping("name/{name}")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getByName(@PathVariable("name") String name) {
-        return customerfacade
-                .findByName(name)
+    public Flux<CustomerDto> getByName(@NonNull @PathVariable("name") String name) {
+        return customerfacade.findByName(name)
                 .map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item))
                 .switchIfEmpty(Flux.error(new NotFoundException(name)));
     }
@@ -84,8 +75,6 @@ public class CustomerController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
-        Flux<Customer> customers = customerfacade.getAllCustomers();
-
-        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
+        return customerfacade.getAllCustomers().map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 }

@@ -1,6 +1,7 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.facades.StateFacade;
+import com.complyt.security.permissions.state.StateReadPermission;
 import com.complyt.v1.mappers.StateMapper;
 import com.complyt.v1.model.StateDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,9 +24,10 @@ public class StateController {
     private final StateFacade stateFacade;
 
     @Operation(summary = "Gets state by name")
+    @StateReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<StateDto>> getState(@RequestParam String name) {
+    public Mono<ResponseEntity<StateDto>> getState(@NonNull @RequestParam String name) {
         return stateFacade.findByName(name)
                 .map(customerItem -> new ResponseEntity<>(StateMapper.INSTANCE.stateToStateDto(customerItem), HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND))
