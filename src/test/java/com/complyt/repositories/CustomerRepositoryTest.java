@@ -50,7 +50,7 @@ class CustomerRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address,clientId);
+        customer = new Customer(id, externalId, name, address, clientId);
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
@@ -246,5 +246,38 @@ class CustomerRepositoryTest {
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findByExternalId_IdExists_ReturnsCustomer() {
+        // Given
+        Query query = Query.query(Criteria.where("_id").is(customer.getId())
+                .and("clientId").is(user.getClientId()));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
+
+        Mono<Customer> customerMono = customerRepository.findById(customer.getId());
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findByExternalId_IdNotExists_ReturnsEmpty() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        Query query = Query.query(Criteria.where("_id").is(id)
+                .and("clientId").is(user.getClientId()));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.empty());
+
+        Mono<Customer> customerMono = customerRepository.findById(id);
+
+        // Then
+        StepVerifier.create(customerMono).expectNextCount(0).verifyComplete();
     }
 }

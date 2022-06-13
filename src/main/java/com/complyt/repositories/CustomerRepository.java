@@ -74,7 +74,8 @@ public class CustomerRepository {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
-                    Query query = Query.query(Criteria.where("externalId").is(externalId));
+                    Query query = Query.query(Criteria.where("externalId").is(externalId)
+                            .and("clientId").is(user.getClientId()));
 
                     return reactiveMongoTemplate.findOne(query, Customer.class);
                 });
