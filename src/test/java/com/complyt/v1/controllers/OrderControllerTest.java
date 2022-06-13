@@ -84,7 +84,7 @@ class OrderControllerTest {
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
@@ -99,7 +99,7 @@ class OrderControllerTest {
         assertEquals(nullPointerException.getMessage(), "orderFacade is marked non-null but is null");
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void update_NewOrderCreated_SavesOrder() {
         // Given
@@ -121,7 +121,7 @@ class OrderControllerTest {
                 .value(orderDtoItem -> orderDtoItem, equalTo(orderDto));
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void update_UpdateFails_Returns5xxServerError() {
         // Given
@@ -246,7 +246,7 @@ class OrderControllerTest {
                 .value(orderDtos -> orderDtos, equalTo(allOrdersWithNoId));
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
         // Given
@@ -269,7 +269,7 @@ class OrderControllerTest {
 
     }
 
-    @WithUserDetails("user")
+    @WithUserDetails()
     @Test
     void markAsCancelled_CancelsOrder_OrderStatusChanges() {
         // Given
