@@ -252,13 +252,13 @@ class CustomerRepositoryTest {
     @Test
     void findByExternalId_IdExists_ReturnsCustomer() {
         // Given
-        Query query = Query.query(Criteria.where("_id").is(customer.getId())
+        Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId())
                 .and("clientId").is(user.getClientId()));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
 
-        Mono<Customer> customerMono = customerRepository.findById(customer.getId());
+        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId());
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
@@ -269,13 +269,13 @@ class CustomerRepositoryTest {
     void findByExternalId_IdNotExists_ReturnsEmpty() {
         // Given
         String id = UUID.randomUUID().toString();
-        Query query = Query.query(Criteria.where("_id").is(id)
+        Query query = Query.query(Criteria.where("externalId").is(id)
                 .and("clientId").is(user.getClientId()));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.empty());
 
-        Mono<Customer> customerMono = customerRepository.findById(id);
+        Mono<Customer> customerMono = customerRepository.findByExternalId(id);
 
         // Then
         StepVerifier.create(customerMono).expectNextCount(0).verifyComplete();
