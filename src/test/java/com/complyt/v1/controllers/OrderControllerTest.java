@@ -13,7 +13,6 @@ import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,8 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -43,8 +41,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest(OrderController.class)
 @ExtendWith(MockitoExtension.class)
 @Import(JacksonConfig.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@WithMockUser(username = "mock", password = "mock")
 class OrderControllerTest {
 
     @MockBean
@@ -63,6 +59,7 @@ class OrderControllerTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
+        ObjectId clientId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -73,10 +70,21 @@ class OrderControllerTest {
             }
         };
 
-        orderWithId = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        orderWithId = Order.builder()
+                .id(id)
+                .externalId(externalId)
+                .items(items)
+                .billingAddress(billingAddress)
+                .shippingAddress(shippingAddress)
+                .customerId(customerId)
+                .orderStatus(OrderStatus.ACTIVE)
+                .clientId(clientId)
+                .build();
+
         orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
     }
 
+    @WithUserDetails()
     @Test
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
@@ -85,25 +93,25 @@ class OrderControllerTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderController controller = new OrderController(facade);
+            new OrderController(facade);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderFacade is marked non-null but is null");
     }
 
+    @WithUserDetails()
     @Test
     void update_NewOrderCreated_SavesOrder() {
         // Given
-        Order orderNoId = orderWithId.withId(null);
-        String externalId = orderNoId.getExternalId();
-        when(orderFacade.upsert(externalId, orderNoId)).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.upsert(orderDto.getExternalId(), OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
+                .thenReturn(Mono.just(orderWithId));
 
         // When + Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + externalId)
+                        .path(OrderController.BASE_URL + "/" + orderDto.getExternalId())
                         .build())
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -113,6 +121,7 @@ class OrderControllerTest {
                 .value(orderDtoItem -> orderDtoItem, equalTo(orderDto));
     }
 
+    @WithUserDetails()
     @Test
     void update_UpdateFails_Returns5xxServerError() {
         // Given
@@ -132,6 +141,7 @@ class OrderControllerTest {
                 .expectStatus().is5xxServerError();
     }
 
+    @WithUserDetails()
     @Test
     void getOne_FindsOrder_ReturnsOrder() {
         // Given
@@ -151,6 +161,7 @@ class OrderControllerTest {
                 .value(orderItem -> orderItem, equalTo(orderDto));
     }
 
+    @WithUserDetails()
     @Test
     void getOne_NullExternalIdGiven_InternalServerError() {
         // Given
@@ -167,6 +178,7 @@ class OrderControllerTest {
                 .expectStatus().is5xxServerError();
     }
 
+    @WithUserDetails()
     @Test
     void update_NullExternalIdGiven_InternalServerError() {
         // Given
@@ -185,6 +197,7 @@ class OrderControllerTest {
                 .expectStatus().is5xxServerError();
     }
 
+    @WithUserDetails()
     @Test
     void getOne_OperationFails_Returns4xxNotFound() {
         // Given
@@ -202,6 +215,7 @@ class OrderControllerTest {
                 .expectStatus().isNotFound();
     }
 
+    @WithUserDetails()
     @Test
     void getAll_ExpectTwoOrders_ReturnsTwoOrders() {
         // Given
@@ -232,6 +246,7 @@ class OrderControllerTest {
                 .value(orderDtos -> orderDtos, equalTo(allOrdersWithNoId));
     }
 
+    @WithUserDetails()
     @Test
     void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
         // Given
@@ -254,6 +269,7 @@ class OrderControllerTest {
 
     }
 
+    @WithUserDetails()
     @Test
     void markAsCancelled_CancelsOrder_OrderStatusChanges() {
         // Given
@@ -270,7 +286,5 @@ class OrderControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNoContent();
-
     }
 }
-

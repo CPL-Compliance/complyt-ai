@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Customer;
+import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,36 +22,73 @@ public class CustomerRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Flux<Customer> findByName(@NonNull String name) {
-        Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMapMany(user -> {
+                    Query query = Query.query(Criteria.where("name").regex("^" + name, "i")
+                            .and("clientId").is(user.getClientId()));
 
-        return reactiveMongoTemplate.find(query, Customer.class);
+                    return reactiveMongoTemplate.find(query, Customer.class);
+                });
     }
 
     public Mono<Customer> findOneByName(@NonNull String name) {
-        Query query = Query.query(Criteria.where("name").is("^" + name));
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> {
+                    Query query = Query.query(Criteria.where("name").is("^" + name)
+                            .and("clientId").is(user.getClientId()));
 
-        return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                });
     }
 
     public Flux<Customer> findAll() {
-        return reactiveMongoTemplate.findAll(Customer.class);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMapMany(user -> {
+                    Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+
+                    return reactiveMongoTemplate.find(query, Customer.class);
+                });
     }
 
     public Mono<Customer> save(@NonNull Customer customer) {
-        return reactiveMongoTemplate.save(customer);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> reactiveMongoTemplate.save(customer.withClientId(user.getClientId())));
     }
 
     public Mono<Customer> findById(String id) {
-        return reactiveMongoTemplate.findById(id, Customer.class);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> {
+                    Query query = Query.query(Criteria.where("_id").is(id)
+                            .and("clientId").is(user.getClientId()));
+
+                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                });
     }
 
     public Mono<Customer> findByExternalId(String externalId) {
-        Query query = Query.query(Criteria.where("externalId").is(externalId));
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> {
+                    Query query = Query.query(Criteria.where("externalId").is(externalId)
+                            .and("clientId").is(user.getClientId()));
 
-        return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                });
     }
 
-    public Mono<Customer> findById(ObjectId upsertedId) {
-        return reactiveMongoTemplate.findById(upsertedId, Customer.class);
+    public Mono<Customer> findById(ObjectId id) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> {
+                    Query query = Query.query(Criteria.where("_id").is(id)
+                            .and("clientId").is(user.getClientId()));
+
+                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                });
     }
 }

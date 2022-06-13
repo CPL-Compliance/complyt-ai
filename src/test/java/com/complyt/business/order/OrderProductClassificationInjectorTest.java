@@ -32,6 +32,7 @@ public class OrderProductClassificationInjectorTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
+        ObjectId clientId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -42,7 +43,16 @@ public class OrderProductClassificationInjectorTest {
             }
         };
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        order = Order.builder()
+                .id(id)
+                .externalId(externalId)
+                .items(items)
+                .billingAddress(billingAddress)
+                .shippingAddress(shippingAddress)
+                .clientId(customerId)
+                .orderStatus(OrderStatus.ACTIVE)
+                .clientId(clientId)
+                .build();
     }
 
     @Test

@@ -9,10 +9,10 @@ import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderServiceImplTest {
 
     @InjectMocks
@@ -43,11 +42,13 @@ class OrderServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -56,7 +57,7 @@ class OrderServiceImplTest {
             }
         };
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
     }
 
     @Test
@@ -162,7 +163,7 @@ class OrderServiceImplTest {
         Order secondOrder = order.withExternalId(externalId);
 
         //When
-        when(orderRepository.findAll()).thenReturn(Flux.just(order, secondOrder));
+        when(orderRepository.find()).thenReturn(Flux.just(order, secondOrder));
         Flux<Order> orderFlux = orderServiceImpl.findAll();
 
         //Then
@@ -299,5 +300,24 @@ class OrderServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
+    }
+
+    @Test
+    void find_findsAllOrdersWithClientId_ReturnsAllOrders() {
+        // Given
+        String anotherOrderId = UUID.randomUUID().toString();
+        Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
+        List<Order> orders = new ArrayList<Order>() {{
+            add(order);
+            add(anotherOrderWithSameClientId);
+        }};
+
+        // When
+        when(orderRepository.find()).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderServiceImpl.findAll();
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
+
     }
 }

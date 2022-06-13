@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Function;
 
-
 @Component
 @AllArgsConstructor
 @Slf4j
@@ -100,5 +99,4 @@ public class OrderFacade {
     public Mono<Order> markAsCancelled(String orderId) {
         return orderService.markAsCancelled(orderId);
     }
-
 }

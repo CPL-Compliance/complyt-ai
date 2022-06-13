@@ -53,11 +53,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-            <version>${spring-boot-starter-data-mongodb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <version>${spring-boot-dev-tools.version}</version>
         </dependency>
@@ -126,6 +121,11 @@
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring-boot-starter-security.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.security</groupId>-->
+<!--            <artifactId>spring-security-data</artifactId>-->
+<!--            <version>5.6.3</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
