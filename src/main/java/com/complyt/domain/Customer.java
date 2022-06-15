@@ -1,6 +1,7 @@
 package com.complyt.domain;
 
 import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,4 +17,5 @@ public class Customer {
     private final String externalId;
     private final String name;
     private final Address address;
+    private final ObjectId clientId;
 }

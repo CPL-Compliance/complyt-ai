@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class OrderMapperTest {
 
     @Test
@@ -24,6 +22,7 @@ class OrderMapperTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode",
@@ -32,7 +31,7 @@ class OrderMapperTest {
             }
         };
 
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId,null, OrderStatus.ACTIVE);
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId);
         OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
 
     }

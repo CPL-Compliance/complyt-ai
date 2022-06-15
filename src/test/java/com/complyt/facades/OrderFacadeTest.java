@@ -16,7 +16,6 @@ import com.complyt.services.SalesTaxService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OrderFacadeTest {
 
     @InjectMocks
@@ -62,10 +60,11 @@ public class OrderFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
+        ObjectId clientId = new ObjectId();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null
-                ));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        ));
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
     }
 
     @Test
@@ -77,7 +76,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
+            new OrderFacade(orderService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
@@ -92,7 +91,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
+            new OrderFacade(orderService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
@@ -184,7 +183,7 @@ public class OrderFacadeTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.upsert(nullExternalId,order);
+            orderFacade.upsert(nullExternalId, order);
         });
 
         // Then
@@ -193,14 +192,14 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void update_NullExternalIdGiven_ThrowsException(){
+    void update_NullExternalIdGiven_ThrowsException() {
         // Given
         String externalId = null;
 
         // When + Then
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.update(externalId,order);
+            orderFacade.update(externalId, order);
         });
 
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
@@ -270,17 +269,17 @@ public class OrderFacadeTest {
         // Given
         String externalId = order.getExternalId();
         FastTaxData fastTaxData = new FastTaxData();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f,0.1f,0.1f,0.1f,0.1f,0.5f);
-        SalesTax salesTax = new SalesTax(1000,salesTaxRate);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
         String taxCode = "C1S1";
 
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                order.getShippingAddress().getState(),true,false, CalculationType.FIXED,"description",0);
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
+                order.getShippingAddress().getState(), true, false, CalculationType.FIXED, "description", 0);
+        Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String, JurisdictionalSalesTaxRules>() {{
+            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
-        ProductClassification productClassification = new ProductClassification("id",taxCode,"description",
-                "title",jurisdictionalSalesTaxRulesList);
+        ProductClassification productClassification = new ProductClassification("id", taxCode, "description",
+                "title", jurisdictionalSalesTaxRulesList);
 
         Item itemWithRule = order.getItems().get(0).withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
         List<Item> itemsWithRules = new ArrayList<Item>() {{
@@ -303,7 +302,7 @@ public class OrderFacadeTest {
 
         when(salesTaxService.salesTaxDataToSalesTaxRate(fastTaxData)).thenReturn(salesTaxRate);
 
-        when(salesTaxService.setSalesTaxRatesForItems(itemsWithRules,salesTaxRate)).thenReturn(itemsWithRates);
+        when(salesTaxService.setSalesTaxRatesForItems(itemsWithRules, salesTaxRate)).thenReturn(itemsWithRates);
 
         when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
 
@@ -313,7 +312,6 @@ public class OrderFacadeTest {
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
-
     }
 
     @Test
@@ -332,11 +330,11 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void getClassification_ClassificationFound_Classification_returned(){
+    void getClassification_ClassificationFound_Classification_returned() {
         // Given
         String taxCode = "C1S1";
-        ProductClassification productClassification = new ProductClassification("id","C1S1","description",
-                "title",null);
+        ProductClassification productClassification = new ProductClassification("id", "C1S1", "description",
+                "title", null);
 
         // When
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
@@ -344,6 +342,25 @@ public class OrderFacadeTest {
 
         // Then
         StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+
+    }
+
+    @Test
+    void getAll_findsAllOrdersWithClientId_ReturnsAllOrders() {
+        // Given
+        String anotherOrderId = UUID.randomUUID().toString();
+        Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
+        List<Order> orders = new ArrayList<Order>() {{
+            add(order);
+            add(anotherOrderWithSameClientId);
+        }};
+
+        // When
+        when(orderService.findAll()).thenReturn(Flux.fromIterable(orders));
+        Flux<Order> orderFlux = orderFacade.getAll();
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
 
     }
 }

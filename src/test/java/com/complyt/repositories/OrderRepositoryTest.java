@@ -1,10 +1,9 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.config.SecurityConfigMockTest;
+import com.complyt.domain.*;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.security.User;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,14 +24,14 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
+@Import(SecurityConfigMockTest.class)
 class OrderRepositoryTest {
     @InjectMocks
     OrderRepository orderRepository;
@@ -40,8 +41,15 @@ class OrderRepositoryTest {
 
     Order order;
 
+    Customer customer;
+
+    User user;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
+        ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
+        user = User.builder().username("user").password("password").clientId(clientId).build();
+
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
@@ -49,9 +57,9 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, OrderStatus.ACTIVE);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        customer = new Customer(id, externalId, "customer", shippingAddress,clientId);
     }
 
     @Test
@@ -67,61 +75,56 @@ class OrderRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void findByExternalIdSync_FindsOrder_ReturnsOrder() throws InterruptedException {
+    void findByExternalId_FindsOrder_ReturnsOrder() {
         // Given
-        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()));
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()).and("clientId").is(user.getClientId()));
 
         // When
         when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
-        orderRepository.findByExternalId(order.getExternalId()).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        Mono<Order> orderMono = orderRepository.findByExternalId(order.getExternalId());
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order.withCustomer(customer)).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void save() {
-    }
-
-    @Test
-    void findOneById_IdDoesNotExist_ReturnsNull() throws InterruptedException {
+    void findOneById_IdDoesNotExist_ReturnsNull() {
         // Given
-        Query query = Query.query(Criteria.where("_id").is(order.getId()));
+        Query query = Query.query(Criteria.where("_id").is(order.getId())
+                .and("clientId").is(user.getClientId()));
 
         // When
-        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.empty());
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         Mono<Order> orderMono = orderRepository.findById(order.getId());
 
         // Then
-        StepVerifier.create(orderMono).expectNextCount(0).verifyComplete();
+        StepVerifier.create(orderMono).expectNext(order.withCustomer(customer)).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void findByExternalId_ExternalIdExists_ReturnsOneOrder() throws InterruptedException {
+    void findByExternalId_ExternalIdExists_ReturnsOneOrder() {
         // Given
-        String orderExternalId = UUID.randomUUID().toString();
-        Query query = Query.query(Criteria.where("externalId").is(orderExternalId));
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        Query query = Query.query(Criteria.where("externalId").is(order.getExternalId()).and("clientId").is(user.getClientId()));
 
         // When
-        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order.withExternalId(orderExternalId)));
-        Mono<Order> orderMono = orderRepository.findByExternalId(orderExternalId);
+        when(reactiveMongoTemplate.findOne(query, Order.class)).thenReturn(Mono.just(order));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+
+        Mono<Order> orderMono = orderRepository.findByExternalId(order.getExternalId());
 
         // Then
-        StepVerifier.create(orderMono).expectNextCount(1).verifyComplete();
+        StepVerifier.create(orderMono).expectNext(order.withCustomer(customer)).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void insertAll_Inserts2Orders_Returns2Orders() {
+    void insertAll_InsertsTwoOrders_ReturnsTwoOrders() {
         // Given
         String id = UUID.randomUUID().toString();
         Order secondOrder = order.withExternalId(id);
@@ -131,31 +134,28 @@ class OrderRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.insertAll(allOrders)).thenReturn(Flux.fromIterable(allOrders));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(),Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(),Customer.class)).thenReturn(Mono.just(customer));
         Flux<Order> orderFlux = orderRepository.saveAll(allOrders);
 
         // Then
         StepVerifier.create(orderFlux).expectNextCount(2).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void saveOrder_OrderSaved_OrderReturned() throws InterruptedException {
         // Given
         String id = UUID.randomUUID().toString();
-        Order newOrder = order.withExternalId(id);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        Order newOrder = order.withExternalId(id).withCustomer(customer);
 
         // When
         when(reactiveMongoTemplate.save(order)).thenReturn(Mono.just(newOrder));
-        orderRepository.save(order).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        when(reactiveMongoTemplate.findById(newOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        Mono<Order> orderMono = orderRepository.save(order);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(newOrder, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(newOrder).verifyComplete();
     }
 
     @Test
@@ -173,22 +173,28 @@ class OrderRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void findAll_returns2Orders() {
+    void findAll_twoOrdersMatch_returnsTwoOrders() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        Order secondOrder = order.withExternalId(externalId);
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        Order secondOrder = order.withExternalId(externalId).withCustomerId(customerId);
         List<Order> allOrders = new ArrayList<Order>() {{
             add(order);
             add(secondOrder);
         }};
+        Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
         //When
-        when(reactiveMongoTemplate.findAll(Order.class)).thenReturn(Flux.fromIterable(allOrders));
-        Flux<Order> orderFlux = orderRepository.findAll();
+        when(reactiveMongoTemplate.find(query, Order.class)).thenReturn(Flux.fromIterable(allOrders));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+
+        Flux<Order> orderFlux = orderRepository.find();
 
         //Then
-        StepVerifier.create(orderFlux).expectNextCount(2).verifyComplete();
+        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrder.withCustomer(customer)).verifyComplete();
     }
 
     @Test
