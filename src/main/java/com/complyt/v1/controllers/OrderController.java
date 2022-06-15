@@ -1,7 +1,9 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.facades.OrderFacade;
+import com.complyt.security.permissions.order.OrderDeletePermission;
+import com.complyt.security.permissions.order.OrderReadPermission;
+import com.complyt.security.permissions.order.OrderUpdatePermission;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +30,7 @@ public class OrderController {
     private final OrderFacade orderFacade;
 
     @Operation(summary = "Gets order by externalId")
+    @OrderReadPermission
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
@@ -37,6 +40,7 @@ public class OrderController {
     }
 
     @Operation(summary = "Gets all orders")
+    @OrderReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
@@ -44,14 +48,17 @@ public class OrderController {
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
+    @OrderUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId, @RequestBody @NonNull OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
+                                                 @RequestBody @NonNull OrderDto orderDto) {
         return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-    
+
     @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
+    @OrderUpdatePermission
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
@@ -61,11 +68,10 @@ public class OrderController {
     }
 
     @Operation(summary = "Marks the order as cancelled")
+    @OrderDeletePermission
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.markAsCancelled(externalId)
-                .map(order -> ResponseEntity.noContent().build());
+        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
     }
-
 }

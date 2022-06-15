@@ -37,13 +37,14 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WithMockUser(username = "mock", password = "mock")
 class CustomerControllerTest {
-
     @MockBean
     private CustomerFacade customerFacade;
+
     @Autowired
     private WebTestClient webTestClient;
 
     Customer customer;
+
     CustomerDto customerDto;
 
     @BeforeAll

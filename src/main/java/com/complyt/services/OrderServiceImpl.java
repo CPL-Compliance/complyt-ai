@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Flux<Order> findAll() {
-        return orderRepository.findAll();
+        return orderRepository.find();
     }
 
     @Override

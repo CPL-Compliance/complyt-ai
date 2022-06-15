@@ -1,8 +1,10 @@
 package com.complyt.v1.controllers;
 
 
-import com.complyt.domain.Customer;
 import com.complyt.facades.CustomerFacade;
+import com.complyt.security.permissions.customer.CustomerCreatePermission;
+import com.complyt.security.permissions.customer.CustomerReadPermission;
+import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,19 +31,17 @@ public class CustomerController {
     private final CustomerFacade customerfacade;
 
     @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
+    @CustomerUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId
-            , @RequestBody @NonNull CustomerDto customerDto) {
-
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-
-        return customerfacade
-                .upsert(customer)
+    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId,
+                                                            @RequestBody @NonNull CustomerDto customerDto) {
+        return customerfacade.upsert(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
                 .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets customer by externalId")
+    @CustomerReadPermission
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
@@ -51,33 +51,30 @@ public class CustomerController {
     }
 
     @Operation(summary = "This will create a customer")
+    @CustomerCreatePermission
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ResponseEntity<CustomerDto>> create(@RequestBody CustomerDto customerDto) {
-        Customer customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-
-        return customerfacade.save(customer)
-                .map(item -> ResponseEntity
-                        .created(URI.create(BASE_URL + "/" + item.getExternalId()))
+    public Mono<ResponseEntity<CustomerDto>> create(@NonNull @RequestBody CustomerDto customerDto) {
+        return customerfacade.save(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
+                .map(item -> ResponseEntity.created(URI.create(BASE_URL + "/" + item.getExternalId()))
                         .body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
     }
 
     @Operation(summary = "Gets all matching customers by name")
+    @CustomerReadPermission
     @GetMapping("name/{name}")
     @ResponseStatus(HttpStatus.OK)
-    public Flux<CustomerDto> getByName(@PathVariable("name") String name) {
-        return customerfacade
-                .findByName(name)
+    public Flux<CustomerDto> getByName(@NonNull @PathVariable("name") String name) {
+        return customerfacade.findByName(name)
                 .map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item))
                 .switchIfEmpty(Flux.error(new NotFoundException(name)));
     }
 
     @Operation(summary = "Gets all the customers")
+    @CustomerReadPermission
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
-        Flux<Customer> customers = customerfacade.getAllCustomers();
-
-        return customers.map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
+        return customerfacade.getAllCustomers().map(item -> CustomerMapper.INSTANCE.customerToCustomerDto(item));
     }
 }
