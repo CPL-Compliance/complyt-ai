@@ -12,10 +12,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -27,9 +24,10 @@ public class SecurityConfig {
     @Bean
     UserDetailsService userDetailsService(UserRepository userRepository,
                                           AuthorityRepository authorityRepository,
-                                          RoleRepository roleRepository){
+                                          RoleRepository roleRepository) {
         return new UserDetailsService(userRepository, authorityRepository, roleRepository);
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
