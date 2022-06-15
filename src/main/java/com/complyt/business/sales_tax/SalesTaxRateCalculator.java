@@ -20,7 +20,7 @@ public class SalesTaxRateCalculator {
      * @param originalSalesTaxRate - Sales tax rate given by external resource for the current order's address
      * @return
      */
-    public SalesTaxRate calculateSalesTaxRate(@NonNull final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull final SalesTaxRate originalSalesTaxRate) {
+    public SalesTaxRate calculateSalesTaxRate(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
             log.info("None taxable rule - setting sales tax rate to 0");
             return new SalesTaxRate(0, 0, 0, 0, 0, 0);
