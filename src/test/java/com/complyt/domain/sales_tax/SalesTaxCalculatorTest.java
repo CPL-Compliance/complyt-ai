@@ -28,8 +28,8 @@ public class SalesTaxCalculatorTest {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         List<Item> items = new ArrayList<Item>(){{
-                add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate));
-                add(new Item(3000,3,9000,"description","name","taxCode",null, salesTaxRate));
+                add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,false,0));
+                add(new Item(3000,3,9000,"description","name","taxCode",null, salesTaxRate,false,0));
         }};
         float amount = 0;
 

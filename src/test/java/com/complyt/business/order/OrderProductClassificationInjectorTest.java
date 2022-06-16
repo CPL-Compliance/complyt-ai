@@ -38,7 +38,7 @@ public class OrderProductClassificationInjectorTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f)
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
                 ));
             }
         };
@@ -58,9 +58,9 @@ public class OrderProductClassificationInjectorTest {
     @Test
     void testAct() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null,null);
+                null,null,false,0);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
-                null,null);
+                null,null,false,0);
         List<Item> itemsNoRules = new ArrayList<Item>(){{
             add(item1NoRule);
             add(item2NoRule);

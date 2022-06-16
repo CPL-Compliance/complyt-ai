@@ -11,7 +11,10 @@ public class SalesTaxCalculator {
     public float calculate(List<Item> items){
 
         Optional<Float> amount = items.stream()
-                .map(item -> item.getSalesTaxRate().getTaxRate() * item.getUnitPrice() * item.getQuantity())
+                .map(item -> {
+                    float salesTaxRate = item.isManualSalesTax() ? item.getManualSalesTaxRate() : item.getSalesTaxRate().getTaxRate();
+                    return salesTaxRate * item.getUnitPrice() * item.getQuantity();
+                })
                 .reduce(Float::sum);
 
         return amount.get();

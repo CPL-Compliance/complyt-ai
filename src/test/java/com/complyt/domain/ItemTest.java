@@ -21,7 +21,7 @@ class ItemTest {
         String name = "Existing Customer";
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate);
+        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate,false,0);
         anotherItem = item.withName("anotherName");
     }
 
