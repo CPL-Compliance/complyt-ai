@@ -1,16 +1,13 @@
 package com.complyt.domain.sales_tax.product_classification;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 @With
 @ToString
-public class JurisdictionalSalesTaxRules {
+public class CitySalesTaxRules {
     private final String name;
     private final String abbreviation;
     private final boolean taxable;
@@ -18,5 +15,4 @@ public class JurisdictionalSalesTaxRules {
     private final CalculationType calculationType;
     private final String description;
     private final float calculationValue;
-    private final Map<String,CitySalesTaxRules> cities;
 }

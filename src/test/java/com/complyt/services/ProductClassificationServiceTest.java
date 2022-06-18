@@ -41,7 +41,7 @@ public class ProductClassificationServiceTest {
     @BeforeEach
     void setUp(){
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                "CA",true,false, CalculationType.FIXED,"description",0);
+                "CA",true,false, CalculationType.FIXED,"description",0,null);
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
