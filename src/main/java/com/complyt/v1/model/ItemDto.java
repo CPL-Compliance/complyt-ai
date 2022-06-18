@@ -18,6 +18,6 @@ public class ItemDto {
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRateDto salesTaxRate;
-    private boolean isManualSalesTax;
+    private boolean manualSalesTax;
     private float manualSalesTaxRate;
 }

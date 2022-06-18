@@ -18,6 +18,6 @@ public class Item {
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRate salesTaxRate;
-    private boolean isManualSalesTax;
+    private boolean manualSalesTax;
     private float manualSalesTaxRate;
 }
