@@ -66,9 +66,9 @@ public class OrderProductClassificationInjectorTest {
             add(item2NoRule);
         }};
         JurisdictionalSalesTaxRules rule1 = new JurisdictionalSalesTaxRules("rule1","CA",true,false,
-                CalculationType.FIXED,"rule1",0);
+                CalculationType.FIXED,"rule1",0,null);
         JurisdictionalSalesTaxRules rule2 = new JurisdictionalSalesTaxRules("rule2","CA",true,false,
-                CalculationType.FIXED,"rule2",0);
+                CalculationType.FIXED,"rule2",0,null);
 
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(rule1.getAbbreviation(),rule1);

@@ -29,7 +29,7 @@ public class JurisdictionalSalesTaxControllerTest {
         jurisdictionalSalesTaxController = new SalesTaxRateCalculator();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
                 "California","CA", true,true, CalculationType.FIXED,
-                "description",0.07f);
+                "description",0.07f,null);
     }
 
     @Test
