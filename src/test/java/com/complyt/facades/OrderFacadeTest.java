@@ -274,7 +274,7 @@ public class OrderFacadeTest {
         String taxCode = "C1S1";
 
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                order.getShippingAddress().getState(), true, false, CalculationType.FIXED, "description", 0);
+                order.getShippingAddress().getState(), true, false, CalculationType.FIXED, "description", 0,null);
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String, JurisdictionalSalesTaxRules>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
