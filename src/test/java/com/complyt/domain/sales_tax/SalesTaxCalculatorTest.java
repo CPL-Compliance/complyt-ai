@@ -45,4 +45,22 @@ public class SalesTaxCalculatorTest {
 
     }
 
+    @Test
+    void calculate_OrderComesWithItemWithManualSalesTax_SalesTaxAmountReturned(){
+        // Given
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
+        List<Item> items = new ArrayList<Item>(){{
+            add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,true,0.5f));
+        }};
+        float amount = items.get(0).getTotalPrice() * 0.5f;
+
+        // When
+        SalesTax salesTax = new SalesTax(amount,salesTaxRate);
+        float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
+
+        // Then
+        assertEquals(salesTax.getAmount(),salesTaxAmountReturnedFromCalculation);
+
+    }
+
 }
