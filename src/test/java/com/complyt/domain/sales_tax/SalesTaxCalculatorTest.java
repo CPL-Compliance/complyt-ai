@@ -37,11 +37,11 @@ public class SalesTaxCalculatorTest {
         for(Item item : items){
             amount += salesTaxRate.getTaxRate() * item.getUnitPrice() * item.getQuantity();
         }
-        SalesTax salesTax = new SalesTax(amount,salesTaxRate);
+
         float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
 
         // Then
-        assertEquals(salesTax.getAmount(),salesTaxAmountReturnedFromCalculation);
+        assertEquals(amount,salesTaxAmountReturnedFromCalculation);
 
     }
 
@@ -55,11 +55,10 @@ public class SalesTaxCalculatorTest {
         float amount = items.get(0).getTotalPrice() * 0.5f;
 
         // When
-        SalesTax salesTax = new SalesTax(amount,salesTaxRate);
         float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
 
         // Then
-        assertEquals(salesTax.getAmount(),salesTaxAmountReturnedFromCalculation);
+        assertEquals(amount,salesTaxAmountReturnedFromCalculation);
 
     }
 
