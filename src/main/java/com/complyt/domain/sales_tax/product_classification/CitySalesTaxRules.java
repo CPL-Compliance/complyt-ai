@@ -5,7 +5,6 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-@With
 @ToString
 public class CitySalesTaxRules {
     private final String name;
