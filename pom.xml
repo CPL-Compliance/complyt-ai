@@ -21,7 +21,7 @@
         <lombok.version>1.18.24</lombok.version>
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
-        <spring-boot.version>2.6.7</spring-boot.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
         <mockito-junit-jupiter.version>4.5.1</mockito-junit-jupiter.version>
         <jUnit.version>4.13.2</jUnit.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
