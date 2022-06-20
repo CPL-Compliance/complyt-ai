@@ -20,4 +20,8 @@ public class Item {
     private SalesTaxRate salesTaxRate;
     private boolean manualSalesTax;
     private float manualSalesTaxRate;
+
+    public float getManualSalesTaxAmount(){
+        return manualSalesTaxRate * totalPrice;
+    }
 }
