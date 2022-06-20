@@ -8,8 +8,7 @@ import java.util.Optional;
 
 @Component
 public class SalesTaxCalculator {
-    public float calculate(List<Item> items){
-
+    public float calculate(List<Item> items) {
         Optional<Float> amount = items.stream()
                 .map(item -> {
                     float salesTaxRate = item.isManualSalesTax() ? item.getManualSalesTaxRate() : item.getSalesTaxRate().getTaxRate();
