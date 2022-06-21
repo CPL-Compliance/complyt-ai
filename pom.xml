@@ -22,7 +22,7 @@
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
         <spring-boot.version>2.7.0</spring-boot.version>
-        <mockito-junit-jupiter.version>4.5.1</mockito-junit-jupiter.version>
+        <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
         <jUnit.version>4.13.2</jUnit.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
