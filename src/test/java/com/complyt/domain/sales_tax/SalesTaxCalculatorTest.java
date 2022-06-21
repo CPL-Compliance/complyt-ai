@@ -2,6 +2,8 @@ package com.complyt.domain.sales_tax;
 
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.Item;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,15 +29,17 @@ public class SalesTaxCalculatorTest {
     void calculate_SalesTaxBeingCalculated_SalesTaxAmountReturned(){
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California","CA",true,false,
+                CalculationType.FIXED,"description",0f,null);
         List<Item> items = new ArrayList<Item>(){{
-                add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,false,0));
-                add(new Item(3000,3,9000,"description","name","taxCode",null, salesTaxRate,false,0));
+                add(new Item(1000,2,2000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0));
+                add(new Item(3000,3,9000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0));
         }};
         float amount = 0;
 
         // When
         for(Item item : items){
-            amount += salesTaxRate.getTaxRate() * item.getUnitPrice() * item.getQuantity();
+            amount += salesTaxRate.getTaxRate() * item.getTotalPrice();
         }
 
         float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
