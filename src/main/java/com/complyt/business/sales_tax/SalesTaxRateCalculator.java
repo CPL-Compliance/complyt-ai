@@ -46,11 +46,4 @@ public class SalesTaxRateCalculator {
         return calculatedRate;
     }
 
-//    private SalesTaxRate modifyRateByPercentageTreatment(float jurisdictionalRuleCalculationValue, SalesTaxRate salesTaxRate) {
-//        float newStateRate = salesTaxRate.getStateRate() * jurisdictionalRuleCalculationValue;
-//        float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + newStateRate;
-//        SalesTaxRate calculatedRate = salesTaxRate.withStateRate(newStateRate).withTaxRate(newTaxRate);
-//        log.info("Sales tax rate after percentage modification : " + calculatedRate);
-//        return calculatedRate;
-//    }
 }
