@@ -83,15 +83,14 @@ public class SalesTaxCalculatorTest {
             add(new Item(1000,2,2000,"description","name","taxCode",
                     jurisdictionalSalesTaxRulesByPercentage, salesTaxRate,false,0.5f));
         }};
-        float totalPrice = items.get(0).getTotalPrice() * jurisdictionalSalesTaxRulesByPercentage.getCalculationValue();
-        float amount = totalPrice * items.get(0).getSalesTaxRate().getTaxRate();
+        float partialTotalPrice = items.get(0).getTotalPrice() * jurisdictionalSalesTaxRulesByPercentage.getCalculationValue();
+        float amount = partialTotalPrice * items.get(0).getSalesTaxRate().getTaxRate();
 
         // When
         float salesTaxAmountReturnedFromCalculation = salesTaxCalculator.calculate(items);
 
         // Then
         assertEquals(amount,salesTaxAmountReturnedFromCalculation);
-
     }
 
 }
