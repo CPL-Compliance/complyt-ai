@@ -1,7 +1,6 @@
 package com.complyt.domain.sales_tax.product_classification;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.util.Map;
 
@@ -19,4 +18,8 @@ public class JurisdictionalSalesTaxRules {
     private final String description;
     private final float calculationValue;
     private final Map<String,CitySalesTaxRules> cities;
+
+    public boolean isCalculatedByPercentage(){
+        return taxable && specialTreatment && calculationType == CalculationType.PERCENTAGE;
+    }
 }

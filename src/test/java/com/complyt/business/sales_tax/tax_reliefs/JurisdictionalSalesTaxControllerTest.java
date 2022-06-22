@@ -70,11 +70,10 @@ public class JurisdictionalSalesTaxControllerTest {
         // Given
         float newStateRate = salesTaxRateByService.getStateRate() * jurisdictionalSalesTaxRules.getCalculationValue();
         float newTaxRate = salesTaxRateByService.getTaxRate() - salesTaxRateByService.getStateRate() + newStateRate;
-        SalesTaxRate expectedSalesTaxRate = salesTaxRateByService.withTaxRate(newTaxRate).withStateRate(newStateRate);
         JurisdictionalSalesTaxRules precentageCalculationTypeRule = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
 
         // When + Then
         SalesTaxRate returnedRate = jurisdictionalSalesTaxController.calculateSalesTaxRate(precentageCalculationTypeRule, salesTaxRateByService);
-        Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
+        Assertions.assertEquals(salesTaxRateByService, returnedRate);
     }
 }

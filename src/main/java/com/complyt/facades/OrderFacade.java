@@ -77,7 +77,7 @@ public class OrderFacade {
                 .map(salesTaxData -> salesTaxService.salesTaxDataToSalesTaxRate(salesTaxData))
                 .map(injectSalesTaxToOrder(order));
     }
-
+    
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
         return salesTaxRate -> {
             log.info("Setting sales tax rates for order's items");

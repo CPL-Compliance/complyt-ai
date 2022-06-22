@@ -62,7 +62,7 @@ public class OrderFacadeTest {
         List<Item> items = new ArrayList<>();
         ObjectId clientId = new ObjectId();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null
+                null, null,false,0
         ));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
     }
