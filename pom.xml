@@ -135,7 +135,7 @@
                 <configuration>
                     <!--For Linux users us the tag below-->
                     <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
-                    <dockerHost>unix:///var/run/docker.sock</dockerHost>
+<!--                    <dockerHost>unix:///var/run/docker.sock</dockerHost>-->
                     <verbose>true</verbose>
                     <images>
                         <image>
