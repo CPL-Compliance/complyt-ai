@@ -21,21 +21,22 @@ public class SalesTaxRateCalculator {
      */
     public SalesTaxRate calculateSalesTaxRate(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
-            log.info("None taxable rule - setting sales tax rate to 0");
+            log.info("None taxable rule - returning sales tax rate that is set to 0");
             return new SalesTaxRate(0, 0, 0, 0, 0, 0);
         }
 
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
-            log.info("None special treatment for rule - setting sales tax rate to original rate");
+            log.info("None special treatment for rule - returning original sales tax rate");
             return originalSalesTaxRate;
         }
 
         if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
-            log.info("setting sales tax rate to fixed rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
+            log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.getCalculationValue());
             return modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
         }
-        log.info("setting sales tax rate to percentage rate with calculation value of " + jurisdictionalSalesTaxRules.getCalculationValue());
-        return modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+
+        log.info("Calculation type is percentage - returning original sales tax rate");
+        return originalSalesTaxRate;
     }
 
     private SalesTaxRate modifyRateByFixedTreatment(float jurisdictionalRuleStateRate, SalesTaxRate salesTaxRate) {
@@ -45,11 +46,4 @@ public class SalesTaxRateCalculator {
         return calculatedRate;
     }
 
-    private SalesTaxRate modifyRateByPercentageTreatment(float jurisdictionalRuleCalculationValue, SalesTaxRate salesTaxRate) {
-        float newStateRate = salesTaxRate.getStateRate() * jurisdictionalRuleCalculationValue;
-        float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + newStateRate;
-        SalesTaxRate calculatedRate = salesTaxRate.withStateRate(newStateRate).withTaxRate(newTaxRate);
-        log.info("Sales tax rate after percentage modification : " + calculatedRate);
-        return calculatedRate;
-    }
 }

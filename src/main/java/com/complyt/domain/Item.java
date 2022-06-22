@@ -18,4 +18,10 @@ public class Item {
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRate salesTaxRate;
+    private boolean manualSalesTax;
+    private float manualSalesTaxRate;
+
+    public float getManualSalesTaxAmount(){
+        return manualSalesTaxRate * totalPrice;
+    }
 }
