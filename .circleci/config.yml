@@ -56,6 +56,11 @@ jobs:
     # working_directory: ~/repo
     steps:
       - checkout
+      - run: mvn dependency:go-offline
+      - restore_cache:
+          keys:
+            - hello-spring-mvn-V2-{{ checksum "pom.xml" }}
+            - hello-spring-mvn-V2
       - run: mkdir ~/.m2
       - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
       - run: echo "****************************************************"
@@ -65,4 +70,4 @@ jobs:
       - run: cat ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
-          command: ./mvnw clean package docker:build docker:push
+          command: ./mvnw compile clean package docker:build docker:push
