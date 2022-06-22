@@ -54,14 +54,10 @@ jobs:
     machine:
         image: "ubuntu-2004:current"
         docker_layer_caching: true
-    working_directory: ~/repo
+    # working_directory: ~/repo
     steps:
       - checkout
       - run: mvn dependency:go-offline
-      # - restore_cache:
-      #     keys:
-      #       - hello-spring-mvn-V2-{{ checksum "pom.xml" }}
-      #       - hello-spring-mvn-V2
       - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
       - run: echo "<settingsSecurity><master>${maven_security_master}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
