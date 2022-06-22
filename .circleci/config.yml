@@ -61,13 +61,8 @@ jobs:
           keys:
             - hello-spring-mvn-V2-{{ checksum "pom.xml" }}
             - hello-spring-mvn-V2
-      # - run: mkdir ~/.m2
       - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
-      - run: echo "****************************************************"
-      - run: cat ~/.m2/settings.xml
       - run: echo "<settingsSecurity><master>${maven_security_master}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-      - run: echo "#####################################################"
-      - run: cat ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
           command: ./mvnw compile clean package docker:build docker:push
