@@ -53,7 +53,7 @@ jobs:
   publish-docker:
     docker:
       - image: cimg/openjdk:11.0
-    # working_directory: ~/repo
+    working_directory: ~/repo
     steps:
       - checkout
       - run: mvn dependency:go-offline
@@ -61,7 +61,7 @@ jobs:
           keys:
             - hello-spring-mvn-V2-{{ checksum "pom.xml" }}
             - hello-spring-mvn-V2
-      - run: mkdir ~/.m2
+      # - run: mkdir ~/.m2
       - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
       - run: echo "****************************************************"
       - run: cat ~/.m2/settings.xml
