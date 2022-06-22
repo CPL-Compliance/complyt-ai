@@ -2,12 +2,15 @@ version: 2.1
 
 workflows:
   version: 2
-  build-test:
+  build-test-deploy:
     jobs:
       - build
       - test:
           requires:
           - build
+      - publish-docker:
+          requires:
+            - test
 
 orbs:
   codecov: codecov/codecov@3.0.0
