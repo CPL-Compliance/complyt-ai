@@ -1,8 +1,17 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - build
+      - test:
+          requires:
+          - build
+
 orbs:
   codecov: codecov/codecov@3.0.0
   docker: circleci/docker@1.5.0
-
-version: 2.1
 
 
 jobs:
@@ -39,12 +48,3 @@ jobs:
       - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
-
-workflows:
-  version: 2
-  build-test:
-    jobs:
-      - build
-      - test:
-          requires:
-          - build
