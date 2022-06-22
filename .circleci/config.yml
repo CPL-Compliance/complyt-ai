@@ -52,7 +52,7 @@ jobs:
 
   publish-docker:
     docker:
-      - image: cimg/openjdk:8-jdk-browsers
+      - image: cimg/openjdk:
     working_directory: ~/repo
     steps:
       - checkout
@@ -61,4 +61,4 @@ jobs:
       - run: echo "<settingsSecurity><master>${maven_security_master}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
-          command: mvn clean package docker:build docker:push
+          command: ./mvnw clean package docker:build docker:push
