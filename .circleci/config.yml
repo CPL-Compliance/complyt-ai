@@ -58,7 +58,8 @@ jobs:
     steps:
       - checkout
       - run: mvn dependency:go-offline
-      - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
+      # - run: cp .mvn/wrapper/settings.xml ~/.m2/settings.xml
+      - run: echo "<?xml version="1.0" encoding="UTF-8"?><settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>{c4uq99arEgYHM2Vp/lBL7oX+oUkkHAmObYffPNUtZ2w=}</password></server></servers></settings>" > ~/.m2/settings.xml
       - run: echo "<settingsSecurity><master>${maven_security_master}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
