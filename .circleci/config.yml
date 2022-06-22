@@ -30,11 +30,8 @@ jobs:
             - .
 
   test:
-      machine:
-        image: "ubuntu-2004:current"
-        docker_layer_caching: true
-      # docker: 
-      #   - image: cimg/openjdk:11.0
+      docker: 
+        - image: cimg/openjdk:11.0
       steps:
       - attach_workspace:
           at: .
@@ -54,8 +51,11 @@ jobs:
             token: CODECOV_TOKEN
 
   publish-docker:
-    docker:
-      - image: cimg/openjdk:11.0
+    machine:
+        image: "ubuntu-2004:current"
+        docker_layer_caching: true
+    # docker:
+    #   - image: cimg/openjdk:11.0
     working_directory: ~/repo
     steps:
       - checkout
