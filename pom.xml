@@ -133,6 +133,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.40.1</version>
                 <configuration>
+                    <!--For Linux users us the tag below-->
                     <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
                     <dockerHost>unix:///var/run/docker.sock</dockerHost>
                     <verbose>true</verbose>
@@ -150,6 +151,15 @@
                                     <tag>${project.version}</tag>
                                 </tags>
                             </build>
+                            <run>
+                                <env>
+                                    <MONGODB_USER>complyt_app</MONGODB_USER>
+                                    <MONGODB_PASSWORD>d4GVyPYBMEDfJgKp</MONGODB_PASSWORD>
+                                </env>
+                                <ports>
+                                    <port>9898:9898</port>
+                                </ports>
+                            </run>
                         </image>
                     </images>
                 </configuration>

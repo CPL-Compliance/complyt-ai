@@ -1,6 +1,4 @@
 FROM openjdk
-ENV MONGODB_USER=complyt_app
-ENV MONGODB_PASSWORD=d4GVyPYBMEDfJgKp
 VOLUME /tmp
 
 ADD maven/${fileName}.jar ${fileName}.jar
