@@ -37,6 +37,17 @@ jobs:
       - codecov/upload:
             file: '/target/jacoco-reports/jacoco.xml'
             token: CODECOV_TOKEN
+  
+  deploy:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy to Docker Hub
+          command: mvn docker:deploy
+
 
 workflows:
   build-test:
@@ -45,3 +56,6 @@ workflows:
       - test:
           requires:
           - build
+  deploy-to-docker-hub:
+    jobs:
+      - deploy
