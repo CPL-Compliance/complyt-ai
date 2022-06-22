@@ -66,4 +66,4 @@ jobs:
       - run: echo "<settingsSecurity><master>${maven_security_master}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
-          command: mvn docker:build docker:push
+          command: mvn clean package docker:build docker:push
