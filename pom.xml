@@ -14,7 +14,7 @@
     <name>complyt</name>
     <description>Complyt</description>
     <properties>
-        <docker.image.prefix>shaolinrabbi</docker.image.prefix>
+        <docker.image.prefix>complyt</docker.image.prefix>
         <docker.image.name>complyt</docker.image.name>
         <maven.test.skip>false</maven.test.skip>
         <mapstruct.version>1.5.1.Final</mapstruct.version>
