@@ -8,7 +8,7 @@ workflows:
       - test:
           requires:
           - build
-      - publish-docker:
+      - publish-docker
           # requires:
           #   - test
 
