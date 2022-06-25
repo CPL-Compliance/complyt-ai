@@ -156,7 +156,7 @@
                                     <!--suppress UnresolvedMavenProperty -->
                                     <MONGODB_USER>${env.MONGODB_USER}</MONGODB_USER>
                                     <!--suppress UnresolvedMavenProperty -->
-                                    <MONGODB_PASSWORD>${MONGODB_PASSWORD}</MONGODB_PASSWORD>
+                                    <MONGODB_PASSWORD>${env.MONGODB_PASSWORD}</MONGODB_PASSWORD>
                                 </env>
                                 <ports>
                                     <port>9898:9898</port>
