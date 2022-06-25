@@ -63,6 +63,9 @@ jobs:
       - run: mvn dependency:go-offline
       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
       - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+      - run: |
+          echo 'export MONGODB_USER=${MONGODB_USERNAME}' >> $BASH_ENV
+          echo 'export MONGODB_PASSWORD=${MONGODB_PASSWORD}' >> $BASH_ENV
       - run:
           name: Publish Docker image with Fabric8
           command: mvn clean package docker:build docker:push
