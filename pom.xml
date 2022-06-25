@@ -142,7 +142,7 @@
                             <name>${docker.image.prefix}/${docker.image.name}</name>
                             <build>
                                 <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
-                                <!--copies artficact to docker build dir in target-->
+                                <!--copies artficact to docker build directory in target-->
                                 <assembly>
                                     <descriptorRef>artifact</descriptorRef>
                                 </assembly>
@@ -153,8 +153,10 @@
                             </build>
                             <run>
                                 <env>
-                                    <MONGODB_USER>complyt_app</MONGODB_USER>
-                                    <MONGODB_PASSWORD>d4GVyPYBMEDfJgKp</MONGODB_PASSWORD>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <MONGODB_USER>${env.MONGODB_USER}</MONGODB_USER>
+                                    <!--suppress UnresolvedMavenProperty -->
+                                    <MONGODB_PASSWORD>${MONGODB_PASSWORD}</MONGODB_PASSWORD>
                                 </env>
                                 <ports>
                                     <port>9898:9898</port>
