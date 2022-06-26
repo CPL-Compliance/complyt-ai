@@ -153,10 +153,8 @@
                             </build>
                             <run>
                                 <env>
-                                    <!--suppress UnresolvedMavenProperty -->
-                                    <MONGODB_USER>${env.MONGODB_USER}</MONGODB_USER>
-                                    <!--suppress UnresolvedMavenProperty -->
-                                    <MONGODB_PASSWORD>${env.MONGODB_PASSWORD}</MONGODB_PASSWORD>
+                                    <MONGODB_USER>complyt_app</MONGODB_USER>
+                                    <MONGODB_PASSWORD>d4GVyPYBMEDfJgKp</MONGODB_PASSWORD>
                                 </env>
                                 <ports>
                                     <port>9898:9898</port>
