@@ -14,6 +14,7 @@ import java.util.List;
 @With
 @Schema(name = "Order")
 public class OrderDto {
+    private String id;
     private String externalId;
     private List<ItemDto> items;
     private AddressDto billingAddress;
