@@ -1,5 +1,6 @@
 package com.complyt.repositories.security;
 
+import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.security.Role;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -19,7 +20,7 @@ import java.util.Set;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@Import(SecurityConfigMockTest.class)
 public class RoleRepositoryTest {
 
     @InjectMocks
