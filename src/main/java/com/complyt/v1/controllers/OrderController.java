@@ -61,8 +61,9 @@ public class OrderController {
     @OrderUpdatePermission
     @PutMapping("{externalId}/salesTax")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.updateSalesTax(externalId)
+    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId,
+                                                         @RequestBody @NonNull OrderDto orderDto) {
+        return orderFacade.updateSalesTax(externalId,OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }

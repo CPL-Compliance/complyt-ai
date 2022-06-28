@@ -194,22 +194,22 @@ class OrderControllerTest {
     @Test
     void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
         // Given
-        String externalId = UUID.randomUUID().toString();
-        Order order = orderWithId.withExternalId(externalId);
+        Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
         // When + Then
-        when(orderFacade.updateSalesTax(orderWithId.getExternalId())).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.updateSalesTax(order.getExternalId(),order)).thenReturn(Mono.just(orderWithId));
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
+                        .path(OrderController.BASE_URL + "/" + order.getExternalId() + "/salesTax")
                         .build())
+                .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(OrderDto.class)
-                .value(orderDto -> orderDto, equalTo(orderDto));
+                .value(returnedOrderDto -> returnedOrderDto, equalTo(orderDto));
 
     }
 

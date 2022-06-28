@@ -56,13 +56,14 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> updateSalesTax(String externalId) {
-        return orderService
-                .findByExternalId(externalId)
-                .map(OrderProductClassificationInjector::new)
-                .flatMap(injectRulesToOrderItems())
-                .flatMap(setSalesTaxToOrder())
-                .flatMap(order -> orderService.update(externalId, order));
+    public Mono<Order> updateSalesTax(String externalId,Order order) {
+            OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+
+            return injectRulesToOrderItems()
+                    .apply(orderProductClassificationInjector)
+                    .flatMap(setSalesTaxToOrder())
+                    .flatMap(updatedOrder -> orderService.upsert(externalId, updatedOrder));
+
     }
 
     private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
