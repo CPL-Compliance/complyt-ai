@@ -5,9 +5,12 @@ workflows:
   build-test-deploy:
     jobs:
       - build
-      - test:
+      - unit-test:
           requires:
-          - build
+            - build
+      - integration-test:
+          requires:
+            - build
       - publish-docker:
 #          filters:
 #            branches:
@@ -27,13 +30,24 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: mvn -B -DskipTests clean package
+          command: ./mvnw -B -DskipTests clean package
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  test:
+  integration-test:
+    machine:
+      image: "ubuntu-2004:current"
+        docker_layer_caching: true
+      steps:
+        - attach_workspace:
+            at: .
+        - run:
+            name: Integration Test
+            command: ./mvnw verify
+
+  unit-test:
       docker: 
         - image: cimg/openjdk:11.0
       steps:
@@ -41,7 +55,7 @@ jobs:
           at: .
       - run:
           name: Test
-          command: mvn test
+          command: ./mvnw test
       - run:
             name: Save test results
             command: |
@@ -60,9 +74,9 @@ jobs:
         docker_layer_caching: true
     steps:
       - checkout
-      - run: mvn dependency:go-offline
+      - run: ./mvnw dependency:go-offline
       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
       - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Publish Docker image with Fabric8
-          command: mvn clean package docker:build docker:push
+          command: ./mvnw clean package docker:build docker:push
