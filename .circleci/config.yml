@@ -17,7 +17,8 @@ workflows:
 #              only:
 #                - main
           requires:
-            - test
+            - unit-test
+            - integration-test
 
 orbs:
   codecov: codecov/codecov@3.0.0
@@ -40,7 +41,7 @@ jobs:
     machine:
         image: "ubuntu-2004:current"
         docker_layer_caching: true
-      steps:
+    steps:
         - attach_workspace:
             at: .
         - run:
