@@ -62,7 +62,7 @@ public class OrderFacade {
             return injectRulesToOrderItems()
                     .apply(orderProductClassificationInjector)
                     .flatMap(setSalesTaxToOrder())
-                    .flatMap(updatedOrder -> orderService.save(updatedOrder));
+                    .flatMap(this::save);
 
     }
 
