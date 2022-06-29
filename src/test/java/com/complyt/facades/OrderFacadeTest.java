@@ -307,7 +307,7 @@ public class OrderFacadeTest {
 
         when(orderService.upsert(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
-        Mono<Order> orderMono = orderFacade.updateSalesTax(externalId,order);
+        Mono<Order> orderMono = orderFacade.setSalesTax(externalId,order);
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();

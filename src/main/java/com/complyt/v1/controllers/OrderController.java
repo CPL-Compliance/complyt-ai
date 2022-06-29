@@ -53,19 +53,19 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
                                                  @RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+        return orderFacade.update(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
 
-    @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
+    @Operation(summary = "This will create a new order with sales tax calculated in it")
     @OrderUpdatePermission
-    @PutMapping("{externalId}/salesTax")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId,
-                                                         @RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.updateSalesTax(externalId,OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+    public Mono<ResponseEntity<OrderDto>> create(@RequestBody @NonNull OrderDto orderDto) {
+        return orderFacade.findByExternalId(orderDto.getExternalId())
+                .switchIfEmpty(orderFacade.setSalesTax(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
-                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+                .switchIfEmpty(Mono.error(new NotFoundException(orderDto.getExternalId())));
     }
 
     @Operation(summary = "Marks the order as cancelled")

@@ -56,13 +56,13 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> updateSalesTax(String externalId,Order order) {
+    public Mono<Order> setSalesTax(String externalId, Order order) {
             OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
 
             return injectRulesToOrderItems()
                     .apply(orderProductClassificationInjector)
                     .flatMap(setSalesTaxToOrder())
-                    .flatMap(updatedOrder -> orderService.upsert(externalId, updatedOrder));
+                    .flatMap(updatedOrder -> orderService.save(updatedOrder));
 
     }
 

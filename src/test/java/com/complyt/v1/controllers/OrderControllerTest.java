@@ -7,7 +7,6 @@ import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.OrderFacade;
-import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.OrderMapper;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
@@ -197,7 +196,7 @@ class OrderControllerTest {
         Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
         // When + Then
-        when(orderFacade.updateSalesTax(order.getExternalId(),order)).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.setSalesTax(order.getExternalId(),order)).thenReturn(Mono.just(orderWithId));
         webTestClient
                 .mutateWith(csrf())
                 .put()
