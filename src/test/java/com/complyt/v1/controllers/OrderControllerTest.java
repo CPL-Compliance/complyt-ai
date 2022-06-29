@@ -102,7 +102,7 @@ class OrderControllerTest {
     @Test
     void update_NewOrderCreated_SavesOrder() {
         // Given
-        when(orderFacade.upsert(orderDto.getExternalId(), OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
+        when(orderFacade.update(orderDto.getExternalId(), OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
                 .thenReturn(Mono.just(orderWithId));
 
         // When + Then
@@ -196,12 +196,13 @@ class OrderControllerTest {
         Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
         // When + Then
+        when(orderFacade.findByExternalId(order.getExternalId())).thenReturn(Mono.just(orderWithId));
         when(orderFacade.setSalesTax(order.getExternalId(),order)).thenReturn(Mono.just(orderWithId));
         webTestClient
                 .mutateWith(csrf())
-                .put()
+                .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + order.getExternalId() + "/salesTax")
+                        .path(OrderController.BASE_URL)
                         .build())
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)

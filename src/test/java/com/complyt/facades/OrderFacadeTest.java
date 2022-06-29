@@ -305,7 +305,7 @@ public class OrderFacadeTest {
 
         when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
 
-        when(orderService.upsert(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
+        when(orderService.save(orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
         Mono<Order> orderMono = orderFacade.setSalesTax(externalId,order);
 

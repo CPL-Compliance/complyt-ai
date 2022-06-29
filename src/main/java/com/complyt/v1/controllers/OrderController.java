@@ -56,7 +56,7 @@ public class OrderController {
         return orderFacade.update(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-
+    
     @Operation(summary = "This will create a new order with sales tax calculated in it")
     @OrderUpdatePermission
     @PostMapping("")
