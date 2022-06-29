@@ -2,7 +2,6 @@ package com.complyt.facades;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
-import com.complyt.domain.Order;
 import com.complyt.services.CustomerService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;

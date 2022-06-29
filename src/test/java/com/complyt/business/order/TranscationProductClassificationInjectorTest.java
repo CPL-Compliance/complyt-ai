@@ -1,9 +1,10 @@
 package com.complyt.business.order;
 
+import com.complyt.business.transaction.TransactionProductClassificationInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -23,9 +24,9 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class OrderProductClassificationInjectorTest {
+public class TranscationProductClassificationInjectorTest {
 
-    Order order;
+    Transaction order;
 
     @BeforeEach
     void setUp() {
@@ -43,14 +44,14 @@ public class OrderProductClassificationInjectorTest {
             }
         };
 
-        order = Order.builder()
+        order = Transaction.builder()
                 .id(id)
                 .externalId(externalId)
                 .items(items)
                 .billingAddress(billingAddress)
                 .shippingAddress(shippingAddress)
                 .clientId(customerId)
-                .orderStatus(OrderStatus.ACTIVE)
+                .transactionStatus(TransactionStatus.ACTIVE)
                 .clientId(clientId)
                 .build();
     }
@@ -91,12 +92,12 @@ public class OrderProductClassificationInjectorTest {
             add(item2WithRule);
         }};
 
-        Order order2 = order.withItems(itemsNoRules);
-        OrderProductClassificationInjector orderProductClassificationInjector2 = new OrderProductClassificationInjector(order2);
+        Transaction order2 = order.withItems(itemsNoRules);
+        TransactionProductClassificationInjector orderProductClassificationInjector2 = new TransactionProductClassificationInjector(order2);
 
-        Order newOrder = order.withItems(itemsWithRules);
+        Transaction newOrder = order.withItems(itemsWithRules);
 
-        Mono<Order> orderMono = orderProductClassificationInjector2.act(productClassifications);
+        Mono<Transaction> orderMono = orderProductClassificationInjector2.act(productClassifications);
 
         StepVerifier.create(orderMono).expectNext(newOrder).verifyComplete();
 

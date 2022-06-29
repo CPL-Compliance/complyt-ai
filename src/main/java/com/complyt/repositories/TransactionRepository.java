@@ -1,7 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Customer;
-import com.complyt.domain.Order;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,43 +20,43 @@ import java.util.stream.Collectors;
 @Repository
 @Slf4j
 @AllArgsConstructor
-public class OrderRepository {
+public class TransactionRepository {
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Order> save(@NonNull Order order) {
+    public Mono<Transaction> save(@NonNull Transaction transaction) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMap(user -> reactiveMongoTemplate.save(order.withClientId(user.getClientId()))
-                        .flatMap(savedOrder -> reactiveMongoTemplate.findById(savedOrder.getCustomerId(), Customer.class)
-                                .map(savedOrder::withCustomer)));
+                .flatMap(user -> reactiveMongoTemplate.save(transaction.withClientId(user.getClientId()))
+                        .flatMap(savedTransaction -> reactiveMongoTemplate.findById(savedTransaction.getCustomerId(), Customer.class)
+                                .map(savedTransaction::withCustomer)));
     }
 
-    public Flux<Order> saveAll(List<Order> orders) {
+    public Flux<Transaction> saveAll(List<Transaction> transactions) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .map(user -> orders.stream().map(order -> order.withClientId(user.getClientId())).collect(Collectors.toList()))
-                .flatMapMany(ordersWithClientId -> reactiveMongoTemplate.insertAll(ordersWithClientId)
-                        .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
-                                .map(order::withCustomer)));
+                .map(user -> transactions.stream().map(transaction -> transaction.withClientId(user.getClientId())).collect(Collectors.toList()))
+                .flatMapMany(transactionsWithClientId -> reactiveMongoTemplate.insertAll(transactionsWithClientId)
+                        .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
+                                .map(transaction::withCustomer)));
     }
 
-    public Mono<Order> findById(@NonNull String orderId) {
+    public Mono<Transaction> findById(@NonNull String transactionId) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
-                    Query query = Query.query(Criteria.where("_id").is(orderId)
+                    Query query = Query.query(Criteria.where("_id").is(transactionId)
                             .and("clientId").is(user.getClientId()));
 
                     return reactiveMongoTemplate
-                            .findOne(query, Order.class)
-                            .flatMap(order -> reactiveMongoTemplate
-                                    .findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer));
+                            .findOne(query, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate
+                                    .findById(transaction.getCustomerId(), Customer.class)
+                                    .map(transaction::withCustomer));
                 });
     }
 
-    public Mono<Order> findByExternalId(String externalId) {
+    public Mono<Transaction> findByExternalId(String externalId) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
@@ -64,22 +64,22 @@ public class OrderRepository {
                             .and("clientId").is(user.getClientId()));
 
                     return reactiveMongoTemplate
-                            .findOne(query, Order.class)
-                            .flatMap(order -> reactiveMongoTemplate
-                                    .findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer));
+                            .findOne(query, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate
+                                    .findById(transaction.getCustomerId(), Customer.class)
+                                    .map(transaction::withCustomer));
                 });
     }
 
-    public Flux<Order> find() {
+    public Flux<Transaction> find() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
-                    return reactiveMongoTemplate.find(query, Order.class)
-                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer));
+                    return reactiveMongoTemplate.find(query, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
+                                    .map(transaction::withCustomer));
                 });
     }
 }

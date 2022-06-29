@@ -1,6 +1,6 @@
 package com.complyt.domain;
 
-public enum OrderStatus {
+public enum TransactionStatus {
     ACTIVE,
     CANCELLED
 }

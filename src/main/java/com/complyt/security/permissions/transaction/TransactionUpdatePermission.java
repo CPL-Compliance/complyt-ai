@@ -1,4 +1,4 @@
-package com.complyt.security.permissions.order;
+package com.complyt.security.permissions.transaction;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize("hasAuthority('order.update') OR hasAuthority('customer.order.update')")
-public @interface OrderUpdatePermission {
+public @interface TransactionUpdatePermission {
 }

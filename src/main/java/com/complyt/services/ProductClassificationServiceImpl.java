@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.domain.Order;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;
@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -21,27 +19,27 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     private ProductClassificationRepository productClassificationRepository;
 
     @Override
-    public Mono<Order> save(Order object) {
+    public Mono<Transaction> save(Transaction object) {
         throw new UnsupportedOperationException("save isn't implemented");
     }
 
     @Override
-    public Mono<Order> findOneByName(@NonNull String name) {
+    public Mono<Transaction> findOneByName(@NonNull String name) {
         throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     @Override
-    public Flux<Order> findByName(@NonNull String name) {
+    public Flux<Transaction> findByName(@NonNull String name) {
         throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     @Override
-    public Mono<Order> findById(@NonNull String id) {
+    public Mono<Transaction> findById(@NonNull String id) {
         throw new UnsupportedOperationException("findById isn't implemented");
     }
 
     @Override
-    public Flux<Order> findAll() {
+    public Flux<Transaction> findAll() {
         throw new UnsupportedOperationException("findAll isn't implemented");
     }
 

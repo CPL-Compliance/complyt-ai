@@ -14,8 +14,8 @@ import java.util.List;
 @With
 @ToString
 @Builder
-@Document(collection = "order")
-public class Order {
+@Document(collection = "transaction")
+public class Transaction {
     @Id
     private String id;
     private String externalId;
@@ -25,6 +25,6 @@ public class Order {
     private ObjectId customerId;
     private Customer customer;
     private SalesTax salesTax;
-    private OrderStatus orderStatus;
+    private TransactionStatus transactionStatus;
     private ObjectId clientId;
 }

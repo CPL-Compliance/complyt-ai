@@ -2,10 +2,10 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.v1.model.OrderDto;
+import com.complyt.v1.model.TransactionDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-class OrderMapperTest {
+class TransactionMapperTest {
 
     @Test
-    void orderDtoToOrder() {
+    void transactionDtoToTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -31,16 +31,16 @@ class OrderMapperTest {
             }
         };
 
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId);
-        OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, clientId);
+        TransactionDto transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
     }
 
     @Test
-    void orderToOrderDto() {
+    void transactionToTransactionDto() {
     }
 
     @Test
-    void testOrderToOrderDto() {
+    void testTransactionToTransactionDto() {
     }
 }

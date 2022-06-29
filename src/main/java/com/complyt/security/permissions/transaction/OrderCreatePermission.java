@@ -1,4 +1,4 @@
-package com.complyt.security.permissions.order;
+package com.complyt.security.permissions.transaction;
 
 
 import org.springframework.security.access.prepost.PreAuthorize;

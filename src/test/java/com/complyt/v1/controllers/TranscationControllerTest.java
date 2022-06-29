@@ -3,13 +3,12 @@ package com.complyt.v1.controllers;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.facades.OrderFacade;
-import com.complyt.repositories.exceptions.OperationFailedException;
-import com.complyt.v1.mappers.OrderMapper;
-import com.complyt.v1.model.OrderDto;
+import com.complyt.facades.TransactionFacade;
+import com.complyt.v1.mappers.TransactionMapper;
+import com.complyt.v1.model.TransactionDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,20 +37,20 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(OrderController.class)
+@WebFluxTest(TransactionController.class)
 @ExtendWith(MockitoExtension.class)
 @Import(JacksonConfig.class)
-class OrderControllerTest {
+class TransactionControllerTest {
 
     @MockBean
-    private OrderFacade orderFacade;
+    private TransactionFacade transactionFacade;
 
     @Autowired
     private WebTestClient webTestClient;
 
-    Order orderWithId;
+    Transaction transactionWithId;
 
-    OrderDto orderDto;
+    TransactionDto transactionDto;
 
     @BeforeEach
     void cleanUp() {
@@ -70,75 +69,75 @@ class OrderControllerTest {
             }
         };
 
-        orderWithId = Order.builder()
+        transactionWithId = Transaction.builder()
                 .id(id)
                 .externalId(externalId)
                 .items(items)
                 .billingAddress(billingAddress)
                 .shippingAddress(shippingAddress)
                 .customerId(customerId)
-                .orderStatus(OrderStatus.ACTIVE)
+                .transactionStatus(TransactionStatus.ACTIVE)
                 .clientId(clientId)
                 .build();
 
-        orderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
+        transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithId);
     }
 
     @WithUserDetails()
     @Test
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
-        OrderFacade facade = null;
+        TransactionFacade facade = null;
         // When
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new OrderController(facade);
+            new TransactionController(facade);
         });
 
-        assertEquals(nullPointerException.getMessage(), "orderFacade is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transactionFacade is marked non-null but is null");
     }
 
     @WithUserDetails()
     @Test
-    void update_NewOrderCreated_SavesOrder() {
+    void update_NewTransactionCreated_SavesTransaction() {
         // Given
-        when(orderFacade.upsert(orderDto.getExternalId(), OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
-                .thenReturn(Mono.just(orderWithId));
+        when(transactionFacade.upsert(transactionDto.getExternalId(), TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)))
+                .thenReturn(Mono.just(transactionWithId));
 
         // When + Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + orderDto.getExternalId())
+                        .path(TransactionController.BASE_URL + "/" + transactionDto.getExternalId())
                         .build())
-                .bodyValue(orderDto)
+                .bodyValue(transactionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(OrderDto.class)
-                .value(orderDtoItem -> orderDtoItem, equalTo(orderDto));
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(transactionDto));
     }
 
     @WithUserDetails()
     @Test
-    void getOne_FindsOrder_ReturnsOrder() {
+    void getOne_FindsTransactionWithId_ReturnsTransactionWithId() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
+        when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.just(transactionWithId));
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + externalId)
+                        .path(TransactionController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(OrderDto.class)
-                .value(orderItem -> orderItem, equalTo(orderDto));
+                .expectBody(TransactionDto.class)
+                .value(transactionItem -> transactionItem, equalTo(transactionDto));
     }
 
     @WithUserDetails()
@@ -146,13 +145,13 @@ class OrderControllerTest {
     void getOne_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + externalId)
+                        .path(TransactionController.BASE_URL + "/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -161,71 +160,72 @@ class OrderControllerTest {
 
     @WithUserDetails()
     @Test
-    void getAll_ExpectTwoOrders_ReturnsTwoOrders() {
+    void getAll_ExpectTwoTransactions_ReturnsTwoTransactions() {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
-        OrderDto orderNoId = orderDto.withExternalId(firstId);
-        OrderDto secondOrderNoId = orderDto.withExternalId(secondId);
-        Order firstOrder = orderWithId.withExternalId(firstId);
-        Order secondOrder = orderWithId.withExternalId(secondId);
-        List<OrderDto> allOrdersWithNoId = new ArrayList<OrderDto>() {{
-            add(orderNoId);
-            add(secondOrderNoId);
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transactionWithId.withExternalId(firstId);
+        Transaction secondTransaction = transactionWithId.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<TransactionDto>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
         }};
 
         // When
-        when(orderFacade.getAll()).thenReturn(Flux.just(firstOrder, secondOrder));
+        when(transactionFacade.getAll()).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
         // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL)
+                        .path(TransactionController.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(OrderDto.class)
-                .value(orderDtos -> orderDtos, equalTo(allOrdersWithNoId));
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
     }
 
     @WithUserDetails()
     @Test
-    void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
+    void updateSalesTax_UpdatesTransaction_ReturnsStatus200() {
         // Given
-        String externalId = UUID.randomUUID().toString();
-        Order order = orderWithId.withExternalId(externalId);
+        Transaction transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        TransactionDto returnedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
         // When + Then
-        when(orderFacade.updateSalesTax(orderWithId.getExternalId())).thenReturn(Mono.just(orderWithId));
+        when(transactionFacade.upsert(transactionDto.getExternalId(),transaction)).thenReturn(Mono.just(transactionWithId));
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId() + "/salesTax")
+                        .path(TransactionController.BASE_URL + "/" + transactionDto.getExternalId())
                         .build())
+                .bodyValue(transactionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(OrderDto.class)
-                .value(orderDto -> orderDto, equalTo(orderDto));
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> transactionDto, equalTo(returnedTransactionDto));
 
     }
 
     @WithUserDetails()
     @Test
-    void markAsCancelled_CancelsOrder_OrderStatusChanges() {
+    void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
         // Given
-        Order cancelledOrdered = orderWithId.withOrderStatus(OrderStatus.CANCELLED);
+        Transaction cancelledTransaction = transactionWithId.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When + Then
-        when(orderFacade.markAsCancelled(orderWithId.getExternalId())).thenReturn(Mono.just(cancelledOrdered));
+        when(transactionFacade.markAsCancelled(transactionWithId.getExternalId())).thenReturn(Mono.just(cancelledTransaction));
         webTestClient
                 .mutateWith(csrf())
                 .delete()
                 .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL + "/" + orderWithId.getExternalId())
+                        .path(TransactionController.BASE_URL + "/" + transactionWithId.getExternalId())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

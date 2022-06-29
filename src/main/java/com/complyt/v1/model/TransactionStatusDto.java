@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-public enum OrderStatusDto {
+public enum TransactionStatusDto {
     ACTIVE,
     CANCELLED
 }

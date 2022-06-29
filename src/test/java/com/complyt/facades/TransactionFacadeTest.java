@@ -2,15 +2,15 @@ package com.complyt.facades;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.services.OrderService;
+import com.complyt.services.TransactionService;
 import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import org.bson.types.ObjectId;
@@ -35,13 +35,13 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class OrderFacadeTest {
+public class TransactionFacadeTest {
 
     @InjectMocks
-    OrderFacade orderFacade;
+    TransactionFacade transactionFacade;
 
     @Mock
-    OrderService orderService;
+    TransactionService transactionService;
 
     @Mock
     SalesTaxService salesTaxService;
@@ -49,7 +49,7 @@ public class OrderFacadeTest {
     @Mock
     ProductClassificationService productClassificationService;
 
-    Order order;
+    Transaction transaction;
 
     @BeforeEach
     void setUp() {
@@ -64,22 +64,22 @@ public class OrderFacadeTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null,false,0
         ));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId);
     }
 
     @Test
-    void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException() {
+    void initFacade_NullTransactionServiceInstanceGiven_ThrowsNullPointerException() {
         // Given
-        orderService = null;
+        transactionService = null;
 
         // When
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new OrderFacade(orderService, salesTaxService, productClassificationService);
+            new TransactionFacade(transactionService, salesTaxService, productClassificationService);
         });
 
-        assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transactionService is marked non-null but is null");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new OrderFacade(orderService, salesTaxService, productClassificationService);
+            new TransactionFacade(transactionService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxService is marked non-null but is null");
@@ -106,84 +106,84 @@ public class OrderFacadeTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            OrderFacade facade = new OrderFacade(orderService, salesTaxService, productClassificationService);
+            TransactionFacade facade = new TransactionFacade(transactionService, salesTaxService, productClassificationService);
         });
 
         assertEquals(nullPointerException.getMessage(), "productClassificationService is marked non-null but is null");
     }
 
     @Test
-    public void saveOrder_OrderSaved_OrderReturned() throws InterruptedException {
+    public void saveTransaction_TransactionSaved_TransactionReturned() throws InterruptedException {
         // Given
 
         // When
-        when(orderService.save(order)).thenReturn(Mono.just(order));
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        when(transactionService.save(transaction)).thenReturn(Mono.just(transaction));
+        AtomicReference<Transaction> transactionAtomicReference = new AtomicReference<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        orderFacade.save(order)
-                .subscribe(returnedOrder -> {
-                    orderAtomicReference.set(returnedOrder);
+        transactionFacade.save(transaction)
+                .subscribe(returnedTransaction -> {
+                    transactionAtomicReference.set(returnedTransaction);
                     countDownLatch.countDown();
                 });
 
         // Then
         countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        assertNotNull(transactionAtomicReference.get());
+        assertEquals(transaction, transactionAtomicReference.get());
     }
 
     @Test
-    void updateOrder_OrderInserted_OrderReturned() throws InterruptedException {
+    void updateTransaction_TransactionInserted_TransactionReturned() throws InterruptedException {
         // Given
-        String externalId = order.getExternalId();
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        String externalId = transaction.getExternalId();
+        AtomicReference<Transaction> transactionAtomicReference = new AtomicReference<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
-        orderFacade.update(externalId, order)
-                .subscribe(returnedOrder -> {
-                    orderAtomicReference.set(returnedOrder);
+        when(transactionService.update(externalId, transaction)).thenReturn(Mono.just(transaction));
+        transactionFacade.update(externalId, transaction)
+                .subscribe(returnedTransaction -> {
+                    transactionAtomicReference.set(returnedTransaction);
                     countDownLatch.countDown();
                 });
 
         // Then
         countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        assertNotNull(transactionAtomicReference.get());
+        assertEquals(transaction, transactionAtomicReference.get());
     }
 
     @Test
-    void upsertOrder_Orderupserted_OrderReturned() throws InterruptedException {
+    void upsertTransaction_Transactionupserted_TransactionReturned() throws InterruptedException {
         // Given
-        String externalId = order.getExternalId();
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        String externalId = transaction.getExternalId();
+        AtomicReference<Transaction> transactionAtomicReference = new AtomicReference<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.upsert(externalId, order)).thenReturn(Mono.just(order));
-        orderFacade.upsert(externalId, order)
-                .subscribe(returnedOrder -> {
-                    orderAtomicReference.set(returnedOrder);
+        when(transactionService.upsert(externalId, transaction)).thenReturn(Mono.just(transaction));
+        transactionFacade.upsert(externalId, transaction)
+                .subscribe(returnedTransaction -> {
+                    transactionAtomicReference.set(returnedTransaction);
                     countDownLatch.countDown();
                 });
 
         // Then
         countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        assertNotNull(transactionAtomicReference.get());
+        assertEquals(transaction, transactionAtomicReference.get());
     }
 
     @Test
-    void upsertOrder_NullExternalIdGiven_ThrowsException() {
+    void upsertTransaction_NullExternalIdGiven_ThrowsException() {
         // Given
         String nullExternalId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.upsert(nullExternalId, order);
+            transactionFacade.upsert(nullExternalId, transaction);
         });
 
         // Then
@@ -199,89 +199,89 @@ public class OrderFacadeTest {
         // When + Then
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.update(externalId, order);
+            transactionFacade.update(externalId, transaction);
         });
 
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
 
     @Test
-    void addOrderToClient_OrderAddedToClient_OrderReturned() throws InterruptedException {
+    void addTransactionToClient_TransactionAddedToClient_TransactionReturned() throws InterruptedException {
         // Given
-        String externalId = order.getExternalId();
+        String externalId = transaction.getExternalId();
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        AtomicReference<Transaction> transactionAtomicReference = new AtomicReference<>();
 
         // When
-        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
-        orderFacade.update(externalId, order).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
+        when(transactionService.update(externalId, transaction)).thenReturn(Mono.just(transaction));
+        transactionFacade.update(externalId, transaction).subscribe(returnedTransaction -> {
+            transactionAtomicReference.set(returnedTransaction);
             countDownLatch.countDown();
         });
 
         // Then
         countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        assertNotNull(transactionAtomicReference.get());
+        assertEquals(transaction, transactionAtomicReference.get());
     }
 
     @Test
-    void getOrderByExternalId_OrderFound_OrderReturned() throws InterruptedException {
+    void getTransactionByExternalId_TransactionFound_TransactionReturned() throws InterruptedException {
         // Given
         String id = UUID.randomUUID().toString();
-        Order orderToSearchFor = order.withExternalId(id);
+        Transaction transactionToSearchFor = transaction.withExternalId(id);
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
+        AtomicReference<Transaction> transactionAtomicReference = new AtomicReference<>();
 
         // When
-        when(orderService.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        orderFacade.findByExternalId(id).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
+        when(transactionService.findByExternalId(id)).thenReturn(Mono.just(transactionToSearchFor));
+        transactionFacade.findByExternalId(id).subscribe(returnedTransaction -> {
+            transactionAtomicReference.set(returnedTransaction);
             countDownLatch.countDown();
         });
 
         // Then
         countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(orderAtomicReference.get().getExternalId(), id);
-        assertEquals(orderToSearchFor, orderAtomicReference.get());
+        assertNotNull(transactionAtomicReference.get());
+        assertEquals(transactionAtomicReference.get().getExternalId(), id);
+        assertEquals(transactionToSearchFor, transactionAtomicReference.get());
     }
 
     @Test
-    void getAllOrders_AllOrdersRetrieved_ReturnsAllOrdersFound() {
+    void getAllTransactions_AllTransactionsRetrieved_ReturnsAllTransactionsFound() {
         // Given
         String id = UUID.randomUUID().toString();
-        Order secondOrder = order.withExternalId(id);
-        List<Order> allOrders = new ArrayList<>();
-        allOrders.add(order);
-        allOrders.add(secondOrder);
+        Transaction secondTransaction = transaction.withExternalId(id);
+        List<Transaction> allTransactions = new ArrayList<>();
+        allTransactions.add(transaction);
+        allTransactions.add(secondTransaction);
 
         // When
-        when(orderService.findAll()).thenReturn(Flux.fromIterable(allOrders));
-        Flux<Order> returnedCustomers = orderFacade.getAll();
+        when(transactionService.findAll()).thenReturn(Flux.fromIterable(allTransactions));
+        Flux<Transaction> returnedCustomers = transactionFacade.getAll();
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
 
     @Test
-    void updateSalesTax_ValidExternalIdGiven_UpdatesOrder() throws InterruptedException {
+    void updateSalesTax_ValidExternalIdGiven_UpdatesTransaction() throws InterruptedException {
         // Given
-        String externalId = order.getExternalId();
+        String externalId = transaction.getExternalId();
         FastTaxData fastTaxData = new FastTaxData();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
         SalesTax salesTax = new SalesTax(1000, salesTaxRate);
         String taxCode = "C1S1";
 
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                order.getShippingAddress().getState(), true, false, CalculationType.FIXED, "description", 0,null);
+                transaction.getShippingAddress().getState(), true, false, CalculationType.FIXED, "description", 0,null);
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String, JurisdictionalSalesTaxRules>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
         ProductClassification productClassification = new ProductClassification("id", taxCode, "description",
                 "title", jurisdictionalSalesTaxRulesList);
 
-        Item itemWithRule = order.getItems().get(0).withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
+        Item itemWithRule = transaction.getItems().get(0).withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
         List<Item> itemsWithRules = new ArrayList<Item>() {{
             add(itemWithRule);
         }};
@@ -291,14 +291,14 @@ public class OrderFacadeTest {
             add(itemWithRate);
         }};
 
-        Order orderWithSalesTax = order.withSalesTax(salesTax).withItems(itemsWithRates);
+        Transaction transactionWithSalesTax = transaction.withSalesTax(salesTax).withItems(itemsWithRates);
 
         // When
-        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(order));
+        when(transactionService.findByExternalId(externalId)).thenReturn(Mono.just(transaction));
 
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
 
-        when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+        when(salesTaxService.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
 
         when(salesTaxService.salesTaxDataToSalesTaxRate(fastTaxData)).thenReturn(salesTaxRate);
 
@@ -306,27 +306,26 @@ public class OrderFacadeTest {
 
         when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
 
-        when(orderService.update(externalId, orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
+        when(transactionService.update(externalId, transactionWithSalesTax)).thenReturn(Mono.just(transactionWithSalesTax));
 
-        Mono<Order> orderMono = orderFacade.updateSalesTax(externalId);
+        Mono<Transaction> transactionMono = transactionFacade.updateSalesTax(externalId);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
     }
 
     @Test
-    void markAsCancelled_orderIdGiven_ChangesOrderStatus() {
+    void markAsCancelled_transactionIdGiven_ChangesTransactionStatus() {
         // Given
-        String orderId = order.getId();
-        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
+        String transactionId = transaction.getId();
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
-        when(orderService.markAsCancelled(orderId)).thenReturn(Mono.just(cancelledOrder));
-        Mono<Order> orderWithCancelledStatus = orderFacade.markAsCancelled(orderId);
+        when(transactionService.markAsCancelled(transactionId)).thenReturn(Mono.just(cancelledTransaction));
+        Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(transactionId);
 
         // Then
-        assertNotNull(orderWithCancelledStatus);
-        assertEquals(orderWithCancelledStatus.block(), cancelledOrder);
+        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction);
     }
 
     @Test
@@ -338,7 +337,7 @@ public class OrderFacadeTest {
 
         // When
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
-        Mono<ProductClassification> productClassificationMono = orderFacade.getClassification(taxCode);
+        Mono<ProductClassification> productClassificationMono = transactionFacade.getClassification(taxCode);
 
         // Then
         StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
@@ -346,21 +345,21 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void getAll_findsAllOrdersWithClientId_ReturnsAllOrders() {
+    void getAll_findsAllTransactionsWithClientId_ReturnsAllTransactions() {
         // Given
-        String anotherOrderId = UUID.randomUUID().toString();
-        Order anotherOrderWithSameClientId = order.withId(anotherOrderId);
-        List<Order> orders = new ArrayList<Order>() {{
-            add(order);
-            add(anotherOrderWithSameClientId);
+        String anotherTransactionId = UUID.randomUUID().toString();
+        Transaction anotherTransactionWithSameClientId = transaction.withId(anotherTransactionId);
+        List<Transaction> transactions = new ArrayList<Transaction>() {{
+            add(transaction);
+            add(anotherTransactionWithSameClientId);
         }};
 
         // When
-        when(orderService.findAll()).thenReturn(Flux.fromIterable(orders));
-        Flux<Order> orderFlux = orderFacade.getAll();
+        when(transactionService.findAll()).thenReturn(Flux.fromIterable(transactions));
+        Flux<Transaction> transactionFlux = transactionFacade.getAll();
 
         // Then
-        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
 
     }
 }

@@ -58,7 +58,7 @@ public class SalesTaxCalculatorTest {
     }
 
     @Test
-    void calculate_OrderComesWithItemWithManualSalesTax_SalesTaxAmountReturned(){
+    void calculate_TransactionComesWithItemWithManualSalesTax_SalesTaxAmountReturned(){
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         List<Item> items = new ArrayList<Item>(){{

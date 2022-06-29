@@ -1,12 +1,12 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.ItemDto;
-import com.complyt.v1.model.OrderDto;
-import com.complyt.v1.model.OrderStatusDto;
+import com.complyt.v1.model.TransactionDto;
+import com.complyt.v1.model.TransactionStatusDto;
 import com.complyt.v1.model.SalesTaxRateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
@@ -15,17 +15,17 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface OrderMapper {
-    OrderMapper INSTANCE = Mappers.getMapper( OrderMapper.class );
+public interface TransactionMapper {
+    TransactionMapper INSTANCE = Mappers.getMapper( TransactionMapper.class );
 
-    Order orderDtoToOrder(OrderDto orderDto);
-    OrderDto orderToOrderDto(Order order);
+    Transaction transactionDtoToTransaction(TransactionDto transactionDto);
+    TransactionDto transactionToTransactionDto(Transaction transaction);
 
     SalesTaxRateDto salesTaxRateToSalesTaxRateDto(SalesTaxRate salesTaxRate);
     SalesTaxRate salesTaxRateDtoToSalesTaxRate(SalesTaxRateDto salesTaxRateDto);
 
-    OrderStatusDto orderStatusToOrderStatusDto(OrderStatus orderStatus);
-    OrderStatus orderStatusDtoToOrderStatus(OrderStatusDto orderStatusDto);
+    TransactionStatusDto transactionStatusToTransactionStatusDto(TransactionStatus transactionStatus);
+    TransactionStatus transactionStatusDtoToTransactionStatus(TransactionStatusDto transactionStatusDto);
 
     List<Item> itemDtosToItems(List<ItemDto> itemDtos);
     List<ItemDto> itemsToItemDtos(List<Item> items);
