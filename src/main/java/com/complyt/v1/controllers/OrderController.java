@@ -63,7 +63,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> create(@RequestBody @NonNull OrderDto orderDto) {
         return orderFacade.findByExternalId(orderDto.getExternalId())
-                .switchIfEmpty(orderFacade.saveOrderWithSalesTax(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
+                .switchIfEmpty(orderFacade.saveOrderWithSalesTax(OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
                 .switchIfEmpty(Mono.error(new NotFoundException(orderDto.getExternalId())));
     }
