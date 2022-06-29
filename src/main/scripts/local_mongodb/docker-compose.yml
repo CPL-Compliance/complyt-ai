@@ -9,3 +9,19 @@ services:
       - '27017:27017'
     volumes:
       - ~/dockerdata/mongodb:/data/db
+
+  complyt:
+    image: complyt/complyt:latest
+    ports:
+      - '9898:9898'
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_PROFILES_ACTIVE: 'local-docker, stubFastTax'
+      SPRING_DATA_MONGODB_URI: 'mongodb://mongodb:27017/complyt'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9898/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
