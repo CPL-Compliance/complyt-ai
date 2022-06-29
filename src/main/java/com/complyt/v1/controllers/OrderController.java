@@ -56,14 +56,14 @@ public class OrderController {
         return orderFacade.update(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
     }
-    
+
     @Operation(summary = "This will create a new order with sales tax calculated in it")
     @OrderUpdatePermission
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> create(@RequestBody @NonNull OrderDto orderDto) {
         return orderFacade.findByExternalId(orderDto.getExternalId())
-                .switchIfEmpty(orderFacade.setSalesTax(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
+                .switchIfEmpty(orderFacade.saveOrderWithSalesTax(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
                 .switchIfEmpty(Mono.error(new NotFoundException(orderDto.getExternalId())));
     }

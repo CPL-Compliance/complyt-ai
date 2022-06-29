@@ -56,7 +56,7 @@ public class OrderFacade {
         return orderService.findAll();
     }
 
-    public Mono<Order> setSalesTax(String externalId, Order order) {
+    public Mono<Order> saveOrderWithSalesTax(String externalId, Order order) {
             OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
 
             return injectRulesToOrderItems()
