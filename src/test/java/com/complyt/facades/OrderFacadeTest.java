@@ -142,7 +142,8 @@ public class OrderFacadeTest {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
-        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
+        when(orderService.update(externalId,order)).thenReturn(Mono.just(order));
+
         orderFacade.update(externalId, order)
                 .subscribe(returnedOrder -> {
                     orderAtomicReference.set(returnedOrder);
@@ -213,38 +214,27 @@ public class OrderFacadeTest {
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
         // When
-        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
-        orderFacade.update(externalId, order).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        when(orderService.update(externalId,order)).thenReturn(Mono.just(order));
+        Mono<Order> returnedOrder = orderFacade.update(externalId, order);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(returnedOrder).expectNext(order).verifyComplete();
     }
 
     @Test
     void getOrderByExternalId_OrderFound_OrderReturned() throws InterruptedException {
         // Given
-        String id = UUID.randomUUID().toString();
-        Order orderToSearchFor = order.withExternalId(id);
+        String externalId = UUID.randomUUID().toString();
+        Order orderToSearchFor = order.withExternalId(externalId);
         CountDownLatch countDownLatch = new CountDownLatch(1);
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
 
         // When
-        when(orderService.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        orderFacade.findByExternalId(id).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        when(orderService.findByExternalId(externalId)).thenReturn(Mono.just(orderToSearchFor));
+        Mono<Order> returnedOrder =  orderFacade.findByExternalId(externalId);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(orderAtomicReference.get().getExternalId(), id);
-        assertEquals(orderToSearchFor, orderAtomicReference.get());
+        StepVerifier.create(returnedOrder).expectNext(orderToSearchFor).verifyComplete();
     }
 
     @Test
@@ -295,8 +285,6 @@ public class OrderFacadeTest {
 
         // When
 
-        when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.empty());
-
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
 
         when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
@@ -307,11 +295,9 @@ public class OrderFacadeTest {
 
         when(salesTaxService.calculateSalesTaxAmount(itemsWithRates)).thenReturn(salesTax.getAmount());
 
-        when(orderService.save(order)).thenReturn(Mono.just(order));
-
         when(orderService.update(orderWithSalesTax.getExternalId(),orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
-        Mono<Order> orderMono = orderFacade.createOrderWithSalesTax(order);
+        Mono<Order> orderMono = orderFacade.insertSalesTaxAndSaveOrder(order);
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();

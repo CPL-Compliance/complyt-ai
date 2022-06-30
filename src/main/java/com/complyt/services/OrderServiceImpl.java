@@ -17,8 +17,15 @@ import java.util.function.Function;
 @Service
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
+
     @NonNull
     private OrderRepository orderRepository;
+
+    public Mono<Order> create(Order order) {
+        return findByExternalId(order.getExternalId())
+                .flatMap(orderItem -> update(order.getExternalId(),order))
+                .switchIfEmpty(save(order));
+    }
 
     @Override
     public Mono<Order> save(Order order) {

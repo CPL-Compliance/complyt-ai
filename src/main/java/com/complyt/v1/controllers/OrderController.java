@@ -1,7 +1,6 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.facades.OrderFacade;
-import com.complyt.security.permissions.order.OrderCreatePermission;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
 import com.complyt.security.permissions.order.OrderUpdatePermission;
@@ -45,7 +44,7 @@ public class OrderController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
-        return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+        return orderFacade.getAll().map(OrderMapper.INSTANCE::orderToOrderDto);
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
@@ -54,18 +53,12 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
                                                  @RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.update(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
-    }
-
-    @Operation(summary = "This will create a new order with sales tax calculated in it")
-    @OrderCreatePermission
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> create(@RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.createOrderWithSalesTax(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
-                .switchIfEmpty(Mono.error(new NotFoundException(orderDto.getExternalId())));
+        return orderFacade.findByExternalId(externalId)
+                .flatMap(order -> orderFacade.updateIfModified(externalId,OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+                        .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))))
+                .switchIfEmpty(orderFacade.save(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+                        .flatMap(orderFacade::insertSalesTaxAndSaveOrder)
+                            .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
     }
 
     @Operation(summary = "Marks the order as cancelled")

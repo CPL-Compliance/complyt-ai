@@ -5,6 +5,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.OrderFacade;
 import com.complyt.v1.mappers.OrderMapper;
@@ -100,12 +101,16 @@ class OrderControllerTest {
 
     @WithUserDetails()
     @Test
-    void update_NewOrderCreated_SavesOrder() {
+    void update_NewOrderCreated_ReturnsStatus201Created() {
         // Given
-        when(orderFacade.update(orderDto.getExternalId(), OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
-                .thenReturn(Mono.just(orderWithId));
+        Order orderWithSalesTax = orderWithId.withSalesTax(new SalesTax(0,new SalesTaxRate(0,0,0,0,0,0)));
 
         // When + Then
+        when(orderFacade.findByExternalId(orderDto.getExternalId())).thenReturn(Mono.empty());
+        when(orderFacade.save(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.insertSalesTaxAndSaveOrder(orderWithId)).thenReturn(Mono.just(orderWithSalesTax));
+        OrderDto orderDtoWithSalesTax = OrderMapper.INSTANCE.orderToOrderDto(orderWithSalesTax);
+
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -115,10 +120,35 @@ class OrderControllerTest {
                 .bodyValue(orderDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(OrderDto.class)
-                .value(orderDtoItem -> orderDtoItem, equalTo(orderDto));
+                .value(orderDtoItem -> orderDtoItem, equalTo(orderDtoWithSalesTax));
     }
+
+//    @WithUserDetails()
+//    @Test
+//    void update_OrderExists_ReturnsStatus200Ok() {
+//        // Given
+//        String externalId = orderDto.getExternalId();
+//
+//        // When + Then
+//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
+//        when(orderFacade.updateIfModified(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto))).thenReturn(Mono.just(orderWithId));
+//        OrderDto returnedOrderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
+//
+//        webTestClient
+//                .mutateWith(csrf())
+//                .put()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(OrderController.BASE_URL + "/" + externalId)
+//                        .build())
+//                .bodyValue(orderDto)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBody(OrderDto.class)
+//                .value(orderDtoItem -> orderDtoItem, equalTo(returnedOrderDto));
+//    }
 
     @WithUserDetails()
     @Test
@@ -187,30 +217,6 @@ class OrderControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(OrderDto.class)
                 .value(orderDtos -> orderDtos, equalTo(allOrdersWithNoId));
-    }
-
-    @WithUserDetails()
-    @Test
-    void updateSalesTax_UpdatesOrder_ReturnsStatus200() {
-        // Given
-        Order order = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
-
-        // When + Then
-        when(orderFacade.findByExternalId(order.getExternalId())).thenReturn(Mono.just(orderWithId));
-        when(orderFacade.createOrderWithSalesTax(order)).thenReturn(Mono.just(orderWithId));
-        webTestClient
-                .mutateWith(csrf())
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(OrderController.BASE_URL)
-                        .build())
-                .bodyValue(orderDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(OrderDto.class)
-                .value(returnedOrderDto -> returnedOrderDto, equalTo(orderDto));
-
     }
 
     @WithUserDetails()

@@ -13,8 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,24 +36,32 @@ public class OrderFacade {
     @NonNull
     private ProductClassificationService productClassificationService;
 
-    public Mono<Order> save(Order order) {
-        return orderService.save(order);
-    }
-
-    public Mono<Order> createOrderWithSalesTax(Order order) {
-        return orderService.findByExternalId(order.getExternalId())
-                .flatMap(orderItem -> update(order.getExternalId(),order))
-                .switchIfEmpty(save(order))
-                .flatMap(this::handleSettingSalesTaxToOrder)
-                .flatMap(orderWithSalesTax -> update(orderWithSalesTax.getExternalId(),orderWithSalesTax));
+    public Mono<Order> create(Order order) {
+        return orderService.create(order);
     }
 
     public Mono<Order> upsert(@NonNull String externalId, Order order) {
         return orderService.upsert(externalId, order);
     }
 
+    public Mono<Order> save(Order order) {
+        return orderService.save(order);
+    }
+
+    public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
+        return findByExternalId(externalId)
+                .flatMap(orderItem -> orderItem.equals(order) ? Mono.just(order) :
+                        update(externalId, orderItem)
+                                .flatMap(this::insertSalesTaxAndSaveOrder));
+    }
+
     public Mono<Order> update(@NonNull String externalId, Order order) {
-        return orderService.update(externalId, order);
+        return orderService.update(externalId,order);
+    }
+
+    public Mono<Order> insertSalesTaxAndSaveOrder(Order order){
+        return handleSettingSalesTaxToOrder(order)
+                .flatMap(orderWithSalesTax -> update(orderWithSalesTax.getExternalId(),orderWithSalesTax));
     }
 
     public Mono<Order> handleSettingSalesTaxToOrder(Order order) {
