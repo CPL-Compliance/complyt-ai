@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
     public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
             return orderRepository.findByExternalId(externalId)
-                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId" + externalId)))
+                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
     }

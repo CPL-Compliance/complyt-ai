@@ -197,7 +197,7 @@ class OrderControllerTest {
 
         // When + Then
         when(orderFacade.findByExternalId(order.getExternalId())).thenReturn(Mono.just(orderWithId));
-        when(orderFacade.saveOrderWithSalesTax(order)).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.createOrderWithSalesTax(order)).thenReturn(Mono.just(orderWithId));
         webTestClient
                 .mutateWith(csrf())
                 .post()

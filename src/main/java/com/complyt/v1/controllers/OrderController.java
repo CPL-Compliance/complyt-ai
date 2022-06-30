@@ -1,6 +1,7 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.facades.OrderFacade;
+import com.complyt.security.permissions.order.OrderCreatePermission;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
 import com.complyt.security.permissions.order.OrderUpdatePermission;
@@ -58,12 +59,11 @@ public class OrderController {
     }
 
     @Operation(summary = "This will create a new order with sales tax calculated in it")
-    @OrderUpdatePermission
+    @OrderCreatePermission
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> create(@RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.findByExternalId(orderDto.getExternalId())
-                .switchIfEmpty(orderFacade.saveOrderWithSalesTax(OrderMapper.INSTANCE.orderDtoToOrder(orderDto)))
+        return orderFacade.createOrderWithSalesTax(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                 .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
                 .switchIfEmpty(Mono.error(new NotFoundException(orderDto.getExternalId())));
     }

@@ -295,6 +295,8 @@ public class OrderFacadeTest {
 
         // When
 
+        when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.empty());
+
         when(productClassificationService.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
 
         when(salesTaxService.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
@@ -307,7 +309,7 @@ public class OrderFacadeTest {
 
         when(orderService.save(orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
 
-        Mono<Order> orderMono = orderFacade.saveOrderWithSalesTax(order);
+        Mono<Order> orderMono = orderFacade.createOrderWithSalesTax(order);
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();

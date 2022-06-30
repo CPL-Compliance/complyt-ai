@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,6 +42,14 @@ public class OrderFacade {
         return orderService.save(order);
     }
 
+    public Mono<Order> createOrderWithSalesTax(Order order) {
+        return orderService.findByExternalId(order.getExternalId())
+                .flatMap(orderItem -> update(order.getExternalId(),order))
+                .switchIfEmpty(save(order))
+                .flatMap(this::handleSettingSalesTaxToOrder)
+                .flatMap(orderWithSalesTax -> update(orderWithSalesTax.getExternalId(),orderWithSalesTax));
+    }
+
     public Mono<Order> upsert(@NonNull String externalId, Order order) {
         return orderService.upsert(externalId, order);
     }
@@ -48,21 +58,12 @@ public class OrderFacade {
         return orderService.update(externalId, order);
     }
 
-    public Mono<Order> findByExternalId(String externalId) {
-        return orderService.findByExternalId(externalId);
-    }
-
-    public Flux<Order> getAll() {
-        return orderService.findAll();
-    }
-
-    public Mono<Order> saveOrderWithSalesTax(Order order) {
+    public Mono<Order> handleSettingSalesTaxToOrder(Order order) {
             OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
 
             return injectRulesToOrderItems()
                     .apply(orderProductClassificationInjector)
-                    .flatMap(setSalesTaxToOrder())
-                    .flatMap(this::save);
+                    .flatMap(setSalesTaxToOrder());
     }
 
     private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
@@ -94,6 +95,14 @@ public class OrderFacade {
     public Mono<ProductClassification> getClassification(String taxCode) {
         log.debug("Searching for product classification for tax code : " + taxCode);
         return productClassificationService.findOneByTaxCode(taxCode);
+    }
+
+    public Mono<Order> findByExternalId(String externalId) {
+        return orderService.findByExternalId(externalId);
+    }
+
+    public Flux<Order> getAll() {
+        return orderService.findAll();
     }
 
     public Mono<Order> markAsCancelled(String orderId) {
