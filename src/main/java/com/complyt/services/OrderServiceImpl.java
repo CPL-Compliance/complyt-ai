@@ -5,7 +5,9 @@ import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -16,15 +18,25 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @NonNull
     private OrderRepository orderRepository;
 
+    @NonNull
+    @Qualifier("salesTaxServiceImpl")
+    private SalesTaxService salesTaxService;
+
     public Mono<Order> create(Order order) {
         return findByExternalId(order.getExternalId())
                 .flatMap(orderItem -> update(order.getExternalId(),order))
                 .switchIfEmpty(save(order));
+    }
+
+    @Override
+    public Mono<Order> temp(Order order) {
+        return salesTaxService.calculate(order);
     }
 
     @Override

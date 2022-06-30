@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
+import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import reactor.core.publisher.Mono;
@@ -13,4 +14,6 @@ public interface SalesTaxService {
     public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData);
     public float calculateSalesTaxAmount(List<Item> items);
     public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate);
+
+    Mono<Order> calculate(Order order);
 }

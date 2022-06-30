@@ -5,53 +5,80 @@ import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
+import com.complyt.domain.Order;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
     private final SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    private final SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
+    private final SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @NonNull
     private final SalesTaxCalculator salesTaxCalculator;
 
     @NonNull
-    private final SalesTaxRateCalculator jurisdictionalSalesTaxController;
+    private final SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
-    public Mono<SalesTaxData> findByAddress(Address address){
+    public Mono<SalesTaxData> findByAddress(Address address) {
         return salesTaxWebClientWrapper.findByAddress(address);
     }
 
     @Override
-    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData){
-        return salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
+    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
+        return salesTaxDataToSalesTaxRate.map(salesTaxData);
     }
 
     @Override
-    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate){
+    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
         return items.stream()
-                .map(item -> item.withSalesTaxRate(jurisdictionalSalesTaxController.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(),salesTaxRate)))
+                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public float calculateSalesTaxAmount(List<Item> items){
+    public Mono<Order> calculate(Order order) {
+        return findByAddress(order.getShippingAddress())
+                .map(salesTaxData -> salesTaxDataToSalesTaxRate(salesTaxData))
+                .map(injectSalesTaxToOrder(order));
+    }
+
+    @Override
+    public float calculateSalesTaxAmount(List<Item> items) {
         return salesTaxCalculator.calculate(items);
+    }
+
+    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
+        return salesTaxRate -> {
+            log.info("Setting sales tax rates for order's items");
+            List<Item> itemsWithRates = setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
+            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+
+            log.info("Calculating total sales tax amount for order");
+            float salesTaxAmount = calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
+            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+
+            log.debug("Order's sales tax : " + salesTax);
+            return orderWithItemsWithRates.withSalesTax(salesTax);
+        };
     }
 }

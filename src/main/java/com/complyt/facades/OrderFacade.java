@@ -1,11 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.business.order.OrderProductClassificationInjector;
-import com.complyt.domain.Item;
 import com.complyt.domain.Order;
-import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
@@ -16,9 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Function;
 
 @Component
 @AllArgsConstructor
@@ -50,57 +43,26 @@ public class OrderFacade {
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
         return findByExternalId(externalId)
-                .flatMap(orderItem -> orderItem.equals(order) ? Mono.just(order) :
-                        update(externalId, orderItem)
-                                .flatMap(this::insertSalesTaxAndSaveOrder));
+                .flatMap(orderItem -> orderItem.equals(order) ?
+                        Mono.just(order) :
+                        calculateSalesTax(order)
+                                .flatMap(updatedOrder -> update(externalId, updatedOrder)));
     }
 
     public Mono<Order> update(@NonNull String externalId, Order order) {
-        return orderService.update(externalId,order);
+        return orderService.update(externalId, order);
     }
 
-    public Mono<Order> insertSalesTaxAndSaveOrder(Order order){
-        return handleSettingSalesTaxToOrder(order)
-                .flatMap(orderWithSalesTax -> update(orderWithSalesTax.getExternalId(),orderWithSalesTax));
-    }
+    public Mono<Order> calculateSalesTax(Order order) {
+        return productClassificationService
+                .setJuresdictionalRules(new OrderProductClassificationInjector(order))
+                .flatMap(orderService::temp);
 
-    public Mono<Order> handleSettingSalesTaxToOrder(Order order) {
-            OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+//        return salesTaxService.moo()
 
-            return injectRulesToOrderItems()
-                    .apply(orderProductClassificationInjector)
-                    .flatMap(setSalesTaxToOrder());
-    }
-
-    private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
-        return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
-                .flatMap(item -> getClassification(item.getTaxCode()))
-                .collectMap(productClassification -> productClassification.getTaxCode(), productClassification -> productClassification)
-                .flatMap(orderProductClassificationInjector::act);
-    }
-
-    private Function<Order, Mono<Order>> setSalesTaxToOrder() {
-        return order -> salesTaxService.findByAddress(order.getShippingAddress())
-                .map(salesTaxData -> salesTaxService.salesTaxDataToSalesTaxRate(salesTaxData))
-                .map(injectSalesTaxToOrder(order));
-    }
-    
-    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
-        return salesTaxRate -> {
-            log.info("Setting sales tax rates for order's items");
-            List<Item> itemsWithRates = salesTaxService.setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
-            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
-            log.info("Calculating total sales tax amount for order");
-            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
-            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
-            log.debug("Order's sales tax : " + salesTax);
-            return orderWithItemsWithRates.withSalesTax(salesTax);
-        };
-    }
-
-    public Mono<ProductClassification> getClassification(String taxCode) {
-        log.debug("Searching for product classification for tax code : " + taxCode);
-        return productClassificationService.findOneByTaxCode(taxCode);
+//        return injectRulesToOrderItems()
+//                .apply(orderProductClassificationInjector)
+//                .flatMap(setSalesTaxToOrder());
     }
 
     public Mono<Order> findByExternalId(String externalId) {
@@ -114,4 +76,38 @@ public class OrderFacade {
     public Mono<Order> markAsCancelled(String orderId) {
         return orderService.markAsCancelled(orderId);
     }
+
+//    private Function<Order, Mono<Order>> setSalesTaxToOrder() {
+//        return order -> salesTaxService.findByAddress(order.getShippingAddress())
+//                .map(salesTaxData -> salesTaxService.salesTaxDataToSalesTaxRate(salesTaxData))
+//                .map(injectSalesTaxToOrder(order));
+//    }
+
+//    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
+//        return salesTaxRate -> {
+//            log.info("Setting sales tax rates for order's items");
+//            List<Item> itemsWithRates = salesTaxService.setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
+//            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+//            log.info("Calculating total sales tax amount for order");
+//            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
+//            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+//            log.debug("Order's sales tax : " + salesTax);
+//            return orderWithItemsWithRates.withSalesTax(salesTax);
+//        };
+//    }
+//    private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
+//        return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
+//                .flatMap(item -> getClassification(item.getTaxCode()))
+//                .collectMap(productClassification -> productClassification.getTaxCode(), productClassification -> productClassification)
+//                .flatMap(orderProductClassificationInjector::act);
+//    }
+
+//    public Mono<ProductClassification> getClassification(String taxCode) {
+//        log.debug("Searching for product classification for tax code : " + taxCode);
+//        return productClassificationService.findOneByTaxCode(taxCode);
+//    }
+//    public Mono<Order> calculateAndInjectSalesTax(Order order) {
+//        return handleSettingSalesTaxToOrder(order)
+//                .flatMap(orderWithSalesTax -> update(orderWithSalesTax.getExternalId(), orderWithSalesTax));
+//    }
 }

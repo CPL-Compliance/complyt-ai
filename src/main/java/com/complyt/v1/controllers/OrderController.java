@@ -57,7 +57,7 @@ public class OrderController {
                 .flatMap(order -> orderFacade.updateIfModified(externalId,OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
                         .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))))
                 .switchIfEmpty(orderFacade.save(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                        .flatMap(orderFacade::insertSalesTaxAndSaveOrder)
+                        .flatMap(orderFacade::calculateSalesTax) // flatMap update
                             .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
     }
 

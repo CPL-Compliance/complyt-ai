@@ -14,4 +14,6 @@ public interface OrderService extends CrudService<Order, String> {
     Mono<Order> update(@NonNull final String externalId, @NonNull final Order order);
     Mono<Order> markAsCancelled(@NonNull final  String orderId);
     public Mono<Order> create(Order order);
+
+    Mono<Order> temp(Order orderTemp);
 }
