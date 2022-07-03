@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
@@ -51,13 +52,14 @@ public class OrderController {
     @OrderUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
+    public Mono<ResponseEntity<OrderDto>> upsert(@PathVariable("externalId") @NonNull String externalId,
                                                  @RequestBody @NonNull OrderDto orderDto) {
+        Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
+
         return orderFacade.findByExternalId(externalId)
-                .flatMap(order -> orderFacade.updateIfModified(externalId,OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
+                .flatMap(order -> orderFacade.updateIfModified(externalId,mappedOrder)
                         .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))))
-                .switchIfEmpty(orderFacade.save(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                        .flatMap(orderFacade::calculateSalesTax) // flatMap update
+                .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
                             .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
     }
 

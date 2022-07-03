@@ -56,7 +56,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Mono<Order> setJuresdictionalRules(OrderProductClassificationInjector orderProductClassificationInjector) {
+    public Mono<Order> setJurisdictionalRules(OrderProductClassificationInjector orderProductClassificationInjector) {
         return injectRulesToOrderItems().apply(orderProductClassificationInjector);
     }
 

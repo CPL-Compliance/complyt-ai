@@ -28,12 +28,6 @@ public class OrderServiceImpl implements OrderService {
     @Qualifier("salesTaxServiceImpl")
     private SalesTaxService salesTaxService;
 
-    public Mono<Order> create(Order order) {
-        return findByExternalId(order.getExternalId())
-                .flatMap(orderItem -> update(order.getExternalId(),order))
-                .switchIfEmpty(save(order));
-    }
-
     @Override
     public Mono<Order> calculate(Order order) {
         return salesTaxService.calculate(order);

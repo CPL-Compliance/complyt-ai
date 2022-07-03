@@ -11,5 +11,5 @@ public interface ProductClassificationService extends CrudService<ProductClassif
     Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode);
     Flux<ProductClassification> getAll() ;
 
-    Mono<Order> setJuresdictionalRules(OrderProductClassificationInjector orderProductClassificationInjector);
+    Mono<Order> setJurisdictionalRules(OrderProductClassificationInjector orderProductClassificationInjector);
 }

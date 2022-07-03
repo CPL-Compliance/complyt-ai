@@ -24,33 +24,31 @@ public class OrderFacade {
     @NonNull
     private ProductClassificationService productClassificationService;
 
-    public Mono<Order> create(Order order) {
-        return orderService.create(order);
-    }
-
     public Mono<Order> upsert(@NonNull String externalId, Order order) {
         return orderService.upsert(externalId, order);
+    }
+
+    public Mono<Order> saveOrder(Order order) {
+        return calculateSalesTax(order)
+                .flatMap(this::save);
+    }
+
+    public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
+        return findByExternalId(externalId)
+                .flatMap(orderItem -> orderItem.equals(order) ?
+                        Mono.just(order) :
+                        calculateSalesTax(order)
+                                .flatMap(updatedOrder -> update(externalId, updatedOrder))
+                );
     }
 
     public Mono<Order> save(Order order) {
         return orderService.save(order);
     }
 
-    public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
-        return findByExternalId(externalId)
-                .flatMap(orderItem -> {
-                    boolean isEqual = orderItem.equals(order);
-                    System.out.println("isEqual = " + isEqual);
-                    return isEqual ?
-                            Mono.just(order) :
-                            calculateSalesTax(order)
-                                    .flatMap(updatedOrder -> update(externalId, updatedOrder));
-                });
-    }
-
     public Mono<Order> calculateSalesTax(Order order) {
         return productClassificationService
-                .setJuresdictionalRules(new OrderProductClassificationInjector(order))
+                .setJurisdictionalRules(new OrderProductClassificationInjector(order))
                 .flatMap(orderService::calculate);
     }
 
