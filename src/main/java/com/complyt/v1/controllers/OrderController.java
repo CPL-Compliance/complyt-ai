@@ -61,6 +61,7 @@ public class OrderController {
                             .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
     }
 
+
     @Operation(summary = "Marks the order as cancelled")
     @OrderDeletePermission
     @DeleteMapping("{externalId}")

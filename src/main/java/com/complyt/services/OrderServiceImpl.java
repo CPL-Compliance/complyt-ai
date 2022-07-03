@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> temp(Order order) {
+    public Mono<Order> calculate(Order order) {
         return salesTaxService.calculate(order);
     }
 
@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
-            return orderRepository.findByExternalId(externalId)
+            return orderRepository.findByExternalId(externalId).log()
                 .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
