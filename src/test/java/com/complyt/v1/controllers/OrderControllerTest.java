@@ -107,8 +107,8 @@ class OrderControllerTest {
 
         // When + Then
         when(orderFacade.findByExternalId(orderDto.getExternalId())).thenReturn(Mono.empty());
-        when(orderFacade.save(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))).thenReturn(Mono.just(orderWithId));
-        when(orderFacade.calculateSalesTax(orderWithId)).thenReturn(Mono.just(orderWithSalesTax));
+        when(orderFacade.saveOrder(OrderMapper.INSTANCE.orderDtoToOrder(orderDto))).thenReturn(Mono.just(orderWithSalesTax));
+
         OrderDto orderDtoWithSalesTax = OrderMapper.INSTANCE.orderToOrderDto(orderWithSalesTax);
 
         webTestClient
