@@ -13,6 +13,7 @@ import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -65,8 +67,8 @@ class OrderControllerTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
-                    ));
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0
+                ));
             }
         };
 
@@ -101,9 +103,9 @@ class OrderControllerTest {
 
     @WithUserDetails()
     @Test
-    void update_NewOrderCreated_ReturnsStatus201Created() {
+    void upsert_NewOrderCreated_ReturnsStatus201Created() {
         // Given
-        Order orderWithSalesTax = orderWithId.withSalesTax(new SalesTax(0,new SalesTaxRate(0,0,0,0,0,0)));
+        Order orderWithSalesTax = orderWithId.withSalesTax(new SalesTax(0, new SalesTaxRate(0, 0, 0, 0, 0, 0)));
 
         // When + Then
         when(orderFacade.findByExternalId(orderDto.getExternalId())).thenReturn(Mono.empty());
@@ -125,30 +127,32 @@ class OrderControllerTest {
                 .value(orderDtoItem -> orderDtoItem, equalTo(orderDtoWithSalesTax));
     }
 
-//    @WithUserDetails()
-//    @Test
-//    void update_OrderExists_ReturnsStatus200Ok() {
-//        // Given
-//        String externalId = orderDto.getExternalId();
-//
-//        // When + Then
-//        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
-//        when(orderFacade.updateIfModified(orderDto.getExternalId(),OrderMapper.INSTANCE.orderDtoToOrder(orderDto))).thenReturn(Mono.just(orderWithId));
-//        OrderDto returnedOrderDto = OrderMapper.INSTANCE.orderToOrderDto(orderWithId);
-//
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path(OrderController.BASE_URL + "/" + externalId)
-//                        .build())
-//                .bodyValue(orderDto)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody(OrderDto.class)
-//                .value(orderDtoItem -> orderDtoItem, equalTo(returnedOrderDto));
-//    }
+    @WithUserDetails()
+    @Test
+    void update_OrderExists_ReturnsStatus200() {
+        // Given
+        String externalId = orderDto.getExternalId();
+        Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
+        Order updatedOrder = mappedOrder.withId(orderWithId.getId());
+
+        // When + Then
+        when(orderFacade.findByExternalId(externalId)).thenReturn(Mono.just(orderWithId));
+        when(orderFacade.saveOrder(mappedOrder)).thenReturn(Mono.empty());
+        when(orderFacade.updateIfModified(externalId, mappedOrder)).thenReturn(Mono.just(updatedOrder));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(OrderController.BASE_URL + "/" + externalId)
+                        .build())
+                .bodyValue(orderDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(OrderDto.class)
+                .value(returnedOrder -> returnedOrder, equalTo(orderDto));
+    }
 
     @WithUserDetails()
     @Test

@@ -28,14 +28,14 @@ public class OrderController {
     public static final String BASE_URL = "/v1/orders";
 
     @NonNull
-    private final OrderFacade orderFacade;
+    private OrderFacade orderFacade;
 
     @Operation(summary = "Gets order by externalId")
     @OrderReadPermission
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.findByExternalId(externalId)
+        return orderFacade.findByExternalId(externalId).log()
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
@@ -57,18 +57,17 @@ public class OrderController {
         Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
         return orderFacade.findByExternalId(externalId)
-                .flatMap(order -> orderFacade.updateIfModified(externalId,mappedOrder)
-                        .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))))
+                .flatMap(order -> orderFacade.updateIfModified(externalId, mappedOrder))
+                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem)))
                 .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
-                            .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
+                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
     }
-
 
     @Operation(summary = "Marks the order as cancelled")
     @OrderDeletePermission
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
+        return orderFacade.markAsCancelled(externalId).log().map(order -> ResponseEntity.noContent().build());
     }
 }

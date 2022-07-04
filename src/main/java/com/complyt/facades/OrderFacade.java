@@ -37,15 +37,15 @@ public class OrderFacade {
         return findByExternalId(externalId)
                 .flatMap(orderItem -> orderItem.equals(order) ?
                         Mono.just(order) :
-                        calculateSalesTax(order)
-                                .flatMap(updatedOrder -> update(externalId, updatedOrder))
+                        calculateSalesTax(order).log()
+                                .flatMap(updatedOrder -> update(externalId, updatedOrder)).log()
                 );
     }
 
     private Mono<Order> calculateSalesTax(Order order) {
         return productClassificationService
                 .setJurisdictionalRules(new OrderProductClassificationInjector(order))
-                .flatMap(orderService::calculate);
+                .flatMap(orderService::calculate).log();
     }
 
     public Mono<Order> save(Order order) {
