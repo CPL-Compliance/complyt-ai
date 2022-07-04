@@ -277,7 +277,7 @@ public class OrderFacadeTest {
 //    }
 
     @Test
-    void updateIfModified_OrdernotModified_ReturnsSameOrder() {
+    void updateIfModified_OrderNotModified_ReturnsSameOrder() {
         // Given
 
         // When
@@ -298,6 +298,25 @@ public class OrderFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void saveOrder_OrderSavedWithSalesTax_OrderReturned() {
+        // Given
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTax salesTax = new SalesTax(10,salesTaxRate);
+        Order orderWithSalesTax = order.withSalesTax(salesTax);
+        OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+
+        // When
+        when(productClassificationService.setJurisdictionalRules(orderProductClassificationInjector)).thenReturn(Mono.just(order));
+        when(orderService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
+        when(orderService.save(orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
+
+        Mono<Order> monoOrder = orderFacade.saveOrder(order);
+
+        // Then
+        StepVerifier.create(monoOrder).expectNext(orderWithSalesTax).verifyComplete();
     }
 
 //    @Test

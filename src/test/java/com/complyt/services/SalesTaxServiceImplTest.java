@@ -136,6 +136,7 @@ public class SalesTaxServiceImplTest {
         List<Item> itemsWithRates = new ArrayList<Item>(){{
             add(order.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
+        Order orderWithSalesTax = order.withItems(itemsWithRates).withSalesTax(salesTax);
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
@@ -146,7 +147,7 @@ public class SalesTaxServiceImplTest {
         Mono<Order> orderMono = salesTaxService.calculate(order);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(order.withSalesTax(salesTax).withItems(itemsWithRates)).verifyComplete();
+        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
     }
 
 }
