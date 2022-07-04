@@ -63,7 +63,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
         return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
-                .collectMap(productClassification -> productClassification.getTaxCode(), productClassification -> productClassification)
+                .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
                 .flatMap(orderProductClassificationInjector::act);
     }
 

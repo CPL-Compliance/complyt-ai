@@ -1,10 +1,17 @@
 package com.complyt.services;
 
+import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.domain.Address;
+import com.complyt.domain.Item;
+import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.OrderRepository;
 import com.complyt.repositories.ProductClassificationRepository;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,10 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -92,5 +96,109 @@ public class ProductClassificationServiceTest {
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
     }
+
+    @Test
+    void setJurisdictionalRules_SetsRules_ReturnsModifiedOrder() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
+                ));
+            }
+        };
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        List<Item> itemsWithRules = new ArrayList<Item>() {{
+            add(order.getItems().get(0).withJurisdictionalSalesTaxRules(productClassification.getJurisdictionalSalesTaxRules().get("CA")));
+        }};
+        Order orderWithItemsWithRules = order.withItems(itemsWithRules);
+        OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+
+        // When
+        when(productClassificationRepository.findOneByTaxCode(order.getItems().get(0).getTaxCode()))
+                .thenReturn(Mono.just(productClassification));
+        Mono<Order> orderMono = productClassificationService.setJurisdictionalRules(orderProductClassificationInjector);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(orderWithItemsWithRules).verifyComplete();
+
+    }
+
+    @Test
+    void save_SaveNotImplemented_ThrowsUnsupportedOperationException() {
+        // Given
+        String name = "name";
+
+        // When
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            productClassificationService.save(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "save isn't implemented");
+    }
+
+    @Test
+    void findOneByName_FindOneByNameNotImplemented_ThrowsUnsupportedOperationException() {
+        // Given
+        String name = "name";
+
+        // When
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            productClassificationService.findOneByName(name);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
+    }
+
+    @Test
+    void findByName_findByNameNotImplemented_ThrowsUnsupportedOperationException() {
+        // Given
+        String name = "name";
+
+        // When
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            productClassificationService.findByName(name);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
+    }
+
+    @Test
+    void findById_FindByIdNotImplemented_ThrowsUnsupportedOperationException() {
+        // Given
+        String id = "id";
+
+        // When
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            productClassificationService.findById(id);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "findById isn't implemented");
+    }
+
+    @Test
+    void findAll_FindAllIdNotImplemented_ThrowsUnsupportedOperationException() {
+        // Given
+        String id = "id";
+
+        // When
+        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
+            productClassificationService.findAll();
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "findAll isn't implemented");
+    }
+
 
 }
