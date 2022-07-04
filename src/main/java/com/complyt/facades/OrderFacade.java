@@ -46,7 +46,7 @@ public class OrderFacade {
         return orderService.save(order);
     }
 
-    public Mono<Order> calculateSalesTax(Order order) {
+    private Mono<Order> calculateSalesTax(Order order) {
         return productClassificationService
                 .setJurisdictionalRules(new OrderProductClassificationInjector(order))
                 .flatMap(orderService::calculate);
