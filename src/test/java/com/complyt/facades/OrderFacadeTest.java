@@ -175,9 +175,7 @@ public class OrderFacadeTest {
 
         // When + Then
 
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderFacade.update(externalId, order);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> orderFacade.update(externalId, order));
 
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
@@ -288,6 +286,18 @@ public class OrderFacadeTest {
 
         // Then
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+    }
+
+    @Test
+    void updateIfModified_NullExternalidPassed_ThrowsException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> orderFacade.updateIfModified(nullExternalId, order));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
 
 //    @Test

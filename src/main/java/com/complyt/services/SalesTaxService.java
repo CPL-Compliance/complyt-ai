@@ -10,10 +10,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface SalesTaxService {
-    public Mono<SalesTaxData> findByAddress(Address address);
-    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData);
-    public float calculateSalesTaxAmount(List<Item> items);
-    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate);
-
+    float calculateSalesTaxAmount(List<Item> items);
     Mono<Order> calculate(Order order);
 }

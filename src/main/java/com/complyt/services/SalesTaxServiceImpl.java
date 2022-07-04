@@ -39,22 +39,19 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private final SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
-    public Mono<SalesTaxData> findByAddress(Address address) {
-        return salesTaxWebClientWrapper.findByAddress(address);
-    }
-
-    @Override
-    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
-        return salesTaxDataToSalesTaxRate.map(salesTaxData);
-    }
-
-    @Override
     public Mono<Order> calculate(Order order) {
         return findByAddress(order.getShippingAddress())
                 .map(this::salesTaxDataToSalesTaxRate)
                 .map(injectSalesTaxToOrder(order));
     }
 
+    private Mono<SalesTaxData> findByAddress(Address address) {
+        return salesTaxWebClientWrapper.findByAddress(address);
+    }
+
+    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
+        return salesTaxDataToSalesTaxRate.map(salesTaxData);
+    }
 
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
         return salesTaxRate -> {
@@ -71,8 +68,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         };
     }
 
-    @Override
-    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
+    private List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
         return items.stream()
                 .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
                 .collect(Collectors.toList());

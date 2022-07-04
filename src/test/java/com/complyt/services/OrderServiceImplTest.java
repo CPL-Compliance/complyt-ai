@@ -205,6 +205,19 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void update_NullExternalIdGiven_ThrowsException() {
+        // Given
+        String externalID = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> orderService.update(externalID, order));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+
+    @Test
     void update_OrderUpdated_OrderReturned() throws InterruptedException {
         // Given
         AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
