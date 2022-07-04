@@ -49,23 +49,12 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
     @Override
-    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
-        return items.stream()
-                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public Mono<Order> calculate(Order order) {
         return findByAddress(order.getShippingAddress())
-                .map(salesTaxData -> salesTaxDataToSalesTaxRate(salesTaxData))
+                .map(this::salesTaxDataToSalesTaxRate)
                 .map(injectSalesTaxToOrder(order));
     }
 
-    @Override
-    public float calculateSalesTaxAmount(List<Item> items) {
-        return salesTaxCalculator.calculate(items);
-    }
 
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
         return salesTaxRate -> {
@@ -80,5 +69,17 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             log.debug("Order's sales tax : " + salesTax);
             return orderWithItemsWithRates.withSalesTax(salesTax);
         };
+    }
+
+    @Override
+    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
+        return items.stream()
+                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public float calculateSalesTaxAmount(List<Item> items) {
+        return salesTaxCalculator.calculate(items);
     }
 }
