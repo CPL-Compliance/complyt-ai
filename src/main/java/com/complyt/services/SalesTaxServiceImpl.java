@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private final SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    private final SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
+    private SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @NonNull
-    private final SalesTaxCalculator salesTaxCalculator;
+    private SalesTaxCalculator salesTaxCalculator;
 
     @NonNull
-    private final SalesTaxRateCalculator salesTaxRateCalculator;
+    private SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
     public Mono<Order> calculate(Order order) {

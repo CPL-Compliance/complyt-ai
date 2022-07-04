@@ -1,8 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -15,7 +15,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,10 +40,13 @@ public class SalesTaxServiceImplTest {
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+
     @Mock
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
+
     @Mock
     SalesTaxCalculator salesTaxCalculator;
+
     @Mock
     SalesTaxRateCalculator salesTaxRateCalculator;
 
@@ -124,23 +126,27 @@ public class SalesTaxServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "salesTaxRateCalculator is marked non-null but is null");
     }
 
-//    @Test
-//    void calculate_SalesTaxCalculated_OrderModified() {
-//        // Given
-//        FastTaxData fastTaxData = new FastTaxData();
-//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-//        SalesTax salesTax = new SalesTax(10,salesTaxRate);
-//
-//        // When
-//        when(salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-//        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-//        when(salesTaxRateCalculator.calculateSalesTaxRate(order.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
-//                .thenReturn(salesTaxRate);
-//        when(salesTaxCalculator.calculate(order.getItems())).thenReturn(salesTax.getAmount());
-//        Mono<Order> orderMono = salesTaxService.calculate(order);
-//
-//        // Then
-//        StepVerifier.create(orderMono).expectNext(order.withSalesTax(salesTax));
-//    }
+    @Test
+    void calculate_SalesTaxCalculated_OrderModified() {
+        // Given
+        FastTaxData fastTaxData = new FastTaxData();
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTax salesTax = new SalesTax(10,salesTaxRate);
+
+        List<Item> itemsWithRates = new ArrayList<Item>(){{
+            add(order.getItems().get(0).withSalesTaxRate(salesTaxRate));
+        }};
+
+        // When
+        when(salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxRateCalculator.calculateSalesTaxRate(order.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
+                .thenReturn(salesTaxRate);
+        when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
+        Mono<Order> orderMono = salesTaxService.calculate(order);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(order.withSalesTax(salesTax).withItems(itemsWithRates)).verifyComplete();
+    }
 
 }
