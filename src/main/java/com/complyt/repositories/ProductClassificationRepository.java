@@ -23,6 +23,7 @@ public class ProductClassificationRepository {
 
     public Mono<ProductClassification> findOneByTaxCode(String taxCode) {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
+        log.debug("Searching for product classification for tax code : " + taxCode);
 
         return reactiveMongoTemplate.findOne(query, ProductClassification.class);
     }

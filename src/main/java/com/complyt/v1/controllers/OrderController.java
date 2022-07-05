@@ -58,9 +58,9 @@ public class OrderController {
 
         return orderFacade.findByExternalId(externalId)
                 .flatMap(order -> orderFacade.updateIfModified(externalId, mappedOrder))
-                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem)))
+                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))).log()
                 .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
-                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order))));
+                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order)))).log();
     }
 
     @Operation(summary = "Marks the order as cancelled")

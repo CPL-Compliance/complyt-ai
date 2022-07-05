@@ -68,7 +68,6 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     private Mono<ProductClassification> getClassification(String taxCode) {
-        log.debug("Searching for product classification for tax code : " + taxCode);
         return findOneByTaxCode(taxCode);
     }
 }
