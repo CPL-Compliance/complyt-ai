@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
-@Log
+@Slf4j
 @Tag(name = "Order", description = "This is the Order controller")
 @RestController
 @RequestMapping(OrderController.BASE_URL)
@@ -54,6 +55,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> upsert(@PathVariable("externalId") @NonNull String externalId,
                                                  @RequestBody @NonNull OrderDto orderDto) {
+        log.debug("Upsert order - DTO received in request body : " + orderDto);
         Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
         return orderFacade.findByExternalId(externalId)
@@ -68,6 +70,8 @@ public class OrderController {
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
+        log.debug("Delete order - external id received as path variable : " + externalId);
+
         return orderFacade.markAsCancelled(externalId).log().map(order -> ResponseEntity.noContent().build());
     }
 }
