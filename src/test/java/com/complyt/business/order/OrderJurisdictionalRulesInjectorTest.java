@@ -23,7 +23,7 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class OrderProductClassificationInjectorTest {
+public class OrderJurisdictionalRulesInjectorTest {
 
     Order order;
 
@@ -92,7 +92,7 @@ public class OrderProductClassificationInjectorTest {
         }};
 
         Order order2 = order.withItems(itemsNoRules);
-        OrderProductClassificationInjector orderProductClassificationInjector2 = new OrderProductClassificationInjector(order2);
+        OrderJurisdictionalRulesInjector orderProductClassificationInjector2 = new OrderJurisdictionalRulesInjector(order2);
 
         Order newOrder = order.withItems(itemsWithRules);
 

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -9,7 +9,6 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.repositories.OrderRepository;
 import com.complyt.repositories.ProductClassificationRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,7 +117,7 @@ public class ProductClassificationServiceTest {
             add(order.getItems().get(0).withJurisdictionalSalesTaxRules(productClassification.getJurisdictionalSalesTaxRules().get("CA")));
         }};
         Order orderWithItemsWithRules = order.withItems(itemsWithRules);
-        OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+        OrderJurisdictionalRulesInjector orderProductClassificationInjector = new OrderJurisdictionalRulesInjector(order);
 
         // When
         when(productClassificationRepository.findOneByTaxCode(order.getItems().get(0).getTaxCode()))

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
@@ -56,11 +56,11 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Mono<Order> setJurisdictionalRules(OrderProductClassificationInjector orderProductClassificationInjector) {
+    public Mono<Order> setJurisdictionalRules(OrderJurisdictionalRulesInjector orderProductClassificationInjector) {
         return injectRulesToOrderItems().apply(orderProductClassificationInjector);
     }
 
-    private Function<OrderProductClassificationInjector, Mono<Order>> injectRulesToOrderItems() {
+    private Function<OrderJurisdictionalRulesInjector, Mono<Order>> injectRulesToOrderItems() {
         return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
                 .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)

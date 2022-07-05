@@ -1,6 +1,6 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -261,7 +261,7 @@ public class OrderFacadeTest {
 
         // When
         when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
-        when(productClassificationService.setJurisdictionalRules(new OrderProductClassificationInjector(orderWithNewAddress)))
+        when(productClassificationService.setJurisdictionalRules(new OrderJurisdictionalRulesInjector(orderWithNewAddress)))
                 .thenReturn(Mono.just(orderWithNewAddress));
         when(orderService.calculate(orderWithNewAddress)).thenReturn(Mono.just(newOrderWithSalesTax));
         when(orderService.update(newOrderWithSalesTax.getExternalId(),newOrderWithSalesTax)).thenReturn(Mono.just(newOrderWithSalesTax));
@@ -277,7 +277,7 @@ public class OrderFacadeTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
         SalesTax salesTax = new SalesTax(10,salesTaxRate);
         Order orderWithSalesTax = order.withSalesTax(salesTax);
-        OrderProductClassificationInjector orderProductClassificationInjector = new OrderProductClassificationInjector(order);
+        OrderJurisdictionalRulesInjector orderProductClassificationInjector = new OrderJurisdictionalRulesInjector(order);
 
         // When
         when(productClassificationService.setJurisdictionalRules(orderProductClassificationInjector)).thenReturn(Mono.just(order));

@@ -1,6 +1,6 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderProductClassificationInjector;
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -44,7 +44,7 @@ public class OrderFacade {
 
     private Mono<Order> calculateSalesTax(Order order) {
         return productClassificationService
-                .setJurisdictionalRules(new OrderProductClassificationInjector(order))
+                .setJurisdictionalRules(new OrderJurisdictionalRulesInjector(order))
                 .flatMap(orderService::calculate).log();
     }
 
