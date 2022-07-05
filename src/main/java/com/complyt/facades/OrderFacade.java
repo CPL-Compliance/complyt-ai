@@ -38,7 +38,7 @@ public class OrderFacade {
                 .flatMap(orderItem -> orderItem.equals(order) ?
                         Mono.just(order) :
                         calculateSalesTax(order).log()
-                                .flatMap(updatedOrder -> update(externalId, updatedOrder)).log()
+                                .flatMap(updatedOrder -> update(externalId, updatedOrder))
                 );
     }
 

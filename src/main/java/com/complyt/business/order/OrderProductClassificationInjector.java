@@ -42,7 +42,9 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
                 itemsWithRules.add(itemWithRules);
             }
 
-            return order.withItems(itemsWithRules);
+            Order orderWithModifiedItems = order.withItems(itemsWithRules);
+            log.debug("Order with items with rules injected : " + orderWithModifiedItems);
+            return orderWithModifiedItems;
         });
     }
 }
