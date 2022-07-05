@@ -95,20 +95,14 @@ class OrderServiceImplTest {
     void upsertOrder_OrderInserted_OrderReturned() {
         // Given
         String externalId = order.getExternalId();
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
         when(orderRepository.save(order)).thenReturn(Mono.just(order));
-        orderService.upsert(externalId, order).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.upsert(externalId, order);
 
         // Then
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
     @Test
@@ -131,20 +125,13 @@ class OrderServiceImplTest {
         // Given
         String id = UUID.randomUUID().toString();
         Order orderToSearchFor = order.withExternalId(id);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(orderRepository.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        orderService.findByExternalId(id).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.findByExternalId(id);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(orderToSearchFor, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(orderToSearchFor).verifyComplete();
     }
 
     @Test
@@ -220,23 +207,16 @@ class OrderServiceImplTest {
     @Test
     void update_OrderUpdated_OrderReturned() throws InterruptedException {
         // Given
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
         String externalId = order.getExternalId();
 
         // When
         when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
         when(orderRepository.save(order)).thenReturn(Mono.just(order));
 
-        orderService.update(externalId, order).subscribe(savedOrder -> {
-            orderAtomicReference.set(savedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.update(externalId, order);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
     @Test
@@ -256,23 +236,16 @@ class OrderServiceImplTest {
     @Test
     void markAsCancelled_ChangesOrdersStatus_ReturnsUpdatedOrder() throws InterruptedException {
         // Given
-        Order cancelledOrderWithId = order.withOrderStatus(OrderStatus.CANCELLED).withId(order.getId());
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
 
         // When
         when(orderRepository.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
-        when(orderRepository.save(cancelledOrderWithId)).thenReturn(Mono.just(cancelledOrderWithId));
+        when(orderRepository.save(cancelledOrder)).thenReturn(Mono.just(cancelledOrder));
 
-        orderService.markAsCancelled(order.getExternalId()).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.markAsCancelled(order.getExternalId());
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(cancelledOrderWithId, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(cancelledOrder).verifyComplete();
     }
 
     @Test
