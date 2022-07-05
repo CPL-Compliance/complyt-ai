@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
-@Log
+@Slf4j
 @Tag(name = "Order", description = "This is the Order controller")
 @RestController
 @RequestMapping(OrderController.BASE_URL)
@@ -27,14 +29,14 @@ public class OrderController {
     public static final String BASE_URL = "/v1/orders";
 
     @NonNull
-    private final OrderFacade orderFacade;
+    private OrderFacade orderFacade;
 
     @Operation(summary = "Gets order by externalId")
     @OrderReadPermission
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.findByExternalId(externalId)
+        return orderFacade.findByExternalId(externalId).log()
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
     }
@@ -44,27 +46,23 @@ public class OrderController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
-        return orderFacade.getAll().map(order -> OrderMapper.INSTANCE.orderToOrderDto(order));
+        return orderFacade.getAll().map(OrderMapper.INSTANCE::orderToOrderDto);
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")
     @OrderUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("externalId") @NonNull String externalId,
+    public Mono<ResponseEntity<OrderDto>> upsert(@PathVariable("externalId") @NonNull String externalId,
                                                  @RequestBody @NonNull OrderDto orderDto) {
-        return orderFacade.upsert(externalId, OrderMapper.INSTANCE.orderDtoToOrder(orderDto))
-                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)));
-    }
+        log.debug("Upsert order - DTO received in request body : " + orderDto);
+        Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
 
-    @Operation(summary = "This will calculate Sales Tax and update the Order by the External ID")
-    @OrderUpdatePermission
-    @PutMapping("{externalId}/salesTax")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<OrderDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.updateSalesTax(externalId)
-                .map(order -> ResponseEntity.ok().body(OrderMapper.INSTANCE.orderToOrderDto(order)))
-                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+        return orderFacade.findByExternalId(externalId)
+                .flatMap(order -> orderFacade.updateIfModified(externalId, mappedOrder))
+                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))).log()
+                .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
+                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order)))).log();
     }
 
     @Operation(summary = "Marks the order as cancelled")
@@ -72,6 +70,8 @@ public class OrderController {
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.markAsCancelled(externalId).map(order -> ResponseEntity.noContent().build());
+        log.debug("Delete order - external id received as path variable : " + externalId);
+
+        return orderFacade.markAsCancelled(externalId).log().map(order -> ResponseEntity.noContent().build());
     }
 }

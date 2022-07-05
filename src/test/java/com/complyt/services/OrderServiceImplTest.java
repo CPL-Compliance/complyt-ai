@@ -4,6 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
@@ -33,10 +34,13 @@ import static org.mockito.Mockito.when;
 class OrderServiceImplTest {
 
     @InjectMocks
-    OrderServiceImpl orderServiceImpl;
+    OrderServiceImpl orderService;
 
     @Mock
     OrderRepository orderRepository;
+
+    @Mock
+    SalesTaxService salesTaxService;
 
     Order order;
 
@@ -66,30 +70,39 @@ class OrderServiceImplTest {
 
         // When
         when(orderRepository.save(order)).thenReturn(Mono.just(order));
-        Mono<Order> orderMono = orderServiceImpl.save(order);
+        Mono<Order> orderMono = orderService.save(order);
 
         // Then
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
     @Test
+    void calculate_SalesTaxCalculated_ModifiedOrderReturned() {
+        // Given
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
+        Order orderWithSalesTax = order.withSalesTax(salesTax);
+
+        // When
+        when(salesTaxService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
+        Mono<Order> orderMono = orderService.calculate(order);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
+    }
+
+    @Test
     void upsertOrder_OrderInserted_OrderReturned() {
         // Given
         String externalId = order.getExternalId();
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
         when(orderRepository.save(order)).thenReturn(Mono.just(order));
-        orderServiceImpl.upsert(externalId, order).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.upsert(externalId, order);
 
         // Then
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
     @Test
@@ -100,7 +113,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderServiceImpl.upsert(externalId, order);
+            orderService.upsert(externalId, order);
         });
 
         // Then
@@ -112,20 +125,13 @@ class OrderServiceImplTest {
         // Given
         String id = UUID.randomUUID().toString();
         Order orderToSearchFor = order.withExternalId(id);
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(orderRepository.findByExternalId(id)).thenReturn(Mono.just(orderToSearchFor));
-        orderServiceImpl.findByExternalId(id).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.findByExternalId(id);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(orderToSearchFor, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(orderToSearchFor).verifyComplete();
     }
 
     @Test
@@ -135,7 +141,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderServiceImpl.findByExternalId(null);
+            orderService.findByExternalId(null);
         });
 
         // Then
@@ -150,7 +156,7 @@ class OrderServiceImplTest {
 
         // When
         when(orderRepository.findById(id)).thenReturn(Mono.just(orderToSearchFor));
-        Mono<Order> orderMono = orderServiceImpl.findById(id);
+        Mono<Order> orderMono = orderService.findById(id);
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderToSearchFor).verifyComplete();
@@ -164,7 +170,7 @@ class OrderServiceImplTest {
 
         //When
         when(orderRepository.find()).thenReturn(Flux.just(order, secondOrder));
-        Flux<Order> orderFlux = orderServiceImpl.findAll();
+        Flux<Order> orderFlux = orderService.findAll();
 
         //Then
         StepVerifier.create(orderFlux).expectNext(order, secondOrder).verifyComplete();
@@ -178,7 +184,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderServiceImpl.update(externalID, order);
+            orderService.update(externalID, order);
         });
 
         // Then
@@ -186,25 +192,31 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void update_NullExternalIdGiven_ThrowsException() {
+        // Given
+        String externalID = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> orderService.update(externalID, order));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+
+    @Test
     void update_OrderUpdated_OrderReturned() throws InterruptedException {
         // Given
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
         String externalId = order.getExternalId();
 
         // When
         when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
         when(orderRepository.save(order)).thenReturn(Mono.just(order));
 
-        orderServiceImpl.update(externalId, order).subscribe(savedOrder -> {
-            orderAtomicReference.set(savedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.update(externalId, order);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(order, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
     @Test
@@ -214,7 +226,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderServiceImpl.update("", order);
+            orderService.update("", order);
         });
 
         // Then
@@ -224,23 +236,16 @@ class OrderServiceImplTest {
     @Test
     void markAsCancelled_ChangesOrdersStatus_ReturnsUpdatedOrder() throws InterruptedException {
         // Given
-        Order cancelledOrderWithId = order.withOrderStatus(OrderStatus.CANCELLED).withId(order.getId());
-        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Order cancelledOrder = order.withOrderStatus(OrderStatus.CANCELLED);
 
         // When
         when(orderRepository.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
-        when(orderRepository.save(cancelledOrderWithId)).thenReturn(Mono.just(cancelledOrderWithId));
+        when(orderRepository.save(cancelledOrder)).thenReturn(Mono.just(cancelledOrder));
 
-        orderServiceImpl.markAsCancelled(order.getExternalId()).subscribe(returnedOrder -> {
-            orderAtomicReference.set(returnedOrder);
-            countDownLatch.countDown();
-        });
+        Mono<Order> orderMono = orderService.markAsCancelled(order.getExternalId());
 
         // Then
-        countDownLatch.await();
-        assertNotNull(orderAtomicReference.get());
-        assertEquals(cancelledOrderWithId, orderAtomicReference.get());
+        StepVerifier.create(orderMono).expectNext(cancelledOrder).verifyComplete();
     }
 
     @Test
@@ -250,7 +255,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderServiceImpl.save(nullOrders);
+            orderService.save(nullOrders);
         });
 
         // Then
@@ -267,7 +272,7 @@ class OrderServiceImplTest {
 
         // When
         UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderServiceImpl.save(orders);
+            orderService.save(orders);
         });
 
         // Then
@@ -281,7 +286,7 @@ class OrderServiceImplTest {
 
         // When
         UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderServiceImpl.findByName(name);
+            orderService.findByName(name);
         });
 
         // Then
@@ -295,7 +300,7 @@ class OrderServiceImplTest {
 
         // When
         UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderServiceImpl.findOneByName(name);
+            orderService.findOneByName(name);
         });
 
         // Then
@@ -314,7 +319,7 @@ class OrderServiceImplTest {
 
         // When
         when(orderRepository.find()).thenReturn(Flux.fromIterable(orders));
-        Flux<Order> orderFlux = orderServiceImpl.findAll();
+        Flux<Order> orderFlux = orderService.findAll();
 
         // Then
         StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
