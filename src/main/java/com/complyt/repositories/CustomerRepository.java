@@ -27,8 +27,9 @@ public class CustomerRepository {
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("name").regex("^" + name, "i")
                             .and("clientId").is(user.getClientId()));
+                    log.debug("Searching for customers with name : " + name);
 
-                    return reactiveMongoTemplate.find(query, Customer.class);
+                    return reactiveMongoTemplate.find(query, Customer.class).log();
                 });
     }
 
@@ -38,8 +39,9 @@ public class CustomerRepository {
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("name").is("^" + name)
                             .and("clientId").is(user.getClientId()));
+                    log.debug("Searching for a customer with name : " + name);
 
-                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class).log();
                 });
     }
 
@@ -48,15 +50,16 @@ public class CustomerRepository {
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+                    log.debug("Executing findAll customers");
 
-                    return reactiveMongoTemplate.find(query, Customer.class);
+                    return reactiveMongoTemplate.find(query, Customer.class).log();
                 });
     }
 
     public Mono<Customer> save(@NonNull Customer customer) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMap(user -> reactiveMongoTemplate.save(customer.withClientId(user.getClientId())));
+                .flatMap(user -> reactiveMongoTemplate.save(customer.withClientId(user.getClientId()))).log();
     }
 
     public Mono<Customer> findById(String id) {
@@ -65,8 +68,9 @@ public class CustomerRepository {
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("clientId").is(user.getClientId()));
+                    log.debug("Searching for a customer with id of : " + id);
 
-                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class).log();
                 });
     }
 
@@ -76,8 +80,9 @@ public class CustomerRepository {
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
                             .and("clientId").is(user.getClientId()));
+                    log.debug("Searching for a customer with externalId of : " + externalId);
 
-                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class).log();
                 });
     }
 
@@ -87,8 +92,9 @@ public class CustomerRepository {
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("clientId").is(user.getClientId()));
+                    log.debug("Executing findById with search criteria of customer id : " + id.toString());
 
-                    return reactiveMongoTemplate.findOne(query, Customer.class);
+                    return reactiveMongoTemplate.findOne(query, Customer.class).log();
                 });
     }
 }

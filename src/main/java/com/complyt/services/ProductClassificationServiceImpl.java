@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
+import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
@@ -21,27 +22,27 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     private ProductClassificationRepository productClassificationRepository;
 
     @Override
-    public Mono<Order> save(Order object) {
+    public Mono<ProductClassification> save(ProductClassification object) {
         throw new UnsupportedOperationException("save isn't implemented");
     }
 
     @Override
-    public Mono<Order> findOneByName(@NonNull String name) {
+    public Mono<ProductClassification> findOneByName(@NonNull String name) {
         throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     @Override
-    public Flux<Order> findByName(@NonNull String name) {
+    public Flux<ProductClassification> findByName(@NonNull String name) {
         throw new UnsupportedOperationException("findByName isn't implemented");
     }
 
     @Override
-    public Mono<Order> findById(@NonNull String id) {
+    public Mono<ProductClassification> findById(@NonNull String id) {
         throw new UnsupportedOperationException("findById isn't implemented");
     }
 
     @Override
-    public Flux<Order> findAll() {
+    public Flux<ProductClassification> findAll() {
         throw new UnsupportedOperationException("findAll isn't implemented");
     }
 
@@ -54,4 +55,19 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return productClassificationRepository.findAll();
     }
 
+    @Override
+    public Mono<Order> setJurisdictionalRules(OrderJurisdictionalRulesInjector orderProductClassificationInjector) {
+        return injectRulesToOrderItems().apply(orderProductClassificationInjector);
+    }
+
+    private Function<OrderJurisdictionalRulesInjector, Mono<Order>> injectRulesToOrderItems() {
+        return orderProductClassificationInjector -> Flux.fromIterable(orderProductClassificationInjector.getOrder().getItems())
+                .flatMap(item -> getClassification(item.getTaxCode()))
+                .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
+                .flatMap(orderProductClassificationInjector::act);
+    }
+
+    private Mono<ProductClassification> getClassification(String taxCode) {
+        return findOneByTaxCode(taxCode);
+    }
 }

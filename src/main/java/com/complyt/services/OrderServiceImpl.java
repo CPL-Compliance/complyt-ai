@@ -5,7 +5,9 @@ import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -16,9 +18,20 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
+
     @NonNull
     private OrderRepository orderRepository;
+
+    @NonNull
+    @Qualifier("salesTaxServiceImpl")
+    private SalesTaxService salesTaxService;
+
+    @Override
+    public Mono<Order> calculate(Order order) {
+        return salesTaxService.calculate(order);
+    }
 
     @Override
     public Mono<Order> save(Order order) {
@@ -39,8 +52,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
-            return orderRepository.findByExternalId(order.getExternalId())
-                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId" + externalId)))
+            return orderRepository.findByExternalId(externalId).log()
+                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
     }
