@@ -5,6 +5,7 @@ import com.complyt.domain.Order;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 @Getter
 @Slf4j
-public class OrderProductClassificationInjector implements OrderDataInjector<ProductClassification> {
+public class OrderJurisdictionalRulesInjector implements OrderDataInjector<ProductClassification> {
     @NonNull
     private final Order order;
 
@@ -40,7 +42,9 @@ public class OrderProductClassificationInjector implements OrderDataInjector<Pro
                 itemsWithRules.add(itemWithRules);
             }
 
-            return order.withItems(itemsWithRules);
+            Order orderWithModifiedItems = order.withItems(itemsWithRules);
+            log.debug("Order with items with rules injected : " + orderWithModifiedItems);
+            return orderWithModifiedItems;
         });
     }
 }
