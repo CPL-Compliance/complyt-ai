@@ -1,6 +1,7 @@
 package com.complyt.domain.nexus;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.List;
 @ToString
 @Document(collection = "nexus_state_rule")
 public class NexusStateRule {
+    @Id
+    private String id;
     private boolean enforcesNexus;
     private String state;
     private List<TaxableCategory> taxableCategories;
