@@ -4,5 +4,5 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://complyt_app:d4GVyPYBMEDfJgKp@cluster0.tlaie.mongodb.net/complyt
-#      uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.tlaie.mongodb.net/${MONGODB_DBNAME}
+#      uri: mongodb+srv://complyt_app:d4GVyPYBMEDfJgKp@cluster0.tlaie.mongodb.net/complyt
+      uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@cluster0.tlaie.mongodb.net/complyt
