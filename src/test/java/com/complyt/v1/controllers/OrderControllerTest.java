@@ -5,6 +5,8 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.OrderFacade;
@@ -67,7 +69,7 @@ class OrderControllerTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };

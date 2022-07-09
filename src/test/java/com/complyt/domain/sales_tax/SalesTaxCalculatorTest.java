@@ -2,6 +2,8 @@ package com.complyt.domain.sales_tax;
 
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.Item;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,8 +42,8 @@ public class SalesTaxCalculatorTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
 
         List<Item> items = new ArrayList<Item>(){{
-                add(new Item(1000,2,2000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0));
-                add(new Item(3000,3,9000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0));
+                add(new Item(1000,2,2000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+                add(new Item(3000,3,9000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float amount = 0;
 
@@ -62,7 +64,7 @@ public class SalesTaxCalculatorTest {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         List<Item> items = new ArrayList<Item>(){{
-            add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,true,0.5f));
+            add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,true,0.5f,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float amount = items.get(0).getTotalPrice() * 0.5f;
 
@@ -81,7 +83,7 @@ public class SalesTaxCalculatorTest {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesByPercentage = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
         List<Item> items = new ArrayList<Item>(){{
             add(new Item(1000,2,2000,"description","name","taxCode",
-                    jurisdictionalSalesTaxRulesByPercentage, salesTaxRate,false,0.5f));
+                    jurisdictionalSalesTaxRulesByPercentage, salesTaxRate,false,0.5f,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float partialTotalPrice = items.get(0).getTotalPrice() * jurisdictionalSalesTaxRulesByPercentage.getCalculationValue();
         float amount = partialTotalPrice * items.get(0).getSalesTaxRate().getTaxRate();

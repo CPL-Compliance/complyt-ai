@@ -37,14 +37,12 @@ public class StateRepositoryTest {
 
     @BeforeAll
     public void setUp() {
-        String id = UUID.randomUUID().toString();
-        double salesTaxRate = 0.6;
         String abbreviation = "CA";
         String code = "08";
         String name = "California";
         List<Nexus> nexuses = null;
 
-        state = new State(id, salesTaxRate, abbreviation, code, name, nexuses);
+        state = new State(abbreviation, code, name);
     }
 
     @Test

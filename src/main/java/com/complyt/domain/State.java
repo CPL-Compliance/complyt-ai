@@ -11,13 +11,8 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @With
-@Document(collection = "state")
 public class State {
-    @Id
-    private String id;
-    private double salesTaxRate;
     private String abbreviation;
     private String code;
     private String name;
-    private List<Nexus> nexuses;
 }

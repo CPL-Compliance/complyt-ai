@@ -2,6 +2,9 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
+import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.security.User;
 import org.bson.types.ObjectId;
@@ -57,8 +60,8 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null, CustomerType.MARKET_PLACE);
         customer = new Customer(id, externalId, "customer", shippingAddress,clientId);
     }
 

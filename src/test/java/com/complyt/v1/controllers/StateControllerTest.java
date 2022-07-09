@@ -64,7 +64,7 @@ public class StateControllerTest {
         String name = "California";
         List<Nexus> nexuses = null;
 
-        Mono<State> state = Mono.just(new State(id, salesTaxRate, abbreviation, code, name, nexuses));
+        Mono<State> state = Mono.just(new State(abbreviation, code, name));
         when(stateFacade.findByName(name)).thenReturn(state);
 
         // When + Then
@@ -78,7 +78,6 @@ public class StateControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(State.class)
-                .value(stateItem -> stateItem.getName(), equalTo(name))
-                .value(stateItem -> stateItem.getSalesTaxRate(), equalTo(salesTaxRate));
+                .value(stateItem -> stateItem.getName(), equalTo(name));
     }
 }

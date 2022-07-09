@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.nexus.CustomerType;
 import com.complyt.domain.sales_tax.SalesTax;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -27,4 +28,7 @@ public class Order {
     private SalesTax salesTax;
     private OrderStatus orderStatus;
     private ObjectId clientId;
+    private TimeStamps internalTimeStamps;
+    private TimeStamps externalTimeStamps;
+    private CustomerType customerType;
 }

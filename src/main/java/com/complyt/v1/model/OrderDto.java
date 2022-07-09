@@ -21,4 +21,7 @@ public class OrderDto {
     private CustomerDto customer;
     private SalesTaxDto salesTax;
     private OrderStatusDto orderStatus;
+    private TimeStampsDto internalTimeStamps;
+    private TimeStampsDto externalTimeStamps;
+    private CustomerTypeDto customerType;
 }

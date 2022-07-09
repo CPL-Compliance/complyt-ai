@@ -4,6 +4,8 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -38,7 +40,7 @@ public class OrderJurisdictionalRulesInjectorTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };
@@ -58,9 +60,9 @@ public class OrderJurisdictionalRulesInjectorTest {
     @Test
     void testAct() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null,null,false,0);
+                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
-                null,null,false,0);
+                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
         List<Item> itemsNoRules = new ArrayList<Item>(){{
             add(item1NoRule);
             add(item2NoRule);

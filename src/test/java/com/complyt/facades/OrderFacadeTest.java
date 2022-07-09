@@ -5,6 +5,9 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.OrderService;
@@ -57,9 +60,9 @@ public class OrderFacadeTest {
         List<Item> items = new ArrayList<>();
         ObjectId clientId = new ObjectId();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null,false,0
+                null, null,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null, CustomerType.MARKET_PLACE);
     }
 
     @Test

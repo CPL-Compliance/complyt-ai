@@ -5,6 +5,9 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.nexus.TangibleCategory;
+import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -108,11 +111,11 @@ public class ProductClassificationServiceTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null, CustomerType.MARKET_PLACE);
         List<Item> itemsWithRules = new ArrayList<Item>() {{
             add(order.getItems().get(0).withJurisdictionalSalesTaxRules(productClassification.getJurisdictionalSalesTaxRules().get("CA")));
         }};

@@ -20,4 +20,6 @@ public class ItemDto {
     private SalesTaxRateDto salesTaxRate;
     private boolean manualSalesTax;
     private float manualSalesTaxRate;
+    private TangibleCategoryDto tangibleCategory;
+    private TaxableCategoryDto taxableCategory;
 }
