@@ -6,14 +6,13 @@ import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -71,13 +70,13 @@ public class OrderServiceImpl implements OrderService {
                 .flatMap(orderRepository::save);
     }
 
-    public Flux<Order> findAll() {
-        return orderRepository.find();
+    @Override
+    public Flux<Order> getOrdersByFilter(@NonNull Query query) {
+        return orderRepository.find(query);
     }
 
-    @Override
-    public void save(@NonNull List<ObjectId> orders) {
-        throw new UnsupportedOperationException("save isn't implemented yet");
+    public Flux<Order> findAll() {
+        return orderRepository.find();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.complyt.domain.nexus;
+package com.complyt.domain;
 
 public enum CustomerType {
     RETAIL,

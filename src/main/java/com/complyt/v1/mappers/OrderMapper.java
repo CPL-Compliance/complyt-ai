@@ -1,9 +1,6 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.*;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.*;
 import org.mapstruct.Mapper;
@@ -33,4 +30,7 @@ public interface OrderMapper {
 
     TimeStamps timeStampsDtoToTimeStamps(TimeStampsDto timeStampsDto);
     TimeStampsDto timeStampsToTimeStampsDto(TimeStamps timeStamps);
+
+    CustomerType CustomerTypeDtoToCustomerType(CustomerTypeDto customerTypeDto);
+    CustomerTypeDto CustomerTypeToCustomerTypeDto(CustomerType customerType);
 }

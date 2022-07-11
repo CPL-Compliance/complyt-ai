@@ -11,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 @With
 @ToString
-public class EconomicNexusTracker{
+public class EconomicNexusTracker {
     private boolean established;
     private Date establishedDate;
 }

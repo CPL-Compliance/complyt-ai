@@ -2,6 +2,9 @@ package com.complyt.facades;
 
 import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusTracking;
+import com.complyt.services.NexusService;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
 import lombok.AllArgsConstructor;
@@ -24,14 +27,32 @@ public class OrderFacade {
     @NonNull
     private ProductClassificationService productClassificationService;
 
+    @NonNull
+    private NexusService nexusService;
+
+    public Mono<NexusStateRule> handle(String state){
+        return nexusService.findRuleByState(state);
+    }
+
     public Mono<Order> upsert(@NonNull String externalId, Order order) {
         return orderService.upsert(externalId, order);
     }
 
     public Mono<Order> saveOrder(Order order) {
-        return calculateSalesTax(order)
-                .flatMap(this::save);
-    }
+        return nexusService.handle(order);
+//        return nexusService.handle(order);
+//        return nexusService.hasNexus(order.getShippingAddress().getState()).flatMap(hasNexus -> {
+//            hasNexus ?
+//                    calculateSalesTax(order).flatMap(this::save) :
+//                    save(order).flatMap(nexusService::handle)
+//
+//        });
+        }
+
+//    public Mono<Order> saveOrder(Order order) {
+//        return calculateSalesTax(order)
+//                .flatMap(this::save);
+//    }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
         return findByExternalId(externalId)

@@ -7,7 +7,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.nexus.TangibleCategory;
 import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;

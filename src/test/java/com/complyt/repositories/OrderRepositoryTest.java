@@ -2,7 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
-import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.nexus.TangibleCategory;
 import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;

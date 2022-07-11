@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,25 +66,39 @@ public class OrderRepository {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
                             .and("clientId").is(user.getClientId()));
                     log.debug("Searching for an order with external id of : " + externalId);
-
+                    System.out.println("" + query);
                     return reactiveMongoTemplate
                             .findOne(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate
                                     .findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer)).log();
-                });
+                                    .map(order::withCustomer));
+                }).log();
     }
 
     public Flux<Order> find() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+        return ReactiveSecurityContextHolder.getContext().log()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal()).log()
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
-                    log.debug("Executing find client's related customers");
+                    log.debug("Executing find client's related orders");
 
                     return reactiveMongoTemplate.find(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
                                     .map(order::withCustomer)).log();
                 });
+    }
+
+    public Flux<Order> find(Query query) {
+            System.out.println("" + query);
+//        return ReactiveSecurityContextHolder.getContext()
+//                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+//                .flatMapMany(user -> {
+//
+//                    log.debug("Executing find client's related orders by query : " + query);
+
+                    return reactiveMongoTemplate.find(query, Order.class).log()
+                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class).log()
+                                    .map(order::withCustomer));
+//                });
     }
 }

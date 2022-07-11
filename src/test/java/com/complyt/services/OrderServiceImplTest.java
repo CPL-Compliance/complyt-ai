@@ -4,7 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.nexus.CustomerType;
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.nexus.TangibleCategory;
 import com.complyt.domain.nexus.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -26,8 +26,6 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -249,37 +247,6 @@ class OrderServiceImplTest {
 
         // Then
         StepVerifier.create(orderMono).expectNext(cancelledOrder).verifyComplete();
-    }
-
-    @Test
-    void saveOrders_NullGiven_ThrowsException() {
-        // Given
-        List<ObjectId> nullOrders = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderService.save(nullOrders);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "orders is marked non-null but is null");
-    }
-
-    @Test
-    void saveOrders_OrdersListGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        List<ObjectId> orders = new ArrayList<ObjectId>() {{
-            add(new ObjectId());
-            add(new ObjectId());
-        }};
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.save(orders);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "save isn't implemented yet");
     }
 
     @Test

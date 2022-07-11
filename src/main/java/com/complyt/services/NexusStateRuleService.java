@@ -1,0 +1,10 @@
+package com.complyt.services;
+
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.services.CrudService;
+import lombok.NonNull;
+import reactor.core.publisher.Mono;
+
+public interface NexusStateRuleService extends CrudService <NexusStateRule,String> {
+    Mono<NexusStateRule> findByState(@NonNull String state);
+}

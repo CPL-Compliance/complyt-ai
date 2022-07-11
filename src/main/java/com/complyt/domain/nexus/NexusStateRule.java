@@ -1,5 +1,6 @@
 package com.complyt.domain.nexus;
 
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.State;
 import lombok.*;
 import org.springframework.data.annotation.Id;

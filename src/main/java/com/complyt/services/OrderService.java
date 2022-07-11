@@ -1,18 +1,17 @@
 package com.complyt.services;
 
 import com.complyt.domain.Order;
+import com.complyt.services.CrudService;
 import lombok.NonNull;
-import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Query;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface OrderService extends CrudService<Order, String> {
-    void save(List<ObjectId> orders);
     Mono<Order> findByExternalId(@NonNull final String externalId);
     Mono<Order> upsert(@NonNull final String externalId, @NonNull final Order order);
     Mono<Order> update(@NonNull final String externalId, @NonNull final Order order);
     Mono<Order> markAsCancelled(@NonNull final  String orderId);
-
-    Mono<Order> calculate(Order orderTemp);
+    Flux<Order> getOrdersByFilter(@NonNull Query query);
+    Mono<Order> calculate(@NonNull Order orderTemp);
 }

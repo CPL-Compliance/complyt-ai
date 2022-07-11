@@ -1,6 +1,8 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
 import com.complyt.security.permissions.order.OrderReadPermission;
@@ -36,9 +38,19 @@ public class OrderController {
     @GetMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<OrderDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
-        return orderFacade.findByExternalId(externalId).log()
+        return orderFacade.findByExternalId(externalId)
                 .map(orderItem -> new ResponseEntity<>(OrderMapper.INSTANCE.orderToOrderDto(orderItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+    }
+
+    @Operation(summary = "Gets order by externalId")
+    @OrderReadPermission
+    @GetMapping("tracking/{state}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<NexusStateRule>> getTracking(@PathVariable("state") @NonNull String state) {
+        return orderFacade.handle(state).log()
+                .map(statee -> new ResponseEntity<>(statee, HttpStatus.OK))
+                .switchIfEmpty(Mono.error(new NotFoundException("bad")));
     }
 
     @Operation(summary = "Gets all orders")
@@ -57,12 +69,12 @@ public class OrderController {
                                                  @RequestBody @NonNull OrderDto orderDto) {
         log.debug("Upsert order - DTO received in request body : " + orderDto);
         Order mappedOrder = OrderMapper.INSTANCE.orderDtoToOrder(orderDto);
-
-        return orderFacade.findByExternalId(externalId)
-                .flatMap(order -> orderFacade.updateIfModified(externalId, mappedOrder))
-                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))).log()
-                .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
-                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order)))).log();
+        return orderFacade.saveOrder(mappedOrder).map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order)));
+//        return orderFacade.findByExternalId(externalId)
+//                .flatMap(order -> orderFacade.updateIfModified(externalId, mappedOrder))
+//                .map(orderItem -> ResponseEntity.status(HttpStatus.OK).body(OrderMapper.INSTANCE.orderToOrderDto(orderItem))).log()
+//                .switchIfEmpty(orderFacade.saveOrder(mappedOrder)
+//                        .map(order -> ResponseEntity.status(HttpStatus.CREATED).body(OrderMapper.INSTANCE.orderToOrderDto(order)))).log();
     }
 
     @Operation(summary = "Marks the order as cancelled")
