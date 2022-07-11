@@ -89,16 +89,14 @@ public class OrderRepository {
     }
 
     public Flux<Order> find(Query query) {
-            System.out.println("" + query);
-//        return ReactiveSecurityContextHolder.getContext()
-//                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-//                .flatMapMany(user -> {
-//
-//                    log.debug("Executing find client's related orders by query : " + query);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMapMany(user -> {
+                    log.debug("Executing find client's related orders by query : " + query);
 
                     return reactiveMongoTemplate.find(query, Order.class).log()
-                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class).log()
+                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
                                     .map(order::withCustomer));
-//                });
+                });
     }
 }
