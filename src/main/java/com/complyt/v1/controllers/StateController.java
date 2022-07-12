@@ -33,12 +33,4 @@ public class StateController {
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND))
                 .onErrorReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
-
-    @Operation(summary = "Test method")
-    @StateReadPermission
-    @GetMapping("/test")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<String> test(){
-        return Mono.just("Hi from Docker :)");
-    }
 }
