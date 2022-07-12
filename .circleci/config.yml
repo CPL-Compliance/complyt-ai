@@ -12,10 +12,10 @@ workflows:
           requires:
             - build
       - publish-docker:
-#          filters:
-#            branches:
-#              only:
-#                - main
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - unit-test
             - integration-test
