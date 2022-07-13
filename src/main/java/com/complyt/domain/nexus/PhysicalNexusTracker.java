@@ -1,7 +1,11 @@
 package com.complyt.domain.nexus;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.With;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter

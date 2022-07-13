@@ -2,6 +2,7 @@ package com.complyt.business.order;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,7 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
             String state = order.getShippingAddress().getState();
             List<Item> itemsWithRules = new ArrayList<>();
             Item itemWithRules;
+
             for (Item item : order.getItems()) {
                 ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
                 JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
@@ -41,8 +43,15 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
                 log.debug("Inserting new item with rules : " + itemWithRules);
                 itemsWithRules.add(itemWithRules);
             }
+            List<Item> itemsWithTaxableCategories = new ArrayList<>();
+            for(Item item : itemsWithRules) {
+                TaxableCategory taxAbleCategory = item.getJurisdictionalSalesTaxRules().isTaxable() ?
+                        TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
+                Item newItem = item.withTaxableCategory(taxAbleCategory);
+                itemsWithTaxableCategories.add(newItem);
+            }
 
-            Order orderWithModifiedItems = order.withItems(itemsWithRules);
+            Order orderWithModifiedItems = order.withItems(itemsWithTaxableCategories);
             log.debug("Order with items with rules injected : " + orderWithModifiedItems);
             return orderWithModifiedItems;
         });

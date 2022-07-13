@@ -29,5 +29,4 @@ public class Order {
     private ObjectId clientId;
     private TimeStamps internalTimeStamps;
     private TimeStamps externalTimeStamps;
-    private CustomerType customerType;
 }

@@ -1,5 +1,6 @@
-package com.complyt.services;
+package com.complyt.services.nexus;
 
+import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.repositories.NexusTrackingRepository;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 @AllArgsConstructor
 @Slf4j
@@ -34,7 +38,7 @@ public class NexusTrackingServiceImpl implements NexusTrackingService {
 
     @Override
     public Mono<NexusTracking> save(@NonNull NexusTracking nexusTracking) {
-        return null;
+        return nexusTrackingRepository.save(nexusTracking);
     }
 
     @Override
@@ -45,5 +49,14 @@ public class NexusTrackingServiceImpl implements NexusTrackingService {
     @Override
     public Flux<NexusTracking> findAll() {
         return null;
+    }
+
+    @Override
+    public Mono<NexusTracking> saveWithEconomicQualified(@NonNull NexusTracking nexusTracking) {
+        EconomicNexusTracker newTracker = new EconomicNexusTracker(true,
+                new Date());
+        NexusTracking modifiedTracking = nexusTracking.withEconomicNexusTracker(newTracker);
+
+        return save(modifiedTracking);
     }
 }

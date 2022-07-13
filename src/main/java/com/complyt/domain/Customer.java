@@ -5,12 +5,12 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "customer")
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 @With
 @ToString
+@Document(collection = "customer")
 public class Customer {
     @Id
     private final String id;
@@ -18,4 +18,5 @@ public class Customer {
     private final String name;
     private final Address address;
     private final ObjectId clientId;
+    private CustomerType customerType;
 }

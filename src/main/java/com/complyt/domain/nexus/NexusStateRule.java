@@ -2,6 +2,9 @@ package com.complyt.domain.nexus;
 
 import com.complyt.domain.CustomerType;
 import com.complyt.domain.State;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.nexus.enums.TimeFrame;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

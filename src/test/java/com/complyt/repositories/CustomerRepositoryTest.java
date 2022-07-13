@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.security.User;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ class CustomerRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, clientId);
+        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")

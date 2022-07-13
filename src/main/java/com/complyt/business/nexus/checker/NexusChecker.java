@@ -1,4 +1,4 @@
-package com.complyt.domain.nexus.checker;
+package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -27,10 +27,10 @@ public class NexusChecker {
 
     public boolean hasNexus(@NonNull NexusTracking nexusTracking) {
         return physicalNexusChecker.check(nexusTracking) || economicNexusChecker.check(nexusTracking) ||
-                nexusEnforcementChecker.check(nexusTracking);
+                !nexusEnforcementChecker.check(nexusTracking);
     }
 
-    public boolean exceededNexus(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule){
+    public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule){
         Pair<NexusCalculationSummary,NexusStateRule> summaryAndRule = new Pair<>(calculationSummary,stateRule);
         return nexusThresholdCheck.check(summaryAndRule);
     }

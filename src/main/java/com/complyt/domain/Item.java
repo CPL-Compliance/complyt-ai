@@ -1,7 +1,7 @@
 package com.complyt.domain;
 
-import com.complyt.domain.nexus.TangibleCategory;
-import com.complyt.domain.nexus.TaxableCategory;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.*;

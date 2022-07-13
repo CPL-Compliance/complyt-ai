@@ -1,4 +1,4 @@
-package com.complyt.domain.nexus;
+package com.complyt.domain.nexus.enums;
 
 public enum TimeFrame {
     CURRENT_AND_PREVIOUS_TAXABLE_YEAR,

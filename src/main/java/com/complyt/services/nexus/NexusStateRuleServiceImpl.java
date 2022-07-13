@@ -1,4 +1,4 @@
-package com.complyt.services;
+package com.complyt.services.nexus;
 
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.repositories.NexusStateRuleRepository;

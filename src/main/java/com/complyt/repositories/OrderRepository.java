@@ -14,8 +14,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +64,7 @@ public class OrderRepository {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
                             .and("clientId").is(user.getClientId()));
                     log.debug("Searching for an order with external id of : " + externalId);
-                    System.out.println("" + query);
+
                     return reactiveMongoTemplate
                             .findOne(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate

@@ -1,4 +1,4 @@
-package com.complyt.services;
+package com.complyt.services.nexus;
 
 import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.services.CrudService;
@@ -14,4 +14,6 @@ public interface NexusTrackingService extends CrudService<NexusTracking,String> 
     Mono<NexusTracking> findByState(@NonNull String state);
 
     Flux<NexusTracking> findAll();
+
+    Mono<NexusTracking> saveWithEconomicQualified(@NonNull NexusTracking nexusTracking);
 }

@@ -1,4 +1,4 @@
-package com.complyt.domain.nexus.checker;
+package com.complyt.business.nexus.checker;
 
 import lombok.NonNull;
 

@@ -1,6 +1,8 @@
-package com.complyt.domain.nexus;
+package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.NexusCalculationSummary;
+import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

@@ -6,8 +6,8 @@
 //import com.complyt.domain.Order;
 //import com.complyt.domain.OrderStatus;
 //import com.complyt.domain.CustomerType;
-//import com.complyt.domain.nexus.TangibleCategory;
-//import com.complyt.domain.nexus.TaxableCategory;
+//import com.complyt.domain.nexus.enums.TangibleCategory;
+//import com.complyt.domain.nexus.enums.TaxableCategory;
 //import com.complyt.domain.sales_tax.SalesTax;
 //import com.complyt.domain.sales_tax.SalesTaxRate;
 //import com.complyt.services.OrderService;

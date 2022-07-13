@@ -1,7 +1,6 @@
 package com.complyt.v1.controllers;
 
 
-import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.facades.StateFacade;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -62,7 +60,7 @@ public class StateControllerTest {
         String abbreviation = "Abbreviation";
         String code = "08";
         String name = "California";
-        List<Nexus> nexuses = null;
+//        List<Nexus> nexuses = null;
 
         Mono<State> state = Mono.just(new State(abbreviation, code, name));
         when(stateFacade.findByName(name)).thenReturn(state);

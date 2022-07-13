@@ -1,7 +1,7 @@
-package com.complyt.domain.nexus;
+package com.complyt.business.nexus.data_extractor;
 
+import com.complyt.domain.nexus.NexusStateRule;
 import lombok.NonNull;
-import reactor.core.publisher.Mono;
 
 public interface NexusDataExtractor<T, Obj> {
     T extract(@NonNull Obj obj, @NonNull NexusStateRule nexusStateRule);

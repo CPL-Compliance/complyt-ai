@@ -1,14 +1,16 @@
-package com.complyt.domain.nexus.checker;
+package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Slf4j
 public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> {
 
     @Override

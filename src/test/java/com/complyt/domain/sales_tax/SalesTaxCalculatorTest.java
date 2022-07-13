@@ -2,8 +2,8 @@ package com.complyt.domain.sales_tax;
 
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.Item;
-import com.complyt.domain.nexus.TangibleCategory;
-import com.complyt.domain.nexus.TaxableCategory;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;

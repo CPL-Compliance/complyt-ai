@@ -1,4 +1,4 @@
-package com.complyt.domain.nexus;
+package com.complyt.domain.nexus.enums;
 
 public enum Definition {
     AMOUNT_AND_COUNT,

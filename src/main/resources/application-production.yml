@@ -1,6 +1,6 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@cluster0.tlaie.mongodb.net/comply
+      uri: mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@cluster0.tlaie.mongodb.net/eyal
 server:
   port: ${PORT:9898}
