@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Service
 @AllArgsConstructor
 @Slf4j
+@Service
 public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @NonNull
@@ -38,9 +38,13 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
         return null;
     }
 
+    @Override
+    public Mono<ClientTracking> getClientTracking(){
+        return clientTrackingRepository.findClient();
+    }
+
     public Mono<Nexus> getNexusInfo() {
-        return clientTrackingRepository.findClient().log()
-                .map(ClientTracking::getNexus);
+        return getClientTracking().map(clientTracking -> clientTracking.getNexus());
     }
 
     @Override

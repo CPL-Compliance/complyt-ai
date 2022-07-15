@@ -1,70 +1,81 @@
-//package com.complyt.facades;
-//
-//import com.complyt.business.order.OrderJurisdictionalRulesInjector;
-//import com.complyt.domain.Address;
-//import com.complyt.domain.Item;
-//import com.complyt.domain.Order;
-//import com.complyt.domain.OrderStatus;
-//import com.complyt.domain.CustomerType;
-//import com.complyt.domain.nexus.enums.TangibleCategory;
-//import com.complyt.domain.nexus.enums.TaxableCategory;
-//import com.complyt.domain.sales_tax.SalesTax;
-//import com.complyt.domain.sales_tax.SalesTaxRate;
-//import com.complyt.services.OrderService;
-//import com.complyt.services.ProductClassificationService;
-//import org.bson.types.ObjectId;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import reactor.core.publisher.Flux;
-//import reactor.core.publisher.Mono;
-//import reactor.test.StepVerifier;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.UUID;
-//import java.util.concurrent.CountDownLatch;
-//import java.util.concurrent.atomic.AtomicReference;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.when;
-//
-//@ExtendWith(SpringExtension.class)
-//@ExtendWith(MockitoExtension.class)
-//public class OrderFacadeTest {
-//
-//    @InjectMocks
-//    OrderFacade orderFacade;
-//
-//    @Mock
-//    OrderService orderService;
-//
-//    @Mock
-//    ProductClassificationService productClassificationService;
-//
-//    Order order;
-//
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//        String id = UUID.randomUUID().toString();
-//        String externalId = UUID.randomUUID().toString();
-//        ObjectId customerId = new ObjectId();
-//        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-//        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-//        List<Item> items = new ArrayList<>();
-//        ObjectId clientId = new ObjectId();
-//        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-//                null, null,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
-//        ));
+package com.complyt.facades;
+
+import com.complyt.business.order.OrderJurisdictionalRulesInjector;
+import com.complyt.domain.Address;
+import com.complyt.domain.Item;
+import com.complyt.domain.Order;
+import com.complyt.domain.OrderStatus;
+import com.complyt.domain.CustomerType;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.services.OrderService;
+import com.complyt.services.ProductClassificationService;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+public class OrderFacadeTest {
+
+    @InjectMocks
+    OrderFacade orderFacade;
+
+    @Mock
+    OrderService orderService;
+
+    @Mock
+    ProductClassificationService productClassificationService;
+
+    Order order;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        List<Item> items = new ArrayList<>();
+        ObjectId clientId = new ObjectId();
+        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
+                null, null,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
+        ));
 //        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null, CustomerType.MARKET_PLACE);
-//    }
-//
+    }
+
+    @Test
+    void stringMono() {
+
+    }
+
+    @Test
+    void voidMono() {
+
+    }
+
+    //
 //    @Test
 //    void initFacade_NullOrderServiceInstanceGiven_ThrowsNullPointerException() {
 //        // Given
@@ -326,4 +337,4 @@
 //        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
 //
 //    }
-//}
+}

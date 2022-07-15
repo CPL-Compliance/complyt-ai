@@ -10,10 +10,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
-@Repository
 @Slf4j
 @AllArgsConstructor
+@Repository
 public class NexusStateRuleRepository {
+
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
@@ -23,7 +24,7 @@ public class NexusStateRuleRepository {
 
     public Mono<NexusStateRule> findByState(@NonNull String state){
         Query query = Query.query(Criteria.where("state.abbreviation").is(state));
-        return reactiveMongoTemplate.findOne(query, NexusStateRule.class);
+        return reactiveMongoTemplate.findOne(query, NexusStateRule.class).log();
     }
 
 }

@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface ClientTrackingService extends CrudService<ClientTracking,String> {
     Mono<Nexus> getNexusInfo();
+    Mono<ClientTracking> getClientTracking();
 }

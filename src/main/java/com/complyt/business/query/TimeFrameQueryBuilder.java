@@ -43,6 +43,7 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
                 break;
 
         }
+
         return build(dateRange);
     }
 
@@ -51,15 +52,19 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
     }
 
     public Query buildNexusTimeFrame(Nexus nexusInfo, NexusStateRule nexusStateRule) {
-        if(nexusStateRule.getTimeFrame() == TimeFrame.CURRENT_AND_PREVIOUS_TAXABLE_YEAR)
-        {
-            if(nexusInfo.isHasTaxableDate())
+        if (nexusStateRule.getTimeFrame() == TimeFrame.CURRENT_AND_PREVIOUS_TAXABLE_YEAR) {
+            if (nexusInfo.isHasTaxableDate()) {
                 return buildTaxableYearDateRange(nexusInfo.getTaxableDate());
+            }
+
             return build(DateRange.Factory.newPrevAndCurrentCalenderYear());
         }
-
 
         return buildDateRange(nexusStateRule.getTimeFrame());
     }
 
+    public Query buildNexusTimeFrame(NexusStateRule nexusStateRule) {
+
+        return buildDateRange(nexusStateRule.getTimeFrame());
+    }
 }

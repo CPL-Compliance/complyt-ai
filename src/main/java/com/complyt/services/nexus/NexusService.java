@@ -3,10 +3,12 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.TimeFrameQueryBuilder;
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusTracking;
+import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -24,20 +28,20 @@ import java.util.List;
 @Slf4j
 public class NexusService {
 
-    @NonNull
     @Qualifier("nexusTrackingServiceImpl")
+    @NonNull
     private NexusTrackingService nexusTrackingService;
 
-    @NonNull
     @Qualifier("nexusStateRuleServiceImpl")
+    @NonNull
     private NexusStateRuleService nexusStateRuleService;
 
-    @NonNull
     @Qualifier("orderServiceImpl")
+    @NonNull
     private OrderService orderService;
 
-    @NonNull
     @Qualifier("clientTrackingServiceImpl")
+    @NonNull
     private ClientTrackingService clientTrackingService;
 
     @NonNull
@@ -49,6 +53,10 @@ public class NexusService {
     @NonNull
     private TimeFrameQueryBuilder timeFrameQueryBuilder;
 
+    public Mono<ClientTracking> getClientTracking() {
+        return clientTrackingService.getClientTracking();
+    }
+
     public Mono<NexusTracking> findTrackingByState(String state) {
         return nexusTrackingService.findByState(state);
     }
@@ -57,64 +65,49 @@ public class NexusService {
         return nexusStateRuleService.findByState(state);
     }
 
-    public Mono<Boolean> hasNexus(@NonNull String state) {
-        return findTrackingByState(state)
+    public Mono<Boolean> hasNexus(@NonNull Order order) {
+        return findTrackingByState(order.getShippingAddress().getState())
                 .map(nexusTracking -> nexusChecker.hasNexus(nexusTracking));
     }
 
-    public Mono<Order> handle(@NonNull Order order) {
-        return findRuleByState(order.getShippingAddress().getState())
-                .map(nexusStateRule -> {
-                    clientTrackingService.getNexusInfo()
-                            .map(nexusInfo -> {
+    public Flux<Order> getOrdersByTimeFrame() {
+        Query query = timeFrameQueryBuilder.buildDateRange(TimeFrame.CURRENT_AND_PREVIOUS_CALENDER_YEAR);
 
-                                Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule);
-                                return orderService.getOrdersByFilter(query).collectList()
-                                        .flatMap(orders -> aggregateNexusInfo(orders, nexusStateRule));
-                            });
-                    
-                    return order;
-                });
+        return orderService.getOrdersByFilter(query).log();
     }
+
+    public Mono<Order> handle(@NonNull Order order) {
+        return  Mono.empty();
+    }
+
+//    public Mono<Order> handle(@NonNull Order order) {
+//        System.out.println("1 *******");
+//        return clientTrackingService.getNexusInfo().log()
+//                .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
+//                        .flatMap(nexusStateRule -> {
+//                            getOrdersByTimeFrame().collectList().log()
+//                                    .subscribe(orders -> aggregateNexusInfo(orders, nexusStateRule).map(nexusTracking -> order));
+//
+//                        });
+//                        .map(nexusStateRule -> {
+//                            System.out.println("2 *******");
+//                            Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule);
+//
+//                            getOrdersByTimeFrame()
+//                                    .collectList().log()
+//                                    .subscribe(orders -> aggregateNexusInfo(orders, nexusStateRule));
+//
+//                            return order;
+//                        }));
+//    }
 
     public Mono<NexusTracking> aggregateNexusInfo(List<Order> orders, NexusStateRule stateRule) {
         NexusCalculationSummary summary = nexusCalculator.calculate(orders, stateRule);
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
-
-        if (passedThreshold) {
-            return findTrackingByState(stateRule.getState().getAbbreviation())
-                    .flatMap(nexusTrackingService::saveWithEconomicQualified);
-        }
-        return Mono.empty();
-
+        System.out.println("3 *******");
+        return findTrackingByState(stateRule.getState().getAbbreviation())
+                .flatMap(nexusTracking -> passedThreshold ?
+                        nexusTrackingService.saveWithEconomicQualified(nexusTracking) :
+                        Mono.just(nexusTracking)).log();
     }
 }
-
-
-//    public Mono<Order> handle(@NonNull Order order) {
-//        return findRuleByState(order.getShippingAddress().getState())
-//                .map(nexusStateRule -> {
-//                    clientTrackingService.getNexusInfo()
-//                            .map(nexusInfo -> {
-//
-//                                Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule);
-//                                return orderService.getOrdersByFilter(query).collectList()
-//                                        .map(orders -> nexusCalculator.calculate(orders, nexusStateRule))
-//                                        .map(nexusCalculationSummary -> nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule))
-//                                        .flatMap(exceeded -> exceeded ? findTrackingByState(order.getShippingAddress().getState()) : Mono.empty())
-//                                        .flatMap(nexusTrackingService::saveWithEconomicQualified);
-//                            });
-//
-//                    return order;
-//                });
-//    }
-//
-//
-//}
-
-
-//                                orderService.getOrdersByFilter(query).collectList()
-//                                        .map(orders -> nexusCalculator.calculate(orders, nexusStateRule))
-//                                        .map(nexusCalculationSummary -> nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule))
-//                                        .flatMap(exceeded -> exceeded ? findTrackingByState(order.getShippingAddress().getState()) : Mono.empty())
-//                                        .flatMap(nexusTrackingService::saveWithEconomicQualified);

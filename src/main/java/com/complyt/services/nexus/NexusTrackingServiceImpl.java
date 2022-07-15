@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -53,10 +52,9 @@ public class NexusTrackingServiceImpl implements NexusTrackingService {
 
     @Override
     public Mono<NexusTracking> saveWithEconomicQualified(@NonNull NexusTracking nexusTracking) {
-        EconomicNexusTracker newTracker = new EconomicNexusTracker(true,
-                new Date());
+        EconomicNexusTracker newTracker = new EconomicNexusTracker(true, new Date());
         NexusTracking modifiedTracking = nexusTracking.withEconomicNexusTracker(newTracker);
 
-        return save(modifiedTracking);
+        return save(modifiedTracking).log();
     }
 }

@@ -93,7 +93,7 @@ public class OrderRepository {
                     log.debug("Executing find client's related orders by query : " + query);
 
                     return reactiveMongoTemplate.find(query, Order.class).log()
-                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
+                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class).log()
                                     .map(order::withCustomer));
                 });
     }

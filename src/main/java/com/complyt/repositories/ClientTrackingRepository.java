@@ -12,17 +12,17 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
-@Repository
 @Slf4j
 @AllArgsConstructor
+@Repository
 public class ClientTrackingRepository {
 
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<ClientTracking> findClient() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+        return ReactiveSecurityContextHolder.getContext().log()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal()).log()
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 

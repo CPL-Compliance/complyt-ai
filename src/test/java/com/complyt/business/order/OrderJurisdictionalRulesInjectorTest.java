@@ -78,8 +78,8 @@ public class OrderJurisdictionalRulesInjectorTest {
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(rule2.getAbbreviation(),rule2);
         }};
-        ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1);
-        ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2);
+        ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1,TangibleCategory.TANGIBLE);
+        ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2, TangibleCategory.TANGIBLE);
 
         Map<String,ProductClassification> productClassifications = new HashMap<String,ProductClassification>(){{
             put(productClassification1.getTaxCode(),productClassification1);

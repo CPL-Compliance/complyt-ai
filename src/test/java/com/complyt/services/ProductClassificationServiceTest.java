@@ -52,7 +52,7 @@ public class ProductClassificationServiceTest {
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
         productClassification = new ProductClassification("id","C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList);
+                "title",jurisdictionalSalesTaxRulesList,TangibleCategory.TANGIBLE);
     }
 
     @Test

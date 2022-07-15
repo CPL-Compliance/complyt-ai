@@ -14,5 +14,4 @@ public class ClientTracking {
 
     private final ObjectId clientId;
     private Nexus nexus;
-
 }

@@ -2,6 +2,7 @@ package com.complyt.business.order;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -38,6 +39,7 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
 
             for (Item item : order.getItems()) {
                 ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
+
                 JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
                 itemWithRules = item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
                 log.debug("Inserting new item with rules : " + itemWithRules);
@@ -51,7 +53,15 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
                 itemsWithTaxableCategories.add(newItem);
             }
 
-            Order orderWithModifiedItems = order.withItems(itemsWithTaxableCategories);
+            List<Item> itemsWithTangibleCategories = new ArrayList<>();
+            for(Item item : itemsWithTaxableCategories) {
+                ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
+                TangibleCategory tangibleCategory = productClassification.getTangibleCategory();
+                Item newItem = item.withTangibleCategory(tangibleCategory);
+                itemsWithTangibleCategories.add(newItem);
+            }
+
+            Order orderWithModifiedItems = order.withItems(itemsWithTangibleCategories);
             log.debug("Order with items with rules injected : " + orderWithModifiedItems);
             return orderWithModifiedItems;
         });

@@ -1,5 +1,6 @@
 package com.complyt.repositories;
 
+import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -42,7 +43,7 @@ public class ProductClassificationRepositoryTest {
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
         productClassification = new ProductClassification("id","C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList);
+                "title",jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
 
     @Test
