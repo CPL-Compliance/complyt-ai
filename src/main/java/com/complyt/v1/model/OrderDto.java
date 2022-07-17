@@ -23,4 +23,5 @@ public class OrderDto {
     private OrderStatusDto orderStatus;
     private TimeStampsDto internalTimeStamps;
     private TimeStampsDto externalTimeStamps;
+    private NexusTrackingDto nexusTracking;
 }

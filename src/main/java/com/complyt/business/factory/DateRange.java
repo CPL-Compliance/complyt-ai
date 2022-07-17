@@ -27,19 +27,19 @@ public class DateRange {
         public static DateRange newPrevCalenderYear() {
             LocalDateTime firstDayOfLastYear = LocalDate.now().with(firstDayOfYear()).minusYears(1).atStartOfDay();
             LocalDateTime lastDayOfLastYear = firstDayOfLastYear.with(lastDayOfYear());
-            return new DateRange(firstDayOfLastYear,lastDayOfLastYear);
+            return new DateRange(firstDayOfLastYear, lastDayOfLastYear);
         }
 
         public static DateRange newPrevAndCurrentCalenderYear() {
             LocalDateTime firstDayOfLastYear = LocalDate.now().with(firstDayOfYear()).minusYears(1).atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
-            return new DateRange(firstDayOfLastYear,now);
+            return new DateRange(firstDayOfLastYear, now);
         }
 
         public static DateRange newPrevTwelveMonths() {
             LocalDateTime oneYearAgo = LocalDate.now().minusYears(1).atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
-            return new DateRange(oneYearAgo,now);
+            return new DateRange(oneYearAgo, now);
         }
 
         public static DateRange newYearFromSeptember() {
@@ -48,32 +48,39 @@ public class DateRange {
             LocalDateTime startDate, endDate;
 
             // from october 1st to december 31st
-            if(currentDate.compareTo(september30) > 0){
+            if (currentDate.compareTo(september30) > 0) {
                 startDate = september30.minusYears(1).atStartOfDay();
                 endDate = september30.atStartOfDay();
-            }
-            else {
+            } else {
                 startDate = september30.minusYears(2).atStartOfDay();
                 endDate = september30.minusYears(1).atStartOfDay();
             }
 
-            return new DateRange(startDate,endDate);
+            return new DateRange(startDate, endDate);
         }
 
         public static DateRange newTaxableYear(@NonNull LocalDate taxableDate) {
             LocalDate currentDate = LocalDate.now();
             LocalDateTime startDate, endDate;
+            int minusYears;
 
-            if(currentDate.compareTo(taxableDate) > 0) {
-                startDate = taxableDate.minusYears(1).atStartOfDay();
-                endDate = taxableDate.atStartOfDay();
-            }
-            else {
-                startDate = taxableDate.minusYears(2).atStartOfDay();
-                endDate = taxableDate.minusYears(1).atStartOfDay();
+            if (currentDate.compareTo(taxableDate) > 0) {
+                minusYears = 1;
+            } else {
+                minusYears = 2;
             }
 
-            return new DateRange(startDate,endDate);
+            startDate = currentDate
+                    .minusYears(minusYears)
+                    .withMonth(taxableDate.getMonthValue())
+                    .withDayOfMonth(taxableDate.getDayOfMonth())
+                    .atStartOfDay();
+
+            endDate = startDate
+                    .plusYears(1)
+                    .minusDays(1);
+
+            return new DateRange(startDate, endDate);
         }
     }
 }

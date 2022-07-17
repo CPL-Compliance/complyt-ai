@@ -39,12 +39,13 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Mono<ClientTracking> getClientTracking(){
+    public Mono<ClientTracking> getClientTracking() {
         return clientTrackingRepository.findClient();
     }
 
     public Mono<Nexus> getNexusInfo() {
-        return getClientTracking().map(clientTracking -> clientTracking.getNexus());
+        return getClientTracking()
+                .map(ClientTracking::getNexus);
     }
 
     @Override

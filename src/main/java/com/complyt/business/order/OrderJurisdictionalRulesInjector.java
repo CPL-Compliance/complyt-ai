@@ -2,7 +2,6 @@ package com.complyt.business.order;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
-import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -32,38 +31,28 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
     @Override
     public Mono<Order> act(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
-            log.info("Setting jurisdictional sales tax rules to order's items");
+            log.info("Setting jurisdictional sales tax rules and taxable categories to order's items");
             String state = order.getShippingAddress().getState();
-            List<Item> itemsWithRules = new ArrayList<>();
-            Item itemWithRules;
+            List<Item> modifiedItems = new ArrayList<>();
 
             for (Item item : order.getItems()) {
-                ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
+                ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
 
-                JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = productClassification.getJurisdictionalSalesTaxRules().get(state);
-                itemWithRules = item.withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules);
-                log.debug("Inserting new item with rules : " + itemWithRules);
-                itemsWithRules.add(itemWithRules);
-            }
-            List<Item> itemsWithTaxableCategories = new ArrayList<>();
-            for(Item item : itemsWithRules) {
-                TaxableCategory taxAbleCategory = item.getJurisdictionalSalesTaxRules().isTaxable() ?
+                JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
+                Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
+
+                TaxableCategory category  = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
                         TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
-                Item newItem = item.withTaxableCategory(taxAbleCategory);
-                itemsWithTaxableCategories.add(newItem);
+                Item itemWithCategory = itemWithRules.withTaxableCategory(category);
+
+                log.debug("Inserting new item with rules : " + rules + ", with taxable category : " + category);
+                modifiedItems.add(itemWithCategory);
             }
 
-            List<Item> itemsWithTangibleCategories = new ArrayList<>();
-            for(Item item : itemsWithTaxableCategories) {
-                ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
-                TangibleCategory tangibleCategory = productClassification.getTangibleCategory();
-                Item newItem = item.withTangibleCategory(tangibleCategory);
-                itemsWithTangibleCategories.add(newItem);
-            }
+            Order modifiedOrder = order.withItems(modifiedItems);
+            log.debug("Order with items with rules and taxable categories injected : " + modifiedOrder);
 
-            Order orderWithModifiedItems = order.withItems(itemsWithTangibleCategories);
-            log.debug("Order with items with rules injected : " + orderWithModifiedItems);
-            return orderWithModifiedItems;
+            return modifiedOrder;
         });
     }
 }

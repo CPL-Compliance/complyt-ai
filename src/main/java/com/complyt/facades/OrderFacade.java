@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.business.order.OrderJurisdictionalRulesInjector;
-import com.complyt.domain.ClientTracking;
+import com.complyt.business.order.OrderTangibleCategoryInjector;
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -13,10 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 @Component
 @AllArgsConstructor
@@ -33,59 +29,31 @@ public class OrderFacade {
     @NonNull
     private NexusService nexusService;
 
-    public Mono<ClientTracking> getClientTracking() {
-        return nexusService.getClientTracking();
-    }
-
     public Mono<Order> upsert(@NonNull String externalId, Order order) {
         return orderService.upsert(externalId, order);
-    }
-
-    public Flux<Order> getOrdersByTimeFrame() {
-        return nexusService.getOrdersByTimeFrame();
     }
 
     public Mono<Order> saveOrder(Order order) {
         return setBeforeSave(order)
                 .flatMap(setOrder -> nexusService.hasNexus(setOrder)
-                        .flatMap(hasNexus -> {
-                            if (hasNexus == true) {
-                                return calculateSalesTax(setOrder).flatMap(this::save);
-                            } else {
-                                return nexusService.handle(order).flatMap(this::save);
-                            }
-                        }));
+                        .flatMap(hasNexus -> hasNexus ?
+                                calculateSalesTax(setOrder).flatMap(this::save) :
+                                save(setOrder).flatMap(nexusService::handle).map(setOrder::withNexusTracking)));
     }
-//    public Mono<Order> saveOrder(Order order) {
-//        return setBeforeSave(order)
-//                .flatMap(setOrder -> nexusService.hasNexus(setOrder)
-//                        .flatMap(hasNexus -> {
-//                            if (hasNexus == true) {
-//                                return calculateSalesTax(setOrder).flatMap(this::save);
-//                            } else {
-//                                save(setOrder).subscribe(savedOrder -> {
-//                                    log.info("******** " + savedOrder.toString());
-//                                });
-//                                //nexusService.handle(order);
-//
-//                                return Mono.just(order);
-//                            }
-//                        }));
-//    }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
         return findByExternalId(externalId)
                 .flatMap(orderItem -> orderItem.equals(order) ?
                         Mono.just(order) :
                         setBeforeSave(order)
-                                .flatMap(this::calculateSalesTax).log()
+                                .flatMap(this::calculateSalesTax)
                                 .flatMap(updatedOrder -> update(externalId, updatedOrder))
                 );
     }
 
     public Mono<Order> setBeforeSave(Order order) {
         return productClassificationService
-                .setJurisdictionalRules(new OrderJurisdictionalRulesInjector(order));
+                .setDataToOrder(order);
     }
 
     private Mono<Order> calculateSalesTax(Order order) {

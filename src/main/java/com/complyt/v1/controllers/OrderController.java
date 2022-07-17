@@ -1,6 +1,5 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Order;
 import com.complyt.facades.OrderFacade;
 import com.complyt.security.permissions.order.OrderDeletePermission;
@@ -47,22 +46,6 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public Flux<OrderDto> getAll() {
         return orderFacade.getAll().map(OrderMapper.INSTANCE::orderToOrderDto);
-    }
-
-    @Operation(summary = "Gets clientTracking")
-    @OrderReadPermission
-    @GetMapping("clientTracking")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<ClientTracking>> getClientTracking() {
-        return orderFacade.getClientTracking().map(client -> ResponseEntity.status(HttpStatus.CREATED).body(client));
-    }
-
-    @Operation(summary = "Gets clientTracking")
-    @OrderReadPermission
-    @GetMapping("getOrders")
-    @ResponseStatus(HttpStatus.OK)
-    public Flux<Order> getOrdersByTimeFrame() {
-        return orderFacade.getOrdersByTimeFrame().map(order -> order);
     }
 
     @Operation(summary = "This will update the order if found by externalId, otherwise it will create it")

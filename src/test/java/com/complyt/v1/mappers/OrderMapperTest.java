@@ -34,7 +34,7 @@ class OrderMapperTest {
             }
         };
 
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId,  null,null);
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId,  null,null,null);
         OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
 
     }

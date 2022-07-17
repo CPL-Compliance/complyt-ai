@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
 public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
 
@@ -19,7 +17,6 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
 
         return Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart()).lte(dateRange.getEnd()));
-
     }
 
     public Query buildDateRange(@NonNull TimeFrame timeFrame) {
@@ -41,30 +38,17 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
             case YEAR_FROM_SEPTEMBER_TO_SEPTEMBER:
                 dateRange = DateRange.Factory.newYearFromSeptember();
                 break;
-
         }
 
         return build(dateRange);
     }
 
-    public Query buildTaxableYearDateRange(@NonNull LocalDate taxableDate) {
-        return build(DateRange.Factory.newTaxableYear(taxableDate));
-    }
-
     public Query buildNexusTimeFrame(Nexus nexusInfo, NexusStateRule nexusStateRule) {
         if (nexusStateRule.getTimeFrame() == TimeFrame.CURRENT_AND_PREVIOUS_TAXABLE_YEAR) {
-            if (nexusInfo.isHasTaxableDate()) {
-                return buildTaxableYearDateRange(nexusInfo.getTaxableDate());
-            }
-
-            return build(DateRange.Factory.newPrevAndCurrentCalenderYear());
+            return build(DateRange.Factory.newTaxableYear(nexusInfo.getTaxableDate()));
         }
 
         return buildDateRange(nexusStateRule.getTimeFrame());
     }
 
-    public Query buildNexusTimeFrame(NexusStateRule nexusStateRule) {
-
-        return buildDateRange(nexusStateRule.getTimeFrame());
-    }
 }

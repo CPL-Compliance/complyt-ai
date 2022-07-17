@@ -110,7 +110,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,new TimeStamps(new Date(),new Date()));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,new TimeStamps(new Date(),new Date()),null);
     }
 
     @Test
@@ -157,7 +157,7 @@ class NexusServiceTest {
         when(nexusTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusTracking));
 
 //        Mono<NexusTracking> nexusStateRuleMono = nexusService.handle(order);
-
+//
 //        StepVerifier.create(nexusStateRuleMono).expectNext(nexusTracking).verifyComplete();
     }
 

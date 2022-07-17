@@ -1,6 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.*;
+import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.*;
 import org.mapstruct.Mapper;
@@ -31,6 +32,9 @@ public interface OrderMapper {
     TimeStamps timeStampsDtoToTimeStamps(TimeStampsDto timeStampsDto);
     TimeStampsDto timeStampsToTimeStampsDto(TimeStamps timeStamps);
 
-    CustomerType CustomerTypeDtoToCustomerType(CustomerTypeDto customerTypeDto);
-    CustomerTypeDto CustomerTypeToCustomerTypeDto(CustomerType customerType);
+    CustomerType customerTypeDtoToCustomerType(CustomerTypeDto customerTypeDto);
+    CustomerTypeDto customerTypeToCustomerTypeDto(CustomerType customerType);
+
+    NexusTracking nexusTrackingDtoToNexusTracking(NexusTrackingDto nexusTrackingDto);
+    NexusTrackingDto nexusTrackingToNexusTrackingDto(NexusTracking nexusTracking);
 }

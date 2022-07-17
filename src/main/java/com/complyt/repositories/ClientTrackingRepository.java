@@ -21,14 +21,15 @@ public class ClientTrackingRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<ClientTracking> findClient() {
-        return ReactiveSecurityContextHolder.getContext().log()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal()).log()
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
                     log.debug("Searching for a client with id of : " + user.getClientId());
-                    return reactiveMongoTemplate.findOne(query,ClientTracking.class).log();
+                    return reactiveMongoTemplate.findOne(query,ClientTracking.class);
                 });
 
     }
+
 }

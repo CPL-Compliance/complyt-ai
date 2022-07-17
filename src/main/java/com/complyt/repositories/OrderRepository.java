@@ -25,11 +25,20 @@ public class OrderRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<Order> save(@NonNull Order order) {
+
+//        ReactiveSecurityContextHolder.getContext().switchIfEmpty(this::print);
+//                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal());
+
+
+
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(order.withClientId(user.getClientId()))
                         .flatMap(savedOrder -> reactiveMongoTemplate.findById(savedOrder.getCustomerId(), Customer.class)
-                                .map(savedOrder::withCustomer))).log();
+                            .map(savedOrder::withCustomer)));
+    }
+    void print(){
+        System.out.println("empty");
     }
 
     public Flux<Order> saveAll(List<Order> orders) {

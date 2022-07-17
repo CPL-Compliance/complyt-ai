@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -29,4 +30,5 @@ public class Order {
     private ObjectId clientId;
     private TimeStamps internalTimeStamps;
     private TimeStamps externalTimeStamps;
+    private NexusTracking nexusTracking;
 }

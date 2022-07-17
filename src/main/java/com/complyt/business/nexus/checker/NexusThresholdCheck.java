@@ -35,11 +35,11 @@ public class NexusThresholdCheck implements NexusCheck<Pair<NexusCalculationSumm
     }
 
     public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
-        return nexusCalculationSummary.getAmount() > nexusStateRule.getNexusThreshold().getAmount();
+        return nexusCalculationSummary.getAmount() >= nexusStateRule.getNexusThreshold().getAmount();
     }
 
     public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
-        return nexusCalculationSummary.getCount() > nexusStateRule.getNexusThreshold().getCount();
+        return nexusCalculationSummary.getCount() >= nexusStateRule.getNexusThreshold().getCount();
     }
 
     public boolean exceededAmountAndCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
