@@ -40,7 +40,7 @@ public class CustomerDtoTest {
 
     @Test
     void testToString() {
-        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ")";
+        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ", customerType=" + customerDto.getCustomerType() + ")";
 
         assertEquals(referenceString, customerDto.toString());
     }

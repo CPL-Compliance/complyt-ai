@@ -65,15 +65,6 @@ public class OrderFacadeTest {
 //        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null, CustomerType.MARKET_PLACE);
     }
 
-    @Test
-    void stringMono() {
-
-    }
-
-    @Test
-    void voidMono() {
-
-    }
 
     //
 //    @Test

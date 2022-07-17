@@ -57,51 +57,51 @@ public class OrderJurisdictionalRulesInjectorTest {
                 .build();
     }
 
-    @Test
-    void testAct() {
-        Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
-        Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
-                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
-        List<Item> itemsNoRules = new ArrayList<Item>(){{
-            add(item1NoRule);
-            add(item2NoRule);
-        }};
-        JurisdictionalSalesTaxRules rule1 = new JurisdictionalSalesTaxRules("rule1","CA",true,false,
-                CalculationType.FIXED,"rule1",0,null);
-        JurisdictionalSalesTaxRules rule2 = new JurisdictionalSalesTaxRules("rule2","CA",true,false,
-                CalculationType.FIXED,"rule2",0,null);
-
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(rule1.getAbbreviation(),rule1);
-        }};
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(rule2.getAbbreviation(),rule2);
-        }};
-        ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1,TangibleCategory.TANGIBLE);
-        ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2, TangibleCategory.TANGIBLE);
-
-        Map<String,ProductClassification> productClassifications = new HashMap<String,ProductClassification>(){{
-            put(productClassification1.getTaxCode(),productClassification1);
-            put(productClassification2.getTaxCode(),productClassification2);
-        }};
-
-        Item item1WithRule = item1NoRule.withJurisdictionalSalesTaxRules(rule1);
-        Item item2WithRule = item2NoRule.withJurisdictionalSalesTaxRules(rule2);
-        List<Item> itemsWithRules = new ArrayList<Item>(){{
-            add(item1WithRule);
-            add(item2WithRule);
-        }};
-
-        Order order2 = order.withItems(itemsNoRules);
-        OrderJurisdictionalRulesInjector orderProductClassificationInjector2 = new OrderJurisdictionalRulesInjector(order2);
-
-        Order newOrder = order.withItems(itemsWithRules);
-
-        Mono<Order> orderMono = orderProductClassificationInjector2.act(productClassifications);
-
-        StepVerifier.create(orderMono).expectNext(newOrder).verifyComplete();
-
-    }
+//    @Test
+//    void testAct() {
+//        Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
+//                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
+//        Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
+//                null,null,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
+//        List<Item> itemsNoRules = new ArrayList<Item>(){{
+//            add(item1NoRule);
+//            add(item2NoRule);
+//        }};
+//        JurisdictionalSalesTaxRules rule1 = new JurisdictionalSalesTaxRules("rule1","CA",true,false,
+//                CalculationType.FIXED,"rule1",0,null);
+//        JurisdictionalSalesTaxRules rule2 = new JurisdictionalSalesTaxRules("rule2","CA",true,false,
+//                CalculationType.FIXED,"rule2",0,null);
+//
+//        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+//            put(rule1.getAbbreviation(),rule1);
+//        }};
+//        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+//            put(rule2.getAbbreviation(),rule2);
+//        }};
+//        ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1,TangibleCategory.TANGIBLE);
+//        ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2, TangibleCategory.TANGIBLE);
+//
+//        Map<String,ProductClassification> productClassifications = new HashMap<String,ProductClassification>(){{
+//            put(productClassification1.getTaxCode(),productClassification1);
+//            put(productClassification2.getTaxCode(),productClassification2);
+//        }};
+//
+//        Item item1WithRule = item1NoRule.withJurisdictionalSalesTaxRules(rule1);
+//        Item item2WithRule = item2NoRule.withJurisdictionalSalesTaxRules(rule2);
+//        List<Item> itemsWithRules = new ArrayList<Item>(){{
+//            add(item1WithRule);
+//            add(item2WithRule);
+//        }};
+//
+//        Order order2 = order.withItems(itemsNoRules);
+//        OrderJurisdictionalRulesInjector orderProductClassificationInjector2 = new OrderJurisdictionalRulesInjector(order2);
+//
+//        Order newOrder = order.withItems(itemsWithRules);
+//
+//        Mono<Order> orderMono = orderProductClassificationInjector2.act(productClassifications);
+//
+//        StepVerifier.create(orderMono).expectNext(newOrder).verifyComplete();
+//
+//    }
 
 }

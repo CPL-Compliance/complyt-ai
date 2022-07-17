@@ -133,33 +133,33 @@ class NexusServiceTest {
     void getOrdersByTimeFrame() {
     }
 
-    @Test
-    void handle() {
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
-                .gte(LocalDateTime.now().minusYears(1).withMonth(1).withDayOfMonth(1)).lte(LocalDateTime.now()));
-
-        List<Order> filteredOrders = new ArrayList<Order>() {{
-            add(order);
-        }};
-
-        NexusCalculationSummary summary = new NexusCalculationSummary(1,order.getItems().get(0).getTotalPrice());
-        Nexus nexus = new Nexus(false, LocalDate.now());
-
-        NexusTracking nexusTracking = new NexusTracking(UUID.randomUUID().toString(),nexusStateRule.getState(),
-                new ObjectId(),true,new PhysicalNexusTracker(false,null),new EconomicNexusTracker(false,null));
-
-        when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexus));
-        when(nexusStateRuleService.findByState(any())).thenReturn(Mono.just(nexusStateRule));
-        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexus,nexusStateRule)).thenReturn(query);
-        when(orderService.getOrdersByFilter(query)).thenReturn(Flux.fromIterable(filteredOrders));
-        when(nexusCalculator.calculate(filteredOrders,nexusStateRule)).thenReturn(summary);
-        when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
-        when(nexusTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusTracking));
+//    @Test
+//    void handle() {
+//        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+//                .gte(LocalDateTime.now().minusYears(1).withMonth(1).withDayOfMonth(1)).lte(LocalDateTime.now()));
+//
+//        List<Order> filteredOrders = new ArrayList<Order>() {{
+//            add(order);
+//        }};
+//
+//        NexusCalculationSummary summary = new NexusCalculationSummary(1,order.getItems().get(0).getTotalPrice());
+//        Nexus nexus = new Nexus(false, LocalDate.now());
+//
+//        NexusTracking nexusTracking = new NexusTracking(UUID.randomUUID().toString(),nexusStateRule.getState(),
+//                new ObjectId(),true,new PhysicalNexusTracker(false,null),new EconomicNexusTracker(false,null));
+//
+//        when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexus));
+//        when(nexusStateRuleService.findByState(any())).thenReturn(Mono.just(nexusStateRule));
+//        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexus,nexusStateRule)).thenReturn(query);
+//        when(orderService.getOrdersByFilter(query)).thenReturn(Flux.fromIterable(filteredOrders));
+//        when(nexusCalculator.calculate(filteredOrders,nexusStateRule)).thenReturn(summary);
+//        when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
+//        when(nexusTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusTracking));
 
 //        Mono<NexusTracking> nexusStateRuleMono = nexusService.handle(order);
 //
 //        StepVerifier.create(nexusStateRuleMono).expectNext(nexusTracking).verifyComplete();
-    }
+//    }
 
     @Test
     void aggregateNexusInfo() {
