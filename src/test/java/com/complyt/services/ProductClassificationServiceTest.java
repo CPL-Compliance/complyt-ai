@@ -132,47 +132,4 @@ public class ProductClassificationServiceTest {
 //
 //    }
 
-    @Test
-    void save_SaveNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.save(null);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "save isn't implemented");
-    }
-
-    @Test
-    void findById_FindByIdNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String id = "id";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findById(id);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findById isn't implemented");
-    }
-
-    @Test
-    void findAll_FindAllIdNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String id = "id";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findAll();
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findAll isn't implemented");
-    }
-
-
 }
