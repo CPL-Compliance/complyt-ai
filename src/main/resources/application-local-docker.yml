@@ -1,7 +1,6 @@
 server:
   port: ${PORT:9898}
-
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/complyt
+      uri:

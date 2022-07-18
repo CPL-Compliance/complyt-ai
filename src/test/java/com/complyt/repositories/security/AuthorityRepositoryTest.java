@@ -1,5 +1,6 @@
 package com.complyt.repositories.security;
 
+import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.security.Authority;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -23,7 +24,7 @@ import java.util.Collection;
 import static org.mockito.Mockito.when;
 
 
-@SpringBootTest
+@Import(SecurityConfigMockTest.class)
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class AuthorityRepositoryTest {
