@@ -1,12 +1,14 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
@@ -25,6 +27,12 @@ public class NexusStateRuleRepository {
     public Mono<NexusStateRule> findByState(@NonNull String state){
         Query query = Query.query(Criteria.where("state.abbreviation").is(state));
         return reactiveMongoTemplate.findOne(query, NexusStateRule.class).log();
+    }
+
+    public Mono<NexusStateRule> save(@NonNull NexusStateRule nexusStateRule) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> reactiveMongoTemplate.save(nexusStateRule).log());
     }
 
 }

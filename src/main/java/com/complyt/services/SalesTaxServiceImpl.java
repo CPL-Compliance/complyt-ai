@@ -6,6 +6,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.domain.Order;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -45,6 +46,16 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .map(injectSalesTaxToOrder(order));
     }
 
+    @Override
+    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
+    }
+
+    @Override
+    public float calculateSalesTaxAmount(List<Item> items) {
+        return salesTaxCalculator.calculate(items);
+    }
+
     private Mono<SalesTaxData> findByAddress(Address address) {
         return salesTaxWebClientWrapper.findByAddress(address);
     }
@@ -72,10 +83,5 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return items.stream()
                 .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public float calculateSalesTaxAmount(List<Item> items) {
-        return salesTaxCalculator.calculate(items);
     }
 }

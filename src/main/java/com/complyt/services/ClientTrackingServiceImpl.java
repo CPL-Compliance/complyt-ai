@@ -24,16 +24,6 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
     }
 
     @Override
-    public Mono<ClientTracking> findOneByName(@NonNull String name) {
-        return null;
-    }
-
-    @Override
-    public Flux<ClientTracking> findByName(@NonNull String name) {
-        return null;
-    }
-
-    @Override
     public Mono<ClientTracking> findById(@NonNull String id) {
         return null;
     }

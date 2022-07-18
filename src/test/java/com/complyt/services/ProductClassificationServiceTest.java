@@ -147,34 +147,6 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void findOneByName_FindOneByNameNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findOneByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
-    }
-
-    @Test
-    void findByName_findByNameNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
-    }
-
-    @Test
     void findById_FindByIdNotImplemented_ThrowsUnsupportedOperationException() {
         // Given
         String id = "id";

@@ -19,17 +19,7 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
 
     @Override
     public Mono<NexusStateRule> save(NexusStateRule nexusStateRule) {
-        return null;
-    }
-
-    @Override
-    public Mono<NexusStateRule> findOneByName(@NonNull String name) {
-        return null;
-    }
-
-    @Override
-    public Flux<NexusStateRule> findByName(@NonNull String name) {
-        return null;
+        return nexusStateRuleRepository.save(nexusStateRule);
     }
 
     @Override

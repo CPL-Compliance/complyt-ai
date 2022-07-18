@@ -4,10 +4,8 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
@@ -27,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -77,49 +76,20 @@ class OrderServiceImplTest {
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
-    @Test
-    void calculate_SalesTaxCalculated_ModifiedOrderReturned() {
-        // Given
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
-        Order orderWithSalesTax = order.withSalesTax(salesTax);
-
-        // When
-        when(salesTaxService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
-        Mono<Order> orderMono = orderService.calculate(order);
-
-        // Then
-        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
-    }
-
-    @Test
-    void upsertOrder_OrderInserted_OrderReturned() {
-        // Given
-        String externalId = order.getExternalId();
-
-        // When
-        when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
-        when(orderRepository.save(order)).thenReturn(Mono.just(order));
-        Mono<Order> orderMono = orderService.upsert(externalId, order);
-
-        // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
-    }
-
-    @Test
-    void upsertOrder_NullGiven_NullPointerExceptionThrown() {
-        // Given
-        String externalId = "";
-        Order order = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderService.upsert(externalId, order);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
-    }
+//    @Test
+//    void calculate_SalesTaxCalculated_ModifiedOrderReturned() {
+//        // Given
+//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+//        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
+//        Order orderWithSalesTax = order.withSalesTax(salesTax);
+//
+//        // When
+//        when(salesTaxService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
+//        Mono<Order> orderMono = orderService.calculate(order);
+//
+//        // Then
+//        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
+//    }
 
     @Test
     void findByExternalId_OrderFound_ReturnsOrder() throws InterruptedException {
@@ -247,34 +217,6 @@ class OrderServiceImplTest {
 
         // Then
         StepVerifier.create(orderMono).expectNext(cancelledOrder).verifyComplete();
-    }
-
-    @Test
-    void findByName_NameGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.findByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
-    }
-
-    @Test
-    void findOneByName_NameGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.findOneByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
     }
 
     @Test

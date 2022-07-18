@@ -24,10 +24,6 @@ public class OrderServiceImpl implements OrderService {
     @NonNull
     private OrderRepository orderRepository;
 
-    @NonNull
-    @Qualifier("salesTaxServiceImpl")
-    private SalesTaxService salesTaxService;
-
     @Override
     public Mono<Order> save(Order order) {
         return orderRepository.save(order);
@@ -36,14 +32,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Mono<Order> findByExternalId(@NonNull String externalId) {
         return orderRepository.findByExternalId(externalId);
-    }
-
-    @Override
-    public Mono<Order> upsert(@NonNull String externalId, @NonNull Order order) {
-        return orderRepository.findByExternalId(externalId)
-                .switchIfEmpty(orderRepository.save(order))
-                .map(createUpdateOrderFunction(order))
-                .flatMap(orderRepository::save);
     }
 
     public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
@@ -67,32 +55,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Flux<Order> getOrdersByFilter(@NonNull Query query) {
+    public Flux<Order> getOrdersByQuery(@NonNull Query query) {
         return orderRepository.find(query);
-    }
-
-    @Override
-    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
-    }
-
-    @Override
-    public Mono<Order> calculate(Order order) {
-        return salesTaxService.calculate(order);
     }
 
     public Flux<Order> findAll() {
         return orderRepository.find();
-    }
-
-    @Override
-    public Flux<Order> findByName(String name) {
-        throw new UnsupportedOperationException("findByName isn't implemented");
-    }
-
-    @Override
-    public Mono<Order> findOneByName(String name) {
-        throw new UnsupportedOperationException("findOneByName isn't implemented");
     }
 
     private Function<Order, Order> createUpdateOrderFunction(@NonNull final Order order) {

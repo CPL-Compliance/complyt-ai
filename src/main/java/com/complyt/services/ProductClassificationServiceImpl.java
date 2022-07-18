@@ -23,28 +23,18 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     private ProductClassificationRepository productClassificationRepository;
 
     @Override
-    public Mono<ProductClassification> save(ProductClassification object) {
-        throw new UnsupportedOperationException("save isn't implemented");
-    }
-
-    @Override
-    public Mono<ProductClassification> findOneByName(@NonNull String name) {
-        throw new UnsupportedOperationException("findOneByName isn't implemented");
-    }
-
-    @Override
-    public Flux<ProductClassification> findByName(@NonNull String name) {
-        throw new UnsupportedOperationException("findByName isn't implemented");
+    public Mono<ProductClassification> save(ProductClassification productClassification) {
+        return productClassificationRepository.save(productClassification);
     }
 
     @Override
     public Mono<ProductClassification> findById(@NonNull String id) {
-        throw new UnsupportedOperationException("findById isn't implemented");
+        return productClassificationRepository.findById(id);
     }
 
     @Override
     public Flux<ProductClassification> findAll() {
-        throw new UnsupportedOperationException("findAll isn't implemented");
+        return productClassificationRepository.findAll();
     }
 
     @Override
@@ -57,7 +47,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Mono<Order> setDataToOrder(Order order) {
+    public Mono<Order> getOrderWithRelevantProductClassificationData(Order order) {
         return Flux.fromIterable(order.getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
                 .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)

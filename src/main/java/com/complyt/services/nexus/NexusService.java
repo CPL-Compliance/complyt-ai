@@ -71,7 +71,7 @@ public class NexusService {
                         .flatMap(stateRule -> {
                             Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, stateRule);
 
-                            return orderService.getOrdersByFilter(query)
+                            return orderService.getOrdersByQuery(query)
                                     .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule));
                         }));
     }

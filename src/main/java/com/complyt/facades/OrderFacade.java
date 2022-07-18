@@ -3,6 +3,7 @@ package com.complyt.facades;
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
+import com.complyt.services.SalesTaxService;
 import com.complyt.services.nexus.NexusService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,27 +17,27 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Slf4j
 public class OrderFacade {
-    @Qualifier("orderServiceImpl")
     @NonNull
+    @Qualifier("orderServiceImpl")
     private OrderService orderService;
 
-    @Qualifier("productClassificationServiceImpl")
     @NonNull
+    @Qualifier("salesTaxServiceImpl")
+    private SalesTaxService salesTaxService;
+
+    @NonNull
+    @Qualifier("productClassificationServiceImpl")
     private ProductClassificationService productClassificationService;
 
     @NonNull
     private NexusService nexusService;
 
-    public Mono<Order> upsert(@NonNull String externalId, Order order) {
-        return orderService.upsert(externalId, order);
-    }
-
     public Mono<Order> saveOrder(Order order) {
-        return setBeforeSave(order)
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order)
                 .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
-                                orderService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(this::save) :
-                                save(setOrder).flatMap(nexusService::calculate).thenReturn(setOrder)));
+                                salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(orderService::save) :
+                                orderService.save(setOrder).flatMap(nexusService::calculate).thenReturn(setOrder)));
     }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
@@ -44,27 +45,10 @@ public class OrderFacade {
                 .flatMap(orderItem ->
                         orderItem.equals(order) ?
                                 Mono.just(order) :
-                                setBeforeSave(order)
-                                        .flatMap(this::calculateSalesTax)
-                                        .flatMap(updatedOrder -> update(externalId, updatedOrder))
+                                productClassificationService.getOrderWithRelevantProductClassificationData(order)
+                                        .flatMap(salesTaxService::calculate)
+                                        .flatMap(updatedOrder -> orderService.update(externalId, updatedOrder))
                 );
-    }
-
-    public Mono<Order> setBeforeSave(Order order) {
-        return productClassificationService
-                .setDataToOrder(order);
-    }
-
-    private Mono<Order> calculateSalesTax(Order order) {
-        return orderService.calculate(order).log();
-    }
-
-    public Mono<Order> save(Order order) {
-        return orderService.save(order);
-    }
-
-    public Mono<Order> update(@NonNull String externalId, Order order) {
-        return orderService.update(externalId, order);
     }
 
     public Mono<Order> findByExternalId(String externalId) {

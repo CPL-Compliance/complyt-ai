@@ -1,7 +1,7 @@
 package com.complyt.services.nexus;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.services.CrudService;
+import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
