@@ -1,9 +1,7 @@
 package com.complyt.services.nexus;
-
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.TimeFrameQueryBuilder;
-import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -64,7 +62,6 @@ public class NexusService {
     }
 
     public Mono<NexusTracking> handle(@NonNull Order order) {
-
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
                         .flatMap(nexusStateRuleMono -> {
@@ -80,10 +77,9 @@ public class NexusService {
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
 
         return findTrackingByState(stateRule.getState().getAbbreviation())
-                .flatMap(nexusTracking -> {
-                    if (passedThreshold)
-                        return nexusTrackingService.saveWithEconomicQualified(nexusTracking);
-                    return Mono.just(nexusTracking);
-                });
+                .flatMap(nexusTracking -> passedThreshold ?
+                        nexusTrackingService.saveWithEconomicQualified(nexusTracking) :
+                        Mono.just(nexusTracking)
+                );
     }
 }

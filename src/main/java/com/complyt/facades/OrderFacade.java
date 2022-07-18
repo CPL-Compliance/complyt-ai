@@ -1,7 +1,5 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderJurisdictionalRulesInjector;
-import com.complyt.business.order.OrderTangibleCategoryInjector;
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
 import com.complyt.services.ProductClassificationService;
@@ -38,7 +36,7 @@ public class OrderFacade {
                 .flatMap(setOrder -> nexusService.hasNexus(setOrder)
                         .flatMap(hasNexus -> hasNexus ?
                                 calculateSalesTax(setOrder).flatMap(this::save) :
-                                save(setOrder).flatMap(nexusService::handle).map(setOrder::withNexusTracking)));
+                                save(setOrder).flatMap(nexusService::handle).thenReturn(setOrder)));
     }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {

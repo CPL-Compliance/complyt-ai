@@ -35,6 +35,4 @@ public interface OrderMapper {
     CustomerType customerTypeDtoToCustomerType(CustomerTypeDto customerTypeDto);
     CustomerTypeDto customerTypeToCustomerTypeDto(CustomerType customerType);
 
-    NexusTracking nexusTrackingDtoToNexusTracking(NexusTrackingDto nexusTrackingDto);
-    NexusTrackingDto nexusTrackingToNexusTrackingDto(NexusTracking nexusTracking);
 }

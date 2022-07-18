@@ -110,7 +110,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,new TimeStamps(new Date(),new Date()),null);
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,new TimeStamps(new Date(),new Date()));
     }
 
     @Test

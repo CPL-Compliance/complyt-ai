@@ -31,8 +31,10 @@ public class OrderTangibleCategoryInjector implements OrderDataInjector<ProductC
 
             for(Item item : order.getItems()) {
                 ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
-                TangibleCategory tangibleCategory = productClassification.getTangibleCategory();
-                Item newItem = item.withTangibleCategory(tangibleCategory);
+                TangibleCategory category = productClassification.getTangibleCategory();
+                Item newItem = item.withTangibleCategory(category);
+
+                log.debug("Inserting new item with tangible category : " + category);
                 modifiedItems.add(newItem);
             }
 
