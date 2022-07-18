@@ -2,12 +2,10 @@ package com.complyt.services;
 
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -56,11 +54,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Flux<Order> getOrdersByQuery(@NonNull Query query) {
-        return orderRepository.find(query);
+        return orderRepository.findAll(query);
     }
 
     public Flux<Order> findAll() {
-        return orderRepository.find();
+        return orderRepository.findAll();
     }
 
     private Function<Order, Order> createUpdateOrderFunction(@NonNull final Order order) {

@@ -21,8 +21,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     private SalesTaxTrackingRepository salesTaxTrackingRepository;
 
     @Override
-    public Mono<SalesTaxTracking> findById(@NonNull String s) {
-        return null;
+    public Mono<SalesTaxTracking> findById(@NonNull String id) {
+        return salesTaxTrackingRepository.findById(id);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Flux<SalesTaxTracking> findAll() {
-        return null;
+        return salesTaxTrackingRepository.findAll();
     }
 
     @Override

@@ -74,7 +74,7 @@ public class OrderRepository {
                 }).log();
     }
 
-    public Flux<Order> find() {
+    public Flux<Order> findAll() {
         return ReactiveSecurityContextHolder.getContext().log()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal()).log()
                 .flatMapMany(user -> {
@@ -87,7 +87,7 @@ public class OrderRepository {
                 });
     }
 
-    public Flux<Order> find(Query query) {
+    public Flux<Order> findAll(Query query) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMapMany(user -> {

@@ -20,12 +20,12 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @Override
     public Mono<ClientTracking> save(ClientTracking clientTracking) {
-        return null;
+        return clientTrackingRepository.save(clientTracking);
     }
 
     @Override
     public Mono<ClientTracking> findById(@NonNull String id) {
-        return null;
+        return clientTrackingRepository.findById(id);
     }
 
     @Override
@@ -40,6 +40,6 @@ public class ClientTrackingServiceImpl implements ClientTrackingService {
 
     @Override
     public Flux<ClientTracking> findAll() {
-        return null;
+        return clientTrackingRepository.findAll();
     }
 }

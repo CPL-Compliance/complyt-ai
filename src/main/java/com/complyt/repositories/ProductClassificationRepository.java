@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;

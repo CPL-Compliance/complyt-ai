@@ -24,12 +24,12 @@ public class NexusStateRuleServiceImpl implements NexusStateRuleService {
 
     @Override
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return null;
+        return nexusStateRuleRepository.findById(id);
     }
 
     @Override
     public Flux<NexusStateRule> findAll() {
-        return null;
+        return nexusStateRuleRepository.findAll();
     }
 
     @Override

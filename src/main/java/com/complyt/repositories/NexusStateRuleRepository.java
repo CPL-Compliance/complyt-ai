@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -33,6 +34,17 @@ public class NexusStateRuleRepository {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(nexusStateRule).log());
+    }
+
+    public Flux<NexusStateRule> findAll() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMapMany(user -> {
+
+                    log.debug("Executing findAll nexus state rule");
+
+                    return reactiveMongoTemplate.findAll(NexusStateRule.class).log();
+                });
     }
 
 }

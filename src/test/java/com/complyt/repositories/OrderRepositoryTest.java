@@ -194,7 +194,7 @@ class OrderRepositoryTest {
         when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
 
-        Flux<Order> orderFlux = orderRepository.find();
+        Flux<Order> orderFlux = orderRepository.findAll();
 
         //Then
         StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrder.withCustomer(customer)).verifyComplete();
