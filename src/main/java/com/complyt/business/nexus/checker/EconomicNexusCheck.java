@@ -1,15 +1,15 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.nexus.NexusTracking;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class EconomicNexusCheck implements NexusCheck<NexusTracking> {
+public class EconomicNexusCheck implements NexusCheck<SalesTaxTracking> {
     @Override
-    public boolean check(@NonNull NexusTracking nexusTracking) {
-        return nexusTracking.getEconomicNexusTracker().isEstablished();
+    public boolean check(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.getEconomicNexusTracker().isEstablished();
     }
 }

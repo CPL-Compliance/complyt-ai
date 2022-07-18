@@ -33,19 +33,20 @@ public class OrderFacade {
 
     public Mono<Order> saveOrder(Order order) {
         return setBeforeSave(order)
-                .flatMap(setOrder -> nexusService.hasNexus(setOrder)
-                        .flatMap(hasNexus -> hasNexus ?
-                                calculateSalesTax(setOrder).flatMap(this::save) :
-                                save(setOrder).flatMap(nexusService::handle).thenReturn(setOrder)));
+                .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
+                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                orderService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(this::save) :
+                                save(setOrder).flatMap(nexusService::calculate).thenReturn(setOrder)));
     }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
         return findByExternalId(externalId)
-                .flatMap(orderItem -> orderItem.equals(order) ?
-                        Mono.just(order) :
-                        setBeforeSave(order)
-                                .flatMap(this::calculateSalesTax)
-                                .flatMap(updatedOrder -> update(externalId, updatedOrder))
+                .flatMap(orderItem ->
+                        orderItem.equals(order) ?
+                                Mono.just(order) :
+                                setBeforeSave(order)
+                                        .flatMap(this::calculateSalesTax)
+                                        .flatMap(updatedOrder -> update(externalId, updatedOrder))
                 );
     }
 

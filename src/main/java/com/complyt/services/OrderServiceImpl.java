@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -28,11 +29,6 @@ public class OrderServiceImpl implements OrderService {
     private SalesTaxService salesTaxService;
 
     @Override
-    public Mono<Order> calculate(Order order) {
-        return salesTaxService.calculate(order);
-    }
-
-    @Override
     public Mono<Order> save(Order order) {
         return orderRepository.save(order);
     }
@@ -51,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
-            return orderRepository.findByExternalId(externalId).log()
+        return orderRepository.findByExternalId(externalId).log()
                 .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
@@ -75,6 +71,16 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.find(query);
     }
 
+    @Override
+    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
+    }
+
+    @Override
+    public Mono<Order> calculate(Order order) {
+        return salesTaxService.calculate(order);
+    }
+
     public Flux<Order> findAll() {
         return orderRepository.find();
     }
@@ -91,11 +97,11 @@ public class OrderServiceImpl implements OrderService {
 
     private Function<Order, Order> createUpdateOrderFunction(@NonNull final Order order) {
         return orderInfo -> orderInfo.withExternalId(order.getExternalId())
+                .withItems(order.getItems())
                 .withBillingAddress(order.getBillingAddress())
                 .withShippingAddress(order.getShippingAddress())
                 .withCustomerId(order.getCustomerId())
-                .withItems(order.getItems())
-                .withOrderStatus(order.getOrderStatus())
-                .withSalesTax(order.getSalesTax());
+                .withSalesTax(order.getSalesTax())
+                .withOrderStatus(order.getOrderStatus());
     }
 }

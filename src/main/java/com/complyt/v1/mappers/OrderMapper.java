@@ -1,7 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.*;
-import com.complyt.domain.nexus.NexusTracking;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.*;
 import org.mapstruct.Mapper;

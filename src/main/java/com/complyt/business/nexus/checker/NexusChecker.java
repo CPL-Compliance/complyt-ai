@@ -2,7 +2,7 @@ package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.nexus.NexusTracking;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +20,18 @@ public class NexusChecker {
     private EconomicNexusCheck economicNexusChecker;
 
     @NonNull
-    private NexusEnforcementCheck nexusEnforcementChecker;
+    private SalesTaxEnforcementCheck salesTaxEnforcementChecker;
 
     @NonNull
     private NexusThresholdCheck nexusThresholdCheck;
 
-    public boolean hasNexus(@NonNull NexusTracking nexusTracking) {
-        return physicalNexusChecker.check(nexusTracking) || economicNexusChecker.check(nexusTracking) ||
-                !nexusEnforcementChecker.check(nexusTracking);
+    public boolean hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxEnforcementChecker.check(salesTaxTracking) &&
+                (physicalNexusChecker.check(salesTaxTracking) || economicNexusChecker.check(salesTaxTracking));
     }
 
-    public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule){
-        Pair<NexusCalculationSummary,NexusStateRule> summaryAndRule = new Pair<>(calculationSummary,stateRule);
+    public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule) {
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(calculationSummary, stateRule);
         return nexusThresholdCheck.check(summaryAndRule);
     }
 }

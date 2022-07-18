@@ -20,7 +20,7 @@ import java.util.List;
 public class NexusStateRule {
     @Id
     private String id;
-    private boolean enforcesNexus;
+    private boolean enforcesSalesTax;
     private State state;
     private List<TaxableCategory> taxableCategories;
     private List<TangibleCategory> tangibleCategories;

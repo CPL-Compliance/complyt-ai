@@ -11,13 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 @With
 @ToString
-@Document(collection = "nexus_tracking")
-public class NexusTracking {
+@Document(collection = "sales_tax_tracking")
+public class SalesTaxTracking {
     @Id
     private String id;
     private State state;
     private final ObjectId clientId;
-    private boolean enforcesNexus;
+    private boolean enforcesSalesTax;
     private PhysicalNexusTracker physicalNexusTracker;
     private EconomicNexusTracker economicNexusTracker;
 }

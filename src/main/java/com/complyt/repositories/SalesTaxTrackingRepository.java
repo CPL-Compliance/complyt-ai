@@ -1,6 +1,6 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.nexus.NexusTracking;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.security.User;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,29 +16,29 @@ import org.springframework.data.mongodb.core.query.Query;
 @Slf4j
 @AllArgsConstructor
 @Repository
-public class NexusTrackingRepository {
+public class SalesTaxTrackingRepository {
 
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<NexusTracking> findByState(@NonNull String state) {
+    public Mono<SalesTaxTracking> findByState(@NonNull String state) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
                     Query query = Query.query(Criteria.where("state.abbreviation").is(state)
                             .and("clientId").is(user.getClientId()));
 
-                    return reactiveMongoTemplate.findOne(query, NexusTracking.class);
+                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class);
                 });
     }
 
-    public Mono<NexusTracking> save(@NonNull NexusTracking nexusTracking) {
+    public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
-                    log.debug("Saving modified nexus tracking : " + nexusTracking);
+                    log.debug("Saving modified nexus tracking : " + salesTaxTracking);
 
-                    return reactiveMongoTemplate.save(nexusTracking).log();
+                    return reactiveMongoTemplate.save(salesTaxTracking).log();
                 });
     }
 }
