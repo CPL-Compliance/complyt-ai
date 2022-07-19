@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
 @AllArgsConstructor
 @Slf4j
+@Component
 public class OrderFacade {
     @NonNull
     @Qualifier("orderServiceImpl")

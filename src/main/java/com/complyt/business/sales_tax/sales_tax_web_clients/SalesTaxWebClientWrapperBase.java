@@ -2,7 +2,6 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import lombok.AllArgsConstructor;
 import org.javatuples.Pair;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @AllArgsConstructor
