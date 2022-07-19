@@ -14,6 +14,7 @@ import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -40,15 +41,15 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
-    public Mono<Order> calculate(Order order) {
-        return findByAddress(order.getShippingAddress())
-                .map(this::salesTaxDataToSalesTaxRate)
-                .map(injectSalesTaxToOrder(order));
+    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
     }
 
     @Override
-    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
+    public Mono<Order> calculate(@NotNull Order order) {
+        return findByAddress(order.getShippingAddress())
+                .map(this::salesTaxDataToSalesTaxRate)
+                .map(injectSalesTaxToOrder(order));
     }
 
     @Override

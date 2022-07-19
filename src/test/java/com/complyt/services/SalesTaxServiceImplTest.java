@@ -3,11 +3,8 @@ package com.complyt.services;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.*;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -130,7 +127,21 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
-    void calculate_SalesTaxCalculated_OrderModified() {
+    void handleSalesTaxCalculation_StateDoesntEnforceNexus_ReturnsSameOrder() {
+        // Given
+        State state = new State("CA","02","California");
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
+                new ObjectId(),false,null,null);
+
+        // When
+        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order,tracking);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxCalculation_SalesTaxCalculated_OrderModified() {
         // Given
         FastTaxData fastTaxData = new FastTaxData();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
@@ -140,6 +151,10 @@ public class SalesTaxServiceImplTest {
             add(order.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Order orderWithSalesTax = order.withItems(itemsWithRates).withSalesTax(salesTax);
+        State state = new State("CA","02","California");
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
+                new ObjectId(),true,null,null);
+
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
@@ -147,7 +162,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxRateCalculator.calculateSalesTaxRate(order.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
                 .thenReturn(salesTaxRate);
         when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
-        Mono<Order> orderMono = salesTaxService.calculate(order);
+        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order,tracking);
 
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();

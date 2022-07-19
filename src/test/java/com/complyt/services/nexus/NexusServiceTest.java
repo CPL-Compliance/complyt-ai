@@ -124,9 +124,9 @@ class NexusServiceTest {
     @Test
     void getOrdersByTimeFrame() {
     }
-
+//
 //    @Test
-//    void handle() {
+//    void calculate() {
 //        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
 //                .gte(LocalDateTime.now().minusYears(1).withMonth(1).withDayOfMonth(1)).lte(LocalDateTime.now()));
 //
@@ -147,7 +147,7 @@ class NexusServiceTest {
 //        when(nexusCalculator.calculate(filteredOrders,nexusStateRule)).thenReturn(summary);
 //        when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
 //        when(nexusTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusTracking));
-
+//
 //        Mono<NexusTracking> nexusStateRuleMono = nexusService.handle(order);
 //
 //        StepVerifier.create(nexusStateRuleMono).expectNext(nexusTracking).verifyComplete();
