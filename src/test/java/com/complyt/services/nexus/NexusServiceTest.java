@@ -13,6 +13,8 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.OrderService;
 import org.bson.types.ObjectId;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -67,8 +70,16 @@ class NexusServiceTest {
         nexusStateRule = createNexusStateRule();
     }
 
+    private SalesTaxTracking createSalesTaxTracking() {
+        State state = new State("CA", "02", "California");
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state,
+                new ObjectId(), true,
+                new PhysicalNexusTracker(false, null),
+                new EconomicNexusTracker(false, null));
+    }
+
     private NexusStateRule createNexusStateRule() {
-        State state = new State("CA","02","California");
+        State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
             add(TaxableCategory.TAXABLE);
         }};
@@ -81,10 +92,10 @@ class NexusServiceTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000,2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,customerTypes,
-                TimeFrame.CURRENT_AND_PREVIOUS_CALENDER_YEAR,nexusThreshold);
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.CURRENT_AND_PREVIOUS_CALENDER_YEAR, nexusThreshold);
     }
 
     private Order createOrder() {
@@ -97,12 +108,12 @@ class NexusServiceTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
                 ));
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,new TimeStamps(new Date(),new Date()));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(new Date(), new Date()));
     }
 
     @Test
@@ -118,7 +129,16 @@ class NexusServiceTest {
     }
 
     @Test
-    void hasNexus() {
+    void hasNexus_HasNexus_ReturnsHasNexus() {
+        // Given
+        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+
+        // When
+        when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
+        boolean hasNexus = nexusService.hasNexus(salesTaxTracking);
+
+        // Then
+        Assertions.assertTrue(hasNexus);
     }
 
     @Test
