@@ -23,12 +23,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 
@@ -121,11 +125,30 @@ class NexusServiceTest {
     }
 
     @Test
-    void findTrackingByState() {
+    void findTrackingByState_FindsTracking_ReturnsTracking() {
+        // Given
+        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+
+        // When
+        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(order);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
     @Test
-    void findRuleByState() {
+    void findRuleByState_FindsRule_ReturnsRule() {
+        // Given
+        NexusStateRule nexusStateRule = createNexusStateRule();
+        String state = nexusStateRule.getState().getAbbreviation();
+
+        // When
+        when(nexusStateRuleService.findByState(state)).thenReturn(Mono.just(nexusStateRule));
+        Mono<NexusStateRule> nexusStateRuleMono = nexusService.findRuleByState(state);
+
+        // Then
+        StepVerifier.create(nexusStateRuleMono).expectNext(nexusStateRule).verifyComplete();
     }
 
     @Test
@@ -139,6 +162,19 @@ class NexusServiceTest {
 
         // Then
         Assertions.assertTrue(hasNexus);
+    }
+
+    @Test
+    void hasNexus_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.hasNexus(nullSalesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
 
     @Test
