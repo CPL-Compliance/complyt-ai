@@ -1,15 +1,11 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.services.OrderService;
@@ -32,8 +28,6 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;

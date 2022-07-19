@@ -77,21 +77,6 @@ class OrderServiceImplTest {
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
-//    @Test
-//    void calculate_SalesTaxCalculated_ModifiedOrderReturned() {
-//        // Given
-//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-//        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
-//        Order orderWithSalesTax = order.withSalesTax(salesTax);
-//
-//        // When
-//        when(salesTaxService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
-//        Mono<Order> orderMono = orderService.calculate(order);
-//
-//        // Then
-//        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
-//    }
-
     @Test
     void findByExternalId_OrderFound_ReturnsOrder() throws InterruptedException {
         // Given
