@@ -125,7 +125,20 @@ class NexusServiceTest {
     }
 
     @Test
-    void findTrackingByState_FindsTracking_ReturnsTracking() {
+    void findTrackingByState_StateSent_FindsTracking_ReturnsTracking() {
+        // Given
+        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+
+        // When
+        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(order.getShippingAddress().getState());
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findTrackingByState_OrderSent_FindsTracking_ReturnsTracking() {
         // Given
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
 
