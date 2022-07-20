@@ -102,7 +102,7 @@ public class ProductClassificationServiceTest {
 
         // When
         when(productClassificationRepository.findAll()).thenReturn(Flux.fromIterable(productClassifications));
-        Flux<ProductClassification> productClassificationFlux = productClassificationService.getAll();
+        Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll();
 
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();

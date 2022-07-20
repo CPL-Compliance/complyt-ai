@@ -42,10 +42,6 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return productClassificationRepository.findOneByTaxCode(taxCode);
     }
 
-    public Flux<ProductClassification> getAll() {
-        return productClassificationRepository.findAll();
-    }
-
     @Override
     public Mono<Order> getOrderWithRelevantProductClassificationData(Order order) {
         return Flux.fromIterable(order.getItems())
