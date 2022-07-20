@@ -1,7 +1,7 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,27 +19,26 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class EconomicNexusCheckTest {
+public class PhysicalNexusCheckTest {
 
-    EconomicNexusCheck economicNexusCheck;
+    PhysicalNexusCheck physicalNexusCheck;
 
     @BeforeEach
     void setUp() {
-        economicNexusCheck = new EconomicNexusCheck();
+        physicalNexusCheck = new PhysicalNexusCheck();
     }
 
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true,new Date());
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true,new Date());
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,null,economicNexusTracker);
+                true,physicalNexusTracker,null);
 
         // When + Then
-        boolean hasEconomicNexus = economicNexusCheck.check(salesTaxTracking);
-        assertTrue(hasEconomicNexus);
-
+        boolean hasPhysicalNexus = physicalNexusCheck.check(salesTaxTracking);
+        assertTrue(hasPhysicalNexus);
     }
 
     @Test
@@ -49,10 +48,11 @@ public class EconomicNexusCheckTest {
 
         //When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            economicNexusCheck.check(nullSalesTaxTracking);
+            physicalNexusCheck.check(nullSalesTaxTracking);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
+
 }
