@@ -66,7 +66,7 @@ class ClientTrackingServiceImplTest {
         // Given
         String nullId = null;
 
-        // When = Then
+        // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             clientTrackingService.findById(nullId);
         });

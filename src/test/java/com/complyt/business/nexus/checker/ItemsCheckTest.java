@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.Customer;
 import com.complyt.domain.Item;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -13,11 +12,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -72,5 +72,18 @@ public class ItemsCheckTest {
         // When + Then
         boolean doItemsCount = itemsCheck.check(nexusStateRulePair);
         assertTrue(doItemsCount);
+    }
+
+    @Test
+    void check_NullPairPassed_ThrowsException() {
+        // Given
+        Pair<List<Item>, NexusStateRule> nexusStateRulePair = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            itemsCheck.check(nexusStateRulePair);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "itemsAndRule is marked non-null but is null");
     }
 }

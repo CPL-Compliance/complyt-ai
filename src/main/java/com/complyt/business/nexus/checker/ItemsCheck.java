@@ -14,9 +14,9 @@ import java.util.List;
 public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> {
 
     @Override
-    public boolean check(@NonNull Pair<List<Item>, NexusStateRule> objects) {
-        List<Item> items = objects.getValue0();
-        NexusStateRule nexusStateRule = objects.getValue1();
+    public boolean check(@NonNull Pair<List<Item>, NexusStateRule> itemsAndRule) {
+        List<Item> items = itemsAndRule.getValue0();
+        NexusStateRule nexusStateRule = itemsAndRule.getValue1();
 
         for(Item item : items) {
             if(isCounted(item,nexusStateRule)) {
