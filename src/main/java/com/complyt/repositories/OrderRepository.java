@@ -30,9 +30,9 @@ public class OrderRepository {
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(order.withClientId(user.getClientId()))
                         .flatMap(savedOrder -> reactiveMongoTemplate.findById(savedOrder.getCustomerId(), Customer.class)
-                            .map(savedOrder::withCustomer)));
+                                .map(savedOrder::withCustomer)));
     }
-    
+
     public Flux<Order> saveAll(List<Order> orders) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
@@ -87,13 +87,14 @@ public class OrderRepository {
                 });
     }
 
-    public Flux<Order> findAll(Query query) {
+    public Flux<Order> findAllByQuery(Query query) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMapMany(user -> {
                     log.debug("Executing find client's related orders by query : " + query);
+                    Query updatedQuery = query.addCriteria(Criteria.where("clientId").is(user.getClientId()));
 
-                    return reactiveMongoTemplate.find(query, Order.class).log()
+                    return reactiveMongoTemplate.find(updatedQuery, Order.class).log()
                             .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class).log()
                                     .map(order::withCustomer));
                 });

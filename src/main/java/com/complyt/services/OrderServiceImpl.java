@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Flux<Order> getOrdersByQuery(@NonNull Query query) {
-        return orderRepository.findAll(query);
+        return orderRepository.findAllByQuery(query);
     }
 
     public Flux<Order> findAll() {

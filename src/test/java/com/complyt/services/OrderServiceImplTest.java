@@ -1,12 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
@@ -17,11 +13,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -162,7 +162,7 @@ class OrderServiceImplTest {
 
 
     @Test
-    void update_OrderUpdated_OrderReturned() throws InterruptedException {
+    void update_OrderUpdated_OrderReturned() {
         // Given
         String externalId = order.getExternalId();
 
@@ -221,6 +221,33 @@ class OrderServiceImplTest {
 
         // Then
         StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
-
     }
+
+    @Test
+    void getOrdersByQuery_TwoOrdersMatch_returnsTwoOrders() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", order.getShippingAddress(),new ObjectId(),CustomerType.RETAIL);
+
+        Order orderWithCustomer = order.withCustomer(customer);
+        Order secondOrderWithCustomer = order.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
+
+        List<Order> allOrders = new ArrayList<Order>() {{
+            add(orderWithCustomer);
+            add(secondOrderWithCustomer);
+        }};
+        LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
+        LocalDateTime end = start.plusYears(1);
+        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+                .gte(start).lte(end));
+
+        // When
+        when(orderRepository.findAllByQuery(query)).thenReturn(Flux.fromIterable(allOrders));
+        Flux<Order> orderFlux = orderService.getOrdersByQuery(query);
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrderWithCustomer).verifyComplete();
+    }
+
 }
