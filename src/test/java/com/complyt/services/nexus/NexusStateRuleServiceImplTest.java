@@ -9,8 +9,6 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.repositories.NexusStateRuleRepository;
-import lombok.NonNull;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class NexusStateRuleServiceImplTest {
@@ -34,10 +31,10 @@ class NexusStateRuleServiceImplTest {
     private NexusStateRuleRepository nexusStateRuleRepository;
 
     private NexusStateRule nexusStateRule;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         nexusStateRule = createNexusStateRule();
     }
 
