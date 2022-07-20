@@ -250,4 +250,34 @@ class OrderServiceImplTest {
         StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrderWithCustomer).verifyComplete();
     }
 
+    @Test
+    void getOrdersByQuery_NullQueryPassed_ThrowsException() {
+        // Given
+        Query nullQuery = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.getOrdersByQuery(nullQuery);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "query is marked non-null but is null");
+    }
+
+    @Test
+    void createUpdateOrderFunction_NullOrderPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order nullOrder = null;
+//        when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.update(externalId,nullOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
 }

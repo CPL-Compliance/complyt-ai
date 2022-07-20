@@ -168,4 +168,31 @@ public class SalesTaxServiceImplTest {
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
     }
 
+
+    @Test
+    void handleSalesTaxCalculation_NullOrderPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),null,
+                new ObjectId(), true,null,null);
+        Order nullOrder = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxService.handleSalesTaxCalculation(nullOrder,tracking);
+        });
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+
+    }
+
+    @Test
+    void handleSalesTaxCalculation_NullTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullTracking = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxService.handleSalesTaxCalculation(order,nullTracking);
+        });
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
 }
