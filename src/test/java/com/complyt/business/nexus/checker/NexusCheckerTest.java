@@ -144,7 +144,7 @@ public class NexusCheckerTest {
 
         // When
         when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(true);
-        boolean passedThreshold = nexusThresholdCheck.check(summaryAndRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary,nexusStateRule);
 
         // Then
         assertTrue(passedThreshold);
@@ -157,7 +157,7 @@ public class NexusCheckerTest {
 
         // When
         when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(false);
-        boolean passedThreshold = nexusThresholdCheck.check(summaryAndRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary,nexusStateRule);
 
         // Then
         assertFalse(passedThreshold);
