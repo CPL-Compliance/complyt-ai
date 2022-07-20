@@ -24,6 +24,8 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -78,6 +80,21 @@ public class ClientTrackingRepositoryTest {
 
         // Then
         StepVerifier.create(actualClientTracking).expectNext(clientTracking).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void save_NullClientTrackingPassed_ThrowsException() {
+        // Given
+        ClientTracking nullClientTrackingNoId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            clientTrackingRepository.save(nullClientTrackingNoId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")

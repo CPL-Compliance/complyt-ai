@@ -72,7 +72,7 @@ class OrderRepositoryTest {
         // Given
         reactiveMongoTemplate = null;
 
-        // Then
+        // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate);
         });
