@@ -126,11 +126,11 @@ public class NexusCheckerTest {
     @Test
     void hasNexus_NullTrackingPassed_ThrowsException() {
         // Given
-        SalesTaxTracking nullCalculationSummary = null;
+        SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.passedThreshold(nexusCalculationSummary,nexusStateRule);
+            nexusChecker.hasNexus(nullSalesTaxTracking);
         });
 
         // Then
