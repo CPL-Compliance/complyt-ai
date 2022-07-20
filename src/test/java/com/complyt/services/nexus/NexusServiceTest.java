@@ -13,7 +13,6 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.OrderService;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

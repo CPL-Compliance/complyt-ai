@@ -11,9 +11,12 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.repositories.NexusStateRuleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -26,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class NexusStateRuleServiceImplTest {
     @InjectMocks
     private NexusStateRuleServiceImpl nexusStateRuleServiceImpl;
@@ -123,7 +128,7 @@ class NexusStateRuleServiceImplTest {
 
         // When
         when(nexusStateRuleRepository.findAll()).thenReturn(Flux.fromIterable(nexusStateRuleList));
-        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleRepository.findAll();
+        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleServiceImpl.findAll();
 
         // Then
         StepVerifier.create(nexusStateRuleFlux).expectNext(nexusStateRule).expectNext(secondRule).verifyComplete();
