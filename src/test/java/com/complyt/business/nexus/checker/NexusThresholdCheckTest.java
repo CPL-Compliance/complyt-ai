@@ -64,6 +64,20 @@ public class NexusThresholdCheckTest {
     }
 
     @Test
+    void check_NullPairPassed_ThrowsException() {
+        // Given
+        Pair<NexusCalculationSummary, NexusStateRule> nullSummaryAndRule = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusThresholdCheck.check(nullSummaryAndRule);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "summaryAndRule is marked non-null but is null");
+    }
+
+    @Test
     void check_DefinitionOfAmount_ReturnsTrue() {
         // Given
         NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
@@ -153,7 +167,7 @@ public class NexusThresholdCheckTest {
     }
 
     @Test
-    void check_DefinitionOfAmountAndCount_ReturnsFalse() {
+    void check_DefinitionOfAmountAndCount_ReturnsFalseBecauseOfCount() {
         // Given
         NexusCalculationSummary summary = nexusCalculationSummary
                 .withCount(nexusStateRule.getNexusThreshold().getCount()-1);
@@ -171,4 +185,106 @@ public class NexusThresholdCheckTest {
         assertFalse(exceededAmountAndCount);
     }
 
+    @Test
+    void check_DefinitionOfAmountAndCount_ReturnsFalseBecauseOfAmount() {
+        // Given
+        NexusCalculationSummary summary = nexusCalculationSummary
+                .withAmount(nexusStateRule.getNexusThreshold().getAmount()-1);
+        NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
+                nexusStateRule.getNexusThreshold().getCount(),Definition.AMOUNT_AND_COUNT);
+
+        NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
+
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
+
+        // When
+        boolean exceededAmountAndCount = nexusThresholdCheck.check(summaryAndRule);
+
+        // Then
+        assertFalse(exceededAmountAndCount);
+    }
+
+    @Test
+    void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfAmount() {
+        // Given
+        NexusCalculationSummary summary = nexusCalculationSummary
+                .withAmount(nexusStateRule.getNexusThreshold().getAmount())
+                .withCount(nexusStateRule.getNexusThreshold().getCount()-1);
+
+        NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
+                nexusStateRule.getNexusThreshold().getCount(),Definition.AMOUNT_OR_COUNT);
+
+        NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
+
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
+
+        // When
+        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+
+        // Then
+        assertTrue(exceededAmountOrCount);
+    }
+
+    @Test
+    void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfCount() {
+        // Given
+        NexusCalculationSummary summary = nexusCalculationSummary
+                .withAmount(nexusStateRule.getNexusThreshold().getAmount()-1)
+                .withCount(nexusStateRule.getNexusThreshold().getCount());
+
+        NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
+                nexusStateRule.getNexusThreshold().getCount(),Definition.AMOUNT_OR_COUNT);
+
+        NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
+
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
+
+        // When
+        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+
+        // Then
+        assertTrue(exceededAmountOrCount);
+    }
+
+    @Test
+    void check_DefinitionOfAmountOrCount_ReturnsTrueBecauseOfCountAndAmount() {
+        // Given
+        NexusCalculationSummary summary = nexusCalculationSummary
+                .withAmount(nexusStateRule.getNexusThreshold().getAmount())
+                .withCount(nexusStateRule.getNexusThreshold().getCount());
+
+        NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
+                nexusStateRule.getNexusThreshold().getCount(),Definition.AMOUNT_OR_COUNT);
+
+        NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
+
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
+
+        // When
+        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+
+        // Then
+        assertTrue(exceededAmountOrCount);
+    }
+
+    @Test
+    void check_DefinitionOfAmountOrCount_ReturnsFalse() {
+        // Given
+        NexusCalculationSummary summary = nexusCalculationSummary
+                .withAmount(nexusStateRule.getNexusThreshold().getAmount()-1)
+                .withCount(nexusStateRule.getNexusThreshold().getCount()-1);
+
+        NexusThreshold nexusThreshold = new NexusThreshold(nexusStateRule.getNexusThreshold().getAmount(),
+                nexusStateRule.getNexusThreshold().getCount(),Definition.AMOUNT_OR_COUNT);
+
+        NexusStateRule nexusStateRuleWithCountDefinition = nexusStateRule.withNexusThreshold(nexusThreshold);
+
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
+
+        // When
+        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+
+        // Then
+        assertFalse(exceededAmountOrCount);
+    }
 }
