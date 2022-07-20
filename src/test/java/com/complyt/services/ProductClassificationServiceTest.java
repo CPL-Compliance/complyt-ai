@@ -46,13 +46,22 @@ public class ProductClassificationServiceTest {
 
     @BeforeEach
     void setUp(){
+        productClassification = createProductClassification();
+    }
+
+    private ProductClassification createProductClassification() {
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
+        return new ProductClassification("id","C1S1","description",
+                "title",jurisdictionalSalesTaxRulesList,TangibleCategory.TANGIBLE);
+    }
+
+    private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA",true,false, CalculationType.FIXED,"description",0,null);
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+
+        return new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
-        productClassification = new ProductClassification("id","C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList,TangibleCategory.TANGIBLE);
     }
 
     @Test
@@ -97,6 +106,47 @@ public class ProductClassificationServiceTest {
 
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
+    }
+
+    @Test
+    void save_SavesClassification_ReturnsClassification(){
+        // Given
+        ProductClassification productClassificationNoId = productClassification.withId(null);
+
+        // When
+        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> productClassificationMono = productClassificationService.save(productClassificationNoId);
+
+        // Then
+        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+    }
+
+    @Test
+    void findById_FindClassification_ReturnsClassification(){
+        // Given
+        String id = productClassification.getId();
+
+        // When
+        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> productClassificationMono = productClassificationService.findById(id);
+
+        // Then
+        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+    }
+
+
+    @Test
+    void findById_NullIdPassed_ThrowsException(){
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            productClassificationService.findById(nullId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
 //    @Test
