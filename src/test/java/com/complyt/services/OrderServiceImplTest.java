@@ -269,7 +269,6 @@ class OrderServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         Order nullOrder = null;
-//        when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {

@@ -142,7 +142,4 @@ public class SalesTaxTrackingRepositoryTest {
         // Then
         StepVerifier.create(salesTaxTrackingFlux).expectNext(salesTaxTracking).verifyComplete();
     }
-
-
-
 }

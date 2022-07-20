@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class NexusStateRuleServiceImplTest {
@@ -59,7 +62,16 @@ class NexusStateRuleServiceImplTest {
     }
 
     @Test
-    void save() {
+    void save_SaveStateRule_Returns_StateRule() {
+        // Given
+        NexusStateRule nexusStateRuleNoId = nexusStateRule.withId(null);
+
+        // When
+        when(nexusStateRuleRepository.save(nexusStateRuleNoId)).thenReturn(Mono.just(nexusStateRule));
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleServiceImpl.save(nexusStateRuleNoId);
+
+        // Then
+        StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
     @Test
@@ -71,20 +83,73 @@ class NexusStateRuleServiceImplTest {
     }
 
     @Test
-    void findById() {
+    void findById_FindsStateRule_ReturnsStateRule() {
+        // Given
+        String id = nexusStateRule.getId();
+
+        // When
+        when(nexusStateRuleRepository.findById(id)).thenReturn(Mono.just(nexusStateRule));
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleServiceImpl.findById(id);
+
+        // Then
+        StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
     @Test
-    void findAll() {
+    void findById_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusStateRuleServiceImpl.findById(nullId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
     @Test
-    void findByState() {
+    void findAll_FindsTwoRules_ReturnsTwoRules() {
+        // Given
+        State secondState = new State("NY","04","New-York");
+        NexusStateRule secondRule = nexusStateRule
+                .withId(UUID.randomUUID().toString())
+                .withState(secondState);
+        List<NexusStateRule> nexusStateRuleList = new ArrayList<NexusStateRule>() {{
+            add(nexusStateRule);
+            add(secondRule);
+        }};
+
+        // When
+        when(nexusStateRuleRepository.findAll()).thenReturn(Flux.fromIterable(nexusStateRuleList));
+        Flux<NexusStateRule> nexusStateRuleFlux = nexusStateRuleRepository.findAll();
+
+        // Then
+        StepVerifier.create(nexusStateRuleFlux).expectNext(nexusStateRule).expectNext(secondRule).verifyComplete();
+    }
+
+    @Test
+    void findByState_FindsRule_ReturnsRule() {
         when(nexusStateRuleRepository.findByState(nexusStateRule.getState().getAbbreviation())).thenReturn(Mono.just(nexusStateRule));
 
         Mono<NexusStateRule> result = nexusStateRuleServiceImpl.findByState(nexusStateRule.getState().getAbbreviation());
 
         StepVerifier.create(result).expectNext(nexusStateRule).verifyComplete();
+    }
+
+    @Test
+    void findByState_NullStatePassed_ThrowsException() {
+        // Given
+        String nullState = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusStateRuleServiceImpl.findByState(nullState);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
 }
