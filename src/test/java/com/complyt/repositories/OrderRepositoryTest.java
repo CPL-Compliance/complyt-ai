@@ -55,6 +55,11 @@ class OrderRepositoryTest {
         ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
         user = User.builder().username("user").password("password").clientId(clientId).build();
 
+        order = createOrder();
+        customer = new Customer(order.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", order.getShippingAddress(),clientId,CustomerType.RETAIL);
+    }
+
+    private Order createOrder() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
@@ -63,8 +68,7 @@ class OrderRepositoryTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null);
-        customer = new Customer(customerId.toString(), externalId, "customer", shippingAddress,clientId,CustomerType.RETAIL);
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, user.getClientId(),  null,null);
     }
 
     @Test
