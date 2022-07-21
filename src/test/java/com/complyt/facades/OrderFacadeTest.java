@@ -57,6 +57,12 @@ public class OrderFacadeTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        order = createOrder();
+        orderNoId = order.withId(null);
+    }
+
+    private Order createOrder() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -67,8 +73,7 @@ public class OrderFacadeTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
-        orderNoId = order.withId(null);
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
     }
 
     private Order createOrderWithProductClassificationData() {
@@ -79,35 +84,37 @@ public class OrderFacadeTest {
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
+        List<Item> modifiedItems = new ArrayList<Item>() {{
+            add(item);
+        }};
         return orderNoId.withItems(modifiedItems);
 
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California","CA",true,
-                false,CalculationType.FIXED,"description",0,null);
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false,null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false,null);
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
+        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
 
-        State state = new State("CA","02","California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker);
+        State state = new State("CA", "02", "California");
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+                true, physicalNexusTracker, economicNexusTracker);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
         SalesTaxTracking salesTaxTrackingWithNexus = createSalesTaxTrackingWithoutNexusEstablished()
-                .withEconomicNexusTracker(new EconomicNexusTracker(true,new Date()));
+                .withEconomicNexusTracker(new EconomicNexusTracker(true, new Date()));
 
         return salesTaxTrackingWithNexus;
     }
 
     private SalesTax createSalesTax() {
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f,0.1f,0.1f,0.1f,0.1f,0.5f);
-        return new SalesTax(1000,salesTaxRate);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        return new SalesTax(1000, salesTaxRate);
     }
 
     @Test
@@ -171,7 +178,7 @@ public class OrderFacadeTest {
         when(productClassificationService.getOrderWithRelevantProductClassificationData(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
         when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
-        when(salesTaxService.handleSalesTaxCalculation(orderWithClassificationData,salesTaxTracking)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTax));
+        when(salesTaxService.handleSalesTaxCalculation(orderWithClassificationData, salesTaxTracking)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTax));
         when(orderService.save(orderWithClassificationDataAndSalesTax)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTaxAndId));
 
         Mono<Order> actualOrder = orderFacade.saveOrder(orderNoId);

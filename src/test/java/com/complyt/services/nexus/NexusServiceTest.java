@@ -141,6 +141,18 @@ class NexusServiceTest {
     }
 
     @Test
+    void calculate_NullOrderPassed_ThrowsException(){
+        // Given
+        Order nullOrder = null;
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.calculate(nullOrder));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
     void calculate_NexusDoesNotPassThreshold_NexusTrackingDoesNotChange() {
         // Given
         Nexus nexusInfo = new Nexus(false,null);

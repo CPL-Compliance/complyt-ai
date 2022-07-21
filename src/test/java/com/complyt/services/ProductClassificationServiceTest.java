@@ -43,10 +43,14 @@ public class ProductClassificationServiceTest {
     ProductClassificationRepository productClassificationRepository;
 
     ProductClassification productClassification;
+    ObjectId customerId;
+    ObjectId clientId;
 
     @BeforeEach
     void setUp(){
         productClassification = createProductClassification();
+        customerId = new ObjectId();
+        clientId = new ObjectId();
     }
 
     private ProductClassification createProductClassification() {
@@ -63,6 +67,52 @@ public class ProductClassificationServiceTest {
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
     }
+
+    private Order createOrder() {
+        String id = null;
+        String externalId = "externalId";
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        List<Item> items = new ArrayList<>();
+        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
+                null, null, false, 0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
+        ));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
+    }
+
+    private Order createOrderWithProductClassificationData() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        Order order = createOrder();
+
+        Item item = order.getItems().get(0)
+                .withTaxableCategory(TaxableCategory.TAXABLE)
+                .withTangibleCategory(TangibleCategory.TANGIBLE)
+                .withJurisdictionalSalesTaxRules(rules);
+
+        List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
+        return order.withItems(modifiedItems);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California","CA",true,
+                false,CalculationType.FIXED,"description",0,null);
+    }
+
+    @Test
+    void getOrderWithRelevantProductClassificationData_InjectsDateToOrder_ReturnsOrder() {
+        // Given
+        Order order = createOrder();
+        String taxCode = order.getItems().get(0).getTaxCode();
+        Order orderWithData = createOrderWithProductClassificationData();
+
+        // When
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        Mono<Order> actualOrder = productClassificationService.getOrderWithRelevantProductClassificationData(order);
+
+        // Then
+        StepVerifier.create(actualOrder).expectNext(orderWithData).verifyComplete();
+    }
+
 
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne(){
@@ -148,38 +198,5 @@ public class ProductClassificationServiceTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
-
-//    @Test
-//    void setJurisdictionalRules_SetsRules_ReturnsModifiedOrder() {
-//        // Given
-//        String id = UUID.randomUUID().toString();
-//        String externalId = UUID.randomUUID().toString();
-//        ObjectId customerId = new ObjectId();
-//        Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-//        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-//        ObjectId clientId = new ObjectId();
-//        List<Item> items = new ArrayList<Item>() {
-//            {
-//                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-//                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
-//                ));
-//            }
-//        };
-//        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null,null);
-//        List<Item> itemsWithRules = new ArrayList<Item>() {{
-//            add(order.getItems().get(0).withJurisdictionalSalesTaxRules(productClassification.getJurisdictionalSalesTaxRules().get("CA")));
-//        }};
-//        Order orderWithItemsWithRules = order.withItems(itemsWithRules);
-//        OrderJurisdictionalRulesInjector orderProductClassificationInjector = new OrderJurisdictionalRulesInjector(order);
-//
-//        // When
-//        when(productClassificationRepository.findOneByTaxCode(order.getItems().get(0).getTaxCode()))
-//                .thenReturn(Mono.just(productClassification));
-//        Mono<Order> orderMono = productClassificationService.setJurisdictionalRules(order,orderProductClassificationInjector);
-//
-//        // Then
-//        StepVerifier.create(orderMono).expectNext(orderWithItemsWithRules).verifyComplete();
-//
-//    }
 
 }

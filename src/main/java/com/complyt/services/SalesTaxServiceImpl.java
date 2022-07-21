@@ -47,7 +47,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Order> calculate(@NotNull Order order) {
-        return findByAddress(order.getShippingAddress())
+        return findByAddress(order.getShippingAddress()).log()
                 .map(this::salesTaxDataToSalesTaxRate)
                 .map(injectSalesTaxToOrder(order));
     }
