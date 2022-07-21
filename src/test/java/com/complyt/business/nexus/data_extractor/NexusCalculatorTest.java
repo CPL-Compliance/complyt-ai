@@ -103,5 +103,4 @@ public class NexusCalculatorTest {
         assertEquals(summary,actualSummary);
     }
 
-
 }
