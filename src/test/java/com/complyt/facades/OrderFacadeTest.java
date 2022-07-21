@@ -1,11 +1,13 @@
 package com.complyt.facades;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.*;
+import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.PhysicalNexusTracker;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.services.OrderService;
@@ -25,9 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -52,6 +52,7 @@ public class OrderFacadeTest {
     NexusService nexusService;
 
     Order order;
+    Order orderNoId;
 
     @BeforeEach
     void setUp() {
@@ -67,25 +68,46 @@ public class OrderFacadeTest {
                 null, null, false, 0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
+        orderNoId = order.withId(null);
     }
 
-    Order getOrderWithRelevantProductClassificationData() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+    private Order createOrderWithProductClassificationData() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+
         Item item = order.getItems().get(0)
-                .withJurisdictionalSalesTaxRules(jurisdictionalSalesTaxRules)
+                .withTaxableCategory(TaxableCategory.TAXABLE)
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
-                .withTaxableCategory(TaxableCategory.TAXABLE);
+                .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = new ArrayList<Item>() {{
-            add(item);
-        }};
+        List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
+        return orderNoId.withItems(modifiedItems);
 
-        return order.withItems(modifiedItems);
     }
 
-    JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA",
-                true, false, CalculationType.FIXED, "description", 0, null);
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California","CA",true,
+                false,CalculationType.FIXED,"description",0,null);
+    }
+
+    private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false,null);
+        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false,null);
+
+        State state = new State("CA","02","California");
+        return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
+                true,physicalNexusTracker,economicNexusTracker);
+    }
+
+    private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
+        SalesTaxTracking salesTaxTrackingWithNexus = createSalesTaxTrackingWithoutNexusEstablished()
+                .withEconomicNexusTracker(new EconomicNexusTracker(true,new Date()));
+
+        return salesTaxTrackingWithNexus;
+    }
+
+    private SalesTax createSalesTax() {
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f,0.1f,0.1f,0.1f,0.1f,0.5f);
+        return new SalesTax(1000,salesTaxRate);
     }
 
     @Test
@@ -114,29 +136,50 @@ public class OrderFacadeTest {
         assertEquals(nullPointerException.getMessage(), "productClassificationService is marked non-null but is null");
     }
 
-    //
-//    @Test
-//    public void saveOrder_OrderSaved_OrderReturned() throws InterruptedException {
-//        // Given
-//
-//        // When
-//        when(orderService.save(order)).thenReturn(Mono.just(order));
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//        // When
-//        orderFacade.saveOrder(order)
-//                .subscribe(returnedOrder -> {
-//                    orderAtomicReference.set(returnedOrder);
-//                    countDownLatch.countDown();
-//                });
-//
-//        // Then
-//        countDownLatch.await();
-//        assertNotNull(orderAtomicReference.get());
-//        assertEquals(order, orderAtomicReference.get());
-//    }
-//
+    @Test
+    public void saveOrder_NexusIsNotEstablished_OrderSavedAndReturned() throws InterruptedException {
+        // Given
+        Order orderWithClassificationData = createOrderWithProductClassificationData();
+        Order orderWithClassificationDataAndId = orderWithClassificationData.withId(order.getId());
+        SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
+
+
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
+        when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
+        when(orderService.save(orderWithClassificationData)).thenReturn(Mono.just(orderWithClassificationDataAndId));
+        when(nexusService.calculate(orderWithClassificationDataAndId)).thenReturn(Mono.just(salesTaxTracking));
+
+        Mono<Order> actualOrder = orderFacade.saveOrder(orderNoId);
+
+        // Then
+        StepVerifier.create(actualOrder).expectNext(orderWithClassificationData).verifyComplete();
+    }
+
+    @Test
+    public void saveOrder_NexusIsEstablished_CalculatesSalesTaxAndReturnsOrder() throws InterruptedException {
+        // Given
+        SalesTax salesTax = createSalesTax();
+        Order orderWithClassificationData = createOrderWithProductClassificationData();
+        Order orderWithClassificationDataAndSalesTax = orderWithClassificationData.withSalesTax(salesTax);
+        Order orderWithClassificationDataAndSalesTaxAndId = orderWithClassificationDataAndSalesTax.withId(order.getId());
+        SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished();
+
+
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
+        when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
+        when(salesTaxService.handleSalesTaxCalculation(orderWithClassificationData,salesTaxTracking)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTax));
+        when(orderService.save(orderWithClassificationDataAndSalesTax)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTaxAndId));
+
+        Mono<Order> actualOrder = orderFacade.saveOrder(orderNoId);
+
+        // Then
+        StepVerifier.create(actualOrder).expectNext(orderWithClassificationDataAndSalesTaxAndId).verifyComplete();
+    }
+
 //    @Test
 //    void updateOrder_OrderInserted_OrderReturned() throws InterruptedException {
 //        // Given
