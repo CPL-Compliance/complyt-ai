@@ -1,31 +1,37 @@
 package com.complyt.repositories;
 
+import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.domain.security.User;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
+@Import(SecurityConfigMockTest.class)
 public class ProductClassificationRepositoryTest {
     @InjectMocks
     ProductClassificationRepository productClassificationRepository;
@@ -35,14 +41,18 @@ public class ProductClassificationRepositoryTest {
 
     ProductClassification productClassification;
 
+    User user;
+
     @BeforeEach
     void setUp(){
+        ObjectId clientId = new ObjectId();
+        user = User.builder().username("user").password("password").clientId(clientId).build();
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA",true,false, CalculationType.FIXED,"description",0,null);
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
-        productClassification = new ProductClassification("id","C1S1","description",
+        productClassification = new ProductClassification(UUID.randomUUID().toString(),"C1S1","description",
                 "title",jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
 
@@ -76,4 +86,60 @@ public class ProductClassificationRepositoryTest {
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
     }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findById_FindsClassification_ReturnsClassification() {
+        // Given
+        String id = productClassification.getId();
+        Query query = Query.query(Criteria.where("_id").is(id));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, ProductClassification.class)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> actualClassification = productClassificationRepository.findById(id);
+
+        // Then
+        StepVerifier.create(actualClassification).expectNext(productClassification).verifyComplete();
+    }
+
+    @Test
+    void findById_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            productClassificationRepository.findById(nullId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void save_SavesClassification_ReturnsClassification() {
+        // Given
+        ProductClassification productClassificationNoId = productClassification.withId(null);
+
+        // When
+        when(reactiveMongoTemplate.save(productClassificationNoId)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> actualClassification = productClassificationRepository.save(productClassificationNoId);
+
+        // Then
+        StepVerifier.create(actualClassification).expectNext(productClassification).verifyComplete();
+    }
+
+    @Test
+    void save_NullClassificationPassed_ThrowsException() {
+        // Given
+        ProductClassification nullClassification = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            productClassificationRepository.save(nullClassification);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "productClassification is marked non-null but is null");
+    }
+
 }

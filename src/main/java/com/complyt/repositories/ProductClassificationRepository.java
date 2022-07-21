@@ -36,8 +36,7 @@ public class ProductClassificationRepository {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
-                    Query query = Query.query(Criteria.where("_id").is(id)
-                            .and("clientId").is(user.getClientId()));
+                    Query query = Query.query(Criteria.where("_id").is(id));
                     log.debug("Searching for a productClassification with id of : " + id);
 
                     return reactiveMongoTemplate.findOne(query, ProductClassification.class).log();
