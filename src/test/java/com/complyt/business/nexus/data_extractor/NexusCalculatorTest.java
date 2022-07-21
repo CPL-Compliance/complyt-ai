@@ -43,7 +43,7 @@ public class NexusCalculatorTest {
         String id = UUID.randomUUID().toString();
         ObjectId clientId = new ObjectId();
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
+        ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
