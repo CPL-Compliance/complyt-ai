@@ -45,6 +45,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, new Date());
         SalesTaxTracking modifiedTracking = salesTaxTracking.withEconomicNexusTracker(newTracker);
 
+        log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
         return save(modifiedTracking).log();
     }
 }

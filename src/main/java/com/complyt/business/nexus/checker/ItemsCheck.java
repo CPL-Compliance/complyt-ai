@@ -17,6 +17,9 @@ public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> 
     public boolean check(@NonNull Pair<List<Item>, NexusStateRule> itemsAndRule) {
         List<Item> items = itemsAndRule.getValue0();
         NexusStateRule nexusStateRule = itemsAndRule.getValue1();
+        log.debug("Checking if items received should be counted into nexus aggregation, state rule info :" +
+                "taxable categories - " + nexusStateRule.getTaxableCategories()  + " , tangible categories "
+        + nexusStateRule.getTangibleCategories());
 
         for(Item item : items) {
             if(isCounted(item,nexusStateRule)) {
@@ -29,6 +32,8 @@ public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> 
     public boolean isCounted(Item item, NexusStateRule nexusStateRule) {
         boolean containsTaxable = nexusStateRule.getTaxableCategories().contains(item.getTaxableCategory());
         boolean containsTangible = nexusStateRule.getTangibleCategories().contains(item.getTangibleCategory());
+        log.debug("Item with tax code: " + item.getTaxCode() + ", containsTaxable: " + containsTangible + ", "
+        + "containsTangible: " + containsTangible);
 
         return containsTaxable && containsTangible;
     }

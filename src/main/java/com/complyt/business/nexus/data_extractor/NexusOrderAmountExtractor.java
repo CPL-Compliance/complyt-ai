@@ -6,12 +6,10 @@ import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-@Slf4j
 public class NexusOrderAmountExtractor implements NexusDataExtractor<Float, Order> {
 
     @NonNull

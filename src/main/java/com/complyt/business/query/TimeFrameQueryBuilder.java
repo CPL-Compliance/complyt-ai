@@ -42,8 +42,12 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
                 dateRange = DateRange.Factory.newYearFromSeptember();
                 break;
 
-            default:
+            case CURRENT_AND_PREVIOUS_TAXABLE_YEAR:
                 dateRange = DateRange.Factory.newTaxableYear(nexusInfo.getTaxableDate());
+                break;
+
+            default:
+                throw new IllegalArgumentException("Illegal time frame received : " + timeFrame);
         }
 
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() + " , end date : " + dateRange.getEnd());

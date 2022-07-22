@@ -18,5 +18,5 @@ public class Customer {
     private final String name;
     private final Address address;
     private final ObjectId clientId;
-    private CustomerType customerType;
+    private final CustomerType customerType;
 }

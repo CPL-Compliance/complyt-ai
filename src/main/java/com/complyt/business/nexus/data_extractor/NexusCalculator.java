@@ -21,12 +21,16 @@ public class NexusCalculator {
     private NexusOrderCountExtractor nexusOrderCountExtractor;
 
     public NexusCalculationSummary calculate(List<Order> orders, NexusStateRule nexusStateRule) {
+        log.debug("Calculating amount and count for all orders on timeframe : " + nexusStateRule.getTimeFrame());
+
         int count = 0;
         float amount = 0;
         for (Order order : orders) {
             count += nexusOrderCountExtractor.extract(order, nexusStateRule);
             amount += nexusOrderAmountExtractor.extract(order, nexusStateRule);
         }
+
+        log.debug("Calculated total amount of : " + amount + ", and count : " + count);
         return new NexusCalculationSummary(count,amount);
     }
 }
