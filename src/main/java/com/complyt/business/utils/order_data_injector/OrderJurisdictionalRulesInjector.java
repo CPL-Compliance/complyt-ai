@@ -1,4 +1,4 @@
-package com.complyt.business.order;
+package com.complyt.business.utils.order_data_injector;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -29,7 +29,7 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
      * @return - order with items with the corresponding jurisdictional Sales Tax Rules in each one of them
      */
     @Override
-    public Mono<Order> act(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+    public Mono<Order> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
             log.info("Setting jurisdictional sales tax rules and taxable categories to order's items");
             String state = order.getShippingAddress().getState();

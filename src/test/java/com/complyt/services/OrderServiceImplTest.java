@@ -41,7 +41,7 @@ class OrderServiceImplTest {
     OrderRepository orderRepository;
 
     @Mock
-    SalesTaxService salesTaxService;
+    ProductClassificationServiceImpl productClassificationService;
 
     Order order;
 

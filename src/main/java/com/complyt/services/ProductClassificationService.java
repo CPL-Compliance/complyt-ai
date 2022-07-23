@@ -12,5 +12,4 @@ import java.util.Map;
 public interface ProductClassificationService extends CrudService<ProductClassification, String> {
     Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode);
     Mono<Order> getOrderWithRelevantProductClassificationData(Order order);
-    Mono<Order> injectJurisdictionalRules(Order order, Map<String, ProductClassification> mapTaxCodesToClassifications);
 }

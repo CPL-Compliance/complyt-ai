@@ -1,4 +1,4 @@
-package com.complyt.business.order;
+package com.complyt.business.utils.order_data_injector;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
@@ -24,7 +24,7 @@ public class OrderTangibleCategoryInjector implements OrderDataInjector<ProductC
     private final Order order;
 
     @Override
-    public Mono<Order> act(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+    public Mono<Order> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
             log.info("Setting tangible categories to order's items");
             List<Item> modifiedItems = new ArrayList<>();

@@ -2,7 +2,6 @@ package com.complyt.facades;
 
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
-import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.nexus.NexusService;
 import lombok.AllArgsConstructor;
@@ -26,14 +25,10 @@ public class OrderFacade {
     private SalesTaxService salesTaxService;
 
     @NonNull
-    @Qualifier("productClassificationServiceImpl")
-    private ProductClassificationService productClassificationService;
-
-    @NonNull
     private NexusService nexusService;
 
     public Mono<Order> saveOrder(Order order) {
-        return productClassificationService.getOrderWithRelevantProductClassificationData(order)
+        return orderService.injectDataToNewOrder(order)
                 .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
                                 salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(orderService::save) :
@@ -45,7 +40,7 @@ public class OrderFacade {
                 .flatMap(orderItem ->
                         orderItem.equals(order) ?
                                 Mono.just(order) :
-                                productClassificationService.getOrderWithRelevantProductClassificationData(order)
+                                orderService.injectDataToModifiedOrder(order)
                                         .flatMap(salesTaxService::calculate)
                                         .flatMap(updatedOrder -> orderService.update(externalId, updatedOrder))
                 );

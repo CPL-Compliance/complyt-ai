@@ -124,23 +124,9 @@ public class OrderFacadeTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> new OrderFacade(orderService, salesTaxService, productClassificationService, nexusService));
+                () -> new OrderFacade(orderService, salesTaxService, nexusService));
 
         assertEquals(nullPointerException.getMessage(), "orderService is marked non-null but is null");
-    }
-
-    @Test
-    void initFacade_NullProductClassificationServiceInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        productClassificationService = null;
-
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> new OrderFacade(orderService, salesTaxService, productClassificationService, nexusService));
-
-        assertEquals(nullPointerException.getMessage(), "productClassificationService is marked non-null but is null");
     }
 
     @Test
@@ -152,7 +138,7 @@ public class OrderFacadeTest {
 
 
         // When
-        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
+        when(orderService.injectDataToNewOrder(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
         when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
         when(orderService.save(orderWithClassificationData)).thenReturn(Mono.just(orderWithClassificationDataAndId));
@@ -175,7 +161,7 @@ public class OrderFacadeTest {
 
 
         // When
-        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
+        when(orderService.injectDataToNewOrder(orderNoId)).thenReturn(Mono.just(orderWithClassificationData));
         when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
         when(salesTaxService.handleSalesTaxCalculation(orderWithClassificationData, salesTaxTracking)).thenReturn(Mono.just(orderWithClassificationDataAndSalesTax));

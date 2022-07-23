@@ -1,11 +1,14 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.date_injector.ModifiedOrderInternalDateInjector;
+import com.complyt.business.utils.date_injector.NewOrderInternalDateInjector;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -22,6 +25,10 @@ public class OrderServiceImpl implements OrderService {
     @NonNull
     private OrderRepository orderRepository;
 
+    @NonNull
+    @Qualifier("productClassificationServiceImpl")
+    private ProductClassificationService productClassificationService;
+
     @Override
     public Mono<Order> save(Order order) {
         return orderRepository.save(order);
@@ -37,6 +44,20 @@ public class OrderServiceImpl implements OrderService {
                 .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
+    }
+
+    @Override
+    public Mono<Order> injectDataToModifiedOrder(@NonNull Order order) {
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order);
+//                .map(ModifiedOrderInternalDateInjector::new)
+//                .map(dateInjector -> dateInjector.inject());
+    }
+
+    @Override
+    public Mono<Order> injectDataToNewOrder(@NonNull Order order) {
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order);
+//                .map(NewOrderInternalDateInjector::new)
+//                .map(dateInjector -> dateInjector.inject());
     }
 
     @Override

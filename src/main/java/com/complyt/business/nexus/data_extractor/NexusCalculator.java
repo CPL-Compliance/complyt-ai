@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class NexusCalculator {
+
     @NonNull
     private NexusOrderAmountExtractor nexusOrderAmountExtractor;
 

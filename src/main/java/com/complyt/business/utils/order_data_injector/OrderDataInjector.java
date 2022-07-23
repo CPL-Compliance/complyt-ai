@@ -1,4 +1,4 @@
-package com.complyt.business.order;
+package com.complyt.business.utils.order_data_injector;
 
 import com.complyt.domain.Order;
 import reactor.core.publisher.Mono;
@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 public interface OrderDataInjector<T> {
-    Mono<Order> act(Map<String, T> t);
+    Mono<Order> inject(Map<String, T> t);
 }
