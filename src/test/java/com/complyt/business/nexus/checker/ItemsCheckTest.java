@@ -45,7 +45,7 @@ public class ItemsCheckTest {
 
     private List<Item> createItems() {
         Item item = new Item(10,5,50,"description","name","C1S1",null,
-                null,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE);
+                null,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
         return new ArrayList<Item>() {{add(item);}};
     }
 

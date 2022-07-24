@@ -2,6 +2,7 @@ package com.complyt.business.factory;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.With;
 
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
 @Getter
+@ToString
 @With
 public class DateRange {
 

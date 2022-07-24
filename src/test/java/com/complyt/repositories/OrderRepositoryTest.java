@@ -67,7 +67,7 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, user.getClientId(),  null,null);
     }
 

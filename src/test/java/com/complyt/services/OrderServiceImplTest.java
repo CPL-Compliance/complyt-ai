@@ -57,7 +57,7 @@ class OrderServiceImplTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
             }
         };

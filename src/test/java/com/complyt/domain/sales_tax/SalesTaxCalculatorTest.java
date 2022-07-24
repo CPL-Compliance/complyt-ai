@@ -42,8 +42,8 @@ public class SalesTaxCalculatorTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
 
         List<Item> items = new ArrayList<Item>(){{
-                add(new Item(1000,2,2000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0, TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
-                add(new Item(3000,3,9000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+                add(new Item(1000,2,2000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+                add(new Item(3000,3,9000,"description","name","taxCode",jurisdictionalSalesTaxRules, salesTaxRate,false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float amount = 0;
 
@@ -64,7 +64,7 @@ public class SalesTaxCalculatorTest {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         List<Item> items = new ArrayList<Item>(){{
-            add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,true,0.5f,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+            add(new Item(1000,2,2000,"description","name","taxCode",null, salesTaxRate,true,0.5f,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float amount = items.get(0).getTotalPrice() * 0.5f;
 
@@ -83,7 +83,7 @@ public class SalesTaxCalculatorTest {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesByPercentage = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
         List<Item> items = new ArrayList<Item>(){{
             add(new Item(1000,2,2000,"description","name","taxCode",
-                    jurisdictionalSalesTaxRulesByPercentage, salesTaxRate,false,0.5f,TangibleCategory.NON_TANGIBLE, TaxableCategory.NOT_TAXABLE));
+                    jurisdictionalSalesTaxRulesByPercentage, salesTaxRate,false,0.5f,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
         float partialTotalPrice = items.get(0).getTotalPrice() * jurisdictionalSalesTaxRulesByPercentage.getCalculationValue();
         float amount = partialTotalPrice * items.get(0).getSalesTaxRate().getTaxRate();
