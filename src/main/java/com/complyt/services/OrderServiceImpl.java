@@ -8,6 +8,7 @@ import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -55,9 +56,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Mono<Order> injectDataToNewOrder(@NonNull Order order) {
-        return productClassificationService.getOrderWithRelevantProductClassificationData(order);
-//                .map(NewOrderInternalDateInjector::new)
-//                .map(dateInjector -> dateInjector.inject());
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order)
+                .map(NewOrderInternalDateInjector::new)
+                .map(dateInjector -> dateInjector.inject());
     }
 
     @Override
@@ -66,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> markAsCancelled(String externalId) {
+    public Mono<Order> markAsCancelled(@NotNull String externalId) {
         return orderRepository
                 .findByExternalId(externalId)
                 .map(order -> order.withOrderStatus(OrderStatus.CANCELLED))
