@@ -31,6 +31,8 @@ public class NexusThresholdCheck implements NexusCheck<Pair<NexusCalculationSumm
             case AMOUNT_OR_COUNT:
                 return exceededAmountOrCount(nexusCalculationSummary,nexusStateRule);
         }
+
+        log.debug("Invalid nexus calculation definition : " + definition + ", returning false");
         return false;
     }
 
