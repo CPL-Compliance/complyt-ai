@@ -35,12 +35,12 @@ public class OrderFacade {
                                 orderService.save(setOrder).flatMap(nexusService::calculate).thenReturn(setOrder)));
     }
 
-    public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
+    public Mono<Order> updateIfModified(@NonNull String externalId, Order newOrder) {
         return findByExternalId(externalId)
-                .flatMap(orderItem ->
-                        orderItem.equals(order) ?
-                                Mono.just(order) :
-                                orderService.injectDataToModifiedOrder(order)
+                .flatMap(oldOrder ->
+                        oldOrder.equals(newOrder) ?
+                                Mono.just(newOrder) :
+                                orderService.injectDataToModifiedOrder(newOrder.withInternalTimeStamps(oldOrder.getInternalTimeStamps()))
                                         .flatMap(salesTaxService::calculate)
                                         .flatMap(updatedOrder -> orderService.update(externalId, updatedOrder))
                 );

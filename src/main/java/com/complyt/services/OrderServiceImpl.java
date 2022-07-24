@@ -49,9 +49,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Mono<Order> injectDataToModifiedOrder(@NonNull Order order) {
-        return productClassificationService.getOrderWithRelevantProductClassificationData(order);
-//                .map(ModifiedOrderInternalDateInjector::new)
-//                .map(dateInjector -> dateInjector.inject());
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order)
+                .map(ModifiedOrderInternalDateInjector::new)
+                .map(dateInjector -> dateInjector.inject());
     }
 
     @Override
