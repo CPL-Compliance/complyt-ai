@@ -127,7 +127,7 @@ public class NexusOrderCountExtractorTest {
     @Test
     void extract_ExtractsOrderItemsCount_ReturnsShouldNotBeCountedBecauseCustomerTypeDoesNotExist() {
         // Given
-        Customer otherCustomer = order.getCustomer().withCustomerType(CustomerType.MARKET_PLACE);
+        Customer otherCustomer = order.getCustomer().withCustomerType(CustomerType.MARKETPLACE);
         Order otherOrder = order.withCustomer(otherCustomer);
 
         // When

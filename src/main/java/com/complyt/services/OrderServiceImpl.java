@@ -90,6 +90,7 @@ public class OrderServiceImpl implements OrderService {
                 .withCustomerId(order.getCustomerId())
                 .withSalesTax(order.getSalesTax())
                 .withOrderStatus(order.getOrderStatus())
+                .withInternalTimeStamps(order.getInternalTimeStamps())
                 .withExternalTimeStamps(order.getExternalTimeStamps());
     }
 }
