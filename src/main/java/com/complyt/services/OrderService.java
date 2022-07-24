@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public interface OrderService extends CrudService<Order, String> {
     Mono<Order> findByExternalId(@NonNull final String externalId);
     Mono<Order> update(@NonNull final String externalId, @NonNull final Order order);
-    Mono<Order> injectDataToModifiedOrder(@NonNull Order order);
+    Mono<Order> injectDataToModifiedOrder(@NonNull Order newOrder, @NonNull Order oldOrder);
     Mono<Order> injectDataToNewOrder(@NonNull Order order);
     Mono<Order> markAsCancelled(@NonNull final  String orderId);
     Flux<Order> getOrdersByQuery(@NonNull Query query);

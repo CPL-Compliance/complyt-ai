@@ -40,10 +40,11 @@ public class OrderFacade {
                 .flatMap(oldOrder ->
                         oldOrder.equals(newOrder) ?
                                 Mono.just(newOrder) :
-                                orderService.injectDataToModifiedOrder(newOrder.withInternalTimeStamps(oldOrder.getInternalTimeStamps()))
-                                        .flatMap(salesTaxService::calculate)
-                                        .flatMap(updatedOrder -> orderService.update(externalId, updatedOrder))
-                );
+                                orderService.injectDataToModifiedOrder(newOrder, oldOrder)
+                                        .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
+                                                .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                                        salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(updatedOrder -> orderService.update(externalId, updatedOrder)) :
+                                                        orderService.update(externalId, setOrder).flatMap(nexusService::calculate).thenReturn(setOrder))));
     }
 
     public Mono<Order> findByExternalId(String externalId) {
