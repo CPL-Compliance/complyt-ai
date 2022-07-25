@@ -97,5 +97,4 @@ public class TimeFrameQueryBuilderTest {
         Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame);
         assertEquals(expectedQuery, actualQuery);
     }
-
 }
