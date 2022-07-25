@@ -10,34 +10,28 @@
     </parent>
     <groupId>com.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.6-SNAPSHOT</version>
     <name>complyt</name>
     <description>Complyt</description>
     <properties>
-        <java.version>8</java.version>
+        <docker.image.prefix>complyt</docker.image.prefix>
+        <docker.image.name>complyt</docker.image.name>
         <maven.test.skip>false</maven.test.skip>
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <mapstruct.version>1.5.1.Final</mapstruct.version>
         <lombok.version>1.18.24</lombok.version>
-        <web-flux.version>2.6.7</web-flux.version>
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
-        <spring-boot-starter-data-mongodb-reactive.version>2.6.7</spring-boot-starter-data-mongodb-reactive.version>
-        <spring-boot-dev-tools.version>2.6.7</spring-boot-dev-tools.version>
-        <spring-boot-starter-test.version>2.6.7</spring-boot-starter-test.version>
-        <spring-boot-starter-aop.version>2.6.7</spring-boot-starter-aop.version>
-        <mockito-junit-jupiter.version>4.5.1</mockito-junit-jupiter.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
+        <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
         <jUnit.version>4.13.2</jUnit.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <springdoc-openapi-webflux-ui.version>1.6.8</springdoc-openapi-webflux-ui.version>
-        <spring-boot-starter-security.version>2.6.7</spring-boot-starter-security.version>
+        <springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
         <spring-security-test.version>5.6.3</spring-security-test.version>
-        <spring-boot-starter-data-mongodb.version>2.6.7</spring-boot-starter-data-mongodb.version>
-        <spring-boot-starter-actuator.version>2.6.7</spring-boot-starter-actuator.version>
-        <spring-boot-starter-hateoas.version>2.6.7</spring-boot-starter-hateoas.version>
+        <reactor-test.version>3.4.18</reactor-test.version>
     </properties>
     <dependencies>
         <dependency>
@@ -48,17 +42,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-            <version>${spring-boot-starter-data-mongodb-reactive.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${spring-boot-dev-tools.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot-starter-test.version}</version>
+            <version>${spring-boot.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -74,7 +68,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot-starter-aop.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -102,7 +96,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${web-flux.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -113,12 +107,12 @@
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
-            <version>3.4.17</version>
+            <version>${reactor-test.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring-boot-starter-security.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -129,7 +123,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring-boot-starter-actuator.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -140,6 +134,113 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.40.1</version>
+                <configuration>
+                    <!--For Linux users us the tag below-->
+                    <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
+                    <dockerHost>unix:///var/run/docker.sock</dockerHost>
+                    <verbose>true</verbose>
+                    <images>
+                        <!--Complyt Application Container-->
+                        <image>
+                            <name>${docker.image.prefix}/${docker.image.name}</name>
+                            <alias>complyt</alias>
+                            <build>
+                                <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
+                                <!--copies artficact to docker build directory in target-->
+                                <assembly>
+                                    <descriptorRef>artifact</descriptorRef>
+                                </assembly>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
+                            <run>
+                                <env>
+                                    <SPRING_PROFILES_ACTIVE>local-docker, stubFastTax</SPRING_PROFILES_ACTIVE>
+                                    <SPRING_DATA_MONGODB_URI>mongodb://mongo:27017/complyt</SPRING_DATA_MONGODB_URI>
+                                </env>
+                                <ports>
+                                    <port>9898:9898</port>
+                                </ports>
+                                <links>
+                                    <link>mongo</link>
+                                </links>
+                                <dependsOn>
+                                    <container>mongo</container>
+                                </dependsOn>
+                            </run>
+                        </image>
+                        <!--MongoDB container-->
+                        <image>
+                            <name>mongo:4.4.6</name>
+                            <alias>mongo</alias>
+                            <run>
+                                <ports>
+                                    <port>27017:27017</port>
+                                </ports>
+                                <volumes>
+                                    <bind>
+                                        <volume>${project.basedir}/dockerdata:/data/db</volume>
+                                    </bind>
+                                </volumes>
+                                <wait>
+                                    <log>Waiting for connections</log>
+                                    <time>10000</time>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>start</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scripts>
+                        <script>file:///${project.basedir}/src/main/scripts/BuildDockerfile.groovy</script>
+                    </scripts>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <!-- any version of Groovy \>= 1.5.0 should work here -->
+                        <version>2.4.8</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -217,6 +318,20 @@
                 </executions>
                 <configuration>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

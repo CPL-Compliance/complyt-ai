@@ -66,7 +66,6 @@ class ThresholdProcessor {
         }
     }
 
-
     public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return nexusCalculationSummary.getAmount() >= nexusStateRule.getNexusThreshold().getAmount();
     }
