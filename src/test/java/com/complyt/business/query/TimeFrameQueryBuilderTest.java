@@ -54,20 +54,21 @@ public class TimeFrameQueryBuilderTest {
         assertEquals(expectedQuery, actualQuery);
     }
 
-    //    @Test
+//        @Test
 //    void buildNexusTimeFrame_BuildingPrevAndCurrentCalenderYear_ReturnsQuery() {
 //        // Given
 //        NexusStateRule ruleWithPrevCalenderYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.CURRENT_AND_PREVIOUS_CALENDER_YEAR);
-//        DateRange dateRange = DateRange.Factory.newPrevAndCurrentCalenderYear();
+//        DateRange dateRange = DateRange.Factory.newPreviousAndCurrentCalenderYear();
 //        DateRange dateRangeWithFixedEndDate = dateRange.withEnd(dateRange.getEnd().withHour(0).withMinute(0).withSecond(0).withNano(0));
 //        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
 //                .gte(dateRange.getStart())
-//                .lte(dateRangeWithFixedEndDate));
+//                .lte(dateRangeWithFixedEndDate.getEnd()));
 //
 //        // When + Then
 //        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,ruleWithPrevCalenderYearTimeFrame);
 //        assertEquals(expectedQuery,actualQuery);
 //    }
+
     @Test
     void buildNexusTimeFrame_BuildingFromSeptemberToSeptember_ReturnsQuery() {
         // Given
