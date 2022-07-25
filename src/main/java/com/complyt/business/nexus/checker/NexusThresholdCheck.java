@@ -18,22 +18,24 @@ public class NexusThresholdCheck implements NexusCheck<Pair<NexusCalculationSumm
     public boolean check(@NonNull Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule) {
         NexusCalculationSummary nexusCalculationSummary = summaryAndRule.getValue0();
         NexusStateRule nexusStateRule = summaryAndRule.getValue1();
-        ThresholdProcessor thresholdProcessor = new ThresholdProcessor(nexusCalculationSummary, nexusStateRule);
+        ThresholdStrategy thresholdStrategy = new ThresholdStrategy(nexusCalculationSummary, nexusStateRule);
+        boolean exceededThreshold = thresholdStrategy.isExceeded();
+        log.debug("Exceeded threshold : " + exceededThreshold);
 
-        return thresholdProcessor.isExceeded();
+        return exceededThreshold;
     }
 }
 
 @Slf4j
 @ToString
 @Getter
-class ThresholdProcessor {
+class ThresholdStrategy {
 
     private final NexusCalculationSummary calculationSummary;
     private final NexusStateRule stateRule;
     private boolean exceeded;
 
-    public ThresholdProcessor(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
+    public ThresholdStrategy(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         calculationSummary = nexusCalculationSummary;
         stateRule = nexusStateRule;
         setIsNexusExceeded();

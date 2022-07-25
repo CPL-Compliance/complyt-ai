@@ -87,6 +87,4 @@ public class DateRangeTest {
         assertEquals(expectedDateRange.getStart(), expectedStartDate);
         assertEquals(expectedDateRange.getEnd(), expectedEndDate);
     }
-
-
 }
