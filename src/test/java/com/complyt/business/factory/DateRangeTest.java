@@ -25,7 +25,7 @@ public class DateRangeTest {
         LocalDateTime expectedLastDayOfLastYear = expectedFirstDayOfLastYear.with(lastDayOfYear());
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newPrevCalenderYear();
+        DateRange expectedDateRange = DateRange.Factory.newPreviousCalenderYear();
         assertEquals(expectedDateRange.getStart(), expectedFirstDayOfLastYear);
         assertEquals(expectedDateRange.getEnd(), expectedLastDayOfLastYear);
     }
@@ -37,7 +37,7 @@ public class DateRangeTest {
         LocalDateTime expectedNow = LocalDateTime.now();
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newPrevAndCurrentCalenderYear();
+        DateRange expectedDateRange = DateRange.Factory.newPreviousAndCurrentCalenderYear();
         assertEquals(expectedDateRange.getStart(), expectedFirstDayOfLastYear);
         assertEquals(expectedDateRange.getEnd().getYear(), expectedNow.getYear());
         assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedNow.getMonthValue());
@@ -51,7 +51,7 @@ public class DateRangeTest {
         LocalDateTime expectedNow = LocalDateTime.now();
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newPrevTwelveMonths();
+        DateRange expectedDateRange = DateRange.Factory.newPreviousTwelveMonths();
         assertEquals(expectedDateRange.getStart(), expectedOneYearAgo);
         assertEquals(expectedDateRange.getEnd().getYear(), expectedNow.getYear());
         assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedNow.getMonthValue());

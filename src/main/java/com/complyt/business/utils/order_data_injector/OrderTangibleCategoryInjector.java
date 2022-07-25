@@ -27,20 +27,26 @@ public class OrderTangibleCategoryInjector implements OrderDataInjector<ProductC
     public Mono<Order> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
             log.info("Setting tangible categories to order's items");
-            List<Item> modifiedItems = new ArrayList<>();
-
-            for(Item item : order.getItems()) {
-                ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
-                TangibleCategory category = productClassification.getTangibleCategory();
-                Item newItem = item.withTangibleCategory(category);
-
-                log.debug("Inserting new item with tangible category : " + category);
-                modifiedItems.add(newItem);
-            }
-
+            List<Item> modifiedItems = createItemsWithTangibleCategories(mapTaxCodesToClassifications);
             Order modifiedOrder = order.withItems(modifiedItems);
+
             log.debug("Order with items with tangible categories injected : " + modifiedOrder);
             return modifiedOrder;
         });
+    }
+
+    private List<Item> createItemsWithTangibleCategories(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+        List<Item> modifiedItems = new ArrayList<>();
+
+        for(Item item : order.getItems()) {
+            ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
+            TangibleCategory category = productClassification.getTangibleCategory();
+            Item newItem = item.withTangibleCategory(category);
+
+            log.debug("Inserting new item with tangible category : " + category);
+            modifiedItems.add(newItem);
+        }
+
+        return modifiedItems;
     }
 }

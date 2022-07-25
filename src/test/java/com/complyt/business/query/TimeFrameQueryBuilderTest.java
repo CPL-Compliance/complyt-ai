@@ -46,7 +46,7 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingPrevCalenderYear_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithPrevCalenderYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.PREVIOUS_CALENDER_YEAR);
-        DateRange dateRange = DateRange.Factory.newPrevCalenderYear();
+        DateRange dateRange = DateRange.Factory.newPreviousCalenderYear();
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate").gte(dateRange.getStart()).lte(dateRange.getEnd()));
 
         // When + Then

@@ -3,7 +3,9 @@ package com.complyt.business.nexus.checker;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
@@ -16,41 +18,70 @@ public class NexusThresholdCheck implements NexusCheck<Pair<NexusCalculationSumm
     public boolean check(@NonNull Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule) {
         NexusCalculationSummary nexusCalculationSummary = summaryAndRule.getValue0();
         NexusStateRule nexusStateRule = summaryAndRule.getValue1();
-        Definition definition = nexusStateRule.getNexusThreshold().getDefinition();
+        ThresholdProcessor thresholdProcessor = new ThresholdProcessor(nexusCalculationSummary, nexusStateRule);
+
+        return thresholdProcessor.isExceeded();
+    }
+}
+
+@Slf4j
+@ToString
+@Getter
+class ThresholdProcessor {
+
+    private final NexusCalculationSummary calculationSummary;
+    private final NexusStateRule stateRule;
+    private boolean exceeded;
+
+    public ThresholdProcessor(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
+        calculationSummary = nexusCalculationSummary;
+        stateRule = nexusStateRule;
+        setIsNexusExceeded();
+    }
+
+    private void setIsNexusExceeded() {
+        Definition definition = stateRule.getNexusThreshold().getDefinition();
+        log.debug("Checking if nexus has been exceeded, threshold definition : " + definition);
 
         switch (definition) {
             case AMOUNT:
-                return exceededAmount(nexusCalculationSummary,nexusStateRule);
+                exceeded = exceededAmount(calculationSummary, stateRule);
+                return;
 
             case COUNT:
-                return exceededCount(nexusCalculationSummary,nexusStateRule);
+                exceeded = exceededCount(calculationSummary, stateRule);
+                return;
 
             case AMOUNT_AND_COUNT:
-                return exceededAmountAndCount(nexusCalculationSummary,nexusStateRule);
+                exceeded = exceededAmountAndCount(calculationSummary, stateRule);
+                return;
 
             case AMOUNT_OR_COUNT:
-                return exceededAmountOrCount(nexusCalculationSummary,nexusStateRule);
-        }
+                exceeded = exceededAmountOrCount(calculationSummary, stateRule);
+                return;
 
-        log.debug("Invalid nexus calculation definition : " + definition + ", returning false");
-        return false;
+            default:
+                log.debug("Invalid nexus calculation definition, returning false");
+                exceeded = false;
+        }
     }
 
-    public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
+
+    public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return nexusCalculationSummary.getAmount() >= nexusStateRule.getNexusThreshold().getAmount();
     }
 
-    public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
+    public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return nexusCalculationSummary.getCount() >= nexusStateRule.getNexusThreshold().getCount();
     }
 
-    public boolean exceededAmountAndCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
-        return exceededAmount(nexusCalculationSummary,nexusStateRule) &&
-                exceededCount(nexusCalculationSummary,nexusStateRule);
+    public boolean exceededAmountAndCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
+        return exceededAmount(nexusCalculationSummary, nexusStateRule) &&
+                exceededCount(nexusCalculationSummary, nexusStateRule);
     }
 
-    public boolean exceededAmountOrCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule){
-        return exceededAmount(nexusCalculationSummary,nexusStateRule) ||
-                exceededCount(nexusCalculationSummary,nexusStateRule);
+    public boolean exceededAmountOrCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
+        return exceededAmount(nexusCalculationSummary, nexusStateRule) ||
+                exceededCount(nexusCalculationSummary, nexusStateRule);
     }
 }

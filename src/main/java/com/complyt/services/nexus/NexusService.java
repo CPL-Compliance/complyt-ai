@@ -65,7 +65,7 @@ public class NexusService {
         return nexusChecker.hasNexus(salesTaxTracking);
     }
 
-    public Mono<SalesTaxTracking> calculate(@NonNull Order order) {
+    public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Order order) {
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
                         .flatMap(stateRule -> {

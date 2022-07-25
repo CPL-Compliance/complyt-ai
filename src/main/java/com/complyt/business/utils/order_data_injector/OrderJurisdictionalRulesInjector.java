@@ -32,27 +32,33 @@ public class OrderJurisdictionalRulesInjector implements OrderDataInjector<Produ
     public Mono<Order> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
             log.info("Setting jurisdictional sales tax rules and taxable categories to order's items");
-            String state = order.getShippingAddress().getState();
-            List<Item> modifiedItems = new ArrayList<>();
-
-            for (Item item : order.getItems()) {
-                ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
-
-                JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
-                Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
-
-                TaxableCategory category  = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
-                        TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
-                Item itemWithCategory = itemWithRules.withTaxableCategory(category);
-
-                log.debug("Inserting new item with rules : " + rules + ", with taxable category : " + category);
-                modifiedItems.add(itemWithCategory);
-            }
-
+            List<Item> modifiedItems = createItemsWithRules(mapTaxCodesToClassifications);
             Order modifiedOrder = order.withItems(modifiedItems);
             log.debug("Order with items with rules and taxable categories injected : " + modifiedOrder);
 
             return modifiedOrder;
         });
     }
+
+    private List<Item> createItemsWithRules(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+        String state = order.getShippingAddress().getState();
+        List<Item> modifiedItems = new ArrayList<>();
+
+        for (Item item : order.getItems()) {
+            ProductClassification classification = mapTaxCodesToClassifications.get(item.getTaxCode());
+
+            JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
+            Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
+
+            TaxableCategory category  = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
+                    TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
+            Item itemWithCategory = itemWithRules.withTaxableCategory(category);
+
+            log.debug("Inserting new item with rules : " + rules + ", with taxable category : " + category);
+            modifiedItems.add(itemWithCategory);
+        }
+
+        return modifiedItems;
+    }
+
 }

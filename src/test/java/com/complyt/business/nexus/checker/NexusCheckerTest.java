@@ -151,7 +151,7 @@ public class NexusCheckerTest {
     }
 
     @Test
-    void passedThreshold_SummaryPassedThreshold_ReturnsFalse() {
+    void passedThreshold_SummaryDoesNotPassedThreshold_ReturnsFalse() {
         // Given
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary,nexusStateRule);
 

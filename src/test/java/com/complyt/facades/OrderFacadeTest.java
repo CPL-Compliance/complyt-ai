@@ -142,7 +142,7 @@ public class OrderFacadeTest {
         when(nexusService.findTrackingByState(orderWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
         when(orderService.save(orderWithClassificationData)).thenReturn(Mono.just(orderWithClassificationDataAndId));
-        when(nexusService.calculate(orderWithClassificationDataAndId)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.calculateNexusTracking(orderWithClassificationDataAndId)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<Order> actualOrder = orderFacade.saveOrder(orderNoId);
 

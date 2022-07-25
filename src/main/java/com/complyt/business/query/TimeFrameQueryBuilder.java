@@ -27,15 +27,15 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
 
         switch (timeFrame) {
             case PREVIOUS_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newPrevCalenderYear();
+                dateRange = DateRange.Factory.newPreviousCalenderYear();
                 break;
 
             case CURRENT_AND_PREVIOUS_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newPrevAndCurrentCalenderYear();
+                dateRange = DateRange.Factory.newPreviousAndCurrentCalenderYear();
                 break;
 
             case PREVIOUS_TWELVE_MONTHS:
-                dateRange = DateRange.Factory.newPrevTwelveMonths();
+                dateRange = DateRange.Factory.newPreviousTwelveMonths();
                 break;
 
             case YEAR_FROM_SEPTEMBER_TO_SEPTEMBER:

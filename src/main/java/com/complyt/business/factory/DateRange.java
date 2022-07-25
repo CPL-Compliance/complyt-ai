@@ -19,26 +19,31 @@ public class DateRange {
     private final LocalDateTime start;
     private final LocalDateTime end;
 
-    private DateRange(LocalDateTime start, LocalDateTime end) {
+    private DateRange(@NonNull LocalDateTime start,@NonNull LocalDateTime end) {
         this.start = start;
         this.end = end;
     }
 
+    /*
+    Each factory method returns a date range object instance
+    with start and end dates according to
+    a nexus state rule timeframe.
+    */
     public static class Factory {
 
-        public static DateRange newPrevCalenderYear() {
+        public static DateRange newPreviousCalenderYear() {
             LocalDateTime firstDayOfLastYear = LocalDate.now().with(firstDayOfYear()).minusYears(1).atStartOfDay();
             LocalDateTime lastDayOfLastYear = firstDayOfLastYear.with(lastDayOfYear());
             return new DateRange(firstDayOfLastYear, lastDayOfLastYear);
         }
 
-        public static DateRange newPrevAndCurrentCalenderYear() {
+        public static DateRange newPreviousAndCurrentCalenderYear() {
             LocalDateTime firstDayOfLastYear = LocalDate.now().with(firstDayOfYear()).minusYears(1).atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
             return new DateRange(firstDayOfLastYear, now);
         }
 
-        public static DateRange newPrevTwelveMonths() {
+        public static DateRange newPreviousTwelveMonths() {
             LocalDateTime oneYearAgo = LocalDate.now().minusYears(1).atStartOfDay();
             LocalDateTime now = LocalDateTime.now();
             return new DateRange(oneYearAgo, now);

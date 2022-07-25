@@ -146,7 +146,7 @@ class NexusServiceTest {
         Order nullOrder = null;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.calculate(nullOrder));
+                () -> nexusService.calculateNexusTracking(nullOrder));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
@@ -177,7 +177,7 @@ class NexusServiceTest {
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
         when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculate(order);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(order);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
@@ -211,7 +211,7 @@ class NexusServiceTest {
         when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished))
                 .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculate(order);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(order);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();

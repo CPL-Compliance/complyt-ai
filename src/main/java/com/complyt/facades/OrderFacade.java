@@ -32,7 +32,7 @@ public class OrderFacade {
                 .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
                         .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
                                 salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(orderService::save) :
-                                orderService.save(setOrder).flatMap(nexusService::calculate).thenReturn(setOrder)));
+                                orderService.save(setOrder).flatMap(nexusService::calculateNexusTracking).thenReturn(setOrder)));
     }
 
     public Mono<Order> updateIfModified(@NonNull String externalId, Order newOrder) {
@@ -44,7 +44,7 @@ public class OrderFacade {
                                         .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
                                                 .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
                                                         salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(updatedOrder -> orderService.update(externalId, updatedOrder)) :
-                                                        orderService.update(externalId, setOrder).flatMap(nexusService::calculate).thenReturn(setOrder))));
+                                                        orderService.update(externalId, setOrder).flatMap(nexusService::calculateNexusTracking).thenReturn(setOrder))));
     }
 
     public Mono<Order> findByExternalId(String externalId) {
