@@ -32,7 +32,7 @@ public class NexusThresholdCheckTest {
     NexusCalculationSummary nexusCalculationSummary;
 
     @BeforeEach
-    void setuP() {
+    void setUp() {
         nexusThresholdCheck = new NexusThresholdCheck();
         nexusStateRule = createNexusStateRule();
         nexusCalculationSummary = createNexusCalculationSummary();

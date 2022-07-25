@@ -4,6 +4,8 @@ import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +51,7 @@ class OrderServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        String id = UUID.randomUUID().toString();
+        String id = null;
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -61,8 +64,29 @@ class OrderServiceImplTest {
         ));
             }
         };
+        TimeStamps timeStamps = new TimeStamps(new Date(),new Date());
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  timeStamps,timeStamps);
+    }
+
+    private Order createOrderWithProductClassificationData() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+
+        Item item = order.getItems().get(0)
+                .withTaxableCategory(TaxableCategory.TAXABLE)
+                .withTangibleCategory(TangibleCategory.TANGIBLE)
+                .withJurisdictionalSalesTaxRules(rules);
+
+        List<Item> modifiedItems = new ArrayList<Item>() {{
+            add(item);
+        }};
+        return order.withItems(modifiedItems);
+
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
     }
 
     @Test
@@ -278,5 +302,25 @@ class OrderServiceImplTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
     }
+
+//    @Test
+//    void injectDataToModifiedOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
+//        // Given
+//        TimeStamps modifiedTimeStamp = new TimeStamps(order.getExternalTimeStamps().getCreatedDate()
+//                , new Date());
+//        Order orderWithTimeStamps = order.withExternalTimeStamps(modifiedTimeStamp);
+//        Order orderWithProductClassification = createOrderWithProductClassificationData()
+//                .withExternalTimeStamps(orderWithTimeStamps.getExternalTimeStamps());
+//
+////        Order newOrder = orderWithProductClassification.withExternalTimeStamps(modifiedTimeStamp);
+//
+//        // When
+//        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderWithTimeStamps))
+//                .thenReturn(Mono.just(orderWithProductClassification));
+//        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(orderWithTimeStamps,order);
+//
+//        // Then
+//        StepVerifier.create(orderMono).expectNext(orderWithProductClassification).verifyComplete();
+//    }
 
 }

@@ -27,7 +27,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -151,7 +154,7 @@ public class OrderFacadeTest {
     }
 
     @Test
-    public void saveOrder_NexusIsEstablished_CalculatesSalesTaxAndReturnsOrder() throws InterruptedException {
+    void saveOrder_NexusIsEstablished_CalculatesSalesTaxAndReturnsOrder() throws InterruptedException {
         // Given
         SalesTax salesTax = createSalesTax();
         Order orderWithClassificationData = createOrderWithProductClassificationData();
@@ -172,50 +175,6 @@ public class OrderFacadeTest {
         // Then
         StepVerifier.create(actualOrder).expectNext(orderWithClassificationDataAndSalesTaxAndId).verifyComplete();
     }
-
-//    @Test
-//    void updateOrder_OrderInserted_OrderReturned() throws InterruptedException {
-//        // Given
-//        String externalId = order.getExternalId();
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//        // When
-//        when(orderService.update(externalId, order)).thenReturn(Mono.just(order));
-//
-//        orderFacade.updateIfModified(externalId, order)
-//                .subscribe(returnedOrder -> {
-//                    orderAtomicReference.set(returnedOrder);
-//                    countDownLatch.countDown();
-//                });
-//    }
-//        // Then
-//        countDownLatch.await();
-//        assertNotNull(orderAtomicReference.get());
-//        assertEquals(order, orderAtomicReference.get());
-//    }
-//
-//    @Test
-//    void upsertOrder_Orderupserted_OrderReturned() throws InterruptedException {
-//        // Given
-//        String externalId = order.getExternalId();
-//        AtomicReference<Order> orderAtomicReference = new AtomicReference<>();
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//        // When
-//        when(orderService.upsert(externalId, order)).thenReturn(Mono.just(order));
-//        orderFacade.upsert(externalId, order)
-//                .subscribe(returnedOrder -> {
-//                    orderAtomicReference.set(returnedOrder);
-//                    countDownLatch.countDown();
-//                });
-//
-//        // Then
-//        countDownLatch.await();
-//        assertNotNull(orderAtomicReference.get());
-//        assertEquals(order, orderAtomicReference.get());
-//    }
-//
 
     @Test
     void getOrderByExternalId_OrderFound_OrderReturned() throws InterruptedException {
@@ -261,7 +220,7 @@ public class OrderFacadeTest {
     }
 
     @Test
-    void updateIfModified_NullExternalidPassed_ThrowsException() {
+    void updateIfModified_NullExternalIdPassed_ThrowsException() {
         // Given
         String nullExternalId = null;
 
@@ -272,48 +231,54 @@ public class OrderFacadeTest {
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
 
-    //
-//    @Test
-//    void updateIfModified_OrderModified_UpdatesOrder() {
-//        // Given
-//        Address newShippingAddress = order.getShippingAddress().withState("newState");
-//        Order orderWithNewAddress = order.withShippingAddress(newShippingAddress);
-//
-//        SalesTax salesTax = new SalesTax(100,new SalesTaxRate(0,0,0,0,0,0));
-//        Order newOrderWithSalesTax = orderWithNewAddress.withSalesTax(salesTax);
-//        Order modifiedOrder = getOrderWithRelevantProductClassificationData();
-//
-//        // When
-//        when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
-//        when(productClassificationService.injectJurisdictionalRules(order,new OrderJurisdictionalRulesInjector(orderWithNewAddress)))
-//                .thenReturn(Mono.just(orderWithNewAddress));
-//        when(orderService.calculate(orderWithNewAddress)).thenReturn(Mono.just(newOrderWithSalesTax));
-//        when(orderService.update(newOrderWithSalesTax.getExternalId(),newOrderWithSalesTax)).thenReturn(Mono.just(newOrderWithSalesTax));
-//        Mono<Order> orderMono = orderFacade.updateIfModified(orderWithNewAddress.getExternalId(),orderWithNewAddress);
-//
-//        // Then
-//        StepVerifier.create(orderMono).expectNext(newOrderWithSalesTax).verifyComplete();
-//    }
-//
-//    @Test
-//    void saveOrder_OrderSavedWithSalesTax_OrderReturned() {
-//        // Given
-//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-//        SalesTax salesTax = new SalesTax(10,salesTaxRate);
-//        Order orderWithSalesTax = order.withSalesTax(salesTax);
-//        OrderJurisdictionalRulesInjector orderProductClassificationInjector = new OrderJurisdictionalRulesInjector(order);
-//
-//        // When
-//        when(productClassificationService.setJurisdictionalRules(orderProductClassificationInjector)).thenReturn(Mono.just(order));
-//        when(orderService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
-//        when(orderService.save(orderWithSalesTax)).thenReturn(Mono.just(orderWithSalesTax));
-//
-//        Mono<Order> monoOrder = orderFacade.saveOrder(order);
-//
-//        // Then
-//        StepVerifier.create(monoOrder).expectNext(orderWithSalesTax).verifyComplete();
-//    }
-//
+
+    @Test
+    void updateIfModified_OrderModifiedAndHasNexus_UpdatesOrder() {
+        // Given
+        Address newShippingAddress = order.getShippingAddress().withState("newState");
+        Order orderWithNewAddress = order.withShippingAddress(newShippingAddress);
+        SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished();
+        SalesTax salesTax = new SalesTax(100, new SalesTaxRate(0, 0, 0, 0, 0, 0));
+        Order modifiedOrder = createOrderWithProductClassificationData().withShippingAddress(newShippingAddress);
+        Order newOrderWithSalesTax = modifiedOrder.withSalesTax(salesTax);
+
+        // When
+        when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
+        when(orderService.injectDataToModifiedOrder(orderWithNewAddress, order))
+                .thenReturn(Mono.just(modifiedOrder));
+        when(nexusService.findTrackingByState(modifiedOrder)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
+        when(salesTaxService.handleSalesTaxCalculation(modifiedOrder,salesTaxTracking)).thenReturn(Mono.just(newOrderWithSalesTax));
+        when(orderService.update(newOrderWithSalesTax.getExternalId(), newOrderWithSalesTax)).thenReturn(Mono.just(newOrderWithSalesTax));
+        Mono<Order> orderMono = orderFacade.updateIfModified(orderWithNewAddress.getExternalId(), orderWithNewAddress);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(newOrderWithSalesTax).verifyComplete();
+    }
+
+    @Test
+    void updateIfModified_OrderModifiedAndDoesNotHaveNexus_OrderUpdatedAndReturned() {
+        // Given
+        Address newShippingAddress = order.getShippingAddress().withState("newState");
+        Order orderWithNewAddress = order.withShippingAddress(newShippingAddress);
+        SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
+        Order modifiedOrder = createOrderWithProductClassificationData().withShippingAddress(newShippingAddress).withId(null);
+        Order modifiedOrderWithId = modifiedOrder.withId(UUID.randomUUID().toString());
+
+        // When
+        when(orderService.findByExternalId(order.getExternalId())).thenReturn(Mono.just(order));
+        when(orderService.injectDataToModifiedOrder(orderWithNewAddress, order))
+                .thenReturn(Mono.just(modifiedOrder));
+        when(nexusService.findTrackingByState(modifiedOrder)).thenReturn(Mono.just(salesTaxTracking));
+        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
+        when(orderService.update(modifiedOrder.getExternalId(), modifiedOrder)).thenReturn(Mono.just(modifiedOrderWithId));
+        when(nexusService.calculateNexusTracking(modifiedOrderWithId)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<Order> orderMono = orderFacade.updateIfModified(orderWithNewAddress.getExternalId(), orderWithNewAddress);
+
+        // Then
+        StepVerifier.create(orderMono).expectNext(modifiedOrder).verifyComplete();
+    }
+
     @Test
     void markAsCancelled_orderIdGiven_ChangesOrderStatus() {
         // Given
