@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -167,11 +168,12 @@ class NexusServiceTest {
 
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
+        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
         when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule)).thenReturn(query);
+        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule,referenceDate)).thenReturn(query);
         when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
         when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
@@ -199,11 +201,13 @@ class NexusServiceTest {
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = createSalesTaxTrackingWithoutNexusEstablished();
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
+        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
+
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
         when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule)).thenReturn(query);
+        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule, referenceDate)).thenReturn(query);
         when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
         when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(true);

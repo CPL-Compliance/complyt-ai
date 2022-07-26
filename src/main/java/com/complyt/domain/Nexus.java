@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @AllArgsConstructor
 @With
@@ -14,5 +14,5 @@ import java.time.LocalDate;
 public class Nexus {
 
     private boolean hasTaxableDate;
-    private LocalDate taxableDate;
+    private Date taxableDate;
 }

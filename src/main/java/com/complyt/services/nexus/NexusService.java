@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -69,7 +70,9 @@ public class NexusService {
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
                         .flatMap(stateRule -> {
-                            Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, stateRule);
+                            Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
+
+                            Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, stateRule, referenceDate);
 
                             return orderService.getOrdersByQuery(query)
                                     .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule));
