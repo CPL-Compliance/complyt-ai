@@ -58,13 +58,9 @@ class ThresholdStrategy {
                 exceeded = exceededAmountAndCount(calculationSummary, stateRule);
                 return;
 
-            case AMOUNT_OR_COUNT:
-                exceeded = exceededAmountOrCount(calculationSummary, stateRule);
-                return;
-
+            // AMOUNT_OR_COUNT
             default:
-                log.debug("Invalid nexus calculation definition, returning false");
-                exceeded = false;
+                exceeded = exceededAmountOrCount(calculationSummary, stateRule);
         }
     }
 
