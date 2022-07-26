@@ -60,7 +60,7 @@ class DateRangeStrategy {
                 dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
                 break;
 
-            case CURRENT_AND_PREVIOUS_CALENDER_YEAR:
+            case CURRENT_CALENDER_YEAR:
                 dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
                 break;
 
@@ -72,7 +72,7 @@ class DateRangeStrategy {
                 dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
                 break;
 
-            case CURRENT_AND_PREVIOUS_TAXABLE_YEAR:
+            case CURRENT_TAXABLE_YEAR:
                 dateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
                 break;
 

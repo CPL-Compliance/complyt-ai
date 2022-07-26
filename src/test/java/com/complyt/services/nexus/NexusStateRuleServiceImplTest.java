@@ -63,7 +63,7 @@ class NexusStateRuleServiceImplTest {
         NexusThreshold nexusThreshold = new NexusThreshold(1000,2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,customerTypes,
-                TimeFrame.CURRENT_AND_PREVIOUS_CALENDER_YEAR,nexusThreshold);
+                TimeFrame.CURRENT_CALENDER_YEAR,nexusThreshold);
     }
 
     @Test
