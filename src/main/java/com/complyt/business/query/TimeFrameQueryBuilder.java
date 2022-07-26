@@ -72,12 +72,10 @@ class DateRangeStrategy {
                 dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
                 break;
 
-            case CURRENT_TAXABLE_YEAR:
+            //CURRENT_TAXABLE_YEAR
+            default:
                 dateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
                 break;
-
-            default:
-                throw new IllegalArgumentException("Illegal time frame received : " + timeFrame);
         }
     }
 }
