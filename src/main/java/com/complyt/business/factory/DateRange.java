@@ -92,7 +92,6 @@ public class DateRange {
                         .withHour(0)
                         .withMinute(0)
                         .withSecond(0);
-                ;
             }
 
             return new DateRange(startDate, endDate);
