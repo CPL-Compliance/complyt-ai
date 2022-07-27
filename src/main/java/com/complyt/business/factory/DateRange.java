@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.With;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
@@ -38,8 +39,8 @@ public class DateRange {
                     .withMinute(0)
                     .withSecond(0);
 
-            LocalDateTime lastDayOfLastYear = firstDayOfLastYear
-                    .with(lastDayOfYear());
+            LocalDateTime lastDayOfLastYear = firstDayOfLastYear.with(lastDayOfYear())
+                    .with(LocalTime.of(23,59,59));
 
             return new DateRange(firstDayOfLastYear, lastDayOfLastYear);
         }
@@ -51,7 +52,10 @@ public class DateRange {
                     .withMinute(0)
                     .withSecond(0);
 
-            return new DateRange(firstDayOfTheYear, referenceDate);
+            LocalDateTime lastDayOfThisYear = firstDayOfTheYear.with(lastDayOfYear())
+                    .with(LocalTime.of(23,59,59));
+
+            return new DateRange(firstDayOfTheYear, lastDayOfThisYear);
         }
 
         public static DateRange newPreviousTwelveMonths(LocalDateTime referenceDate) {
@@ -67,32 +71,27 @@ public class DateRange {
         public static DateRange newYearFromSeptember(LocalDateTime referenceDate) {
             LocalDateTime september30 = referenceDate.withMonth(9).withDayOfMonth(30);
             LocalDateTime startDate, endDate;
+            int minusYears;
 
             // from october 1st to december 31st
-            if (referenceDate.compareTo(september30) > 0) {
-                startDate = september30
-                        .minusYears(1)
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
-
-                endDate = september30
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
-            } else {
-                startDate = september30
-                        .minusYears(2)
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
-
-                endDate = september30
-                        .minusYears(1)
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
+            if(referenceDate.compareTo(september30) > 0) {
+                minusYears = 1;
             }
+            else {
+                minusYears = 2;
+            }
+            startDate = september30
+                        .minusYears(minusYears)
+                        .withHour(0)
+                        .withMinute(0)
+                        .withSecond(0);
+
+                endDate = september30
+                        .minusYears(minusYears-1)
+                        .withHour(0)
+                        .withMinute(0)
+                        .withSecond(0);
+
 
             return new DateRange(startDate, endDate);
         }

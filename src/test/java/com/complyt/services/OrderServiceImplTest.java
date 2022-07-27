@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.date_injector.ModifiedOrderInternalDateInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -308,16 +309,18 @@ class OrderServiceImplTest {
 //        // Given
 //        TimeStamps modifiedTimeStamp = new TimeStamps(order.getExternalTimeStamps().getCreatedDate()
 //                , new Date());
-//        Order orderWithTimeStamps = order.withExternalTimeStamps(modifiedTimeStamp);
+//        Order newOrderWithTimeStamps = order.withExternalTimeStamps(modifiedTimeStamp);
+//
 //        Order orderWithProductClassification = createOrderWithProductClassificationData()
-//                .withExternalTimeStamps(orderWithTimeStamps.getExternalTimeStamps());
+//                .withExternalTimeStamps(newOrderWithTimeStamps.getExternalTimeStamps());
+//        ModifiedOrderInternalDateInjector m = new ModifiedOrderInternalDateInjector(orderWithProductClassification);
 //
 ////        Order newOrder = orderWithProductClassification.withExternalTimeStamps(modifiedTimeStamp);
 //
 //        // When
-//        when(productClassificationService.getOrderWithRelevantProductClassificationData(orderWithTimeStamps))
+//        when(productClassificationService.getOrderWithRelevantProductClassificationData(newOrderWithTimeStamps))
 //                .thenReturn(Mono.just(orderWithProductClassification));
-//        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(orderWithTimeStamps,order);
+//        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(newOrderWithTimeStamps, order);
 //
 //        // Then
 //        StepVerifier.create(orderMono).expectNext(orderWithProductClassification).verifyComplete();

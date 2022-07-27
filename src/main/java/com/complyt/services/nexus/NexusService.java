@@ -71,9 +71,7 @@ public class NexusService {
                 .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
                         .flatMap(stateRule -> {
                             Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
-
                             Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, stateRule, referenceDate);
-
                             return orderService.getOrdersByQuery(query)
                                     .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule));
                         }));
