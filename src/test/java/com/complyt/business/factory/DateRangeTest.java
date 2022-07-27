@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
@@ -40,16 +41,19 @@ public class DateRangeTest {
     void newCurrentCalenderYear_DateRangeCreated_DateRangeReturned() {
         // Given
         LocalDateTime expectedFirstDayOfTheYear = LocalDate.now().with(firstDayOfYear()).atStartOfDay();
+        LocalDateTime expectedLastDayOfThisYear = expectedFirstDayOfTheYear.with(lastDayOfYear())
+                .with(LocalTime.of(23,59,59));
         LocalDateTime referenceDate = LocalDateTime.now();
 
         //When + Then
         DateRange expectedDateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
+
         assertEquals(expectedDateRange.getStart().getYear(), expectedFirstDayOfTheYear.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedFirstDayOfTheYear.getMonthValue());
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedFirstDayOfTheYear.getDayOfMonth());
-        assertEquals(expectedDateRange.getEnd().getYear(), referenceDate.getYear());
-        assertEquals(expectedDateRange.getEnd().getMonthValue(), referenceDate.getMonthValue());
-        assertEquals(expectedDateRange.getEnd().getDayOfMonth(), referenceDate.getDayOfMonth());
+        assertEquals(expectedDateRange.getEnd().getYear(), expectedLastDayOfThisYear.getYear());
+        assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedLastDayOfThisYear.getMonthValue());
+        assertEquals(expectedDateRange.getEnd().getDayOfMonth(), expectedLastDayOfThisYear.getDayOfMonth());
     }
 
     @Test
