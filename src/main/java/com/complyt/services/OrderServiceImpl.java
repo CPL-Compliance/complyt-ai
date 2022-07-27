@@ -53,14 +53,14 @@ public class OrderServiceImpl implements OrderService {
 
         return productClassificationService.getOrderWithRelevantProductClassificationData(newOrderWithInternalTimeStamps)
                 .map(ModifiedOrderInternalDateInjector::new)
-                .map(dateInjector -> dateInjector.inject());
+                .map(ModifiedOrderInternalDateInjector::inject);
     }
 
     @Override
     public Mono<Order> injectDataToNewOrder(@NonNull Order order) {
         return productClassificationService.getOrderWithRelevantProductClassificationData(order)
                 .map(NewOrderInternalDateInjector::new)
-                .map(dateInjector -> dateInjector.inject());
+                .map(NewOrderInternalDateInjector::inject);
     }
 
     @Override

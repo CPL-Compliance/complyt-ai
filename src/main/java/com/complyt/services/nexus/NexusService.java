@@ -82,9 +82,9 @@ public class NexusService {
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
 
         return findTrackingByState(stateRule.getState().getAbbreviation())
-                .flatMap(nexusTracking -> passedThreshold ?
-                        salesTaxTrackingService.saveWithEconomicQualified(nexusTracking) :
-                        Mono.just(nexusTracking)
+                .flatMap(salesTaxTracking -> passedThreshold ?
+                        salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking) :
+                        Mono.just(salesTaxTracking)
                 );
     }
 }

@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.utils.date_injector.ModifiedOrderInternalDateInjector;
+import com.complyt.business.utils.date_injector.NewOrderInternalDateInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -61,13 +62,13 @@ class OrderServiceImplTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-        ));
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(new Date(),new Date());
+        TimeStamps timeStamps = new TimeStamps(new Date(), new Date());
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  timeStamps,timeStamps);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, timeStamps, timeStamps);
     }
 
     private Order createOrderWithProductClassificationData() {
@@ -245,7 +246,7 @@ class OrderServiceImplTest {
         Flux<Order> orderFlux = orderService.findAll();
 
         // Then
-        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
+        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
     }
 
     @Test
@@ -253,7 +254,7 @@ class OrderServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", order.getShippingAddress(),new ObjectId(),CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", order.getShippingAddress(), new ObjectId(), CustomerType.RETAIL);
 
         Order orderWithCustomer = order.withCustomer(customer);
         Order secondOrderWithCustomer = order.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
@@ -272,7 +273,7 @@ class OrderServiceImplTest {
         Flux<Order> orderFlux = orderService.getOrdersByQuery(query);
 
         // Then
-        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrderWithCustomer).verifyComplete();
+        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer), secondOrderWithCustomer).verifyComplete();
     }
 
     @Test
@@ -297,7 +298,7 @@ class OrderServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderService.update(externalId,nullOrder);
+            orderService.update(externalId, nullOrder);
         });
 
         // Then
@@ -305,22 +306,14 @@ class OrderServiceImplTest {
     }
 
 //    @Test
-//    void injectDataToModifiedOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
+//    void injectDataToNewOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
 //        // Given
-//        TimeStamps modifiedTimeStamp = new TimeStamps(order.getExternalTimeStamps().getCreatedDate()
-//                , new Date());
-//        Order newOrderWithTimeStamps = order.withExternalTimeStamps(modifiedTimeStamp);
-//
-//        Order orderWithProductClassification = createOrderWithProductClassificationData()
-//                .withExternalTimeStamps(newOrderWithTimeStamps.getExternalTimeStamps());
-//        ModifiedOrderInternalDateInjector m = new ModifiedOrderInternalDateInjector(orderWithProductClassification);
-//
-////        Order newOrder = orderWithProductClassification.withExternalTimeStamps(modifiedTimeStamp);
+//        Order orderWithProductClassification = createOrderWithProductClassificationData();
 //
 //        // When
-//        when(productClassificationService.getOrderWithRelevantProductClassificationData(newOrderWithTimeStamps))
+//        when(productClassificationService.getOrderWithRelevantProductClassificationData(order))
 //                .thenReturn(Mono.just(orderWithProductClassification));
-//        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(newOrderWithTimeStamps, order);
+//        Mono<Order> orderMono = orderService.injectDataToNewOrder(order);
 //
 //        // Then
 //        StepVerifier.create(orderMono).expectNext(orderWithProductClassification).verifyComplete();
