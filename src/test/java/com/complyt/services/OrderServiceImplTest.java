@@ -26,10 +26,8 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.time.ZoneId;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -305,18 +303,82 @@ class OrderServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
     }
 
-//    @Test
-//    void injectDataToNewOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
-//        // Given
-//        Order orderWithProductClassification = createOrderWithProductClassificationData();
-//
-//        // When
-//        when(productClassificationService.getOrderWithRelevantProductClassificationData(order))
-//                .thenReturn(Mono.just(orderWithProductClassification));
-//        Mono<Order> orderMono = orderService.injectDataToNewOrder(order);
-//
-//        // Then
-//        StepVerifier.create(orderMono).expectNext(orderWithProductClassification).verifyComplete();
-//    }
+    @Test
+    void injectDataToNewOrder_InjectsDateToNewOrder_ReturnsOrder() {
+        // Given
+        Order orderWithProductClassification = createOrderWithProductClassificationData();
+        NewOrderInternalDateInjector injector = new NewOrderInternalDateInjector(orderWithProductClassification);
+        Order orderWithUpdatedDates = injector.inject();
 
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(order))
+                .thenReturn(Mono.just(orderWithProductClassification));
+        Mono<Order> orderMono = orderService.injectDataToNewOrder(order);
+
+        // Then
+        StepVerifier.create(orderMono)
+                .expectNextMatches(order -> {
+                    LocalDateTime expectedCreatedDateTime = LocalDateTime
+                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime expectedUpdatedDateTime = LocalDateTime
+                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+
+                    LocalDateTime actualCreatedDateTime = LocalDateTime
+                            .ofInstant(order.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime actualUpdatedDateTime = LocalDateTime
+                            .ofInstant(order.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+
+
+                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() ;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void injectDataToModifiedOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
+        // Given
+        Order newOrder = order.withBillingAddress(order.getBillingAddress().withCity("someCity"));
+        Order orderWithProductClassification = createOrderWithProductClassificationData();
+        ModifiedOrderInternalDateInjector injector = new ModifiedOrderInternalDateInjector(orderWithProductClassification);
+        Order orderWithUpdatedDates = injector.inject();
+
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(newOrder))
+                .thenReturn(Mono.just(orderWithProductClassification));
+        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(newOrder,order);
+
+        // Then
+        StepVerifier.create(orderMono)
+                .expectNextMatches(order -> {
+                    LocalDateTime expectedCreatedDateTime = LocalDateTime
+                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime expectedUpdatedDateTime = LocalDateTime
+                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+
+                    LocalDateTime actualCreatedDateTime = LocalDateTime
+                            .ofInstant(order.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime actualUpdatedDateTime = LocalDateTime
+                            .ofInstant(order.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+
+
+                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() ;
+                })
+                .expectComplete()
+                .verify();
+    }
 }
