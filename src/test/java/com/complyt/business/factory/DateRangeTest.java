@@ -1,5 +1,6 @@
 package com.complyt.business.factory;
 
+import com.complyt.domain.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -144,4 +145,91 @@ public class DateRangeTest {
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedStartDate.getDayOfMonth());
         assertEquals(expectedDateRange.getEnd(), referenceDate);
     }
+
+    @Test
+    void newTaxableYear_NullTaxableDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullTaxableDate = null;
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newTaxableYear(nullTaxableDate,referenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "taxableDate is marked non-null but is null");
+    }
+
+    @Test
+    void newTaxableYear_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+        LocalDateTime taxableDate = LocalDateTime.now();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newTaxableYear(taxableDate,nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void newYearFromSeptember_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newYearFromSeptember(nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void newPreviousTwelveMonths_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newPreviousTwelveMonths(nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void newCurrentCalenderYear_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newCurrentCalenderYear(nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+    
+    @Test
+    void newPreviousCalenderYear_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            DateRange.Factory.newPreviousCalenderYear(nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
 }

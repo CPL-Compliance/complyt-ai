@@ -31,7 +31,7 @@ public class DateRange {
     */
     public static class Factory {
 
-        public static DateRange newPreviousCalenderYear(LocalDateTime referenceDate) {
+        public static DateRange newPreviousCalenderYear(@NonNull LocalDateTime referenceDate) {
             LocalDateTime firstDayOfLastYear = referenceDate
                     .with(firstDayOfYear())
                     .minusYears(1)
@@ -45,7 +45,7 @@ public class DateRange {
             return new DateRange(firstDayOfLastYear, lastDayOfLastYear);
         }
 
-        public static DateRange newCurrentCalenderYear(LocalDateTime referenceDate) {
+        public static DateRange newCurrentCalenderYear(@NonNull LocalDateTime referenceDate) {
             LocalDateTime firstDayOfTheYear = referenceDate
                     .with(firstDayOfYear())
                     .withHour(0)
@@ -58,7 +58,7 @@ public class DateRange {
             return new DateRange(firstDayOfTheYear, lastDayOfThisYear);
         }
 
-        public static DateRange newPreviousTwelveMonths(LocalDateTime referenceDate) {
+        public static DateRange newPreviousTwelveMonths(@NonNull LocalDateTime referenceDate) {
             LocalDateTime oneYearAgo = referenceDate
                     .minusYears(1)
                     .withHour(0)
@@ -68,7 +68,7 @@ public class DateRange {
             return new DateRange(oneYearAgo, referenceDate);
         }
 
-        public static DateRange newYearFromSeptember(LocalDateTime referenceDate) {
+        public static DateRange newYearFromSeptember(@NonNull LocalDateTime referenceDate) {
             LocalDateTime september30 = referenceDate.withMonth(9).withDayOfMonth(30);
             LocalDateTime startDate, endDate;
             int minusYears;
@@ -96,7 +96,7 @@ public class DateRange {
             return new DateRange(startDate, endDate);
         }
 
-        public static DateRange newTaxableYear(@NonNull LocalDateTime taxableDate, LocalDateTime referenceDate) {
+        public static DateRange newTaxableYear(@NonNull LocalDateTime taxableDate,@NonNull LocalDateTime referenceDate) {
             LocalDateTime startDate;
             int minusYears;
 
