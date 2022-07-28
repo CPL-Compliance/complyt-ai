@@ -381,4 +381,47 @@ class OrderServiceImplTest {
                 .expectComplete()
                 .verify();
     }
+
+    @Test
+    void injectDataToModifiedOrder_NullNewOrderPassed_ThrowsException() {
+        // Given
+        Order nullNewOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToModifiedOrder(nullNewOrder,order);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newOrder is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToModifiedOrder_NullOldOrderPassed_ThrowsException() {
+        // Given
+        Order nullOldOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToModifiedOrder(order,nullOldOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "oldOrder is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewOrder_NullOrderPassed_ThrowsException() {
+        // Given
+        Order nullOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToNewOrder(nullOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
 }
