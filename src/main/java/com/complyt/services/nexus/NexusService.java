@@ -2,7 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.business.query.TimeFrameQueryBuilder;
+import com.complyt.business.query.NexusOrdersSearchQueryBuilder;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -48,7 +48,7 @@ public class NexusService {
     private NexusChecker nexusChecker;
 
     @NonNull
-    private TimeFrameQueryBuilder timeFrameQueryBuilder;
+    private NexusOrdersSearchQueryBuilder nexusOrdersSearchQueryBuilder;
 
     public Mono<SalesTaxTracking> findTrackingByState(String state) {
         return salesTaxTrackingService.findByState(state);
@@ -67,12 +67,14 @@ public class NexusService {
     }
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Order order) {
+        String state = order.getShippingAddress().getState();
+        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        
         return clientTrackingService.getNexusInfo()
-                .flatMap(nexusInfo -> findRuleByState(order.getShippingAddress().getState())
+                .flatMap(nexusInfo -> findRuleByState(state)
                         .flatMap(stateRule -> {
-                            Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
-                            Query query = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, stateRule, referenceDate);
-                            return orderService.getOrdersByQuery(query)
+                            Query nexusOrdersSearchQuery = nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo, stateRule, referenceDate);
+                            return orderService.getOrdersByQuery(nexusOrdersSearchQuery)
                                     .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule));
                         }));
     }

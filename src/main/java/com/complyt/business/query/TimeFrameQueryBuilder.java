@@ -1,5 +1,4 @@
 package com.complyt.business.query;
-
 import com.complyt.business.factory.DateRange;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;

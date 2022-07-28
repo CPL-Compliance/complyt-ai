@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+import com.complyt.business.query.NexusOrdersSearchQueryBuilder;
 import com.complyt.business.query.TimeFrameQueryBuilder;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.*;
@@ -54,7 +55,7 @@ class NexusServiceTest {
     NexusStateRuleService nexusStateRuleService;
 
     @Mock
-    private TimeFrameQueryBuilder timeFrameQueryBuilder;
+    private NexusOrdersSearchQueryBuilder nexusOrdersSearchQueryBuilder;
 
     @Mock
     private OrderService orderService;
@@ -159,7 +160,8 @@ class NexusServiceTest {
         Nexus nexusInfo = new Nexus(false,null);
         NexusStateRule nexusStateRule = createNexusStateRule();
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
-                .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()));
+                .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
+                .is(nexusStateRule.getState().getAbbreviation()));
         List<Order> ordersList = new ArrayList<Order>() {{add(order);}};
         Flux<Order> ordersFlux = Flux.fromIterable(ordersList);
 
@@ -173,7 +175,7 @@ class NexusServiceTest {
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
         when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule,referenceDate)).thenReturn(query);
+        when(nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo,nexusStateRule,referenceDate)).thenReturn(query);
         when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
         when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
@@ -191,7 +193,9 @@ class NexusServiceTest {
         Nexus nexusInfo = new Nexus(false,null);
         NexusStateRule nexusStateRule = createNexusStateRule();
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
-                .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()));
+                .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()))
+                .addCriteria(Criteria.where("shippingAddress.state")
+                .is(nexusStateRule.getState().getAbbreviation()));
         List<Order> ordersList = new ArrayList<Order>() {{add(order);}};
         Flux<Order> ordersFlux = Flux.fromIterable(ordersList);
 
@@ -207,7 +211,7 @@ class NexusServiceTest {
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
         when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo,nexusStateRule, referenceDate)).thenReturn(query);
+        when(nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo,nexusStateRule, referenceDate)).thenReturn(query);
         when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
         when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(true);
