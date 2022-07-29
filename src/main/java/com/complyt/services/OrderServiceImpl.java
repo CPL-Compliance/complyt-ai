@@ -8,7 +8,6 @@ import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> markAsCancelled(@NotNull String externalId) {
+    public Mono<Order> markAsCancelled(@NonNull String externalId) {
         return orderRepository
                 .findByExternalId(externalId)
                 .map(order -> order.withOrderStatus(OrderStatus.CANCELLED))
