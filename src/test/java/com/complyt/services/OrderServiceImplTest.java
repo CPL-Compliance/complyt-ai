@@ -230,6 +230,22 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void markAsCancelled_NullExternalIdPassed_ThrowsException() throws InterruptedException {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.markAsCancelled(nullExternalId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+
+
+    }
+
+    @Test
     void find_findsAllOrdersWithClientId_ReturnsAllOrders() {
         // Given
         String anotherOrderId = UUID.randomUUID().toString();
