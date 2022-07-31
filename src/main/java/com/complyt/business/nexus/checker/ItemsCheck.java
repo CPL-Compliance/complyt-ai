@@ -13,6 +13,10 @@ import java.util.List;
 @Slf4j
 public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> {
 
+    /*
+    * Checks if there is an item from the given list that should be counted
+    * according to the nexus state rules given
+    */
     @Override
     public boolean check(@NonNull Pair<List<Item>, NexusStateRule> itemsAndRule) {
         List<Item> items = itemsAndRule.getValue0();

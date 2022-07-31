@@ -4,10 +4,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.time.LocalDateTime;
-
-import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-
 @SpringBootApplication
 public class ComplytApplication implements CommandLineRunner {
 
