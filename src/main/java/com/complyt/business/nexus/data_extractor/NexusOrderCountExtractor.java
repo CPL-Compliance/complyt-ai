@@ -1,5 +1,4 @@
 package com.complyt.business.nexus.data_extractor;
-
 import com.complyt.business.nexus.checker.ItemsCheck;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -22,9 +21,9 @@ public class NexusOrderCountExtractor implements NexusDataExtractor<Integer, Ord
         final int COUNTED = 1, NOT_COUNTED = 0;
 
         boolean customerTypeExists = nexusStateRule.getCustomerTypes().contains(order.getCustomer().getCustomerType());
-        boolean itemsQualify = itemsCheck.check(new Pair(order.getItems(),nexusStateRule));
+        boolean itemsQualify = itemsCheck.check(new Pair(order.getItems(), nexusStateRule));
 
-        if(itemsQualify && customerTypeExists) {
+        if (itemsQualify && customerTypeExists) {
             return COUNTED;
         }
 

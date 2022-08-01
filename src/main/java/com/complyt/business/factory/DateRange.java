@@ -74,7 +74,7 @@ public class DateRange {
             int minusYears;
 
             // from october 1st to december 31st
-            if(referenceDate.compareTo(september30) > 0) {
+            if(referenceDate.compareTo(september30) >= 0) {
                 minusYears = 1;
             }
             else {

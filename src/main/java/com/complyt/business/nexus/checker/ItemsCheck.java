@@ -1,12 +1,10 @@
 package com.complyt.business.nexus.checker;
-
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
@@ -41,5 +39,4 @@ public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> 
 
         return containsTaxable && containsTangible;
     }
-
 }
