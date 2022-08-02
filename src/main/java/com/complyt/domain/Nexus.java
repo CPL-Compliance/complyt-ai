@@ -1,18 +1,17 @@
 package com.complyt.domain;
 
-
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.With;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Date;
 
-@Getter
 @AllArgsConstructor
-@EqualsAndHashCode
+@With
+@Getter
 @ToString
 public class Nexus {
-    private String type;
-    private List<NexusRule> rules;
+    private LocalDateTime taxableDate;
 }

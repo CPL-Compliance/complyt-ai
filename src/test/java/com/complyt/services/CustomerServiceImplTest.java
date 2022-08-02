@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.domain.CustomerType;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,7 +44,7 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address,clientId);
+        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
     @Test

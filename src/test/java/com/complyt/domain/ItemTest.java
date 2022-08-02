@@ -1,5 +1,7 @@
 package com.complyt.domain;
 
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +23,7 @@ class ItemTest {
         String name = "Existing Customer";
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate,false,0);
+        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
         anotherItem = item.withName("anotherName");
     }
 

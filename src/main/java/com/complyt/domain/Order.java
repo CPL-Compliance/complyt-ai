@@ -27,4 +27,6 @@ public class Order {
     private SalesTax salesTax;
     private OrderStatus orderStatus;
     private ObjectId clientId;
+    private TimeStamps internalTimeStamps;
+    private TimeStamps externalTimeStamps;
 }

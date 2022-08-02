@@ -1,11 +1,13 @@
 package com.complyt.v1.controllers;
 
 import com.complyt.domain.Customer;
+import com.complyt.domain.CustomerType;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.CustomerDto;
+import com.complyt.v1.model.CustomerTypeDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,7 +55,7 @@ class CustomerControllerTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address);
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 

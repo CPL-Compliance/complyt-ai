@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 public class CustomerRepository {
+
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 

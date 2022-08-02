@@ -1,11 +1,11 @@
 package com.complyt.services;
 
-import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -40,17 +40,76 @@ public class ProductClassificationServiceTest {
     ProductClassificationRepository productClassificationRepository;
 
     ProductClassification productClassification;
+    ObjectId customerId;
+    ObjectId clientId;
 
     @BeforeEach
     void setUp(){
+        productClassification = createProductClassification();
+        customerId = new ObjectId();
+        clientId = new ObjectId();
+    }
+
+    private ProductClassification createProductClassification() {
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
+        return new ProductClassification("id","C1S1","description",
+                "title",jurisdictionalSalesTaxRulesList,TangibleCategory.TANGIBLE);
+    }
+
+    private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA",true,false, CalculationType.FIXED,"description",0,null);
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
+
+        return new HashMap<String,JurisdictionalSalesTaxRules>(){{
             put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
         }};
-        productClassification = new ProductClassification("id","C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList);
     }
+
+    private Order createOrder() {
+        String id = null;
+        String externalId = "externalId";
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        List<Item> items = new ArrayList<>();
+        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
+                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+        ));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
+    }
+
+    private Order createOrderWithProductClassificationData() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        Order order = createOrder();
+
+        Item item = order.getItems().get(0)
+                .withTaxableCategory(TaxableCategory.TAXABLE)
+                .withTangibleCategory(TangibleCategory.TANGIBLE)
+                .withJurisdictionalSalesTaxRules(rules);
+
+        List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
+        return order.withItems(modifiedItems);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California","CA",true,
+                false,CalculationType.FIXED,"description",0,null);
+    }
+
+    @Test
+    void getOrderWithRelevantProductClassificationData_InjectsDateToOrder_ReturnsOrder() {
+        // Given
+        Order order = createOrder();
+        String taxCode = order.getItems().get(0).getTaxCode();
+        Order orderWithData = createOrderWithProductClassificationData();
+
+        // When
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        Mono<Order> actualOrder = productClassificationService.getOrderWithRelevantProductClassificationData(order);
+
+        // Then
+        StepVerifier.create(actualOrder).expectNext(orderWithData).verifyComplete();
+    }
+
 
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne(){
@@ -90,114 +149,51 @@ public class ProductClassificationServiceTest {
 
         // When
         when(productClassificationRepository.findAll()).thenReturn(Flux.fromIterable(productClassifications));
-        Flux<ProductClassification> productClassificationFlux = productClassificationService.getAll();
+        Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll();
 
         // Then
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
     }
 
     @Test
-    void setJurisdictionalRules_SetsRules_ReturnsModifiedOrder() {
+    void save_SavesClassification_ReturnsClassification(){
         // Given
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
-                ));
-            }
-        };
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
-        List<Item> itemsWithRules = new ArrayList<Item>() {{
-            add(order.getItems().get(0).withJurisdictionalSalesTaxRules(productClassification.getJurisdictionalSalesTaxRules().get("CA")));
-        }};
-        Order orderWithItemsWithRules = order.withItems(itemsWithRules);
-        OrderJurisdictionalRulesInjector orderProductClassificationInjector = new OrderJurisdictionalRulesInjector(order);
+        ProductClassification productClassificationNoId = productClassification.withId(null);
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(order.getItems().get(0).getTaxCode()))
-                .thenReturn(Mono.just(productClassification));
-        Mono<Order> orderMono = productClassificationService.setJurisdictionalRules(orderProductClassificationInjector);
+        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> productClassificationMono = productClassificationService.save(productClassificationNoId);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(orderWithItemsWithRules).verifyComplete();
-
+        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
     }
 
     @Test
-    void save_SaveNotImplemented_ThrowsUnsupportedOperationException() {
+    void findById_FindClassification_ReturnsClassification(){
         // Given
-        String name = "name";
+        String id = productClassification.getId();
 
         // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.save(null);
-        });
+        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(productClassification));
+        Mono<ProductClassification> productClassificationMono = productClassificationService.findById(id);
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "save isn't implemented");
+        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
     }
+
 
     @Test
-    void findOneByName_FindOneByNameNotImplemented_ThrowsUnsupportedOperationException() {
+    void findById_NullIdPassed_ThrowsException(){
         // Given
-        String name = "name";
+        String nullId = null;
 
         // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findOneByName(name);
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            productClassificationService.findById(nullId);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
-
-    @Test
-    void findByName_findByNameNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
-    }
-
-    @Test
-    void findById_FindByIdNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String id = "id";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findById(id);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findById isn't implemented");
-    }
-
-    @Test
-    void findAll_FindAllIdNotImplemented_ThrowsUnsupportedOperationException() {
-        // Given
-        String id = "id";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            productClassificationService.findAll();
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findAll isn't implemented");
-    }
-
 
 }

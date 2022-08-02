@@ -25,11 +25,12 @@ public class OrderRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<Order> save(@NonNull Order order) {
+
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(order.withClientId(user.getClientId()))
                         .flatMap(savedOrder -> reactiveMongoTemplate.findById(savedOrder.getCustomerId(), Customer.class)
-                                .map(savedOrder::withCustomer))).log();
+                                .map(savedOrder::withCustomer)));
     }
 
     public Flux<Order> saveAll(List<Order> orders) {
@@ -69,20 +70,33 @@ public class OrderRepository {
                             .findOne(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate
                                     .findById(order.getCustomerId(), Customer.class)
-                                    .map(order::withCustomer)).log();
-                });
+                                    .map(order::withCustomer));
+                }).log();
     }
 
-    public Flux<Order> find() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+    public Flux<Order> findAll() {
+        return ReactiveSecurityContextHolder.getContext().log()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal()).log()
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
-                    log.debug("Executing find client's related customers");
+                    log.debug("Executing find client's related orders");
 
                     return reactiveMongoTemplate.find(query, Order.class)
                             .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)
                                     .map(order::withCustomer)).log();
+                });
+    }
+
+    public Flux<Order> findAllByQuery(Query query) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMapMany(user -> {
+                    log.debug("Executing find client's related orders by query : " + query);
+                    Query updatedQuery = query.addCriteria(Criteria.where("clientId").is(user.getClientId()));
+
+                    return reactiveMongoTemplate.find(updatedQuery, Order.class).log()
+                            .flatMap(order -> reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class).log()
+                                    .map(order::withCustomer));
                 });
     }
 }
