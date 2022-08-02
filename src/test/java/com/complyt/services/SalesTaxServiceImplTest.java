@@ -142,6 +142,20 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
+    void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameOrder() {
+        // Given
+        State state = new State("CA","02","California");
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
+                new ObjectId(),false,null,null, LocalDateTime.now().plusYears(1));
+
+        // When
+        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order,tracking);
+
+        // Then`
+        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+    }
+
+    @Test
     void handleSalesTaxCalculation_SalesTaxCalculated_OrderModified() {
         // Given
         FastTaxData fastTaxData = new FastTaxData();

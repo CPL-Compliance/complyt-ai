@@ -31,6 +31,7 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
         
         DateRangeStrategy dateRangeStrategy = new DateRangeStrategy(timeFrame, taxableDate, referenceDate);
         DateRange dateRange = dateRangeStrategy.getDateRange();
+        
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() +
                 " , end date : " + dateRange.getEnd());
 
