@@ -200,6 +200,19 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
+    void calculate_NullOrderPassed_ThrowsException() {
+        // Given
+        Order nullOrder = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxService.calculate(nullOrder);
+        });
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+
+    }
+
+    @Test
     void handleSalesTaxCalculation_NullTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullTracking = null;
