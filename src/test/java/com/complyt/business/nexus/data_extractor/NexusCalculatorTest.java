@@ -103,4 +103,22 @@ public class NexusCalculatorTest {
         assertEquals(summary,actualSummary);
     }
 
+    @Test
+    void calculate_CustomerTypeDoesNotExist_ReturnsSummary() {
+        // Given
+        List<Order> orders = createOrdersList();
+        int count = 0;
+        float amount = 0;
+        NexusCalculationSummary summary = new NexusCalculationSummary(count,amount);
+        List<CustomerType> resellerCustomerOnly = new ArrayList<CustomerType>(){{add(CustomerType.RESELLER);}};
+        NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
+
+        // When
+
+        NexusCalculationSummary actualSummary = nexusCalculator.calculate(orders,nexusStateRule);
+
+        // Then
+        assertEquals(summary,actualSummary);
+    }
+
 }
