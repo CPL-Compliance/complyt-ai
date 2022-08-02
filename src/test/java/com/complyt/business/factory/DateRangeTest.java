@@ -23,7 +23,7 @@ public class DateRangeTest {
     @Test
     void newPrevCalenderYear_DateRangeCreated_DateRangeReturned() {
         // Given
-        LocalDateTime expectedFirstDayOfLastYear = LocalDateTime.now().with(firstDayOfYear()).minusYears(1);
+        LocalDateTime expectedFirstDayOfLastYear = LocalDateTime.now().with(firstDayOfYear());
         LocalDateTime expectedLastDayOfLastYear = expectedFirstDayOfLastYear.with(lastDayOfYear());
         LocalDateTime referenceDate = LocalDateTime.now();
 
@@ -80,14 +80,13 @@ public class DateRangeTest {
         LocalDateTime september30 = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
         LocalDateTime referenceDate = september30.plusDays(1);
 
-        LocalDateTime expectedStartDate = september30;
-        LocalDateTime expectedEndDate = referenceDate;
+        LocalDateTime expectedEndDate = september30.plusYears(1);
 
-        // When + Then
+        // When + Thenx
         DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
-        assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
-        assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
-        assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedStartDate.getDayOfMonth());
+        assertEquals(expectedDateRange.getStart().getYear(), september30.getYear());
+        assertEquals(expectedDateRange.getStart().getMonthValue(), september30.getMonthValue());
+        assertEquals(expectedDateRange.getStart().getDayOfMonth(), september30.getDayOfMonth());
         assertEquals(expectedDateRange.getEnd().getYear(), expectedEndDate.getYear());
         assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedEndDate.getMonthValue());
         assertEquals(expectedDateRange.getEnd().getDayOfMonth(), expectedEndDate.getDayOfMonth());
@@ -100,48 +99,55 @@ public class DateRangeTest {
         LocalDateTime referenceDate = september30.minusDays(1);
 
         LocalDateTime expectedStartDate = september30.minusYears(1);
-        LocalDateTime expectedEndDate = referenceDate;
+        LocalDateTime expectedEndDate = expectedStartDate.plusYears(1);
 
         // When + Then
-        DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
-        assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
-        assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
-        assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedStartDate.getDayOfMonth());
-        assertEquals(expectedDateRange.getEnd().getYear(), expectedEndDate.getYear());
-        assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedEndDate.getMonthValue());
-        assertEquals(expectedDateRange.getEnd().getDayOfMonth(), expectedEndDate.getDayOfMonth());
+        DateRange actualDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
+
+        assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
+        assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
+        assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
+        assertEquals(expectedEndDate.getYear(), actualDateRange.getEnd().getYear());
+        assertEquals(expectedEndDate.getMonthValue(), actualDateRange.getEnd().getMonthValue());
+        assertEquals(expectedEndDate.getDayOfMonth(), actualDateRange.getEnd().getDayOfMonth());
     }
 
     @Test
     void newTaxableYear_PriorToTaxableDate_DateRangeReturned() {
         // Given
-        LocalDateTime taxableDate = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
-        LocalDateTime referenceDate = taxableDate.minusDays(1);
+        LocalDateTime taxableDate = LocalDateTime.now().withMonth(12).withDayOfMonth(25);
+        LocalDateTime referenceDate = taxableDate.minusDays(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0);
         LocalDateTime expectedStartDate = taxableDate.minusYears(1);
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
+        DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
-        assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
-        assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
-        assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedStartDate.getDayOfMonth());
-        assertEquals(expectedDateRange.getEnd(), referenceDate);
+        assertEquals(expectedStartDate.getYear(),actualDateRange.getStart().getYear());
+        assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
+        assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
     }
 
     @Test
-    void newTaxableYear_FutureToTaxableDate_DateRangeReturned() {
+    void newTaxableYear_ReferenceDateLaterThanTaxableDate_DateRangeReturned() {
         // Given
-        LocalDateTime taxableDate = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
-        LocalDateTime referenceDate = taxableDate.plusDays(1);
+        LocalDateTime taxableDate = LocalDateTime.now().withMonth(12).withDayOfMonth(25);
+        LocalDateTime referenceDate = taxableDate.plusYears(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
         LocalDateTime expectedStartDate = taxableDate.minusYears(0);
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
+        DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
-        assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
-        assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
-        assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedStartDate.getDayOfMonth());
-        assertEquals(expectedDateRange.getEnd(), referenceDate);
+        assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
+        assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
+        assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
+        assertEquals(referenceDate, actualDateRange.getEnd());
     }
 
     @Test

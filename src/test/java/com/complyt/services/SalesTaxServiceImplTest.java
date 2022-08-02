@@ -65,7 +65,8 @@ public class SalesTaxServiceImplTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,null);
+        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(),LocalDateTime.now());
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId,  null,externalTimeStamps);
     }
 
     @Test
@@ -151,7 +152,7 @@ public class SalesTaxServiceImplTest {
         // When
         Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order,tracking);
 
-        // Then`
+        // Then
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
     }
 
@@ -168,7 +169,7 @@ public class SalesTaxServiceImplTest {
         Order orderWithSalesTax = order.withItems(itemsWithRates).withSalesTax(salesTax);
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),true,null,null,LocalDateTime.now());
+                new ObjectId(),true,null,null,LocalDateTime.now().minusYears(1));
 
 
         // When
@@ -182,7 +183,6 @@ public class SalesTaxServiceImplTest {
         // Then
         StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
     }
-
 
     @Test
     void handleSalesTaxCalculation_NullOrderPassed_ThrowsException() {

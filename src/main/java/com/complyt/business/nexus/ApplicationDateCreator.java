@@ -3,11 +3,13 @@ package com.complyt.business.nexus;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@Slf4j
 public class ApplicationDateCreator {
 
     public LocalDateTime create(@NonNull TimeFrame timeFrame,@NonNull LocalDateTime referenceDate) {
@@ -17,18 +19,23 @@ public class ApplicationDateCreator {
         if(timeFrame.equals(TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER)) {
             return applyNextSeptember(referenceDate);
         }
+        log.info("Creating sales tax application date : " + referenceDate);
 
-        return LocalDateTime.now().minusHours(3);
+        return referenceDate;
     }
 
     public LocalDateTime applyNextCalenderYear(@NonNull LocalDateTime referenceDate) {
-        return referenceDate
+        LocalDateTime applicationDate = referenceDate
                 .plusYears(1)
                 .with(firstDayOfYear())
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
+
+        log.info("Creating sales tax application date : " + applicationDate);
+
+        return applicationDate;
     }
 
     public LocalDateTime applyNextSeptember(@NonNull LocalDateTime referenceDate) {
@@ -40,11 +47,17 @@ public class ApplicationDateCreator {
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
+        LocalDateTime applicationDate;
 
         // from october 1st to december 31st
         if(referenceDate.compareTo(september30) >= 0) {
-            return september30.plusYears(1);
+            applicationDate = september30.plusYears(1);
         }
-        return september30;
+        else {
+            applicationDate = september30;
+        }
+        log.info("Creating sales tax application date : " + applicationDate);
+
+        return applicationDate;
     }
 }

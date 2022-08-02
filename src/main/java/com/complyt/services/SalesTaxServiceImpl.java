@@ -42,7 +42,9 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        boolean isApplied = LocalDateTime.now().compareTo(salesTaxTracking.getAppliedDate()) >= 0;
+        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
+        boolean isApplied = referenceDate.compareTo(applicationDate) >= 0;
 
         return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(order) : Mono.just(order);
     }
