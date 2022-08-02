@@ -11,18 +11,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
-import static org.junit.jupiter.api.Assertions.*;
-import org.springframework.data.mongodb.core.query.Criteria;
-import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-import org.springframework.data.mongodb.core.query.Query;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
+
+import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
+import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -37,13 +36,13 @@ public class NexusOrdersSearchQueryBuilderTest {
 
     private NexusStateRule nexusStateRule;
     private Nexus nexus;
-    private Date dateReference;
+    private LocalDateTime dateReference;
 
     @BeforeEach
     void setUp() {
         nexusStateRule = createNexusStateRule();
         nexus = createNexusInfo();
-        dateReference = new Date();
+        dateReference = LocalDateTime.now();
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -53,7 +52,7 @@ public class NexusOrdersSearchQueryBuilderTest {
     }
 
     private Nexus createNexusInfo() {
-        return new Nexus(true,new Date());
+        return new Nexus(true,LocalDateTime.now());
     }
 
     @Test

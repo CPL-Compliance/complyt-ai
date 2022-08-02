@@ -67,7 +67,7 @@ public class NexusCheckerTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false,null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false,null);
         return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker);
+                true,physicalNexusTracker,economicNexusTracker,null);
     }
 
     @Test

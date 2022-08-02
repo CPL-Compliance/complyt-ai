@@ -43,7 +43,7 @@ public class DateRangeTest {
         // Given
         LocalDateTime expectedFirstDayOfTheYear = LocalDate.now().with(firstDayOfYear()).atStartOfDay();
         LocalDateTime expectedLastDayOfThisYear = expectedFirstDayOfTheYear.with(lastDayOfYear())
-                .with(LocalTime.of(23,59,59));
+                .with(LocalTime.of(23, 59, 59));
         LocalDateTime referenceDate = LocalDateTime.now();
 
         //When + Then
@@ -79,10 +79,9 @@ public class DateRangeTest {
         // Given
         LocalDateTime september30 = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
         LocalDateTime referenceDate = september30.plusDays(1);
-        int minusYears = referenceDate.compareTo(september30) > 0 ? 1 : 2;
 
-        LocalDateTime expectedStartDate = september30.minusYears(minusYears);
-        LocalDateTime expectedEndDate = september30.minusYears(minusYears-1);
+        LocalDateTime expectedStartDate = september30;
+        LocalDateTime expectedEndDate = referenceDate;
 
         // When + Then
         DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
@@ -95,14 +94,13 @@ public class DateRangeTest {
     }
 
     @Test
-        void newYearFromSeptember_PriorToSeptember_DateRangeReturned() {
+    void newYearFromSeptember_PriorToSeptember_DateRangeReturned() {
         // Given
         LocalDateTime september30 = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
         LocalDateTime referenceDate = september30.minusDays(1);
-        int minusYears = referenceDate.compareTo(september30) > 0 ? 1 : 2;
 
-        LocalDateTime expectedStartDate = september30.minusYears(minusYears);
-        LocalDateTime expectedEndDate = september30.minusYears(minusYears-1);
+        LocalDateTime expectedStartDate = september30.minusYears(1);
+        LocalDateTime expectedEndDate = referenceDate;
 
         // When + Then
         DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
@@ -122,7 +120,7 @@ public class DateRangeTest {
         LocalDateTime expectedStartDate = taxableDate.minusYears(1);
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate,referenceDate);
+        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
         assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
@@ -138,7 +136,7 @@ public class DateRangeTest {
         LocalDateTime expectedStartDate = taxableDate.minusYears(0);
 
         //When + Then
-        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate,referenceDate);
+        DateRange expectedDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
         assertEquals(expectedDateRange.getStart().getYear(), expectedStartDate.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedStartDate.getMonthValue());
@@ -154,7 +152,7 @@ public class DateRangeTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            DateRange.Factory.newTaxableYear(nullTaxableDate,referenceDate);
+            DateRange.Factory.newTaxableYear(nullTaxableDate, referenceDate);
         });
 
         // Then
@@ -169,7 +167,7 @@ public class DateRangeTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            DateRange.Factory.newTaxableYear(taxableDate,nullReferenceDate);
+            DateRange.Factory.newTaxableYear(taxableDate, nullReferenceDate);
         });
 
         // Then
@@ -217,7 +215,7 @@ public class DateRangeTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
-    
+
     @Test
     void newPreviousCalenderYear_NullReferenceDatePassed_ThrowsException() {
         // Given

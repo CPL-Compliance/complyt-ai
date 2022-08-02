@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
@@ -17,8 +17,8 @@ public class ModifiedOrderInternalDateInjector implements DateInjector<Order> {
 
     @Override
     public Order inject() {
-        Date createdDate = order.getInternalTimeStamps().getCreatedDate();
-        Date modifiedDate = new Date();
+        LocalDateTime createdDate = order.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime modifiedDate = LocalDateTime.now();
         TimeStamps modifiedTimeStamps = new TimeStamps(createdDate,modifiedDate);
 
         return order.withInternalTimeStamps(modifiedTimeStamps);

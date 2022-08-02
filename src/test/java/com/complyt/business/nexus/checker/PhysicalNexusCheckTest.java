@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,10 +31,10 @@ public class PhysicalNexusCheckTest {
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true,new Date());
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true,LocalDateTime.now());
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,null);
+                true,physicalNexusTracker,null, LocalDateTime.now());
 
         // When + Then
         boolean hasPhysicalNexus = physicalNexusCheck.check(salesTaxTracking);

@@ -85,7 +85,7 @@ class NexusServiceTest {
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), true,
                 new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null));
+                new EconomicNexusTracker(false, null),LocalDateTime.now());
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -123,7 +123,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(new Date(), new Date()));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
@@ -132,12 +132,12 @@ class NexusServiceTest {
 
         State state = new State("CA","02","California");
         return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker);
+                true,physicalNexusTracker,economicNexusTracker,LocalDateTime.now());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
         SalesTaxTracking salesTaxTrackingWithNexus = createSalesTaxTrackingWithoutNexusEstablished()
-                .withEconomicNexusTracker(new EconomicNexusTracker(true,new Date()));
+                .withEconomicNexusTracker(new EconomicNexusTracker(true,LocalDateTime.now()));
 
         return salesTaxTrackingWithNexus;
     }
@@ -170,7 +170,7 @@ class NexusServiceTest {
 
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
-        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
@@ -205,7 +205,7 @@ class NexusServiceTest {
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = createSalesTaxTrackingWithoutNexusEstablished();
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
-        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
 
 
         // When
@@ -216,7 +216,7 @@ class NexusServiceTest {
         when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(true);
         when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
-        when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished))
+        when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished,nexusStateRule,referenceDate))
                 .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(order);

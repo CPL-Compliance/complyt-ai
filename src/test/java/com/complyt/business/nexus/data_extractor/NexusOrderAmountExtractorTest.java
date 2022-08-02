@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +98,7 @@ public class NexusOrderAmountExtractorTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(new Date(), new Date()));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     @Test

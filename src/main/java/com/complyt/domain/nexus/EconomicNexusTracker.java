@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -13,5 +13,5 @@ import java.util.Date;
 @ToString
 public class EconomicNexusTracker {
     private boolean established;
-    private Date establishedDate;
+    private LocalDateTime establishedDate;
 }

@@ -27,6 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,12 +106,12 @@ public class OrderFacadeTest {
 
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker);
+                true, physicalNexusTracker, economicNexusTracker,null);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
         SalesTaxTracking salesTaxTrackingWithNexus = createSalesTaxTrackingWithoutNexusEstablished()
-                .withEconomicNexusTracker(new EconomicNexusTracker(true, new Date()));
+                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
 
         return salesTaxTrackingWithNexus;
     }

@@ -26,8 +26,9 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,7 +65,7 @@ class OrderServiceImplTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(new Date(), new Date());
+        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
 
         order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, timeStamps, timeStamps);
     }
@@ -334,15 +335,11 @@ class OrderServiceImplTest {
         // Then
         StepVerifier.create(orderMono)
                 .expectNextMatches(order -> {
-                    LocalDateTime expectedCreatedDateTime = LocalDateTime
-                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
-                    LocalDateTime expectedUpdatedDateTime = LocalDateTime
-                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime expectedCreatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime expectedUpdatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
 
-                    LocalDateTime actualCreatedDateTime = LocalDateTime
-                            .ofInstant(order.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
-                    LocalDateTime actualUpdatedDateTime = LocalDateTime
-                            .ofInstant(order.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime actualCreatedDateTime = order.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime actualUpdatedDateTime = order.getInternalTimeStamps().getUpdatedDate();
 
 
                     return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
@@ -374,15 +371,11 @@ class OrderServiceImplTest {
         // Then
         StepVerifier.create(orderMono)
                 .expectNextMatches(order -> {
-                    LocalDateTime expectedCreatedDateTime = LocalDateTime
-                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
-                    LocalDateTime expectedUpdatedDateTime = LocalDateTime
-                            .ofInstant(orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime expectedCreatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime expectedUpdatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
 
-                    LocalDateTime actualCreatedDateTime = LocalDateTime
-                            .ofInstant(order.getInternalTimeStamps().getCreatedDate().toInstant(), ZoneId.systemDefault());
-                    LocalDateTime actualUpdatedDateTime = LocalDateTime
-                            .ofInstant(order.getInternalTimeStamps().getUpdatedDate().toInstant(), ZoneId.systemDefault());
+                    LocalDateTime actualCreatedDateTime = order.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime actualUpdatedDateTime = order.getInternalTimeStamps().getUpdatedDate();
 
 
                     return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&

@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -14,5 +13,5 @@ import java.util.Date;
 @ToString
 public class PhysicalNexusTracker {
     private boolean established;
-    private Date establishedDate;
+    private LocalDateTime establishedDate;
 }

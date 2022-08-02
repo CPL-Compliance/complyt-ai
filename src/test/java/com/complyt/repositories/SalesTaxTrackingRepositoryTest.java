@@ -55,7 +55,7 @@ public class SalesTaxTrackingRepositoryTest {
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                user.getClientId(), true, null, null);
+                user.getClientId(), true, null, null,null);
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")

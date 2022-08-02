@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.With;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,6 +12,7 @@ import java.time.LocalTime;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
+@Slf4j
 @Getter
 @ToString
 @With
@@ -69,31 +71,24 @@ public class DateRange {
         }
 
         public static DateRange newYearFromSeptember(@NonNull LocalDateTime referenceDate) {
-            LocalDateTime september30 = referenceDate.withMonth(9).withDayOfMonth(30);
-            LocalDateTime startDate, endDate;
-            int minusYears;
+            LocalDateTime september30 = referenceDate
+                    .withMonth(9)
+                    .withDayOfMonth(30)
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0);
+
+            LocalDateTime startDate;
 
             // from october 1st to december 31st
-            if(referenceDate.compareTo(september30) >= 0) {
-                minusYears = 1;
+            if(referenceDate.compareTo(september30) <= 0) {
+                startDate = september30.minusYears(1);
             }
             else {
-                minusYears = 2;
+                startDate = september30;
             }
-            startDate = september30
-                        .minusYears(minusYears)
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
 
-                endDate = september30
-                        .minusYears(minusYears-1)
-                        .withHour(0)
-                        .withMinute(0)
-                        .withSecond(0);
-
-
-            return new DateRange(startDate, endDate);
+            return new DateRange(startDate, referenceDate);
         }
 
         public static DateRange newTaxableYear(@NonNull LocalDateTime taxableDate,@NonNull LocalDateTime referenceDate) {

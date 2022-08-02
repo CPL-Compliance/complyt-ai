@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,7 +42,9 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax() ? calculate(order) : Mono.just(order);
+        boolean isApplied = LocalDateTime.now().compareTo(salesTaxTracking.getAppliedDate()) >= 0;
+
+        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(order) : Mono.just(order);
     }
 
     @Override

@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,24 +68,24 @@ public class NexusService {
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Order order) {
         String state = order.getShippingAddress().getState();
-        Date referenceDate = order.getExternalTimeStamps().getCreatedDate();
-        
+        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(state)
                         .flatMap(stateRule -> {
                             Query nexusOrdersSearchQuery = nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo, stateRule, referenceDate);
                             return orderService.getOrdersByQuery(nexusOrdersSearchQuery)
-                                    .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule));
+                                    .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule,referenceDate));
                         }));
     }
 
-    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Order> orders, NexusStateRule stateRule) {
+    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Order> orders, NexusStateRule stateRule,LocalDateTime referenceDate) {
         NexusCalculationSummary summary = nexusCalculator.calculate(orders, stateRule);
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
 
         return findTrackingByState(stateRule.getState().getAbbreviation())
                 .flatMap(salesTaxTracking -> passedThreshold ?
-                        salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking) :
+                        salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,stateRule,referenceDate) :
                         Mono.just(salesTaxTracking)
                 );
     }

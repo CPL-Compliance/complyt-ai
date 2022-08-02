@@ -6,6 +6,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -20,4 +22,5 @@ public class SalesTaxTracking {
     private boolean enforcesSalesTax;
     private PhysicalNexusTracker physicalNexusTracker;
     private EconomicNexusTracker economicNexusTracker;
+    private LocalDateTime appliedDate;
 }

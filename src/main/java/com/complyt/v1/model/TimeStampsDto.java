@@ -2,8 +2,7 @@ package com.complyt.v1.model;
 
 import lombok.*;
 
-import java.util.Date;
-
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -11,6 +10,6 @@ import java.util.Date;
 @ToString
 @With
 public class TimeStampsDto {
-    private Date createdDate;
-    private Date updatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 }

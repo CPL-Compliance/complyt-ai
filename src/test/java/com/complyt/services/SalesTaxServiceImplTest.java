@@ -23,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -131,7 +132,7 @@ public class SalesTaxServiceImplTest {
         // Given
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),false,null,null);
+                new ObjectId(),false,null,null, LocalDateTime.now());
 
         // When
         Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order,tracking);
@@ -153,7 +154,7 @@ public class SalesTaxServiceImplTest {
         Order orderWithSalesTax = order.withItems(itemsWithRates).withSalesTax(salesTax);
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),true,null,null);
+                new ObjectId(),true,null,null,LocalDateTime.now());
 
 
         // When
@@ -173,7 +174,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NullOrderPassed_ThrowsException() {
         // Given
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),null,
-                new ObjectId(), true,null,null);
+                new ObjectId(), true,null,null,null);
         Order nullOrder = null;
 
         // When + Then

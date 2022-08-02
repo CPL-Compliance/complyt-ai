@@ -1,6 +1,8 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import lombok.AllArgsConstructor;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Slf4j
@@ -19,6 +21,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @NonNull
     private SalesTaxTrackingRepository salesTaxTrackingRepository;
+
+    @NonNull
+    private ApplicationDateCreator applicationDateCreator;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -41,9 +46,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking) {
-        EconomicNexusTracker newTracker = new EconomicNexusTracker(true, new Date());
-        SalesTaxTracking modifiedTracking = salesTaxTracking.withEconomicNexusTracker(newTracker);
+    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking,@NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
+        EconomicNexusTracker newTracker = new EconomicNexusTracker(true, LocalDateTime.now());
+        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.getTimeFrame(),referenceDate);
+
+        SalesTaxTracking modifiedTracking = salesTaxTracking
+                .withEconomicNexusTracker(newTracker)
+                .withAppliedDate(appliedDate);
 
         log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
         return save(modifiedTracking).log();

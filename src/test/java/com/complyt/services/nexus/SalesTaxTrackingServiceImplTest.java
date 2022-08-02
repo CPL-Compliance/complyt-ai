@@ -1,9 +1,13 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.nexus.ApplicationDateCreator;
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
-import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.*;
+import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +41,9 @@ public class SalesTaxTrackingServiceImplTest {
     @Mock
     SalesTaxTrackingRepository salesTaxTrackingRepository;
 
+    @Mock
+    ApplicationDateCreator applicationDateCreator;
+
     SalesTaxTracking salesTaxTracking;
 
     private SalesTaxTracking createSalesTaxTracking() {
@@ -44,7 +51,7 @@ public class SalesTaxTrackingServiceImplTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker);
+                true, physicalNexusTracker, economicNexusTracker, null);
     }
 
     @BeforeEach
@@ -53,10 +60,28 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
-        SalesTaxTracking salesTaxTrackingWithNexus = salesTaxTracking
-                .withEconomicNexusTracker(new EconomicNexusTracker(true, new Date()));
+        return salesTaxTracking
+                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
+    }
 
-        return salesTaxTrackingWithNexus;
+    private NexusStateRule createNexusStateRule() {
+        State state = new State("CA","02","California");
+        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+            add(TaxableCategory.TAXABLE);
+        }};
+
+        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+            add(TangibleCategory.TANGIBLE);
+        }};
+
+        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+            add(CustomerType.RETAIL);
+        }};
+
+        NexusThreshold nexusThreshold = new NexusThreshold(1000,2, Definition.AMOUNT_OR_COUNT);
+
+        return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,customerTypes,
+                TimeFrame.CURRENT_CALENDER_YEAR,nexusThreshold);
     }
 
     @Test
@@ -159,10 +184,13 @@ public class SalesTaxTrackingServiceImplTest {
     void saveWithEconomicQualified_SavesModifiedSalesTaxTracking_ReturnsModifiedSalesTaxTracking() {
         // Given
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
+        NexusStateRule stateRule = createNexusStateRule();
+        LocalDateTime referenceDate = LocalDateTime.now();
 
         // When
         when(salesTaxTrackingRepository.save(any())).thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking);
+        when(applicationDateCreator.create(stateRule.getTimeFrame(),referenceDate)).thenReturn(LocalDateTime.now());
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,stateRule,referenceDate);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();
@@ -172,14 +200,46 @@ public class SalesTaxTrackingServiceImplTest {
     void saveWithEconomicQualified_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
+        NexusStateRule nexusStateRule = createNexusStateRule();
+        LocalDateTime referenceDate = LocalDateTime.now();
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(nullSalesTaxTracking);
+            salesTaxTrackingService.saveWithEconomicQualified(nullSalesTaxTracking,nexusStateRule,referenceDate);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void saveWithEconomicQualified_NullStateRulePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,nullNexusStateRule,referenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "stateRule is marked non-null but is null");
+    }
+
+    @Test
+    void saveWithEconomicQualified_NullReferenceDatePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = createNexusStateRule();
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,nullNexusStateRule,nullReferenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
 
 }

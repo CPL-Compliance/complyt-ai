@@ -1,4 +1,5 @@
 package com.complyt.business.query;
+
 import com.complyt.business.factory.DateRange;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -12,8 +13,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 @Component
 @Slf4j
@@ -26,16 +25,11 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
                 .gte(dateRange.getStart()).lte(dateRange.getEnd()));
     }
 
-    public Query buildNexusTimeFrame(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull Date referenceDate) {
+    public Query buildNexusTimeFrame(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate) {
         TimeFrame timeFrame = nexusStateRule.getTimeFrame();
-
-        LocalDateTime taxableDate = LocalDateTime
-                .ofInstant(nexusInfo.getTaxableDate().toInstant(), ZoneId.systemDefault());
-
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
-
-        DateRangeStrategy dateRangeStrategy = new DateRangeStrategy(timeFrame, taxableDate, localDateTimeReferenceDate);
+        LocalDateTime taxableDate = nexusInfo.getTaxableDate();
+        
+        DateRangeStrategy dateRangeStrategy = new DateRangeStrategy(timeFrame, taxableDate, referenceDate);
         DateRange dateRange = dateRangeStrategy.getDateRange();
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() +
                 " , end date : " + dateRange.getEnd());

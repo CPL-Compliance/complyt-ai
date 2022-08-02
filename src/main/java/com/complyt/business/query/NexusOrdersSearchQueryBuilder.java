@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -19,7 +19,7 @@ public class NexusOrdersSearchQueryBuilder {
     @NonNull
     private TimeFrameQueryBuilder timeFrameQueryBuilder;
 
-    public Query buildNexusOrdersSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull Date referenceDate) {
+    public Query buildNexusOrdersSearch(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate) {
         Query timeFrameQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, referenceDate);
         return timeFrameQuery
                 .addCriteria(Criteria.where("shippingAddress.state")

@@ -15,8 +15,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +32,7 @@ public class TimeFrameQueryBuilderTest {
     void setUp() {
         timeFrameQueryBuilder = new TimeFrameQueryBuilder();
         nexusStateRule = createNexusStateRule();
-        nexusInfo = new Nexus(false, new Date());
+        nexusInfo = new Nexus(false, LocalDateTime.now());
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -47,11 +45,9 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingPrevCalenderYear_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithPrevCalenderYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.PREVIOUS_CALENDER_YEAR);
-        Date referenceDate = new Date();
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime referenceDate = LocalDateTime.now();
 
-        DateRange dateRange = DateRange.Factory.newPreviousCalenderYear(localDateTimeReferenceDate);
+        DateRange dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate").gte(dateRange.getStart()).lte(dateRange.getEnd()));
 
         // When + Then
@@ -63,11 +59,9 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingCurrentCalenderYear_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithPrevCalenderYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.CURRENT_CALENDER_YEAR);
-        Date referenceDate = new Date();
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime referenceDate = LocalDateTime.now();
 
-        DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(localDateTimeReferenceDate);
+        DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
 
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart())
@@ -82,11 +76,9 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingFromSeptemberToSeptember_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithSeptemberToSeptemberTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER);
-        Date referenceDate = new Date();
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime referenceDate = LocalDateTime.now();
 
-        DateRange dateRange = DateRange.Factory.newYearFromSeptember(localDateTimeReferenceDate);
+        DateRange dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
@@ -100,14 +92,11 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingTaxableYearRange_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithTaxableYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.CURRENT_TAXABLE_YEAR);
-        Nexus nexusWithTaxableDate = nexusInfo.withTaxableDate(new Date());
-        Date referenceDate = new Date();
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
-        LocalDateTime localDateTimeTaxableDate = LocalDateTime
-                .ofInstant(nexusWithTaxableDate.getTaxableDate().toInstant(), ZoneId.systemDefault());
+        Nexus nexusWithTaxableDate = nexusInfo.withTaxableDate(LocalDateTime.now());
+        LocalDateTime referenceDate = LocalDateTime.now();
+        LocalDateTime localDateTimeTaxableDate = nexusWithTaxableDate.getTaxableDate();
 
-        DateRange dateRange = DateRange.Factory.newTaxableYear(localDateTimeTaxableDate,localDateTimeReferenceDate);
+        DateRange dateRange = DateRange.Factory.newTaxableYear(localDateTimeTaxableDate,referenceDate);
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
@@ -121,12 +110,10 @@ public class TimeFrameQueryBuilderTest {
     void buildNexusTimeFrame_BuildingPreviousTwelveMonths_ReturnsQuery() {
         // Given
         NexusStateRule ruleWithTaxableYearTimeFrame = nexusStateRule.withTimeFrame(TimeFrame.PREVIOUS_TWELVE_MONTHS);
-        Nexus nexusWithTaxableDate = nexusInfo.withTaxableDate(new Date());
-        Date referenceDate = new Date();
-        LocalDateTime localDateTimeReferenceDate = LocalDateTime
-                .ofInstant(referenceDate.toInstant(), ZoneId.systemDefault());
+        Nexus nexusWithTaxableDate = nexusInfo.withTaxableDate(LocalDateTime.now());
+        LocalDateTime referenceDate = LocalDateTime.now();
 
-        DateRange dateRange = DateRange.Factory.newPreviousTwelveMonths(localDateTimeReferenceDate);
+        DateRange dateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
