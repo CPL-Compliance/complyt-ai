@@ -24,7 +24,7 @@ public class ApplicationDateCreator {
         return referenceDate;
     }
 
-    public LocalDateTime applyNextCalenderYear(@NonNull LocalDateTime referenceDate) {
+    private LocalDateTime applyNextCalenderYear(@NonNull LocalDateTime referenceDate) {
         LocalDateTime applicationDate = referenceDate
                 .plusYears(1)
                 .with(firstDayOfYear())
@@ -38,7 +38,7 @@ public class ApplicationDateCreator {
         return applicationDate;
     }
 
-    public LocalDateTime applyNextSeptember(@NonNull LocalDateTime referenceDate) {
+    private LocalDateTime applyNextSeptember(@NonNull LocalDateTime referenceDate) {
 
         LocalDateTime september30 = referenceDate
                 .withMonth(9)
