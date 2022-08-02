@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
+
 @Component
 @AllArgsConstructor
 public class NexusOrderAmountExtractor implements NexusDataExtractor<Float, Order> {
@@ -18,7 +20,6 @@ public class NexusOrderAmountExtractor implements NexusDataExtractor<Float, Orde
     @Override
     public Float extract(@NonNull Order order, @NonNull NexusStateRule nexusStateRule) {
         float amount = 0;
-
         for(Item item: order.getItems()) {
             if(itemStateThresholdQualifier.isCounted(item,nexusStateRule)){
                 amount += item.getTotalPrice();

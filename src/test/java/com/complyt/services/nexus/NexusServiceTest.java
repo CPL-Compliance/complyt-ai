@@ -157,7 +157,7 @@ class NexusServiceTest {
     @Test
     void calculate_NexusDoesNotPassThreshold_NexusTrackingDoesNotChange() {
         // Given
-        Nexus nexusInfo = new Nexus(false,null);
+        Nexus nexusInfo = new Nexus(null);
         NexusStateRule nexusStateRule = createNexusStateRule();
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
@@ -190,7 +190,7 @@ class NexusServiceTest {
     @Test
     void calculate_NexusPassesThreshold_NexusTrackingChanges() {
         // Given
-        Nexus nexusInfo = new Nexus(false,null);
+        Nexus nexusInfo = new Nexus(null);
         NexusStateRule nexusStateRule = createNexusStateRule();
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()))

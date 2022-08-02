@@ -13,7 +13,5 @@ import java.util.Date;
 @Getter
 @ToString
 public class Nexus {
-
-    private boolean hasTaxableDate;
     private LocalDateTime taxableDate;
 }

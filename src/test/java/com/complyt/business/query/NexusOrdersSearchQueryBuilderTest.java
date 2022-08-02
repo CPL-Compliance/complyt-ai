@@ -52,7 +52,7 @@ public class NexusOrdersSearchQueryBuilderTest {
     }
 
     private Nexus createNexusInfo() {
-        return new Nexus(true,LocalDateTime.now());
+        return new Nexus(LocalDateTime.now());
     }
 
     @Test

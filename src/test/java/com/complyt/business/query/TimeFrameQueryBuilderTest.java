@@ -32,7 +32,7 @@ public class TimeFrameQueryBuilderTest {
     void setUp() {
         timeFrameQueryBuilder = new TimeFrameQueryBuilder();
         nexusStateRule = createNexusStateRule();
-        nexusInfo = new Nexus(false, LocalDateTime.now());
+        nexusInfo = new Nexus( LocalDateTime.now());
     }
 
     private NexusStateRule createNexusStateRule() {

@@ -51,7 +51,7 @@ public class ClientTrackingRepositoryTest {
 
     private ClientTracking createClientTracking() {
         return new ClientTracking(user.getClientId().toString(), new ObjectId(),
-                new Nexus(false, null));
+                new Nexus( null));
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
