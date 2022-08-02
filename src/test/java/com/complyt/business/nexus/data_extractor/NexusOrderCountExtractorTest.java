@@ -128,21 +128,6 @@ public class NexusOrderCountExtractorTest {
     }
 
     @Test
-    void extract_ExtractsOrderItemsCount_ReturnsShouldNotBeCountedBecauseCustomerTypeDoesNotExist() {
-        // Given
-        Customer otherCustomer = order.getCustomer().withCustomerType(CustomerType.MARKETPLACE);
-        Order otherOrder = order.withCustomer(otherCustomer);
-
-        // When
-        when(itemsCheck.check(new Pair(otherOrder.getItems(),nexusStateRule))).thenReturn(true);
-        int count = nexusOrderCountExtractor.extract(otherOrder,nexusStateRule);
-
-        // Then
-        assertEquals(count,0);
-    }
-
-
-    @Test
     void extract_NullOrderPassed_ThrowsException() {
         // Given
         Order nullOrder = null;

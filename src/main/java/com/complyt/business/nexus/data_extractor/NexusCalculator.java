@@ -1,5 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
+import com.complyt.domain.CustomerType;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -27,6 +28,12 @@ public class NexusCalculator {
         int count = 0;
         float amount = 0;
         for (Order order : orders) {
+            CustomerType customerType = order.getCustomer().getCustomerType();
+            boolean customerTypeExists = nexusStateRule.getCustomerTypes().contains(customerType);
+            if(!customerTypeExists){
+                log.debug("Customer of type "  + customerType + " does not exist in state rule customer types, order does not count in calculation");
+                continue;
+            }
             count += nexusOrderCountExtractor.extract(order, nexusStateRule);
             amount += nexusOrderAmountExtractor.extract(order, nexusStateRule);
         }
