@@ -24,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ItemsCheckTest {
 
-    private ItemsCheck itemsCheck;
+    private ItemStateThresholdQualifier itemStateThresholdQualifier;
 
     private List<Item> items;
     private NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
-        itemsCheck = new ItemsCheck();
+        itemStateThresholdQualifier = new ItemStateThresholdQualifier();
         items = createItems();
         nexusStateRule = createNexusStateRule();
     }
@@ -55,7 +55,7 @@ public class ItemsCheckTest {
         Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair(items,nexusStateRule);
 
         // When + Then
-        boolean doItemsCount = itemsCheck.check(nexusStateRulePair);
+        boolean doItemsCount = itemStateThresholdQualifier.check(nexusStateRulePair);
         assertFalse(doItemsCount);
     }
 
@@ -70,7 +70,7 @@ public class ItemsCheckTest {
         Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair(items,nexusStateRule);
 
         // When + Then
-        boolean doItemsCount = itemsCheck.check(nexusStateRulePair);
+        boolean doItemsCount = itemStateThresholdQualifier.check(nexusStateRulePair);
         assertTrue(doItemsCount);
     }
 
@@ -81,7 +81,7 @@ public class ItemsCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemsCheck.check(nexusStateRulePair);
+            itemStateThresholdQualifier.check(nexusStateRulePair);
         });
 
         assertEquals(nullPointerException.getMessage(), "itemsAndRule is marked non-null but is null");

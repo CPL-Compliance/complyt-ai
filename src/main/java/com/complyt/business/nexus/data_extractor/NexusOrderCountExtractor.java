@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemsCheck;
+import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
 import com.complyt.domain.Order;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 public class NexusOrderCountExtractor implements NexusDataExtractor<Integer, Order> {
 
     @NonNull
-    private ItemsCheck itemsCheck;
+    private ItemStateThresholdQualifier itemStateThresholdQualifier;
 
     @Override
     public Integer extract(@NonNull Order order, @NonNull NexusStateRule nexusStateRule) {
         final int COUNTED = 1, NOT_COUNTED = 0;
-        boolean itemsQualify = itemsCheck.check(new Pair(order.getItems(), nexusStateRule));
+        boolean itemsQualify = itemStateThresholdQualifier.check(new Pair(order.getItems(), nexusStateRule));
 
         return itemsQualify ? COUNTED : NOT_COUNTED;
     }

@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemsCheck;
+import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
@@ -38,7 +38,7 @@ public class NexusOrderCountExtractorTest {
     NexusOrderCountExtractor nexusOrderCountExtractor;
 
     @Mock
-    ItemsCheck itemsCheck;
+    ItemStateThresholdQualifier itemStateThresholdQualifier;
 
     Order order;
     NexusStateRule nexusStateRule;
@@ -104,7 +104,7 @@ public class NexusOrderCountExtractorTest {
         // Given
 
         // When
-        when(itemsCheck.check(new Pair(order.getItems(),nexusStateRule))).thenReturn(true);
+        when(itemStateThresholdQualifier.check(new Pair(order.getItems(),nexusStateRule))).thenReturn(true);
         int count = nexusOrderCountExtractor.extract(order,nexusStateRule);
 
         // Then
@@ -120,7 +120,7 @@ public class NexusOrderCountExtractorTest {
         Order otherOrder = order.withItems(items);
 
         // When
-        when(itemsCheck.check(new Pair(otherOrder.getItems(),nexusStateRule))).thenReturn(false);
+        when(itemStateThresholdQualifier.check(new Pair(otherOrder.getItems(),nexusStateRule))).thenReturn(false);
         int count = nexusOrderCountExtractor.extract(otherOrder,nexusStateRule);
 
         // Then

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class ItemsCheck implements NexusCheck<Pair<List<Item>, NexusStateRule>> {
+public class ItemStateThresholdQualifier implements NexusCheck<Pair<List<Item>, NexusStateRule>> {
 
     /*
     * Checks if there is an item from the given list that should be counted

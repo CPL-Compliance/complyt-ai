@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemsCheck;
+import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +36,7 @@ public class NexusOrderAmountExtractorTest {
     NexusOrderAmountExtractor nexusOrderAmountExtractor;
 
     @Mock
-    ItemsCheck itemsCheck;
+    ItemStateThresholdQualifier itemStateThresholdQualifier;
 
     Order order;
     NexusStateRule nexusStateRule;
@@ -106,8 +105,8 @@ public class NexusOrderAmountExtractorTest {
         // Given
 
         // When
-        when(itemsCheck.isCounted(order.getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(itemsCheck.isCounted(order.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(itemStateThresholdQualifier.isCounted(order.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(itemStateThresholdQualifier.isCounted(order.getItems().get(1), nexusStateRule)).thenReturn(false);
         float amount = nexusOrderAmountExtractor.extract(order, nexusStateRule);
 
         // Then
