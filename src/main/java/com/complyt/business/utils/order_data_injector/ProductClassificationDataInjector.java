@@ -13,7 +13,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Slf4j
-public class ProductClassificationDataInjector implements OrderDataInjector<ProductClassification> {
+public class ProductClassificationDataInjector implements OrderDataInjector<Map<String, ProductClassification>> {
 
     @NonNull
     private final Order order;

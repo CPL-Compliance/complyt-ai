@@ -19,7 +19,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class OrderTangibleCategoryInjector implements OrderDataInjector<ProductClassification> {
+public class OrderTangibleCategoryInjector implements OrderDataInjector<Map<String, ProductClassification>> {
     @NonNull
     private final Order order;
 

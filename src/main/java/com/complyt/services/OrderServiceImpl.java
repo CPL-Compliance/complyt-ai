@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> findById(String id) {
+    public Mono<Order> findById(@NonNull String id) {
         return orderRepository.findById(id);
     }
 

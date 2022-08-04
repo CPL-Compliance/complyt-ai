@@ -28,7 +28,7 @@ public class SalesTaxTrackingRepository {
                     Query query = Query.query(Criteria.where("state.abbreviation").is(state)
                             .and("clientId").is(user.getClientId()));
 
-                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class);
+                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
                 });
     }
 

@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -10,18 +11,18 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.county_injector.CountyInjector;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 
 @Service
 @AllArgsConstructor
@@ -40,20 +41,28 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
+    @NonNull
+    private SalesTaxApplyCheck salesTaxApplyCheck;
+
+    @NonNull
+    @Qualifier("fastTaxCountyInjector")
+    private CountyInjector countyInjector;
+
     @Override
     public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
-        LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
-        boolean isApplied = referenceDate.compareTo(applicationDate) >= 0;
+        boolean isApplied = salesTaxApplyCheck.isApplied(order, salesTaxTracking);
 
-        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(order) : Mono.just(order);
+        return isApplied ? injectCountyToOrderAndCalculate(order) : Mono.just(order);
     }
 
     @Override
-    public Mono<Order> calculate(@NonNull Order order) {
+    public Mono<Order> injectCountyToOrderAndCalculate(@NonNull Order order) {
         return findByAddress(order.getShippingAddress())
-                .map(this::salesTaxDataToSalesTaxRate)
-                .map(injectSalesTaxToOrder(order));
+                .map(salesTaxData -> {
+                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
+                    Order orderWithCounty = countyInjector.inject(order, salesTaxData);
+                    return injectSalesTaxToOrder(orderWithCounty).apply(salesTaxRate);
+                });
     }
 
     @Override

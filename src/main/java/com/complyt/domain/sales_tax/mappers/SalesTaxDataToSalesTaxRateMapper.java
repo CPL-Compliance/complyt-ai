@@ -1,6 +1,5 @@
 package com.complyt.domain.sales_tax.mappers;
 
-
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import org.mapstruct.Mapper;

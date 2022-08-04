@@ -55,6 +55,6 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .withAppliedDate(appliedDate);
 
         log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
-        return save(modifiedTracking).log();
+        return save(modifiedTracking);
     }
 }

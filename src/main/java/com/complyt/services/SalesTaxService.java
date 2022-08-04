@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface SalesTaxService {
     float calculateSalesTaxAmount(List<Item> items);
-    Mono<Order> calculate(Order order);
+    Mono<Order> injectCountyToOrderAndCalculate(Order order);
     Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking);
 }
