@@ -5,6 +5,7 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,10 @@ class FastTaxCountyInjectorTest {
 
     @Test
     void inject_InjectsCounty_ReturnsOrder() {
+        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>(){{add(new TaxInfoItem());}};
+        FastTaxData fastTaxData = new FastTaxData("0",taxInfoItems);
+        Order actualOrder = fastTaxCountyInjector.inject(order,fastTaxData);
 
+        assertEquals(actualOrder.getShippingAddress().getCounty(),null);
     }
 }
