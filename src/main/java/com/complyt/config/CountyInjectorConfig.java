@@ -1,6 +1,6 @@
 package com.complyt.config;
 
-import com.complyt.domain.sales_tax.county_injector.FastTaxCountyInjector;
+import com.complyt.business.utils.order_data_injector.FastTaxCountyInjector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 

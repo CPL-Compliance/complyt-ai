@@ -11,7 +11,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.county_injector.CountyInjector;
+import com.complyt.business.utils.order_data_injector.CountyInjector;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -45,7 +45,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxApplyCheck salesTaxApplyCheck;
 
     @NonNull
-    @Qualifier("fastTaxCountyInjector")
     private CountyInjector countyInjector;
 
     @Override
