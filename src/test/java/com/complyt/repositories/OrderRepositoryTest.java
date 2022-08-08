@@ -2,6 +2,9 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
+import com.complyt.domain.CustomerType;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.security.User;
 import org.bson.types.ObjectId;
@@ -21,6 +24,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +55,11 @@ class OrderRepositoryTest {
         ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
         user = User.builder().username("user").password("password").clientId(clientId).build();
 
+        order = createOrder();
+        customer = new Customer(order.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", order.getShippingAddress(),clientId,CustomerType.RETAIL);
+    }
+
+    private Order createOrder() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
@@ -57,9 +67,8 @@ class OrderRepositoryTest {
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0));
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
-        customer = new Customer(id, externalId, "customer", shippingAddress,clientId);
+        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, user.getClientId(),  null,null);
     }
 
     @Test
@@ -67,7 +76,7 @@ class OrderRepositoryTest {
         // Given
         reactiveMongoTemplate = null;
 
-        // Then
+        // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             OrderRepository orderRepository = new OrderRepository(reactiveMongoTemplate);
         });
@@ -191,7 +200,34 @@ class OrderRepositoryTest {
         when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
 
-        Flux<Order> orderFlux = orderRepository.find();
+        Flux<Order> orderFlux = orderRepository.findAll();
+
+        //Then
+        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrder.withCustomer(customer)).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findAllByQuery_twoOrdersMatch_returnsTwoOrders() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        Order secondOrder = order.withExternalId(externalId).withCustomerId(customerId);
+        List<Order> allOrders = new ArrayList<Order>() {{
+            add(order);
+            add(secondOrder);
+        }};
+        LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
+        LocalDateTime end = start.plusYears(1);
+        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+                .gte(start).lte(end));
+
+        //When
+        when(reactiveMongoTemplate.find(query, Order.class)).thenReturn(Flux.fromIterable(allOrders));
+        when(reactiveMongoTemplate.findById(order.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(secondOrder.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+
+        Flux<Order> orderFlux = orderRepository.findAllByQuery(query);
 
         //Then
         StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer),secondOrder.withCustomer(customer)).verifyComplete();

@@ -10,9 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(name = "State")
 public class StateDto {
-    private double salesTaxRate;
     private String abbreviation;
     private String code;
     private String name;
-    private List<NexusDto> nexuses;
 }

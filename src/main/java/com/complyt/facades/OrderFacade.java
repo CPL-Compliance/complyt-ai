@@ -1,9 +1,9 @@
 package com.complyt.facades;
 
-import com.complyt.business.order.OrderJurisdictionalRulesInjector;
 import com.complyt.domain.Order;
 import com.complyt.services.OrderService;
-import com.complyt.services.ProductClassificationService;
+import com.complyt.services.SalesTaxService;
+import com.complyt.services.nexus.NexusService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -12,48 +12,39 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
 @AllArgsConstructor
 @Slf4j
+@Component
 public class OrderFacade {
-    @Qualifier("orderServiceImpl")
     @NonNull
+    @Qualifier("orderServiceImpl")
     private OrderService orderService;
 
-    @Qualifier("productClassificationServiceImpl")
     @NonNull
-    private ProductClassificationService productClassificationService;
+    @Qualifier("salesTaxServiceImpl")
+    private SalesTaxService salesTaxService;
 
-    public Mono<Order> upsert(@NonNull String externalId, Order order) {
-        return orderService.upsert(externalId, order);
-    }
+    @NonNull
+    private NexusService nexusService;
 
     public Mono<Order> saveOrder(Order order) {
-        return calculateSalesTax(order)
-                .flatMap(this::save);
+        return orderService.injectDataToNewOrder(order)
+                .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
+                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(orderService::save) :
+                                orderService.save(setOrder).flatMap(nexusService::calculateNexusTracking).thenReturn(setOrder)));
     }
 
-    public Mono<Order> updateIfModified(@NonNull String externalId, Order order) {
+    public Mono<Order> updateIfModified(@NonNull String externalId, Order newOrder) {
         return findByExternalId(externalId)
-                .flatMap(orderItem -> orderItem.equals(order) ?
-                        Mono.just(order) :
-                        calculateSalesTax(order).log()
-                                .flatMap(updatedOrder -> update(externalId, updatedOrder))
-                );
-    }
-
-    private Mono<Order> calculateSalesTax(Order order) {
-        return productClassificationService
-                .setJurisdictionalRules(new OrderJurisdictionalRulesInjector(order))
-                .flatMap(orderService::calculate).log();
-    }
-
-    public Mono<Order> save(Order order) {
-        return orderService.save(order);
-    }
-
-    public Mono<Order> update(@NonNull String externalId, Order order) {
-        return orderService.update(externalId, order);
+                .flatMap(oldOrder ->
+                        oldOrder.equals(newOrder) ?
+                                Mono.just(newOrder) :
+                                orderService.injectDataToModifiedOrder(newOrder, oldOrder)
+                                        .flatMap(setOrder -> nexusService.findTrackingByState(setOrder)
+                                                .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                                        salesTaxService.handleSalesTaxCalculation(setOrder, salesTaxTracking).flatMap(updatedOrder -> orderService.update(externalId, updatedOrder)) :
+                                                        orderService.update(externalId, setOrder).flatMap(nexusService::calculateNexusTracking).thenReturn(setOrder))));
     }
 
     public Mono<Order> findByExternalId(String externalId) {

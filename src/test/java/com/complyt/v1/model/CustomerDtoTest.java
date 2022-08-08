@@ -1,5 +1,6 @@
 package com.complyt.v1.model;
 
+import com.complyt.domain.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +24,8 @@ public class CustomerDtoTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address);
-        anotherCustomerDto = new CustomerDto(customerDto.getId(),customerDto.getExternalId(),customerDto.getName(),customerDto.getAddress());
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
+        anotherCustomerDto = new CustomerDto(customerDto.getId(),customerDto.getExternalId(),customerDto.getName(),customerDto.getAddress(), customerDto.getCustomerType());
     }
 
     @Test
@@ -39,7 +40,7 @@ public class CustomerDtoTest {
 
     @Test
     void testToString() {
-        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ")";
+        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ", customerType=" + customerDto.getCustomerType() + ")";
 
         assertEquals(referenceString, customerDto.toString());
     }

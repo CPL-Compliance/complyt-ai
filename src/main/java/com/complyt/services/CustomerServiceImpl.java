@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.domain.Customer;
-import com.complyt.domain.Order;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -42,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findByName(name);
     }
 
+    @Override
     public Mono<Customer> findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }

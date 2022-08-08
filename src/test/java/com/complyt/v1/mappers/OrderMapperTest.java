@@ -4,6 +4,9 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
+import com.complyt.domain.CustomerType;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.v1.model.OrderDto;
 import org.bson.types.ObjectId;
@@ -26,12 +29,12 @@ class OrderMapperTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
+                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };
 
-        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId);
+        Order order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, OrderStatus.ACTIVE, clientId,  null,null);
         OrderDto orderDto = OrderMapper.INSTANCE.orderToOrderDto(order);
 
     }

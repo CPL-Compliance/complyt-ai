@@ -1,11 +1,13 @@
 package com.complyt.services;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
-import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.business.utils.date_injector.ModifiedOrderInternalDateInjector;
+import com.complyt.business.utils.date_injector.NewOrderInternalDateInjector;
+import com.complyt.domain.*;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.repositories.OrderRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,18 +17,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -40,14 +45,14 @@ class OrderServiceImplTest {
     OrderRepository orderRepository;
 
     @Mock
-    SalesTaxService salesTaxService;
+    ProductClassificationServiceImpl productClassificationService;
 
     Order order;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        String id = UUID.randomUUID().toString();
+        String id = null;
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -56,12 +61,33 @@ class OrderServiceImplTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
-        ));
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                ));
             }
         };
+        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
 
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId);
+        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, timeStamps, timeStamps);
+    }
+
+    private Order createOrderWithProductClassificationData() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+
+        Item item = order.getItems().get(0)
+                .withTaxableCategory(TaxableCategory.TAXABLE)
+                .withTangibleCategory(TangibleCategory.TANGIBLE)
+                .withJurisdictionalSalesTaxRules(rules);
+
+        List<Item> modifiedItems = new ArrayList<Item>() {{
+            add(item);
+        }};
+        return order.withItems(modifiedItems);
+
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
     }
 
     @Test
@@ -74,50 +100,6 @@ class OrderServiceImplTest {
 
         // Then
         StepVerifier.create(orderMono).expectNext(order).verifyComplete();
-    }
-
-    @Test
-    void calculate_SalesTaxCalculated_ModifiedOrderReturned() {
-        // Given
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-        SalesTax salesTax = new SalesTax(1000, salesTaxRate);
-        Order orderWithSalesTax = order.withSalesTax(salesTax);
-
-        // When
-        when(salesTaxService.calculate(order)).thenReturn(Mono.just(orderWithSalesTax));
-        Mono<Order> orderMono = orderService.calculate(order);
-
-        // Then
-        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
-    }
-
-    @Test
-    void upsertOrder_OrderInserted_OrderReturned() {
-        // Given
-        String externalId = order.getExternalId();
-
-        // When
-        when(orderRepository.findByExternalId(externalId)).thenReturn(Mono.just(order));
-        when(orderRepository.save(order)).thenReturn(Mono.just(order));
-        Mono<Order> orderMono = orderService.upsert(externalId, order);
-
-        // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
-    }
-
-    @Test
-    void upsertOrder_NullGiven_NullPointerExceptionThrown() {
-        // Given
-        String externalId = "";
-        Order order = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderService.upsert(externalId, order);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
     }
 
     @Test
@@ -169,7 +151,7 @@ class OrderServiceImplTest {
         Order secondOrder = order.withExternalId(externalId);
 
         //When
-        when(orderRepository.find()).thenReturn(Flux.just(order, secondOrder));
+        when(orderRepository.findAll()).thenReturn(Flux.just(order, secondOrder));
         Flux<Order> orderFlux = orderService.findAll();
 
         //Then
@@ -205,7 +187,7 @@ class OrderServiceImplTest {
 
 
     @Test
-    void update_OrderUpdated_OrderReturned() throws InterruptedException {
+    void update_OrderUpdated_OrderReturned() {
         // Given
         String externalId = order.getExternalId();
 
@@ -249,62 +231,19 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void saveOrders_NullGiven_ThrowsException() {
+    void markAsCancelled_NullExternalIdPassed_ThrowsException() throws InterruptedException {
         // Given
-        List<ObjectId> nullOrders = null;
+        String nullExternalId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            orderService.save(nullOrders);
+            orderService.markAsCancelled(nullExternalId);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "orders is marked non-null but is null");
-    }
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
 
-    @Test
-    void saveOrders_OrdersListGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        List<ObjectId> orders = new ArrayList<ObjectId>() {{
-            add(new ObjectId());
-            add(new ObjectId());
-        }};
 
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.save(orders);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "save isn't implemented yet");
-    }
-
-    @Test
-    void findByName_NameGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.findByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findByName isn't implemented");
-    }
-
-    @Test
-    void findOneByName_NameGiven_ThrowsUnsupportedOperationException() {
-        // Given
-        String name = "name";
-
-        // When
-        UnsupportedOperationException nullPointerException = assertThrows(UnsupportedOperationException.class, () -> {
-            orderService.findOneByName(name);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "findOneByName isn't implemented");
     }
 
     @Test
@@ -318,11 +257,180 @@ class OrderServiceImplTest {
         }};
 
         // When
-        when(orderRepository.find()).thenReturn(Flux.fromIterable(orders));
+        when(orderRepository.findAll()).thenReturn(Flux.fromIterable(orders));
         Flux<Order> orderFlux = orderService.findAll();
 
         // Then
-        StepVerifier.create(orderFlux).expectNext(order,anotherOrderWithSameClientId).verifyComplete();
-
+        StepVerifier.create(orderFlux).expectNext(order, anotherOrderWithSameClientId).verifyComplete();
     }
+
+    @Test
+    void getOrdersByQuery_TwoOrdersMatch_returnsTwoOrders() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", order.getShippingAddress(), new ObjectId(), CustomerType.RETAIL);
+
+        Order orderWithCustomer = order.withCustomer(customer);
+        Order secondOrderWithCustomer = order.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
+
+        List<Order> allOrders = new ArrayList<Order>() {{
+            add(orderWithCustomer);
+            add(secondOrderWithCustomer);
+        }};
+        LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
+        LocalDateTime end = start.plusYears(1);
+        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+                .gte(start).lte(end));
+
+        // When
+        when(orderRepository.findAllByQuery(query)).thenReturn(Flux.fromIterable(allOrders));
+        Flux<Order> orderFlux = orderService.getOrdersByQuery(query);
+
+        // Then
+        StepVerifier.create(orderFlux).expectNext(order.withCustomer(customer), secondOrderWithCustomer).verifyComplete();
+    }
+
+    @Test
+    void getOrdersByQuery_NullQueryPassed_ThrowsException() {
+        // Given
+        Query nullQuery = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.getOrdersByQuery(nullQuery);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "query is marked non-null but is null");
+    }
+
+    @Test
+    void createUpdateOrderFunction_NullOrderPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Order nullOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.update(externalId, nullOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewOrder_InjectsDateToNewOrder_ReturnsOrder() {
+        // Given
+        Order orderWithProductClassification = createOrderWithProductClassificationData();
+        NewOrderInternalDateInjector injector = new NewOrderInternalDateInjector(orderWithProductClassification);
+        Order orderWithUpdatedDates = injector.inject();
+
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(order))
+                .thenReturn(Mono.just(orderWithProductClassification));
+        Mono<Order> orderMono = orderService.injectDataToNewOrder(order);
+
+        // Then
+        StepVerifier.create(orderMono)
+                .expectNextMatches(order -> {
+                    LocalDateTime expectedCreatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime expectedUpdatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+                    LocalDateTime actualCreatedDateTime = order.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime actualUpdatedDateTime = order.getInternalTimeStamps().getUpdatedDate();
+
+
+                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() ;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void injectDataToModifiedOrder_InjectsDateToModifiedOrder_ReturnsOrder() {
+        // Given
+        Order newOrder = order.withBillingAddress(order.getBillingAddress().withCity("someCity"));
+        Order orderWithProductClassification = createOrderWithProductClassificationData();
+        ModifiedOrderInternalDateInjector injector = new ModifiedOrderInternalDateInjector(orderWithProductClassification);
+        Order orderWithUpdatedDates = injector.inject();
+
+        // When
+        when(productClassificationService.getOrderWithRelevantProductClassificationData(newOrder))
+                .thenReturn(Mono.just(orderWithProductClassification));
+        Mono<Order> orderMono = orderService.injectDataToModifiedOrder(newOrder,order);
+
+        // Then
+        StepVerifier.create(orderMono)
+                .expectNextMatches(order -> {
+                    LocalDateTime expectedCreatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime expectedUpdatedDateTime = orderWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+                    LocalDateTime actualCreatedDateTime = order.getInternalTimeStamps().getCreatedDate();
+                    LocalDateTime actualUpdatedDateTime = order.getInternalTimeStamps().getUpdatedDate();
+
+
+                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() ;
+                })
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void injectDataToModifiedOrder_NullNewOrderPassed_ThrowsException() {
+        // Given
+        Order nullNewOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToModifiedOrder(nullNewOrder,order);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newOrder is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToModifiedOrder_NullOldOrderPassed_ThrowsException() {
+        // Given
+        Order nullOldOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToModifiedOrder(order,nullOldOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "oldOrder is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewOrder_NullOrderPassed_ThrowsException() {
+        // Given
+        Order nullOrder = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            orderService.injectDataToNewOrder(nullOrder);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+    }
+
 }

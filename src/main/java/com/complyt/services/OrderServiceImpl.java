@@ -1,19 +1,20 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.date_injector.ModifiedOrderInternalDateInjector;
+import com.complyt.business.utils.date_injector.NewOrderInternalDateInjector;
 import com.complyt.domain.Order;
 import com.complyt.domain.OrderStatus;
 import com.complyt.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -25,13 +26,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
 
     @NonNull
-    @Qualifier("salesTaxServiceImpl")
-    private SalesTaxService salesTaxService;
-
-    @Override
-    public Mono<Order> calculate(Order order) {
-        return salesTaxService.calculate(order);
-    }
+    @Qualifier("productClassificationServiceImpl")
+    private ProductClassificationService productClassificationService;
 
     @Override
     public Mono<Order> save(Order order) {
@@ -43,19 +39,27 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByExternalId(externalId);
     }
 
-    @Override
-    public Mono<Order> upsert(@NonNull String externalId, @NonNull Order order) {
-        return orderRepository.findByExternalId(externalId)
-                .switchIfEmpty(orderRepository.save(order))
+    public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
+        return orderRepository.findByExternalId(externalId).log()
+                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
                 .map(createUpdateOrderFunction(order))
                 .flatMap(orderRepository::save);
     }
 
-    public Mono<Order> update(@NonNull final String externalId, @NonNull final Order order) {
-            return orderRepository.findByExternalId(externalId).log()
-                .switchIfEmpty(Mono.error(new NotFoundException("No Order with externalId " + externalId)))
-                .map(createUpdateOrderFunction(order))
-                .flatMap(orderRepository::save);
+    @Override
+    public Mono<Order> injectDataToModifiedOrder(@NonNull Order newOrder, @NonNull Order oldOrder) {
+        Order newOrderWithInternalTimeStamps = newOrder.withInternalTimeStamps(oldOrder.getInternalTimeStamps());
+
+        return productClassificationService.getOrderWithRelevantProductClassificationData(newOrderWithInternalTimeStamps)
+                .map(ModifiedOrderInternalDateInjector::new)
+                .map(ModifiedOrderInternalDateInjector::inject);
+    }
+
+    @Override
+    public Mono<Order> injectDataToNewOrder(@NonNull Order order) {
+        return productClassificationService.getOrderWithRelevantProductClassificationData(order)
+                .map(NewOrderInternalDateInjector::new)
+                .map(NewOrderInternalDateInjector::inject);
     }
 
     @Override
@@ -64,39 +68,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Mono<Order> markAsCancelled(String externalId) {
+    public Mono<Order> markAsCancelled(@NonNull String externalId) {
         return orderRepository
                 .findByExternalId(externalId)
                 .map(order -> order.withOrderStatus(OrderStatus.CANCELLED))
                 .flatMap(orderRepository::save);
     }
 
+    @Override
+    public Flux<Order> getOrdersByQuery(@NonNull Query query) {
+        return orderRepository.findAllByQuery(query);
+    }
+
     public Flux<Order> findAll() {
-        return orderRepository.find();
-    }
-
-    @Override
-    public void save(@NonNull List<ObjectId> orders) {
-        throw new UnsupportedOperationException("save isn't implemented yet");
-    }
-
-    @Override
-    public Flux<Order> findByName(String name) {
-        throw new UnsupportedOperationException("findByName isn't implemented");
-    }
-
-    @Override
-    public Mono<Order> findOneByName(String name) {
-        throw new UnsupportedOperationException("findOneByName isn't implemented");
+        return orderRepository.findAll();
     }
 
     private Function<Order, Order> createUpdateOrderFunction(@NonNull final Order order) {
         return orderInfo -> orderInfo.withExternalId(order.getExternalId())
+                .withItems(order.getItems())
                 .withBillingAddress(order.getBillingAddress())
                 .withShippingAddress(order.getShippingAddress())
                 .withCustomerId(order.getCustomerId())
-                .withItems(order.getItems())
+                .withSalesTax(order.getSalesTax())
                 .withOrderStatus(order.getOrderStatus())
-                .withSalesTax(order.getSalesTax());
+                .withInternalTimeStamps(order.getInternalTimeStamps())
+                .withExternalTimeStamps(order.getExternalTimeStamps());
     }
 }
