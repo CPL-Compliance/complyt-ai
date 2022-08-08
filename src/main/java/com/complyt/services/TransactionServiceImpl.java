@@ -1,24 +1,33 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
+import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.bson.types.ObjectId;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TransactionServiceImpl implements TransactionService {
+
     @NonNull
     private TransactionRepository transactionRepository;
+
+    @NonNull
+    @Qualifier("productClassificationServiceImpl")
+    private ProductClassificationService productClassificationService;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -30,19 +39,27 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findByExternalId(externalId);
     }
 
-    @Override
-    public Mono<Transaction> upsert(@NonNull String externalId, @NonNull Transaction transaction) {
-        return transactionRepository.findByExternalId(externalId)
-                .switchIfEmpty(transactionRepository.save(transaction))
+    public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
+        return transactionRepository.findByExternalId(externalId).log()
+                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
                 .map(createUpdateTransactionFunction(transaction))
                 .flatMap(transactionRepository::save);
     }
 
-    public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
-            return transactionRepository.findByExternalId(transaction.getExternalId())
-                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId" + externalId)))
-                .map(createUpdateTransactionFunction(transaction))
-                .flatMap(transactionRepository::save);
+    @Override
+    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction) {
+        Transaction newTransactionWithInternalTimeStamps = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps());
+
+        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
+                .map(ModifiedTransactionInternalDateInjector::new)
+                .map(ModifiedTransactionInternalDateInjector::inject);
+    }
+
+    @Override
+    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
+        return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
+                .map(NewTransactionInternalDateInjector::new)
+                .map(NewTransactionInternalDateInjector::inject);
     }
 
     @Override
@@ -51,39 +68,31 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> markAsCancelled(String externalId) {
+    public Mono<Transaction> markAsCancelled(@NonNull String externalId) {
         return transactionRepository
                 .findByExternalId(externalId)
                 .map(transaction -> transaction.withTransactionStatus(TransactionStatus.CANCELLED))
                 .flatMap(transactionRepository::save);
     }
 
+    @Override
+    public Flux<Transaction> getTransactionsByQuery(@NonNull Query query) {
+        return transactionRepository.findAllByQuery(query);
+    }
+
     public Flux<Transaction> findAll() {
-        return transactionRepository.find();
-    }
-
-    @Override
-    public void save(@NonNull List<ObjectId> transactions) {
-        throw new UnsupportedOperationException("save isn't implemented yet");
-    }
-
-    @Override
-    public Flux<Transaction> findByName(String name) {
-        throw new UnsupportedOperationException("findByName isn't implemented");
-    }
-
-    @Override
-    public Mono<Transaction> findOneByName(String name) {
-        throw new UnsupportedOperationException("findOneByName isn't implemented");
+        return transactionRepository.findAll();
     }
 
     private Function<Transaction, Transaction> createUpdateTransactionFunction(@NonNull final Transaction transaction) {
         return transactionInfo -> transactionInfo.withExternalId(transaction.getExternalId())
+                .withItems(transaction.getItems())
                 .withBillingAddress(transaction.getBillingAddress())
                 .withShippingAddress(transaction.getShippingAddress())
                 .withCustomerId(transaction.getCustomerId())
-                .withItems(transaction.getItems())
+                .withSalesTax(transaction.getSalesTax())
                 .withTransactionStatus(transaction.getTransactionStatus())
-                .withSalesTax(transaction.getSalesTax());
+                .withInternalTimeStamps(transaction.getInternalTimeStamps())
+                .withExternalTimeStamps(transaction.getExternalTimeStamps());
     }
 }

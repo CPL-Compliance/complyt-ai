@@ -41,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findByName(name);
     }
 
+    @Override
     public Mono<Customer> findOneByName(@NonNull String name) {
         return customerRepository.findOneByName(name);
     }

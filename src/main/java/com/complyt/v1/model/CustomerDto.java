@@ -14,4 +14,5 @@ public class CustomerDto {
     private String externalId;
     private String name;
     private AddressDto address;
+    private CustomerTypeDto customerType;
 }

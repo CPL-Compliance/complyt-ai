@@ -27,4 +27,6 @@ public class Transaction {
     private SalesTax salesTax;
     private TransactionStatus transactionStatus;
     private ObjectId clientId;
+    private TimeStamps internalTimeStamps;
+    private TimeStamps externalTimeStamps;
 }

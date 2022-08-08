@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.domain.Transaction;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
@@ -10,7 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
-@Log
+@Slf4j
 @Tag(name = "Transaction", description = "This is the Transaction controller")
 @RestController
 @RequestMapping(TransactionController.BASE_URL)
@@ -27,7 +28,7 @@ public class TransactionController {
     public static final String BASE_URL = "/v1/transactions";
 
     @NonNull
-    private final TransactionFacade transactionFacade;
+    private TransactionFacade transactionFacade;
 
     @Operation(summary = "Gets transaction by externalId")
     @TransactionReadPermission
@@ -44,27 +45,23 @@ public class TransactionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<TransactionDto> getAll() {
-        return transactionFacade.getAll().map(transaction -> TransactionMapper.INSTANCE.transactionToTransactionDto(transaction));
+        return transactionFacade.getAll().map(TransactionMapper.INSTANCE::transactionToTransactionDto);
     }
 
     @Operation(summary = "This will update the transaction if found by externalId, otherwise it will create it")
     @TransactionUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<TransactionDto>> update(@PathVariable("externalId") @NonNull String externalId,
+    public Mono<ResponseEntity<TransactionDto>> upsert(@PathVariable("externalId") @NonNull String externalId,
                                                        @RequestBody @NonNull TransactionDto transactionDto) {
-        return transactionFacade.upsert(externalId, TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))
-                .map(transaction -> ResponseEntity.ok().body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction)));
-    }
+        log.debug("Upsert transaction - DTO received in request body : " + transactionDto);
+        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
 
-    @Operation(summary = "This will calculate Sales Tax and update the Transaction by the External ID")
-    @TransactionUpdatePermission
-    @PutMapping("{externalId}/salesTax")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<TransactionDto>> updateSalesTax(@PathVariable("externalId") @NonNull String externalId) {
-        return transactionFacade.updateSalesTax(externalId)
-                .map(transaction -> ResponseEntity.ok().body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction)))
-                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+        return transactionFacade.findByExternalId(externalId)
+                .flatMap(transaction -> transactionFacade.updateIfModified(externalId, mappedTransaction))
+                .map(transactionItem -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem))).log()
+                .switchIfEmpty(transactionFacade.saveTransaction(mappedTransaction)
+                        .map(transaction -> ResponseEntity.status(HttpStatus.CREATED).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction)))).log();
     }
 
     @Operation(summary = "Marks the transaction as cancelled")
@@ -72,6 +69,8 @@ public class TransactionController {
     @DeleteMapping("{externalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity> delete(@PathVariable("externalId") @NonNull String externalId) {
-        return transactionFacade.markAsCancelled(externalId).map(transaction -> ResponseEntity.noContent().build());
+        log.debug("Delete transaction - external id received as path variable : " + externalId);
+
+        return transactionFacade.markAsCancelled(externalId).log().map(transaction -> ResponseEntity.noContent().build());
     }
 }

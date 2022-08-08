@@ -1,16 +1,22 @@
 package com.complyt.services;
 
 import com.complyt.domain.Transaction;
+import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
-import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Query;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface TransactionService extends CrudService<Transaction, String> {
-    void save(List<ObjectId> transactions);
     Mono<Transaction> findByExternalId(@NonNull final String externalId);
-    Mono<Transaction> upsert(@NonNull final String externalId, @NonNull final Transaction transaction);
+
     Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction);
-    Mono<Transaction> markAsCancelled(@NonNull final  String transactionId);
+
+    Mono<Transaction> markAsCancelled(@NonNull final String transactionId);
+
+    Flux<Transaction> getTransactionsByQuery(@NonNull Query query);
+
+    Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
+
+    Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
 }

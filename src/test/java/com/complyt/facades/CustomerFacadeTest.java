@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Customer;
+import com.complyt.domain.CustomerType;
 import com.complyt.services.CustomerService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,10 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -46,7 +46,7 @@ class CustomerFacadeTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address,clientId);
+        customer = new Customer(id, externalId, name, address,clientId, CustomerType.RETAIL);
     }
 
     @Test
@@ -66,39 +66,25 @@ class CustomerFacadeTest {
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() throws InterruptedException {
         // Given
-        AtomicReference<Customer> atomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(customerService.save(customer)).thenReturn(Mono.just(customer));
-        customerFacade.save(customer).subscribe(returnedCustomer -> {
-            atomicReference.set(returnedCustomer);
-            countDownLatch.countDown();
-        });
+        Mono<Customer> customerMono = customerFacade.save(customer);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(atomicReference.get());
-        assertEquals(customer, atomicReference.get());
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
     void upsertCustomer_CustomerInserted_CustomerReturned() throws InterruptedException {
         // Given
-        AtomicReference<Customer> atomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         // When
         when(customerService.upsert(customer)).thenReturn(Mono.just(customer));
-        customerFacade.upsert(customer).subscribe(returnedCustomer -> {
-            atomicReference.set(returnedCustomer);
-            countDownLatch.countDown();
-        });
+        Mono<Customer> customerMono = customerFacade.upsert(customer);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(atomicReference.get());
-        assertEquals(customer, atomicReference.get());
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
@@ -119,21 +105,14 @@ class CustomerFacadeTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);
-        AtomicReference<Customer> atomicReference = new AtomicReference<>();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+
 
         // When
         when(customerService.findByExternalId(id)).thenReturn(Mono.just(customerToSearchFor));
-        customerFacade.findByExternalId(id).subscribe(returnedCustomer -> {
-            atomicReference.set(returnedCustomer);
-            countDownLatch.countDown();
-        });
+        Mono<Customer> customerMono = customerFacade.findByExternalId(id);
 
         // Then
-        countDownLatch.await();
-        assertNotNull(atomicReference.get());
-        assertEquals(atomicReference.get().getExternalId(), id);
-        assertEquals(customerToSearchFor, atomicReference.get());
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
     @Test

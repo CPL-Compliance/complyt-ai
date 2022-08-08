@@ -1,10 +1,10 @@
 package com.complyt.domain.sales_tax.product_classification;
 
+import com.complyt.domain.nexus.enums.TangibleCategory;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -20,4 +20,5 @@ public class ProductClassification {
     private final String description;
     private final String title;
     private final Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
+    private TangibleCategory tangibleCategory;
 }

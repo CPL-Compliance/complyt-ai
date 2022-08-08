@@ -6,6 +6,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @With
+@ToString
 @EqualsAndHashCode
 @Schema(name = "Address")
 public class AddressDto {

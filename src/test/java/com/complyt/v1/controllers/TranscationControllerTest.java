@@ -5,6 +5,9 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.v1.mappers.TransactionMapper;
@@ -64,8 +67,8 @@ class TransactionControllerTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
-                    ));
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                ));
             }
         };
 
@@ -91,21 +94,23 @@ class TransactionControllerTest {
         // When
 
         // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new TransactionController(facade);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> new TransactionController(facade));
 
         assertEquals(nullPointerException.getMessage(), "transactionFacade is marked non-null but is null");
     }
 
     @WithUserDetails()
     @Test
-    void update_NewTransactionCreated_SavesTransaction() {
+    void upsert_NewTransactionCreated_ReturnsStatus201Created() {
         // Given
-        when(transactionFacade.upsert(transactionDto.getExternalId(), TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto)))
-                .thenReturn(Mono.just(transactionWithId));
+        Transaction transactionWithSalesTax = transactionWithId.withSalesTax(new SalesTax(0, new SalesTaxRate(0, 0, 0, 0, 0, 0)));
 
         // When + Then
+        when(transactionFacade.findByExternalId(transactionDto.getExternalId())).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transactionWithSalesTax));
+
+        TransactionDto transactionDtoWithSalesTax = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithSalesTax);
+
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -115,14 +120,41 @@ class TransactionControllerTest {
                 .bodyValue(transactionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDtoItem -> transactionDtoItem, equalTo(transactionDto));
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(transactionDtoWithSalesTax));
     }
 
     @WithUserDetails()
     @Test
-    void getOne_FindsTransactionWithId_ReturnsTransactionWithId() {
+    void update_TransactionExists_ReturnsStatus200() {
+        // Given
+        String externalId = transactionDto.getExternalId();
+        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        Transaction updatedTransaction = mappedTransaction.withId(transactionWithId.getId());
+
+        // When + Then
+        when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.just(transactionWithId));
+        when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, mappedTransaction)).thenReturn(Mono.just(updatedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionController.BASE_URL + "/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
+    }
+
+    @WithUserDetails()
+    @Test
+    void getOne_FindsTransaction_ReturnsTransaction() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.just(transactionWithId));
@@ -187,30 +219,6 @@ class TransactionControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
                 .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
-    }
-
-    @WithUserDetails()
-    @Test
-    void updateSalesTax_UpdatesTransaction_ReturnsStatus200() {
-        // Given
-        Transaction transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
-        TransactionDto returnedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
-
-        // When + Then
-        when(transactionFacade.upsert(transactionDto.getExternalId(),transaction)).thenReturn(Mono.just(transactionWithId));
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionController.BASE_URL + "/" + transactionDto.getExternalId())
-                        .build())
-                .bodyValue(transactionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> transactionDto, equalTo(returnedTransactionDto));
-
     }
 
     @WithUserDetails()

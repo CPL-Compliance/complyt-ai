@@ -1,57 +1,92 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.business.sales_tax.SalesTaxCalculator;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private final SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    private final SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
+    private SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @NonNull
-    private final SalesTaxCalculator salesTaxCalculator;
+    private SalesTaxCalculator salesTaxCalculator;
 
     @NonNull
-    private final SalesTaxRateCalculator jurisdictionalSalesTaxController;
+    private SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
-    public Mono<SalesTaxData> findByAddress(Address address){
+    public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
+        boolean isApplied = referenceDate.compareTo(applicationDate) >= 0;
+
+        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(transaction) : Mono.just(transaction);
+    }
+
+    @Override
+    public Mono<Transaction> calculate(@NonNull Transaction transaction) {
+        return findByAddress(transaction.getShippingAddress())
+                .map(this::salesTaxDataToSalesTaxRate)
+                .map(injectSalesTaxToTransaction(transaction));
+    }
+
+    @Override
+    public float calculateSalesTaxAmount(List<Item> items) {
+        return salesTaxCalculator.calculate(items);
+    }
+
+    private Mono<SalesTaxData> findByAddress(Address address) {
         return salesTaxWebClientWrapper.findByAddress(address);
     }
 
-    @Override
-    public SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData){
-        return salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
+    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
+        return salesTaxDataToSalesTaxRate.map(salesTaxData);
     }
 
-    @Override
-    public List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate){
+    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxRate -> {
+            log.info("Setting sales tax rates for transaction's items");
+            List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
+            Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
+
+            log.info("Calculating total sales tax amount for transaction");
+            float salesTaxAmount = calculateSalesTaxAmount(transactionWithItemsWithRates.getItems());
+            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+
+            log.debug("Transaction's sales tax : " + salesTax);
+            return transactionWithItemsWithRates.withSalesTax(salesTax);
+        };
+    }
+
+    private List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
         return items.stream()
-                .map(item -> item.withSalesTaxRate(jurisdictionalSalesTaxController.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(),salesTaxRate)))
+                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public float calculateSalesTaxAmount(List<Item> items){
-        return salesTaxCalculator.calculate(items);
     }
 }

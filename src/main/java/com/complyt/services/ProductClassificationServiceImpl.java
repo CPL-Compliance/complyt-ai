@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.domain.Transaction;
+import com.complyt.business.utils.transaction_data_injector.ProductClassificationDataInjector;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;
@@ -18,29 +19,19 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     @NonNull
     private ProductClassificationRepository productClassificationRepository;
 
-    @Override
-    public Mono<Transaction> save(Transaction object) {
-        throw new UnsupportedOperationException("save isn't implemented");
+
+    public Mono<ProductClassification> save(ProductClassification productClassification) {
+        return productClassificationRepository.save(productClassification);
     }
 
     @Override
-    public Mono<Transaction> findOneByName(@NonNull String name) {
-        throw new UnsupportedOperationException("findOneByName isn't implemented");
+    public Mono<ProductClassification> findById(@NonNull String id) {
+        return productClassificationRepository.findById(id);
     }
 
     @Override
-    public Flux<Transaction> findByName(@NonNull String name) {
-        throw new UnsupportedOperationException("findByName isn't implemented");
-    }
-
-    @Override
-    public Mono<Transaction> findById(@NonNull String id) {
-        throw new UnsupportedOperationException("findById isn't implemented");
-    }
-
-    @Override
-    public Flux<Transaction> findAll() {
-        throw new UnsupportedOperationException("findAll isn't implemented");
+    public Flux<ProductClassification> findAll() {
+        return productClassificationRepository.findAll();
     }
 
     @Override
@@ -48,8 +39,15 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return productClassificationRepository.findOneByTaxCode(taxCode);
     }
 
-    public Flux<ProductClassification> getAll() {
-        return productClassificationRepository.findAll();
+    @Override
+    public Mono<Transaction> getTransactionWithRelevantProductClassificationData(Transaction transaction) {
+        return Flux.fromIterable(transaction.getItems())
+                .flatMap(item -> getClassification(item.getTaxCode()))
+                .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
+                .flatMap(mapTaxCodesToClassifications -> new ProductClassificationDataInjector(transaction).inject(mapTaxCodesToClassifications));
     }
 
+    private Mono<ProductClassification> getClassification(String taxCode) {
+        return findOneByTaxCode(taxCode);
+    }
 }

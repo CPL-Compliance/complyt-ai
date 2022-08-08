@@ -1,14 +1,9 @@
 package com.complyt.facades;
 
-import com.complyt.business.transaction.TransactionProductClassificationInjector;
-import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.services.TransactionService;
-import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
+import com.complyt.services.TransactionService;
+import com.complyt.services.nexus.NexusService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -17,35 +12,39 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.function.Function;
-
-@Component
 @AllArgsConstructor
 @Slf4j
+@Component
 public class TransactionFacade {
-    @Qualifier("transactionServiceImpl")
     @NonNull
+    @Qualifier("transactionServiceImpl")
     private TransactionService transactionService;
 
-    @Qualifier("salesTaxServiceImpl")
     @NonNull
+    @Qualifier("salesTaxServiceImpl")
     private SalesTaxService salesTaxService;
 
-    @Qualifier("productClassificationServiceImpl")
     @NonNull
-    private ProductClassificationService productClassificationService;
+    private NexusService nexusService;
 
-    public Mono<Transaction> save(Transaction transaction) {
-        return transactionService.save(transaction);
+    public Mono<Transaction> saveTransaction(Transaction transaction) {
+        return transactionService.injectDataToNewTransaction(transaction)
+                .flatMap(setTransaction -> nexusService.findTrackingByState(setTransaction)
+                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTracking).flatMap(transactionService::save) :
+                                transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
     }
 
-    public Mono<Transaction> upsert(@NonNull String externalId, Transaction transaction) {
-        return transactionService.upsert(externalId, transaction);
-    }
-
-    public Mono<Transaction> update(@NonNull String externalId, Transaction transaction) {
-        return transactionService.update(externalId, transaction);
+    public Mono<Transaction> updateIfModified(@NonNull String externalId, Transaction newTransaction) {
+        return findByExternalId(externalId)
+                .flatMap(oldTransaction ->
+                        oldTransaction.equals(newTransaction) ?
+                                Mono.just(newTransaction) :
+                                transactionService.injectDataToModifiedTransaction(newTransaction, oldTransaction)
+                                        .flatMap(setTransaction -> nexusService.findTrackingByState(setTransaction)
+                                                .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
+                                                        salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTracking).flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction)) :
+                                                        transactionService.update(externalId, setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction))));
     }
 
     public Mono<Transaction> findByExternalId(String externalId) {
@@ -54,46 +53,6 @@ public class TransactionFacade {
 
     public Flux<Transaction> getAll() {
         return transactionService.findAll();
-    }
-
-    public Mono<Transaction> updateSalesTax(String externalId) {
-        return transactionService
-                .findByExternalId(externalId)
-                .map(TransactionProductClassificationInjector::new)
-                .flatMap(injectRulesToTransactionItems())
-                .flatMap(setSalesTaxToTransaction())
-                .flatMap(transaction -> transactionService.update(externalId, transaction));
-    }
-
-    private Function<TransactionProductClassificationInjector, Mono<Transaction>> injectRulesToTransactionItems() {
-        return transactionProductClassificationInjector -> Flux.fromIterable(transactionProductClassificationInjector.getTransaction().getItems())
-                .flatMap(item -> getClassification(item.getTaxCode()))
-                .collectMap(productClassification -> productClassification.getTaxCode(), productClassification -> productClassification)
-                .flatMap(transactionProductClassificationInjector::act);
-    }
-
-    private Function<Transaction, Mono<Transaction>> setSalesTaxToTransaction() {
-        return transaction -> salesTaxService.findByAddress(transaction.getShippingAddress())
-                .map(salesTaxData -> salesTaxService.salesTaxDataToSalesTaxRate(salesTaxData))
-                .map(injectSalesTaxToTransaction(transaction));
-    }
-    
-    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxRate -> {
-            log.info("Setting sales tax rates for transaction's items");
-            List<Item> itemsWithRates = salesTaxService.setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
-            Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
-            log.info("Calculating total sales tax amount for transaction");
-            float salesTaxAmount = salesTaxService.calculateSalesTaxAmount(transactionWithItemsWithRates.getItems());
-            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
-            log.debug("transaction's sales tax : " + salesTax);
-            return transactionWithItemsWithRates.withSalesTax(salesTax);
-        };
-    }
-
-    public Mono<ProductClassification> getClassification(String taxCode) {
-        log.debug("Searching for product classification for tax code : " + taxCode);
-        return productClassificationService.findOneByTaxCode(taxCode);
     }
 
     public Mono<Transaction> markAsCancelled(String transactionId) {

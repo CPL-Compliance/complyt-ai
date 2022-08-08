@@ -21,4 +21,6 @@ public class TransactionDto {
     private CustomerDto customer;
     private SalesTaxDto salesTax;
     private TransactionStatusDto transactionStatus;
+    private TimeStampsDto internalTimeStamps;
+    private TimeStampsDto externalTimeStamps;
 }
