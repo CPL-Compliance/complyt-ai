@@ -84,4 +84,3 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .collect(Collectors.toList());
     }
 }
-

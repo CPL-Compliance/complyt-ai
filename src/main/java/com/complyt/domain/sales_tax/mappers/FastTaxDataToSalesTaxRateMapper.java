@@ -26,6 +26,7 @@ public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxR
         FastTaxData fastTaxData = ((FastTaxData) salesTaxData);
         TaxInfoItem taxInfoItem = fastTaxData.getTaxInfoItems().get(0);
         SalesTaxRate salesTaxRate = map(taxInfoItem);
+
         return salesTaxRate;
     }
 }
