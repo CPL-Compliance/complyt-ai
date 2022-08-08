@@ -1,6 +1,5 @@
 package com.complyt.domain.sales_tax.fast_tax;
 
-import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 

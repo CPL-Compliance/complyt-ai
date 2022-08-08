@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface SalesTaxService {
-    float calculateSalesTaxAmount(List<Item> items);
     Mono<Order> injectCountyToOrderAndCalculate(Order order);
     Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking);
 }

@@ -55,25 +55,12 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Order> injectCountyToOrderAndCalculate(@NonNull Order order) {
-        return findByAddress(order.getShippingAddress())
+        return salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())
                 .map(salesTaxData -> {
-                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
+                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
                     Order orderWithCounty = countyInjector.inject(order, salesTaxData);
                     return injectSalesTaxToOrder(orderWithCounty).apply(salesTaxRate);
                 });
-    }
-
-    @Override
-    public float calculateSalesTaxAmount(List<Item> items) {
-        return salesTaxCalculator.calculate(items);
-    }
-
-    private Mono<SalesTaxData> findByAddress(Address address) {
-        return salesTaxWebClientWrapper.findByAddress(address);
-    }
-
-    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
-        return salesTaxDataToSalesTaxRate.map(salesTaxData);
     }
 
     private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
@@ -83,7 +70,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             Order orderWithItemsWithRates = order.withItems(itemsWithRates);
 
             log.info("Calculating total sales tax amount for order");
-            float salesTaxAmount = calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
+            float salesTaxAmount = salesTaxCalculator.calculate(orderWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             log.debug("Order's sales tax : " + salesTax);
@@ -97,3 +84,4 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .collect(Collectors.toList());
     }
 }
+
