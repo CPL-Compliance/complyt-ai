@@ -105,7 +105,7 @@ public class TransactionFacadeTest {
 
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker,null);
+                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
@@ -247,7 +247,7 @@ public class TransactionFacadeTest {
                 .thenReturn(Mono.just(modifiedTransaction));
         when(nexusService.findTrackingByState(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
-        when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction,salesTaxTracking)).thenReturn(Mono.just(newTransactionWithSalesTax));
+        when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(newTransactionWithSalesTax));
         when(transactionService.update(newTransactionWithSalesTax.getExternalId(), newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress);
 
