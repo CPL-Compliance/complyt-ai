@@ -4,13 +4,11 @@ import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.order_data_injector.CountyInjector;
-import com.complyt.domain.Address;
+import com.complyt.business.utils.transaction_data_injector.CountyInjector;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
@@ -46,35 +44,37 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private CountyInjector countyInjector;
 
-    @Override
-    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        boolean isApplied = salesTaxApplyCheck.isApplied(order, salesTaxTracking);
 
-        return isApplied ? injectCountyToOrderAndCalculate(order) : Mono.just(order);
+    @Override
+    public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+
+        return isApplied ? injectCountyToTransactionAndCalculate(transaction) : Mono.just(transaction);
     }
 
     @Override
-    public Mono<Order> injectCountyToOrderAndCalculate(@NonNull Order order) {
-        return salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())
+    public Mono<Transaction> injectCountyToTransactionAndCalculate(@NonNull Transaction transaction) {
+        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
                 .map(salesTaxData -> {
                     SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
-                    Order orderWithCounty = countyInjector.inject(order, salesTaxData);
-                    return injectSalesTaxToOrder(orderWithCounty).apply(salesTaxRate);
+                    Transaction transactionWithCounty = countyInjector.inject(transaction, salesTaxData);
+                    return injectSalesTaxToTransaction(transactionWithCounty).apply(salesTaxRate);
                 });
     }
 
-    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
+    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxRate -> {
-            log.info("Setting sales tax rates for order's items");
-            List<Item> itemsWithRates = setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
-            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+            log.info("Setting sales tax rates for transaction's items");
+            List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
+            Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
 
-            log.info("Calculating total sales tax amount for order");
-            float salesTaxAmount = salesTaxCalculator.calculate(orderWithItemsWithRates.getItems());
+            log.info("Calculating total sales tax amount for transaction");
+
+            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
-            log.debug("Order's sales tax : " + salesTax);
-            return orderWithItemsWithRates.withSalesTax(salesTax);
+            log.debug("Transaction's sales tax : " + salesTax);
+            return transactionWithItemsWithRates.withSalesTax(salesTax);
         };
     }
 

@@ -34,12 +34,12 @@ public class NexusCalculatorTest {
     NexusCalculator nexusCalculator;
 
     @Mock
-    NexusOrderAmountExtractor nexusOrderAmountExtractor;
+    NexusTransactionAmountExtractor nexusTransactionAmountExtractor;
 
     @Mock
-    NexusOrderCountExtractor nexusOrderCountExtractor;
+    NexusTransactionCountExtractor nexusTransactionCountExtractor;
 
-    private Order createOrder() {
+    private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         ObjectId clientId = new ObjectId();
         String externalId = UUID.randomUUID().toString();
@@ -50,7 +50,7 @@ public class NexusCalculatorTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL);
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, OrderStatus.ACTIVE, clientId, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -73,31 +73,31 @@ public class NexusCalculatorTest {
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
-    private List<Order> createOrdersList() {
-        Order order = createOrder();
-        Order secondOrder = order.withId(UUID.randomUUID().toString());
-        return new ArrayList<Order>() {{
-            add(order);
-            add(secondOrder);
+    private List<Transaction> createTransactionsList() {
+        Transaction transaction = createTransaction();
+        Transaction secondTransaction = transaction.withId(UUID.randomUUID().toString());
+        return new ArrayList<Transaction>() {{
+            add(transaction);
+            add(secondTransaction);
         }};
     }
 
     @Test
     void calculate_CalculatesNexusData_ReturnsSummary() {
         // Given
-        List<Order> orders = createOrdersList();
-        int count = orders.size();
-        float amount = orders.get(0).getItems().get(0).getTotalPrice() + orders.get(1).getItems().get(0).getTotalPrice();
+        List<Transaction> transactions = createTransactionsList();
+        int count = transactions.size();
+        float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count,amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
 
         // When
-        when(nexusOrderCountExtractor.extract(orders.get(0),nexusStateRule)).thenReturn(1);
-        when(nexusOrderCountExtractor.extract(orders.get(1),nexusStateRule)).thenReturn(1);
-        when(nexusOrderAmountExtractor.extract(orders.get(0),nexusStateRule)).thenReturn(orders.get(0).getItems().get(0).getTotalPrice());
-        when(nexusOrderAmountExtractor.extract(orders.get(1),nexusStateRule)).thenReturn(orders.get(1).getItems().get(0).getTotalPrice());
+        when(nexusTransactionCountExtractor.extract(transactions.get(0),nexusStateRule)).thenReturn(1);
+        when(nexusTransactionCountExtractor.extract(transactions.get(1),nexusStateRule)).thenReturn(1);
+        when(nexusTransactionAmountExtractor.extract(transactions.get(0),nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());
+        when(nexusTransactionAmountExtractor.extract(transactions.get(1),nexusStateRule)).thenReturn(transactions.get(1).getItems().get(0).getTotalPrice());
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(orders,nexusStateRule);
+        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions,nexusStateRule);
 
         // Then
         assertEquals(summary,actualSummary);
@@ -106,7 +106,7 @@ public class NexusCalculatorTest {
     @Test
     void calculate_CustomerTypeDoesNotExist_ReturnsSummary() {
         // Given
-        List<Order> orders = createOrdersList();
+        List<Transaction> transactions = createTransactionsList();
         int count = 0;
         float amount = 0;
         NexusCalculationSummary summary = new NexusCalculationSummary(count,amount);
@@ -115,7 +115,7 @@ public class NexusCalculatorTest {
 
         // When
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(orders,nexusStateRule);
+        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions,nexusStateRule);
 
         // Then
         assertEquals(summary,actualSummary);

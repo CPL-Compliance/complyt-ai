@@ -2,8 +2,8 @@ package com.complyt.services;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
-import com.complyt.domain.OrderStatus;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
@@ -65,7 +65,7 @@ public class ProductClassificationServiceTest {
         }};
     }
 
-    private Order createOrder() {
+    private Transaction createTransaction() {
         String id = null;
         String externalId = "externalId";
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -74,20 +74,20 @@ public class ProductClassificationServiceTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null);
     }
 
-    private Order createOrderWithProductClassificationData() {
+    private Transaction createTransactionWithProductClassificationData() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        Order order = createOrder();
+        Transaction transaction = createTransaction();
 
-        Item item = order.getItems().get(0)
+        Item item = transaction.getItems().get(0)
                 .withTaxableCategory(TaxableCategory.TAXABLE)
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
         List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
-        return order.withItems(modifiedItems);
+        return transaction.withItems(modifiedItems);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -96,18 +96,18 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void getOrderWithRelevantProductClassificationData_InjectsDateToOrder_ReturnsOrder() {
+    void getTransactionWithRelevantProductClassificationData_InjectsDateToTransaction_ReturnsTransaction() {
         // Given
-        Order order = createOrder();
-        String taxCode = order.getItems().get(0).getTaxCode();
-        Order orderWithData = createOrderWithProductClassificationData();
+        Transaction transaction = createTransaction();
+        String taxCode = transaction.getItems().get(0).getTaxCode();
+        Transaction transactionWithData = createTransactionWithProductClassificationData();
 
         // When
         when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
-        Mono<Order> actualOrder = productClassificationService.getOrderWithRelevantProductClassificationData(order);
+        Mono<Transaction> actualtransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(transaction);
 
         // Then
-        StepVerifier.create(actualOrder).expectNext(orderWithData).verifyComplete();
+        StepVerifier.create(actualtransaction).expectNext(transactionWithData).verifyComplete();
     }
 
 

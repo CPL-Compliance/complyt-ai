@@ -4,13 +4,13 @@ import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.utils.transaction_data_injector.CountyInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.business.utils.order_data_injector.CountyInjector;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.bson.types.ObjectId;
@@ -58,7 +58,7 @@ public class SalesTaxServiceImplTest {
     @Mock
     CountyInjector countyInjector;
 
-    Order order;
+    Transaction transaction;
 
     @BeforeEach
     void setUp() {
@@ -72,8 +72,8 @@ public class SalesTaxServiceImplTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        order = new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, externalTimeStamps);
+        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(),LocalDateTime.now());
+        transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId,  null,externalTimeStamps);
     }
 
     @Test
@@ -127,45 +127,45 @@ public class SalesTaxServiceImplTest {
     }
 
     @Test
-    void handleSalesTaxCalculation_StateDoesntEnforceNexus_ReturnsSameOrder() {
+    void handleSalesTaxCalculation_StateDoesntEnforceNexus_ReturnsSameTransaction() {
         // Given
         State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), false, null, null, LocalDateTime.now());
 
         // When
-        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction,tracking);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 
     @Test
-    void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameOrder() {
+    void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
         State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), false, null, null, LocalDateTime.now().plusYears(1));
 
         // When
-        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction,tracking);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(order).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 
     @Test
-    void handleSalesTaxCalculation_SalesTaxCalculated_OrderModified() {
+    void handleSalesTaxCalculation_SalesTaxCalculated_TransactionModified() {
         // Given
         FastTaxData fastTaxData = new FastTaxData();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
         SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
         List<Item> itemsWithRates = new ArrayList<Item>() {{
-            add(order.getItems().get(0).withSalesTaxRate(salesTaxRate));
+            add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
-        Order orderWithCounty = order.withShippingAddress(order.getShippingAddress().withCounty("county"));
-        Order orderWithSalesTax = orderWithCounty.withItems(itemsWithRates).withSalesTax(salesTax).withShippingAddress(order.getShippingAddress().withCounty("county"));
+        Transaction transactionWithCounty = transaction.withShippingAddress(transaction.getShippingAddress().withCounty("county"));
+        Transaction transactionWithSalesTax = transactionWithCounty.withItems(itemsWithRates).withSalesTax(salesTax).withShippingAddress(transaction.getShippingAddress().withCounty("county"));
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
@@ -173,44 +173,40 @@ public class SalesTaxServiceImplTest {
 
 
         // When
-        when(salesTaxApplyCheck.isApplied(order, tracking)).thenReturn(true);
-        when(countyInjector.inject(order,fastTaxData)).thenReturn(orderWithCounty);
-        when(salesTaxWebClientWrapper.findByAddress(order.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(true);
+        when(countyInjector.inject(transaction,fastTaxData)).thenReturn(transactionWithCounty);
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRateCalculator.calculateSalesTaxRate(order.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
+        when(salesTaxRateCalculator.calculateSalesTaxRate(transaction.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
                 .thenReturn(salesTaxRate);
         when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
-        Mono<Order> orderMono = salesTaxService.handleSalesTaxCalculation(order, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
-        StepVerifier.create(orderMono).expectNext(orderWithSalesTax).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
     }
 
     @Test
-    void handleSalesTaxCalculation_NullOrderPassed_ThrowsException() {
+    void handleSalesTaxCalculation_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), null,
-                new ObjectId(), true, null, null, null);
-        Order nullOrder = null;
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),null,
+                new ObjectId(), true,null,null,null);
+        Transaction nullTransaction = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxService.handleSalesTaxCalculation(nullOrder, tracking);
-        });
-        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(nullTransaction,tracking));
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
 
     }
 
     @Test
-    void calculate_NullOrderPassed_ThrowsException() {
+    void calculate_NullTransactionPassed_ThrowsException() {
         // Given
-        Order nullOrder = null;
+        Transaction nullTransaction = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxService.injectCountyToOrderAndCalculate(nullOrder);
-        });
-        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.injectCountyToTransactionAndCalculate(nullTransaction));
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
 
     }
 
@@ -221,7 +217,7 @@ public class SalesTaxServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxService.handleSalesTaxCalculation(order, nullTracking);
+            salesTaxService.handleSalesTaxCalculation(transaction,nullTracking);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }

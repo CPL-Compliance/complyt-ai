@@ -1,5 +1,6 @@
 package com.complyt.business.utils.order_data_injector;
 
+import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -27,15 +28,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class FastTaxCountyInjectorTest {
 
     private FastTaxCountyInjector fastTaxCountyInjector;
-    private Order order;
+    private Transaction transaction;
 
     @BeforeEach
     void setUp() {
         fastTaxCountyInjector = new FastTaxCountyInjector();
-        order = createOrder();
+        transaction = createTransaction();
     }
 
-    private Order createOrder() {
+    private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -50,7 +51,7 @@ class FastTaxCountyInjectorTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
 
@@ -58,8 +59,8 @@ class FastTaxCountyInjectorTest {
     void inject_InjectsCounty_ReturnsOrder() {
         List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>(){{add(new TaxInfoItem());}};
         FastTaxData fastTaxData = new FastTaxData("0",taxInfoItems);
-        Order actualOrder = fastTaxCountyInjector.inject(order,fastTaxData);
+        Transaction actualTransaction = fastTaxCountyInjector.inject(transaction,fastTaxData);
 
-        assertEquals(actualOrder.getShippingAddress().getCounty(),null);
+        assertEquals(actualTransaction.getShippingAddress().getCounty(),null);
     }
 }

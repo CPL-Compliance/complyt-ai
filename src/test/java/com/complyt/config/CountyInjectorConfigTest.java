@@ -1,6 +1,6 @@
 package com.complyt.config;
 
-import com.complyt.business.utils.order_data_injector.FastTaxCountyInjector;
+import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,7 +1,5 @@
-package com.complyt.business.utils.order_data_injector;
+package com.complyt.business.utils.transaction_data_injector;
 
-import com.complyt.business.utils.transaction_data_injector.TransactionJurisdictionalRulesInjector;
-import com.complyt.business.utils.transaction_data_injector.TransactionTangibleCategoryInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.AllArgsConstructor;
@@ -15,7 +13,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Slf4j
-public class ProductClassificationDataInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+public class ProductClassificationDataInjector implements TransactionDataInjector<ProductClassification> {
 
     @NonNull
     private final Transaction transaction;
@@ -24,7 +22,7 @@ public class ProductClassificationDataInjector implements TransactionDataInjecto
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return new TransactionJurisdictionalRulesInjector(transaction)
                 .inject(mapTaxCodesToClassifications)
-                .map(orderWithRules -> new TransactionTangibleCategoryInjector(orderWithRules))
-                .flatMap(orderTangibleCategoryInjector -> orderTangibleCategoryInjector.inject(mapTaxCodesToClassifications));
+                .map(transactionWithRules -> new TransactionTangibleCategoryInjector(transactionWithRules))
+                .flatMap(transactionTangibleCategoryInjector -> transactionTangibleCategoryInjector.inject(mapTaxCodesToClassifications));
     }
 }

@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax;
 
-import com.complyt.domain.Order;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Slf4j
 public class SalesTaxApplyCheck {
 
-    public boolean isApplied(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+    public boolean isApplied(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
         LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
 
         boolean isSalesTaxEnforced = salesTaxTracking.isEnforcesSalesTax();
