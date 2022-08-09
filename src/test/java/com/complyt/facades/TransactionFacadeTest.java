@@ -105,7 +105,7 @@ public class TransactionFacadeTest {
 
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker,null);
+                true, physicalNexusTracker, economicNexusTracker,null,true,LocalDateTime.now());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {

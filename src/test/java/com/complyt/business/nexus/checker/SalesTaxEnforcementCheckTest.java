@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
@@ -29,7 +31,8 @@ public class SalesTaxEnforcementCheckTest {
         // Given
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),
-                state,new ObjectId(),true,null,null,null);
+                state,new ObjectId(),true,null,null,null,
+                true, LocalDateTime.now());
 
         // When + Then
         boolean isEnforcesSalesTax = salesTaxEnforcementCheck.check(salesTaxTracking);

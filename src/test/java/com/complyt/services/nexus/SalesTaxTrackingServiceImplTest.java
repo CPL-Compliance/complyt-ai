@@ -51,7 +51,7 @@ public class SalesTaxTrackingServiceImplTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker, null);
+                true, physicalNexusTracker, economicNexusTracker, null,true,LocalDateTime.now());
     }
 
     @BeforeEach

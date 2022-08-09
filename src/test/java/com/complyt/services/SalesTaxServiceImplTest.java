@@ -133,7 +133,7 @@ public class SalesTaxServiceImplTest {
         // Given
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),false,null,null, LocalDateTime.now());
+                new ObjectId(),false,null,null, LocalDateTime.now(),true,LocalDateTime.now());
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction,tracking);
@@ -147,7 +147,7 @@ public class SalesTaxServiceImplTest {
         // Given
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),false,null,null, LocalDateTime.now().plusYears(1));
+                new ObjectId(),false,null,null, LocalDateTime.now().plusYears(1),true,LocalDateTime.now());
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction,tracking);
@@ -169,7 +169,8 @@ public class SalesTaxServiceImplTest {
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         State state = new State("CA","02","California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),true,null,null,LocalDateTime.now().minusYears(1));
+                new ObjectId(),true,null,null,
+                LocalDateTime.now().minusYears(1),true,LocalDateTime.now());
 
 
         // When
@@ -188,7 +189,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NullTransactionPassed_ThrowsException() {
         // Given
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),null,
-                new ObjectId(), true,null,null,null);
+                new ObjectId(), true,null,null,null,true,LocalDateTime.now());
         Transaction nullTransaction = null;
 
         // When + Then

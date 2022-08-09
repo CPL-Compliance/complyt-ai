@@ -82,7 +82,8 @@ class NexusServiceTest {
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), true,
                 new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null),LocalDateTime.now());
+                new EconomicNexusTracker(false, null),
+                LocalDateTime.now(),true,LocalDateTime.now());
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -129,7 +130,8 @@ class NexusServiceTest {
 
         State state = new State("CA","02","California");
         return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker,LocalDateTime.now());
+                true,physicalNexusTracker,economicNexusTracker,
+                LocalDateTime.now(),true,LocalDateTime.now());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {

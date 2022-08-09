@@ -34,7 +34,7 @@ public class PhysicalNexusCheckTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true,LocalDateTime.now());
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,null, LocalDateTime.now());
+                true,physicalNexusTracker,null, LocalDateTime.now(),true,LocalDateTime.now());
 
         // When + Then
         boolean hasPhysicalNexus = physicalNexusCheck.check(salesTaxTracking);

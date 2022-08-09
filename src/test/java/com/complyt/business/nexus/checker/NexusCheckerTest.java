@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +68,7 @@ public class NexusCheckerTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false,null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false,null);
         return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker,null);
+                true,physicalNexusTracker,economicNexusTracker,null,true, LocalDateTime.now());
     }
 
     @Test
