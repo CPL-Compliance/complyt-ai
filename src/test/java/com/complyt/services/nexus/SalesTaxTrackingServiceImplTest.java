@@ -51,7 +51,7 @@ public class SalesTaxTrackingServiceImplTest {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
         return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
-                true, physicalNexusTracker, economicNexusTracker, null,true,LocalDateTime.now());
+                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 
     @BeforeEach
@@ -65,7 +65,7 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     private NexusStateRule createNexusStateRule() {
-        State state = new State("CA","02","California");
+        State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
             add(TaxableCategory.TAXABLE);
         }};
@@ -78,10 +78,10 @@ public class SalesTaxTrackingServiceImplTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000,2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR,nexusThreshold);
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
     }
 
     @Test
@@ -189,8 +189,8 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(any())).thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
-        when(applicationDateCreator.create(stateRule.getTimeFrame(),referenceDate)).thenReturn(LocalDateTime.now());
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,stateRule,referenceDate);
+        when(applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();
@@ -205,7 +205,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(nullSalesTaxTracking,nexusStateRule,referenceDate);
+            salesTaxTrackingService.saveWithEconomicQualified(nullSalesTaxTracking, nexusStateRule, referenceDate);
         });
 
         // Then
@@ -220,7 +220,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,nullNexusStateRule,referenceDate);
+            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, nullNexusStateRule, referenceDate);
         });
 
         // Then
@@ -235,7 +235,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking,nullNexusStateRule,nullReferenceDate);
+            salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, nullNexusStateRule, nullReferenceDate);
         });
 
         // Then
