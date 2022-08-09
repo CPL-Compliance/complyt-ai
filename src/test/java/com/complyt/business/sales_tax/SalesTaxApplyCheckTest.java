@@ -45,7 +45,7 @@ public class SalesTaxApplyCheckTest {
                 true, LocalDateTime.now());
     }
 
-    private Transaction createOrderWithAppliedReferenceDate() {
+    private Transaction createTransactionWithAppliedReferenceDate() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -63,7 +63,7 @@ public class SalesTaxApplyCheckTest {
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)));
     }
 
-    private Transaction createOrderWithReferenceDateNotApplied() {
+    private Transaction createTransactionWithReferenceDateNotApplied() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -86,7 +86,7 @@ public class SalesTaxApplyCheckTest {
         // Given
 
         // When
-        Transaction transaction = createOrderWithAppliedReferenceDate();
+        Transaction transaction = createTransactionWithAppliedReferenceDate();
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
         // Then
@@ -99,7 +99,7 @@ public class SalesTaxApplyCheckTest {
         // Given
 
         // When
-        Transaction transaction = createOrderWithReferenceDateNotApplied();
+        Transaction transaction = createTransactionWithReferenceDateNotApplied();
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
         // Then
@@ -112,7 +112,7 @@ public class SalesTaxApplyCheckTest {
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking.withEnforcesSalesTax(false);
 
         // When
-        Transaction transaction = createOrderWithAppliedReferenceDate();
+        Transaction transaction = createTransactionWithAppliedReferenceDate();
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
 
         // Then
@@ -127,11 +127,38 @@ public class SalesTaxApplyCheckTest {
                 .withApprovalDate(null);
 
         // When
-        Transaction transaction = createOrderWithAppliedReferenceDate();
+        Transaction transaction = createTransactionWithAppliedReferenceDate();
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
 
         // Then
         assertFalse(isApplied);
+    }
+
+    @Test
+    void isApplied_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxApplyCheck.isApplied(nullTransaction,salesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void isApplied_NullTrackingPassed_ThrowsException() {
+        // Given
+        Transaction transaction = createTransactionWithAppliedReferenceDate();
+        SalesTaxTracking nullTracking = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxApplyCheck.isApplied(transaction,nullTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
 
 }
