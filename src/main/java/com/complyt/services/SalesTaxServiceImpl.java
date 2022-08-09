@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -17,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,11 +40,12 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
+    @NonNull
+    private SalesTaxApplyCheck salesTaxApplyCheck;
+
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
-        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
-        LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
-        boolean isApplied = referenceDate.compareTo(applicationDate) >= 0;
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
         return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(transaction) : Mono.just(transaction);
     }

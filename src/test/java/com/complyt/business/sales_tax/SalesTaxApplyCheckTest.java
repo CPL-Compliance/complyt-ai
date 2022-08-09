@@ -1,0 +1,137 @@
+package com.complyt.business.sales_tax;
+
+import com.complyt.domain.*;
+import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.PhysicalNexusTracker;
+import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class SalesTaxApplyCheckTest {
+
+    private SalesTaxApplyCheck salesTaxApplyCheck;
+    private SalesTaxTracking salesTaxTracking;
+
+    @BeforeEach
+    void setUp() {
+        salesTaxApplyCheck = new SalesTaxApplyCheck();
+        salesTaxTracking = createSalesTaxTracking();
+    }
+
+    private SalesTaxTracking createSalesTaxTracking() {
+        State state = new State("CA", "02", "California");
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state,
+                new ObjectId(), true,
+                new PhysicalNexusTracker(false, null),
+                new EconomicNexusTracker(false, null), LocalDateTime.now(),
+                true, LocalDateTime.now());
+    }
+
+    private Transaction createOrderWithAppliedReferenceDate() {
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                ));
+            }
+        };
+
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)));
+    }
+
+    private Transaction createOrderWithReferenceDateNotApplied() {
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                ));
+            }
+        };
+
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)));
+    }
+
+    @Test
+    void isApplied_SalesTaxApplied_ReturnsTrue() {
+        // Given
+
+        // When
+        Transaction transaction = createOrderWithAppliedReferenceDate();
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+
+        // Then
+        assertTrue(isApplied);
+
+    }
+
+    @Test
+    void isApplied_SalesTaxNotAppliedBecauseOfApplicationDate_ReturnsFalse() {
+        // Given
+
+        // When
+        Transaction transaction = createOrderWithReferenceDateNotApplied();
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+
+        // Then
+        assertFalse(isApplied);
+    }
+
+    @Test
+    void isApplied_SalesTaxNotAppliedBecauseEnforcedSalesTaxIsFalse_ReturnsFalse() {
+        // Given
+        SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking.withEnforcesSalesTax(false);
+
+        // When
+        Transaction transaction = createOrderWithAppliedReferenceDate();
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
+
+        // Then
+        assertFalse(isApplied);
+    }
+
+    @Test
+    void isApplied_SalesTaxNotAppliedBecauseNotApproved_ReturnsFalse() {
+        // Given
+        SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
+                .withApproved(false)
+                .withApprovalDate(null);
+
+        // When
+        Transaction transaction = createOrderWithAppliedReferenceDate();
+        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
+
+        // Then
+        assertFalse(isApplied);
+    }
+
+}
