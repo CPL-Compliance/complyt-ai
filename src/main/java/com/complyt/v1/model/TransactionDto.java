@@ -13,6 +13,7 @@ import java.util.List;
 @With
 @Schema(name = "Transaction")
 public class TransactionDto {
+    private String id;
     private String externalId;
     private List<ItemDto> items;
     private AddressDto billingAddress;
