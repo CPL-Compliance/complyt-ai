@@ -19,7 +19,10 @@ public class SalesTaxApplyCheck {
         boolean isSalesTaxEnforced = salesTaxTracking.isEnforcesSalesTax();
         boolean isPassedApplicationDate = referenceDate.compareTo(applicationDate) >= 0;
 
-        boolean isApplied = isSalesTaxEnforced && isPassedApplicationDate;
+        boolean isApproved = salesTaxTracking.isApproved() &&
+                referenceDate.compareTo(salesTaxTracking.getApprovalDate()) >= 0;
+
+        boolean isApplied = isSalesTaxEnforced && isPassedApplicationDate && isApproved;
         log.debug("Is sales tax applied for order returned : " + isApplied);
 
         return isApplied;

@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +56,8 @@ public class SalesTaxTrackingRepositoryTest {
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                user.getClientId(), true, null, null,null);
+                user.getClientId(), true, null,
+                null,null,true, LocalDateTime.now());
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")

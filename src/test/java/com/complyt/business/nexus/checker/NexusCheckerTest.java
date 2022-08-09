@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,22 +53,22 @@ public class NexusCheckerTest {
     }
 
     private NexusStateRule createNexusStateRule() {
-        NexusThreshold nexusThreshold = new NexusThreshold(10,10000, Definition.AMOUNT_OR_COUNT);
-        State state = new State("CA","02","California");
-        return new NexusStateRule(UUID.randomUUID().toString(),true,state,null,null,null,
-                null,nexusThreshold);
+        NexusThreshold nexusThreshold = new NexusThreshold(10, 10000, Definition.AMOUNT_OR_COUNT);
+        State state = new State("CA", "02", "California");
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
+                null, nexusThreshold);
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(10,10000);
+        return new NexusCalculationSummary(10, 10000);
     }
 
     private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA","02","California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false,null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false,null);
-        return new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,economicNexusTracker,null);
+        State state = new State("CA", "02", "California");
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
+        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 
     @Test
@@ -140,11 +141,11 @@ public class NexusCheckerTest {
     @Test
     void passedThreshold_SummaryPassedThreshold_ReturnsTrue() {
         // Given
-        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary,nexusStateRule);
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
 
         // When
         when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(true);
-        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary,nexusStateRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
 
         // Then
         assertTrue(passedThreshold);
@@ -153,11 +154,11 @@ public class NexusCheckerTest {
     @Test
     void passedThreshold_SummaryDoesNotPassedThreshold_ReturnsFalse() {
         // Given
-        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary,nexusStateRule);
+        Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
 
         // When
         when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(false);
-        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary,nexusStateRule);
+        boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
 
         // Then
         assertFalse(passedThreshold);
@@ -170,7 +171,7 @@ public class NexusCheckerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.passedThreshold(nullCalculationSummary,nexusStateRule);
+            nexusChecker.passedThreshold(nullCalculationSummary, nexusStateRule);
         });
 
         // Then
@@ -184,7 +185,7 @@ public class NexusCheckerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.passedThreshold(nexusCalculationSummary,nullStateRule);
+            nexusChecker.passedThreshold(nexusCalculationSummary, nullStateRule);
         });
 
         // Then

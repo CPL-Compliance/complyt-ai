@@ -31,10 +31,10 @@ public class PhysicalNexusCheckTest {
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true,LocalDateTime.now());
-        State state = new State("CA","02","California");
-        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,new ObjectId(),
-                true,physicalNexusTracker,null, LocalDateTime.now());
+        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true, LocalDateTime.now());
+        State state = new State("CA", "02", "California");
+        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+                true, physicalNexusTracker, null, LocalDateTime.now(), true, LocalDateTime.now());
 
         // When + Then
         boolean hasPhysicalNexus = physicalNexusCheck.check(salesTaxTracking);
