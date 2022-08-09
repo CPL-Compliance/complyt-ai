@@ -2,13 +2,13 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.business.query.NexusOrdersSearchQueryBuilder;
-import com.complyt.domain.Order;
+import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
-import com.complyt.services.OrderService;
+import com.complyt.services.TransactionService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ public class NexusService {
     @NonNull
     private NexusStateRuleService nexusStateRuleService;
 
-    @Qualifier("orderServiceImpl")
+    @Qualifier("transactionServiceImpl")
     @NonNull
-    private OrderService orderService;
+    private TransactionService transactionService;
 
     @Qualifier("clientTrackingServiceImpl")
     @NonNull
@@ -48,14 +48,14 @@ public class NexusService {
     private NexusChecker nexusChecker;
 
     @NonNull
-    private NexusOrdersSearchQueryBuilder nexusOrdersSearchQueryBuilder;
+    private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
     public Mono<SalesTaxTracking> findTrackingByState(String state) {
         return salesTaxTrackingService.findByState(state);
     }
 
-    public Mono<SalesTaxTracking> findTrackingByState(Order order) {
-        return salesTaxTrackingService.findByState(order.getShippingAddress().getState());
+    public Mono<SalesTaxTracking> findTrackingByState(Transaction transaction) {
+        return salesTaxTrackingService.findByState(transaction.getShippingAddress().getState());
     }
 
     public Mono<NexusStateRule> findRuleByState(String state) {
@@ -66,21 +66,21 @@ public class NexusService {
         return nexusChecker.hasNexus(salesTaxTracking);
     }
 
-    public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Order order) {
-        String state = order.getShippingAddress().getState();
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+    public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
+        String state = transaction.getShippingAddress().getState();
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
 
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(state)
                         .flatMap(stateRule -> {
-                            Query nexusOrdersSearchQuery = nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo, stateRule, referenceDate);
-                            return orderService.getOrdersByQuery(nexusOrdersSearchQuery)
-                                    .collectList().flatMap(orders -> aggregateNexusInfo(orders, stateRule,referenceDate));
+                            Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, stateRule, referenceDate);
+                            return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
+                                    .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule,referenceDate));
                         }));
     }
 
-    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Order> orders, NexusStateRule stateRule,LocalDateTime referenceDate) {
-        NexusCalculationSummary summary = nexusCalculator.calculate(orders, stateRule);
+    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule,LocalDateTime referenceDate) {
+        NexusCalculationSummary summary = nexusCalculator.calculate(transactions, stateRule);
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
 
         return findTrackingByState(stateRule.getState().getAbbreviation())

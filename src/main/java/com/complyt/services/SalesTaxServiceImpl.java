@@ -5,7 +5,7 @@ import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
-import com.complyt.domain.Order;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
@@ -41,19 +41,19 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
-    public Mono<Order> handleSalesTaxCalculation(@NonNull Order order, @NonNull SalesTaxTracking salesTaxTracking) {
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+    public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
         LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
         boolean isApplied = referenceDate.compareTo(applicationDate) >= 0;
 
-        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(order) : Mono.just(order);
+        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(transaction) : Mono.just(transaction);
     }
 
     @Override
-    public Mono<Order> calculate(@NonNull Order order) {
-        return findByAddress(order.getShippingAddress())
+    public Mono<Transaction> calculate(@NonNull Transaction transaction) {
+        return findByAddress(transaction.getShippingAddress())
                 .map(this::salesTaxDataToSalesTaxRate)
-                .map(injectSalesTaxToOrder(order));
+                .map(injectSalesTaxToTransaction(transaction));
     }
 
     @Override
@@ -69,18 +69,18 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return salesTaxDataToSalesTaxRate.map(salesTaxData);
     }
 
-    private Function<SalesTaxRate, Order> injectSalesTaxToOrder(Order order) {
+    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxRate -> {
-            log.info("Setting sales tax rates for order's items");
-            List<Item> itemsWithRates = setSalesTaxRatesForItems(order.getItems(), salesTaxRate);
-            Order orderWithItemsWithRates = order.withItems(itemsWithRates);
+            log.info("Setting sales tax rates for transaction's items");
+            List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
+            Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
 
-            log.info("Calculating total sales tax amount for order");
-            float salesTaxAmount = calculateSalesTaxAmount(orderWithItemsWithRates.getItems());
+            log.info("Calculating total sales tax amount for transaction");
+            float salesTaxAmount = calculateSalesTaxAmount(transactionWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
-            log.debug("Order's sales tax : " + salesTax);
-            return orderWithItemsWithRates.withSalesTax(salesTax);
+            log.debug("Transaction's sales tax : " + salesTax);
+            return transactionWithItemsWithRates.withSalesTax(salesTax);
         };
     }
 
