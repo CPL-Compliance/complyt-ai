@@ -1,0 +1,26 @@
+package com.complyt.v1.model;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import org.bson.types.ObjectId;
+
+import java.util.List;
+
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@With
+@Schema(name = "Transaction")
+public class TransactionDto {
+    private String externalId;
+    private List<ItemDto> items;
+    private AddressDto billingAddress;
+    private AddressDto shippingAddress;
+    private ObjectId customerId;
+    private CustomerDto customer;
+    private SalesTaxDto salesTax;
+    private TransactionStatusDto transactionStatus;
+    private TimeStampsDto internalTimeStamps;
+    private TimeStampsDto externalTimeStamps;
+}

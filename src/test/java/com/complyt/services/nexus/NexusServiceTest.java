@@ -2,8 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.business.query.NexusOrdersSearchQueryBuilder;
-import com.complyt.business.query.TimeFrameQueryBuilder;
+import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
@@ -12,7 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
-import com.complyt.services.OrderService;
+import com.complyt.services.TransactionService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +30,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,10 +52,10 @@ class NexusServiceTest {
     NexusStateRuleService nexusStateRuleService;
 
     @Mock
-    private NexusOrdersSearchQueryBuilder nexusOrdersSearchQueryBuilder;
+    private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
     @Mock
-    private OrderService orderService;
+    private TransactionService transactionService;
 
     @Mock
     private SalesTaxTrackingService salesTaxTrackingService;
@@ -69,14 +66,14 @@ class NexusServiceTest {
     @Mock
     private NexusChecker nexusChecker;
 
-    private Order order;
+    private Transaction transaction;
     private NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        order = createOrder();
+        transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
     }
 
@@ -108,7 +105,7 @@ class NexusServiceTest {
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
-    private Order createOrder() {
+    private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -123,7 +120,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Order(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, OrderStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
@@ -143,15 +140,15 @@ class NexusServiceTest {
     }
 
     @Test
-    void calculate_NullOrderPassed_ThrowsException(){
+    void calculate_NullTransactionPassed_ThrowsException(){
         // Given
-        Order nullOrder = null;
+        Transaction nullTransaction = null;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.calculateNexusTracking(nullOrder));
+                () -> nexusService.calculateNexusTracking(nullTransaction));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "order is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 
     @Test
@@ -162,26 +159,26 @@ class NexusServiceTest {
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
-        List<Order> ordersList = new ArrayList<Order>() {{add(order);}};
-        Flux<Order> ordersFlux = Flux.fromIterable(ordersList);
+        List<Transaction> transactionList = new ArrayList<Transaction>() {{add(transaction);}};
+        Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount()-1,
                 nexusStateRule.getNexusThreshold().getAmount()-1);
 
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
-        when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo,nexusStateRule,referenceDate)).thenReturn(query);
-        when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
-        when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo,nexusStateRule,referenceDate)).thenReturn(query);
+        when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(nexusCalculator.calculate(transactionList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
-        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(order);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(transaction);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
@@ -196,8 +193,8 @@ class NexusServiceTest {
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()))
                 .addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
-        List<Order> ordersList = new ArrayList<Order>() {{add(order);}};
-        Flux<Order> ordersFlux = Flux.fromIterable(ordersList);
+        List<Transaction> transactionList = new ArrayList<Transaction>() {{add(transaction);}};
+        Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount()+1,
                 nexusStateRule.getNexusThreshold().getAmount()+1);
@@ -205,21 +202,21 @@ class NexusServiceTest {
         State state = new State("CA","02","California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = createSalesTaxTrackingWithoutNexusEstablished();
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
-        LocalDateTime referenceDate = order.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
 
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
-        when(nexusStateRuleService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
-        when(nexusOrdersSearchQueryBuilder.buildNexusOrdersSearch(nexusInfo,nexusStateRule, referenceDate)).thenReturn(query);
-        when(orderService.getOrdersByQuery(query)).thenReturn(ordersFlux);
-        when(nexusCalculator.calculate(ordersList,nexusStateRule)).thenReturn(summary);
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo,nexusStateRule, referenceDate)).thenReturn(query);
+        when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(nexusCalculator.calculate(transactionList,nexusStateRule)).thenReturn(summary);
         when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(true);
-        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
         when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished,nexusStateRule,referenceDate))
                 .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(order);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(transaction);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();
@@ -235,21 +232,21 @@ class NexusServiceTest {
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
 
         // When
-        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(order.getShippingAddress().getState());
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().getState());
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
     @Test
-    void findTrackingByState_OrderSent_FindsTracking_ReturnsTracking() {
+    void findTrackingByState_TransactionSent_FindsTracking_ReturnsTracking() {
         // Given
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
 
         // When
-        when(salesTaxTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(order);
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
@@ -293,42 +290,5 @@ class NexusServiceTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
-    }
-
-    @Test
-    void getOrdersByTimeFrame() {
-    }
-
-//
-//    @Test
-//    void calculate() {
-//        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
-//                .gte(LocalDateTime.now().minusYears(1).withMonth(1).withDayOfMonth(1)).lte(LocalDateTime.now()));
-//
-//        List<Order> filteredOrders = new ArrayList<Order>() {{
-//            add(order);
-//        }};
-//
-//        NexusCalculationSummary summary = new NexusCalculationSummary(1,order.getItems().get(0).getTotalPrice());
-//        Nexus nexus = new Nexus(false, LocalDate.now());
-//
-//        NexusTracking nexusTracking = new NexusTracking(UUID.randomUUID().toString(),nexusStateRule.getState(),
-//                new ObjectId(),true,new PhysicalNexusTracker(false,null),new EconomicNexusTracker(false,null));
-//
-//        when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexus));
-//        when(nexusStateRuleService.findByState(any())).thenReturn(Mono.just(nexusStateRule));
-//        when(timeFrameQueryBuilder.buildNexusTimeFrame(nexus,nexusStateRule)).thenReturn(query);
-//        when(orderService.getOrdersByFilter(query)).thenReturn(Flux.fromIterable(filteredOrders));
-//        when(nexusCalculator.calculate(filteredOrders,nexusStateRule)).thenReturn(summary);
-//        when(nexusChecker.passedThreshold(summary,nexusStateRule)).thenReturn(false);
-//        when(nexusTrackingService.findByState(order.getShippingAddress().getState())).thenReturn(Mono.just(nexusTracking));
-//
-//        Mono<NexusTracking> nexusStateRuleMono = nexusService.handle(order);
-//
-//        StepVerifier.create(nexusStateRuleMono).expectNext(nexusTracking).verifyComplete();
-//    }
-
-    @Test
-    void aggregateNexusInfo() {
     }
 }
