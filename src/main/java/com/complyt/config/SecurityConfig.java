@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .matches(serverWebExchange))
                 .and()
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/login", "/logout", "/").permitAll()
+                        .pathMatchers("/login", "/logout", "/", "/actuator/health").permitAll()
                         .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
                         .anyExchange().authenticated())
                 .httpBasic(withDefaults())
