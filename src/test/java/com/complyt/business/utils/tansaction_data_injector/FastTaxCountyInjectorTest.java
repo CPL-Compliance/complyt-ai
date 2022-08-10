@@ -1,5 +1,6 @@
 package com.complyt.business.utils.tansaction_data_injector;
 
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -12,8 +13,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,7 +34,12 @@ import static org.junit.Assert.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FastTaxCountyInjectorTest {
 
+    @InjectMocks
     private FastTaxCountyInjector fastTaxCountyInjector;
+
+    @Mock
+    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+
     private Transaction transaction;
 
     @BeforeEach
@@ -41,7 +53,7 @@ class FastTaxCountyInjectorTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
         ObjectId clientId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
@@ -54,12 +66,25 @@ class FastTaxCountyInjectorTest {
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
     }
 
-//    @Test
-//    void inject_InjectsCounty_ReturnsOrder() {
-//        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>(){{add(new TaxInfoItem());}};
-//        FastTaxData fastTaxData = new FastTaxData("0",taxInfoItems);
-//        Transaction actualTransaction = fastTaxCountyInjector.inject(transaction,fastTaxData);
-//
-//        assertEquals(actualTransaction.getShippingAddress().getCounty(),null);
-//    }
+    private TaxInfoItem createTaxInfoItem() {
+        return new TaxInfoItem("city","","","injectedCounty","","",null,"","","","","","","","","");
+    }
+
+    @Test
+    void inject_InjectsCounty_ReturnsOrder() {
+        // Given
+        TaxInfoItem taxInfoItem = createTaxInfoItem();
+        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>(){{add(taxInfoItem);}};
+        FastTaxData fastTaxData = new FastTaxData("0",taxInfoItems);
+        Transaction transactionWithInjectedCounty = transaction
+                .withShippingAddress(transaction.getShippingAddress()
+                        .withCounty(fastTaxData.getTaxInfoItems().get(0).getCounty()));
+
+        // When
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+        Mono<Transaction> transactionMono = fastTaxCountyInjector.inject(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithInjectedCounty).verifyComplete();
+    }
 }
