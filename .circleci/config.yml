@@ -1,27 +1,36 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@3.0.0
+  aws-cli: circleci/aws-cli@1.3
+  aws-ecs: circleci/aws-ecs@2.0
+
 workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - build
-      - unit-test:
-          requires:
-            - build
-      - integration-test:
-          requires:
-            - build
-      - publish-docker:
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - unit-test
-            - integration-test
-
-orbs:
-  codecov: codecov/codecov@3.0.0
+#      - build
+#      - unit-test:
+#          requires:
+#            - build
+#      - integration-test:
+#          requires:
+#            - build
+#      - publish-docker:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          requires:
+#            - unit-test
+#            - integration-test
+      - update-service:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          requires:
+#            - publish-docker
 
 jobs:
   build:
@@ -81,3 +90,16 @@ jobs:
       - run:
           name: Publish Docker image with Fabric8
           command: ./mvnw clean package docker:build docker:push
+
+  update-service:
+    docker:
+      - image: 'cimg/python:3.9.1'
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_DEFAULT_REGION
+          aws-secret-access-key: AWS_DEFAULT_REGION
+      - aws-ecs/update-service:
+          cluster: '${MY_APP_PREFIX}-cluster'
+          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=stable'
+          family: '${MY_APP_PREFIX}-service'
