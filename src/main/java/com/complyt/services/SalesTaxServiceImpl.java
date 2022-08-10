@@ -4,7 +4,6 @@ import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.transaction_data_injector.CountyInjector;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -41,25 +40,18 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private SalesTaxApplyCheck salesTaxApplyCheck;
 
-    @NonNull
-    private CountyInjector countyInjector;
-
-
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
-        return isApplied ? injectCountyToTransactionAndCalculate(transaction) : Mono.just(transaction);
+        return isApplied ? calculate(transaction) : Mono.just(transaction);
     }
 
     @Override
-    public Mono<Transaction> injectCountyToTransactionAndCalculate(@NonNull Transaction transaction) {
+    public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
-                .map(salesTaxData -> {
-                    SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
-                    Transaction transactionWithCounty = countyInjector.inject(transaction, salesTaxData);
-                    return injectSalesTaxToTransaction(transactionWithCounty).apply(salesTaxRate);
-                });
+                .map(salesTaxDataToSalesTaxRate::map)
+                .map(injectSalesTaxToTransaction(transaction));
     }
 
     private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
