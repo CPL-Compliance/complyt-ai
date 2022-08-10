@@ -20,7 +20,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<ProductClassification> {
+public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
     @NonNull
     private final Transaction transaction;
 

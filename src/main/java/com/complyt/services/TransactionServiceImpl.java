@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.business.utils.transaction_data_injector.CountyInjector;
+import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
@@ -31,7 +32,6 @@ public class TransactionServiceImpl implements TransactionService {
     private ProductClassificationService productClassificationService;
 
     @NonNull
-    @Qualifier("fastTaxCountyInjector")
     private CountyInjector countyInjector;
 
     @Override
