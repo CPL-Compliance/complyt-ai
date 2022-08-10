@@ -1,4 +1,4 @@
-package com.complyt.business.utils.transaction_data_injector;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;

@@ -4,7 +4,7 @@ import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.transaction_data_injector.CountyInjector;
+import com.complyt.business.utils.data_fetcher.CountyFetcher;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -56,7 +56,7 @@ public class SalesTaxServiceImplTest {
     SalesTaxApplyCheck salesTaxApplyCheck;
 
     @Mock
-    CountyInjector countyInjector;
+    CountyFetcher countyFetcher;
 
     Transaction transaction;
 

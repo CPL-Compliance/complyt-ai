@@ -1,8 +1,8 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.data_fetcher.CountyFetcher;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
-import com.complyt.business.utils.transaction_data_injector.CountyInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -49,7 +49,7 @@ class TransactionServiceImplTest {
     ProductClassificationServiceImpl productClassificationService;
 
     @Mock
-    CountyInjector countyInjector;
+    CountyFetcher countyFetcher;
 
     Transaction transaction;
 
@@ -329,7 +329,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
-        when(countyInjector.inject(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(countyFetcher.fetch(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
@@ -368,7 +368,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
-        when(countyInjector.inject(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(countyFetcher.fetch(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transaction);
 
         // Then

@@ -1,9 +1,8 @@
 package com.complyt.services;
 
+import com.complyt.business.utils.data_fetcher.CountyFetcher;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
-import com.complyt.business.utils.transaction_data_injector.CountyInjector;
-import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
@@ -32,7 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
     private ProductClassificationService productClassificationService;
 
     @NonNull
-    private CountyInjector countyInjector;
+    private CountyFetcher countyFetcher;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -56,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction newTransactionWithInternalTimeStamps = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps());
 
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
-                .flatMap(countyInjector::inject)
+                .flatMap(countyFetcher::fetch)
                 .map(ModifiedTransactionInternalDateInjector::new)
                 .map(ModifiedTransactionInternalDateInjector::inject);
     }
@@ -64,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
-                .flatMap(countyInjector::inject)
+                .flatMap(countyFetcher::fetch)
                 .map(NewTransactionInternalDateInjector::new)
                 .map(NewTransactionInternalDateInjector::inject);
     }

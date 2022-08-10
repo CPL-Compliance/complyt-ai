@@ -1,7 +1,6 @@
-package com.complyt.business.utils.tansaction_data_injector;
+package com.complyt.business.utils.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.transaction_data_injector.FastTaxCountyInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -20,22 +19,20 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FastTaxCountyInjectorTest {
+class TransactionFastTaxCountyFetcherTest {
 
     @InjectMocks
-    private FastTaxCountyInjector fastTaxCountyInjector;
+    private TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher;
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
@@ -82,7 +79,7 @@ class FastTaxCountyInjectorTest {
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        Mono<Transaction> transactionMono = fastTaxCountyInjector.inject(transaction);
+        Mono<Transaction> transactionMono = transactionFastTaxCountyFetcher.fetch(transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithInjectedCounty).verifyComplete();
