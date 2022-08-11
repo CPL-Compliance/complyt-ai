@@ -8,7 +8,6 @@ import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @AllArgsConstructor
@@ -19,13 +18,13 @@ public class CountyFetcherConfig {
 
     @Profile({"fastTax", "default"})
     @Bean("countyFetcher")
-    public TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher(WebClient webClient) {
+    public TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher() {
         return new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
     }
 
     @Profile({"zipTax"})
     @Bean("countyFetcher")
-    public TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher(WebClient webClient) {
+    public TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher() {
         return new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
     }
 }

@@ -80,9 +80,9 @@ class TransactionFastTaxCountyFetcherTest {
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        Mono<Transaction> transactionMono = transactionFastTaxCountyFetcher.fetch(transaction);
+        Mono<String> countyMono = transactionFastTaxCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionWithInjectedCounty).verifyComplete();
+        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().getCounty()).verifyComplete();
     }
 }

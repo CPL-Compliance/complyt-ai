@@ -7,6 +7,7 @@ import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -19,13 +20,12 @@ public class TransactionZipTaxCountyFetcher implements CountyFetcher {
     private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @Override
-    public Mono<Transaction> fetch(Transaction transaction) {
-        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
+    public Mono<String> fetch(Address address) {
+        return salesTaxWebClientWrapper.findByAddress(address)
                 .map(salesTaxData -> {
                     ZipTaxData zipTaxData = (ZipTaxData) salesTaxData;
                     String countyFromZipTax = zipTaxData.getResults().get(0).getGeoCounty();
-                    Address shippingAddress = transaction.getShippingAddress();
-                    return transaction.withShippingAddress(shippingAddress.withCounty(countyFromZipTax));
+                    return countyFromZipTax;
                 });
     }
 }

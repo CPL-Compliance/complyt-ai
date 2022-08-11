@@ -83,9 +83,9 @@ class TransactionZipTaxCountyFetcherTest {
                         .withCounty(zipTaxData.getResults().get(0).getGeoCounty()));
 
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(zipTaxData));
-        Mono<Transaction> transactionMono = transactionZipTaxCountyFetcher.fetch(transaction);
+        Mono<String> countyMono = transactionZipTaxCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionWithInjectedCounty).verifyComplete();
+        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().getCounty()).verifyComplete();
     }
 }

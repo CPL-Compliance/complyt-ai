@@ -1,8 +1,8 @@
 package com.complyt.business.utils.data_fetcher;
 
-import com.complyt.domain.Transaction;
+import com.complyt.domain.Address;
 import reactor.core.publisher.Mono;
 
 public interface CountyFetcher {
-    Mono<Transaction> fetch(Transaction transaction);
+    Mono<String> fetch(Address address);
 }

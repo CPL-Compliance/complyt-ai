@@ -2,7 +2,6 @@ package com.complyt.business.utils.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
-import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -19,13 +18,12 @@ public class TransactionFastTaxCountyFetcher implements CountyFetcher {
     private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @Override
-    public Mono<Transaction> fetch(Transaction transaction) {
-        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
+    public Mono<String> fetch(Address address) {
+        return salesTaxWebClientWrapper.findByAddress(address)
                 .map(salesTaxData -> {
                     FastTaxData fastTaxData = (FastTaxData) salesTaxData;
                     String countyFromFastTax = fastTaxData.getTaxInfoItems().get(0).getCounty();
-                    Address shippingAddress = transaction.getShippingAddress();
-                    return transaction.withShippingAddress(shippingAddress.withCounty(countyFromFastTax));
+                    return countyFromFastTax;
                 });
     }
 }

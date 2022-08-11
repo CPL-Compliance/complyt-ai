@@ -1,5 +1,6 @@
 package com.complyt.config;
 
+import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import com.complyt.business.utils.data_fetcher.TransactionZipTaxCountyFetcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +24,9 @@ public class CountyFetcherConfigTest {
     @MockBean
     ZipTaxWebClientWrapper zipTaxWebClientWrapper;
 
-    @MockBean
-    WebClient webClient;
-
     @BeforeEach
     void setUp() {
         countyFetcherConfig = new CountyFetcherConfig(zipTaxWebClientWrapper);
-
     }
 
     @Test
@@ -38,7 +35,7 @@ public class CountyFetcherConfigTest {
         TransactionZipTaxCountyFetcher expectedFetcher = new TransactionZipTaxCountyFetcher(zipTaxWebClientWrapper);;
 
         // When + Then
-        TransactionZipTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher(webClient);
+        TransactionZipTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher();
         assertEquals(expectedFetcher,actualFetcher);
     }
 

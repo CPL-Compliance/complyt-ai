@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.utils.data_fetcher.CountyFetcher;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
@@ -49,7 +50,7 @@ class TransactionServiceImplTest {
     ProductClassificationServiceImpl productClassificationService;
 
     @Mock
-    CountyFetcher countyFetcher;
+    CountyProvider countyProvider;
 
     Transaction transaction;
 
@@ -329,7 +330,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
-        when(countyFetcher.fetch(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
@@ -368,7 +369,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
-        when(countyFetcher.fetch(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transaction);
 
         // Then
