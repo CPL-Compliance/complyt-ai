@@ -23,7 +23,7 @@ public class CountyFetcherConfig {
         return new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
     }
 
-    @Profile({"zipTax", "default"})
+    @Profile({"zipTax"})
     @Bean("countyFetcher")
     public TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher(WebClient webClient) {
         return new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
