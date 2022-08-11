@@ -64,19 +64,21 @@ class TransactionZipTaxCountyFetcherTest {
     }
 
     private Result createResult() {
-        return new Result("","","injectedCounty","",0f,0f,"","",
-                0f,0f,0f,0f,"",0f,0,"",
-                0f,0f,"",0,0,"",0,
-                0,"",0,0,"",0,0,"",
-                0,0,"");
+        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
+                0f, 0f, 0f, 0f, "", 0f, 0, "",
+                0f, 0f, "", 0, 0, "", 0,
+                0, "", 0, 0, "", 0, 0, "",
+                0, 0, "");
     }
 
     @Test
     void inject_InjectsCounty_ReturnsOrder() {
         // Given
         Result result = createResult();
-        List<Result> results = new ArrayList<Result>(){{add(result);}};
-        ZipTaxData zipTaxData = new ZipTaxData("version",0,results);
+        List<Result> results = new ArrayList<Result>() {{
+            add(result);
+        }};
+        ZipTaxData zipTaxData = new ZipTaxData("version", 0, results);
         Transaction transactionWithInjectedCounty = transaction
                 .withShippingAddress(transaction.getShippingAddress()
                         .withCounty(zipTaxData.getResults().get(0).getGeoCounty()));

@@ -63,15 +63,17 @@ class TransactionFastTaxCountyFetcherTest {
     }
 
     private TaxInfoItem createTaxInfoItem() {
-        return new TaxInfoItem("city","","","injectedCounty","","",null,"","","","","","","","","");
+        return new TaxInfoItem("city", "", "", "injectedCounty", "", "", null, "", "", "", "", "", "", "", "", "");
     }
 
     @Test
     void inject_InjectsCounty_ReturnsOrder() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
-        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>(){{add(taxInfoItem);}};
-        FastTaxData fastTaxData = new FastTaxData("0",taxInfoItems);
+        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>() {{
+            add(taxInfoItem);
+        }};
+        FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems);
         Transaction transactionWithInjectedCounty = transaction
                 .withShippingAddress(transaction.getShippingAddress()
                         .withCounty(fastTaxData.getTaxInfoItems().get(0).getCounty()));
