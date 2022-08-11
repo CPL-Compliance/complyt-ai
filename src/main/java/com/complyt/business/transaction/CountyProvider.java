@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class CountyProvider {
+public class CountyProvider implements SalesTaxDataProvider<Transaction> {
 
     @NonNull
     private CountyFetcher countyFetcher;
