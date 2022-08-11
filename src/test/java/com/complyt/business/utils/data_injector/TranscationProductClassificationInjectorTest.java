@@ -1,4 +1,4 @@
-package com.complyt.business.transaction;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.business.utils.data_injector.ProductClassificationDataInjector;
 import com.complyt.domain.Address;
