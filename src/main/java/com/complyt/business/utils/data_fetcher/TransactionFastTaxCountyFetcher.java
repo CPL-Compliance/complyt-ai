@@ -5,10 +5,12 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @Component
 public class TransactionFastTaxCountyFetcher implements CountyFetcher {
