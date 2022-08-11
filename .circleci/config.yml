@@ -102,4 +102,4 @@ jobs:
       - aws-ecs/update-service:
           cluster-name: 'Complyt'
           container-image-name-updates: 'container=Complyt,tag=latest'
-          family: 'Complyt'
+          family: 'Complyt-ECS-Fargate-LB'
