@@ -1,5 +1,10 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@3.0.0
+  aws-cli: circleci/aws-cli@1.3
+  aws-ecs: circleci/aws-ecs@2.0
+
 workflows:
   version: 2
   build-test-deploy:
@@ -19,65 +24,82 @@ workflows:
           requires:
             - unit-test
             - integration-test
-
-orbs:
-  codecov: codecov/codecov@3.0.0
+      - update-service:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - publish-docker
 
 jobs:
-  build:
+   build:
+     docker:
+       - image: cimg/openjdk:11.0
+     steps:
+       - checkout
+       - run:
+           name: Build
+           command: ./mvnw -B -DskipTests clean package
+       - persist_to_workspace:
+           root: .
+           paths:
+             - .
+
+   integration-test:
+     machine:
+         image: "ubuntu-2004:current"
+         docker_layer_caching: true
+     steps:
+         - attach_workspace:
+             at: .
+         - run:
+             name: Integration Test
+             command: ./mvnw verify
+
+   unit-test:
+       docker:
+         - image: cimg/openjdk:11.0
+       steps:
+       - attach_workspace:
+           at: .
+       - run:
+           name: Test
+           command: ./mvnw test
+       - run:
+             name: Save test results
+             command: |
+               mkdir -p ~/test-results/
+               find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+             when: always
+       - store_test_results:
+             path: '~/test-results/'
+       - codecov/upload:
+             file: '/target/jacoco-reports/jacoco.xml'
+             token: CODECOV_TOKEN
+
+   publish-docker:
+     machine:
+         image: "ubuntu-2004:current"
+         docker_layer_caching: true
+     steps:
+       - checkout
+       - run: ./mvnw dependency:go-offline
+       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
+       - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+       - run:
+           name: Publish Docker image with Fabric8
+           command: ./mvnw clean package docker:build docker:push
+
+   update-service:
     docker:
-      - image: cimg/openjdk:11.0
+      - image: 'cimg/python:3.9.1'
     steps:
-      - checkout
-      - run:
-          name: Build
-          command: ./mvnw -B -DskipTests clean package
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-  integration-test:
-    machine:
-        image: "ubuntu-2004:current"
-        docker_layer_caching: true
-    steps:
-        - attach_workspace:
-            at: .
-        - run:
-            name: Integration Test
-            command: ./mvnw verify
-
-  unit-test:
-      docker: 
-        - image: cimg/openjdk:11.0
-      steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Test
-          command: ./mvnw test
-      - run:
-            name: Save test results
-            command: |
-              mkdir -p ~/test-results/
-              find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
-            when: always
-      - store_test_results:
-            path: '~/test-results/'
-      - codecov/upload:
-            file: '/target/jacoco-reports/jacoco.xml'
-            token: CODECOV_TOKEN
-
-  publish-docker:
-    machine:
-        image: "ubuntu-2004:current"
-        docker_layer_caching: true
-    steps:
-      - checkout
-      - run: ./mvnw dependency:go-offline
-      - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
-      - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-      - run:
-          name: Publish Docker image with Fabric8
-          command: ./mvnw clean package docker:build docker:push
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-region: AWS_DEFAULT_REGION
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - aws-ecs/update-service:
+          cluster-name: 'Complyt'
+          container-image-name-updates: 'container=Complyt,tag=latest'
+          family: 'Complyt'
