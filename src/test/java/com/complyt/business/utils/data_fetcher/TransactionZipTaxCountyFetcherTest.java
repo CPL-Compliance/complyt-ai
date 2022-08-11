@@ -41,7 +41,6 @@ class TransactionZipTaxCountyFetcherTest {
 
     @BeforeEach
     void setUp() {
-//        fastTaxCountyInjector = new FastTaxCountyInjector();
         transaction = createTransaction();
     }
 
