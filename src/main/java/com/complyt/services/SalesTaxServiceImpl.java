@@ -4,12 +4,10 @@ import com.complyt.business.sales_tax.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
@@ -21,7 +19,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 
 @Service
 @AllArgsConstructor
@@ -47,27 +44,14 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
-        return salesTaxTracking.isEnforcesSalesTax() && isApplied ? calculate(transaction) : Mono.just(transaction);
+        return isApplied ? calculate(transaction) : Mono.just(transaction);
     }
 
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
-        return findByAddress(transaction.getShippingAddress())
-                .map(this::salesTaxDataToSalesTaxRate)
+        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
+                .map(salesTaxDataToSalesTaxRate::map)
                 .map(injectSalesTaxToTransaction(transaction));
-    }
-
-    @Override
-    public float calculateSalesTaxAmount(List<Item> items) {
-        return salesTaxCalculator.calculate(items);
-    }
-
-    private Mono<SalesTaxData> findByAddress(Address address) {
-        return salesTaxWebClientWrapper.findByAddress(address);
-    }
-
-    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
-        return salesTaxDataToSalesTaxRate.map(salesTaxData);
     }
 
     private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
@@ -77,7 +61,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
 
             log.info("Calculating total sales tax amount for transaction");
-            float salesTaxAmount = calculateSalesTaxAmount(transactionWithItemsWithRates.getItems());
+
+            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             log.debug("Transaction's sales tax : " + salesTax);

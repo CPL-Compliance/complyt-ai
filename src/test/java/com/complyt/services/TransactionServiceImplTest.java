@@ -1,5 +1,7 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.utils.data_fetcher.CountyFetcher;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.*;
@@ -46,6 +48,9 @@ class TransactionServiceImplTest {
 
     @Mock
     ProductClassificationServiceImpl productClassificationService;
+
+    @Mock
+    CountyProvider countyProvider;
 
     Transaction transaction;
 
@@ -316,12 +321,16 @@ class TransactionServiceImplTest {
     void injectDataToNewTransaction_InjectsDateToNewTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
+                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
         NewTransactionInternalDateInjector injector = new NewTransactionInternalDateInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
+        when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
@@ -351,12 +360,16 @@ class TransactionServiceImplTest {
         // Given
         Transaction newTransaction = transaction.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
+                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+
         ModifiedTransactionInternalDateInjector injector = new ModifiedTransactionInternalDateInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
+        when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transaction);
 
         // Then

@@ -1,4 +1,4 @@
-package com.complyt.business.transaction;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
@@ -25,7 +25,7 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TranscationProductClassificationInjectorTest {
+public class ProductClassificationDataInjectorTest {
 
     Transaction transaction;
 
@@ -58,7 +58,7 @@ public class TranscationProductClassificationInjectorTest {
     }
 
     @Test
-    void testAct() {
+    void inject_InjectsDataToTransaction_ReturnsTransaction() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
                 null,null,false,0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
@@ -94,14 +94,13 @@ public class TranscationProductClassificationInjectorTest {
         }};
 
         Transaction transaction2 = transaction.withItems(itemsNoRules);
-        TransactionProductClassificationInjector transactionProductClassificationInjector2 = new TransactionProductClassificationInjector(transaction2);
+        ProductClassificationDataInjector transactionProductClassificationInjector2 = new ProductClassificationDataInjector(transaction2);
 
         Transaction newTransaction = transaction.withItems(itemsWithRules);
 
-        Mono<Transaction> transactionMono = transactionProductClassificationInjector2.act(productClassifications);
+        Mono<Transaction> transactionMono = transactionProductClassificationInjector2.inject(productClassifications);
 
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
-
     }
 
 }

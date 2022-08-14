@@ -26,7 +26,7 @@ public class WebClientWrapperConfigTest {
     WebClient webClient;
 
     @Test
-    void zipTaxWebClientWrapper_SetInstance_ReturnInstance() {
+    void zipTaxWebClientWrapper_CreateInstance_ReturnInstance() {
         ZipTaxWebClientWrapper expectedZipTaxWebClientWrapper = new ZipTaxWebClientWrapper(webClient,
                 ZipTaxWebClientWrapperProperties.SCHEME,
                 ZipTaxWebClientWrapperProperties.HOST,

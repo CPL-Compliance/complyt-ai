@@ -42,8 +42,9 @@ public class SalesTaxApplyCheckTest {
                 new ObjectId(), true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null), LocalDateTime.now(),
-                true, LocalDateTime.now());
+                true,LocalDateTime.now());
     }
+
 
     private Transaction createTransactionWithAppliedReferenceDate() {
         String id = UUID.randomUUID().toString();

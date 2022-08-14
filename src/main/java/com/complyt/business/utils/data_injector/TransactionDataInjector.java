@@ -1,10 +1,8 @@
-package com.complyt.business.transaction;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.domain.Transaction;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 public interface TransactionDataInjector<T> {
-    Mono<Transaction> act(Map<String, T> t);
+    Mono<Transaction> inject(T t);
 }

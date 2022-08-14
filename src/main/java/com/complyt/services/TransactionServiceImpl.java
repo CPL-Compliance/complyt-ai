@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.Transaction;
@@ -29,6 +30,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Qualifier("productClassificationServiceImpl")
     private ProductClassificationService productClassificationService;
 
+    @NonNull
+    private CountyProvider countyProvider;
+
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
@@ -51,6 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction newTransactionWithInternalTimeStamps = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps());
 
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
+                .flatMap(countyProvider::provide)
                 .map(ModifiedTransactionInternalDateInjector::new)
                 .map(ModifiedTransactionInternalDateInjector::inject);
     }
@@ -58,6 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
+                .flatMap(countyProvider::provide)
                 .map(NewTransactionInternalDateInjector::new)
                 .map(NewTransactionInternalDateInjector::inject);
     }

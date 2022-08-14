@@ -1,4 +1,4 @@
-package com.complyt.business.utils.transaction_data_injector;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -13,7 +13,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Slf4j
-public class ProductClassificationDataInjector implements TransactionDataInjector<ProductClassification> {
+public class ProductClassificationDataInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
 
     @NonNull
     private final Transaction transaction;

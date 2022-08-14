@@ -18,6 +18,7 @@ public class SalesTaxApplyCheck {
 
         boolean isSalesTaxEnforced = salesTaxTracking.isEnforcesSalesTax();
         boolean isPassedApplicationDate = referenceDate.compareTo(applicationDate) >= 0;
+
         boolean isApproved = salesTaxTracking.isApproved() &&
                 referenceDate.compareTo(salesTaxTracking.getApprovalDate()) >= 0;
 

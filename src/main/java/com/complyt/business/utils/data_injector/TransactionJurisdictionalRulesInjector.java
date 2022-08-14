@@ -1,4 +1,4 @@
-package com.complyt.business.utils.transaction_data_injector;
+package com.complyt.business.utils.data_injector;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
@@ -20,7 +20,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<ProductClassification> {
+public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
     @NonNull
     private final Transaction transaction;
 

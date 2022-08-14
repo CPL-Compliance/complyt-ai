@@ -6,9 +6,9 @@ import lombok.*;
 
 import java.util.List;
 
-
 @Getter
 @EqualsAndHashCode
+@With
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
