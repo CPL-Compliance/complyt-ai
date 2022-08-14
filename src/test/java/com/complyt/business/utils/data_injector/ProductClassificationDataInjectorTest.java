@@ -1,6 +1,5 @@
 package com.complyt.business.utils.data_injector;
 
-import com.complyt.business.utils.data_injector.ProductClassificationDataInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
@@ -26,7 +25,7 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TranscationProductClassificationInjectorTest {
+public class ProductClassificationDataInjectorTest {
 
     Transaction transaction;
 
@@ -102,7 +101,6 @@ public class TranscationProductClassificationInjectorTest {
         Mono<Transaction> transactionMono = transactionProductClassificationInjector2.inject(productClassifications);
 
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
-
     }
 
 }
