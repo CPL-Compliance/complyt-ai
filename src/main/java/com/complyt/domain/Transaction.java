@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.SalesTax;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -17,16 +18,16 @@ import java.util.List;
 @Document(collection = "transaction")
 public class Transaction {
     @Id
-    private String id;
-    private String externalId;
-    private List<Item> items;
-    private Address billingAddress;
-    private Address shippingAddress;
-    private ObjectId customerId;
-    private Customer customer;
-    private SalesTax salesTax;
-    private TransactionStatus transactionStatus;
-    private ObjectId clientId;
-    private TimeStamps internalTimeStamps;
-    private TimeStamps externalTimeStamps;
+    private final String id;
+    private final String externalId;
+    private final List<Item> items;
+    private final Address billingAddress;
+    private final Address shippingAddress;
+    private final ObjectId customerId;
+    private final Customer customer;
+    private final SalesTax salesTax;
+    private final TransactionStatus transactionStatus;
+    private final ObjectId clientId;
+    private final TimeStamps internalTimeStamps;
+    private final TimeStamps externalTimeStamps;
 }

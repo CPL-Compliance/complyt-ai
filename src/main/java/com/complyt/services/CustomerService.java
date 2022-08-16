@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.domain.Customer;
+import com.complyt.domain.customer.Customer;
 import com.complyt.services.crud.CrudService;
 import com.complyt.services.crud.FindByName;
 import com.complyt.services.crud.FindOneByName;

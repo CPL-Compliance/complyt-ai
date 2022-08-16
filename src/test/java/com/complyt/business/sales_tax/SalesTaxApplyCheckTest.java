@@ -7,11 +7,13 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.services.ExemptionServiceImpl;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -19,6 +21,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,9 +34,12 @@ public class SalesTaxApplyCheckTest {
     private SalesTaxApplyCheck salesTaxApplyCheck;
     private SalesTaxTracking salesTaxTracking;
 
+    @Mock
+    private CustomerFullyExemptionCheck customerFullyExemptionCheck;
+
     @BeforeEach
     void setUp() {
-        salesTaxApplyCheck = new SalesTaxApplyCheck();
+        salesTaxApplyCheck = new SalesTaxApplyCheck(customerFullyExemptionCheck);
         salesTaxTracking = createSalesTaxTracking();
     }
 
@@ -42,7 +49,7 @@ public class SalesTaxApplyCheckTest {
                 new ObjectId(), true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null), LocalDateTime.now(),
-                true,LocalDateTime.now());
+                true, LocalDateTime.now());
     }
 
 
@@ -123,12 +130,14 @@ public class SalesTaxApplyCheckTest {
     @Test
     void isApplied_SalesTaxNotAppliedBecauseNotApproved_ReturnsFalse() {
         // Given
+        Transaction transaction = createTransactionWithAppliedReferenceDate();
+
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
                 .withApproved(false)
-                .withApprovalDate(null);
+                .withApprovalDate(transaction.getExternalTimeStamps().getCreatedDate().plusYears(1));
 
         // When
-        Transaction transaction = createTransactionWithAppliedReferenceDate();
+        when(customerFullyExemptionCheck.isFullyExempted(transaction.getCustomer(), transaction.getShippingAddress().getState())).thenReturn(true);
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
 
         // Then
@@ -142,7 +151,7 @@ public class SalesTaxApplyCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxApplyCheck.isApplied(nullTransaction,salesTaxTracking);
+            salesTaxApplyCheck.isApplied(nullTransaction, salesTaxTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -156,7 +165,7 @@ public class SalesTaxApplyCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxApplyCheck.isApplied(transaction,nullTracking);
+            salesTaxApplyCheck.isApplied(transaction, nullTracking);
         });
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");

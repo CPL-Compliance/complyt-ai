@@ -1,6 +1,6 @@
-package com.complyt.v1.model;
+package com.complyt.domain.customer;
 
-public enum CustomerTypeDto {
+public enum CustomerType {
     RETAIL,
     MARKETPLACE,
     RESELLER,

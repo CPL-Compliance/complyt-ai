@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;

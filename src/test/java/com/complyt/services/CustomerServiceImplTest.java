@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,8 +17,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,7 +42,7 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL,null);
     }
 
     @Test

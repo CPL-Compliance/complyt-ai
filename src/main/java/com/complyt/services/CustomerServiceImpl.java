@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.domain.Customer;
+import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

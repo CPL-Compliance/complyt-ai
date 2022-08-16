@@ -1,6 +1,6 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.Customer;
+import com.complyt.domain.customer.Customer;
 import com.complyt.v1.model.CustomerDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;

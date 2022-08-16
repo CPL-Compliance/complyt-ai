@@ -1,7 +1,7 @@
 package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.ApplicationDateCreator;
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;

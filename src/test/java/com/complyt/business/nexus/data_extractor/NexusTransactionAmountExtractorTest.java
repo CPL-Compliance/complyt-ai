@@ -2,6 +2,8 @@ package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
 import com.complyt.domain.nexus.enums.Definition;
@@ -56,7 +58,7 @@ public class NexusTransactionAmountExtractorTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL,null);
     }
 
     private NexusStateRule createNexusStateRule() {
