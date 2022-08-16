@@ -42,9 +42,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
-
-        return isApplied ? calculate(transaction) : Mono.just(transaction);
+        return salesTaxApplyCheck.isApplied(transaction, salesTaxTracking)
+                .flatMap(isApplied -> isApplied ? calculate(transaction) : Mono.just(transaction));
     }
 
     @Override

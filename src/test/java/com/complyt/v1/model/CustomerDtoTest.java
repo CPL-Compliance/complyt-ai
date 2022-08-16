@@ -37,10 +37,10 @@ public class CustomerDtoTest {
         assertEquals(customerDto.hashCode(), anotherCustomerDto.hashCode());
     }
 
-    @Test
-    void testToString() {
-        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ", customerType=" + customerDto.getCustomerType() + ")";
-
-        assertEquals(referenceString, customerDto.toString());
-    }
+//    @Test
+//    void testToString() {
+//        String referenceString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=" + customerDto.getName() + ", address=" + customerDto.getAddress() + ", customerType=" + customerDto.getCustomerType() + ")";
+//
+//        assertEquals(referenceString, customerDto.toString());
+//    }
 }

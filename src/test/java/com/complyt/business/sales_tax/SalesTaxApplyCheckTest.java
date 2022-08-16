@@ -7,7 +7,6 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.services.ExemptionServiceImpl;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,15 +15,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.Mockito.when;
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -92,39 +92,37 @@ public class SalesTaxApplyCheckTest {
     @Test
     void isApplied_SalesTaxApplied_ReturnsTrue() {
         // Given
-
-        // When
         Transaction transaction = createTransactionWithAppliedReferenceDate();
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
-        // Then
-        assertTrue(isApplied);
+        // When + Then
+        when(customerFullyExemptionCheck.isFullyExempted(transaction)).thenReturn(Mono.just(false));
+        Mono<Boolean> isAppliedMono = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+
+        StepVerifier.create(isAppliedMono).expectNext(true).verifyComplete();
 
     }
 
     @Test
     void isApplied_SalesTaxNotAppliedBecauseOfApplicationDate_ReturnsFalse() {
         // Given
-
-        // When
         Transaction transaction = createTransactionWithReferenceDateNotApplied();
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
-        // Then
-        assertFalse(isApplied);
+        // When + Then
+        Mono<Boolean> isAppliedMono = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+
+        StepVerifier.create(isAppliedMono).expectNext(false).verifyComplete();
     }
 
     @Test
     void isApplied_SalesTaxNotAppliedBecauseEnforcedSalesTaxIsFalse_ReturnsFalse() {
         // Given
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking.withEnforcesSalesTax(false);
-
-        // When
         Transaction transaction = createTransactionWithAppliedReferenceDate();
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
 
-        // Then
-        assertFalse(isApplied);
+        // When + Then
+        Mono<Boolean> isAppliedMono = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
+
+        StepVerifier.create(isAppliedMono).expectNext(false).verifyComplete();
     }
 
     @Test
@@ -137,11 +135,10 @@ public class SalesTaxApplyCheckTest {
                 .withApprovalDate(transaction.getExternalTimeStamps().getCreatedDate().plusYears(1));
 
         // When
-        when(customerFullyExemptionCheck.isFullyExempted(transaction.getCustomer(), transaction.getShippingAddress().getState())).thenReturn(true);
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
+        Mono<Boolean> isAppliedMono = salesTaxApplyCheck.isApplied(transaction, salesTaxTrackingWithNoSalesTax);
 
         // Then
-        assertFalse(isApplied);
+        StepVerifier.create(isAppliedMono).expectNext(false).verifyComplete();
     }
 
     @Test

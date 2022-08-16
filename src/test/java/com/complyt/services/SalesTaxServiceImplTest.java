@@ -132,9 +132,10 @@ public class SalesTaxServiceImplTest {
         State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), false, null, null, LocalDateTime.now(),
-                true, LocalDateTime.now());
+                false, LocalDateTime.now());
 
         // When
+        when(salesTaxApplyCheck.isApplied(transaction,tracking)).thenReturn(Mono.just(false));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -150,6 +151,7 @@ public class SalesTaxServiceImplTest {
                 true, LocalDateTime.now());
 
         // When
+        when(salesTaxApplyCheck.isApplied(transaction,tracking)).thenReturn(Mono.just(false));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -161,26 +163,26 @@ public class SalesTaxServiceImplTest {
         // Given
         FastTaxData fastTaxData = new FastTaxData();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-        SalesTax salesTax = new SalesTax(10,salesTaxRate);
+        SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
-        List<Item> itemsWithRates = new ArrayList<Item>(){{
+        List<Item> itemsWithRates = new ArrayList<Item>() {{
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
-        State state = new State("CA","02","California");
-        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(),state,
-                new ObjectId(),true,null,null,LocalDateTime.now().minusYears(1),
-                true,LocalDateTime.now());
+        State state = new State("CA", "02", "California");
+        SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
+                new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
+                true, LocalDateTime.now());
 
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction,tracking)).thenReturn(true);
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(true));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRateCalculator.calculateSalesTaxRate(transaction.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
                 .thenReturn(salesTaxRate);
         when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction,tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();

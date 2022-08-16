@@ -33,7 +33,6 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     private CountyProvider countyProvider;
 
-
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
@@ -53,9 +52,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction) {
-        Transaction newTransactionWithInternalTimeStamps = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps());
+        Transaction newTransactionWithInternalTimeStampsAndCustomer = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps())
+                .withCustomer(oldTransaction.getCustomer());
 
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
+        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStampsAndCustomer)
                 .flatMap(countyProvider::provide)
                 .map(ModifiedTransactionInternalDateInjector::new)
                 .map(ModifiedTransactionInternalDateInjector::inject);
