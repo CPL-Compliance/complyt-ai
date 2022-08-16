@@ -58,8 +58,8 @@ public class TransactionController {
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
 
         return transactionFacade.findByExternalId(externalId)
-                .flatMap(oldTransaction -> transactionFacade.updateIfModified(externalId, receivedTransaction, oldTransaction))
-                .map(transactionItem -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem)))
+                .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, receivedTransaction, originalTransaction))
+                .map(updatedTransaction -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(updatedTransaction)))
                 .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)
                         .map(transaction -> ResponseEntity.status(HttpStatus.CREATED).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction))));
     }

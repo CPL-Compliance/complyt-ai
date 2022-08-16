@@ -51,9 +51,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction) {
-        Transaction newTransactionWithInternalTimeStampsAndCustomer = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps())
-                .withCustomer(oldTransaction.getCustomer());
+    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        Transaction newTransactionWithInternalTimeStampsAndCustomer = modifiedTransaction.withInternalTimeStamps(originalTransaction.getInternalTimeStamps())
+                .withCustomer(originalTransaction.getCustomer());
 
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStampsAndCustomer)
                 .flatMap(countyProvider::provide)

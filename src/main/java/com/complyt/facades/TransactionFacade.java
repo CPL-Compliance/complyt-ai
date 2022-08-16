@@ -36,9 +36,9 @@ public class TransactionFacade {
                                 transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
     }
 
-    public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction oldTransaction) {
-        return oldTransaction.equals(newTransaction) ?
-                Mono.just(newTransaction) : update(externalId, newTransaction, oldTransaction);
+    public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
+        return originalTransaction.equals(newTransaction) ?
+                Mono.just(newTransaction) : update(externalId, newTransaction, originalTransaction);
     }
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction oldTransaction) {
