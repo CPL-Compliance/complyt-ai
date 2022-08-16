@@ -1,7 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.domain.Transaction;
-import com.complyt.business.utils.data_injector.ProductClassificationDataInjector;
+import com.complyt.business.utils.data_injector.TransactionProductClassificationDataInjector;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return Flux.fromIterable(transaction.getItems())
                 .flatMap(item -> getClassification(item.getTaxCode()))
                 .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
-                .flatMap(mapTaxCodesToClassifications -> new ProductClassificationDataInjector(transaction).inject(mapTaxCodesToClassifications));
+                .flatMap(mapTaxCodesToClassifications -> new TransactionProductClassificationDataInjector(transaction).inject(mapTaxCodesToClassifications));
     }
 
     private Mono<ProductClassification> getClassification(String taxCode) {

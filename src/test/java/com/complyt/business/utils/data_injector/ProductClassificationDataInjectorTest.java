@@ -94,7 +94,7 @@ public class ProductClassificationDataInjectorTest {
         }};
 
         Transaction transaction2 = transaction.withItems(itemsNoRules);
-        ProductClassificationDataInjector transactionProductClassificationInjector2 = new ProductClassificationDataInjector(transaction2);
+        TransactionProductClassificationDataInjector transactionProductClassificationInjector2 = new TransactionProductClassificationDataInjector(transaction2);
 
         Transaction newTransaction = transaction.withItems(itemsWithRules);
 

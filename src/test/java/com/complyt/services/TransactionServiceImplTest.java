@@ -406,7 +406,7 @@ class TransactionServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "newTransaction is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
     }
 
     @Test
@@ -420,7 +420,7 @@ class TransactionServiceImplTest {
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "oldTransaction is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
     }
 
     @Test

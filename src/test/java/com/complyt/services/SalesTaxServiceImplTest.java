@@ -1,10 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.sales_tax.SalesTaxApplyCheck;
-import com.complyt.business.sales_tax.SalesTaxCalculator;
-import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.data_fetcher.CountyFetcher;
+import com.complyt.business.utils.data_injector.TransactionSalesTaxInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -14,6 +12,7 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.bson.types.ObjectId;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,16 +46,10 @@ public class SalesTaxServiceImplTest {
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @Mock
-    SalesTaxCalculator salesTaxCalculator;
-
-    @Mock
-    SalesTaxRateCalculator salesTaxRateCalculator;
-
-    @Mock
     SalesTaxApplyCheck salesTaxApplyCheck;
 
     @Mock
-    CountyFetcher countyFetcher;
+    TransactionSalesTaxInjector transactionSalesTaxInjector;
 
     Transaction transaction;
 
@@ -83,7 +76,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxCalculator, salesTaxRateCalculator, salesTaxApplyCheck);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxWebClientWrapper is marked non-null but is null");
     }
@@ -95,35 +88,9 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxCalculator, salesTaxRateCalculator, salesTaxApplyCheck);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxDataToSalesTaxRate is marked non-null but is null");
-    }
-
-    @Test
-    void initService_NullSalesTaxCalculator_ThrowsException() {
-        // Given
-        salesTaxCalculator = null;
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxCalculator, salesTaxRateCalculator, salesTaxApplyCheck);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "salesTaxCalculator is marked non-null but is null");
-    }
-
-    @Test
-    void initService_NullJurisdictionalSalesTaxController_ThrowsException() {
-        // Given
-        salesTaxRateCalculator = null;
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxCalculator, salesTaxRateCalculator, salesTaxApplyCheck);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "salesTaxRateCalculator is marked non-null but is null");
     }
 
     @Test
@@ -135,7 +102,7 @@ public class SalesTaxServiceImplTest {
                 false, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction,tracking)).thenReturn(Mono.just(false));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(false));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -151,7 +118,7 @@ public class SalesTaxServiceImplTest {
                 true, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction,tracking)).thenReturn(Mono.just(false));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(false));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -173,15 +140,13 @@ public class SalesTaxServiceImplTest {
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
                 true, LocalDateTime.now());
-
+        Pair<Transaction, SalesTaxRate> transactionSalesTaxRatePair = new Pair<>(transaction,salesTaxRate);
 
         // When
         when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(true));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRateCalculator.calculateSalesTaxRate(transaction.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate))
-                .thenReturn(salesTaxRate);
-        when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
+        when(transactionSalesTaxInjector.inject(transactionSalesTaxRatePair)).thenReturn(Mono.just(transactionWithSalesTax));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -198,7 +163,7 @@ public class SalesTaxServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(nullTransaction, tracking));
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transactionWithOutSalesTax is marked non-null but is null");
 
     }
 
