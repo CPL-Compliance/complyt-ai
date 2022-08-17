@@ -330,6 +330,14 @@
     </build>
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-        <tag>complyt-0.0.6</tag>
+        <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+<!--        <repository>-->
+<!--            <id>pkg.github.com</id>-->
+<!--            <name>GitHub nbauma109 Apache Maven Packages</name>-->
+<!--            <url>https://maven.pkg.github.com/nbauma109/mvn-repo</url>-->
+<!--        </repository>-->
+    </distributionManagement>
 </project>
