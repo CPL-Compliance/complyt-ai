@@ -203,6 +203,15 @@
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                            <goal>remove</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-and-push</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
                         </goals>
                     </execution>
                 </executions>
