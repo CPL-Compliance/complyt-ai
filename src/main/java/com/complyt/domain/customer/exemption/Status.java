@@ -6,5 +6,4 @@ import lombok.AllArgsConstructor;
 public class Status {
     private final String code;
     private final String name;
-
 }

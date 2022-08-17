@@ -5,6 +5,7 @@ import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,6 +55,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Flux<Customer> findAll() {
         return customerRepository.findAll();
+    }
+
+    @Override
+    public Mono<Customer> findById(@NonNull ObjectId id) {
+        return customerRepository.findById(id);
     }
 
     private Function<Customer, Customer> createUpdateCustomerFunction(@NonNull final Customer customer) {

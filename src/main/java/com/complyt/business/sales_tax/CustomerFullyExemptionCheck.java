@@ -36,14 +36,17 @@ public class CustomerFullyExemptionCheck {
             return Mono.just(false);
         }
 
-        return exemptionService.findByClientCustomerAndState(transaction)
-                .map(exemption -> isExemptionActive(transaction, exemption));
+        return exemptionService.findByClientCustomerAndState(transaction).log()
+                .map(exemption -> isExemptionActive(transaction, exemption))
+                .switchIfEmpty(Mono.just(false));
     }
 
     boolean isExemptionActive(@NonNull Transaction transaction, @NonNull Exemption exemption) {
         LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
-
-        return referenceDate.compareTo(exemption.getValidationDates().getToDate()) >= 0 &&
+        boolean isExemptionInTimeFrame = referenceDate.compareTo(exemption.getValidationDates().getToDate()) >= 0 &&
                 referenceDate.compareTo(exemption.getValidationDates().getFromDate()) <= 0;
+        boolean isFullyExemptionType = exemption.getExemptionType() == ExemptionType.FULLY;
+
+        return isExemptionInTimeFrame && isFullyExemptionType;
     }
 }

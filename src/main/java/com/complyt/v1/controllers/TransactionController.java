@@ -57,7 +57,7 @@ public class TransactionController {
         log.debug("Upsert transaction - DTO received in request body : " + transactionDto);
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
 
-        return transactionFacade.findByExternalId(externalId)
+        return transactionFacade.findByExternalId(externalId).log()
                 .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, receivedTransaction, originalTransaction))
                 .map(updatedTransaction -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(updatedTransaction)))
                 .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)

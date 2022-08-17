@@ -31,7 +31,15 @@ public class SalesTaxApplyCheck {
             return Mono.just(false);
         }
 
-        return checkIfFullyExempted(transaction)
+        return checkIfNotFullyExempted(transaction);
+    }
+
+    boolean checkIfApproved(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
+        return salesTaxTracking.isApproved() && referenceDate.compareTo(salesTaxTracking.getApprovalDate()) >= 0;
+    }
+
+    Mono<Boolean> checkIfNotFullyExempted(@NonNull Transaction transaction) {
+        return customerFullyExemptionCheck.isFullyExempted(transaction)
                 .map(isFullyExempted -> {
                     boolean isSalesTaxApplied = !isFullyExempted;
                     log.debug("Is sales tax applied for order returned : " + isSalesTaxApplied);
@@ -39,11 +47,4 @@ public class SalesTaxApplyCheck {
                 });
     }
 
-    boolean checkIfApproved(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
-        return salesTaxTracking.isApproved() && referenceDate.compareTo(salesTaxTracking.getApprovalDate()) >= 0;
-    }
-
-    Mono<Boolean> checkIfFullyExempted(@NonNull Transaction transaction) {
-        return customerFullyExemptionCheck.isFullyExempted(transaction);
-    }
 }

@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Transaction;
+import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
@@ -28,12 +29,17 @@ public class TransactionFacade {
     @NonNull
     private NexusService nexusService;
 
+    @NonNull
+    @Qualifier("customerServiceImpl")
+    private CustomerService customerService;
+
     public Mono<Transaction> saveTransaction(Transaction transaction) {
-        return transactionService.injectDataToNewTransaction(transaction)
-                .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
-                        .flatMap(salesTaxTrackingDecorator -> salesTaxTrackingDecorator.isHasNexus() ?
-                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingDecorator.getSalesTaxTracking()).flatMap(transactionService::save) :
-                                transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
+        return customerService.findById(transaction.getCustomerId())
+                .flatMap(customer -> transactionService.injectDataToNewTransaction(transaction, customer)
+                        .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
+                                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                        salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(transactionService::save) :
+                                        transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction))));
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
@@ -41,11 +47,11 @@ public class TransactionFacade {
                 Mono.just(newTransaction) : update(externalId, newTransaction, originalTransaction);
     }
 
-    public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction oldTransaction) {
-        return transactionService.injectDataToModifiedTransaction(modifiedTransaction, oldTransaction)
+    public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        return transactionService.injectDataToModifiedTransaction(modifiedTransaction, originalTransaction)
                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
-                        .flatMap(salesTaxTrackingDecorator -> salesTaxTrackingDecorator.isHasNexus() ?
-                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingDecorator.getSalesTaxTracking()).flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction)) :
+                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction)) :
                                 transactionService.update(externalId, setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
     }
 

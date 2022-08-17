@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
-public class SalesTaxTrackingDecorator {
+public class SalesTaxTrackingWithNexusInfo {
     private final SalesTaxTracking salesTaxTracking;
     private final boolean hasNexus;
 }

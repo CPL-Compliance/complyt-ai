@@ -54,10 +54,16 @@ class TransactionServiceImplTest {
     CountyProvider countyProvider;
 
     Transaction transaction;
+    Customer customer;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        transaction = createTransaction();
+        customer = createCustomer();
+    }
+
+    private Transaction createTransaction() {
         String id = null;
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -73,7 +79,19 @@ class TransactionServiceImplTest {
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
 
-        transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps);
+        return  new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps);
+    }
+
+    private Customer createCustomer() {
+
+        return new Customer(
+                transaction.getCustomerId().toString(),
+                UUID.randomUUID().toString(),
+                "name",
+                null,
+                new ObjectId(),
+                CustomerType.RETAIL,
+                null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -87,7 +105,7 @@ class TransactionServiceImplTest {
         List<Item> modifiedItems = new ArrayList<Item>() {{
             add(item);
         }};
-        return transaction.withItems(modifiedItems);
+        return transaction.withItems(modifiedItems).withCustomer(customer);
 
     }
 
@@ -267,7 +285,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), new ObjectId(), CustomerType.RETAIL,null);
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), new ObjectId(), CustomerType.RETAIL, null);
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
@@ -321,7 +339,9 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToNewTransaction_InjectsDateToNewTransaction_ReturnsTransaction() {
         // Given
+        Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
+
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
                 .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
@@ -329,10 +349,10 @@ class TransactionServiceImplTest {
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
-        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithCustomer))
                 .thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
+        Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction, customer);
 
         // Then
         StepVerifier.create(transactionMono)
@@ -359,7 +379,8 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToModifiedTransaction_InjectsDateToModifiedTransaction_ReturnsTransaction() {
         // Given
-        Transaction newTransaction = transaction.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));
+        Transaction transactionWithCustomer = transaction.withCustomer(customer);
+        Transaction newTransaction = transactionWithCustomer.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
                 .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
@@ -371,7 +392,7 @@ class TransactionServiceImplTest {
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transaction);
+        Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transactionWithCustomer);
 
         // Then
         StepVerifier.create(transactionMono)
@@ -430,7 +451,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.injectDataToNewTransaction(nullTransaction);
+            transactionService.injectDataToNewTransaction(nullTransaction, null);
         });
 
         // Then

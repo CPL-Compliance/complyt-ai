@@ -5,6 +5,7 @@ import com.complyt.services.crud.CrudService;
 import com.complyt.services.crud.FindByName;
 import com.complyt.services.crud.FindOneByName;
 import lombok.NonNull;
+import org.bson.types.ObjectId;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,4 +19,6 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
     Mono<Customer> findByExternalId(String externalId);
 
     Flux<Customer> findAll();
+
+    Mono<Customer> findById(@NonNull ObjectId id);
 }

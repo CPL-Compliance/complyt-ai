@@ -4,7 +4,7 @@ import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.decorator.SalesTaxTrackingDecorator;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -63,11 +63,11 @@ public class NexusService {
         return nexusStateRuleService.findByState(state);
     }
 
-    public Mono<SalesTaxTrackingDecorator> hasNexus(@NonNull Transaction transaction) {
+    public Mono<SalesTaxTrackingWithNexusInfo> hasNexus(@NonNull Transaction transaction) {
         return findTrackingByState(transaction)
                 .map(salesTaxTracking -> {
                     boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
-                    return new SalesTaxTrackingDecorator(salesTaxTracking, hasNexus);
+                    return new SalesTaxTrackingWithNexusInfo(salesTaxTracking, hasNexus);
                 });
     }
 

@@ -5,7 +5,7 @@ import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.decorator.SalesTaxTrackingDecorator;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -15,7 +15,6 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -278,12 +277,12 @@ class NexusServiceTest {
         // Given
         Transaction transaction = createTransaction();
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
-        SalesTaxTrackingDecorator salesTaxTrackingDecorator = new SalesTaxTrackingDecorator(salesTaxTracking,true);
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTrackingDecorator> salesTaxTrackingDecoratorMono = nexusService.hasNexus(transaction);
+        Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.hasNexus(transaction);
 
         // Then
         StepVerifier.create(salesTaxTrackingDecoratorMono).expectNext(salesTaxTrackingDecorator).verifyComplete();

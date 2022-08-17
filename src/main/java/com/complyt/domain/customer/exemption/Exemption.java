@@ -2,6 +2,7 @@ package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
 import com.complyt.domain.TimeStamps;
+import com.complyt.domain.customer.ExemptionType;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -24,4 +25,5 @@ public class Exemption {
     private final TimeStamps internalTimeStamps;
     private final Status status;
     private final Certificate certificate;
+    private final ExemptionType exemptionType;
 }
