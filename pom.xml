@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9-SNAPSHOT</version>
     <name>complyt</name>
     <description>Complyt</description>
     <properties>
@@ -339,7 +339,7 @@
     </build>
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-        <tag>complyt-0.0.8</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
