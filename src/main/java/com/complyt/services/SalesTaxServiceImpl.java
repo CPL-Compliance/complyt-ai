@@ -1,18 +1,25 @@
 package com.complyt.services;
 
 import com.complyt.business.sales_tax.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.SalesTaxCalculator;
+import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.data_injector.TransactionSalesTaxInjector;
+import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,11 +36,14 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxApplyCheck salesTaxApplyCheck;
 
     @NonNull
-    private TransactionSalesTaxInjector transactionSalesTaxInjector;
-
-    @NonNull
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;
+
+    @NonNull
+    private SalesTaxCalculator salesTaxCalculator;
+
+    @NonNull
+    private SalesTaxRateCalculator salesTaxRateCalculator;
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
@@ -48,6 +58,28 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
                 .map(salesTaxDataToSalesTaxRate::map)
-                .flatMap(salesTaxRate -> transactionSalesTaxInjector.inject(new Pair<>(transaction, salesTaxRate)));
+                .map(injectSalesTaxToTransaction(transaction));
+    }
+
+    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxRate -> {
+            log.info("Setting sales tax rates for transaction's items");
+            List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
+            Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
+
+            log.info("Calculating total sales tax amount for transaction");
+
+            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems());
+            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+
+            log.debug("Transaction's sales tax : " + salesTax);
+            return transactionWithItemsWithRates.withSalesTax(salesTax);
+        };
+    }
+
+    private List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {
+        return items.stream()
+                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
+                .collect(Collectors.toList());
     }
 }
