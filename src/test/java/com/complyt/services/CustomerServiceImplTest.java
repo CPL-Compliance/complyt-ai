@@ -126,6 +126,20 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void findByObjectId_CustomerFound_ReturnsCustomer() {
+        // Given
+        ObjectId id = new ObjectId();
+        Customer customerToSearchFor = customer.withId(id.toString());
+
+        // When
+        when(customerRepository.findById(id)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerServiceImpl.findById(id);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
+    }
+
+    @Test
     void getAllCustomers_AllCustomersReturned() {
          // Given
         String id = UUID.randomUUID().toString();
@@ -205,6 +219,19 @@ class CustomerServiceImplTest {
         String nullId = null;
 
         // When
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.findById(nullId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
+    void findByObjectId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        ObjectId nullId = null;
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
