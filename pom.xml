@@ -8,7 +8,7 @@
         <relativePath />
     </parent>
     <groupId>io.complyt</groupId>
-    <artifactId>salesTax</artifactId>
+    <artifactId>complyt</artifactId>
     <version>0.0.14-SNAPSHOT</version>
     <name>complyt</name>
     <description>Complyt Sales Tax</description>
