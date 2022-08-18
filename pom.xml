@@ -7,9 +7,9 @@
         <version>2.6.3</version>
         <relativePath />
     </parent>
-    <groupId>com.complyt</groupId>
-    <artifactId>complyt</artifactId>
-    <version>0.0.11-SNAPSHOT</version>
+    <groupId>io.complyt</groupId>
+    <artifactId>salesTax</artifactId>
+    <version>0.0.12-SNAPSHOT</version>
     <name>complyt</name>
     <description>Complyt Sales Tax</description>
     <properties>
