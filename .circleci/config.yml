@@ -9,21 +9,21 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - build
-      - unit-test:
-          requires:
-            - build
-      - integration-test:
-          requires:
-            - build
+#      - build
+#      - unit-test:
+#          requires:
+#            - build
+#      - integration-test:
+#          requires:
+#            - build
       - deploy:
           filters:
             branches:
               only:
                 - main
-          requires:
-            - unit-test
-            - integration-test
+#          requires:
+#            - unit-test
+#            - integration-test
       - update-ecs-service:
           filters:
             branches:
