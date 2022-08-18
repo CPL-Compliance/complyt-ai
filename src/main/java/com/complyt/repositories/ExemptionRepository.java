@@ -29,6 +29,7 @@ public class ExemptionRepository {
                             .where("clientId").is(user.getClientId())
                             .and("customerId").is(transaction.getCustomerId())
                             .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
+
                     log.debug("Searching for an exemption by query : " + query);
 
                     return reactiveMongoTemplate.findOne(query, Exemption.class);

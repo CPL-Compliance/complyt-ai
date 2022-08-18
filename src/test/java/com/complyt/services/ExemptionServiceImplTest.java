@@ -178,5 +178,25 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
     }
 
+    @Test
+    void isFullyExempted_ExemptionTypeIsPartially_ReturnsFalse() {
+        // Given
+        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+            put("CA", ExemptionType.FULLY);
+        }};
+        Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);
+
+        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
+        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
+        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1),LocalDateTime.now()));
+
+        // When
+        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemptionWithPartiallyType));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
+
+        // Then
+        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
 
 }
