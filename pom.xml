@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.0.10-SNAPSHOT</version>
     <name>complyt</name>
     <description>Complyt</description>
     <properties>
@@ -211,7 +211,7 @@
                         <phase>deploy</phase>
                         <goals>
                             <goal>build</goal>
-<!--                            <goal>push</goal>-->
+                            <goal>push</goal>
                         </goals>
                     </execution>
                 </executions>

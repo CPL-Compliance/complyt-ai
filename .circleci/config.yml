@@ -16,7 +16,7 @@ workflows:
       - integration-test:
           requires:
             - build
-      - publish-docker:
+      - deploy:
           filters:
             branches:
               only:
@@ -24,74 +24,90 @@ workflows:
           requires:
             - unit-test
             - integration-test
-      - update-service:
+      - update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - publish-docker
+            - deploy
 
 jobs:
-   build:
-     docker:
-       - image: cimg/openjdk:11.0
-     steps:
-       - checkout
-       - run:
-           name: Build
-           command: ./mvnw -B -DskipTests clean package
-       - persist_to_workspace:
-           root: .
-           paths:
-             - .
+  build:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: ./mvnw -B -DskipTests clean package
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
-   integration-test:
-     machine:
-         image: "ubuntu-2004:current"
-         docker_layer_caching: true
-     steps:
-         - attach_workspace:
-             at: .
-         - run:
-             name: Integration Test
-             command: ./mvnw verify
+  integration-test:
+    machine:
+      image: "ubuntu-2004:current"
+      docker_layer_caching: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Integration Tests
+          command: ./mvnw verify
 
-   unit-test:
-       docker:
-         - image: cimg/openjdk:11.0
-       steps:
-       - attach_workspace:
-           at: .
-       - run:
-           name: Test
-           command: ./mvnw test
-       - run:
-             name: Save test results
-             command: |
-               mkdir -p ~/test-results/
-               find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
-             when: always
-       - store_test_results:
-             path: '~/test-results/'
-       - codecov/upload:
-             file: '/target/jacoco-reports/jacoco.xml'
-             token: CODECOV_TOKEN
+  unit-test:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Test
+          command: ./mvnw test
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+          when: always
+      - store_test_results:
+          path: '~/test-results/'
+      - codecov/upload:
+          file: '/target/jacoco-reports/jacoco.xml'
+          token: CODECOV_TOKEN
 
-   publish-docker:
-     machine:
-         image: "ubuntu-2004:current"
-         docker_layer_caching: true
-     steps:
-       - checkout
-       - run: ./mvnw dependency:go-offline
-       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
-       - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-       - run:
-           name: Publish Docker image with Fabric8
-           command: ./mvnw clean package docker:build docker:push
+  deploy:
+    machine:
+      image: "ubuntu-2004:current"
+      docker_layer_caching: true
 
-   update-service:
+    steps:
+      - checkout
+      - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+      - run:
+          name: Setup Git credentials user email
+          command: git config user.email "alexander@complyt.io"
+
+      - run:
+          name: Setup Git credentials user name
+          command: git config user.name "Via CircleCI Build"
+
+      - run: ./mvnw dependency:go-offline
+      - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server><server><id>github</id><username>shaolinrabbi</username><password>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</password></server></servers></settings>" > ~/.m2/settings.xml
+      - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+      - run:
+          name: Deploy
+          command: ./mvnw --batch-mode release:prepare release:perform
+
+  update-ecs-service:
     docker:
       - image: 'cimg/python:3.9.1'
     steps:
