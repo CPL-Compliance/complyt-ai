@@ -208,7 +208,7 @@
                     </execution>
                     <execution>
                         <id>build-and-push</id>
-                        <phase>install</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>build</goal>
                             <goal>push</goal>
@@ -345,8 +345,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/complyt/complyt</url>
+            <name>GitHub Complyt Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Complyt/complyt</url>
         </repository>
     </distributionManagement>
 </project>
