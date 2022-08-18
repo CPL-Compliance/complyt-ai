@@ -11,7 +11,7 @@
     <artifactId>complyt</artifactId>
     <version>0.0.11-SNAPSHOT</version>
     <name>complyt</name>
-    <description>Complyt</description>
+    <description>Complyt Sales Tax</description>
     <properties>
         <docker.image.prefix>complyt</docker.image.prefix>
         <docker.image.name>complyt</docker.image.name>
