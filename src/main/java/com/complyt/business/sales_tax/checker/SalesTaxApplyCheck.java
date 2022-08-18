@@ -1,20 +1,21 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.checker;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
 @AllArgsConstructor
 @Slf4j
-public class SalesTaxApplyCheck {
+public class SalesTaxApplyCheck implements SalesTaxChecker<SalesTaxTracking> {
 
-    public boolean isApplied(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+    @NonNull
+    private Transaction transaction;
+
+    public boolean check(@NonNull SalesTaxTracking salesTaxTracking) {
         LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
         LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
 

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -12,7 +12,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
-import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,9 +47,6 @@ public class SalesTaxServiceImplTest {
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @Mock
-    SalesTaxApplyCheck salesTaxApplyCheck;
-
-    @Mock
     ExemptionService exemptionService;
 
     @Mock
@@ -84,7 +80,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, exemptionService, salesTaxCalculator, salesTaxRateCalculator);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, exemptionService, salesTaxCalculator, salesTaxRateCalculator);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxWebClientWrapper is marked non-null but is null");
     }
@@ -96,7 +92,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, exemptionService, salesTaxCalculator, salesTaxRateCalculator);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, exemptionService, salesTaxCalculator, salesTaxRateCalculator);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxDataToSalesTaxRate is marked non-null but is null");
     }
@@ -110,7 +106,6 @@ public class SalesTaxServiceImplTest {
                 false, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(false);
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -126,7 +121,6 @@ public class SalesTaxServiceImplTest {
                 true, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(false);
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -147,11 +141,9 @@ public class SalesTaxServiceImplTest {
         State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
-                true, LocalDateTime.now());
-        Pair<Transaction, SalesTaxRate> transactionSalesTaxRatePair = new Pair<>(transaction, salesTaxRate);
+                true, transaction.getExternalTimeStamps().getCreatedDate().minusYears(1));
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(true);
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);

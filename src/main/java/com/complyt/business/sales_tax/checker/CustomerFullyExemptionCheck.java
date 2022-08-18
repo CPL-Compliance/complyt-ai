@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.checker;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.ExemptionType;
@@ -6,16 +6,17 @@ import com.complyt.domain.customer.exemption.Exemption;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
 @AllArgsConstructor
 @Slf4j
-public class CustomerFullyExemptionCheck {
+public class CustomerFullyExemptionCheck implements SalesTaxChecker <Exemption> {
 
-    public boolean isFullyExempted(@NonNull Transaction transaction, @NonNull Exemption exemption) {
+    @NonNull
+    private Transaction transaction;
+
+    public boolean check(@NonNull Exemption exemption) {
         boolean noExemptionStates = transaction.getCustomer().getExemptionsStates() == null;
         if (noExemptionStates) {
             log.debug("Customer has no exemption states - no fully exemption for this transaction");
@@ -34,10 +35,10 @@ public class CustomerFullyExemptionCheck {
             return false;
         }
 
-        return isExemptionActive(transaction, exemption);
+        return isExemptionActive(exemption);
     }
 
-    boolean isExemptionActive(@NonNull Transaction transaction, @NonNull Exemption exemption) {
+    boolean isExemptionActive(@NonNull Exemption exemption) {
         LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
         boolean isExemptionInTimeFrame = referenceDate.compareTo(exemption.getValidationDates().getFromDate()) >= 0 &&
                 referenceDate.compareTo(exemption.getValidationDates().getToDate()) <= 0;

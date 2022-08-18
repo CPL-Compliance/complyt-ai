@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -33,9 +33,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @NonNull
-    private SalesTaxApplyCheck salesTaxApplyCheck;
-
-    @NonNull
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;
 
@@ -47,7 +44,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
-        boolean isApplied = salesTaxApplyCheck.isApplied(transactionWithOutSalesTax, salesTaxTracking);
+        SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
+        boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
         return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
                 .flatMap(isExempted -> isExempted ? Mono.just(transactionWithOutSalesTax) : calculate(transactionWithOutSalesTax)) :
