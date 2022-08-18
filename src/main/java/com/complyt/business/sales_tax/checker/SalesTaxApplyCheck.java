@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Slf4j
-public class SalesTaxApplyCheck implements SalesTaxChecker<SalesTaxTracking> {
+public class SalesTaxApplyCheck implements SalesTaxApplyChecker<SalesTaxTracking> {
 
     @NonNull
     private Transaction transaction;
