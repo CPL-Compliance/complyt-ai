@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -58,7 +59,7 @@ public class NexusTransactionAmountExtractorTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL,null);
+        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL, null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -112,7 +113,7 @@ public class NexusTransactionAmountExtractorTest {
         float amount = nexusTransactionAmountExtractor.extract(transaction, nexusStateRule);
 
         // Then
-        assertEquals(amount,transaction.getItems().get(0).getTotalPrice());
+        assertEquals(amount, transaction.getItems().get(0).getTotalPrice());
     }
 
     @Test
@@ -122,7 +123,7 @@ public class NexusTransactionAmountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionAmountExtractor.extract(nullTransaction,nexusStateRule);
+            nexusTransactionAmountExtractor.extract(nullTransaction, nexusStateRule);
         });
 
         // Then
@@ -136,7 +137,7 @@ public class NexusTransactionAmountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionAmountExtractor.extract(transaction,nullNexusStateRule);
+            nexusTransactionAmountExtractor.extract(transaction, nullNexusStateRule);
         });
 
         // Then
