@@ -9,28 +9,28 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - build
-      - unit-test:
-          requires:
-            - build
-      - integration-test:
-          requires:
-            - build
-      - publish-docker:
+      # - build
+      # - unit-test:
+      #     requires:
+      #       - build
+      # - integration-test:
+      #     requires:
+      #       - build
+      - deploy
+          # filters:
+          #   branches:
+          #     only:
+          #       - main
+          # requires:
+          #   - unit-test
+          #   - integration-test
+      - update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - unit-test
-            - integration-test
-      - update-service:
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - publish-docker
+            - deploy
 
 jobs:
    build:
@@ -54,7 +54,7 @@ jobs:
          - attach_workspace:
              at: .
          - run:
-             name: Integration Test
+             name: Integration Tests
              command: ./mvnw verify
 
    unit-test:
@@ -78,20 +78,36 @@ jobs:
              file: '/target/jacoco-reports/jacoco.xml'
              token: CODECOV_TOKEN
 
-   publish-docker:
+   deploy:
      machine:
          image: "ubuntu-2004:current"
          docker_layer_caching: true
+
      steps:
        - checkout
+       - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+       - add_ssh_keys:
+          fingerprints:
+            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+       - run:
+          name: Setup Git credentials user email
+          command: git config user.email "alexander@complyt.io"
+
+       - run:
+          name: Setup Git credentials user name
+          command: git config user.name "Via CircleCI Build"
+
        - run: ./mvnw dependency:go-offline
-       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server></servers></settings>" > ~/.m2/settings.xml
+       - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server><server><id>github</id><username>shaolinrabbi</username><password>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</password></server></servers></settings>" > ~/.m2/settings.xml
        - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
        - run:
-           name: Publish Docker image with Fabric8
-           command: ./mvnw clean package docker:build docker:push
+           name: Deploy
+           command: ./mvnw --batch-mode release:prepare release:perform
 
-   update-service:
+   update-ecs-service:
     docker:
       - image: 'cimg/python:3.9.1'
     steps:
