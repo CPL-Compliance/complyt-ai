@@ -11,7 +11,7 @@
     <artifactId>salesTax</artifactId>
     <version>0.0.12-SNAPSHOT</version>
     <name>complyt</name>
-    <description>This is the Sales Tax service by Complyt</description>
+    <description>Complyt Sales Tax</description>
     <properties>
         <docker.image.prefix>complyt</docker.image.prefix>
         <docker.image.name>complyt</docker.image.name>
