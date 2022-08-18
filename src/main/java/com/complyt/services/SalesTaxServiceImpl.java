@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -30,12 +31,19 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private TransactionSalesTaxInjector transactionSalesTaxInjector;
 
+    @NonNull
+    @Qualifier("exemptionServiceImpl")
+    private ExemptionService exemptionService;
+
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxApplyCheck.isApplied(transactionWithOutSalesTax, salesTaxTracking)
-                .flatMap(isApplied -> isApplied ? calculate(transactionWithOutSalesTax) : Mono.just(transactionWithOutSalesTax));
+        boolean isApplied = salesTaxApplyCheck.isApplied(transactionWithOutSalesTax, salesTaxTracking);
+
+        return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
+                .flatMap(isExempted -> isExempted ? Mono.just(transactionWithOutSalesTax) : calculate(transactionWithOutSalesTax)) :
+                Mono.just(transactionWithOutSalesTax);
     }
-    
+
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())

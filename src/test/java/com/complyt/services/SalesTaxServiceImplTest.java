@@ -51,6 +51,9 @@ public class SalesTaxServiceImplTest {
     @Mock
     TransactionSalesTaxInjector transactionSalesTaxInjector;
 
+    @Mock
+    ExemptionService exemptionService;
+
     Transaction transaction;
 
     @BeforeEach
@@ -76,7 +79,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector, exemptionService);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxWebClientWrapper is marked non-null but is null");
     }
@@ -88,7 +91,7 @@ public class SalesTaxServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector);
+            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, salesTaxApplyCheck, transactionSalesTaxInjector, exemptionService);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxDataToSalesTaxRate is marked non-null but is null");
     }
@@ -102,7 +105,7 @@ public class SalesTaxServiceImplTest {
                 false, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(false));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(false);
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -118,7 +121,7 @@ public class SalesTaxServiceImplTest {
                 true, LocalDateTime.now());
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(false));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(false);
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -140,10 +143,10 @@ public class SalesTaxServiceImplTest {
         SalesTaxTracking tracking = new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
                 true, LocalDateTime.now());
-        Pair<Transaction, SalesTaxRate> transactionSalesTaxRatePair = new Pair<>(transaction,salesTaxRate);
+        Pair<Transaction, SalesTaxRate> transactionSalesTaxRatePair = new Pair<>(transaction, salesTaxRate);
 
         // When
-        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(Mono.just(true));
+        when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(true);
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(transactionSalesTaxInjector.inject(transactionSalesTaxRatePair)).thenReturn(Mono.just(transactionWithSalesTax));

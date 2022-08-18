@@ -6,6 +6,8 @@ import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-public interface ExemptionService extends CrudService<Exemption,String> {
+public interface ExemptionService extends CrudService<Exemption, String> {
     Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction);
+
+    Mono<Boolean> isFullyExempted(@NonNull Transaction transaction);
 }

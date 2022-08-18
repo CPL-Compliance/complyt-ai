@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -15,10 +14,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class SalesTaxApplyCheck {
 
-    @NonNull
-    private CustomerFullyExemptionCheck customerFullyExemptionCheck;
-
-    public Mono<Boolean> isApplied(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+    public boolean isApplied(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
         LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
         LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
 
@@ -26,25 +22,13 @@ public class SalesTaxApplyCheck {
         boolean isPassedApplicationDate = referenceDate.compareTo(applicationDate) >= 0;
         boolean isApproved = checkIfApproved(salesTaxTracking, referenceDate);
 
-        if (!isSalesTaxEnforced || !isPassedApplicationDate || !isApproved) {
-            log.debug("Is sales tax applied for order returned False ");
-            return Mono.just(false);
-        }
-
-        return checkIfNotFullyExempted(transaction);
+        boolean isApplied = isSalesTaxEnforced && isPassedApplicationDate && isApproved;
+        log.debug("Is sales tax applied for order returned : " + isApplied);
+        return isApplied;
     }
 
     boolean checkIfApproved(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
         return salesTaxTracking.isApproved() && referenceDate.compareTo(salesTaxTracking.getApprovalDate()) >= 0;
-    }
-
-    Mono<Boolean> checkIfNotFullyExempted(@NonNull Transaction transaction) {
-        return customerFullyExemptionCheck.isFullyExempted(transaction)
-                .map(isFullyExempted -> {
-                    boolean isSalesTaxApplied = !isFullyExempted;
-                    log.debug("Is sales tax applied for order returned : " + isSalesTaxApplied);
-                    return isSalesTaxApplied;
-                });
     }
 
 }

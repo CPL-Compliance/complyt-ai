@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.sales_tax.CustomerFullyExemptionCheck;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.repositories.ExemptionRepository;
@@ -18,6 +19,9 @@ public class ExemptionServiceImpl implements ExemptionService {
     @NonNull
     private ExemptionRepository exemptionRepository;
 
+    @NonNull
+    private CustomerFullyExemptionCheck customerFullyExemptionCheck;
+
     @Override
     public Mono<Exemption> save(Exemption exemption) {
         return null;
@@ -35,6 +39,12 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction) {
-        return exemptionRepository.findByClientCustomerAndState(transaction);
+        return exemptionRepository.findByClientCustomerAndState(transaction).log();
+    }
+
+    public Mono<Boolean> isFullyExempted(@NonNull Transaction transaction) {
+        return findByClientCustomerAndState(transaction)
+                .map(exemption -> customerFullyExemptionCheck.isFullyExempted(transaction, exemption))
+                .switchIfEmpty(Mono.just(false));
     }
 }
