@@ -140,5 +140,43 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(isFullyExemptedMono).expectNext(true).verifyComplete();
     }
 
+    @Test
+    void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
+        // Given
+        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+            put("CA", ExemptionType.FULLY);
+        }};
+        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
+        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
+        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getToDate().plusYears(1),LocalDateTime.now()));
+
+        // When
+        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
+
+        // Then
+        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
+
+    @Test
+    void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
+        // Given
+        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+            put("CA", ExemptionType.FULLY);
+        }};
+        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
+        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
+        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1),LocalDateTime.now()));
+
+        // When
+        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
+
+        // Then
+        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
+
 
 }
