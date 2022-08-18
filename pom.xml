@@ -204,6 +204,15 @@
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                            <goal>remove</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-and-push-to-container-registry</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -330,7 +339,17 @@
         </plugins>
     </build>
     <scm>
+        <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-        <tag>complyt-0.0.6</tag>
+        <url>git@github.com:idhub-io/idhub-api.git</url>
+        <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Complyt Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Complyt/complyt</url>
+        </repository>
+    </distributionManagement>
 </project>
