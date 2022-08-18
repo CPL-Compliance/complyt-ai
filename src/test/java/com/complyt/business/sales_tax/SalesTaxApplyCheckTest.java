@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -93,7 +92,6 @@ public class SalesTaxApplyCheckTest {
         Transaction transaction = createTransactionWithAppliedReferenceDate();
 
         // When + Then
-        when(customerFullyExemptionCheck.isFullyExempted(transaction, null)).thenReturn(false);
         boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
 
         assertTrue(isApplied);

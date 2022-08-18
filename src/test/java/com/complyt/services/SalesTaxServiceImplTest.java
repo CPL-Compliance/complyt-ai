@@ -147,6 +147,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(salesTaxApplyCheck.isApplied(transaction, tracking)).thenReturn(true);
+        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(transactionSalesTaxInjector.inject(transactionSalesTaxRatePair)).thenReturn(Mono.just(transactionWithSalesTax));
