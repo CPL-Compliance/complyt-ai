@@ -251,6 +251,7 @@
 <!--                    <goals></goals>-->
                     <releaseProfiles>release</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <scmCommentPrefix>[ci skip]</scmCommentPrefix>
                 </configuration>
             </plugin>
             <plugin>
@@ -339,7 +340,9 @@
         </plugins>
     </build>
     <scm>
+        <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+        <url>git@github.com:idhub-io/idhub-api.git</url>
         <tag>HEAD</tag>
     </scm>
 
