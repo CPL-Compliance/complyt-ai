@@ -343,10 +343,10 @@
     </scm>
 
     <distributionManagement>
-<!--        <repository>-->
-<!--            <id>pkg.github.com</id>-->
-<!--            <name>GitHub nbauma109 Apache Maven Packages</name>-->
-<!--            <url>https://maven.pkg.github.com/nbauma109/mvn-repo</url>-->
-<!--        </repository>-->
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/complyt/complyt</url>
+        </repository>
     </distributionManagement>
 </project>
