@@ -1,0 +1,3 @@
+<settingsSecurity>
+    <master>${MAVEN_SECURITY_MASTER}</master>
+</settingsSecurity>
