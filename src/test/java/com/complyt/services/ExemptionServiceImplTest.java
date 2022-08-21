@@ -151,7 +151,7 @@ public class ExemptionServiceImplTest {
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
         Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
         Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getToDate().plusYears(1),LocalDateTime.now()));
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getToDate().plusYears(1), LocalDateTime.now()));
 
         // When
         when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
@@ -170,7 +170,7 @@ public class ExemptionServiceImplTest {
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
         Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
         Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1),LocalDateTime.now()));
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1), LocalDateTime.now()));
 
         // When
         when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
@@ -191,13 +191,25 @@ public class ExemptionServiceImplTest {
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
         Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
         Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1),LocalDateTime.now()));
+                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1), LocalDateTime.now()));
 
         // When
         when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemptionWithPartiallyType));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
 
         // Then
+        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
+
+    @Test
+    void isFullyExemptionActive_ExemptionIsPartially_ThrowsException() {
+        // Given
+        Exemption partiallyExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
+
+        // When + Then
+        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(partiallyExemption));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
+
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
     }
 

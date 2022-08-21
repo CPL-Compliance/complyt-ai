@@ -64,15 +64,16 @@ public class CustomerFullyExemptionCheckTest {
     }
 
     @Test
-    void isExemptionActive_NullExemptionPassed_ThrowsException() {
+    void isFullyExemptionActive_NullExemptionPassed_ThrowsException() {
         // Given
         Exemption nullExemption = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.isExemptionActive(nullExemption);
+            customerFullyExemptionCheck.isFullyExemptionActive(nullExemption);
         });
 
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
+
 }
