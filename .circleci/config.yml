@@ -118,7 +118,7 @@ jobs:
 #      - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Deploy
-          command: ./mvnw -s .circleci.settings.xml --batch-mode release:prepare release:perform
+          command: ./mvnw -s settings.xml --batch-mode release:prepare release:perform
 
   update-ecs-service:
     docker:
