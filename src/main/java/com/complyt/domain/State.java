@@ -5,8 +5,8 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-@ToString
 @With
+@ToString
 public class State {
     private String abbreviation;
     private String code;

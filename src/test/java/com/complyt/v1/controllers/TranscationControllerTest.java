@@ -136,7 +136,7 @@ class TransactionControllerTest {
         // When + Then
         when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.just(transactionWithId));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, mappedTransaction)).thenReturn(Mono.just(updatedTransaction));
+        when(transactionFacade.updateIfModified(externalId, mappedTransaction,transactionWithId)).thenReturn(Mono.just(updatedTransaction));
 
         webTestClient
                 .mutateWith(csrf())

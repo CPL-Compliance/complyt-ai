@@ -55,13 +55,13 @@ public class TransactionController {
     public Mono<ResponseEntity<TransactionDto>> upsert(@PathVariable("externalId") @NonNull String externalId,
                                                        @RequestBody @NonNull TransactionDto transactionDto) {
         log.debug("Upsert transaction - DTO received in request body : " + transactionDto);
-        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
 
-        return transactionFacade.findByExternalId(externalId)
-                .flatMap(transaction -> transactionFacade.updateIfModified(externalId, mappedTransaction))
-                .map(transactionItem -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem))).log()
-                .switchIfEmpty(transactionFacade.saveTransaction(mappedTransaction)
-                        .map(transaction -> ResponseEntity.status(HttpStatus.CREATED).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction)))).log();
+        return transactionFacade.findByExternalId(externalId).log()
+                .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, receivedTransaction, originalTransaction))
+                .map(updatedTransaction -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(updatedTransaction)))
+                .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)
+                        .map(transaction -> ResponseEntity.status(HttpStatus.CREATED).body(TransactionMapper.INSTANCE.transactionToTransactionDto(transaction))));
     }
 
     @Operation(summary = "Marks the transaction as cancelled")

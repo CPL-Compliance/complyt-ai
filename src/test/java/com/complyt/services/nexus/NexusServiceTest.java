@@ -4,6 +4,8 @@ import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.*;
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -13,7 +15,6 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -274,26 +275,29 @@ class NexusServiceTest {
     @Test
     void hasNexus_HasNexus_ReturnsHasNexus() {
         // Given
+        Transaction transaction = createTransaction();
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
-        boolean hasNexus = nexusService.hasNexus(salesTaxTracking);
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.hasNexus(transaction);
 
         // Then
-        Assertions.assertTrue(hasNexus);
+        StepVerifier.create(salesTaxTrackingDecoratorMono).expectNext(salesTaxTrackingDecorator).verifyComplete();
     }
 
     @Test
     void hasNexus_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
-        SalesTaxTracking nullSalesTaxTracking = null;
+        Transaction nullTransaction = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.hasNexus(nullSalesTaxTracking));
+                () -> nexusService.hasNexus(nullTransaction));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 }

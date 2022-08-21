@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -13,6 +13,7 @@ import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -32,19 +33,23 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @NonNull
+    @Qualifier("exemptionServiceImpl")
+    private ExemptionService exemptionService;
+
+    @NonNull
     private SalesTaxCalculator salesTaxCalculator;
 
     @NonNull
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
-    @NonNull
-    private SalesTaxApplyCheck salesTaxApplyCheck;
-
     @Override
-    public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
-        boolean isApplied = salesTaxApplyCheck.isApplied(transaction, salesTaxTracking);
+    public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
+        SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
+        boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
-        return isApplied ? calculate(transaction) : Mono.just(transaction);
+        return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
+                .flatMap(isExempted -> isExempted ? Mono.just(transactionWithOutSalesTax) : calculate(transactionWithOutSalesTax)) :
+                Mono.just(transactionWithOutSalesTax);
     }
 
     @Override

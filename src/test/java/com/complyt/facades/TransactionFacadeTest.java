@@ -1,6 +1,9 @@
 package com.complyt.facades;
 
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -10,7 +13,7 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.services.ProductClassificationService;
+import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionServiceImpl;
 import com.complyt.services.nexus.NexusService;
@@ -32,7 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -49,12 +53,13 @@ public class TransactionFacadeTest {
     SalesTaxService salesTaxService;
 
     @Mock
-    ProductClassificationService productClassificationService;
-
-    @Mock
     NexusService nexusService;
 
+    @Mock
+    CustomerService customerService;
+
     Transaction transaction;
+    Customer customer;
     Transaction transactionNoId;
 
     @BeforeEach
@@ -62,7 +67,21 @@ public class TransactionFacadeTest {
         MockitoAnnotations.openMocks(this);
 
         transaction = createTransaction();
+        customer = createCustomer();
         transactionNoId = transaction.withId(null);
+    }
+
+
+    private Customer createCustomer() {
+
+        return new Customer(
+                transaction.getCustomerId().toString(),
+                UUID.randomUUID().toString(),
+                "name",
+                null,
+                new ObjectId(),
+                CustomerType.RETAIL,
+                null);
     }
 
     private Transaction createTransaction() {
@@ -76,6 +95,7 @@ public class TransactionFacadeTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
+        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, new ObjectId(), CustomerType.RETAIL, null);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null);
     }
 
@@ -127,30 +147,31 @@ public class TransactionFacadeTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> new TransactionFacade(transactionService, salesTaxService, nexusService));
+                () -> new TransactionFacade(transactionService, salesTaxService, nexusService, null));
 
         assertEquals(nullPointerException.getMessage(), "transactionService is marked non-null but is null");
     }
 
     @Test
-    public void saveTransaction_NexusIsNotEstablished_TransactionSavedAndReturned() throws InterruptedException {
+    public void saveTransaction_NexusIsNotEstablished_TransactionSavedAndReturned() {
         // Given
         Transaction transactionWithClassificationData = createTransactionWithProductClassificationData();
-        Transaction transactionWithClassificationDataAndId = transactionWithClassificationData.withId(transaction.getId());
+        Transaction transactionWithCustomer = transactionWithClassificationData.withCustomer(customer);
+        Transaction transactionWithClassificationDataAndId = transactionWithCustomer.withId(transaction.getId());
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
-
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithClassificationData));
-        when(nexusService.findTrackingByState(transactionWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
-        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
-        when(transactionService.save(transactionWithClassificationData)).thenReturn(Mono.just(transactionWithClassificationDataAndId));
+        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
+        when(transactionService.save(transactionWithCustomer)).thenReturn(Mono.just(transactionWithClassificationDataAndId));
         when(nexusService.calculateNexusTracking(transactionWithClassificationDataAndId)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
 
         // Then
-        StepVerifier.create(actualTransaction).expectNext(transactionWithClassificationData).verifyComplete();
+        StepVerifier.create(actualTransaction).expectNext(transactionWithCustomer).verifyComplete();
     }
 
     @Test
@@ -158,15 +179,17 @@ public class TransactionFacadeTest {
         // Given
         SalesTax salesTax = createSalesTax();
         Transaction transactionWithClassificationData = createTransactionWithProductClassificationData();
-        Transaction transactionWithClassificationDataAndSalesTax = transactionWithClassificationData.withSalesTax(salesTax);
+        Transaction transactionWithCustomer = transactionWithClassificationData.withCustomer(customer);
+        Transaction transactionWithClassificationDataAndSalesTax = transactionWithCustomer.withSalesTax(salesTax);
         Transaction transactionWithClassificationDataAndSalesTaxAndId = transactionWithClassificationDataAndSalesTax.withId(transaction.getId());
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished();
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
-        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithClassificationData));
-        when(nexusService.findTrackingByState(transactionWithClassificationData)).thenReturn(Mono.just(salesTaxTracking));
-        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
-        when(salesTaxService.handleSalesTaxCalculation(transactionWithClassificationData, salesTaxTracking)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTax));
+        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
+        when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTax));
         when(transactionService.save(transactionWithClassificationDataAndSalesTax)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTaxAndId));
 
         Mono<Transaction> transactionMono = transactionFacade.saveTransaction(transactionNoId);
@@ -211,8 +234,7 @@ public class TransactionFacadeTest {
         // Given
 
         // When
-        when(transactionService.findByExternalId(transaction.getExternalId())).thenReturn(Mono.just(transaction));
-        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transaction.getExternalId(), transaction);
+        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transaction.getExternalId(), transaction, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -224,7 +246,7 @@ public class TransactionFacadeTest {
         String nullExternalId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(nullExternalId, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(nullExternalId, transaction, transaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
@@ -232,24 +254,87 @@ public class TransactionFacadeTest {
 
 
     @Test
+    void updateIfModified_NullNewTransactionPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullNewTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(externalId, nullNewTransaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullOriginalTransactionPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullOriginalTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(externalId, transaction, nullOriginalTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullExternalIdPassed_ThrowsException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(nullExternalId, transaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullModifiedTransaction_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullModifiedTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(externalId, nullModifiedTransaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullOriginalTransaction_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullOriginalTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(externalId, transaction, nullOriginalTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
     void updateIfModified_TransactionModifiedAndHasNexus_UpdatesTransaction() {
         // Given
         Address newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished();
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
         SalesTax salesTax = new SalesTax(100, new SalesTaxRate(0, 0, 0, 0, 0, 0));
         Transaction modifiedTransaction = createTransactionWithProductClassificationData().withShippingAddress(newShippingAddress);
         Transaction newTransactionWithSalesTax = modifiedTransaction.withSalesTax(salesTax);
 
         // When
-        when(transactionService.findByExternalId(transaction.getExternalId())).thenReturn(Mono.just(transaction));
         when(transactionService.injectDataToModifiedTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
-        when(nexusService.findTrackingByState(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
-        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(true);
+        when(nexusService.hasNexus(modifiedTransaction)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(newTransactionWithSalesTax));
         when(transactionService.update(newTransactionWithSalesTax.getExternalId(), newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
-        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress);
+        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(newTransactionWithSalesTax).verifyComplete();
@@ -261,18 +346,16 @@ public class TransactionFacadeTest {
         Address newShippingAddress = transaction.getShippingAddress().withState("newState");
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
-        Transaction modifiedTransaction = createTransactionWithProductClassificationData().withShippingAddress(newShippingAddress).withId(null);
-        Transaction modifiedTransactionWithId = modifiedTransaction.withId(UUID.randomUUID().toString());
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
+        Transaction modifiedTransaction = createTransactionWithProductClassificationData().withShippingAddress(newShippingAddress).withId(UUID.randomUUID().toString());
 
         // When
-        when(transactionService.findByExternalId(transaction.getExternalId())).thenReturn(Mono.just(transaction));
         when(transactionService.injectDataToModifiedTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
-        when(nexusService.findTrackingByState(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
-        when(nexusService.hasNexus(salesTaxTracking)).thenReturn(false);
-        when(transactionService.update(modifiedTransaction.getExternalId(), modifiedTransaction)).thenReturn(Mono.just(modifiedTransactionWithId));
-        when(nexusService.calculateNexusTracking(modifiedTransactionWithId)).thenReturn(Mono.just(salesTaxTracking));
-        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress);
+        when(nexusService.hasNexus(modifiedTransaction)).thenReturn(Mono.just(salesTaxTrackingDecorator));
+        when(transactionService.update(modifiedTransaction.getExternalId(), modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
+        when(nexusService.calculateNexusTracking(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(modifiedTransaction).verifyComplete();

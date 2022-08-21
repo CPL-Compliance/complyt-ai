@@ -1,6 +1,6 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

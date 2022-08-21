@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Transaction;
+import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
@@ -28,24 +29,30 @@ public class TransactionFacade {
     @NonNull
     private NexusService nexusService;
 
+    @NonNull
+    @Qualifier("customerServiceImpl")
+    private CustomerService customerService;
+
     public Mono<Transaction> saveTransaction(Transaction transaction) {
-        return transactionService.injectDataToNewTransaction(transaction)
-                .flatMap(setTransaction -> nexusService.findTrackingByState(setTransaction)
-                        .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
-                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTracking).flatMap(transactionService::save) :
-                                transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
+        return customerService.findById(transaction.getCustomerId())
+                .flatMap(customer -> transactionService.injectDataToNewTransaction(transaction, customer)
+                        .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
+                                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                        salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(transactionService::save) :
+                                        transactionService.save(setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction))));
     }
 
-    public Mono<Transaction> updateIfModified(@NonNull String externalId, Transaction newTransaction) {
-        return findByExternalId(externalId)
-                .flatMap(oldTransaction ->
-                        oldTransaction.equals(newTransaction) ?
-                                Mono.just(newTransaction) :
-                                transactionService.injectDataToModifiedTransaction(newTransaction, oldTransaction)
-                                        .flatMap(setTransaction -> nexusService.findTrackingByState(setTransaction)
-                                                .flatMap(salesTaxTracking -> nexusService.hasNexus(salesTaxTracking) ?
-                                                        salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTracking).flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction)) :
-                                                        transactionService.update(externalId, setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction))));
+    public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
+        return originalTransaction.equals(newTransaction) ?
+                Mono.just(newTransaction) : update(externalId, newTransaction, originalTransaction);
+    }
+
+    public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        return transactionService.injectDataToModifiedTransaction(modifiedTransaction, originalTransaction)
+                .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
+                        .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+                                salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()).flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction)) :
+                                transactionService.update(externalId, setTransaction).flatMap(nexusService::calculateNexusTracking).thenReturn(setTransaction)));
     }
 
     public Mono<Transaction> findByExternalId(String externalId) {

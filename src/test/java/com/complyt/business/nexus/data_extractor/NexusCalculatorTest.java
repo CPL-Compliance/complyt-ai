@@ -2,6 +2,8 @@ package com.complyt.business.nexus.data_extractor;
 
 
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
@@ -18,7 +20,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +53,7 @@ public class NexusCalculatorTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL, null);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null);
     }
 
@@ -88,19 +92,19 @@ public class NexusCalculatorTest {
         List<Transaction> transactions = createTransactionsList();
         int count = transactions.size();
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
-        NexusCalculationSummary summary = new NexusCalculationSummary(count,amount);
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
 
         // When
-        when(nexusTransactionCountExtractor.extract(transactions.get(0),nexusStateRule)).thenReturn(1);
-        when(nexusTransactionCountExtractor.extract(transactions.get(1),nexusStateRule)).thenReturn(1);
-        when(nexusTransactionAmountExtractor.extract(transactions.get(0),nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());
-        when(nexusTransactionAmountExtractor.extract(transactions.get(1),nexusStateRule)).thenReturn(transactions.get(1).getItems().get(0).getTotalPrice());
+        when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
+        when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
+        when(nexusTransactionAmountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());
+        when(nexusTransactionAmountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(transactions.get(1).getItems().get(0).getTotalPrice());
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions,nexusStateRule);
+        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary,actualSummary);
+        assertEquals(summary, actualSummary);
     }
 
     @Test
@@ -109,16 +113,18 @@ public class NexusCalculatorTest {
         List<Transaction> transactions = createTransactionsList();
         int count = 0;
         float amount = 0;
-        NexusCalculationSummary summary = new NexusCalculationSummary(count,amount);
-        List<CustomerType> resellerCustomerOnly = new ArrayList<CustomerType>(){{add(CustomerType.RESELLER);}};
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
+        List<CustomerType> resellerCustomerOnly = new ArrayList<CustomerType>() {{
+            add(CustomerType.RESELLER);
+        }};
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
 
         // When
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions,nexusStateRule);
+        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary,actualSummary);
+        assertEquals(summary, actualSummary);
     }
 
 }

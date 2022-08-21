@@ -2,7 +2,8 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -56,7 +57,7 @@ class TransactionRepositoryTest {
         user = User.builder().username("user").password("password").clientId(clientId).build();
 
         transaction = createTransaction();
-        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(),clientId,CustomerType.RETAIL);
+        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(),clientId,CustomerType.RETAIL,null);
     }
 
     private Transaction createTransaction() {

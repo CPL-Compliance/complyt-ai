@@ -16,8 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
