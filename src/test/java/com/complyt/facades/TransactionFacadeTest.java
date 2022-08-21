@@ -285,7 +285,7 @@ public class TransactionFacadeTest {
         String nullExternalId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(nullExternalId, transaction, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(nullExternalId, transaction, transaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
