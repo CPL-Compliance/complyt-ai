@@ -13,13 +13,13 @@ workflows:
           filters:
             branches:
               only:
-              - /^[^main].*$/
+              - /^(?!main).*$/
 
       - unit-test:
           filters:
             branches:
               only:
-                - /^[^main].*$/
+                - /^(?!main).*$/
           requires:
             - build
 
@@ -27,7 +27,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^[^main].*$/
+                - /^(?!main).*$/
           requires:
             - build
 
