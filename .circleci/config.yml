@@ -114,11 +114,9 @@ jobs:
           command: git config user.name "Via CircleCI Build"
 
       - run: ./mvnw dependency:go-offline
-#      - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server><server><id>github</id><username>shaolinrabbi</username><password>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</password></server></servers></settings>" > ~/.m2/settings.xml
-#      - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
           name: Deploy
-          command: ./mvnw -s .circleci/settings.xml -Dsettings.security=.circleci/settings-security.xml --batch-mode release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:prepare release:perform
 
   update-ecs-service:
     docker:
