@@ -1,8 +1,8 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.Customer;
-import com.complyt.domain.CustomerType;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.services.CustomerService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,7 +46,7 @@ class CustomerFacadeTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address,clientId, CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address,clientId, CustomerType.RETAIL,null);
     }
 
     @Test

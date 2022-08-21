@@ -1,10 +1,12 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.utils.data_injector.TransactionCustomerInjector;
 import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -33,7 +35,6 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     private CountyProvider countyProvider;
 
-
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
@@ -52,18 +53,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction) {
-        Transaction newTransactionWithInternalTimeStamps = newTransaction.withInternalTimeStamps(oldTransaction.getInternalTimeStamps());
+    public Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        Transaction newTransactionWithInternalTimeStamps = modifiedTransaction
+                .withInternalTimeStamps(originalTransaction.getInternalTimeStamps());
 
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
+        return new TransactionCustomerInjector(newTransactionWithInternalTimeStamps)
+                .inject(originalTransaction.getCustomer())
+                .flatMap(productClassificationService::getTransactionWithRelevantProductClassificationData)
                 .flatMap(countyProvider::provide)
                 .map(ModifiedTransactionInternalDateInjector::new)
                 .map(ModifiedTransactionInternalDateInjector::inject);
     }
 
     @Override
-    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
+    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction, @NonNull Customer customer) {
+        return new TransactionCustomerInjector(transaction)
+                .inject(customer)
+                .flatMap(productClassificationService::getTransactionWithRelevantProductClassificationData)
                 .flatMap(countyProvider::provide)
                 .map(NewTransactionInternalDateInjector::new)
                 .map(NewTransactionInternalDateInjector::inject);

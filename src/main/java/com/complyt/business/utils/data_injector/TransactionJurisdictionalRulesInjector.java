@@ -21,6 +21,7 @@ import java.util.Map;
 @Getter
 @Slf4j
 public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+
     @NonNull
     private final Transaction transaction;
 

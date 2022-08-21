@@ -2,6 +2,8 @@ package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
 import com.complyt.domain.nexus.enums.Definition;
@@ -58,7 +60,7 @@ public class NexusTransactionCountExtractorTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL, null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -104,11 +106,11 @@ public class NexusTransactionCountExtractorTest {
         // Given
 
         // When
-        when(itemStateThresholdQualifier.check(new Pair(transaction.getItems(),nexusStateRule))).thenReturn(true);
-        int count = nexusTransactionCountExtractor.extract(transaction,nexusStateRule);
+        when(itemStateThresholdQualifier.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
+        int count = nexusTransactionCountExtractor.extract(transaction, nexusStateRule);
 
         // Then
-        assertEquals(count,1);
+        assertEquals(count, 1);
     }
 
     @Test
@@ -120,11 +122,11 @@ public class NexusTransactionCountExtractorTest {
         Transaction otherTransaction = transaction.withItems(items);
 
         // When
-        when(itemStateThresholdQualifier.check(new Pair(otherTransaction.getItems(),nexusStateRule))).thenReturn(false);
-        int count = nexusTransactionCountExtractor.extract(otherTransaction,nexusStateRule);
+        when(itemStateThresholdQualifier.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
+        int count = nexusTransactionCountExtractor.extract(otherTransaction, nexusStateRule);
 
         // Then
-        assertEquals(count,0);
+        assertEquals(count, 0);
     }
 
     @Test
@@ -134,7 +136,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionCountExtractor.extract(nullTransaction,nexusStateRule);
+            nexusTransactionCountExtractor.extract(nullTransaction, nexusStateRule);
         });
 
         // Then
@@ -148,7 +150,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionCountExtractor.extract(transaction,nullNexusStateRule);
+            nexusTransactionCountExtractor.extract(transaction, nullNexusStateRule);
         });
 
         // Then

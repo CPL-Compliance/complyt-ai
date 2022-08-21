@@ -1,6 +1,6 @@
 package com.complyt.facades;
 
-import com.complyt.domain.Customer;
+import com.complyt.domain.customer.Customer;
 import com.complyt.services.CustomerService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
