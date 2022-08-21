@@ -14,7 +14,6 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.services.CustomerService;
-import com.complyt.services.ProductClassificationService;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionServiceImpl;
 import com.complyt.services.nexus.NexusService;
@@ -36,7 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -51,9 +51,6 @@ public class TransactionFacadeTest {
 
     @Mock
     SalesTaxService salesTaxService;
-
-    @Mock
-    ProductClassificationService productClassificationService;
 
     @Mock
     NexusService nexusService;
@@ -255,6 +252,70 @@ public class TransactionFacadeTest {
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
 
+
+    @Test
+    void updateIfModified_NullNewTransactionPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullNewTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(externalId, nullNewTransaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullOriginalTransactionPassed_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullOriginalTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(externalId, transaction, nullOriginalTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullExternalIdPassed_ThrowsException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(nullExternalId, transaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullModifiedTransaction_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullModifiedTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(externalId, nullModifiedTransaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullOriginalTransaction_ThrowsException() {
+        // Given
+        String externalId = UUID.randomUUID().toString();
+        Transaction nullOriginalTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(externalId, transaction, nullOriginalTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
 
     @Test
     void updateIfModified_TransactionModifiedAndHasNexus_UpdatesTransaction() {

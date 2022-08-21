@@ -22,6 +22,8 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -197,6 +199,30 @@ public class ExemptionServiceImplTest {
 
         // Then
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
+
+    @Test
+    void findByClientCustomerAndState_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.findByClientCustomerAndState(nullTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void IsFullyExempted_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.isFullyExempted(nullTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 
 }

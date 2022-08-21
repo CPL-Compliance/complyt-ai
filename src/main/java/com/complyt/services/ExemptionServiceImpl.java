@@ -23,6 +23,7 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.findByClientCustomerAndState(transaction).log();
     }
 
+    @Override
     public Mono<Boolean> isFullyExempted(@NonNull Transaction transaction) {
         CustomerFullyExemptionCheck customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
 
