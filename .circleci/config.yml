@@ -45,6 +45,10 @@ workflows:
 #            - deploy
 
 jobs:
+  dependencies:
+    override:
+      - ./mvnw -DskipTests clean install dependency:resolve-plugins dependency:go-offline
+
   build:
     docker:
       - image: cimg/openjdk:11.0
