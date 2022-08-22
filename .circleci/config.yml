@@ -114,6 +114,10 @@ jobs:
 
       - run: ./mvnw dependency:go-offline
       - run:
+          name: Creating Maven settings-security.xml file
+          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
+      - run:
           name: Deploy
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:prepare release:perform
 
