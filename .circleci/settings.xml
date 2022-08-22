@@ -9,8 +9,9 @@
         </server>
         <server>
             <id>github</id>
-            <username>shaolinrabbi</username>
-            <password>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</password>
+            <privateKey>d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1</privateKey>
+<!--            <username>shaolinrabbi</username>-->
+<!--            <password>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</password>-->
         </server>
     </servers>
 </settings>

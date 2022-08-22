@@ -18,10 +18,10 @@ workflows:
            - build
 
      - deployment:
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           requires:
             - unit-tests
             - integration-tests
