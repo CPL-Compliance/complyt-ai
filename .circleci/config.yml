@@ -57,9 +57,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Configure settings.xml path
-          command:
-      - run:
           name: Build
           command: ./mvnw -DskipTests clean package
       - persist_to_workspace:
