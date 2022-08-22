@@ -29,7 +29,7 @@ workflows:
          requires:
            - build
 
-     - deployment:
+     - deployment
 #          filters:
 #            branches:
 #              only:
