@@ -143,7 +143,7 @@ jobs:
           name: Setup Git credentials user name
           command: git config user.name "Via CircleCI Build"
 
-      - run: ./mvnw dependency:go-offline
+#      - run: ./mvnw dependency:go-offline
       - run:
           name: Creating Maven settings-security.xml file
           command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml

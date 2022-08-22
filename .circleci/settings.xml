@@ -9,7 +9,7 @@
         </server>
         <server>
             <id>github</id>
-            <password>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</password>
+            <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
 <!--            <username>shaolinrabbi</username>-->
 <!--            <password>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</password>-->
         </server>
