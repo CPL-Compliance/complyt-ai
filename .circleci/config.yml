@@ -6,7 +6,6 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 workflows:
-  version: 2
   build-test-deploy:
     jobs:
 #      - build:
@@ -31,7 +30,7 @@ workflows:
 #          requires:
 #            - build
 
-      - deploy
+      - deployment
 #          filters:
 #            branches:
 #              only:
@@ -91,7 +90,7 @@ jobs:
           file: '/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
-  deploy:
+  deployment:
     machine:
       image: "ubuntu-2004:current"
       docker_layer_caching: true
