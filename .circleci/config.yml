@@ -58,7 +58,7 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: ./mvnw -DskipTests clean package dependency:resolve-plugins dependency:go-offline
+          command: ./mvnw -DskipTests clean package
       - persist_to_workspace:
           root: .
           paths:
@@ -71,7 +71,7 @@ jobs:
           at: .
       - run:
           name: Integration Tests
-          command: ./mvnw --offline failsafe:verify
+          command: ./mvnw ailsafe:verify
       - persist_to_workspace:
           root: .
           paths:
@@ -84,7 +84,7 @@ jobs:
           at: .
       - run:
           name: Run Unit Tests
-          command: ./mvnw --offline surefire:test
+          command: ./mvnw surefire:test
       - persist_to_workspace:
           root: .
           paths:
@@ -97,7 +97,7 @@ jobs:
           at: .
       - run:
           name: Create Reports
-          command: ./mvnw --offline jacoco:prepare-agent jacoco:report
+          command: ./mvnw jacoco:prepare-agent jacoco:report
       - run:
           name: Save test results
           command: |
@@ -137,7 +137,7 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: ./mvnw --settings .circleci/settings.xml --offline -DskipTests --batch-mode release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:prepare release:perform
 
   update-ecs-service:
     executor: openjdk-image
