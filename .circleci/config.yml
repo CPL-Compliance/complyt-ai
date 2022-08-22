@@ -53,7 +53,7 @@ executors:
 
 jobs:
   build:
-    executor: ubuntu-vm
+    executor: openjdk-image
     steps:
       - checkout
       - run:
@@ -71,7 +71,11 @@ jobs:
           at: .
       - run:
           name: Integration Tests
-          command: ./mvnw -o failsafe:verify
+          command: ./mvnw --offline failsafe:verify
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   unit-tests:
     executor: openjdk-image
@@ -80,7 +84,7 @@ jobs:
           at: .
       - run:
           name: Run Unit Tests
-          command: ./mvnw -o surefire:test
+          command: ./mvnw --offline surefire:test
       - persist_to_workspace:
           root: .
           paths:
@@ -93,7 +97,7 @@ jobs:
           at: .
       - run:
           name: Create Reports
-          command: ./mvnw jacoco:prepare-agent jacoco:report
+          command: ./mvnw --offline jacoco:prepare-agent jacoco:report
       - run:
           name: Save test results
           command: |
