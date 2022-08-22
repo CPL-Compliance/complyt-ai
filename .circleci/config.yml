@@ -52,10 +52,6 @@ executors:
     working_directory: ~/work_directory
 
 jobs:
-  dependencies:
-    override:
-      - ./mvnw -DskipTests clean install dependency:resolve-plugins dependency:go-offline
-
   build:
     executor: openjdk-image
     steps:
