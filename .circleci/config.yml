@@ -1,48 +1,55 @@
 version: 2.1
 
+workflows:
+  build-test-deploy:
+    jobs:
+     - build
+
+     - unit-tests:
+         requires:
+           - build
+     
+     - unit-tests-reports:
+         requires:
+           - unit-tests
+      
+     - integration-tests:
+         requires:
+           - build
+
+     - deployment:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - unit-tests
+            - integration-tests
+
+     - update-ecs-service:
+         filters:
+           branches:
+             only:
+               - main
+         requires:
+           - deployment
+
 orbs:
   codecov: codecov/codecov@3.0.0
   aws-cli: circleci/aws-cli@1.3
   aws-ecs: circleci/aws-ecs@2.0
 
-workflows:
-  build-test-deploy:
-    jobs:
-#      - build:
-#          filters:
-#            branches:
-#              only:
-#              - /^(?!main).*$/
-#
-#      - unit-test:
-#          filters:
-#            branches:
-#              only:
-#                - /^(?!main).*$/
-#          requires:
-#            - build
-#
-#      - integration-test:
-#          filters:
-#            branches:
-#              only:
-#                - /^(?!main).*$/
-#          requires:
-#            - build
-
-      - deployment
-#          filters:
-#            branches:
-#              only:
-#                - main
-#
-#      - update-ecs-service:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - deploy
+executors:
+  ubuntu-vm:
+    machine:
+      image: "ubuntu-2004:current"
+      docker_layer_caching: true
+    working_directory: ~/work_directory
+  
+  openjdk-image:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/work_directory
 
 jobs:
   dependencies:
@@ -50,38 +57,51 @@ jobs:
       - ./mvnw -DskipTests clean install dependency:resolve-plugins dependency:go-offline
 
   build:
-    docker:
-      - image: cimg/openjdk:11.0
+    executor: openjdk-image
     steps:
       - checkout
       - run:
           name: Build
-          command: ./mvnw -B -DskipTests clean package
+          command: ./mvnw -DskipTests clean package dependency:resolve-plugins dependency:go-offline
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  integration-test:
-    machine:
-      image: "ubuntu-2004:current"
-      docker_layer_caching: true
+  integration-tests:
+    executor: ubuntu-vm
     steps:
       - attach_workspace:
           at: .
       - run:
           name: Integration Tests
-          command: ./mvnw verify
+          command: ./mvnw --offline failsafe:verify
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
-  unit-test:
-    docker:
-      - image: cimg/openjdk:11.0
+  unit-tests:
+    executor: openjdk-image
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Test
-          command: ./mvnw test
+          name: Run Unit Tests
+          command: ./mvnw --offline surefire:test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  unit-tests-reports:
+    executor: openjdk-image
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Create Reports
+          command: ./mvnw --offline jacoco:prepare-agent jacoco:report
       - run:
           name: Save test results
           command: |
@@ -95,12 +115,10 @@ jobs:
           token: CODECOV_TOKEN
 
   deployment:
-    machine:
-      image: "ubuntu-2004:current"
-      docker_layer_caching: true
-
+    executor: ubuntu-vm
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Avoid hosts unknown for github
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -122,12 +140,11 @@ jobs:
           command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
 
       - run:
-          name: Deploy
-          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:prepare release:perform
+          name: Release a Production Version
+          command: ./mvnw --settings .circleci/settings.xml --offline -DskipTests --batch-mode release:prepare release:perform
 
   update-ecs-service:
-    docker:
-      - image: 'cimg/python:3.9.1'
+    executor: openjdk-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
