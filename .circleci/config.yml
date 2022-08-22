@@ -3,33 +3,33 @@ version: 2.1
 workflows:
   build-test-deploy:
     jobs:
-#     - build
+    #  - build
 
-     - unit-tests:
-         filters:
-           branches:
-             only:
-               - main
-         requires:
-           - build
+    #  - unit-tests:
+    #      filters:
+    #        branches:
+    #          only:
+    #            - main
+    #      requires:
+    #        - build
      
-     - unit-tests-reports:
-         filters:
-           branches:
-             only:
-               - main
-         requires:
-           - unit-tests
+    #  - unit-tests-reports:
+    #      filters:
+    #        branches:
+    #          only:
+    #            - main
+    #      requires:
+    #        - unit-tests
       
-     - integration-tests:
-         filters:
-           branches:
-             only:
-               - main
-         requires:
-           - build
+    #  - integration-tests:
+    #      filters:
+    #        branches:
+    #          only:
+    #            - main
+    #      requires:
+    #        - build
 
-     - deployment:
+     - deployment
 #          filters:
 #            branches:
 #              only:
@@ -37,7 +37,7 @@ workflows:
 #          requires:
 #            - unit-tests
 #            - integration-tests
-     - checkout
+
      - update-ecs-service:
          filters:
            branches:
@@ -125,8 +125,9 @@ jobs:
   deployment:
     executor: ubuntu-vm
     steps:
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
+      - checkout
       - run:
           name: Avoid hosts unknown for github
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
