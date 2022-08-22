@@ -58,7 +58,7 @@ jobs:
       - checkout
       - run:
           name: Configure settings.xml path
-          command: ./mvnw --settings .circleci/settings.xml
+          command:
       - run:
           name: Build
           command: ./mvnw -DskipTests clean package
@@ -140,7 +140,7 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: ./mvnw --batch-mode release:clean release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
   update-ecs-service:
     executor: openjdk-image
