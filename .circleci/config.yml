@@ -71,7 +71,7 @@ jobs:
           at: .
       - run:
           name: Integration Tests
-          command: ./mvnw ailsafe:verify
+          command: ./mvnw failsafe:verify
       - persist_to_workspace:
           root: .
           paths:
