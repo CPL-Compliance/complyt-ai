@@ -6,7 +6,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.0.27-SNAPSHOT</version>
+    <version>0.0.22-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>complyt</name>
