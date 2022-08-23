@@ -26,13 +26,13 @@ workflows:
             - unit-tests
             - integration-tests
 
-#      - update-ecs-service:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - deployment
+      - update-ecs-service:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - deployment
 
 orbs:
   codecov: codecov/codecov@3.0.0
