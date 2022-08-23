@@ -3,48 +3,36 @@ version: 2.1
 workflows:
   build-test-deploy:
     jobs:
-    #  - build
+      - build
 
-    #  - unit-tests:
-    #      filters:
-    #        branches:
-    #          only:
-    #            - main
-    #      requires:
-    #        - build
-     
-    #  - unit-tests-reports:
-    #      filters:
-    #        branches:
-    #          only:
-    #            - main
-    #      requires:
-    #        - unit-tests
-      
-    #  - integration-tests:
-    #      filters:
-    #        branches:
-    #          only:
-    #            - main
-    #      requires:
-    #        - build
+      - unit-tests:
+          requires:
+            - build
 
-     - deployment
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - unit-tests
-#            - integration-tests
+      - unit-tests-reports:
+          requires:
+            - unit-tests
 
-     - update-ecs-service:
-         filters:
-           branches:
-             only:
-               - main
-         requires:
-           - deployment
+      - integration-tests:
+          requires:
+            - build
+
+      - deployment:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - unit-tests
+            - integration-tests
+
+      - update-ecs-service:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - deployment
 
 orbs:
   codecov: codecov/codecov@3.0.0
@@ -143,7 +131,7 @@ jobs:
           name: Setup Git credentials user name
           command: git config user.name "Via CircleCI Build"
 
-#      - run: ./mvnw dependency:go-offline
+      #      - run: ./mvnw dependency:go-offline
       - run:
           name: Creating Maven settings-security.xml file
           command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
