@@ -6,7 +6,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.0.22-SNAPSHOT</version>
+    <version>0.0.22</version>
     <!-- Maven Coordinates -->
 
     <name>complyt</name>
@@ -333,7 +333,7 @@
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
-        <tag>HEAD</tag>
+        <tag>complyt-0.0.22</tag>
     </scm>
 
     <distributionManagement>
