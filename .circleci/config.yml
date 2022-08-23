@@ -26,13 +26,13 @@ workflows:
             - unit-tests
             - integration-tests
 
-      - update-ecs-service:
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - deployment
+#      - update-ecs-service:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          requires:
+#            - deployment
 
 orbs:
   codecov: codecov/codecov@3.0.0
@@ -113,8 +113,6 @@ jobs:
   deployment:
     executor: ubuntu-vm
     steps:
-      # - attach_workspace:
-      #     at: .
       - checkout
       - run:
           name: Avoid hosts unknown for github
@@ -131,7 +129,6 @@ jobs:
           name: Setup Git credentials user name
           command: git config user.name "Via CircleCI Build"
 
-      #      - run: ./mvnw dependency:go-offline
       - run:
           name: Creating Maven settings-security.xml file
           command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
