@@ -1,41 +1,30 @@
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@3.0.0
-  aws-cli: circleci/aws-cli@1.3
-  aws-ecs: circleci/aws-ecs@2.0
-
 workflows:
-  version: 2
   build-test-deploy:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-              - /^(?!main).*$/
+      - build
 
-      - unit-test:
-          filters:
-            branches:
-              only:
-                - /^(?!main).*$/
+      - unit-tests:
           requires:
             - build
 
-      - integration-test:
-          filters:
-            branches:
-              only:
-                - /^(?!main).*$/
+      - unit-tests-reports:
+          requires:
+            - unit-tests
+
+      - integration-tests:
           requires:
             - build
 
-      - deploy:
+      - deployment:
           filters:
             branches:
               only:
                 - main
+          requires:
+            - unit-tests
+            - integration-tests
 
       - update-ecs-service:
           filters:
@@ -43,42 +32,72 @@ workflows:
               only:
                 - main
           requires:
-            - deploy
+            - deployment
+
+orbs:
+  codecov: codecov/codecov@3.0.0
+  aws-cli: circleci/aws-cli@1.3
+  aws-ecs: circleci/aws-ecs@2.0
+
+executors:
+  ubuntu-vm:
+    machine:
+      image: "ubuntu-2004:current"
+      docker_layer_caching: true
+    working_directory: ~/work_directory
+  
+  openjdk-image:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/work_directory
 
 jobs:
   build:
-    docker:
-      - image: cimg/openjdk:11.0
+    executor: openjdk-image
     steps:
       - checkout
       - run:
           name: Build
-          command: ./mvnw -B -DskipTests clean package
+          command: ./mvnw -DskipTests clean package
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  integration-test:
-    machine:
-      image: "ubuntu-2004:current"
-      docker_layer_caching: true
+  integration-tests:
+    executor: ubuntu-vm
     steps:
       - attach_workspace:
           at: .
       - run:
           name: Integration Tests
-          command: ./mvnw verify
+          command: ./mvnw failsafe:verify
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
-  unit-test:
-    docker:
-      - image: cimg/openjdk:11.0
+  unit-tests:
+    executor: openjdk-image
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Test
-          command: ./mvnw test
+          name: Run Unit Tests
+          command: ./mvnw surefire:test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  unit-tests-reports:
+    executor: openjdk-image
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Create Reports
+          command: ./mvnw jacoco:prepare-agent jacoco:report
       - run:
           name: Save test results
           command: |
@@ -91,11 +110,8 @@ jobs:
           file: '/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
-  deploy:
-    machine:
-      image: "ubuntu-2004:current"
-      docker_layer_caching: true
-
+  deployment:
+    executor: ubuntu-vm
     steps:
       - checkout
       - run:
@@ -113,16 +129,16 @@ jobs:
           name: Setup Git credentials user name
           command: git config user.name "Via CircleCI Build"
 
-      - run: ./mvnw dependency:go-offline
-      - run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\"><servers><server><id>registry.hub.docker.com</id><username>${DOCKER_HUB_USER_NAME}</username><password>${DOCKER_HUB_PASSWORD}</password></server><server><id>github</id><username>shaolinrabbi</username><password>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</password></server></servers></settings>" > ~/.m2/settings.xml
-      - run: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
       - run:
-          name: Deploy
-          command: ./mvnw --batch-mode release:prepare release:perform
+          name: Creating Maven settings-security.xml file
+          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
+      - run:
+          name: Release a Production Version
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
   update-ecs-service:
-    docker:
-      - image: 'cimg/python:3.9.1'
+    executor: openjdk-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID

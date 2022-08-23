@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
@@ -13,8 +18,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.3</version>
-        <relativePath />
+        <version>2.7.0</version>
     </parent>
 
     <properties>
@@ -25,7 +29,6 @@
         <lombok.version>1.18.24</lombok.version>
         <java-tuples.version>1.2</java-tuples.version>
         <spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
         <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
         <jUnit.version>4.13.2</jUnit.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
@@ -36,6 +39,7 @@
         <springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
         <spring-security-test.version>5.6.3</spring-security-test.version>
         <reactor-test.version>3.4.18</reactor-test.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -46,17 +50,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -72,7 +73,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -100,7 +100,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -116,7 +115,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -127,7 +125,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -331,16 +328,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>${maven-failsafe-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
