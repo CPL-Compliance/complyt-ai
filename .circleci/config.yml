@@ -91,7 +91,7 @@ jobs:
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
   send-test-coverage-reports:
-    executor: openjdk-image
+    executor: ubuntu-vm
     steps:
       - attach_workspace:
           at: ~/complyt_work_directory/target
@@ -100,7 +100,6 @@ jobs:
           command: |
             mkdir -p ~/test-results/
             find /home/circleci/complyt_work_directory/target -name '*.xml' -exec cp {} '/home/circleci/test-results' \;
-#            find . -type f -regex "/home/circleci/complyt_work_directory/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
           when: always
       - store_test_results:
           path: '~/test-results/'
