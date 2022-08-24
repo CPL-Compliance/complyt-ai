@@ -53,7 +53,7 @@ jobs:
       - checkout
       - run:
           name: Build
-          command: ./mvnw clean verify
+          command: ./mvnw clean package
       - persist_to_workspace:
           root: .
           paths:
