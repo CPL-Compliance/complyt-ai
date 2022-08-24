@@ -100,7 +100,7 @@ jobs:
       - store_test_results:
           path: '~/codecov/'
       - codecov/upload:
-          file: '/target/site/jacoco-ut/jacoco.xml'
+          file: '/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
   update-ecs-service:
