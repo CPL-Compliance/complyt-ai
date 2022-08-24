@@ -112,7 +112,7 @@ jobs:
       - store_test_results:
           path: '~/work_directory/test-results/'
       - codecov/upload:
-          file: '/work_directory/target/jacoco-reports/jacoco.xml'
+          file: '.*/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
   deployment:
