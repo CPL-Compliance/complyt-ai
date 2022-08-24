@@ -11,10 +11,10 @@ workflows:
               only:
                 - main
 
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - deploy
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#            - deploy
 
       - update-ecs-service:
           filters:
@@ -54,14 +54,25 @@ jobs:
       - run:
           name: Build
           command: ./mvnw clean verify
-      - persist_to_workspace:
-          root: target
-          paths:
-            - surefire-reports/*
-            - jacoco-reports/*
-            - failsafe-reports/*
-            - site/*
-            - jacoco.exec
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/
+            find /home/circleci/complyt_work_directory/target -name '*.xml' -exec cp {} '/home/circleci/test-results' \;
+          when: always
+      - store_test_results:
+          path: '~/test-results/'
+      - codecov/upload:
+          file: '/home/circleci/complyt_work_directory/target/jacoco-reports/jacoco.xml'
+          token: CODECOV_TOKEN
+#      - persist_to_workspace:
+#          root: target
+#          paths:
+#            - surefire-reports/*
+#            - jacoco-reports/*
+#            - failsafe-reports/*
+#            - site/*
+#            - jacoco.exec
 
   deploy:
     executor: ubuntu-vm
