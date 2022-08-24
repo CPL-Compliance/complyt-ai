@@ -87,7 +87,7 @@ jobs:
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
   send-test-coverage-reports:
-    executor: openjdk-image
+    executor: ubuntu-vm
     steps:
       - attach_workspace:
           at: ~/complyt_work_directory/target
