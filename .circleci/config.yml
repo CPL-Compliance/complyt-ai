@@ -25,7 +25,7 @@ workflows:
             - deploy
 
 orbs:
-  codecov: codecov/codecov@3.0.0
+  codecov: codecov/codecov@3.2.3
   aws-cli: circleci/aws-cli@1.3
   aws-ecs: circleci/aws-ecs@2.0
 
@@ -102,6 +102,7 @@ jobs:
           when: always
       - store_test_results:
           path: test-results
+      - checkout
       - codecov/upload:
           file: target/jacoco-reports/jacoco.xml
           token: CODECOV_TOKEN
