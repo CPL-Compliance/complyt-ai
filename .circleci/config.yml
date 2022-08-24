@@ -96,7 +96,9 @@ jobs:
           at: target
       - run:
           name: Save test results
-          command: find target -name '*.xml' -exec cp {} --parents 'test-results' \;
+          command: |
+            mkdir -p test-results
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
           path: test-results
