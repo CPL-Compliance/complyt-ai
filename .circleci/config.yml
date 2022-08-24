@@ -48,12 +48,12 @@ executors:
 
 jobs:
   verify:
-    executor: ubuntu-vm
+    executor: openjdk-image
     steps:
       - checkout
       - run:
           name: Build
-          command: ./mvnw clean verify
+          command: ./mvnw clean package
       # - run:
       #     name: Save test results
       #     command: |
