@@ -57,8 +57,7 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - jacoco-reports
-            - surefire-reports
+            - .
 
   deploy:
     executor: ubuntu-vm
