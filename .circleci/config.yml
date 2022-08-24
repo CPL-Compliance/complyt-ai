@@ -55,9 +55,13 @@ jobs:
           name: Build
           command: ./mvnw clean verify
       - persist_to_workspace:
-          root: .
+          root: target
           paths:
-            - .
+            - surefire-reports/*
+            - jacoco-reports/*
+            - failsafe-reports/*
+            - site/*
+            - jacoco.exec
 
   deploy:
     executor: ubuntu-vm
