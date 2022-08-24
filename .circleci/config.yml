@@ -94,13 +94,13 @@ jobs:
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/test-results/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+            mkdir -p ~/codecov/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/codecov/ \;
           when: always
       - store_test_results:
-          path: '~/test-results/'
+          path: '~/codecov/'
       - codecov/upload:
-          file: '/target/coverage-reports/jacoco-ut.exec'
+          file: '/target/site/jacoco-ut/jacoco-ut.exec'
           token: CODECOV_TOKEN
 
   update-ecs-service:
