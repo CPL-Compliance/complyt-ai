@@ -55,7 +55,7 @@ jobs:
           name: Build
           command: ./mvnw clean verify
       - persist_to_workspace:
-          root: target
+          root: .
           paths:
             - .
 
@@ -87,10 +87,10 @@ jobs:
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
   send-test-coverage-reports:
-    executor: ubuntu-vm
+    executor: openjdk-image
     steps:
       - attach_workspace:
-          at: ~/complyt_work_directory/target
+          at: ~/complyt_work_directory
       - run:
           name: Save test results
           command: |
