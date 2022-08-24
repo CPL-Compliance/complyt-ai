@@ -111,7 +111,7 @@ jobs:
           when: always
       - store_test_results:
           path: '~/work_directory/test-results/'
-      - run: ls -la
+      - run: ls -la target/
       - codecov/upload:
           file: '/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
