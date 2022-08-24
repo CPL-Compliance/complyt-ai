@@ -99,9 +99,9 @@ jobs:
       #       find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/codecov/ \;
       #     when: always
       - store_test_results:
-          path: /home/circleci/work_directory/target/surefire-reports
+          path: /home/circleci/complyt_work_directory/target/surefire-reports
       - codecov/upload:
-          file: /home/circleci/work_directory/target/jacoco-reports/jacoco.xml
+          file: /home/circleci/complyt_work_directory/target/jacoco-reports/jacoco.xml
           token: CODECOV_TOKEN
 
   update-ecs-service:
