@@ -94,12 +94,12 @@ jobs:
     executor: openjdk-image
     steps:
       - attach_workspace:
-          at: ~/complyt_work_directory
+          at: ~/complyt_work_directory/target
       - run:
           name: Save test results
           command: |
             mkdir -p ~/test-results/
-            find . -type f -regex "/home/circleci/complyt_work_directory/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+            find . -type f -regex "/home/circleci/complyt_work_directory/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
           when: always
       - store_test_results:
           path: '~/test-results/'
