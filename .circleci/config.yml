@@ -92,14 +92,14 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/complyt_work_directory/target
-      # - run:
-      #     name: Save test results
-      #     command: |
-      #       mkdir -p ~/codecov/
-      #       find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/codecov/ \;
-      #     when: always
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/ \;
+          when: always
       - store_test_results:
-          path: '/home/circleci/complyt_work_directory/target/surefire-reports'
+          path: '~/test-results/'
       - codecov/upload:
           file: '/home/circleci/complyt_work_directory/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
