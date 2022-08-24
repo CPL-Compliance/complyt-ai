@@ -32,7 +32,7 @@ orbs:
 executors:
   ubuntu-vm:
     machine:
-      image: "ubuntu-2004:current"
+      image: ubuntu-2004:202010-01
       docker_layer_caching: true
     working_directory: ~/work_directory
 
@@ -54,16 +54,16 @@ jobs:
       - run:
           name: Build
           command: ./mvnw clean verify
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p ~/work_directory/codecov/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/work_directory/codecov/ \;
-          when: always
-      - store_test_results:
-          path: '~/work_directory/codecov/'
+      # - run:
+      #     name: Save test results
+      #     command: |
+      #       mkdir -p ~/work_directory/codecov/
+      #       find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/work_directory/codecov/ \;
+      #     when: always
+      # - store_test_results:
+      #     path: '~/work_directory/codecov/'
       - codecov/upload:
-          file: './target/jacoco-reports/jacoco.xml'
+          file: 'target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
   deploy:
