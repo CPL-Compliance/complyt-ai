@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ComplytApplication implements CommandLineRunner {
-    // REMOV
+    // REMOVE
     public static void main(String[] args) {
         SpringApplication.run(ComplytApplication.class, args);
     }
