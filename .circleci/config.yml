@@ -57,8 +57,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - target/surefire-reports/
-            - /target/jacoco-reports/
+            - /target/
 
   deploy:
     executor: ubuntu-vm
@@ -92,14 +91,14 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p ~/codecov/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/codecov/ \;
-          when: always
-      - store_test_results:
-          path: '~/codecov/'
+      # - run:
+      #     name: Save test results
+      #     command: |
+      #       mkdir -p ~/codecov/
+      #       find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/codecov/ \;
+      #     when: always
+      # - store_test_results:
+      #     path: '~/codecov/'
       - codecov/upload:
           file: '/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
