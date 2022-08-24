@@ -92,6 +92,7 @@ jobs:
   send-test-coverage-reports:
     executor: openjdk-image
     steps:
+      - checkout
       - attach_workspace:
           at: target
       - run:
@@ -102,7 +103,6 @@ jobs:
           when: always
       - store_test_results:
           path: test-results
-      - checkout
       - codecov/upload:
           file: target/jacoco-reports/jacoco.xml
           token: CODECOV_TOKEN
