@@ -13,18 +13,15 @@ import org.springframework.context.annotation.Profile;
 @AllArgsConstructor
 public class CountyFetcherConfig {
 
-    @NonNull
-    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
-
-    @Profile({"fastTax", "default"})
+    @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("countyFetcher")
-    public TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher() {
+    public TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher(SalesTaxWebClientWrapper salesTaxWebClientWrapper) {
         return new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
     }
 
     @Profile({"zipTax"})
     @Bean("countyFetcher")
-    public TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher() {
+    public TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher(SalesTaxWebClientWrapper salesTaxWebClientWrapper) {
         return new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
     }
 }
