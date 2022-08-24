@@ -48,12 +48,12 @@ executors:
 
 jobs:
   verify:
-    executor: openjdk-image
+    executor: ubuntu-vm
     steps:
       - checkout
       - run:
           name: Build
-          command: ./mvnw clean package
+          command: ./mvnw clean verify
       # - run:
       #     name: Save test results
       #     command: |
@@ -63,7 +63,7 @@ jobs:
       # - store_test_results:
       #     path: '~/work_directory/codecov/'
       - codecov/upload:
-          file: 'target/jacoco-reports/jacoco.xml'
+          file: '~/work_directory/target/jacoco-reports/jacoco.xml'
           token: CODECOV_TOKEN
 
   deploy:
