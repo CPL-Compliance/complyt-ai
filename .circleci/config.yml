@@ -52,7 +52,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build
+          name: Execute
           command: ./mvnw clean verify
       - persist_to_workspace:
           root: target
