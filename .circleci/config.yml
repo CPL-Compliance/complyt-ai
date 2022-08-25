@@ -57,7 +57,7 @@ jobs:
       - checkout
       - run:
           name: Execute
-          command: ./mvnw clean verify
+          command: ./mvnw clean deploy
       - persist_to_workspace:
           root: target
           paths:

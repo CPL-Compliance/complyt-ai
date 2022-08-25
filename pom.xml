@@ -19,6 +19,7 @@
     </parent>
 
     <properties>
+        <java.version>9</java.version>
         <docker.image.prefix>complyt</docker.image.prefix>
         <docker.image.name>complyt</docker.image.name>
         <maven.test.skip>false</maven.test.skip>
