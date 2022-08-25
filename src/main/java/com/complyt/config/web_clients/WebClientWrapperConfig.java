@@ -11,17 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientWrapperConfig {
 
-    @Profile({"zipTax", "default"})
-    @Bean("salesTaxWebClientWrapper")
-    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
-        return new ZipTaxWebClientWrapper(webClient,
-                ZipTaxWebClientWrapperProperties.SCHEME,
-                ZipTaxWebClientWrapperProperties.HOST,
-                ZipTaxWebClientWrapperProperties.PATH,
-                ZipTaxWebClientWrapperProperties.KEY);
-    }
-
-    @Profile("fastTax")
+    @Profile({"fastTax", "default"})
     @Bean("salesTaxWebClientWrapper")
     public FastTaxWebClientWrapper fastTaxWebClientWrapper(WebClient webClient) {
         return new FastTaxWebClientWrapper(webClient,
@@ -29,6 +19,16 @@ public class WebClientWrapperConfig {
                 FastTaxWebClientWrapperProperties.HOST,
                 FastTaxWebClientWrapperProperties.PATH,
                 FastTaxWebClientWrapperProperties.KEY);
+    }
+
+    @Profile("zipTax")
+    @Bean("salesTaxWebClientWrapper")
+    public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
+        return new ZipTaxWebClientWrapper(webClient,
+                ZipTaxWebClientWrapperProperties.SCHEME,
+                ZipTaxWebClientWrapperProperties.HOST,
+                ZipTaxWebClientWrapperProperties.PATH,
+                ZipTaxWebClientWrapperProperties.KEY);
     }
 
     @Profile("stubFastTax")

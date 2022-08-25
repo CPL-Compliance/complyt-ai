@@ -1,6 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.utils.data_fetcher.TransactionFastTaxCountyFetcher;
 import com.complyt.business.utils.data_fetcher.TransactionZipTaxCountyFetcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,21 +21,32 @@ public class CountyFetcherConfigTest {
     CountyFetcherConfig countyFetcherConfig;
 
     @MockBean
-    ZipTaxWebClientWrapper zipTaxWebClientWrapper;
+    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @BeforeEach
     void setUp() {
-        countyFetcherConfig = new CountyFetcherConfig(zipTaxWebClientWrapper);
+        countyFetcherConfig = new CountyFetcherConfig();
     }
 
     @Test
     void initZipTaxCountyFetcher_CountyFetcherCreated_CountyFetcherReturned() {
         // Given
-        TransactionZipTaxCountyFetcher expectedFetcher = new TransactionZipTaxCountyFetcher(zipTaxWebClientWrapper);;
+        TransactionZipTaxCountyFetcher expectedFetcher = new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
+        ;
 
         // When + Then
-        TransactionZipTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher();
-        assertEquals(expectedFetcher,actualFetcher);
+        TransactionZipTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
+        assertEquals(expectedFetcher, actualFetcher);
     }
 
+    @Test
+    void initFastTaxCountyFetcher_CountyFetcherCreated_CountyFetcherReturned() {
+        // Given
+        TransactionFastTaxCountyFetcher expectedFetcher = new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
+        ;
+
+        // When + Then
+        TransactionFastTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
+        assertEquals(expectedFetcher, actualFetcher);
+    }
 }

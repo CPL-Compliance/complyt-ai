@@ -4,7 +4,7 @@ spring:
       # local - to run your application directly on the OS
       # local-docker - to run your application in a docker container
       # connected to a MongoDB that runs in a docker container as well.
-      # To run in this profile execute ./mnvw clean package docker:build docker:run
+      # To run in this profile execute ./mvnw clean package docker:build docker:run
       # production - This is for production only
       - production
       # fastTax - to use FastTax service
