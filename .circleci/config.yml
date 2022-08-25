@@ -73,9 +73,10 @@ jobs:
       - run:
           name: Creating Maven settings-security.xml file
           command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
       - run:
           name: Execute
-          command: ./mvnw clean deploy
+          command: ./mvnw --settings .circleci/settings.xml clean deploy
       - persist_to_workspace:
           root: target
           paths:
