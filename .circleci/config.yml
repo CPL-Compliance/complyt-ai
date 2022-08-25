@@ -56,27 +56,9 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Avoid hosts unknown for github
-          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-
-      - add_ssh_keys:
-          fingerprints:
-            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
-      - run:
-          name: Setup Git credentials user email
-          command: git config user.email "alexander@complyt.io"
-
-      - run:
-          name: Setup Git credentials user name
-          command: git config user.name "Via CircleCI Build"
-
-      - run:
-          name: Creating Maven settings-security.xml file
-          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-
-      - run:
           name: Execute
-          command: ./mvnw --settings .circleci/settings.xml clean deploy
+          command: ./mvnw clean deploy
+
       - persist_to_workspace:
           root: target
           paths:
@@ -111,6 +93,7 @@ jobs:
       - run:
           name: Release a Production Version
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+
       - persist_to_workspace:
           root: target
           paths:
