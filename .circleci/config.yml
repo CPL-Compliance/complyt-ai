@@ -88,6 +88,13 @@ jobs:
       - run:
           name: Release a Production Version
           command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+      - persist_to_workspace:
+          root: target
+          paths:
+            - surefire-reports
+            - jacoco-reports
+            - failsafe-reports
+            - jacoco.exec
 
   send-test-coverage-reports:
     executor: openjdk-image
