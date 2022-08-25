@@ -31,20 +31,22 @@ public class CountyFetcherConfigTest {
     @Test
     void initZipTaxCountyFetcher_CountyFetcherCreated_CountyFetcherReturned() {
         // Given
-        TransactionZipTaxCountyFetcher expectedFetcher = new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);;
+        TransactionZipTaxCountyFetcher expectedFetcher = new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
+        ;
 
         // When + Then
         TransactionZipTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
-        assertEquals(expectedFetcher,actualFetcher);
+        assertEquals(expectedFetcher, actualFetcher);
     }
 
     @Test
     void initFastTaxCountyFetcher_CountyFetcherCreated_CountyFetcherReturned() {
         // Given
-        TransactionFastTaxCountyFetcher expectedFetcher = new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);;
+        TransactionFastTaxCountyFetcher expectedFetcher = new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
+        ;
 
         // When + Then
         TransactionFastTaxCountyFetcher actualFetcher = countyFetcherConfig.transactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
-        assertEquals(expectedFetcher,actualFetcher);
+        assertEquals(expectedFetcher, actualFetcher);
     }
 }
