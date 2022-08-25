@@ -3,7 +3,11 @@ version: 2.1
 workflows:
   build-test-deploy:
     jobs:
-      - verify
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
 
       - deploy:
           filters:
