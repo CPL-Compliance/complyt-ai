@@ -9,7 +9,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
 
       - send-test-coverage-reports:
           requires:
