@@ -62,10 +62,10 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - surefire-reports
-            - jacoco-reports
+            - coverage-reports
             - failsafe-reports
-            - jacoco.exec
+            - surefire-reports
+            - site
 
   deploy:
     executor: ubuntu-vm
@@ -97,10 +97,10 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - surefire-reports
-            - jacoco-reports
+            - coverage-reports
             - failsafe-reports
-            - jacoco.exec
+            - surefire-reports
+            - site
 
   send-test-coverage-reports:
     executor: openjdk-image
@@ -117,7 +117,7 @@ jobs:
       - store_test_results:
           path: test-results
       - codecov/upload:
-          file: target/jacoco-reports/jacoco.xml
+          file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
 
   update-ecs-service:
