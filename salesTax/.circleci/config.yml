@@ -15,7 +15,7 @@ workflows:
               only:
                 - main
 
-      -   salesTax-send-test-coverage-reports:
+      - salesTax-send-test-coverage-reports:
           requires:
             - salesTax-verify
             - salesTax-deploy
