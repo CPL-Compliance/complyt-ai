@@ -121,7 +121,8 @@ jobs:
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
-
+          flags: transactions
+          
   customers-update-ecs-service:
     executor: python-image
     steps:
