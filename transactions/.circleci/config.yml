@@ -17,8 +17,8 @@ workflows:
 
       - transactions-send-test-coverage-reports:
           requires:
-            - verify
-            - deploy
+            - transactions-verify
+            - transactions-deploy
 
       - transactions-update-ecs-service:
           filters:
@@ -26,7 +26,7 @@ workflows:
               only:
                 - main
           requires:
-            - deploy
+            - transactions-deploy
 
 orbs:
   codecov: codecov/codecov@3.2.3
