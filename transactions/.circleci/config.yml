@@ -1,26 +1,26 @@
 version: 2.1
 
 workflows:
-  module-a-build-test-deploy:
+  transactions-build-test-deploy:
     jobs:
-      - verify:
+      - transactions-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - deploy:
+      - transactions-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - send-test-coverage-reports:
+      - transactions-send-test-coverage-reports:
           requires:
             - verify
             - deploy
 
-      - update-ecs-service:
+      - transactions-update-ecs-service:
           filters:
             branches:
               only:
@@ -51,7 +51,7 @@ executors:
     working_directory: ~/complyt_work_directory
 
 jobs:
-  module-a-verify:
+  transactions-verify:
     executor: ubuntu-vm
     steps:
       - checkout
@@ -67,7 +67,7 @@ jobs:
             - surefire-reports
             - site
 
-  module-a-deploy:
+  transactions-deploy:
     executor: ubuntu-vm
     steps:
       - checkout
@@ -102,7 +102,7 @@ jobs:
             - surefire-reports
             - site
 
-  module-a-send-test-coverage-reports:
+  transactions-send-test-coverage-reports:
     executor: openjdk-image
     steps:
       - checkout
@@ -120,7 +120,7 @@ jobs:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
 
-  module-a-update-ecs-service:
+  transactions-update-ecs-service:
     executor: python-image
     steps:
       - aws-cli/setup:
