@@ -1,32 +1,32 @@
 version: 2.1
 
 workflows:
-  transactions-build-test-deploy:
+  salesTax-build-test-deploy:
     jobs:
-      - transactions-verify:
+      - salesTax-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - transactions-deploy:
+      - salesTax-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - transactions-send-test-coverage-reports:
+      -   salesTax-send-test-coverage-reports:
           requires:
-            - transactions-verify
-            - transactions-deploy
+            - salesTax-verify
+            - salesTax-deploy
 
-      - transactions-update-ecs-service:
+      - salesTax-update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - transactions-deploy
+            - salesTax-deploy
 
 orbs:
   codecov: codecov/codecov@3.2.3
@@ -38,20 +38,20 @@ executors:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory/transactions
+    working_directory: ~/complyt_work_directory/salesTax
 
   openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory/transactions
+    working_directory: ~/complyt_work_directory/salesTax
 
   python-image:
     docker:
       - image: 'cimg/python:3.9.1'
-    working_directory: ~/complyt_work_directory/transactions
+    working_directory: ~/complyt_work_directory/salesTax
 
 jobs:
-  transactions-verify:
+  salesTax-verify:
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -68,7 +68,7 @@ jobs:
             - surefire-reports
             - site
 
-  transactions-deploy:
+  salesTax-deploy:
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -104,7 +104,7 @@ jobs:
             - surefire-reports
             - site
 
-  transactions-send-test-coverage-reports:
+  salesTax-send-test-coverage-reports:
     executor: openjdk-image
     steps:
       - checkout
@@ -121,9 +121,9 @@ jobs:
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
-          flags: transactions
+          flags: salesTax
 
-  transactions-update-ecs-service:
+  salesTax-update-ecs-service:
     executor: python-image
     steps:
       - aws-cli/setup:
