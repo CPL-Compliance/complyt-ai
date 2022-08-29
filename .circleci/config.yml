@@ -36,8 +36,9 @@ orbs:
 executors:
   ubuntu-vm:
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
+    resource_class: medium
     working_directory: ~/complyt_work_directory
 
   openjdk-image:
