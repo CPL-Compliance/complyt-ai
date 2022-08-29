@@ -1,32 +1,32 @@
 version: 2.1
 
 workflows:
-  customers-build-test-deploy:
+  temp-build-test-deploy:
     jobs:
-      - customers-verify:
+      - temp-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - customers-deploy:
+      - temp-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - customers-send-test-coverage-reports:
+      - temp-send-test-coverage-reports:
           requires:
-            - customers-verify
-            - customers-deploy
+            - temp-verify
+            - temp-deploy
 
-      - customers-update-ecs-service:
+      - temp-update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - customers-deploy
+            - temp-deploy
 
 orbs:
   codecov: codecov/codecov@3.2.3
@@ -38,20 +38,20 @@ executors:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/temp
 
   openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/temp
 
   python-image:
     docker:
       - image: 'cimg/python:3.9.1'
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/temp
 
 jobs:
-  customers-verify:
+  temp-verify:
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -68,7 +68,7 @@ jobs:
             - surefire-reports
             - site
 
-  customers-deploy:
+  temp-deploy:
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -104,7 +104,7 @@ jobs:
             - surefire-reports
             - site
 
-  customers-send-test-coverage-reports:
+  temp-send-test-coverage-reports:
     executor: openjdk-image
     steps:
       - checkout
@@ -122,8 +122,8 @@ jobs:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: transactions
-          
-  customers-update-ecs-service:
+
+  temp-update-ecs-service:
     executor: python-image
     steps:
       - aws-cli/setup:

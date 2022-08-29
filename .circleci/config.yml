@@ -55,7 +55,7 @@ workflows:
           # If C is modified, then the jobs for both C and B (as a dependency) will run
           modules: |
             salesTax
-            customers
+            temp
 #            module-c module-b
 
 orbs:
