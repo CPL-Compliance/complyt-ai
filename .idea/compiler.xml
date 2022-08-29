@@ -10,7 +10,7 @@
         <module name="temp" />
         <module name="customers" />
       </profile>
-      <profile name="Annotation profile for salexTax" enabled="true">
+      <profile name="Annotation profile for salesTax" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -25,6 +25,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="complyt" target="17" />
+      <module name="temp" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

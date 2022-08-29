@@ -5,12 +5,12 @@
 
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
-    <artifactId>salexTax</artifactId>
+    <artifactId>salesTax</artifactId>
     <version>0.0.31-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <name>salexTax</name>
-    <description>This is a service for managing salexTax made by Complyt</description>
+    <name>salesTax</name>
+    <description>This is a service for managing salesTax made by Complyt</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
