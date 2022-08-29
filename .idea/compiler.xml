@@ -25,7 +25,6 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="complyt" target="17" />
-      <module name="temp" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
