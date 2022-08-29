@@ -19,7 +19,7 @@
     </parent>
 
     <properties>
-        <java.version>8</java.version>
+        <java.version>17</java.version>
         <docker.image.prefix>complyt</docker.image.prefix>
         <docker.image.name>complyt</docker.image.name>
         <maven.test.skip>false</maven.test.skip>
@@ -135,7 +135,7 @@
                             <alias>complyt</alias>
                             <build>
                                 <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
-                                <!--copies artficact to docker build directory in target-->
+                                <!--copies artifact to docker build directory in target-->
                                 <assembly>
                                     <descriptorRef>artifact</descriptorRef>
                                 </assembly>
