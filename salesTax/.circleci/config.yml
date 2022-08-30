@@ -94,10 +94,10 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: salesTax/mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
       - persist_to_workspace:
-          root: salesTax/target
+          root: target
           paths:
             - coverage-reports
             - failsafe-reports
