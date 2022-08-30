@@ -23,6 +23,8 @@
 
     <properties>
         <java.version>17</java.version>
+        <docker.image.prefix>complyt</docker.image.prefix>
+        <docker.image.name>reports</docker.image.name>
         <mapstruct.version>1.5.1.Final</mapstruct.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>
