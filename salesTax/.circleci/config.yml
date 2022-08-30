@@ -55,12 +55,13 @@ jobs:
     executor: sales-tax-ubuntu-vm
     steps:
       - checkout
+      - run cd salesTax
       - run:
           name: Execute
-          command: ./salesTax/mvnw clean verify
+          command: ./mvnw clean verify
 
       - persist_to_workspace:
-          root: ./salesTax/target
+          root: target
           paths:
             - coverage-reports
             - failsafe-reports
