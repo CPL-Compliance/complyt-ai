@@ -1,32 +1,32 @@
 version: 2.1
 
 workflows:
-  customers-build-test-deploy:
+  reports-build-test-deploy:
     jobs:
-      - customers-verify:
+      - reports-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - customers-deploy:
+      - reports-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - customers-send-test-coverage-reports:
+      - reports-send-test-coverage-reports:
           requires:
-            - customers-verify
-            - customers-deploy
+            - reports-verify
+            - reports-deploy
 
-      - customers-update-ecs-service:
+      - reports-update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - customers-deploy
+            - reports-deploy
 
 orbs:
   codecov: codecov/codecov@3.2.3
@@ -34,25 +34,25 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  customers-ubuntu-vm:
+  reports-ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/reports
 
-  customers-openjdk-image:
+  reports-openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/reports
 
-  customers-python-image:
+  reports-python-image:
     docker:
       - image: 'cimg/python:3.9.1'
-    working_directory: ~/complyt_work_directory/customers
+    working_directory: ~/complyt_work_directory/reports
 
 jobs:
-  customers-verify:
-    executor: customers-ubuntu-vm
+  reports-verify:
+    executor: reports-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -68,8 +68,8 @@ jobs:
             - surefire-reports
             - site
 
-  customers-deploy:
-    executor: customers-ubuntu-vm
+  reports-deploy:
+    executor: reports-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -104,8 +104,8 @@ jobs:
             - surefire-reports
             - site
 
-  customers-send-test-coverage-reports:
-    executor: customers-openjdk-image
+  reports-send-test-coverage-reports:
+    executor: reports-openjdk-image
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -118,14 +118,14 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/customers
+          path: test-results/reports
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
-          flags: customers
+          flags: reports
 
-  customers-update-ecs-service:
-    executor: customers-python-image
+  reports-update-ecs-service:
+    executor: reports-python-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
