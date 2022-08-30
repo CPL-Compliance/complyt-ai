@@ -38,12 +38,12 @@ executors:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory
+    working_directory: ~/complyt_work_directory/salesTax
 
   sales-tax-openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory
+    working_directory: ~/complyt_work_directory/salesTax
 
   sales-tax-python-image:
     docker:
@@ -54,10 +54,11 @@ jobs:
   sales-tax-verify:
     executor: sales-tax-ubuntu-vm
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
       - run:
           name: Execute
-          command: cd salesTax && ./mvnw clean verify
+          command: ./mvnw clean verify
 
       - persist_to_workspace:
           root: target
@@ -106,7 +107,8 @@ jobs:
   sales-tax-send-test-coverage-reports:
     executor: sales-tax-openjdk-image
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
       - attach_workspace:
           at: target
       - run:
@@ -118,7 +120,7 @@ jobs:
       - store_test_results:
           path: test-results
       - codecov/upload:
-          file: /salesTax/target/site/jacoco-ut/jacoco.xml
+          file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: salesTax
 
