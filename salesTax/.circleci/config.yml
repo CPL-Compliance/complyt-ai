@@ -1,32 +1,32 @@
 version: 2.1
 
 workflows:
-  salesTax-build-test-deploy:
+  sales-tax-build-test-deploy:
     jobs:
-      - salesTax-verify:
+      - sales-tax-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - salesTax-deploy:
+      - sales-tax-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - salesTax-send-test-coverage-reports:
+      - sales-tax-send-test-coverage-reports:
           requires:
-            - salesTax-verify
-            - salesTax-deploy
+            - sales-tax-verify
+            - sales-tax-deploy
 
-      - salesTax-update-ecs-service:
+      - sales-tax-update-ecs-service:
           filters:
             branches:
               only:
                 - main
           requires:
-            - salesTax-deploy
+            - sales-tax-deploy
 
 orbs:
   codecov: codecov/codecov@3.2.3
@@ -34,25 +34,25 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  salesTax-ubuntu-vm:
+  sales-tax-ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory/salesTax
+    working_directory: ~/complyt_work_directory/sales_tax
 
-  salesTax-openjdk-image:
+  sales-tax-openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory/salesTax
+    working_directory: ~/complyt_work_directory/sales_tax
 
-  salesTax-python-image:
+  sales-tax-python-image:
     docker:
       - image: 'cimg/python:3.9.1'
-    working_directory: ~/complyt_work_directory/salesTax
+    working_directory: ~/complyt_work_directory/sales_tax
 
 jobs:
-  salesTax-verify:
-    executor: salesTax-ubuntu-vm
+  sales-tax-verify:
+    executor: sales-tax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -68,8 +68,8 @@ jobs:
             - surefire-reports
             - site
 
-  salesTax-deploy:
-    executor: salesTax-ubuntu-vm
+  sales-tax-deploy:
+    executor: sales-tax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -104,8 +104,8 @@ jobs:
             - surefire-reports
             - site
 
-  salesTax-send-test-coverage-reports:
-    executor: salesTax-openjdk-image
+  sales-tax-send-test-coverage-reports:
+    executor: sales-tax-openjdk-image
     steps:
       - checkout
       - attach_workspace:
@@ -117,14 +117,14 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/salesTax
+          path: test-results/sales_tax
       - codecov/upload:
-          file: /salesTax/target/site/jacoco-ut/jacoco.xml
+          file: /sales_tax/target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
-          flags: salesTax
+          flags: sales-tax
 
-  salesTax-update-ecs-service:
-    executor: salesTax-python-image
+  sales-tax-update-ecs-service:
+    executor: sales-tax-python-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
