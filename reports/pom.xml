@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Coordinates -->
     <groupId>io.complyt</groupId>
-    <artifactId>customers</artifactId>
+    <artifactId>reports</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <!-- Coordinates -->
 
@@ -18,8 +18,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <name>customers</name>
-    <description>This is a service for managing customers made by Complyt</description>
+    <name>reports</name>
+    <description>This is a service for managing reports made by Complyt</description>
 
     <properties>
         <java.version>17</java.version>
@@ -178,7 +178,7 @@
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
-        <tag>transactions-0.0.29</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>

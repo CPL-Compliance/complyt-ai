@@ -19,7 +19,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
         <module name="salexTax" />
-        <module name="customers" />
+        <module name="reports" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -30,7 +30,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="complyt" options="-parameters" />
-      <module name="customers" options="-parameters" />
+      <module name="reports" options="-parameters" />
       <module name="salexTax" options="-parameters" />
       <module name="temp" options="-parameters" />
     </option>
