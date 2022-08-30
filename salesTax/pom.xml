@@ -21,7 +21,7 @@
     <properties>
         <java.version>17</java.version>
         <docker.image.prefix>complyt</docker.image.prefix>
-        <docker.image.name>salesTax</docker.image.name>
+        <docker.image.name>salestax</docker.image.name>
         <maven.test.skip>false</maven.test.skip>
         <mapstruct.version>1.5.1.Final</mapstruct.version>
         <lombok.version>1.18.24</lombok.version>
