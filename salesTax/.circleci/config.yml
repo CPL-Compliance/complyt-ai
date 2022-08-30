@@ -34,25 +34,25 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  ubuntu-vm:
+  salesTax-ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
     working_directory: ~/complyt_work_directory/salesTax
 
-  openjdk-image:
+  salesTax-openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
     working_directory: ~/complyt_work_directory/salesTax
 
-  python-image:
+  salesTax-python-image:
     docker:
       - image: 'cimg/python:3.9.1'
     working_directory: ~/complyt_work_directory/salesTax
 
 jobs:
   salesTax-verify:
-    executor: ubuntu-vm
+    executor: salesTax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -69,7 +69,7 @@ jobs:
             - site
 
   salesTax-deploy:
-    executor: ubuntu-vm
+    executor: salesTax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -105,7 +105,7 @@ jobs:
             - site
 
   salesTax-send-test-coverage-reports:
-    executor: openjdk-image
+    executor: salesTax-openjdk-image
     steps:
       - checkout
       - attach_workspace:
@@ -119,12 +119,12 @@ jobs:
       - store_test_results:
           path: test-results/salesTax
       - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
+          file: /salesTax/target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: salesTax
 
   salesTax-update-ecs-service:
-    executor: python-image
+    executor: salesTax-python-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID

@@ -34,25 +34,25 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  ubuntu-vm:
+  customers-ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
     working_directory: ~/complyt_work_directory/customers
 
-  openjdk-image:
+  customers-openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
     working_directory: ~/complyt_work_directory/customers
 
-  python-image:
+  customers-python-image:
     docker:
       - image: 'cimg/python:3.9.1'
     working_directory: ~/complyt_work_directory/customers
 
 jobs:
   customers-verify:
-    executor: ubuntu-vm
+    executor: customers-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -69,7 +69,7 @@ jobs:
             - site
 
   customers-deploy:
-    executor: ubuntu-vm
+    executor: customers-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -105,7 +105,7 @@ jobs:
             - site
 
   customers-send-test-coverage-reports:
-    executor: openjdk-image
+    executor: customers-openjdk-image
     steps:
       - checkout
       - attach_workspace:
@@ -124,7 +124,7 @@ jobs:
           flags: transactions
 
   customers-update-ecs-service:
-    executor: python-image
+    executor: customers-python-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
