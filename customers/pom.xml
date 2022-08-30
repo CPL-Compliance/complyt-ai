@@ -1,41 +1,191 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>io.complyt</groupId>
-	<artifactId>customers</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>customers</name>
-	<description>This is a service for managing customers made by Complyt</description>
-	<properties>
-		<java.version>17</java.version>
-	</properties>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <modelVersion>4.0.0</modelVersion>
+    <!-- Coordinates -->
+    <groupId>io.complyt</groupId>
+    <artifactId>customers</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <!-- Coordinates -->
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
+    <name>customers</name>
+    <description>This is a service for managing customers made by Complyt</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <mapstruct.version>1.5.1.Final</mapstruct.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.7.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Test Dependencies -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-plugin.version}</version>
+                <executions>
+                    <!--
+                        Prepares the property pointing to the JaCoCo runtime agent which
+                        is passed as VM argument when Maven the Surefire plugin is executed.
+                    -->
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                            <!--
+                                Sets the name of the property containing the settings
+                                for JaCoCo runtime agent.
+                            -->
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <!--
+                        Ensures that the code coverage report for unit tests is created after
+                        unit tests have been run.
+                    -->
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- The Executions required by unit tests are omitted. -->
+                    <!--
+                        Prepares the property pointing to the JaCoCo runtime agent which
+                        is passed as VM argument when Maven the Failsafe plugin is executed.
+                    -->
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                            <!--
+                                Sets the name of the property containing the settings
+                                for JaCoCo runtime agent.
+                            -->
+                            <propertyName>failsafeArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <!--
+                        Ensures that the code coverage report for integration tests after
+                        integration tests have been run.
+                    -->
+                    <execution>
+                        <id>post-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!-- Sets the VM argument line used when unit tests are run. -->
+                    <argLine>${surefireArgLine}</argLine>
+                    <!-- Skips unit tests if the value of skip.unit.tests property is true -->
+                    <!--                    <skipTests>${skip.unit.tests}</skipTests>-->
+                    <!-- Excludes integration tests when unit tests are run. -->
+                    <excludes>
+                        <exclude>**/*IT*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <scm>
+        <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
+        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+        <url>git@github.com:idhub-io/idhub-api.git</url>
+        <tag>transactions-0.0.29</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Complyt Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Complyt/complyt</url>
+        </repository>
+    </distributionManagement>
 </project>

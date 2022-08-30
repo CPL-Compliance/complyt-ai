@@ -7,10 +7,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="temp" />
-        <module name="customers" />
       </profile>
-      <profile name="Annotation profile for salesTax" enabled="true">
+      <profile name="Annotation profile for customers" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -21,10 +19,12 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
         <module name="salexTax" />
+        <module name="customers" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="complyt" target="17" />
+      <module name="temp" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
