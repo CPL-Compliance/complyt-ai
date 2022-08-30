@@ -54,15 +54,13 @@ jobs:
   sales-tax-verify:
     executor: sales-tax-ubuntu-vm
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      -
+      - checkout
       - run:
           name: Execute
-          command: ./salesTax/mvnw clean verify
+          command: salesTax/mvnw clean verify
 
       - persist_to_workspace:
-          root: target
+          root: salesTax/target
           paths:
             - coverage-reports
             - failsafe-reports
@@ -95,10 +93,10 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: ./salesTax/mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+          command: salesTax/mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
 
       - persist_to_workspace:
-          root: /salesTax/target
+          root: salesTax/target
           paths:
             - coverage-reports
             - failsafe-reports
