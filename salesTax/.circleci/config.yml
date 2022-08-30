@@ -55,7 +55,8 @@ jobs:
     executor: sales-tax-ubuntu-vm
     steps:
       - checkout
-      - run cd salesTax
+      - run:
+          command: cd salesTax
       - run:
           name: Execute
           command: ./mvnw clean verify
