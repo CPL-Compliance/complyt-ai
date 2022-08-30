@@ -57,10 +57,10 @@ jobs:
       - checkout
       - run:
           name: Execute
-          command: salesTax/mvnw clean verify
+          command: ./salesTax/mvnw clean verify
 
       - persist_to_workspace:
-          root: salesTax/target
+          root: ./salesTax/target
           paths:
             - coverage-reports
             - failsafe-reports
