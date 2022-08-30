@@ -56,10 +56,8 @@ jobs:
     steps:
       - checkout
       - run:
-          command: cd salesTax
-      - run:
           name: Execute
-          command: ./mvnw clean verify
+          command: cd salesTax && ./mvnw clean verify
 
       - persist_to_workspace:
           root: target
