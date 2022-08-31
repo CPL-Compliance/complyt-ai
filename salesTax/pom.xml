@@ -5,11 +5,11 @@
 
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
-    <artifactId>salesTax</artifactId>
+    <artifactId>salestax</artifactId>
     <version>0.0.32-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <name>salesTax</name>
+    <name>salestax</name>
     <description>This is a service for managing salesTax made by Complyt</description>
 
     <parent>
