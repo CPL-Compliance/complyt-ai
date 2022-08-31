@@ -65,7 +65,7 @@
                     <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
                     <dockerHost>unix:///var/run/docker.sock</dockerHost>
                     <verbose>true</verbose>
-                    <registry>docker.io</registry>
+                    <registry>https://index.docker.io/v1/</registry>
                     <images>
                         <!--Complyt Application Container-->
                         <image>
