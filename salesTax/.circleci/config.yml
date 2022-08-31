@@ -1,0 +1,138 @@
+version: 2.1
+
+workflows:
+  sales-tax-build-test-deploy:
+    jobs:
+      - sales-tax-verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+
+      - sales-tax-deploy:
+          filters:
+            branches:
+              only:
+                - main
+
+      - sales-tax-send-test-coverage-reports:
+          requires:
+            - sales-tax-verify
+            - sales-tax-deploy
+
+      - sales-tax-update-ecs-service:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - sales-tax-deploy
+
+orbs:
+  codecov: codecov/codecov@3.2.3
+  aws-cli: circleci/aws-cli@1.3
+  aws-ecs: circleci/aws-ecs@2.0
+
+executors:
+  sales-tax-ubuntu-vm:
+    machine:
+      image: ubuntu-2204:2022.07.1
+      docker_layer_caching: true
+    working_directory: ~/complyt_work_directory/salesTax
+
+  sales-tax-openjdk-image:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/complyt_work_directory/salesTax
+
+  sales-tax-python-image:
+    docker:
+      - image: 'cimg/python:3.9.1'
+    working_directory: ~/complyt_work_directory
+
+jobs:
+  sales-tax-verify:
+    executor: sales-tax-ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Execute
+          command: ./mvnw clean verify
+
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
+            - site
+
+  sales-tax-deploy:
+    executor: sales-tax-ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+      - run:
+          name: Setup Git credentials user email
+          command: git config user.email "alexander@complyt.io"
+
+      - run:
+          name: Setup Git credentials user name
+          command: git config user.name "Via CircleCI Build"
+
+      - run:
+          name: Creating Maven settings-security.xml file
+          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
+      - run:
+          name: Release a Production Version
+          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
+            - site
+
+  sales-tax-send-test-coverage-reports:
+    executor: sales-tax-openjdk-image
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: target
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p test-results
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results \;
+          when: always
+      - store_test_results:
+          path: test-results
+      - codecov/upload:
+          file: target/site/jacoco-ut/jacoco.xml
+          token: CODECOV_TOKEN
+          flags: salesTax
+
+  sales-tax-update-ecs-service:
+    executor: sales-tax-python-image
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-region: AWS_DEFAULT_REGION
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - aws-ecs/update-service:
+          cluster-name: 'Complyt'
+          container-image-name-updates: 'container=salestax,tag=latest'
+          family: 'complyt-td-production'
+          service-name: 'complyt-srvc-production'
