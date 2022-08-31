@@ -133,6 +133,6 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: 'Complyt'
-          container-image-name-updates: 'container=Complyt,tag=latest'
-          family: 'Complyt'
-          service-name: 'Complyt-ECS-Fargate-LB'
+          container-image-name-updates: 'container=salestax,tag=latest'
+          family: 'complyt-td-production'
+          service-name: 'complyt-srvc-production'
