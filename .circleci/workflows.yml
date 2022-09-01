@@ -41,9 +41,9 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-test-service
-            - failsafe-test-service
-            - surefire-test-service
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
             - site
 
   sales-tax-deploy:
@@ -95,10 +95,10 @@ jobs:
           name: Save test results
           command: |
             mkdir -p test-results
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results \;
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results
+          path: test-results/
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
@@ -117,9 +117,9 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-test-service
-            - failsafe-test-service
-            - surefire-test-service
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
             - site
 
   test-service-deploy:
@@ -174,7 +174,7 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/testService
+          path: test-results/
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
