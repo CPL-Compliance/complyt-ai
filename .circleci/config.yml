@@ -10,5 +10,5 @@ workflows:
           base-revision: main
           mapping: |
             salesTax/.* run-salex-tax-workflow true
-            reports/.* run-reports-workflow true
+            testService/.* run-test-service-workflow true
           config-path: .circleci/workflows.yml

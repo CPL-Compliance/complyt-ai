@@ -41,9 +41,9 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
             - site
 
   sales-tax-deploy:
@@ -78,9 +78,9 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
             - site
 
   sales-tax-send-test-coverage-reports:
@@ -104,8 +104,8 @@ jobs:
           token: CODECOV_TOKEN
           flags: salesTax
 
-  reports-verify:
-    working_directory: ~/complyt_work_directory/reports
+  test-service-verify:
+    working_directory: ~/complyt_work_directory/test-service
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -117,13 +117,13 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
             - site
 
-  reports-deploy:
-    working_directory: ~/complyt_work_directory/reports
+  test-service-deploy:
+    working_directory: ~/complyt_work_directory/test-service
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -154,13 +154,13 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
             - site
 
-  reports-send-test-coverage-reports:
-    working_directory: ~/complyt_work_directory/reports
+  test-service-send-test-coverage-reports:
+    working_directory: ~/complyt_work_directory/test-service
     executor: openjdk-image
     steps:
       - checkout:
@@ -174,14 +174,14 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/reports
+          path: test-results/test-service
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
-          flags: reports
+          flags: test-service
 
-  reports-update-ecs-service:
-    working_directory: ~/complyt_work_directory/reports
+  test-service-update-ecs-service:
+    working_directory: ~/complyt_work_directory/test-service
     executor: python-image
     steps:
       - aws-cli/setup:
@@ -190,7 +190,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: 'Complyt'
-          container-image-name-updates: 'container=reports,tag=latest'
+          container-image-name-updates: 'container=test-service,tag=latest'
           family: 'complyt-td-production'
           service-name: 'complyt-srvc-production'
 
@@ -215,22 +215,22 @@ workflows:
             - sales-tax-verify
             - sales-tax-deploy
   
-  reports-build-test-deploy:
-    when: << pipeline.parameters.run-reports-workflow >>
+  test-service-build-test-deploy:
+    when: << pipeline.parameters.run-test-service-workflow >>
     jobs:
-      - reports-verify:
+      - test-service-verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
 
-      - reports-deploy:
+      - test-service-deploy:
           filters:
             branches:
               only:
                 - main
 
-      - reports-send-test-coverage-reports:
+      - test-service-send-test-coverage-reports:
           requires:
-            - reports-verify
-            - reports-deploy
+            - test-service-verify
+            - test-service-deploy
