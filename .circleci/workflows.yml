@@ -192,10 +192,7 @@ jobs:
 
 workflows:
   sales-tax-build-test-deploy:
-    when: 
-      or: 
-        - << pipeline.parameters.run-salex-tax-workflow >>
-        - << pipeline.parameters.force-run >>
+    when: << pipeline.parameters.run-salex-tax-workflow >>
     jobs:
       - sales-tax-verify:
           filters:
@@ -215,10 +212,7 @@ workflows:
             - sales-tax-deploy
   
   reports-build-test-deploy:
-    when: 
-      or: 
-        - << pipeline.parameters.run-reports-workflow >>
-        - << pipeline.parameters.force-run >>
+    when: << pipeline.parameters.run-reports-workflow >>
     jobs:
       - reports-verify:
           filters:
