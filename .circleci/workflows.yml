@@ -198,7 +198,7 @@ workflows:
     when: 
       or: 
         - << pipeline.parameters.run-salex-tax-workflow >>
-        - << pipeline.parameters.force-run >>
+        - << parameters.force-run >>
     jobs:
       - sales-tax-verify:
           filters:
@@ -221,7 +221,7 @@ workflows:
     when: 
       or: 
         - << pipeline.parameters.run-reports-workflow >>
-        - << pipeline.parameters.force-run >>
+        - << parameters.force-run >>
     jobs:
       - reports-verify:
           filters:
