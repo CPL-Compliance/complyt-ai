@@ -32,7 +32,7 @@ parameters:
 
 jobs:
   sales-tax-verify:
-    executor: sales-tax-ubuntu-vm
+    executor: ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -49,7 +49,7 @@ jobs:
             - site
 
   sales-tax-deploy:
-    executor: sales-tax-ubuntu-vm
+    executor: ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -85,7 +85,7 @@ jobs:
             - site
 
   sales-tax-send-test-coverage-reports:
-    executor: sales-tax-openjdk-image
+    executor: openjdk-image
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -105,7 +105,7 @@ jobs:
           flags: salesTax
 
   reports-verify:
-    executor: reports-ubuntu-vm
+    executor: ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -122,7 +122,7 @@ jobs:
             - site
 
   reports-deploy:
-    executor: reports-ubuntu-vm
+    executor: ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -158,7 +158,7 @@ jobs:
             - site
 
   reports-send-test-coverage-reports:
-    executor: reports-openjdk-image
+    executor: openjdk-image
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -178,7 +178,7 @@ jobs:
           flags: reports
 
   reports-update-ecs-service:
-    executor: reports-python-image
+    executor: python-image
     steps:
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
@@ -247,286 +247,286 @@ workflows:
 #             sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
 #             sudo apt update
 #             sudo apt install -y --no-install-recommends azure-functions-core-tools-3
-jobs:
-  build-site-api:
-    docker:
-      # next-gen ubuntu image with java 11.0.10
-      - image: cimg/openjdk:11.0.10
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: build site-api
-          command: mvn -am -pl obfuscated:site-api verify
-      - run:
-          name: prepare artifacts
-          command: |
-            mkdir -p artifacts/site-api
-            cp service/site-api/target/app.jar artifacts/site-api
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - site-api
-  deploy-site-api:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - attach_workspace:
-          at: artifacts
-      - run:
-          name: deploy site-api
-          command: |
-            ... stuff happens
-  build-batch-services:
-    docker:
-      # next-gen ubuntu image with java 11.0.10
-      - image: cimg/openjdk:11.0.10
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: build batch-services
-          command: mvn -am -P azure -pl obfuscated:batch verify
-      - run:
-          name: prepare artifacts
-          command: |
-            ... stuff happens
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - batch
-  deploy-batch-services:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - attach_workspace:
-          at: artifacts
-      - run:
-          name: deploy batch-services
-          command: |
-            ... exciting stuff happens
-  build-admin-ui:
-    docker:
-      # next-gen ubuntu image with python 3.9.4 and node 14.16.1
-      - image: cimg/python:3.9.4-node
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: install admin-ui dependencies
-          command: cd admin-ui && npm ci
-      - run:
-          name: lint admin-ui
-          command: cd admin-ui && npm run lint
-      - run:
-          name: build admin-ui
-          command: cd admin-ui && npm run build
-      - run:
-          name: prepare artifacts
-          command: |
-            mkdir -p artifacts/admin-ui
-            cp -R admin-ui/dist/* artifacts/admin-ui
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - admin-ui
-  deploy-admin-ui:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - attach_workspace:
-          at: artifacts
-      - run:
-          name: deploy admin-ui
-          command: |
-            ... The Doors of Durin, Lord of Moria. Speak, friend, and enter.
-  build-site-ui:
-    docker:
-      - image: circleci/openjdk:11.0.7-jdk-buster-node
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: install data jar & parent pom
-          command: mvn -am -pl obfuscated:data install
-      - run:
-          name: install site-ui frontend dependencies
-          command: cd ui && npm ci
-      - run:
-          name: lint site-ui frontend
-          command: cd ui && npm run lint
-      - run:
-          name: build site-ui frontend
-          command: cd ui && npm run build
-      - run:
-          name: build site-ui backend
-          command: cd ui && sbt assembly
-      - run:
-          name: prepare artifacts
-          command: |
-            mkdir -p artifacts/site-ui
-            cp ui/target/scala-2.13/app.jar artifacts/site-ui
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - site-ui
-  deploy-site-ui:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - attach_workspace:
-          at: artifacts
-      - run:
-          name: deploy site-ui
-          command: |
-            ... here there be dragons
-  build-azure-functions:
-    docker:
-      # next-gen ubuntu image with java 11.0.10
-      - image: cimg/openjdk:11.0.10
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: build azure functions
-          command: mvn -am -pl obfuscated:functions verify
-      - run:
-          name: prepare artifacts
-          command: |
-            ... irrelevant
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - functions
-  deploy-azure-functions:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - azure-functions-core-tools-install
-      - attach_workspace:
-          at: artifacts
-      - run:
-          name: deploy azure functions
-          command: |
-            ... black magic and voodoo
-  build-product-classifier-api:
-    docker:
-      # next-gen ubuntu image with java 11.0.10
-      - image: cimg/openjdk:11.0.10
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: build product-classifier-api
-          command: mvn -am -P azure -pl obfuscated:product-classifier-api verify
-      - run:
-          name: prepare artifacts
-          command: |
-            ... stuff happens
-      - persist_to_workspace:
-          root: artifacts
-          paths:
-            - product-classifier-api
-  image-product-classifier-api:
-    ... not relevant to article
-  deploy-product-classifier-api:
-    docker:
-      # next-gen ubuntu image
-      - image: cimg/base:2021.04
-    resource_class: small
-    steps:
-      - azure-cli-install-login
-      - run:
-          name: deploy product-classifier-api
-          command: |
-            ... stuff happens
-workflows:
-  site-api:
-    when:
-      or:
-        - << pipeline.parameters.run-site-api-workflow >>
-        - << pipeline.parameters.service-layer-modified >>
-        - << pipeline.parameters.config-data-modified >>
-    jobs:
-      - build-site-api
-      - deploy-site-api:
-          requires:
-            - build-site-api
-          filters:
-            branches:
-              only: master
-  batch-services:
-    when:
-      or:
-        - << pipeline.parameters.run-batch-services-workflow >>
-        - << pipeline.parameters.service-layer-modified >>
-        - << pipeline.parameters.config-data-modified >>
-    jobs:
-      - build-batch-services
-      - deploy-batch-services:
-          requires:
-            - build-batch-services
-          filters:
-            branches:
-              only: master
-  admin-ui:
-    when: << pipeline.parameters.run-admin-ui-workflow >>
-    jobs:
-      - build-admin-ui
-      - deploy-admin-ui:
-          requires:
-            - build-admin-ui
-          filters:
-            branches:
-              only: master
-  site-ui:
-    when: << pipeline.parameters.run-site-ui-workflow >>
-    jobs:
-      - build-site-ui
-      - deploy-site-ui:
-          requires:
-            - build-site-ui
-          filters:
-            branches:
-              only: master
-  azure-functions:
-    when: << pipeline.parameters.run-azure-functions-workflow >>
-    jobs:
-      - build-azure-functions
-      - deploy-azure-functions:
-          requires:
-            - build-azure-functions
-          filters:
-            branches:
-              only: master
-  product-classifier-api:
-    when: << pipeline.parameters.run-product-classifier-api-workflow >>
-    jobs:
-      - build-product-classifier-api
-      - image-product-classifier-api:
-          requires:
-            - build-product-classifier-api
-          filters:
-            branches:
-              only: master
-      - deploy-product-classifier-api:
-          requires:
-            - image-product-classifier-api
-          filters:
-            branches:
-              only: master
+# jobs:
+#   build-site-api:
+#     docker:
+#       # next-gen ubuntu image with java 11.0.10
+#       - image: cimg/openjdk:11.0.10
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: build site-api
+#           command: mvn -am -pl obfuscated:site-api verify
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             mkdir -p artifacts/site-api
+#             cp service/site-api/target/app.jar artifacts/site-api
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - site-api
+#   deploy-site-api:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - attach_workspace:
+#           at: artifacts
+#       - run:
+#           name: deploy site-api
+#           command: |
+#             ... stuff happens
+#   build-batch-services:
+#     docker:
+#       # next-gen ubuntu image with java 11.0.10
+#       - image: cimg/openjdk:11.0.10
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: build batch-services
+#           command: mvn -am -P azure -pl obfuscated:batch verify
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             ... stuff happens
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - batch
+#   deploy-batch-services:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - attach_workspace:
+#           at: artifacts
+#       - run:
+#           name: deploy batch-services
+#           command: |
+#             ... exciting stuff happens
+#   build-admin-ui:
+#     docker:
+#       # next-gen ubuntu image with python 3.9.4 and node 14.16.1
+#       - image: cimg/python:3.9.4-node
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: install admin-ui dependencies
+#           command: cd admin-ui && npm ci
+#       - run:
+#           name: lint admin-ui
+#           command: cd admin-ui && npm run lint
+#       - run:
+#           name: build admin-ui
+#           command: cd admin-ui && npm run build
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             mkdir -p artifacts/admin-ui
+#             cp -R admin-ui/dist/* artifacts/admin-ui
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - admin-ui
+#   deploy-admin-ui:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - attach_workspace:
+#           at: artifacts
+#       - run:
+#           name: deploy admin-ui
+#           command: |
+#             ... The Doors of Durin, Lord of Moria. Speak, friend, and enter.
+#   build-site-ui:
+#     docker:
+#       - image: circleci/openjdk:11.0.7-jdk-buster-node
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: install data jar & parent pom
+#           command: mvn -am -pl obfuscated:data install
+#       - run:
+#           name: install site-ui frontend dependencies
+#           command: cd ui && npm ci
+#       - run:
+#           name: lint site-ui frontend
+#           command: cd ui && npm run lint
+#       - run:
+#           name: build site-ui frontend
+#           command: cd ui && npm run build
+#       - run:
+#           name: build site-ui backend
+#           command: cd ui && sbt assembly
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             mkdir -p artifacts/site-ui
+#             cp ui/target/scala-2.13/app.jar artifacts/site-ui
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - site-ui
+#   deploy-site-ui:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - attach_workspace:
+#           at: artifacts
+#       - run:
+#           name: deploy site-ui
+#           command: |
+#             ... here there be dragons
+#   build-azure-functions:
+#     docker:
+#       # next-gen ubuntu image with java 11.0.10
+#       - image: cimg/openjdk:11.0.10
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: build azure functions
+#           command: mvn -am -pl obfuscated:functions verify
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             ... irrelevant
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - functions
+#   deploy-azure-functions:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - azure-functions-core-tools-install
+#       - attach_workspace:
+#           at: artifacts
+#       - run:
+#           name: deploy azure functions
+#           command: |
+#             ... black magic and voodoo
+#   build-product-classifier-api:
+#     docker:
+#       # next-gen ubuntu image with java 11.0.10
+#       - image: cimg/openjdk:11.0.10
+#     resource_class: small
+#     steps:
+#       - checkout
+#       - run:
+#           name: build product-classifier-api
+#           command: mvn -am -P azure -pl obfuscated:product-classifier-api verify
+#       - run:
+#           name: prepare artifacts
+#           command: |
+#             ... stuff happens
+#       - persist_to_workspace:
+#           root: artifacts
+#           paths:
+#             - product-classifier-api
+#   image-product-classifier-api:
+#     ... not relevant to article
+#   deploy-product-classifier-api:
+#     docker:
+#       # next-gen ubuntu image
+#       - image: cimg/base:2021.04
+#     resource_class: small
+#     steps:
+#       - azure-cli-install-login
+#       - run:
+#           name: deploy product-classifier-api
+#           command: |
+#             ... stuff happens
+# workflows:
+#   site-api:
+#     when:
+#       or:
+#         - << pipeline.parameters.run-site-api-workflow >>
+#         - << pipeline.parameters.service-layer-modified >>
+#         - << pipeline.parameters.config-data-modified >>
+#     jobs:
+#       - build-site-api
+#       - deploy-site-api:
+#           requires:
+#             - build-site-api
+#           filters:
+#             branches:
+#               only: master
+#   batch-services:
+#     when:
+#       or:
+#         - << pipeline.parameters.run-batch-services-workflow >>
+#         - << pipeline.parameters.service-layer-modified >>
+#         - << pipeline.parameters.config-data-modified >>
+#     jobs:
+#       - build-batch-services
+#       - deploy-batch-services:
+#           requires:
+#             - build-batch-services
+#           filters:
+#             branches:
+#               only: master
+#   admin-ui:
+#     when: << pipeline.parameters.run-admin-ui-workflow >>
+#     jobs:
+#       - build-admin-ui
+#       - deploy-admin-ui:
+#           requires:
+#             - build-admin-ui
+#           filters:
+#             branches:
+#               only: master
+#   site-ui:
+#     when: << pipeline.parameters.run-site-ui-workflow >>
+#     jobs:
+#       - build-site-ui
+#       - deploy-site-ui:
+#           requires:
+#             - build-site-ui
+#           filters:
+#             branches:
+#               only: master
+#   azure-functions:
+#     when: << pipeline.parameters.run-azure-functions-workflow >>
+#     jobs:
+#       - build-azure-functions
+#       - deploy-azure-functions:
+#           requires:
+#             - build-azure-functions
+#           filters:
+#             branches:
+#               only: master
+#   product-classifier-api:
+#     when: << pipeline.parameters.run-product-classifier-api-workflow >>
+#     jobs:
+#       - build-product-classifier-api
+#       - image-product-classifier-api:
+#           requires:
+#             - build-product-classifier-api
+#           filters:
+#             branches:
+#               only: master
+#       - deploy-product-classifier-api:
+#           requires:
+#             - image-product-classifier-api
+#           filters:
+#             branches:
+#               only: master
