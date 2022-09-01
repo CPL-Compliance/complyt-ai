@@ -29,9 +29,6 @@ parameters:
   run-reports-workflow:
     type: boolean
     default: false
-  force-run:
-    type: boolean
-    default: false
 
 jobs:
   sales-tax-verify:

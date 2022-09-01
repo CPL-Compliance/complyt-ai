@@ -2,6 +2,13 @@ version: 2.1
 setup: true
 orbs:
   path-filtering: circleci/path-filtering@0.0.2
+
+
+parameters:
+  force-run:
+    type: boolean
+    default: false
+
 workflows:
   setup:
     jobs:
