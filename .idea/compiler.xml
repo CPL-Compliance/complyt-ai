@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -18,28 +17,16 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
-        <module name="reports" />
-        <module name="salestax" />
-        <module name="salexTax" />
         <module name="salesTax" />
-        <module name="transactions" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="complyt" target="17" />
       <module name="salesTax" target="17" />
-      <module name="temp" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="complyt" options="-parameters" />
-      <module name="reports" options="-parameters" />
       <module name="salesTax" options="-parameters" />
-      <module name="salestax" options="-parameters" />
-      <module name="salexTax" options="-parameters" />
-      <module name="temp" options="-parameters" />
-      <module name="transactions" options="-parameters" />
     </option>
   </component>
 </project>
