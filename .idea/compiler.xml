@@ -18,13 +18,15 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
+        <module name="reports" />
+        <module name="salestax" />
         <module name="salexTax" />
         <module name="salesTax" />
-        <module name="reports" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="complyt" target="17" />
+      <module name="salesTax" target="17" />
       <module name="temp" target="17" />
     </bytecodeTargetLevel>
   </component>
@@ -33,6 +35,7 @@
       <module name="complyt" options="-parameters" />
       <module name="reports" options="-parameters" />
       <module name="salesTax" options="-parameters" />
+      <module name="salestax" options="-parameters" />
       <module name="salexTax" options="-parameters" />
       <module name="temp" options="-parameters" />
     </option>
