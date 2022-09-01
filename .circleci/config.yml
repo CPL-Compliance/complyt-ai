@@ -131,4 +131,4 @@ jobs:
           cluster-name: 'Complyt'
           container-image-name-updates: 'container=Complyt,tag=latest'
           family: 'Complyt'
-          service-name: 'Complyt-ECS-Fargate-LB'
+          service-name: 'complyt-production'

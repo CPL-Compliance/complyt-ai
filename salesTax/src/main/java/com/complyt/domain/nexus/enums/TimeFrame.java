@@ -1,9 +1,0 @@
-package com.complyt.domain.nexus.enums;
-
-public enum TimeFrame {
-    CURRENT_TAXABLE_YEAR,
-    CURRENT_CALENDER_YEAR,
-    PREVIOUS_TWELVE_MONTHS,
-    PREVIOUS_CALENDER_YEAR,
-    YEAR_FROM_SEPTEMBER_TO_SEPTEMBER
-}
