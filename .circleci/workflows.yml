@@ -10,17 +10,17 @@ executors:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
-    working_directory: ~/complyt_work_directory
+    # working_directory: ~/complyt_work_directory
 
   openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
-    working_directory: ~/complyt_work_directory
+    # working_directory: ~/complyt_work_directory
 
   python-image:
     docker:
       - image: 'cimg/python:3.9.1'
-    working_directory: ~/complyt_work_directory
+    # working_directory: ~/complyt_work_directory
 
 parameters:
   run-salex-tax-workflow:
@@ -32,6 +32,7 @@ parameters:
 
 jobs:
   sales-tax-verify:
+    working_directory: ~/spring-complyt_work_directory/salesTax
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -49,6 +50,7 @@ jobs:
             - site
 
   sales-tax-deploy:
+    working_directory: ~/spring-complyt_work_directory/salesTax
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -85,6 +87,7 @@ jobs:
             - site
 
   sales-tax-send-test-coverage-reports:
+    working_directory: ~/spring-complyt_work_directory/salesTax
     executor: openjdk-image
     steps:
       - checkout:
@@ -105,6 +108,7 @@ jobs:
           flags: salesTax
 
   reports-verify:
+    working_directory: ~/spring-complyt_work_directory/reports
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -122,6 +126,7 @@ jobs:
             - site
 
   reports-deploy:
+    working_directory: ~/spring-complyt_work_directory/reports
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -158,6 +163,7 @@ jobs:
             - site
 
   reports-send-test-coverage-reports:
+    working_directory: ~/spring-complyt_work_directory/reports
     executor: openjdk-image
     steps:
       - checkout:
@@ -178,6 +184,7 @@ jobs:
           flags: reports
 
   reports-update-ecs-service:
+    working_directory: ~/spring-complyt_work_directory/reports
     executor: python-image
     steps:
       - aws-cli/setup:
