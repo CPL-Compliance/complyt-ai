@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/complyt.iml" filepath="$PROJECT_DIR$/.idea/complyt.iml" />
       <module fileurl="file://$PROJECT_DIR$/salesTax/salesTax.iml" filepath="$PROJECT_DIR$/salesTax/salesTax.iml" />
+      <module fileurl="file://$PROJECT_DIR$/testService/testService.iml" filepath="$PROJECT_DIR$/testService/testService.iml" />
     </modules>
   </component>
 </project>
