@@ -5,11 +5,6 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/transactions/pom.xml" />
-        <option value="$PROJECT_DIR$/salexTax/pom.xml" />
-        <option value="$PROJECT_DIR$/salesTax/pom.xml" />
-        <option value="$PROJECT_DIR$/customers/pom.xml" />
-        <option value="$PROJECT_DIR$/reports/pom.xml" />
       </list>
     </option>
   </component>
