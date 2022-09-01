@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ReportsService implements CommandLineRunner {
-	// test
+	// This is a test
 	public static void main(String[] args) {
 		SpringApplication.run(ReportsService.class, args);
 	}
