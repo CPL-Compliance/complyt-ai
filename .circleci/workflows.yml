@@ -23,7 +23,7 @@ parameters:
   run-salex-tax-workflow:
     type: boolean
     default: false
-  run-reports-workflow:
+  run-test-service-workflow:
     type: boolean
     default: false
 
