@@ -105,7 +105,7 @@ jobs:
           flags: salesTax
 
   test-service-verify:
-    working_directory: ~/complyt_work_directory/test-service
+    working_directory: ~/complyt_work_directory/testSerice
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -123,7 +123,7 @@ jobs:
             - site
 
   test-service-deploy:
-    working_directory: ~/complyt_work_directory/test-service
+    working_directory: ~/complyt_work_directory/testSerice
     executor: ubuntu-vm
     steps:
       - checkout:
@@ -160,7 +160,7 @@ jobs:
             - site
 
   test-service-send-test-coverage-reports:
-    working_directory: ~/complyt_work_directory/test-service
+    working_directory: ~/complyt_work_directory/testSerice
     executor: openjdk-image
     steps:
       - checkout:
@@ -174,14 +174,14 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
           when: always
       - store_test_results:
-          path: test-results/test-service
+          path: test-results/testSerice
       - codecov/upload:
           file: target/site/jacoco-ut/jacoco.xml
           token: CODECOV_TOKEN
           flags: test-service
 
   test-service-update-ecs-service:
-    working_directory: ~/complyt_work_directory/test-service
+    working_directory: ~/complyt_work_directory/testSerice
     executor: python-image
     steps:
       - aws-cli/setup:
