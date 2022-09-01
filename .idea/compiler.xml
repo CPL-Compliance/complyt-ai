@@ -8,7 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
       </profile>
-      <profile name="Annotation profile for reports" enabled="true">
+      <profile name="Annotation profile for salesTax" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -22,6 +22,7 @@
         <module name="salestax" />
         <module name="salexTax" />
         <module name="salesTax" />
+        <module name="transactions" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -38,6 +39,7 @@
       <module name="salestax" options="-parameters" />
       <module name="salexTax" options="-parameters" />
       <module name="temp" options="-parameters" />
+      <module name="transactions" options="-parameters" />
     </option>
   </component>
 </project>
