@@ -4,20 +4,21 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>io.complyt</groupId>
+        <artifactId>complyt</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>salesTax</artifactId>
     <version>0.0.33-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <name>salesTax</name>
+    <name>SalesTax</name>
     <description>This is a service for managing salesTax made by Complyt</description>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
-    </parent>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>17</java.version>
