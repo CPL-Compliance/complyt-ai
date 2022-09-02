@@ -25,4 +25,8 @@
     <name>Complyt</name>
     <description>This is a product made by Complyt</description>
 
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
 </project>

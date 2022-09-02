@@ -20,32 +20,56 @@
 	<description>This is a test Service made by Complyt</description>
 
 	<properties>
-		<java.version>17</java.version>
+		<!-- Docker Coordinates -->
 		<docker.image.prefix>complyt</docker.image.prefix>
 		<docker.image.name>testservice</docker.image.name>
-		<maven.test.skip>false</maven.test.skip>
+		<!-- Docker Coordinates -->
+
+		<!-- Dependencies -->
+		<mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
+		<spring-security-test.version>5.6.3</spring-security-test.version>
+		<reactor-test.version>3.4.18</reactor-test.version>
 		<mapstruct.version>1.5.1.Final</mapstruct.version>
 		<lombok.version>1.18.24</lombok.version>
+		<springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
 		<java-tuples.version>1.2</java-tuples.version>
-		<spring-boot-starter-web.version>2.6.4</spring-boot-starter-web.version>
-		<mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
-		<jUnit.version>4.13.2</jUnit.version>
+		<!-- Dependencies -->
+
+		<!-- Plugins -->
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
 		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-		<springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
-		<spring-security-test.version>5.6.3</spring-security-test.version>
-		<reactor-test.version>3.4.18</reactor-test.version>
 		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<!-- Plugins -->
 	</properties>
 
 	<dependencies>
 		<!-- Spring Boot Starter Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<!-- Spring Boot Starter Dependencies -->
 
@@ -75,7 +99,30 @@
 			<version>${mockito-junit-jupiter.version}</version>
 		</dependency>
 		<!-- Test Dependencies -->
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-webflux-ui</artifactId>
+			<version>${springdoc-openapi-webflux-ui.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>${java-tuples.version}</version>
+		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
