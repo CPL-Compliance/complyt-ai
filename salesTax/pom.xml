@@ -26,16 +26,6 @@
         <docker.image.name>salestax</docker.image.name>
         <!-- Docker Coordinates -->
 
-        <!-- Dependencies -->
-        <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
-        <spring-security-test.version>5.6.3</spring-security-test.version>
-        <reactor-test.version>3.4.18</reactor-test.version>
-        <mapstruct.version>1.5.1.Final</mapstruct.version>
-        <lombok.version>1.18.24</lombok.version>
-        <springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
-        <java-tuples.version>1.2</java-tuples.version>
-        <!-- Dependencies -->
-
         <!-- Plugins -->
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -77,49 +67,41 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>2.7.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
-            <version>${reactor-test.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
-            <version>${spring-security-test.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
-            <version>${mockito-junit-jupiter.version}</version>
         </dependency>
         <!-- Test Dependencies -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
-            <version>${springdoc-openapi-webflux-ui.version}</version>
         </dependency>
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
-            <version>${java-tuples.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-ui</artifactId>
         </dependency>
     </dependencies>
 
