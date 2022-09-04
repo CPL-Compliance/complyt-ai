@@ -20,7 +20,7 @@ executors:
       - image: 'cimg/python:3.9.1'
 
 parameters:
-  run-salex-tax-workflow:
+  run-sales-tax-workflow:
     type: boolean
     default: false
   run-test-service-workflow:
@@ -196,7 +196,7 @@ jobs:
 
 workflows:
   sales-tax-build-test-deploy:
-    when: << pipeline.parameters.run-salex-tax-workflow >>
+    when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
       - sales-tax-verify:
           filters:
