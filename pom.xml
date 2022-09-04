@@ -171,7 +171,7 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Complyt Apache Maven Packages</name>
+            <name>Releases</name>
             <url>https://maven.pkg.github.com/Complyt/complyt</url>
         </repository>
     </distributionManagement>
