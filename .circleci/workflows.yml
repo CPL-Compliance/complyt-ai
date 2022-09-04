@@ -6,7 +6,12 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  ubuntu-vm:
+  sales-tax-ubuntu-vm:
+    machine:
+      image: ubuntu-2204:2022.07.1
+      docker_layer_caching: true
+
+  test-service-ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
@@ -30,7 +35,7 @@ parameters:
 jobs:
   sales-tax-verify:
     working_directory: ~/complyt_work_directory/salesTax
-    executor: ubuntu-vm
+    executor: sales-tax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -48,7 +53,7 @@ jobs:
 
   sales-tax-deploy:
     working_directory: ~/complyt_work_directory/salesTax
-    executor: ubuntu-vm
+    executor: sales-tax-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -106,7 +111,7 @@ jobs:
 
   test-service-verify:
     working_directory: ~/complyt_work_directory/testService
-    executor: ubuntu-vm
+    executor: test-service-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -124,7 +129,7 @@ jobs:
 
   test-service-deploy:
     working_directory: ~/complyt_work_directory/testService
-    executor: ubuntu-vm
+    executor: test-service-ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
