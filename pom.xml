@@ -147,13 +147,10 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.github.danielflower.mavenplugins</groupId>
-                <artifactId>multi-module-maven-release-plugin</artifactId>
-                <version>3.6.1</version>
+                <groupId>de.hilling.maven.release</groupId>
+                <artifactId>smart-release-plugin</artifactId>
+                <version>4.0</version>
                 <configuration>
-                    <releaseGoals>
-                        <releaseGoal>deploy</releaseGoal>
-                    </releaseGoals>
                 </configuration>
             </plugin>
 <!--            <plugin>-->
@@ -161,6 +158,7 @@
 <!--                <artifactId>maven-release-plugin</artifactId>-->
 <!--                <version>${maven-release-plugin.version}</version>-->
 <!--                <configuration>-->
+
 <!--                    <releaseProfiles>release</releaseProfiles>-->
 <!--                    <autoVersionSubmodules>true</autoVersionSubmodules>-->
 <!--                    &lt;!&ndash; [skip ci] tells the CI tools to ignore commits coming from the Maven Release Plugin &ndash;&gt;-->
