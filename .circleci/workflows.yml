@@ -202,13 +202,13 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
 
       - sales-tax-deploy:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
 
       - sales-tax-send-test-coverage-reports:
           requires:
@@ -222,13 +222,13 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
 
       - test-service-deploy:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
 
       - test-service-send-test-coverage-reports:
           requires:
