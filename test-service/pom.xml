@@ -22,7 +22,7 @@
 	<properties>
 		<!-- Docker Coordinates -->
 		<docker.image.prefix>complyt</docker.image.prefix>
-		<docker.image.name>testservice</docker.image.name>
+		<docker.image.name>test-service</docker.image.name>
 		<!-- Docker Coordinates -->
 
 		<!-- Dependencies -->
