@@ -49,29 +49,12 @@
 		<!-- Spring Boot Starter Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<!-- Spring Boot Starter Dependencies -->
 
 		<!-- Test Dependencies -->
 		<dependency>
@@ -80,46 +63,11 @@
 			<version>2.7.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-			<version>${reactor-test.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-			<version>${spring-security-test.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<scope>test</scope>
-			<version>${mockito-junit-jupiter.version}</version>
-		</dependency>
 		<!-- Test Dependencies -->
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-			<version>${mapstruct.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-webflux-ui</artifactId>
-			<version>${springdoc-openapi-webflux-ui.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.javatuples</groupId>
-			<artifactId>javatuples</artifactId>
-			<version>${java-tuples.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -150,40 +98,6 @@
 									<tag>${project.version}</tag>
 								</tags>
 							</build>
-							<run>
-								<env>
-									<SPRING_PROFILES_ACTIVE>local-docker, stubFastTax</SPRING_PROFILES_ACTIVE>
-									<SPRING_DATA_MONGODB_URI>mongodb://mongo:27017/complyt</SPRING_DATA_MONGODB_URI>
-								</env>
-								<ports>
-									<port>9898:9898</port>
-								</ports>
-								<links>
-									<link>mongo</link>
-								</links>
-								<dependsOn>
-									<container>mongo</container>
-								</dependsOn>
-							</run>
-						</image>
-						<!--MongoDB container-->
-						<image>
-							<name>mongo:4.4.6</name>
-							<alias>mongo</alias>
-							<run>
-								<ports>
-									<port>27017:27017</port>
-								</ports>
-								<volumes>
-									<bind>
-										<volume>${project.basedir}/dockerdata:/data/db</volume>
-									</bind>
-								</volumes>
-								<wait>
-									<log>Waiting for connections</log>
-									<time>10000</time>
-								</wait>
-							</run>
 						</image>
 					</images>
 				</configuration>
