@@ -1,6 +1,6 @@
 package com.complyt.v1.model;
 
-import com.complyt.domain.customer.ExemptionType;
+import com.complyt.domain.customer.exemption.ExemptionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

@@ -6,7 +6,6 @@ import lombok.ToString;
 import lombok.With;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @AllArgsConstructor
 @With

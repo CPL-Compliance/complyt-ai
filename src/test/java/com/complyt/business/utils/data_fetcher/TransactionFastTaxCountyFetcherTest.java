@@ -59,7 +59,7 @@ class TransactionFastTaxCountyFetcherTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE);
     }
 
     private TaxInfoItem createTaxInfoItem() {
@@ -67,7 +67,7 @@ class TransactionFastTaxCountyFetcherTest {
     }
 
     @Test
-    void inject_InjectsCounty_ReturnsOrder() {
+    void inject_InjectsCounty_ReturnsTransaction() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
         List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>() {{

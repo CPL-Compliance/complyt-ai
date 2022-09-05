@@ -57,7 +57,7 @@ class TransactionRepositoryTest {
         user = User.builder().username("user").password("password").clientId(clientId).build();
 
         transaction = createTransaction();
-        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(),clientId,CustomerType.RETAIL,null);
+        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), clientId, CustomerType.RETAIL, null);
     }
 
     private Transaction createTransaction() {
@@ -67,9 +67,9 @@ class TransactionRepositoryTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode",null,salesTaxRate,false,0,TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, user.getClientId(),  null,null);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, user.getClientId(), null, null, TransactionType.INVOICE);
     }
 
     @Test
@@ -144,8 +144,8 @@ class TransactionRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.insertAll(allTransactions)).thenReturn(Flux.fromIterable(allTransactions));
-        when(reactiveMongoTemplate.findById(transaction.getCustomerId(),Customer.class)).thenReturn(Mono.just(customer));
-        when(reactiveMongoTemplate.findById(secondTransaction.getCustomerId(),Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findById(secondTransaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         Flux<Transaction> transactionFlux = transactionRepository.saveAll(allTransactions);
 
         // Then
@@ -204,7 +204,7 @@ class TransactionRepositoryTest {
         Flux<Transaction> transactionFlux = transactionRepository.findAll();
 
         //Then
-        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer),secondTransaction.withCustomer(customer)).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), secondTransaction.withCustomer(customer)).verifyComplete();
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
@@ -231,7 +231,7 @@ class TransactionRepositoryTest {
         Flux<Transaction> transactionFlux = transactionRepository.findAllByQuery(query);
 
         //Then
-        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer),secondTransaction.withCustomer(customer)).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), secondTransaction.withCustomer(customer)).verifyComplete();
     }
 
     @Test

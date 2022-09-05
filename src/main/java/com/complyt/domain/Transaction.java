@@ -30,4 +30,5 @@ public class Transaction {
     private final ObjectId clientId;
     private final TimeStamps internalTimeStamps;
     private final TimeStamps externalTimeStamps;
+    private final TransactionType transactionType;
 }

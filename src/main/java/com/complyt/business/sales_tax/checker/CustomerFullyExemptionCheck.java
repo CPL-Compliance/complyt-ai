@@ -1,7 +1,7 @@
 package com.complyt.business.sales_tax.checker;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.ExemptionType;
+import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.Exemption;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
