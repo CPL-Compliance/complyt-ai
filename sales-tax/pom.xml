@@ -87,6 +87,7 @@
         </dependency>
         <!-- Test Dependencies -->
 
+        <!-- Other Dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -104,6 +105,7 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
         </dependency>
+        <!-- Other Dependencies -->
     </dependencies>
 
     <build>
