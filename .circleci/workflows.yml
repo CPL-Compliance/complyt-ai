@@ -42,7 +42,9 @@ jobs:
       - run:
           name: Execute
           command: ./mvnw clean verify
-
+      - run:
+          name: test
+          command: echo '<<parameters.service_directory>> is the passed param'
       - persist_to_workspace:
           root: target
           paths:
@@ -135,7 +137,7 @@ jobs:
           cluster-name: 'Complyt'
           container-image-name-updates: 'container=<<parameters.service_name>>, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
-          service-name: <<parameters.service_name>>
+          service-name: '<<parameters.service_name>>-service'
 
 workflows:
   sales-tax-workflow:
