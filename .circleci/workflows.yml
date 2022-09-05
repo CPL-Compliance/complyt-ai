@@ -6,12 +6,7 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0
 
 executors:
-  sales-tax-ubuntu-vm:
-    machine:
-      image: ubuntu-2204:2022.07.1
-      docker_layer_caching: true
-
-  test-service-ubuntu-vm:
+  ubuntu-vm:
     machine:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
@@ -189,7 +184,7 @@ jobs:
         default: ""
 
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-    executor: sales-tax-ubuntu-vm
+    executor: ubuntu-vm
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -205,21 +200,37 @@ jobs:
             - surefire-reports
             - site
 
+    send-test-coverage-reports:
+      working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+      executor: openjdk-image
+      steps:
+        - checkout:
+            path: ~/complyt_work_directory
+        - attach_workspace:
+            at: target
+        - run:
+            name: Save test results
+            command: |
+              mkdir -p test-results
+              find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+            when: always
+        - store_test_results:
+            path: test-results/
+        - codecov/upload:
+            file: target/site/jacoco-ut/jacoco.xml
+            token: CODECOV_TOKEN
+            flags: <<parameters.service_directory>>
+
 workflows:
   build-test:
-    filters:
-      branches:
-        only:
-          - main
+    when: << pipeline.parameters.run-test-service-workflow >>
     jobs:
       - verify:
-          when:
-            condition: << pipeline.parameters.run-sales-tax-workflow >>
           service_directory: "sales-tax"
-      - verify:
-          when:
-            condition: << pipeline.parameters.run-test-service-workflow >>
-          service_directory: "test-service"
+      - send-test-coverage-reports:
+          requires:
+            - verify
+          service_directory: "sales-tax"
 #
 #  sales-tax-build-test-deploy:
 #    when: << pipeline.parameters.run-sales-tax-workflow >>
