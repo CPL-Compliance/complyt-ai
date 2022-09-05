@@ -132,7 +132,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: 'Complyt'
-          container-image-name-updates: 'container=<<parameters.service_name>>, tag=latest'
+          container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'
 
