@@ -9,6 +9,6 @@ workflows:
       - path-filtering/filter:
           base-revision: main
           mapping: |
-            salesTax/.* run-sales-tax-workflow true
-            testService/.* run-test-service-workflow true
+            sales-tax/.* run-sales-tax-workflow true
+            test-service/.* run-test-service-workflow true
           config-path: .circleci/workflows.yml
