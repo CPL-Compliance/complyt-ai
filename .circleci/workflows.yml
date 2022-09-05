@@ -126,7 +126,7 @@ jobs:
 
     executor: python-image
     steps:
-      - print:
+      - run:
           name: test
           command: echo 'container=<<parameters.service_name>>-container, tag=latest'
       - aws-cli/setup:
