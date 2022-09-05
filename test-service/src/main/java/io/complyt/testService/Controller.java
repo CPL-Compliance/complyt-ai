@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Controller {
 
-    // diff
     @GetMapping("/")
     public String hi(){
         return "hi :)";

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Generated
 @SpringBootApplication
 public class ComplytApplication implements CommandLineRunner {
-    // diff
+
     public static void main(String[] args) {
         SpringApplication.run(ComplytApplication.class, args);
     }
