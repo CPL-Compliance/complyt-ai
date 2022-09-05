@@ -22,8 +22,8 @@ public class TransactionsFilterByNexusRules implements ListFilter<Transaction, N
 
     private boolean isNexusCalculationRequiredForTransaction(NexusStateRule nexusStateRule, Transaction transaction) {
         CustomerType customerType = transaction.getCustomer().getCustomerType();
-        boolean customerTypeExists = nexusStateRule.getCustomerTypes().contains(customerType);
-        if (!customerTypeExists) {
+        boolean customerTypeDoesNotExistInRule = !nexusStateRule.getCustomerTypes().contains(customerType);
+        if (customerTypeDoesNotExistInRule) {
             log.debug("Customer of type " + customerType + " does not exist in state rule customer types, transaction does not count in calculation");
             return false;
         }

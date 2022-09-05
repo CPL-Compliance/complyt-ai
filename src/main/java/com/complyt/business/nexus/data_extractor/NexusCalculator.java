@@ -28,9 +28,9 @@ public class NexusCalculator {
     public NexusCalculationSummary calculate(List<Transaction> transactions, NexusStateRule nexusStateRule) {
         log.debug("Calculating amount and count for all transactions on timeframe : " + nexusStateRule.getTimeFrame());
 
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
         long count = 0;
         float amount = 0;
-        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
         for (Transaction filteredTransaction : filteredTransactions) {
             count += nexusTransactionCountExtractor.extract(filteredTransaction, nexusStateRule);

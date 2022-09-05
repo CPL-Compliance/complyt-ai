@@ -3,7 +3,9 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -71,6 +73,10 @@ public class NexusService {
                 });
     }
 
+    public boolean isSalesTaxTrackingCalculationRequired(@NonNull Transaction transaction) {
+        return transaction.getTransactionType() == TransactionType.INVOICE;
+    }
+
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
         String state = transaction.getShippingAddress().getState();
         LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
@@ -80,15 +86,15 @@ public class NexusService {
                         .flatMap(stateRule -> {
                             Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, stateRule, referenceDate);
                             return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
-                                    .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate));
+                                    .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state));
                         }));
     }
 
-    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule, LocalDateTime referenceDate) {
+    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule, LocalDateTime referenceDate, String state) {
         NexusCalculationSummary summary = nexusCalculator.calculate(transactions, stateRule);
         boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
 
-        return findTrackingByState(stateRule.getState().getAbbreviation())
+        return findTrackingByState(state)
                 .flatMap(salesTaxTracking -> passedThreshold ?
                         salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate) :
                         Mono.just(salesTaxTracking)
