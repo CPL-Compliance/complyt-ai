@@ -28,42 +28,6 @@ parameters:
     default: false
 
 
-#  sales-tax-deploy:
-#    working_directory: ~/complyt_work_directory/salesTax
-#    executor: sales-tax-ubuntu-vm
-#    steps:
-#      - checkout:
-#          path: ~/complyt_work_directory
-#      - run:
-#          name: Avoid hosts unknown for github
-#          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-#
-#      - add_ssh_keys:
-#          fingerprints:
-#            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
-#      - run:
-#          name: Setup Git credentials user email
-#          command: git config user.email "alexander@complyt.io"
-#
-#      - run:
-#          name: Setup Git credentials user name
-#          command: git config user.name "Via CircleCI Build"
-#
-#      - run:
-#          name: Creating Maven settings-security.xml file
-#          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-#
-#      - run:
-#          name: Release a Production Version
-#          command: ./mvnw --settings .circleci/settings.xml clean deploy
-#
-#      - persist_to_workspace:
-#          root: target
-#          paths:
-#            - coverage-test-service
-#            - failsafe-test-service
-#            - surefire-test-service
-#            - site
 #
 #  sales-tax-send-test-coverage-reports:
 #    working_directory: ~/complyt_work_directory/salesTax
@@ -198,6 +162,48 @@ jobs:
             - coverage-reports
             - failsafe-reports
             - surefire-reports
+            - site
+
+  deploy:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+      - run:
+          name: Setup Git credentials user email
+          command: git config user.email "alexander@complyt.io"
+
+      - run:
+          name: Setup Git credentials user name
+          command: git config user.name "Via CircleCI Build"
+
+      - run:
+          name: Creating Maven settings-security.xml file
+          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
+      - run:
+          name: Release a Production Version
+          command: ./mvnw --settings .circleci/settings.xml clean deploy
+
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
             - site
 
   send-test-coverage-reports:
