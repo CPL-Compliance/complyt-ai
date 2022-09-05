@@ -32,9 +32,163 @@ parameters:
     type: boolean
     default: false
 
+#
+#  sales-tax-deploy:
+#    working_directory: ~/complyt_work_directory/salesTax
+#    executor: sales-tax-ubuntu-vm
+#    steps:
+#      - checkout:
+#          path: ~/complyt_work_directory
+#      - run:
+#          name: Avoid hosts unknown for github
+#          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#
+#      - add_ssh_keys:
+#          fingerprints:
+#            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+#      - run:
+#          name: Setup Git credentials user email
+#          command: git config user.email "alexander@complyt.io"
+#
+#      - run:
+#          name: Setup Git credentials user name
+#          command: git config user.name "Via CircleCI Build"
+#
+#      - run:
+#          name: Creating Maven settings-security.xml file
+#          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+#
+#      - run:
+#          name: Release a Production Version
+#          command: ./mvnw --settings .circleci/settings.xml clean deploy
+#
+#      - persist_to_workspace:
+#          root: target
+#          paths:
+#            - coverage-test-service
+#            - failsafe-test-service
+#            - surefire-test-service
+#            - site
+#
+#  sales-tax-send-test-coverage-reports:
+#    working_directory: ~/complyt_work_directory/salesTax
+#    executor: openjdk-image
+#    steps:
+#      - checkout:
+#          path: ~/complyt_work_directory
+#      - attach_workspace:
+#          at: target
+#      - run:
+#          name: Save test results
+#          command: |
+#            mkdir -p test-results
+#            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+#          when: always
+#      - store_test_results:
+#          path: test-results/
+#      - codecov/upload:
+#          file: target/site/jacoco-ut/jacoco.xml
+#          token: CODECOV_TOKEN
+#          flags: salesTax
+#
+#  test-service-verify:
+#    working_directory: ~/complyt_work_directory/testService
+#    executor: test-service-ubuntu-vm
+#    steps:
+#      - checkout:
+#          path: ~/complyt_work_directory
+#      - run:
+#          name: Execute
+#          command: ./mvnw clean verify
+#
+#      - persist_to_workspace:
+#          root: target
+#          paths:
+#            - coverage-reports
+#            - failsafe-reports
+#            - surefire-reports
+#            - site
+#
+#  test-service-deploy:
+#    working_directory: ~/complyt_work_directory/testService
+#    executor: test-service-ubuntu-vm
+#    steps:
+#      - checkout:
+#          path: ~/complyt_work_directory
+#      - run:
+#          name: Avoid hosts unknown for github
+#          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#
+#      - add_ssh_keys:
+#          fingerprints:
+#            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+#      - run:
+#          name: Setup Git credentials user email
+#          command: git config user.email "alexander@complyt.io"
+#
+#      - run:
+#          name: Setup Git credentials user name
+#          command: git config user.name "Via CircleCI Build"
+#
+#      - run:
+#          name: Creating Maven settings-security.xml file
+#          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+#
+#      - run:
+#          name: Release a Production Version
+#          command: ./mvnw --settings .circleci/settings.xml clean deploy
+#
+#      - persist_to_workspace:
+#          root: target
+#          paths:
+#            - coverage-test-service
+#            - failsafe-test-service
+#            - surefire-test-service
+#            - site
+#
+#  test-service-send-test-coverage-reports:
+#    working_directory: ~/complyt_work_directory/testService
+#    executor: openjdk-image
+#    steps:
+#      - checkout:
+#          path: ~/complyt_work_directory
+#      - attach_workspace:
+#          at: target
+#      - run:
+#          name: Save test results
+#          command: |
+#            mkdir -p test-results
+#            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+#          when: always
+#      - store_test_results:
+#          path: test-results/
+#      - codecov/upload:
+#          file: target/site/jacoco-ut/jacoco.xml
+#          token: CODECOV_TOKEN
+#          flags: test-service
+#
+#  test-service-update-ecs-service:
+#    working_directory: ~/complyt_work_directory/testService
+#    executor: python-image
+#    steps:
+#      - aws-cli/setup:
+#          aws-access-key-id: AWS_ACCESS_KEY_ID
+#          aws-region: AWS_DEFAULT_REGION
+#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+#      - aws-ecs/update-service:
+#          cluster-name: 'Complyt'
+#          container-image-name-updates: 'container=test-service,tag=latest'
+#          family: 'complyt-td-production'
+#          service-name: 'complyt-srvc-production'
+
 jobs:
-  sales-tax-verify:
-    working_directory: ~/complyt_work_directory/salesTax
+  verify:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: sales-tax-ubuntu-vm
     steps:
       - checkout:
@@ -50,192 +204,57 @@ jobs:
             - failsafe-reports
             - surefire-reports
             - site
-
-  sales-tax-deploy:
-    working_directory: ~/complyt_work_directory/salesTax
-    executor: sales-tax-ubuntu-vm
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - run:
-          name: Avoid hosts unknown for github
-          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-
-      - add_ssh_keys:
-          fingerprints:
-            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
-      - run:
-          name: Setup Git credentials user email
-          command: git config user.email "alexander@complyt.io"
-
-      - run:
-          name: Setup Git credentials user name
-          command: git config user.name "Via CircleCI Build"
-
-      - run:
-          name: Creating Maven settings-security.xml file
-          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-
-      - run:
-          name: Release a Production Version
-          command: ./mvnw --settings .circleci/settings.xml clean deploy
-
-      - persist_to_workspace:
-          root: target
-          paths:
-            - coverage-test-service
-            - failsafe-test-service
-            - surefire-test-service
-            - site
-
-  sales-tax-send-test-coverage-reports:
-    working_directory: ~/complyt_work_directory/salesTax
-    executor: openjdk-image
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: target
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p test-results
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
-          when: always
-      - store_test_results:
-          path: test-results/
-      - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
-          token: CODECOV_TOKEN
-          flags: salesTax
-
-  test-service-verify:
-    working_directory: ~/complyt_work_directory/testService
-    executor: test-service-ubuntu-vm
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - run:
-          name: Execute
-          command: ./mvnw clean verify
-
-      - persist_to_workspace:
-          root: target
-          paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
-            - site
-
-  test-service-deploy:
-    working_directory: ~/complyt_work_directory/testService
-    executor: test-service-ubuntu-vm
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - run:
-          name: Avoid hosts unknown for github
-          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-
-      - add_ssh_keys:
-          fingerprints:
-            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
-      - run:
-          name: Setup Git credentials user email
-          command: git config user.email "alexander@complyt.io"
-
-      - run:
-          name: Setup Git credentials user name
-          command: git config user.name "Via CircleCI Build"
-
-      - run:
-          name: Creating Maven settings-security.xml file
-          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
-
-      - run:
-          name: Release a Production Version
-          command: ./mvnw --settings .circleci/settings.xml clean deploy
-
-      - persist_to_workspace:
-          root: target
-          paths:
-            - coverage-test-service
-            - failsafe-test-service
-            - surefire-test-service
-            - site
-
-  test-service-send-test-coverage-reports:
-    working_directory: ~/complyt_work_directory/testService
-    executor: openjdk-image
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: target
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p test-results
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
-          when: always
-      - store_test_results:
-          path: test-results/
-      - codecov/upload:
-          file: target/site/jacoco-ut/jacoco.xml
-          token: CODECOV_TOKEN
-          flags: test-service
-
-  test-service-update-ecs-service:
-    working_directory: ~/complyt_work_directory/testService
-    executor: python-image
-    steps:
-      - aws-cli/setup:
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-region: AWS_DEFAULT_REGION
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-      - aws-ecs/update-service:
-          cluster-name: 'Complyt'
-          container-image-name-updates: 'container=test-service,tag=latest'
-          family: 'complyt-td-production'
-          service-name: 'complyt-srvc-production'
 
 workflows:
-  sales-tax-build-test-deploy:
-    when: << pipeline.parameters.run-sales-tax-workflow >>
+  build-test:
+    filters:
+      branches:
+        only:
+          - main
     jobs:
-      - sales-tax-verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-
-      - sales-tax-deploy:
-          filters:
-            branches:
-              only:
-                - main
-
-      - sales-tax-send-test-coverage-reports:
-          requires:
-            - sales-tax-verify
-            - sales-tax-deploy
-  
-  test-service-build-test-deploy:
-    when: << pipeline.parameters.run-test-service-workflow >>
-    jobs:
-      - test-service-verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-
-      - test-service-deploy:
-          filters:
-            branches:
-              only:
-                - main
-
-      - test-service-send-test-coverage-reports:
-          requires:
-            - test-service-verify
-            - test-service-deploy
+      - verify:
+          when: << pipeline.parameters.run-sales-tax-workflow >>
+          service_directory: "sales-tax"
+      - verify:
+          when: << pipeline.parameters.run-test-service-workflow >>
+          service_directory: "test-service"
+#
+#  sales-tax-build-test-deploy:
+#    when: << pipeline.parameters.run-sales-tax-workflow >>
+#    jobs:
+#      - sales-tax-verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#
+#      - sales-tax-deploy:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#
+#      - sales-tax-send-test-coverage-reports:
+#          requires:
+#            - sales-tax-verify
+#            - sales-tax-deploy
+#
+#  test-service-build-test-deploy:
+#    when: << pipeline.parameters.run-test-service-workflow >>
+#    jobs:
+#      - test-service-verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#
+#      - test-service-deploy:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#
+#      - test-service-send-test-coverage-reports:
+#          requires:
+#            - test-service-verify
+#            - test-service-deploy
