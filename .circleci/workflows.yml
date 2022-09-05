@@ -280,6 +280,35 @@ workflows:
             - deploy
           service_name: "sales-tax"
 
+  test-service-workflow:
+    when: << pipeline.parameters.run-test-service-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "test-service"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "test-service"
+
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "test-service"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "test-service"
+
 #  sales-tax-build-test-deploy:
 #    when: << pipeline.parameters.run-sales-tax-workflow >>
 #    jobs:
