@@ -18,13 +18,13 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
-        <module name="testService" />
+        <module name="test-service" />
         <module name="sales-tax" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="salestax" target="17" />
-      <module name="test-service" target="17" />
+      <module name="testService" target="17" />
       <module name="testToRemove" target="17" />
     </bytecodeTargetLevel>
   </component>
