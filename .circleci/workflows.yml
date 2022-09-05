@@ -126,6 +126,9 @@ jobs:
 
     executor: python-image
     steps:
+      - print:
+          name: test
+          command: echo 'container=<<parameters.service_name>>-container, tag=latest'
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
