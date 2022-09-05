@@ -213,10 +213,12 @@ workflows:
           - main
     jobs:
       - verify:
-          when: << pipeline.parameters.run-sales-tax-workflow >>
+          when:
+            condition: << pipeline.parameters.run-sales-tax-workflow >>
           service_directory: "sales-tax"
       - verify:
-          when: << pipeline.parameters.run-test-service-workflow >>
+          when:
+            condition: << pipeline.parameters.run-test-service-workflow >>
           service_directory: "test-service"
 #
 #  sales-tax-build-test-deploy:
