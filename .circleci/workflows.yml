@@ -201,6 +201,11 @@ jobs:
             - site
 
   send-test-coverage-reports:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+    
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: openjdk-image
     steps:
