@@ -18,17 +18,21 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
-        <module name="salesTax" />
         <module name="testService" />
+        <module name="sales-tax" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="salestax" target="17" />
+      <module name="test-service" target="17" />
       <module name="testToRemove" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="salesTax" options="-parameters" />
+      <module name="sales-tax" options="-parameters" />
+      <module name="salestax" options="-parameters" />
+      <module name="test-service" options="-parameters" />
       <module name="testService" options="-parameters" />
       <module name="testToRemove" options="-parameters" />
     </option>

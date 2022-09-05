@@ -18,8 +18,8 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>salesTax</module>
-        <module>testService</module>
+        <module>sales-tax</module>
+        <module>test-service</module>
     </modules>
 
     <name>Complyt</name>
@@ -161,6 +161,7 @@
             </plugin>
         </plugins>
     </build>
+
     <scm>
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
@@ -171,7 +172,7 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>Releases</name>
+            <name>Github</name>
             <url>https://maven.pkg.github.com/Complyt/complyt</url>
         </repository>
     </distributionManagement>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -12,11 +13,11 @@
 
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
-    <artifactId>salestax</artifactId>
+    <artifactId>sales-tax</artifactId>
     <version>0.0.33-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <name>SalesTax</name>
+    <name>SalesTaxService</name>
     <description>This is a service for managing salesTax made by Complyt</description>
     <packaging>jar</packaging>
 

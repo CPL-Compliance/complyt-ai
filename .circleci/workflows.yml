@@ -78,7 +78,7 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml clean deploy
 
       - persist_to_workspace:
           root: target
@@ -154,7 +154,7 @@ jobs:
 
       - run:
           name: Release a Production Version
-          command: ./mvnw --settings .circleci/settings.xml --batch-mode release:clean release:prepare release:perform
+          command: ./mvnw --settings .circleci/settings.xml clean deploy
 
       - persist_to_workspace:
           root: target
