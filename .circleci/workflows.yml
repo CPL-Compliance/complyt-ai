@@ -1,0 +1,196 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@3.2.3
+  aws-cli: circleci/aws-cli@1.3
+  aws-ecs: circleci/aws-ecs@2.0
+
+executors:
+  ubuntu-vm:
+    machine:
+      image: ubuntu-2204:2022.07.1
+      docker_layer_caching: true
+
+  openjdk-image:
+    docker:
+      - image: cimg/openjdk:11.0
+
+  python-image:
+    docker:
+      - image: 'cimg/python:3.9.1'
+
+parameters:
+  run-sales-tax-workflow:
+    type: boolean
+    default: false
+  run-test-service-workflow:
+    type: boolean
+    default: false
+
+jobs:
+  verify:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Execute
+          command: ./mvnw clean verify
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
+            - site
+
+  deploy:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Avoid hosts unknown for github
+          command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      - add_ssh_keys:
+          fingerprints:
+            - "d1:1b:cb:32:11:5d:0e:bc:67:c7:25:0f:ca:41:57:b1"
+      - run:
+          name: Setup Git credentials user email
+          command: git config user.email "alexander@complyt.io"
+
+      - run:
+          name: Setup Git credentials user name
+          command: git config user.name "Via CircleCI Build"
+
+      - run:
+          name: Creating Maven settings-security.xml file
+          command: echo "<settingsSecurity><master>${MAVEN_SECURITY_MASTER}</master></settingsSecurity>" > ~/.m2/settings-security.xml
+
+      - run:
+          name: Release a Production Version
+          command: ./mvnw --settings .circleci/settings.xml clean deploy
+
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
+            - site
+
+  send-test-coverage-reports:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: openjdk-image
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: target
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p test-results
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+          when: always
+      - store_test_results:
+          path: test-results/
+      - codecov/upload:
+          file: target/site/jacoco-ut/jacoco.xml
+          token: CODECOV_TOKEN
+          flags: <<parameters.service_directory>>
+
+  update-ecs-service:
+    parameters:
+      service_name:
+        type: string
+        default: ""
+
+    executor: python-image
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-region: AWS_DEFAULT_REGION
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+      - aws-ecs/update-service:
+          cluster-name: 'Complyt'
+          container-image-name-updates: 'container=<<parameters.service_name>>, tag=latest'
+          family: '<<parameters.service_name>>-task-definition'
+          service-name: '<<parameters.service_name>>-service'
+
+workflows:
+  sales-tax-workflow:
+    when: << pipeline.parameters.run-sales-tax-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "sales-tax"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "sales-tax"
+
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "sales-tax"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "sales-tax"
+
+  test-service-workflow:
+    when: << pipeline.parameters.run-test-service-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "test-service"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "test-service"
+
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "test-service"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "test-service"
