@@ -200,26 +200,26 @@ jobs:
             - surefire-reports
             - site
 
-    send-test-coverage-reports:
-      working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-      executor: openjdk-image
-      steps:
-        - checkout:
-            path: ~/complyt_work_directory
-        - attach_workspace:
-            at: target
-        - run:
-            name: Save test results
-            command: |
-              mkdir -p test-results
-              find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
-            when: always
-        - store_test_results:
-            path: test-results/
-        - codecov/upload:
-            file: target/site/jacoco-ut/jacoco.xml
-            token: CODECOV_TOKEN
-            flags: <<parameters.service_directory>>
+  send-test-coverage-reports:
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: openjdk-image
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: target
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p test-results
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} test-results/ \;
+          when: always
+      - store_test_results:
+          path: test-results/
+      - codecov/upload:
+          file: target/site/jacoco-ut/jacoco.xml
+          token: CODECOV_TOKEN
+          flags: <<parameters.service_directory>>
 
 workflows:
   build-test:
