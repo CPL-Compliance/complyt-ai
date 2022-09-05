@@ -24,7 +24,7 @@
     <properties>
         <!-- Docker Coordinates -->
         <docker.image.prefix>complyt</docker.image.prefix>
-        <docker.image.name>salestax</docker.image.name>
+        <docker.image.name>sales-tax</docker.image.name>
         <!-- Docker Coordinates -->
 
         <!-- Plugins -->
