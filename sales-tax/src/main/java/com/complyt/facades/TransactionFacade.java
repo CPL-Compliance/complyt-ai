@@ -67,13 +67,13 @@ public class TransactionFacade {
                                 updateAndHandleNexusTrackingCalculation(externalId, setTransaction)));
     }
 
-    private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, Transaction setTransaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
-        return salesTaxService.handleSalesTaxCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
+    private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+        return salesTaxService.handleSalesTaxCalculation(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
                 .flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction));
     }
 
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, Transaction transaction) {
-        return transactionService.update(externalId, transaction).log()
+        return transactionService.update(externalId, transaction)
                 .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
                         .thenReturn(transaction));
     }
