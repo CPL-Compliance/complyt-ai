@@ -166,13 +166,13 @@ public class TransactionFacadeTest {
         when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer)).thenReturn(Mono.just(transactionWithClassificationDataAndId));
-        when(nexusService.isSalesTaxTrackingCalculationRequired(transactionWithClassificationDataAndId)).thenReturn(true);
+//        when(nexusService.isSalesTaxTrackingCalculationRequired(transactionWithClassificationDataAndId)).thenReturn(true);
         when(nexusService.calculateNexusTracking(transactionWithClassificationDataAndId)).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
 
         // Then
-        StepVerifier.create(actualTransaction).expectNext(transactionWithCustomer).verifyComplete();
+        StepVerifier.create(actualTransaction).expectNext(transactionWithClassificationDataAndId).verifyComplete();
     }
 
     @Test
@@ -355,7 +355,7 @@ public class TransactionFacadeTest {
                 .thenReturn(Mono.just(modifiedTransaction));
         when(nexusService.hasNexus(modifiedTransaction)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.update(modifiedTransaction.getExternalId(), modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
-        when(nexusService.isSalesTaxTrackingCalculationRequired(modifiedTransaction)).thenReturn(true);
+//        when(nexusService.isSalesTaxTrackingCalculationRequired(modifiedTransaction)).thenReturn(true);
         when(nexusService.calculateNexusTracking(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), transactionWithNewAddress, transaction);
 
