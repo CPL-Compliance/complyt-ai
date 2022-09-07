@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 
@@ -135,10 +134,9 @@ class NexusServiceTest {
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
-        SalesTaxTracking salesTaxTrackingWithNexus = createSalesTaxTrackingWithoutNexusEstablished()
-                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
 
-        return salesTaxTrackingWithNexus;
+        return createSalesTaxTrackingWithoutNexusEstablished()
+                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
     }
 
     @Test
@@ -229,10 +227,6 @@ class NexusServiceTest {
     }
 
     @Test
-    void getClientTracking() {
-    }
-
-    @Test
     void findTrackingByState_StateSent_FindsTracking_ReturnsTracking() {
         // Given
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
@@ -286,6 +280,42 @@ class NexusServiceTest {
 
         // Then
         StepVerifier.create(salesTaxTrackingDecoratorMono).expectNext(salesTaxTrackingDecorator).verifyComplete();
+    }
+
+    @Test
+    void isSalesTaxTrackingCalculationRequired_TransactionIsOfTypeInovice_ReturnsTrue() {
+        // Given
+
+        // When
+        boolean isSalesTaxRequired = nexusService.isSalesTaxTrackingCalculationRequired(transaction);
+
+        // Then
+        assertTrue(isSalesTaxRequired);
+    }
+
+    @Test
+    void isSalesTaxTrackingCalculationRequired_TransactionIsOfTypeSalesOrder_ReturnsFalse() {
+        // Given
+
+        // When
+        Transaction salesOrderTransaction = transaction.withTransactionType(TransactionType.SALES_ORDER);
+        boolean isSalesTaxRequired = nexusService.isSalesTaxTrackingCalculationRequired(salesOrderTransaction);
+
+        // Then
+        assertFalse(isSalesTaxRequired);
+    }
+
+    @Test
+    void isSalesTaxTrackingCalculationRequired_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.isSalesTaxTrackingCalculationRequired(nullTransaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 
     @Test
