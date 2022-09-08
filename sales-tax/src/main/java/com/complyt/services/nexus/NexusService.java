@@ -3,7 +3,6 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -73,7 +72,7 @@ public class NexusService {
                 });
     }
 
-    public boolean isSalesTaxTrackingCalculationRequired(@NonNull Transaction transaction) {
+    public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction) {
         return transaction.getTransactionType() == TransactionType.INVOICE;
     }
 

@@ -49,9 +49,9 @@ public class TransactionFacade {
     }
 
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction) {
-        return transactionService.save(transaction)
+        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.save(transaction)
                 .flatMap(savedTransaction -> nexusService.calculateNexusTracking(savedTransaction)
-                        .thenReturn(savedTransaction));
+                        .thenReturn(savedTransaction)) : Mono.just(transaction);
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
@@ -73,9 +73,9 @@ public class TransactionFacade {
     }
 
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, Transaction transaction) {
-        return transactionService.update(externalId, transaction)
+        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.update(externalId, transaction)
                 .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
-                        .thenReturn(transaction));
+                        .thenReturn(transaction)) : Mono.just(transaction);
     }
 
     public Mono<Transaction> findByExternalId(String externalId) {

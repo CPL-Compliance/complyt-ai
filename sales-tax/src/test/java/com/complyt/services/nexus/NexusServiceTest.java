@@ -287,7 +287,7 @@ class NexusServiceTest {
         // Given
 
         // When
-        boolean isSalesTaxRequired = nexusService.isSalesTaxTrackingCalculationRequired(transaction);
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction);
 
         // Then
         assertTrue(isSalesTaxRequired);
@@ -299,7 +299,7 @@ class NexusServiceTest {
 
         // When
         Transaction salesOrderTransaction = transaction.withTransactionType(TransactionType.SALES_ORDER);
-        boolean isSalesTaxRequired = nexusService.isSalesTaxTrackingCalculationRequired(salesOrderTransaction);
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(salesOrderTransaction);
 
         // Then
         assertFalse(isSalesTaxRequired);
@@ -312,7 +312,7 @@ class NexusServiceTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.isSalesTaxTrackingCalculationRequired(nullTransaction));
+                () -> nexusService.isNexusTrackingCalculationRequired(nullTransaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");

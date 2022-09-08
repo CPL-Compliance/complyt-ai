@@ -18,6 +18,6 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Flux<Transaction> getTransactionsByQuery(@NonNull Query query);
 
     Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
-
+    
     Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction, @NonNull Customer customer);
 }
