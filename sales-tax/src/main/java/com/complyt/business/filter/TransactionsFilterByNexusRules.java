@@ -24,7 +24,7 @@ public class TransactionsFilterByNexusRules implements ListFilter<Transaction, N
         CustomerType customerType = transaction.getCustomer().getCustomerType();
         boolean customerTypeDoesNotExistInRule = !nexusStateRule.getCustomerTypes().contains(customerType);
         if (customerTypeDoesNotExistInRule) {
-            log.debug("Customer of type " + customerType + " does not exist in state rule customer types, transaction does not count in calculation");
+            log.debug("Customer of type " + customerType + " does not exist in state rule's customer types, transaction does not count in calculation");
             return false;
         }
 
