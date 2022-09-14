@@ -1,8 +1,8 @@
-package com.complyt.utils.data_fetcher;
+package com.complyt.business.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Component
-public class TransactionFastTaxCountyFetcher implements CountyFetcher {
+public class TransactionZipTaxCountyFetcher implements CountyFetcher {
 
     @NonNull
     private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
@@ -21,9 +21,9 @@ public class TransactionFastTaxCountyFetcher implements CountyFetcher {
     public Mono<String> fetch(Address address) {
         return salesTaxWebClientWrapper.findByAddress(address)
                 .map(salesTaxData -> {
-                    FastTaxData fastTaxData = (FastTaxData) salesTaxData;
-                    String countyFromFastTax = fastTaxData.getTaxInfoItems().get(0).getCounty();
-                    return countyFromFastTax;
+                    ZipTaxData zipTaxData = (ZipTaxData) salesTaxData;
+                    String countyFromZipTax = zipTaxData.getResults().get(0).getGeoCounty();
+                    return countyFromZipTax;
                 });
     }
 }

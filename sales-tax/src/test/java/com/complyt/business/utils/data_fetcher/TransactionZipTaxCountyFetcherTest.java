@@ -7,7 +7,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
-import com.complyt.utils.data_fetcher.TransactionZipTaxCountyFetcher;
+import com.complyt.business.data_fetcher.TransactionZipTaxCountyFetcher;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

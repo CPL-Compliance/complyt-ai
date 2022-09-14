@@ -4,7 +4,7 @@ import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.utils.data_injector.TransactionCustomerInjector;
+import com.complyt.business.data_injector.TransactionCustomerInjector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
