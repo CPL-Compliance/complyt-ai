@@ -1,13 +1,10 @@
 package com.complyt.v1.controllers;
 
-import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
-import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,10 +47,11 @@ public class ExemptionController {
     public Mono<ResponseEntity<ExemptionDto>> create(@RequestBody @NonNull ExemptionDto exemptionDto) {
         log.debug("Create exemption - DTO received in request body : " + exemptionDto);
         Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+
         return exemptionFacade.save(receivedExemption)
                 .map(exemption -> ResponseEntity.status(HttpStatus.CREATED).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
     }
-    
+
     @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
     @TransactionUpdatePermission
     @PutMapping("{id}")

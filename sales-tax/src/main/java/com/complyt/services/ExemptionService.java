@@ -11,5 +11,5 @@ public interface ExemptionService extends CrudService<Exemption, String> {
 
     Mono<Boolean> isFullyExempted(@NonNull Transaction transaction);
 
-    public Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id);
+    Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id);
 }
