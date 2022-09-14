@@ -1,4 +1,4 @@
-package com.complyt.domain.customer.exemption;
+package com.complyt.v1.model.customer.exemption;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @EqualsAndHashCode
 @With
 @ToString
-public class Status {
+public class StatusDto {
     private final String code;
     private final String name;
 }

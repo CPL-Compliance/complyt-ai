@@ -6,7 +6,7 @@ import com.complyt.security.permissions.customer.CustomerCreatePermission;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.model.CustomerDto;
+import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
