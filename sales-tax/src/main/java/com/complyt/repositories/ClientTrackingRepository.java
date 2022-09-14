@@ -37,8 +37,7 @@ public class ClientTrackingRepository {
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(clientTracking.withClientId(user.getClientId()))).log();
     }
-
-
+    
     public Mono<ClientTracking> findById(String id) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())

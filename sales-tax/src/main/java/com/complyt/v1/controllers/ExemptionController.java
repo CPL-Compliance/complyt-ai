@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -58,13 +59,20 @@ public class ExemptionController {
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ExemptionDto>> update(@PathVariable String id, @RequestBody @NonNull ExemptionDto exemptionDto) {
-        log.debug("Upsert exemption - DTO received in request body : " + exemptionDto);
+        log.debug("Update exemption - DTO received in request body : " + exemptionDto);
         Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
 
         return exemptionFacade.findById(exemptionDto.getId())
                 .flatMap(originalExemption -> exemptionFacade.update(receivedExemption, id))
-                .map(updatedExemption -> ResponseEntity.status(HttpStatus.OK).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)))
-                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(exemptionDto)));
+                .map(updatedExemption -> ResponseEntity.status(HttpStatus.OK).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)));
+    }
+
+    @Operation(summary = "Gets all exemptions")
+    @TransactionReadPermission
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<ExemptionDto> getAll() {
+        return exemptionFacade.findAll().map(ExemptionMapper.INSTANCE::exemptionToExemptionDto);
     }
 
 }
