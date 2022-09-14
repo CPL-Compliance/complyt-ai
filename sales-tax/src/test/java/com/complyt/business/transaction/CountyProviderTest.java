@@ -1,6 +1,6 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.utils.data_fetcher.CountyFetcher;
+import com.complyt.utils.data_fetcher.CountyFetcher;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

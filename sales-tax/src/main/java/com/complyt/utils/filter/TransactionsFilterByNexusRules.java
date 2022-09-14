@@ -1,4 +1,4 @@
-package com.complyt.business.filter;
+package com.complyt.utils.filter;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;

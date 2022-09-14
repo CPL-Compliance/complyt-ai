@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.filter.TransactionsFilterByNexusRules;
+import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;

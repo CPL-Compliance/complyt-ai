@@ -1,8 +1,8 @@
 package com.complyt.config;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.utils.data_fetcher.TransactionFastTaxCountyFetcher;
-import com.complyt.business.utils.data_fetcher.TransactionZipTaxCountyFetcher;
+import com.complyt.utils.data_fetcher.TransactionFastTaxCountyFetcher;
+import com.complyt.utils.data_fetcher.TransactionZipTaxCountyFetcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

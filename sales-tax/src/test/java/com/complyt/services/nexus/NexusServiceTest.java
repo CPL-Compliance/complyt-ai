@@ -2,7 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.business.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;

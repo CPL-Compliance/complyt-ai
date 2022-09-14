@@ -1,6 +1,6 @@
-package com.complyt.business.query;
+package com.complyt.utils.query;
 
-import com.complyt.business.factory.DateRange;
+import com.complyt.utils.factory.DateRange;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;

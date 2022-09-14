@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
+import com.complyt.utils.date_injector.ModifiedTransactionInternalDateInjector;
+import com.complyt.utils.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
