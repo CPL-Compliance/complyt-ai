@@ -14,7 +14,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>sales-tax</artifactId>
-    <version>0.0.33-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>SalesTaxService</name>
