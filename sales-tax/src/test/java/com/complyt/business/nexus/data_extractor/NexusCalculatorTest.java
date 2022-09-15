@@ -1,6 +1,7 @@
 package com.complyt.business.nexus.data_extractor;
 
 
+import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -43,6 +44,9 @@ public class NexusCalculatorTest {
     @Mock
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
 
+    @Mock
+    TransactionsFilterByNexusRules transactionNexusFilter;
+
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         ObjectId clientId = new ObjectId();
@@ -54,7 +58,7 @@ public class NexusCalculatorTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL, null);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -79,8 +83,8 @@ public class NexusCalculatorTest {
 
     private List<Transaction> createTransactionsList() {
         Transaction transaction = createTransaction();
-        Transaction secondTransaction = transaction.withId(UUID.randomUUID().toString());
-        return new ArrayList<Transaction>() {{
+        Transaction secondTransaction = transaction.withId(UUID.randomUUID().toString()).withExternalId(UUID.randomUUID().toString());
+        return new ArrayList<>() {{
             add(transaction);
             add(secondTransaction);
         }};
@@ -96,6 +100,7 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule();
 
         // When
+        when(transactionNexusFilter.filter(transactions,nexusStateRule)).thenReturn(transactions);
         when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
         when(nexusTransactionAmountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());

@@ -1,9 +1,9 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.utils.data_injector.TransactionCustomerInjector;
-import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
+import com.complyt.business.data_injector.TransactionCustomerInjector;
+import com.complyt.business.date_injector.ModifiedTransactionInternalDateInjector;
+import com.complyt.business.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.customer.Customer;
@@ -46,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
-        return transactionRepository.findByExternalId(externalId).log()
+        return transactionRepository.findByExternalId(externalId)
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
                 .map(createUpdateTransactionFunction(transaction))
                 .flatMap(transactionRepository::save);
@@ -98,14 +98,18 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Function<Transaction, Transaction> createUpdateTransactionFunction(@NonNull final Transaction transaction) {
-        return transactionInfo -> transactionInfo.withExternalId(transaction.getExternalId())
+        return transactionInfo -> transactionInfo
+                .withExternalId(transaction.getExternalId())
                 .withItems(transaction.getItems())
                 .withBillingAddress(transaction.getBillingAddress())
                 .withShippingAddress(transaction.getShippingAddress())
                 .withCustomerId(transaction.getCustomerId())
+                .withCustomer(transaction.getCustomer())
                 .withSalesTax(transaction.getSalesTax())
                 .withTransactionStatus(transaction.getTransactionStatus())
                 .withInternalTimeStamps(transaction.getInternalTimeStamps())
-                .withExternalTimeStamps(transaction.getExternalTimeStamps());
+                .withExternalTimeStamps(transaction.getExternalTimeStamps())
+                .withTransactionType(transaction.getTransactionType());
     }
+
 }

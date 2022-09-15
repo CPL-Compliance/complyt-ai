@@ -24,4 +24,5 @@ public class TransactionDto {
     private final TransactionStatusDto transactionStatus;
     private final TimeStampsDto internalTimeStamps;
     private final TimeStampsDto externalTimeStamps;
+    private final TransactionTypeDto transactionType;
 }

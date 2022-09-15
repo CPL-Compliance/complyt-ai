@@ -1,6 +1,7 @@
 package com.complyt.domain.customer;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.customer.exemption.ExemptionType;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

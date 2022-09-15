@@ -20,7 +20,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction) {
-        return exemptionRepository.findByClientCustomerAndState(transaction).log();
+        return exemptionRepository.findByClientCustomerAndState(transaction);
     }
 
     @Override

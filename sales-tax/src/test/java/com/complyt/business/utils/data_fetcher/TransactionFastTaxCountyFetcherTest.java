@@ -7,6 +7,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.business.data_fetcher.TransactionFastTaxCountyFetcher;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class TransactionFastTaxCountyFetcherTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()));
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE);
     }
 
     private TaxInfoItem createTaxInfoItem() {
@@ -67,7 +68,7 @@ class TransactionFastTaxCountyFetcherTest {
     }
 
     @Test
-    void inject_InjectsCounty_ReturnsOrder() {
+    void inject_InjectsCounty_ReturnsTransaction() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
         List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>() {{
