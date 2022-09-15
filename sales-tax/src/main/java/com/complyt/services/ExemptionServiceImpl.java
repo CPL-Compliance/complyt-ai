@@ -71,3 +71,4 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .withExemptionType(exemption.getExemptionType());
     }
 }
+

@@ -1,4 +1,4 @@
-package com.complyt.business.query;
+package com.complyt.utils.query;
 
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Query;

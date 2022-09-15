@@ -1,9 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
@@ -44,24 +41,24 @@ public class ProductClassificationServiceTest {
     ObjectId clientId;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         productClassification = createProductClassification();
         customerId = new ObjectId();
         clientId = new ObjectId();
     }
 
     private ProductClassification createProductClassification() {
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
-        return new ProductClassification("id","C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList,TangibleCategory.TANGIBLE);
+        Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
+        return new ProductClassification("id", "C1S1", "description",
+                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
 
     private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                "CA",true,false, CalculationType.FIXED,"description",0,null);
+                "CA", true, false, CalculationType.FIXED, "description", 0, null);
 
-        return new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
+        return new HashMap<String, JurisdictionalSalesTaxRules>() {{
+            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
     }
 
@@ -74,7 +71,7 @@ public class ProductClassificationServiceTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -86,13 +83,15 @@ public class ProductClassificationServiceTest {
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = new ArrayList<Item>() {{add(item);}};
+        List<Item> modifiedItems = new ArrayList<Item>() {{
+            add(item);
+        }};
         return transaction.withItems(modifiedItems);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California","CA",true,
-                false,CalculationType.FIXED,"description",0,null);
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
     }
 
     @Test
@@ -112,7 +111,7 @@ public class ProductClassificationServiceTest {
 
 
     @Test
-    void findOneByTaxCode_FindsOne_ReturnsOne(){
+    void findOneByTaxCode_FindsOne_ReturnsOne() {
         // Given
         String taxCode = productClassification.getTaxCode();
 
@@ -125,7 +124,7 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void findOneByTaxCode_NullTaxCodeGiven_ThrowsException(){
+    void findOneByTaxCode_NullTaxCodeGiven_ThrowsException() {
         // Given
         String taxCode = null;
 
@@ -139,10 +138,10 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void findAll_FindsAllClassifications_ReturnsAllClassifications(){
+    void findAll_FindsAllClassifications_ReturnsAllClassifications() {
         // Given
         ProductClassification otherProductClassification = productClassification.withDescription("second classification").withTaxCode("C2S1");
-        List<ProductClassification> productClassifications =  new ArrayList<ProductClassification>(){{
+        List<ProductClassification> productClassifications = new ArrayList<ProductClassification>() {{
             add(productClassification);
             add(otherProductClassification);
         }};
@@ -152,11 +151,11 @@ public class ProductClassificationServiceTest {
         Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll();
 
         // Then
-        StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
+        StepVerifier.create(productClassificationFlux).expectNext(productClassification, otherProductClassification).verifyComplete();
     }
 
     @Test
-    void save_SavesClassification_ReturnsClassification(){
+    void save_SavesClassification_ReturnsClassification() {
         // Given
         ProductClassification productClassificationNoId = productClassification.withId(null);
 
@@ -169,7 +168,7 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void findById_FindClassification_ReturnsClassification(){
+    void findById_FindClassification_ReturnsClassification() {
         // Given
         String id = productClassification.getId();
 
@@ -183,7 +182,7 @@ public class ProductClassificationServiceTest {
 
 
     @Test
-    void findById_NullIdPassed_ThrowsException(){
+    void findById_NullIdPassed_ThrowsException() {
         // Given
         String nullId = null;
 

@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.utils.date_injector.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.utils.date_injector.NewTransactionInternalDateInjector;
+import com.complyt.business.date_injector.ModifiedTransactionInternalDateInjector;
+import com.complyt.business.date_injector.NewTransactionInternalDateInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -79,7 +79,7 @@ class TransactionServiceImplTest {
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
 
-        return  new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps);
+        return  new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE);
     }
 
     private Customer createCustomer() {
