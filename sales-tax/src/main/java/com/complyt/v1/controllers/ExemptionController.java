@@ -30,47 +30,47 @@ public class ExemptionController {
     @NonNull
     private ExemptionFacade exemptionFacade;
 
-    @Operation(summary = "Gets exemption by id")
-    @TransactionReadPermission
-    @GetMapping("{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<ExemptionDto>> getOne(@PathVariable("id") @NonNull String id) {
-        return exemptionFacade.findById(id)
-                .map(exemptionItem -> new ResponseEntity<>(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionItem), HttpStatus.OK))
-                .switchIfEmpty(Mono.error(new NotFoundException(id)));
-    }
+//    @Operation(summary = "Gets exemption by id")
+//    @TransactionReadPermission
+//    @GetMapping("{id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Mono<ResponseEntity<ExemptionDto>> getOne(@PathVariable("id") @NonNull String id) {
+//        return exemptionFacade.findById(id)
+//                .map(exemptionItem -> new ResponseEntity<>(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionItem), HttpStatus.OK))
+//                .switchIfEmpty(Mono.error(new NotFoundException(id)));
+//    }
 
-    @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
-    @TransactionUpdatePermission
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<ExemptionDto>> create(@RequestBody @NonNull ExemptionDto exemptionDto) {
-        log.debug("Create exemption - DTO received in request body : " + exemptionDto);
-        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+//    @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
+//    @TransactionUpdatePermission
+//    @PostMapping("")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Mono<ResponseEntity<ExemptionDto>> create(@RequestBody @NonNull ExemptionDto exemptionDto) {
+//        log.debug("Create exemption - DTO received in request body : " + exemptionDto);
+//        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+//
+//        return exemptionFacade.save(receivedExemption)
+//                .map(exemption -> ResponseEntity.status(HttpStatus.CREATED).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
+//    }
 
-        return exemptionFacade.save(receivedExemption)
-                .map(exemption -> ResponseEntity.status(HttpStatus.CREATED).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
-    }
+//    @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
+//    @TransactionUpdatePermission
+//    @PutMapping("{id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Mono<ResponseEntity<ExemptionDto>> update(@PathVariable String id, @RequestBody @NonNull ExemptionDto exemptionDto) {
+//        log.debug("Update exemption - DTO received in request body : " + exemptionDto);
+//        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+//
+//        return exemptionFacade.findById(exemptionDto.getId())
+//                .flatMap(originalExemption -> exemptionFacade.update(receivedExemption, id))
+//                .map(updatedExemption -> ResponseEntity.status(HttpStatus.OK).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)));
+//    }
 
-    @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
-    @TransactionUpdatePermission
-    @PutMapping("{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<ExemptionDto>> update(@PathVariable String id, @RequestBody @NonNull ExemptionDto exemptionDto) {
-        log.debug("Update exemption - DTO received in request body : " + exemptionDto);
-        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
-
-        return exemptionFacade.findById(exemptionDto.getId())
-                .flatMap(originalExemption -> exemptionFacade.update(receivedExemption, id))
-                .map(updatedExemption -> ResponseEntity.status(HttpStatus.OK).body(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)));
-    }
-
-    @Operation(summary = "Gets all exemptions")
-    @TransactionReadPermission
-    @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public Flux<ExemptionDto> getAll() {
-        return exemptionFacade.findAll().map(ExemptionMapper.INSTANCE::exemptionToExemptionDto);
-    }
+//    @Operation(summary = "Gets all exemptions")
+//    @TransactionReadPermission
+//    @GetMapping("")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Flux<ExemptionDto> getAll() {
+//        return exemptionFacade.findAll().map(ExemptionMapper.INSTANCE::exemptionToExemptionDto);
+//    }
 
 }
