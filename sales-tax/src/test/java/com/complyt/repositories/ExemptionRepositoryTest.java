@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -97,5 +99,58 @@ public class ExemptionRepositoryTest {
         // Then
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void save_ExemptionSaved_ExemptionReturned() throws InterruptedException {
+        // Given
+        Exemption exemptionNoId = exemption.withId(null);
+
+        // When
+        when(reactiveMongoTemplate.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findById_FindsExemption_ReturnsExemption() {
+        // Given
+        String id = exemption.getId();
+        Query query = Query.query(Criteria.where("_id").is(id)
+                .and("clientId").is(user.getClientId()));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findAll_FindsTwoExemptions_ReturnsTwoExemptions() {
+        // Given
+        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
+                .withState(new State("NY", "05", "New York"));
+        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+            add(exemption);
+            add(secondExemption);
+        }};
+        Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+
+        // When
+        when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.fromIterable(exemptions));
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
+
+        // Then
+        StepVerifier.create(exemptionFlux).expectNext(exemption,secondExemption).verifyComplete();
+
+
+    }
+
 
 }
