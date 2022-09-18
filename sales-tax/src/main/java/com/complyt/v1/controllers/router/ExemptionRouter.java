@@ -9,13 +9,16 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+
 @Configuration
 public class ExemptionRouter {
+
+    public static final String BASE_URL = "/v1/exemptions";
 
     @Bean
     public RouterFunction<ServerResponse> exemptionsRoute(ExemptionHandler exemptionHandler) {
         return route()
-                .nest(path("/v1/exemptions"), builder -> builder
+                .nest(path(BASE_URL), builder -> builder
                         .GET("", exemptionHandler::getAll)
                         .GET("/{id}", exemptionHandler::getOne)
                         .POST("", exemptionHandler::create)
