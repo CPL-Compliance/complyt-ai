@@ -149,7 +149,6 @@ public class ExemptionRepositoryTest {
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemption,secondExemption).verifyComplete();
 
-
     }
 
 

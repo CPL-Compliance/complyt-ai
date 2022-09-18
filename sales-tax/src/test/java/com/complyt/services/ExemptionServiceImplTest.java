@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -76,6 +77,65 @@ public class ExemptionServiceImplTest {
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE);
+    }
+
+    @Test
+    void save_SavesExemption_ReturnsExemption() {
+        // Given
+        Exemption exemptionNoId = exemption.withId(null);
+
+        // When
+        when(exemptionRepository.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.save(exemptionNoId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void findById_FindsExemption_ReturnsExemption() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.findById(id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption);
+    }
+
+    @Test
+    void findAll_FindsTwoExemptions_ReturnsTwoExemptions() {
+        // Given
+        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
+                .withState(new State("NY", "05", "New York"));
+        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+            add(exemption);
+            add(secondExemption);
+        }};
+
+        // When
+        when(exemptionRepository.findAll()).thenReturn(Flux.fromIterable(exemptions));
+        Flux<Exemption> exemptionFlux = exemptionService.findAll();
+
+        // Then
+        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption);
+    }
+
+    @Test
+    void update_UpdatesExemption_ReturnsUpdatedExemption() {
+        // Given
+        Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.save(newExemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.update(newExemption, id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
     }
 
     @Test
@@ -234,6 +294,43 @@ public class ExemptionServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void findById_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.findById(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullExemptionPassed_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+        String id = UUID.randomUUID().toString();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption,id));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption,nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
 }
