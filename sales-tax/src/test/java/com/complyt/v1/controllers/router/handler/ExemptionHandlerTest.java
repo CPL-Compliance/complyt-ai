@@ -7,6 +7,7 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,18 +35,15 @@ import java.util.UUID;
 public class ExemptionHandlerTest {
 
     @Autowired
-    private ApplicationContext context;
+    private WebTestClient webTestClient;
 
     @MockBean
     private ExemptionFacade exemptionFacade;
-
-    private WebTestClient webTestClient;
 
     Exemption exemption;
 
     @BeforeEach
     public void setUp() {
-        webTestClient = WebTestClient.bindToApplicationContext(context).build();
         exemption = createExemption();
     }
 
@@ -75,9 +73,9 @@ public class ExemptionHandlerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(ExemptionDto.class);
-//                .value(exemptionResponse -> {
-//                    Assertions.assertEquals(exemptionResponse.getId(), exemption.getId());
-//                });
+                .expectBody(ExemptionDto.class)
+                .value(exemptionResponse -> {
+                    Assertions.assertEquals(exemptionResponse.getId(), exemption.getId());
+                });
     }
 }
