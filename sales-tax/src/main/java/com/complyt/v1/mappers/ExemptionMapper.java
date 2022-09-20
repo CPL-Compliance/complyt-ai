@@ -11,37 +11,37 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface ExemptionMapper {
-    ExemptionMapper INSTANCE = Mappers.getMapper(com.complyt.v1.mappers.ExemptionMapper.class);
+    ExemptionMapper INSTANCE = Mappers.getMapper(ExemptionMapper.class);
 
     Exemption exemptionDtoToExemption(ExemptionDto exemptionDto);
 
     ExemptionDto exemptionToExemptionDto(Exemption exemption);
-//
-//    State stateDtoToState(StateDto stateDto);
-//
-//    StateDto stateToStateDto(State state);
-//
-//    Classification classificationDtoToClassification(ClassificationDto classificationDto);
-//
-//    ClassificationDto classificationToClassificationDto(Classification classification);
-//
-//    ValidationDates validationDatesDtoToValidationDates(ValidationDatesDto validationDatesDto);
-//
-//    ValidationDatesDto validationDatesToValidationDatesDto(ValidationDates validationDates);
-//
-//    TimeStamps timeStampsDtoToTimeStamps(TimeStampsDto timeStampsDto);
-//
-//    TimeStampsDto timeStampsToTimeStampsDto(TimeStamps timeStamps);
-//
-//    Status statusDtoToStatus(StatusDto statusDto);
-//
-//    StatusDto statusToStatusDto(Status status);
-//
-//    Certificate certificateDtoToCertificate(CertificateDto certificateDto);
-//
-//    CertificateDto certificateToCertificateDto(Certificate certificate);
-//
-//    ExemptionType exemptionTypeDtoToExemptionType(ExemptionTypeDto exemptionTypeDto);
-//
-//    ExemptionTypeDto exemptionTypeToExemptionTypeDto(ExemptionType exemptionType);
+
+    State stateDtoToState(StateDto stateDto);
+
+    StateDto stateToStateDto(State state);
+
+    Classification classificationDtoToClassification(ClassificationDto classificationDto);
+
+    ClassificationDto classificationToClassificationDto(Classification classification);
+
+    ValidationDates validationDatesDtoToValidationDates(ValidationDatesDto validationDatesDto);
+
+    ValidationDatesDto validationDatesToValidationDatesDto(ValidationDates validationDates);
+
+    TimeStamps timeStampsDtoToTimeStamps(TimeStampsDto timeStampsDto);
+
+    TimeStampsDto timeStampsToTimeStampsDto(TimeStamps timeStamps);
+
+    Status statusDtoToStatus(StatusDto statusDto);
+
+    StatusDto statusToStatusDto(Status status);
+
+    Certificate certificateDtoToCertificate(CertificateDto certificateDto);
+
+    CertificateDto certificateToCertificateDto(Certificate certificate);
+
+    ExemptionType exemptionTypeDtoToExemptionType(ExemptionTypeDto exemptionTypeDto);
+
+    ExemptionTypeDto exemptionTypeToExemptionTypeDto(ExemptionType exemptionType);
 }

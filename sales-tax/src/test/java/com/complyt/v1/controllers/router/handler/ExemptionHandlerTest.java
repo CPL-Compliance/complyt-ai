@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers.router.handler;
 
+import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.exemption.*;
@@ -7,6 +8,8 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -38,8 +42,9 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(ExemptionHandler.class)
 @ExtendWith(MockitoExtension.class)
+@Import(JacksonConfig.class)
+@Slf4j
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
-//@WithMockUser(username = "mock", password = "mock")
 public class ExemptionHandlerTest {
 
     @Autowired
@@ -68,6 +73,7 @@ public class ExemptionHandlerTest {
     }
 
     @Test
+    @WithUserDetails()
     public void getOne_FindsExemption_ReturnsExemption() {
         // Given
         String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
@@ -89,7 +95,7 @@ public class ExemptionHandlerTest {
     @Test
     public  void create_CreatesExemption_ReturnsExemption() {
         // Given
-        Exemption exemptionNoId = exemption.withId(null);
+        Exemption exemptionNoId = exemption.withId(null).withClientId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
 
         // When
@@ -109,16 +115,18 @@ public class ExemptionHandlerTest {
     }
 
     @Test
+    @WithUserDetails()
     void update_UpdatesExemption_ReturnsExemption() {
         // Given
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+        Exemption exemptionNoClientId = exemption.withClientId(null);
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoClientId);
 
         // When
-        when(exemptionFacade.update(exemption, exemption.getId())).thenReturn(Mono.just(exemption));
+        when(exemptionFacade.update(exemptionNoClientId, exemption.getId())).thenReturn(Mono.just(exemption));
 
         // Then
         webTestClient
-//                .mutateWith(csrf())
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemption.getId())
                         .build())
@@ -131,6 +139,7 @@ public class ExemptionHandlerTest {
     }
 
     @Test
+    @WithUserDetails()
     void getAll_FindsTwoExemptions_ReturnsTwoExemptions() {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
@@ -153,7 +162,7 @@ public class ExemptionHandlerTest {
 
         // Then
         webTestClient
-//                .mutateWith(csrf())
+                .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
                         .build())
