@@ -13,21 +13,29 @@ spring:
       - fastTax
   cloud:
     vault:
-      kv:
-        default-context:
       application-name: sales-tax-service
       host: vault-cluster-public-vault-81338a8e.8cda002f.z1.hashicorp.cloud
       port: 8200
       scheme: https
       namespace: admin
+      fail-fast: true
+      config:
+        lifecycle:
+          enabled: true
+          min-renewal: 10s
+          expiry-threshold: 1m
       authentication: TOKEN
       token: ${VAULT_TOKEN}
+      kv:
+        default-context:
       database:
         enabled: true
         role: complyt-db-rw
         backend: database
         username-property: db.username
         password-property: db.password
+
+spring.config.import: vault://
 
 logging:
   level:
