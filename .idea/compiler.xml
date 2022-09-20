@@ -23,6 +23,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="config-server" target="17" />
       <module name="salestax" target="17" />
       <module name="testService" target="17" />
       <module name="testToRemove" target="17" />

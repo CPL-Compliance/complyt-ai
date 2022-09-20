@@ -23,14 +23,14 @@ public class ExemptionHandler {
     private ExemptionFacade exemptionFacade;
 
     public Mono<ServerResponse> getOne(ServerRequest request) {
-        var id = request.pathVariable("id");
+        String id = request.pathVariable("id");
 
         return ServerResponse.ok()
                 .body(exemptionFacade.findById(id)
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                         .switchIfEmpty(Mono.error(new NotFoundException(id))), ExemptionDto.class);
     }
-    
+
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(ExemptionDto.class)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
@@ -39,7 +39,7 @@ public class ExemptionHandler {
     }
 
     public Mono<ServerResponse> update(ServerRequest request) {
-        var id = request.pathVariable("id");
+        String id = request.pathVariable("id");
 
         return request.bodyToMono(ExemptionDto.class)
                 .flatMap(exemptionDto -> {
