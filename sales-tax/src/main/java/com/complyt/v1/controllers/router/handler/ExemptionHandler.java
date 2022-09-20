@@ -49,7 +49,7 @@ public class ExemptionHandler {
                 .flatMap(updatedExemption -> ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)));
     }
 
-    public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
+    public Mono<ServerResponse> getAll(ServerRequest request) {
         return ServerResponse
                 .ok()
                 .body(exemptionFacade.findAll().map(ExemptionMapper.INSTANCE::exemptionToExemptionDto), ExemptionDto.class);

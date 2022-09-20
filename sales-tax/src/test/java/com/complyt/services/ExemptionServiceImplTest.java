@@ -242,7 +242,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_ExemptionTypeIsPartially_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);

@@ -5,27 +5,35 @@ import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
+import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(ExemptionHandler.class)
@@ -65,7 +73,7 @@ public class ExemptionHandlerTest {
         String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
 
         // When
-        Mockito.when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.just(exemption));
+        when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.just(exemption));
 
         // Then
         webTestClient.get()
@@ -74,8 +82,86 @@ public class ExemptionHandlerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ExemptionDto.class)
-                .value(exemptionResponse -> {
-                    Assertions.assertEquals(exemptionResponse.getId(), exemption.getId());
-                });
+                .value(exemptionResponse -> Assertions.assertEquals(exemptionResponse.getId(), exemption.getId()));
+    }
+
+    @Test
+    void create_CreatesExemption_ReturnsExemption() {
+        // Given
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption.withId(null));
+        Exemption exemptionNoId = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+
+        // When
+        when(exemptionFacade.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+
+        // Then
+        webTestClient
+//                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(exemptionDto.withId(exemption.getId()));
+    }
+
+    @Test
+    void update_UpdatesExemption_ReturnsExemption() {
+        // Given
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+
+        // When
+        when(exemptionFacade.update(exemption, exemption.getId())).thenReturn(Mono.just(exemption));
+
+        // Then
+        webTestClient
+//                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemption.getId())
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(exemptionDto.withId(exemption.getId()));
+    }
+
+    @Test
+    void getAll_FindsTwoExemptions_ReturnsTwoExemptions() {
+        // Given
+        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
+                .withState(new State("NY", "05", "New York"));
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+        ExemptionDto secondExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(secondExemption);
+
+        List<Exemption> exemptions = new ArrayList<>() {{
+            add(exemption);
+            add(secondExemption);
+        }};
+
+        List<ExemptionDto> exemptionDtos = new ArrayList<>() {{
+            add(exemptionDto);
+            add(secondExemptionDto);
+        }};
+
+        // When
+        when(exemptionFacade.findAll()).thenReturn(Flux.fromIterable(exemptions));
+
+        // Then
+        webTestClient
+//                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(ExemptionDto.class)
+                .isEqualTo(exemptionDtos);
+
     }
 }
