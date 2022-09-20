@@ -30,7 +30,7 @@ public class ExemptionHandler {
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                         .switchIfEmpty(Mono.error(new NotFoundException(id))), ExemptionDto.class);
     }
-
+    
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(ExemptionDto.class)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
