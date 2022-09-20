@@ -32,10 +32,12 @@ public class ExemptionHandler {
     }
 
     public Mono<ServerResponse> create(ServerRequest request) {
+        request.body()
         return request.bodyToMono(ExemptionDto.class)
-                .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
-                .flatMap(exemptionFacade::save)
-                .flatMap(exemption -> ServerResponse.status(HttpStatus.CREATED).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
+                .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption).log()
+                .flatMap(exemptionFacade::save).log()
+                .flatMap(exemption -> ServerResponse.status(HttpStatus.CREATED)
+                        .bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
     }
 
     public Mono<ServerResponse> update(ServerRequest request) {

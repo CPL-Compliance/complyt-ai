@@ -39,7 +39,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest(ExemptionHandler.class)
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
-@WithMockUser(username = "mock", password = "mock")
+//@WithMockUser(username = "mock", password = "mock")
 public class ExemptionHandlerTest {
 
     @Autowired
@@ -85,21 +85,21 @@ public class ExemptionHandlerTest {
                 .value(exemptionResponse -> Assertions.assertEquals(exemptionResponse.getId(), exemption.getId()));
     }
 
+    @WithUserDetails()
     @Test
-    void create_CreatesExemption_ReturnsExemption() {
+    public  void create_CreatesExemption_ReturnsExemption() {
         // Given
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption.withId(null));
-        Exemption exemptionNoId = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+        Exemption exemptionNoId = exemption.withId(null);
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
 
         // When
         when(exemptionFacade.save(exemptionNoId)).thenReturn(Mono.just(exemption));
 
         // Then
         webTestClient
-//                .mutateWith(csrf())
+                .mutateWith(csrf())
                 .post()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
                 .bodyValue(exemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
