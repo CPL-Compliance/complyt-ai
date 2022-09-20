@@ -33,6 +33,7 @@
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
         <!-- Plugins -->
     </properties>
 
@@ -63,6 +64,19 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!-- Spring Boot Starter Dependencies -->
+
+        <!-- Spring Cloud Starter Dependencies -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-vault-config</artifactId>
+            <version>${org.springframework.cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-vault-config-databases</artifactId>
+            <version>${org.springframework.cloud.version}</version>
+        </dependency>
+        <!-- Spring Cloud Starter Dependencies -->
 
         <!-- Test Dependencies -->
         <dependency>

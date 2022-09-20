@@ -11,6 +11,23 @@ spring:
       # stubFastTax - to use stub method of FastTax
       # zipTax - to use Zip Tax Service
       - fastTax
+  cloud:
+    vault:
+      kv:
+        default-context:
+      application-name: sales-tax-service
+      host: vault-cluster-public-vault-81338a8e.8cda002f.z1.hashicorp.cloud
+      port: 8200
+      scheme: https
+      namespace: admin
+      authentication: TOKEN
+      token: ${VAULT_TOKEN}
+      database:
+        enabled: true
+        role: complyt-db-rw
+        backend: database
+        username-property: db.username
+        password-property: db.password
 
 logging:
   level:

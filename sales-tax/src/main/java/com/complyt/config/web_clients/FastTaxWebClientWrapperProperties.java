@@ -1,6 +1,7 @@
 package com.complyt.config.web_clients;
 
 import org.javatuples.Pair;
+import org.springframework.beans.factory.annotation.Value;
 
 public class FastTaxWebClientWrapperProperties {
     public static final String SCHEME = "https";
