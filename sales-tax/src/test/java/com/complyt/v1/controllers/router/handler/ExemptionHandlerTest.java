@@ -8,6 +8,7 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,13 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -97,7 +96,6 @@ public class ExemptionHandlerTest {
 
         // When
         when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.empty());
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
         webTestClient.get()
@@ -209,5 +207,42 @@ public class ExemptionHandlerTest {
                 .expectStatus().isOk()
                 .expectBodyList(ExemptionDto.class)
                 .isEqualTo(exemptionDtos);
+    }
+
+    @Test
+    @WithUserDetails()
+    public void delete_DeletesExemption_Returns204NoContent() {
+        // Given
+        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+
+        // When
+        when(exemptionFacade.delete(exemption.getId())).thenReturn(Mono.just(deleteResult));
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    @WithUserDetails()
+    public void delete_ExemptionDoesNoExistInDB_Throws404NotFound() {
+        // Given
+        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+
+        // When
+        when(exemptionFacade.delete(exemption.getId())).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }

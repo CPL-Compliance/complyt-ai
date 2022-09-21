@@ -7,6 +7,7 @@ import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.security.User;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -147,9 +150,68 @@ public class ExemptionRepositoryTest {
         Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
 
         // Then
-        StepVerifier.create(exemptionFlux).expectNext(exemption,secondExemption).verifyComplete();
-
+        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();
     }
 
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void delete_DeletesExemption_ReturnsDeleteResult() {
+        // Given
+        String id = exemption.getId();
+        Query query = Query.query(Criteria.where("_id").is(id).and("clientId").is(user.getClientId()));
+        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+
+        // When
+        when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void delete_ExemptionDoesNotExistInDB_ReturnsEmptyMono() {
+        // Given
+        String id = exemption.getId();
+        Query query = Query.query(Criteria.where("_id").is(id).and("clientId").is(user.getClientId()));
+
+        // When
+        when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.empty());
+        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).verifyComplete();
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void findById_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionRepository.findById(nullId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
+    void delete_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionRepository.delete(nullId);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
 
 }

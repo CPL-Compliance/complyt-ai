@@ -4,6 +4,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.services.ExemptionServiceImpl;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,6 +136,47 @@ public class ExemptionFacadeTest {
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+
+        // When
+        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+    @Test
+    void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(0);
+
+        // When
+        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+
+    @Test
+    void delete_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.delete(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
     @Test

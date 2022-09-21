@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.services.ExemptionService;
+import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +34,9 @@ public class ExemptionFacade {
 
     public Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id) {
         return exemptionService.update(exemption, id);
+    }
+
+    public Mono<DeleteResult> delete(@NonNull String id) {
+        return exemptionService.delete(id);
     }
 }

@@ -7,6 +7,7 @@ import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.repositories.ExemptionRepository;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -261,6 +262,47 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
+    void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+
+        // When
+        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+    @Test
+    void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(0);
+
+        // When
+        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+
+    @Test
+    void delete_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.delete(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
     void isFullyExemptionActive_ExemptionIsPartially_ThrowsException() {
         // Given
         Exemption partiallyExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
@@ -315,7 +357,7 @@ public class ExemptionServiceImplTest {
         String id = UUID.randomUUID().toString();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption,id));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption, id));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
@@ -327,7 +369,7 @@ public class ExemptionServiceImplTest {
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption,nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");

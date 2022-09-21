@@ -4,6 +4,7 @@ import com.complyt.business.sales_tax.checker.CustomerFullyExemptionCheck;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.repositories.ExemptionRepository;
+import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,11 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.findById(id)
                 .map(createUpdateExemptionFunction(exemption))
                 .flatMap(exemptionRepository::save);
+    }
+
+    @Override
+    public Mono<DeleteResult> delete(@NonNull String id) {
+        return exemptionRepository.delete(id);
     }
 
     private Function<Exemption, Exemption> createUpdateExemptionFunction(Exemption exemption) {

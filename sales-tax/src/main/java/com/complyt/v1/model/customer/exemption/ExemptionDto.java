@@ -1,5 +1,6 @@
 package com.complyt.v1.model.customer.exemption;
 
+import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.TimeStampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

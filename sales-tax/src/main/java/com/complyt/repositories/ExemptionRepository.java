@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.security.User;
+import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class ExemptionRepository {
                 .flatMap(user -> reactiveMongoTemplate.save(exemption.withClientId(user.getClientId()))).log();
     }
 
-    public Mono<Exemption> findById(String id) {
+    public Mono<Exemption> findById(@NonNull String id) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
@@ -66,5 +67,14 @@ public class ExemptionRepository {
                 });
     }
 
+    public Mono<DeleteResult> delete(@NonNull String id) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
+                .flatMap(user -> {
+                    Query query = Query.query(Criteria.where("_id").is(id).and("clientId").is(user.getClientId()));
+                    log.debug("Deleting exemption with id : " + id);
 
+                    return reactiveMongoTemplate.remove(query, Exemption.class);
+                });
+    }
 }
