@@ -2,6 +2,9 @@ package com.complyt.v1.controllers.router.handler;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.facades.ExemptionFacade;
+import com.complyt.security.permissions.exemption.ExemptionCreatePermission;
+import com.complyt.security.permissions.exemption.ExemptionReadPermission;
+import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import lombok.AllArgsConstructor;
@@ -23,6 +26,7 @@ public class ExemptionHandler {
     @NonNull
     private ExemptionFacade exemptionFacade;
 
+    @ExemptionReadPermission
     public Mono<ServerResponse> getOne(ServerRequest request) {
         String id = request.pathVariable("id");
 
@@ -32,6 +36,7 @@ public class ExemptionHandler {
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + "not found"))), ExemptionDto.class);
     }
 
+    @ExemptionCreatePermission
     public Mono<ServerResponse> create(ServerRequest request) {
         return request.bodyToMono(ExemptionDto.class)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption).log()
@@ -40,6 +45,7 @@ public class ExemptionHandler {
                         .bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
     }
 
+    @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest request) {
         String id = request.pathVariable("id");
 
@@ -52,6 +58,7 @@ public class ExemptionHandler {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption not found")));
     }
 
+    @ExemptionReadPermission
     public Mono<ServerResponse> getAll(ServerRequest request) {
         return ServerResponse
                 .ok()
