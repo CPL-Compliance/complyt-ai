@@ -76,6 +76,7 @@ public class ExemptionHandlerTest {
 
         // When
         when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.just(exemption));
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
         webTestClient.get()
@@ -84,7 +85,7 @@ public class ExemptionHandlerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ExemptionDto.class)
-                .value(exemptionResponse -> Assertions.assertEquals(exemptionResponse.getId(), exemption.getId()));
+                .isEqualTo(expectedExemption);
     }
 
     @WithUserDetails()
@@ -167,6 +168,5 @@ public class ExemptionHandlerTest {
                 .expectStatus().isOk()
                 .expectBodyList(ExemptionDto.class)
                 .isEqualTo(exemptionDtos);
-
     }
 }
