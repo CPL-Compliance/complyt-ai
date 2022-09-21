@@ -7,7 +7,9 @@ import com.complyt.repositories.ExemptionRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,7 +56,6 @@ public class ExemptionServiceImpl implements ExemptionService {
     @Override
     public Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id) {
         return exemptionRepository.findById(id)
-                .switchIfEmpty(Mono.error(new NotFoundException("No Exemption with id " + id)))
                 .map(createUpdateExemptionFunction(exemption))
                 .flatMap(exemptionRepository::save);
     }

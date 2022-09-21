@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -28,7 +29,7 @@ public class ExemptionHandler {
         return ServerResponse.ok()
                 .body(exemptionFacade.findById(id)
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                        .switchIfEmpty(Mono.error(new NotFoundException(id))), ExemptionDto.class);
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + "not found"))), ExemptionDto.class);
     }
 
     public Mono<ServerResponse> create(ServerRequest request) {
@@ -47,7 +48,8 @@ public class ExemptionHandler {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
                     return exemptionFacade.update(receivedExemption, id);
                 })
-                .flatMap(updatedExemption -> ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)));
+                .flatMap(updatedExemption -> ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption not found")));
     }
 
     public Mono<ServerResponse> getAll(ServerRequest request) {

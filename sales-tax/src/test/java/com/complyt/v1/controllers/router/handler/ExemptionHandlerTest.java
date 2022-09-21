@@ -18,11 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -87,9 +89,27 @@ public class ExemptionHandlerTest {
                 .isEqualTo(expectedExemption);
     }
 
+    @Test
+    @WithUserDetails()
+    public void getOne_ExemptionDoesNotExistInDB_Throws404NotFound() {
+        // Given
+        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+
+        // When
+        when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.empty());
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
     @WithUserDetails()
     @Test
-    public  void create_CreatesExemption_ReturnsExemption() {
+    public void create_CreatesExemption_ReturnsExemption() {
         // Given
         Exemption exemptionNoId = exemption.withId(null).withClientId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
@@ -132,6 +152,28 @@ public class ExemptionHandlerTest {
                 .expectStatus().isOk()
                 .expectBody(ExemptionDto.class)
                 .isEqualTo(exemptionDto.withId(exemption.getId()));
+    }
+
+    @Test
+    @WithUserDetails()
+    void update_ExemptionDoesNotExistInDB_Throws404NotFound() {
+        // Given
+        Exemption exemptionWithIdThatDoesNotExist = exemption.withClientId(null).withId(UUID.randomUUID().toString());
+        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);
+
+        // When
+        when(exemptionFacade.update(exemptionWithIdThatDoesNotExist, exemption.getId())).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemption.getId())
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
