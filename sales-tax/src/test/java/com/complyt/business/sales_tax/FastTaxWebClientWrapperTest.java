@@ -1,10 +1,11 @@
 package com.complyt.business.sales_tax;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
-import com.complyt.config.web_clients.FastTaxWebClientWrapperProperties;
+import com.complyt.config.web_clients.WebClientWrapperProperties;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,9 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -35,31 +38,43 @@ import static org.mockito.Mockito.when;
 public class FastTaxWebClientWrapperTest {
     @InjectMocks
     FastTaxWebClientWrapper fastTaxWebClientWrapper;
+
+    @InjectMocks
     FastTaxWebClientWrapper anotherFastTaxWebClientWrapper;
 
     @Mock
     WebClient webClient;
+
     @Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersSpecMock;
+
     @Mock
     private WebClient.ResponseSpec responseSpecMock;
 
+    @Mock
+    WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        when(fastTaxWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(fastTaxWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(fastTaxWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(fastTaxWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+
         fastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
-                FastTaxWebClientWrapperProperties.SCHEME,
-                FastTaxWebClientWrapperProperties.HOST,
-                FastTaxWebClientWrapperProperties.PATH,
-                FastTaxWebClientWrapperProperties.KEY);
+                fastTaxWebClientWrapperProperties.getScheme(),
+                fastTaxWebClientWrapperProperties.getHost(),
+                fastTaxWebClientWrapperProperties.getPath(),
+                fastTaxWebClientWrapperProperties.getKey());
 
         anotherFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
-                FastTaxWebClientWrapperProperties.SCHEME,
-                FastTaxWebClientWrapperProperties.HOST,
-                FastTaxWebClientWrapperProperties.PATH,
-                FastTaxWebClientWrapperProperties.KEY);
+                fastTaxWebClientWrapperProperties.getScheme(),
+                fastTaxWebClientWrapperProperties.getHost(),
+                fastTaxWebClientWrapperProperties.getPath(),
+                fastTaxWebClientWrapperProperties.getKey());
     }
 
     @Test
