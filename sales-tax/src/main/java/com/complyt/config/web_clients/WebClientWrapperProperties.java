@@ -1,13 +1,11 @@
 package com.complyt.config.web_clients;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import org.javatuples.Pair;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 @AllArgsConstructor
 public class WebClientWrapperProperties {
     @NonNull
