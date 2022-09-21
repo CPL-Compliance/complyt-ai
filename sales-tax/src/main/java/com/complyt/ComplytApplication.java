@@ -16,21 +16,7 @@ public class ComplytApplication implements CommandLineRunner {
         SpringApplication.run(ComplytApplication.class, args);
     }
 
-    @Value("${fast-tax-api-key}")
-    String fastTaxKey;
-
-    @Value("${zip-tax-api-key}")
-    String zipTaxKey;
-
     @Override
     public void run(String... args) {
-    }
-
-    @PostConstruct
-    private void postConstruct() {
-        System.out.println("##########################");
-        System.out.println(fastTaxKey);
-        System.out.println(zipTaxKey);
-        System.out.println("##########################");
     }
 }

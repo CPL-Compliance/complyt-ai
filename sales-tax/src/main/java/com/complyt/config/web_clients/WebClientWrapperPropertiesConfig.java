@@ -14,6 +14,7 @@ public class WebClientWrapperPropertiesConfig {
     @Profile({"fastTax", "default"})
     @Bean("fastTaxWebClientWrapperProperties")
     public WebClientWrapperProperties fastTaxWebClientWrapper(@Value("${fast-tax-api-key}") String licenseKey) {
+        System.out.println("***** Fast " + licenseKey);
         return WebClientWrapperProperties.builder()
                 .scheme("https")
                 .host("ws.serviceobjects.com")
@@ -24,6 +25,7 @@ public class WebClientWrapperPropertiesConfig {
     @Profile("zipTax")
     @Bean("zipTaxWebClientWrapperProperties")
     public WebClientWrapperProperties zipTaxWebClientWrapper(@Value("${zip-tax-api-key}") String licenseKey) {
+        System.out.println("***** Zip " + licenseKey);
         return WebClientWrapperProperties.builder()
                 .scheme("https")
                 .host("api.zip-tax.com")
