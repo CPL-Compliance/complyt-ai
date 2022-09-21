@@ -116,7 +116,7 @@ public class ExemptionServiceImplTest {
         Mono<Exemption> exemptionMono = exemptionService.findById(id);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+        StepVerifier.create(exemptionMono).verifyComplete();
     }
 
     @Test
