@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('exemption.update')")
+@PreAuthorize("hasAuthority('exemption.update') OR hasAuthority('customer.exemption.update')")
 public @interface ExemptionUpdatePermission {
 }

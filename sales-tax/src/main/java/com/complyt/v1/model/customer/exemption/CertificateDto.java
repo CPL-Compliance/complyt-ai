@@ -1,5 +1,6 @@
 package com.complyt.v1.model.customer.exemption;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -7,6 +8,7 @@ import lombok.*;
 @EqualsAndHashCode
 @With
 @ToString
+@Schema(name = "Certificate")
 public class CertificateDto {
     private final String id;
     private final String url;

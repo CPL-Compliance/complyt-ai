@@ -103,7 +103,20 @@ public class ExemptionServiceImplTest {
         Mono<Exemption> exemptionMono = exemptionService.findById(id);
 
         // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption);
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void findById_IdDoesNotExist_ReturnsEmptyMono() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.findById(id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
     @Test
@@ -121,7 +134,7 @@ public class ExemptionServiceImplTest {
         Flux<Exemption> exemptionFlux = exemptionService.findAll();
 
         // Then
-        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption);
+        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();
     }
 
     @Test
@@ -140,6 +153,19 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
+    void update_IdDoesntExist_ReturnsEmptyMono() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.update(exemption, id);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+    @Test
     void isFullyExempted_NoExemptionStatesToCustomer_ReturnsFalse() {
         // Given
 
@@ -154,7 +180,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_StateDoesNotExistInCustomersExemptionsList_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("NY", ExemptionType.PARTIALLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -171,7 +197,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_CustomerHasPartiallyExemptionInState_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.PARTIALLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -188,7 +214,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_CustomerHasFullyExemptionInState_ReturnsTrue() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -205,7 +231,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -224,7 +250,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
