@@ -1,9 +1,6 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -33,7 +30,7 @@ class TransactionMapperTest {
             }
         };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, clientId,null,null);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, clientId,null,null, TransactionType.INVOICE);
         TransactionDto transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
     }

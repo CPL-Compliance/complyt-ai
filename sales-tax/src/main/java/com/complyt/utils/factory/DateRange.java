@@ -1,4 +1,4 @@
-package com.complyt.business.factory;
+package com.complyt.utils.factory;
 
 import lombok.Getter;
 import lombok.NonNull;

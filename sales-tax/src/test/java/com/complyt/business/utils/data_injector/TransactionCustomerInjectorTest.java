@@ -4,6 +4,7 @@ import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.business.data_injector.TransactionCustomerInjector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -43,7 +44,7 @@ public class TransactionCustomerInjectorTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, null, null, null, TransactionStatus.ACTIVE, null, null, externalTimeStamps);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, null, null, null, TransactionStatus.ACTIVE, null, null, externalTimeStamps, TransactionType.INVOICE);
     }
 
     @Test

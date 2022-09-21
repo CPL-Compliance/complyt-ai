@@ -1,4 +1,4 @@
-package com.complyt.domain.customer;
+package com.complyt.domain.customer.exemption;
 
 public enum ExemptionType {
     FULLY,

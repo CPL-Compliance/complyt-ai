@@ -1,4 +1,4 @@
-package com.complyt.business.utils.date_injector;
+package com.complyt.business.date_injector;
 
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.Transaction;

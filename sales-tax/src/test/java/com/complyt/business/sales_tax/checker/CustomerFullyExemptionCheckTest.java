@@ -47,7 +47,7 @@ public class CustomerFullyExemptionCheckTest {
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, clientId, CustomerType.RETAIL, null);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE);
     }
 
     @Test

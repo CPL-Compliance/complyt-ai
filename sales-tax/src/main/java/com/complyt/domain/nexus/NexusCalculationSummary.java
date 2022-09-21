@@ -8,6 +8,6 @@ import lombok.*;
 @With
 @ToString
 public class NexusCalculationSummary {
-    private int count;
+    private long count;
     private float amount;
 }
