@@ -7,6 +7,7 @@ import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.repositories.ExemptionRepository;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -79,6 +81,91 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
+    void save_SavesExemption_ReturnsExemption() {
+        // Given
+        Exemption exemptionNoId = exemption.withId(null);
+
+        // When
+        when(exemptionRepository.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.save(exemptionNoId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void findById_FindsExemption_ReturnsExemption() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.findById(id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void findById_IdDoesNotExist_ReturnsEmptyMono() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.findById(id);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+    @Test
+    void findAll_FindsTwoExemptions_ReturnsTwoExemptions() {
+        // Given
+        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
+                .withState(new State("NY", "05", "New York"));
+        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+            add(exemption);
+            add(secondExemption);
+        }};
+
+        // When
+        when(exemptionRepository.findAll()).thenReturn(Flux.fromIterable(exemptions));
+        Flux<Exemption> exemptionFlux = exemptionService.findAll();
+
+        // Then
+        StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();
+    }
+
+    @Test
+    void update_UpdatesExemption_ReturnsUpdatedExemption() {
+        // Given
+        Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.save(newExemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.update(newExemption, id);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void update_IdDoesntExist_ReturnsEmptyMono() {
+        // Given
+        String id = exemption.getId();
+
+        // When
+        when(exemptionRepository.findById(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.update(exemption, id);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+    @Test
     void isFullyExempted_NoExemptionStatesToCustomer_ReturnsFalse() {
         // Given
 
@@ -93,7 +180,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_StateDoesNotExistInCustomersExemptionsList_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("NY", ExemptionType.PARTIALLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -110,7 +197,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_CustomerHasPartiallyExemptionInState_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.PARTIALLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -127,7 +214,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_CustomerHasFullyExemptionInState_ReturnsTrue() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -144,7 +231,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -163,7 +250,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Customer newCustomer = customer.withExemptionsStates(exemptionStates);
@@ -182,7 +269,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_ExemptionTypeIsPartially_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<String, ExemptionType>() {{
+        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
             put("CA", ExemptionType.FULLY);
         }};
         Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);
@@ -198,6 +285,47 @@ public class ExemptionServiceImplTest {
 
         // Then
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
+    }
+
+    @Test
+    void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+
+        // When
+        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+    @Test
+    void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        DeleteResult deleteResult = DeleteResult.acknowledged(0);
+
+        // When
+        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+
+        // Then
+        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+    }
+
+
+    @Test
+    void delete_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.delete(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
     @Test
@@ -234,6 +362,43 @@ public class ExemptionServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void findById_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.findById(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullExemptionPassed_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+        String id = UUID.randomUUID().toString();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption, id));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullIdPassed_ThrowsException() {
+        // Given
+        String nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
 }

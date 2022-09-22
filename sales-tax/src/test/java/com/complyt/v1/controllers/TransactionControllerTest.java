@@ -91,9 +91,8 @@ class TransactionControllerTest {
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
         TransactionFacade facade = null;
-        // When
 
-        // Then
+        // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> new TransactionController(facade));
 
         assertEquals(nullPointerException.getMessage(), "transactionFacade is marked non-null but is null");
@@ -136,7 +135,7 @@ class TransactionControllerTest {
         // When + Then
         when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.just(transactionWithId));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, mappedTransaction,transactionWithId)).thenReturn(Mono.just(updatedTransaction));
+        when(transactionFacade.updateIfModified(externalId, mappedTransaction, transactionWithId)).thenReturn(Mono.just(updatedTransaction));
 
         webTestClient
                 .mutateWith(csrf())

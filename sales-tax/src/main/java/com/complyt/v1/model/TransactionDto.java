@@ -1,5 +1,6 @@
 package com.complyt.v1.model;
 
+import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.bson.types.ObjectId;

@@ -1,5 +1,7 @@
 package com.complyt.v1.model;
 
+import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package com.complyt.v1.model;
+package com.complyt.v1.model.customer;
 
 public enum CustomerTypeDto {
     RETAIL,

@@ -6,8 +6,8 @@ import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.CustomerDto;
-import com.complyt.v1.model.CustomerTypeDto;
+import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +43,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest(CustomerController.class)
 @WithMockUser(username = "mock", password = "mock")
 class CustomerControllerTest {
+
     @MockBean
     private CustomerFacade customerFacade;
 

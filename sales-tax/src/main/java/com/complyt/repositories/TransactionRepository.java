@@ -71,7 +71,7 @@ public class TransactionRepository {
                             .findOne(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate
                                     .findById(transaction.getCustomerId(), Customer.class)
-                                    .map(transaction::withCustomer));
+                                    .map(transaction::withCustomer)).log();
                 });
     }
 
