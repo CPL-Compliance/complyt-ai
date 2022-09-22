@@ -1,4 +1,5 @@
 package com.complyt.v1.model;
+import com.complyt.v1.model.customer.exemption.ExemptionTypeDto;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

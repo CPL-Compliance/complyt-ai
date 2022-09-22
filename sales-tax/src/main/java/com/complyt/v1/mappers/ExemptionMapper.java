@@ -1,0 +1,15 @@
+package com.complyt.v1.mappers;
+
+import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.factory.Mappers;
+
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
+public interface ExemptionMapper {
+    ExemptionMapper INSTANCE = Mappers.getMapper(ExemptionMapper.class);
+
+    Exemption exemptionDtoToExemption(ExemptionDto exemptionDto);
+    ExemptionDto exemptionToExemptionDto(Exemption exemption);
+}
