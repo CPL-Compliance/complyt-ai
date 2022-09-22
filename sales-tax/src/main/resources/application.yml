@@ -40,7 +40,7 @@ spring.cloud.vault:
     default-context:
   database:
     enabled: true
-    role: complyt-db-rw
+    role: ${VAULT_DB_ROLE}
     backend: database
 
 spring.config.import: vault://
