@@ -95,6 +95,19 @@ public class ExemptionFacadeTest {
     }
 
     @Test
+    void findById_ExemptionDoesNotExist_ReturnsMonoEmpty() {
+        // Given
+        String idThatDoesNotExist = UUID.randomUUID().toString();
+
+        // When
+        when(exemptionService.findById(idThatDoesNotExist)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionFacade.findById(idThatDoesNotExist);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+    @Test
     void findById_NullIdPassed_ThrowsException() {
         // Given
         String nullId = null;
@@ -136,6 +149,20 @@ public class ExemptionFacadeTest {
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void update_ExemptionDoesNotExist_ReturnsMonoEmpty() {
+        // Given
+        Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
+        String idThatDoesNotExist = UUID.randomUUID().toString();
+
+        // When
+        when(exemptionService.update(newExemption, idThatDoesNotExist)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, idThatDoesNotExist);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
     }
 
     @Test

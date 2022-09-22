@@ -105,6 +105,24 @@ public class ExemptionRepositoryTest {
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
+    void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
+        // Given
+        Query query = Query.query(Criteria
+                .where("clientId").is(user.getClientId())
+                .and("customerId").is(transaction.getCustomerId())
+                .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
+
+        // When
+        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
+
+        // Then
+        StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+
+    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
+    @Test
     void save_ExemptionSaved_ExemptionReturned() {
         // Given
         Exemption exemptionNoId = exemption.withId(null);
@@ -149,7 +167,7 @@ public class ExemptionRepositoryTest {
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
-    void findById_NoExemptionReturned_EmptyMonoReturned() {
+    void findById_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         String id = exemption.getId();
         Query query = Query.query(Criteria.where("_id").is(id)
