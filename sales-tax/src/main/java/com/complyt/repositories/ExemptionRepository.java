@@ -23,7 +23,7 @@ public class ExemptionRepository {
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction) {
+    public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
@@ -38,13 +38,13 @@ public class ExemptionRepository {
                 });
     }
 
-    public Mono<Exemption> save(Exemption exemption) {
+    public Mono<Exemption> save(@NonNull final Exemption exemption) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> reactiveMongoTemplate.save(exemption.withClientId(user.getClientId()))).log();
     }
 
-    public Mono<Exemption> findById(@NonNull String id) {
+    public Mono<Exemption> findById(@NonNull final String id) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {
@@ -67,7 +67,7 @@ public class ExemptionRepository {
                 });
     }
 
-    public Mono<DeleteResult> delete(@NonNull String id) {
+    public Mono<DeleteResult> delete(@NonNull final String id) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
                 .flatMap(user -> {

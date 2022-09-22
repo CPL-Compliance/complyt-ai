@@ -8,11 +8,11 @@ import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
 public interface ExemptionService extends CrudService<Exemption, String> {
-    Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction);
+    Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction);
 
-    Mono<Boolean> isFullyExempted(@NonNull Transaction transaction);
+    Mono<Boolean> isFullyExempted(@NonNull final Transaction transaction);
 
-    Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id);
+    Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id);
 
-    Mono<DeleteResult> delete(String id);
+    Mono<DeleteResult> delete(final String id);
 }

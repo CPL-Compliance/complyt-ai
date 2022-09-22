@@ -20,11 +20,11 @@ public class ExemptionFacade {
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;
 
-    public Mono<Exemption> save(@NonNull Exemption exemption) {
+    public Mono<Exemption> save(@NonNull final Exemption exemption) {
         return exemptionService.save(exemption);
     }
 
-    public Mono<Exemption> findById(@NonNull String id) {
+    public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionService.findById(id);
     }
 
@@ -32,11 +32,11 @@ public class ExemptionFacade {
         return exemptionService.findAll();
     }
 
-    public Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id) {
+    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id) {
         return exemptionService.update(exemption, id);
     }
 
-    public Mono<DeleteResult> delete(@NonNull String id) {
+    public Mono<DeleteResult> delete(@NonNull final String id) {
         return exemptionService.delete(id);
     }
 }

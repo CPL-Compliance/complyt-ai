@@ -8,10 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,12 +23,12 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ExemptionRepository exemptionRepository;
 
     @Override
-    public Mono<Exemption> findByClientCustomerAndState(@NonNull Transaction transaction) {
+    public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
         return exemptionRepository.findByClientCustomerAndState(transaction);
     }
 
     @Override
-    public Mono<Boolean> isFullyExempted(@NonNull Transaction transaction) {
+    public Mono<Boolean> isFullyExempted(@NonNull final Transaction transaction) {
         CustomerFullyExemptionCheck customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
 
         return findByClientCustomerAndState(transaction)
@@ -40,12 +37,12 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<Exemption> save(Exemption exemption) {
+    public Mono<Exemption> save(@NonNull final Exemption exemption) {
         return exemptionRepository.save(exemption);
     }
 
     @Override
-    public Mono<Exemption> findById(@NonNull String id) {
+    public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionRepository.findById(id);
     }
 
@@ -55,14 +52,14 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<Exemption> update(@NonNull Exemption exemption, @NonNull String id) {
+    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id) {
         return exemptionRepository.findById(id)
                 .map(createUpdateExemptionFunction(exemption))
                 .flatMap(exemptionRepository::save);
     }
 
     @Override
-    public Mono<DeleteResult> delete(@NonNull String id) {
+    public Mono<DeleteResult> delete(@NonNull final String id) {
         return exemptionRepository.delete(id);
     }
 

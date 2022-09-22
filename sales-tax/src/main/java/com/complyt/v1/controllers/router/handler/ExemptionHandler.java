@@ -7,7 +7,6 @@ import com.complyt.security.permissions.exemption.ExemptionReadPermission;
 import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -19,8 +18,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-
-import java.net.http.HttpResponse;
 
 @Component
 @Slf4j
