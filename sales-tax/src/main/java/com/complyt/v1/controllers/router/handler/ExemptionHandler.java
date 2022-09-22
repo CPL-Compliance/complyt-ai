@@ -3,6 +3,7 @@ package com.complyt.v1.controllers.router.handler;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.security.permissions.exemption.ExemptionCreatePermission;
+import com.complyt.security.permissions.exemption.ExemptionDeletePermission;
 import com.complyt.security.permissions.exemption.ExemptionReadPermission;
 import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
@@ -76,7 +77,7 @@ public class ExemptionHandler {
 
     @Operation(summary = "This will delete the exemption if found by id")
     @ResponseStatus(HttpStatus.OK)
-    @ExemptionCreatePermission
+    @ExemptionDeletePermission
     public Mono<ServerResponse> delete(ServerRequest request) {
         String id = request.pathVariable("id");
 
