@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 @Schema(name = "Certificate")
 public class CertificateDto {
-    private final String id;
+    private final String certificateId;
     private final String url;
     private final String name;
 }
