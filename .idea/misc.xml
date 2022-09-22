@@ -8,7 +8,6 @@
         <option value="$PROJECT_DIR$/testService/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/test-service/pom.xml" />
-        <option value="$PROJECT_DIR$/config-server/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

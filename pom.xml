@@ -20,7 +20,6 @@
     <modules>
         <module>sales-tax</module>
         <module>test-service</module>
-        <module>config-server</module>
     </modules>
 
     <name>Complyt</name>
