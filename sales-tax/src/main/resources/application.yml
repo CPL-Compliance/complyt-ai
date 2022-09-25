@@ -13,6 +13,9 @@ spring:
       # zipTax - to use Zip Tax Service
       - fastTax
 
+# Spring Cloud Vault configuration
+# To understand what every field stands for visit
+# https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
   application-name: sales-tax-service
