@@ -13,10 +13,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientWrapperConfig {
 
     @Autowired
-    WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+    private WebClientWrapperProperties fastTaxWebClientWrapperProperties;
 
     @Autowired
-    WebClientWrapperProperties zipTaxWebClientWrapperProperties;
+    private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
 
     @Profile({"fastTax", "default"})
     @Bean("salesTaxWebClientWrapper")
