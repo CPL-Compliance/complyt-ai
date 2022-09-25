@@ -35,9 +35,6 @@ spring.cloud.vault:
     secret-id: ${VAULT_SECRET_ID}
     role: ${VAULT_ROLE}
     app-role-path: approle
-  generic:
-    enabled: true
-    backend: secret
   kv:
     enabled: true
     default-context:
@@ -54,16 +51,13 @@ logging:
     web: DEBUG
     org:
       springframework:
-        security: DEBUG
+        security: TRACE
     reactor:
       netty:
-        http: TRACE
+        http: DEBUG
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
-
-
