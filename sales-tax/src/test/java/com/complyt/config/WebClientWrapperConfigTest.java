@@ -2,9 +2,9 @@ package com.complyt.config;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
-import com.complyt.config.web_clients.FastTaxWebClientWrapperProperties;
 import com.complyt.config.web_clients.WebClientWrapperConfig;
-import com.complyt.config.web_clients.ZipTaxWebClientWrapperProperties;
+import com.complyt.config.web_clients.WebClientWrapperProperties;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -25,13 +26,24 @@ public class WebClientWrapperConfigTest {
     @Mock
     WebClient webClient;
 
+    @Mock
+    WebClientWrapperProperties zipTaxWebClientWrapperProperties;
+
+    @Mock
+    WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+
     @Test
     void zipTaxWebClientWrapper_CreateInstance_ReturnInstance() {
+        when(zipTaxWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(zipTaxWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(zipTaxWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(zipTaxWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+
         ZipTaxWebClientWrapper expectedZipTaxWebClientWrapper = new ZipTaxWebClientWrapper(webClient,
-                ZipTaxWebClientWrapperProperties.SCHEME,
-                ZipTaxWebClientWrapperProperties.HOST,
-                ZipTaxWebClientWrapperProperties.PATH,
-                ZipTaxWebClientWrapperProperties.KEY);
+                zipTaxWebClientWrapperProperties.getScheme(),
+                zipTaxWebClientWrapperProperties.getHost(),
+                zipTaxWebClientWrapperProperties.getPath(),
+                zipTaxWebClientWrapperProperties.getKey());
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
                 webClientWrapperConfig.zipTaxWebClientWrapper(webClient);
@@ -41,11 +53,17 @@ public class WebClientWrapperConfigTest {
 
     @Test
     void fastTaxWebClientWrapper_SetInstance_ReturnInstance() {
+        when(fastTaxWebClientWrapperProperties.getScheme()).thenReturn("scheme");
+        when(fastTaxWebClientWrapperProperties.getHost()).thenReturn("host");
+        when(fastTaxWebClientWrapperProperties.getPath()).thenReturn("path");
+        when(fastTaxWebClientWrapperProperties.getKey()).thenReturn(new Pair<>("key", "test-value"));
+
+
         FastTaxWebClientWrapper expectedFastTaxWebClientWrapper = new FastTaxWebClientWrapper(webClient,
-                FastTaxWebClientWrapperProperties.SCHEME,
-                FastTaxWebClientWrapperProperties.HOST,
-                FastTaxWebClientWrapperProperties.PATH,
-                FastTaxWebClientWrapperProperties.KEY);
+                fastTaxWebClientWrapperProperties.getScheme(),
+                fastTaxWebClientWrapperProperties.getScheme(),
+                fastTaxWebClientWrapperProperties.getPath(),
+                fastTaxWebClientWrapperProperties.getKey());
 
         FastTaxWebClientWrapper actualFastTaxWebClientWrapper =
                 webClientWrapperConfig.fastTaxWebClientWrapper(webClient);
