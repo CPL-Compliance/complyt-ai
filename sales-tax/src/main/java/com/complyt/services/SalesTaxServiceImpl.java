@@ -8,6 +8,7 @@ import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
@@ -55,12 +56,13 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
-                .map(salesTaxDataToSalesTaxRate::map)
                 .map(injectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxRate -> {
+    private Function<SalesTaxData, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxData -> {
+            SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
+
             log.info("Setting sales tax rates for transaction's items");
             List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
             Transaction transactionWithItemsWithRates = transaction.withItems(itemsWithRates);
@@ -73,6 +75,15 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             log.debug("Transaction's sales tax : " + salesTax);
             return transactionWithItemsWithRates.withSalesTax(salesTax);
         };
+    }
+
+    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
+        SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+
+        if (salesTaxData.isUnincorporated()) {
+            return salesTaxRate.withCityRate(0).withCityDistrictRate(0);
+        }
+        return salesTaxRate;
     }
 
     private List<Item> setSalesTaxRatesForItems(List<Item> items, SalesTaxRate salesTaxRate) {

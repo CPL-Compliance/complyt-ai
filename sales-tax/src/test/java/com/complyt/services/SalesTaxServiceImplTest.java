@@ -156,7 +156,7 @@ public class SalesTaxServiceImplTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
         SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
-        List<Item> itemsWithRates = new ArrayList<Item>() {{
+        List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);

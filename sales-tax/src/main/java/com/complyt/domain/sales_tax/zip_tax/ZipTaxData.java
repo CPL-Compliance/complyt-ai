@@ -14,4 +14,9 @@ public class ZipTaxData implements SalesTaxData {
     private String version;
     private long rCode;
     private List<Result> results;
+
+    @Override
+    public boolean isUnincorporated() {
+        return false;
+    }
 }
