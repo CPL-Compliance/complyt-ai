@@ -207,7 +207,6 @@ public class SalesTaxServiceImplTest {
         StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
     }
 
-
     @Test
     void handleSalesTaxCalculation_CustomerIsFullyExemptedInState_ReturnsTransactionWithOutSalesTax() {
         // Given

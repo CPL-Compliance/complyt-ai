@@ -9,6 +9,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @With
+@NoArgsConstructor
 @AllArgsConstructor
 public class ZipTaxData implements SalesTaxData {
     private String version;
