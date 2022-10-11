@@ -168,7 +168,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesController.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
-        when(salesTaxCalculator.calculate(itemsWithRates)).thenReturn(salesTax.getAmount());
+        when(salesTaxCalculator.calculate(itemsWithRates, null)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
