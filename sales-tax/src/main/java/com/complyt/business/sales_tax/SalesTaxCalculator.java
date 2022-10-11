@@ -14,6 +14,8 @@ import java.util.Optional;
 public class SalesTaxCalculator {
 
     public float calculate(List<Item> items, ShippingFee shippingFee) {
+        log.info("Calculating total sales tax amount");
+
         Optional<Float> amount = items.stream().map(this::calculateSalesTaxAmountForItem).reduce(Float::sum);
         log.debug("Items Sales tax amount calculated : " + amount);
 

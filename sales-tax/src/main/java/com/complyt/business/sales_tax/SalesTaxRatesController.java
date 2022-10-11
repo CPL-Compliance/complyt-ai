@@ -6,12 +6,14 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 @AllArgsConstructor
 public class SalesTaxRatesController {
 
@@ -19,6 +21,8 @@ public class SalesTaxRatesController {
     private SalesTaxRateCalculator salesTaxRateCalculator;
 
     public Transaction setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
+        log.info("Setting sales tax rates for transaction");
+
         List<Item> itemsWithRates = setSalesTaxRatesForItems(transaction.getItems(), salesTaxRate);
 
         if (transaction.getShippingFee() != null) {
