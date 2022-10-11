@@ -11,7 +11,7 @@ public class ZipTaxDataTest {
 
     @BeforeEach
     void setUp() {
-        zipTaxData = new ZipTaxData();
+        zipTaxData = new ZipTaxData("version", 0L, null);
     }
 
     @Test
