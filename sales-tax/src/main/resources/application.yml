@@ -45,6 +45,14 @@ spring.cloud.vault:
 
 spring.config.import: vault://
 
+auth0:
+  audience: https://sales-tax-service/
+spring.security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: https://dev--lwppdup.us.auth0.com/
+
 logging:
   level:
     root: INFO
