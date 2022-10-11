@@ -1,6 +1,7 @@
 package com.complyt.business.data_injector;
 
 import com.complyt.domain.Item;
+import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -25,17 +26,27 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
     @NonNull
     private final Transaction transaction;
 
-    /** finds each of the transaction's item's  jurisdictional Sales Tax Rules and injects it to the item
+    private final String SHIPPING_FEE_TAX_CODE = "C6S1";
+
+    /**
+     * finds each of the transaction's item's  jurisdictional Sales Tax Rules and injects it to the item
+     *
      * @param mapTaxCodesToClassifications - hashmap of tax code to its product classification representation
      * @return - transaction with items with the corresponding jurisdictional Sales Tax Rules in each one of them
      */
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
-            log.info("Setting jurisdictional sales tax rules and taxable categories to transaction's items");
+            log.info("Setting jurisdictional sales tax rules and taxable categories to transaction");
             List<Item> modifiedItems = createItemsWithRules(mapTaxCodesToClassifications);
             Transaction modifiedTransaction = transaction.withItems(modifiedItems);
-            log.debug("Transaction with items with rules and taxable categories injected : " + modifiedTransaction);
+
+            if (transaction.getShippingFee() != null && mapTaxCodesToClassifications.containsKey(SHIPPING_FEE_TAX_CODE)) {
+                ShippingFee modifiedShippingFee = createShippingFeeWithRules(mapTaxCodesToClassifications.get(SHIPPING_FEE_TAX_CODE));
+                modifiedTransaction = modifiedTransaction.withShippingFee(modifiedShippingFee);
+            }
+
+            log.debug("Transaction with rules and taxable categories injected : " + modifiedTransaction);
 
             return modifiedTransaction;
         });
@@ -51,7 +62,7 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
             JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
             Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
-            TaxableCategory category  = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
+            TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
                     TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
             Item itemWithCategory = itemWithRules.withTaxableCategory(category);
 
@@ -60,6 +71,15 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
         }
 
         return modifiedItems;
+    }
+
+    private ShippingFee createShippingFeeWithRules(ProductClassification classification) {
+        String state = transaction.getShippingAddress().getState();
+        JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
+        log.debug("Inserting Shipping fee with rules : " + rules);
+
+        ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
+        return modifiedShippingFee;
     }
 
 }

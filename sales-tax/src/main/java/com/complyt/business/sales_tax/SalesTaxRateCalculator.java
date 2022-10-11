@@ -16,7 +16,7 @@ public class SalesTaxRateCalculator {
      * - calculated by fixed value to override the original sales tax rate
      * - calculated by certain percentage of the original sales tax rate
      * @param jurisdictionalSalesTaxRules - Rules to declare how sales tax rate should be calculated
-     * @param originalSalesTaxRate - Sales tax rate given by external resource for the current transaction's address
+     * @param originalSalesTaxRate - Sales tax rate given by external resource regarding the current transaction's address
      * @return
      */
     public SalesTaxRate calculateSalesTaxRate(JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, SalesTaxRate originalSalesTaxRate) {

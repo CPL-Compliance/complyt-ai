@@ -24,13 +24,13 @@ class TransactionMapperTest {
         ObjectId clientId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000,4,8000,"description","name","taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, clientId,null,null, TransactionType.INVOICE);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, null);
         TransactionDto transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
     }

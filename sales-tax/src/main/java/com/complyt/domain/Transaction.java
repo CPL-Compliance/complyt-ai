@@ -31,4 +31,5 @@ public class Transaction {
     private final TimeStamps internalTimeStamps;
     private final TimeStamps externalTimeStamps;
     private final TransactionType transactionType;
+    private final ShippingFee shippingFee;
 }
