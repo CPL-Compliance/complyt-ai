@@ -27,8 +27,6 @@ public class SalesTaxRatesController {
 
         if (transaction.getShippingFee() != null) {
             ShippingFee shippingFee = setSalesTaxRateForShippingFee(transaction.getShippingFee(), salesTaxRate);
-            log.debug("hereee");
-            log.debug(" ---- " + transaction.withItems(itemsWithRates).withShippingFee(shippingFee));
             return transaction.withItems(itemsWithRates).withShippingFee(shippingFee);
         }
 
