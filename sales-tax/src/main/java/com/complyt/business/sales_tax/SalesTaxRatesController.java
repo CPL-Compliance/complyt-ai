@@ -40,8 +40,6 @@ public class SalesTaxRatesController {
     }
 
     private ShippingFee setSalesTaxRateForShippingFee(@NonNull ShippingFee shippingFee, SalesTaxRate salesTaxRate) {
-
-        log.debug("chuka muka");
         SalesTaxRate shippingFeeSalesTaxRate = salesTaxRateCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate);
         return shippingFee.withSalesTaxRate(shippingFeeSalesTaxRate);
     }
