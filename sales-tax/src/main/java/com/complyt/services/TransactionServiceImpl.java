@@ -109,7 +109,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .withTransactionStatus(transaction.getTransactionStatus())
                 .withInternalTimeStamps(transaction.getInternalTimeStamps())
                 .withExternalTimeStamps(transaction.getExternalTimeStamps())
-                .withTransactionType(transaction.getTransactionType());
+                .withTransactionType(transaction.getTransactionType())
+                .withShippingFee(transaction.getShippingFee());
     }
 
 }

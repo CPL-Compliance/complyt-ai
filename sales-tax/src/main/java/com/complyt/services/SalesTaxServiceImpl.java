@@ -60,7 +60,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return salesTaxRate -> {
             Transaction transactionWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
 
-            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithRates.getItems(), transaction.getShippingFee());
+            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithRates.getItems(), transactionWithRates.getShippingFee());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             log.debug("Transaction's sales tax : " + salesTax);

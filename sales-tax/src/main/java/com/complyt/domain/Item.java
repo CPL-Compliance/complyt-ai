@@ -24,7 +24,7 @@ public class Item {
     private float manualSalesTaxRate;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
-
+    
     public float getManualSalesTaxAmount(){
         return manualSalesTaxRate * totalPrice;
     }

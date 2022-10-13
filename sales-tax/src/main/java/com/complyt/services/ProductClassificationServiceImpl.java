@@ -19,7 +19,6 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     @NonNull
     private ProductClassificationRepository productClassificationRepository;
 
-
     public Mono<ProductClassification> save(ProductClassification productClassification) {
         return productClassificationRepository.save(productClassification);
     }
@@ -42,12 +41,17 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     @Override
     public Mono<Transaction> getTransactionWithRelevantProductClassificationData(Transaction transaction) {
         return Flux.fromIterable(transaction.getItems())
-                .flatMap(item -> getClassification(item.getTaxCode()))
+                .flatMap(item -> getItemClassification(item.getTaxCode()))
+                .concatWith(getShippingFeeClassification(transaction))
                 .collectMap(ProductClassification::getTaxCode, productClassification -> productClassification)
                 .flatMap(mapTaxCodesToClassifications -> new TransactionProductClassificationDataInjector(transaction).inject(mapTaxCodesToClassifications));
     }
 
-    private Mono<ProductClassification> getClassification(String taxCode) {
+    private Mono<ProductClassification> getItemClassification(String taxCode) {
         return findOneByTaxCode(taxCode);
+    }
+
+    private Mono<ProductClassification> getShippingFeeClassification(@NonNull Transaction transaction) {
+        return transaction.getShippingFee() == null ? Mono.empty() : findOneByTaxCode(transaction.getShippingFee().getTaxCode());
     }
 }

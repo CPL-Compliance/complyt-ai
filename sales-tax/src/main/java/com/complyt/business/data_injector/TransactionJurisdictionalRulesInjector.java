@@ -26,8 +26,6 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
     @NonNull
     private final Transaction transaction;
 
-    private final String SHIPPING_FEE_TAX_CODE = "C6S1";
-
     /**
      * finds each of the transaction's item's  jurisdictional Sales Tax Rules and injects it to the item
      *
@@ -41,8 +39,8 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
             List<Item> modifiedItems = createItemsWithRules(mapTaxCodesToClassifications);
             Transaction modifiedTransaction = transaction.withItems(modifiedItems);
 
-            if (transaction.getShippingFee() != null && mapTaxCodesToClassifications.containsKey(SHIPPING_FEE_TAX_CODE)) {
-                ShippingFee modifiedShippingFee = createShippingFeeWithRules(mapTaxCodesToClassifications.get(SHIPPING_FEE_TAX_CODE));
+            if (transaction.getShippingFee() != null && mapTaxCodesToClassifications.containsKey(transaction.getShippingFee().getTaxCode())) {
+                ShippingFee modifiedShippingFee = createShippingFeeWithRules(mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode()));
                 modifiedTransaction = modifiedTransaction.withShippingFee(modifiedShippingFee);
             }
 

@@ -27,6 +27,8 @@ public class SalesTaxRatesController {
 
         if (transaction.getShippingFee() != null) {
             ShippingFee shippingFee = setSalesTaxRateForShippingFee(transaction.getShippingFee(), salesTaxRate);
+            log.debug("hereee");
+            log.debug(" ---- " + transaction.withItems(itemsWithRates).withShippingFee(shippingFee));
             return transaction.withItems(itemsWithRates).withShippingFee(shippingFee);
         }
 
@@ -40,6 +42,8 @@ public class SalesTaxRatesController {
     }
 
     private ShippingFee setSalesTaxRateForShippingFee(@NonNull ShippingFee shippingFee, SalesTaxRate salesTaxRate) {
+
+        log.debug("chuka muka");
         SalesTaxRate shippingFeeSalesTaxRate = salesTaxRateCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate);
         return shippingFee.withSalesTaxRate(shippingFeeSalesTaxRate);
     }

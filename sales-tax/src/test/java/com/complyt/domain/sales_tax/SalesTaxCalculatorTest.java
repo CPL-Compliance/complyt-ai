@@ -1,6 +1,7 @@
 package com.complyt.domain.sales_tax;
 
 import com.complyt.business.sales_tax.SalesTaxCalculator;
+import com.complyt.business.sales_tax.checker.ItemsTaxableCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -27,6 +29,9 @@ public class SalesTaxCalculatorTest {
 
     @InjectMocks
     SalesTaxCalculator salesTaxCalculator;
+
+    @Mock
+    ItemsTaxableCheck itemsTaxableCheck;
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
