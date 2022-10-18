@@ -39,7 +39,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
     }
 
     @Override
-    public Mono<Transaction> getTransactionWithRelevantProductClassificationData(Transaction transaction) {
+    public Mono<Transaction> getTransactionWithRelevantProductClassificationData(@NonNull Transaction transaction) {
         return Flux.fromIterable(transaction.getItems())
                 .flatMap(item -> getItemClassification(item.getTaxCode()))
                 .concatWith(getShippingFeeClassification(transaction))
@@ -51,7 +51,7 @@ public class ProductClassificationServiceImpl implements ProductClassificationSe
         return findOneByTaxCode(taxCode);
     }
 
-    private Mono<ProductClassification> getShippingFeeClassification(@NonNull Transaction transaction) {
+    private Mono<ProductClassification> getShippingFeeClassification(Transaction transaction) {
         return transaction.getShippingFee() == null ? Mono.empty() : findOneByTaxCode(transaction.getShippingFee().getTaxCode());
     }
 }

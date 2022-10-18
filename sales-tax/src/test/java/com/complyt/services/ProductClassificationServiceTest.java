@@ -238,4 +238,18 @@ public class ProductClassificationServiceTest {
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
+    @Test
+    void getTransactionWithRelevantProductClassificationData_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            productClassificationService.getTransactionWithRelevantProductClassificationData(nullTransaction);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
 }
