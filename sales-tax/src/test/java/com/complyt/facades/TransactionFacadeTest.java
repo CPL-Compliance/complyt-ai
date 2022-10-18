@@ -382,7 +382,7 @@ public class TransactionFacadeTest {
         // Given
         String anotherTransactionId = UUID.randomUUID().toString();
         Transaction anotherTransactionWithSameClientId = transaction.withId(anotherTransactionId);
-        List<Transaction> transactions = new ArrayList<Transaction>() {{
+        List<Transaction> transactions = new ArrayList<>() {{
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};

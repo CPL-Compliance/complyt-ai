@@ -18,7 +18,7 @@ import java.util.Optional;
 public class SalesTaxCalculator {
 
     @NonNull
-    private final ItemsTaxableCheck itemsTaxableCheck;
+    private ItemsTaxableCheck itemsTaxableCheck;
 
     public float calculate(@NonNull List<Item> items, ShippingFee shippingFee) {
         log.info("Calculating total sales tax amount");
@@ -52,7 +52,7 @@ public class SalesTaxCalculator {
     }
 
     private float handleSalesTaxAmountCalculationForShippingFee(ShippingFee shippingFee, List<Item> items) {
-        if(shippingFee == null || !itemsTaxableCheck.hasTaxableItem(items)) {
+        if(shippingFee == null || !itemsTaxableCheck.hasTaxableItem(items)){
             return 0;
         }
 
@@ -60,6 +60,7 @@ public class SalesTaxCalculator {
             log.debug("Shipping fee Sales tax was set manually, amount : " + shippingFee.getManualSalesTaxAmount());
             return shippingFee.getManualSalesTaxAmount();
         }
+
         float amount = shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
         log.debug("Shipping fee Sales tax amount calculated : " + amount);
 
