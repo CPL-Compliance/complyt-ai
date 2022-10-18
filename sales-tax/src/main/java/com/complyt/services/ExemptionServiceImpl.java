@@ -54,7 +54,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     @Override
     public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id) {
         return exemptionRepository.findById(id)
-                .map(createUpdateExemptionFunction(exemption))
+                .map(createFunctionUpdateExemption(exemption))
                 .flatMap(exemptionRepository::save);
     }
 
@@ -63,7 +63,7 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.delete(id);
     }
 
-    private Function<Exemption, Exemption> createUpdateExemptionFunction(Exemption exemption) {
+    private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {
         return exemptionInfo -> exemptionInfo
                 .withCustomerId(exemption.getCustomerId())
                 .withState(exemption.getState())
