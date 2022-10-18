@@ -39,7 +39,7 @@ public class SalesTaxRatesController {
                 .collect(Collectors.toList());
     }
 
-    private ShippingFee setSalesTaxRateForShippingFee(@NonNull ShippingFee shippingFee, SalesTaxRate salesTaxRate) {
+    private ShippingFee setSalesTaxRateForShippingFee(ShippingFee shippingFee, SalesTaxRate salesTaxRate) {
         SalesTaxRate shippingFeeSalesTaxRate = salesTaxRateCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate);
         return shippingFee.withSalesTaxRate(shippingFeeSalesTaxRate);
     }
