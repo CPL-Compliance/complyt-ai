@@ -3,6 +3,7 @@ package com.complyt.services;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductClassificationServiceTest {
+
     @InjectMocks
     ProductClassificationServiceImpl productClassificationService;
 
@@ -42,12 +44,18 @@ public class ProductClassificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        productClassification = createProductClassification();
+        productClassification = createItemProductClassification();
         customerId = new ObjectId();
         clientId = new ObjectId();
     }
 
-    private ProductClassification createProductClassification() {
+    private ProductClassification createItemProductClassification() {
+        Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
+        return new ProductClassification("id", "C1S1", "description",
+                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+    }
+
+    private ProductClassification createShippingFeeProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C1S1", "description",
                 "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
@@ -95,7 +103,7 @@ public class ProductClassificationServiceTest {
     }
 
     @Test
-    void getTransactionWithRelevantProductClassificationData_InjectsDateToTransaction_ReturnsTransaction() {
+    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransaction_ReturnsTransaction() {
         // Given
         Transaction transaction = createTransaction();
         String taxCode = transaction.getItems().get(0).getTaxCode();
@@ -108,6 +116,42 @@ public class ProductClassificationServiceTest {
         // Then
         StepVerifier.create(actualtransaction).expectNext(transactionWithData).verifyComplete();
     }
+
+    @Test
+    void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
+        // Given
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1");
+        Transaction transaction = createTransaction().withShippingFee(shippingFee);
+        String taxCode = transaction.getItems().get(0).getTaxCode();
+        ProductClassification shippingClassification = createShippingFeeProductClassification();
+        Transaction transactionWithData = createTransactionWithProductClassificationData().withShippingFee(shippingFee);
+
+        // When
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.findOneByTaxCode(transaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
+        Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(transaction);
+
+        // Then
+        StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
+    }
+
+//    @Test
+//    void getShippingFeeClassification_FindsClassification_ReturnsClassification() {
+//        // Given
+//        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+//        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1");
+//        ProductClassification shippingClassification = createShippingFeeProductClassification();
+//        Transaction transaction = createTransaction().withShippingFee(shippingFee);
+//
+//        // When
+//        when(productClassificationRepository.findOneByTaxCode(transaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
+//        Mono<ProductClassification> productClassificationMono = productClassificationService.g
+//
+//        // Then
+//    }
 
 
     @Test
@@ -179,7 +223,6 @@ public class ProductClassificationServiceTest {
         // Then
         StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
     }
-
 
     @Test
     void findById_NullIdPassed_ThrowsException() {
