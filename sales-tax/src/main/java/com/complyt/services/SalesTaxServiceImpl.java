@@ -53,10 +53,10 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
                 .map(salesTaxDataToSalesTaxRate::map)
-                .map(injectSalesTaxToTransaction(transaction));
+                .map(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxRate, Transaction> injectSalesTaxToTransaction(Transaction transaction) {
+    private Function<SalesTaxRate, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxRate -> {
             Transaction transactionWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
 
