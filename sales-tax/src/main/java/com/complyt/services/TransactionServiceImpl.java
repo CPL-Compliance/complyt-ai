@@ -48,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
         return transactionRepository.findByExternalId(externalId)
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
-                .map(createFunctionUpdateTransaction(transaction))
+                .map(createUpdateTransactionFunction(transaction))
                 .flatMap(transactionRepository::save);
     }
 
@@ -97,7 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll();
     }
 
-    private Function<Transaction, Transaction> createFunctionUpdateTransaction(@NonNull final Transaction transaction) {
+    private Function<Transaction, Transaction> createUpdateTransactionFunction(@NonNull final Transaction transaction) {
         return transactionInfo -> transactionInfo
                 .withExternalId(transaction.getExternalId())
                 .withItems(transaction.getItems())

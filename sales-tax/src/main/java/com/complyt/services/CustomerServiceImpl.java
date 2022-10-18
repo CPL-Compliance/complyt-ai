@@ -28,7 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> upsert(@NonNull Customer customer) {
         return customerRepository.findByExternalId(customer.getExternalId())
                 .switchIfEmpty(customerRepository.save(customer))
-                .map(createFunctionUpdateCustomer(customer))
+                .map(createUpdateCustomerFunction(customer))
                 .flatMap(customerRepository::save);
     }
 
@@ -62,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findById(id);
     }
 
-    private Function<Customer, Customer> createFunctionUpdateCustomer(@NonNull final Customer customer) {
+    private Function<Customer, Customer> createUpdateCustomerFunction(@NonNull final Customer customer) {
         return customerInfo -> customerInfo.withExternalId(customer.getExternalId())
                 .withAddress(customer.getAddress())
                 .withName(customer.getName());
