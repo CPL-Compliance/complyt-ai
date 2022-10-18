@@ -2,6 +2,7 @@ package com.complyt.v1.model;
 
 public enum TransactionStatusDto {
     ACTIVE,
-    CANCELLED
+    CANCELLED,
+    PAID
 }
 
