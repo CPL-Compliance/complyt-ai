@@ -55,7 +55,6 @@ public class SalesTaxServiceImplTest {
     private SalesTaxRatesController salesTaxRatesController;
 
     Transaction transaction;
-    ObjectId customerId = new ObjectId();
 
     @BeforeEach
     void setUp() {
@@ -73,11 +72,12 @@ public class SalesTaxServiceImplTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        Customer customer = createCustomer();
+        ObjectId customerId = new ObjectId();
+        Customer customer = createCustomer(customerId);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
-    private Customer createCustomer() {
+    private Customer createCustomer(ObjectId customerId) {
         ObjectId clientId = new ObjectId();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";

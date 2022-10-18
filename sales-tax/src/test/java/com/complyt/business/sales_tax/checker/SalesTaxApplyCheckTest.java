@@ -1,7 +1,5 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.checker;
 
-import com.complyt.business.sales_tax.checker.CustomerFullyExemptionCheck;
-import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;

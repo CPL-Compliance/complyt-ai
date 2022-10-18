@@ -57,6 +57,5 @@ public class TransactionCustomerInjectorTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
-
     }
 }
