@@ -13,6 +13,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
+import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -156,7 +157,38 @@ public class SalesTaxServiceImplTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
         SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
-        List<Item> itemsWithRates = new ArrayList<Item>() {{
+        List<Item> itemsWithRates = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
+        }};
+        Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
+        SalesTaxTracking tracking = createSalesTaxTracking();
+
+        // When
+        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxRatesController.setRates(transaction, salesTaxRate))
+                .thenReturn(transaction.withItems(itemsWithRates));
+        when(salesTaxCalculator.calculate(itemsWithRates, null)).thenReturn(salesTax.getAmount());
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxCalculation_SalesTaxDataIsUnincorporated_SalesTaxCalculatedAndTransactionModified() {
+        // Given
+        String unincorporatedCode = "1";
+        List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
+            add(new TaxInfoItem().withNotesCodes(unincorporatedCode));
+        }};
+
+        FastTaxData fastTaxData = new FastTaxData().withTaxInfoItems(taxInfoItems);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0, 0, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTax salesTax = new SalesTax(10, salesTaxRate);
+
+        List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);

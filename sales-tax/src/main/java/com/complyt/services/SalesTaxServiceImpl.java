@@ -4,9 +4,11 @@ import com.complyt.business.sales_tax.SalesTaxRatesController;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.SalesTaxCalculator;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -52,20 +55,32 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
-                .map(salesTaxDataToSalesTaxRate::map)
                 .map(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxRate, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxRate -> {
-            Transaction transactionWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
 
-            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithRates.getItems(), transactionWithRates.getShippingFee());
-            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+        private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction (Transaction transaction){
+            return salesTaxData -> {
+                SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
 
-            log.debug("Transaction's sales tax : " + salesTax);
-            return transactionWithRates.withSalesTax(salesTax);
-        };
+                log.info("Setting sales tax rates for transaction's items");
+                Transaction transactionWithItemsWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
+
+                float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems(), transactionWithItemsWithRates.getShippingFee());
+                SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+
+                log.debug("Transaction's sales tax : " + salesTax);
+                return transactionWithItemsWithRates.withSalesTax(salesTax);
+            };
+        }
+
+    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
+        SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+
+        if (salesTaxData.isUnincorporated()) {
+            return salesTaxRate.withCityRate(0).withCityDistrictRate(0);
+        }
+        return salesTaxRate;
     }
 
 }
