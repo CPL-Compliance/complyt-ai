@@ -58,7 +58,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .map(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-
     private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxData -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
