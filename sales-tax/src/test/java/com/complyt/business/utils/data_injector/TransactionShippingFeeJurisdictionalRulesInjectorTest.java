@@ -1,6 +1,6 @@
 package com.complyt.business.utils.data_injector;
 
-import com.complyt.business.data_injector.TransactionJurisdictionalRulesInjector;
+import com.complyt.business.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -24,15 +24,15 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TransactionJurisdictionalRulesInjectorTest {
+public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
-    TransactionJurisdictionalRulesInjector transactionJurisdictionalRulesInjector;
+    TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector;
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionJurisdictionalRulesInjector = new TransactionJurisdictionalRulesInjector(transaction);
+        transactionShippingFeeJurisdictionalRulesInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -59,11 +59,6 @@ public class TransactionJurisdictionalRulesInjectorTest {
                 new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1");
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, false,
-                CalculationType.FIXED, "description", 0, null);
-    }
-
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> itemJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
@@ -83,24 +78,23 @@ public class TransactionJurisdictionalRulesInjectorTest {
         }};
     }
 
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true, false,
+                CalculationType.FIXED, "description", 0, null);
+    }
+
+
     @Test
     void inject_InjectsDataToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-
         Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassifications();
         ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(createJurisdictionalSalesTaxRules());
-        Item itemWithRules = transaction.getItems().get(0).withJurisdictionalSalesTaxRules(createJurisdictionalSalesTaxRules());
-        List<Item> itemsWithRules = new ArrayList<>() {{
-            add(itemWithRules);
-        }};
-        Transaction transactionWithRules = transaction
-                .withItems(itemsWithRules)
-                .withShippingFee(shippingFeeWithRules);
+
+        Transaction transactionWithRules = transaction.withShippingFee(shippingFeeWithRules);
 
         // When + Then
-        Mono<Transaction> actualTransactionMono = transactionJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications);
+        Mono<Transaction> actualTransactionMono = transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications);
 
         StepVerifier.create(actualTransactionMono).expectNext(transactionWithRules).verifyComplete();
     }
-
 }

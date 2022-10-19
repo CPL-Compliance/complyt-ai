@@ -41,8 +41,8 @@ public class ProductClassificationDataInjectorTest {
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null,new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f),false,0
-                , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0
+                        , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
             }
         };
 
@@ -58,50 +58,61 @@ public class ProductClassificationDataInjectorTest {
                 .build();
     }
 
-    @Test
-    void inject_InjectsDataToTransaction_ReturnsTransaction() {
+    private List<Item> createItemsNoRules() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null,null,false,0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
-                null,null,false,0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
-        List<Item> itemsNoRules = new ArrayList<Item>(){{
+                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+        return new ArrayList<>() {{
             add(item1NoRule);
             add(item2NoRule);
         }};
-        JurisdictionalSalesTaxRules rule1 = new JurisdictionalSalesTaxRules("rule1","CA",true,false,
-                CalculationType.FIXED,"rule1",0,null);
-        JurisdictionalSalesTaxRules rule2 = new JurisdictionalSalesTaxRules("rule2","CA",true,false,
-                CalculationType.FIXED,"rule2",0,null);
+    }
 
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules1 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(rule1.getAbbreviation(),rule1);
-        }};
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules2 = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(rule2.getAbbreviation(),rule2);
-        }};
-        ProductClassification productClassification1 = new ProductClassification("id","C1S1","description","title",jurisdictionalSalesTaxRules1, TangibleCategory.TANGIBLE);
-        ProductClassification productClassification2 = new ProductClassification("id","C2S2","description","title",jurisdictionalSalesTaxRules2, TangibleCategory.TANGIBLE);
-
-        Map<String,ProductClassification> productClassifications = new HashMap<String,ProductClassification>(){{
-            put(productClassification1.getTaxCode(),productClassification1);
-            put(productClassification2.getTaxCode(),productClassification2);
-        }};
-
-        Item item1WithRule = item1NoRule.withJurisdictionalSalesTaxRules(rule1);
-        Item item2WithRule = item2NoRule.withJurisdictionalSalesTaxRules(rule2);
-        List<Item> itemsWithRules = new ArrayList<Item>(){{
+    private List<Item> createItemsWithRules(List<Item> itemsNoRules, JurisdictionalSalesTaxRules firstRule, JurisdictionalSalesTaxRules secondRule) {
+        Item item1WithRule = itemsNoRules.get(0).withJurisdictionalSalesTaxRules(firstRule);
+        Item item2WithRule = itemsNoRules.get(1).withJurisdictionalSalesTaxRules(secondRule);
+        return new ArrayList<>() {{
             add(item1WithRule);
             add(item2WithRule);
         }};
+    }
 
-        Transaction transaction2 = transaction.withItems(itemsNoRules);
-        TransactionProductClassificationDataInjector transactionProductClassificationInjector2 = new TransactionProductClassificationDataInjector(transaction2);
+    private Map<String, ProductClassification> createClassificationsMap(JurisdictionalSalesTaxRules firstRule, JurisdictionalSalesTaxRules secondRule) {
+        Map<String, JurisdictionalSalesTaxRules> firstRulesMap = new HashMap<>() {{
+            put(firstRule.getAbbreviation(), firstRule);
+        }};
+        Map<String, JurisdictionalSalesTaxRules> secondRulesMap = new HashMap<>() {{
+            put(secondRule.getAbbreviation(), secondRule);
+        }};
+        ProductClassification productClassification1 = new ProductClassification("id", "C1S1", "description", "title", firstRulesMap, TangibleCategory.TANGIBLE);
+        ProductClassification productClassification2 = new ProductClassification("id", "C2S2", "description", "title", secondRulesMap, TangibleCategory.TANGIBLE);
+
+        return new HashMap<>() {{
+            put(productClassification1.getTaxCode(), productClassification1);
+            put(productClassification2.getTaxCode(), productClassification2);
+        }};
+    }
+
+    @Test
+    void inject_InjectsDataToTransaction_ReturnsTransaction() {
+        List<Item> itemsNoRules = createItemsNoRules();
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+                CalculationType.FIXED, "rule1", 0, null);
+        JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
+                CalculationType.FIXED, "rule2", 0, null);
+
+        Map<String, ProductClassification> productClassifications = createClassificationsMap(firstRule, secondRule);
+
+        List<Item> itemsWithRules = createItemsWithRules(itemsNoRules, firstRule, secondRule);
+
+        Transaction transactionWithItemsWithRules = transaction.withItems(itemsNoRules);
+        TransactionProductClassificationDataInjector transactionProductClassificationInjector = new TransactionProductClassificationDataInjector(transactionWithItemsWithRules);
 
         Transaction newTransaction = transaction.withItems(itemsWithRules);
 
-        Mono<Transaction> transactionMono = transactionProductClassificationInjector2.inject(productClassifications);
+        Mono<Transaction> transactionMono = transactionProductClassificationInjector.inject(productClassifications);
 
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
     }
-
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionJurisdictionalRulesInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+public class TransactionItemsJurisdictionalRulesInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
 
     @NonNull
     private final Transaction transaction;
@@ -35,14 +35,9 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return Mono.fromCallable(() -> {
-            log.info("Setting jurisdictional sales tax rules and taxable categories to transaction");
+            log.info("Setting jurisdictional sales tax rules and taxable categories to transaction's items");
             List<Item> modifiedItems = createItemsWithRules(mapTaxCodesToClassifications);
             Transaction modifiedTransaction = transaction.withItems(modifiedItems);
-
-            if (transaction.getShippingFee() != null && mapTaxCodesToClassifications.containsKey(transaction.getShippingFee().getTaxCode())) {
-                ShippingFee modifiedShippingFee = createShippingFeeWithRules(mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode()));
-                modifiedTransaction = modifiedTransaction.withShippingFee(modifiedShippingFee);
-            }
 
             log.debug("Transaction with rules and taxable categories injected : " + modifiedTransaction);
 
@@ -69,15 +64,6 @@ public class TransactionJurisdictionalRulesInjector implements TransactionDataIn
         }
 
         return modifiedItems;
-    }
-
-    private ShippingFee createShippingFeeWithRules(ProductClassification classification) {
-        String state = transaction.getShippingAddress().getState();
-        JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
-        log.debug("Inserting Shipping fee with rules : " + rules);
-
-        ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
-        return modifiedShippingFee;
     }
 
 }
