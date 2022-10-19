@@ -59,20 +59,20 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     }
 
 
-        private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction (Transaction transaction){
-            return salesTaxData -> {
-                SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
+    private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxData -> {
+            SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
 
-                log.info("Setting sales tax rates for transaction's items");
-                Transaction transactionWithItemsWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
+            log.info("Setting sales tax rates for transaction's items");
+            Transaction transactionWithItemsWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
 
-                float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems(), transactionWithItemsWithRates.getShippingFee());
-                SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+            float salesTaxAmount = salesTaxCalculator.calculate(transactionWithItemsWithRates.getItems(), transactionWithItemsWithRates.getShippingFee());
+            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
-                log.debug("Transaction's sales tax : " + salesTax);
-                return transactionWithItemsWithRates.withSalesTax(salesTax);
-            };
-        }
+            log.debug("Transaction's sales tax : " + salesTax);
+            return transactionWithItemsWithRates.withSalesTax(salesTax);
+        };
+    }
 
     private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
         SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
