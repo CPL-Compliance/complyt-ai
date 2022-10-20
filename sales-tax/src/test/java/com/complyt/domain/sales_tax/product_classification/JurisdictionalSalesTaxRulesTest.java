@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -26,7 +25,7 @@ public class JurisdictionalSalesTaxRulesTest {
         JurisdictionalSalesTaxRules notTaxAbleJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When
-        boolean isCalculatedByPercentage = notTaxAbleJurisdictionalSalesTaxRules.isCalculatedByPercentage();
+        boolean isCalculatedByPercentage = notTaxAbleJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
         Assertions.assertEquals(false,isCalculatedByPercentage);
@@ -38,7 +37,7 @@ public class JurisdictionalSalesTaxRulesTest {
         JurisdictionalSalesTaxRules noSpecialTreatmentJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
 
         // When
-        boolean isCalculatedByPercentage = noSpecialTreatmentJurisdictionalSalesTaxRules.isCalculatedByPercentage();
+        boolean isCalculatedByPercentage = noSpecialTreatmentJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
         Assertions.assertEquals(false,isCalculatedByPercentage);
@@ -50,7 +49,7 @@ public class JurisdictionalSalesTaxRulesTest {
         JurisdictionalSalesTaxRules fixedCalculationTypeJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.FIXED);
 
         // When
-        boolean isCalculatedByPercentage = fixedCalculationTypeJurisdictionalSalesTaxRules.isCalculatedByPercentage();
+        boolean isCalculatedByPercentage = fixedCalculationTypeJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
         Assertions.assertEquals(false,isCalculatedByPercentage);
@@ -61,7 +60,7 @@ public class JurisdictionalSalesTaxRulesTest {
         // Given
 
         // When
-        boolean isCalculatedByPercentage = jurisdictionalSalesTaxRules.isCalculatedByPercentage();
+        boolean isCalculatedByPercentage = jurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
         Assertions.assertEquals(true,isCalculatedByPercentage);

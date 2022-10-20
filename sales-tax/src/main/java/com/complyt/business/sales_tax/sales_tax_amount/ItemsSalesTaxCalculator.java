@@ -38,7 +38,7 @@ public class ItemsSalesTaxCalculator {
     private float calculateTotalPrice(Item item) {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = item.getJurisdictionalSalesTaxRules();
 
-        if (jurisdictionalSalesTaxRules.isCalculatedByPercentage()) {
+        if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
             return item.getTotalPrice() * jurisdictionalSalesTaxRules.getCalculationValue();
         }
 

@@ -17,9 +17,9 @@ public class JurisdictionalSalesTaxRules {
     private final CalculationType calculationType;
     private final String description;
     private final float calculationValue;
-    private final Map<String,CitySalesTaxRules> cities;
+    private final Map<String, CitySalesTaxRules> cities;
 
-    public boolean isCalculatedByPercentage(){
+    public boolean calculatedByPercentageCheck() {
         return taxable && specialTreatment && calculationType == CalculationType.PERCENTAGE;
     }
 }
