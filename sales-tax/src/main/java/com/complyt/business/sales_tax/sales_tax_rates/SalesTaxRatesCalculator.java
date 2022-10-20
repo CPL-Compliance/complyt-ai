@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class SalesTaxRateCalculator {
+public class SalesTaxRatesCalculator {
     /** Calculating sales tax rate regarding the rules of the given item
      * 4 patterns are available :
      * - not taxable

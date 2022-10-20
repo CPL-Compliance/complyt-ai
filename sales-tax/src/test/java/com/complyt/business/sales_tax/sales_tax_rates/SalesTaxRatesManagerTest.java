@@ -1,5 +1,8 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.business.sales_tax.sales_tax_rates.ItemsSalesTaxRatesCalculator;
+import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
+import com.complyt.business.sales_tax.sales_tax_rates.ShippingFeeSalesTaxRatesCalculator;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -29,13 +32,16 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SalesTaxRatesControllerTest {
+public class SalesTaxRatesManagerTest {
 
     @InjectMocks
-    SalesTaxRatesController salesTaxRatesController;
+    private SalesTaxRatesManager salesTaxRatesManager;
 
     @Mock
-    SalesTaxRateCalculator salesTaxRateCalculator;
+    private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+
+    @Mock
+    private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
 
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
@@ -85,8 +91,8 @@ public class SalesTaxRatesControllerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(salesTaxRateCalculator.calculateSalesTaxRate(transaction.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        Transaction actualTransaction = salesTaxRatesController.setRates(transaction, salesTaxRate);
+        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
+        Transaction actualTransaction = salesTaxRatesManager.setRates(transaction, salesTaxRate);
 
         // Then
         assertEquals(actualTransaction, expectedTransaction);
@@ -106,9 +112,9 @@ public class SalesTaxRatesControllerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
-        when(salesTaxRateCalculator.calculateSalesTaxRate(transaction.getItems().get(0).getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        when(salesTaxRateCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        Transaction actualTransaction = salesTaxRatesController.setRates(transaction, salesTaxRate);
+        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
+        when(shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(shippingFee, salesTaxRate)).thenReturn(shippingFeeWithRates);
+        Transaction actualTransaction = salesTaxRatesManager.setRates(transaction, salesTaxRate);
 
         // Then
         assertEquals(actualTransaction, expectedTransaction);
@@ -121,7 +127,7 @@ public class SalesTaxRatesControllerTest {
         Transaction nullTransaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesController.setRates(nullTransaction, salesTaxRate));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesManager.setRates(nullTransaction, salesTaxRate));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -134,7 +140,7 @@ public class SalesTaxRatesControllerTest {
         Transaction transaction = createTransaction();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesController.setRates(transaction, nullSalesTaxRate));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesManager.setRates(transaction, nullSalesTaxRate));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxRate is marked non-null but is null");

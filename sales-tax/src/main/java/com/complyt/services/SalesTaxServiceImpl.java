@@ -1,8 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.ItemsSalesTaxCalculator;
-import com.complyt.business.sales_tax.SalesTaxCalculationManager;
-import com.complyt.business.sales_tax.SalesTaxRatesController;
+import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxCalculationManager;
+import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Transaction;
@@ -39,7 +38,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxCalculationManager salesTaxCalculationManager;
 
     @NonNull
-    private SalesTaxRatesController salesTaxRatesController;
+    private SalesTaxRatesManager salesTaxRatesManager;
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
@@ -61,7 +60,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return salesTaxData -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
 
-            Transaction transactionWithItemsWithRates = salesTaxRatesController.setRates(transaction, salesTaxRate);
+            Transaction transactionWithItemsWithRates = salesTaxRatesManager.setRates(transaction, salesTaxRate);
 
             float salesTaxAmount = salesTaxCalculationManager.calculate(transactionWithItemsWithRates.getItems(), transactionWithItemsWithRates.getShippingFee());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);

@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
@@ -14,9 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SalesTaxRateCalculatorTest {
+public class SalesTaxRatesCalculatorTest {
 
-    private SalesTaxRateCalculator salesTaxRateCalculator;
+    private SalesTaxRatesCalculator salesTaxRateCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
@@ -25,7 +25,7 @@ public class SalesTaxRateCalculatorTest {
     @BeforeEach
     void set_up(){
         salesTaxRateByService = new SalesTaxRate(0.05f,0.05f,0.05f,0.05f,0.05f,0.25f);
-        salesTaxRateCalculator = new SalesTaxRateCalculator();
+        salesTaxRateCalculator = new SalesTaxRatesCalculator();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
                 "California","CA", true,true, CalculationType.FIXED,
                 "description",0.07f,null);

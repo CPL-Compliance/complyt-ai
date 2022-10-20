@@ -1,4 +1,4 @@
-package com.complyt.business.sales_tax;
+package com.complyt.business.sales_tax.sales_tax_amount;
 
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;

@@ -1,7 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.SalesTaxCalculationManager;
-import com.complyt.business.sales_tax.SalesTaxRatesController;
+import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxCalculationManager;
+import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
@@ -53,7 +53,7 @@ public class SalesTaxServiceImplTest {
     private SalesTaxCalculationManager salesTaxCalculationManager;
 
     @Mock
-    private SalesTaxRatesController salesTaxRatesController;
+    private SalesTaxRatesManager salesTaxRatesController;
 
     Transaction transaction;
 
