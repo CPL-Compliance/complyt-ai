@@ -1,6 +1,5 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.sales_tax_amount.ShippingFeeSalesTaxCalculator;
 import com.complyt.business.sales_tax.checker.ItemsTaxableCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;

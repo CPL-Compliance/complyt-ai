@@ -1,8 +1,5 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.business.sales_tax.sales_tax_rates.ItemsSalesTaxRatesCalculator;
-import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
-import com.complyt.business.sales_tax.sales_tax_rates.ShippingFeeSalesTaxRatesCalculator;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -21,13 +18,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)

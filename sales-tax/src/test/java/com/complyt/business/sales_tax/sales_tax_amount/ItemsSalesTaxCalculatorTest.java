@@ -1,6 +1,5 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.sales_tax_amount.ItemsSalesTaxCalculator;
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
