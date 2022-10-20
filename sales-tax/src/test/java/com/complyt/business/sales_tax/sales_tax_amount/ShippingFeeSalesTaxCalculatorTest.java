@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -115,4 +116,30 @@ public class ShippingFeeSalesTaxCalculatorTest {
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
     }
 
+    @Test
+    void calculate_NullItemsPassed_ThrowsException() {
+        // Given
+        List<Item> nullItems = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            shippingFeeSalesTaxCalculator.calculate(shippingFee, nullItems);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "items is marked non-null but is null");
+    }
+
+    @Test
+    void calculate_NullShippingFeePassed_ThrowsException() {
+        // Given
+        ShippingFee nullShippingFee = null;
+        List<Item> items = createItems();
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            shippingFeeSalesTaxCalculator.calculate(nullShippingFee, items);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "shippingFee is marked non-null but is null");
+    }
 }
