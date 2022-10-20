@@ -1,6 +1,5 @@
-package com.complyt.business.sales_tax.tax_reliefs;
+package com.complyt.business.sales_tax;
 
-import com.complyt.business.sales_tax.SalesTaxRateCalculator;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -15,9 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JurisdictionalSalesTaxControllerTest {
+public class SalesTaxRateCalculatorTest {
 
-    private SalesTaxRateCalculator jurisdictionalSalesTaxController;
+    private SalesTaxRateCalculator salesTaxRateCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
@@ -26,7 +25,7 @@ public class JurisdictionalSalesTaxControllerTest {
     @BeforeEach
     void set_up(){
         salesTaxRateByService = new SalesTaxRate(0.05f,0.05f,0.05f,0.05f,0.05f,0.25f);
-        jurisdictionalSalesTaxController = new SalesTaxRateCalculator();
+        salesTaxRateCalculator = new SalesTaxRateCalculator();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
                 "California","CA", true,true, CalculationType.FIXED,
                 "description",0.07f,null);
@@ -39,7 +38,7 @@ public class JurisdictionalSalesTaxControllerTest {
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
-        SalesTaxRate returnedRate = jurisdictionalSalesTaxController.calculateSalesTaxRate(notTaxableRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(notTaxableRule, salesTaxRateByService);
         Assertions.assertEquals(returnedRate, zeroSalesTaxRate);
     }
 
@@ -49,7 +48,7 @@ public class JurisdictionalSalesTaxControllerTest {
         JurisdictionalSalesTaxRules noSpecialTreatmentRule = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
 
         // When + Then
-        SalesTaxRate returnedRate = jurisdictionalSalesTaxController.calculateSalesTaxRate(noSpecialTreatmentRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(noSpecialTreatmentRule, salesTaxRateByService);
         Assertions.assertEquals(returnedRate, salesTaxRateByService);
     }
 
@@ -61,18 +60,17 @@ public class JurisdictionalSalesTaxControllerTest {
         SalesTaxRate expectedSalesTaxRate = salesTaxRateByService.withTaxRate(newTaxRate).withStateRate(newStateRate);
 
         // When + Then
-        SalesTaxRate returnedRate = jurisdictionalSalesTaxController.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRateByService);
         Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
     }
 
     @Test
     void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate(){
         // Given
-        float newStateRate = salesTaxRateByService.getStateRate() * jurisdictionalSalesTaxRules.getCalculationValue();
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
 
         // When + Then
-        SalesTaxRate returnedRate = jurisdictionalSalesTaxController.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
         Assertions.assertEquals(salesTaxRateByService, returnedRate);
     }
 }
