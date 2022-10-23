@@ -75,7 +75,7 @@ public class TransactionFacade {
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, Transaction transaction) {
         return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.update(externalId, transaction)
                 .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
-                        .thenReturn(transaction)) : transactionService.update(externalId, transaction);
+                        .thenReturn(updatedTransaction)) : transactionService.update(externalId, transaction);
     }
 
     public Mono<Transaction> findByExternalId(String externalId) {
