@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ItemsTaxableCheckTest {
+public class TaxableItemExistCheckTest {
 
-    ItemsTaxableCheck itemsTaxableCheck;
+    TaxableItemExistCheck taxableItemExistCheck;
 
     @BeforeEach
     void setUp() {
-        itemsTaxableCheck = new ItemsTaxableCheck();
+        taxableItemExistCheck = new TaxableItemExistCheck();
     }
 
     private Item createTaxableItem() {
@@ -51,7 +51,7 @@ public class ItemsTaxableCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = itemsTaxableCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistCheck.hasTaxableItem(items);
         assertTrue(hasTaxable);
     }
 
@@ -64,7 +64,7 @@ public class ItemsTaxableCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = itemsTaxableCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistCheck.hasTaxableItem(items);
         assertFalse(hasTaxable);
     }
 
@@ -75,7 +75,7 @@ public class ItemsTaxableCheckTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemsTaxableCheck.hasTaxableItem(nullItems);
+            taxableItemExistCheck.hasTaxableItem(nullItems);
         });
 
         // Then

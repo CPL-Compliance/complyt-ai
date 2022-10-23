@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.checker.ItemsTaxableCheck;
+import com.complyt.business.sales_tax.checker.TaxableItemExistCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ShippingFeeSalesTaxCalculator {
 
     @NonNull
-    private ItemsTaxableCheck itemsTaxableCheck;
+    private TaxableItemExistCheck taxableItemExistCheck;
 
     public float calculate(@NonNull ShippingFee shippingFee, @NonNull List<Item> items) {
         log.info("Calculating total sales tax amount for shipping fee");
@@ -25,7 +25,7 @@ public class ShippingFeeSalesTaxCalculator {
     }
 
     private float handleSalesTaxAmountCalculationForShippingFee(ShippingFee shippingFee, List<Item> items) {
-        if (!itemsTaxableCheck.hasTaxableItem(items)) {
+        if (!taxableItemExistCheck.hasTaxableItem(items)) {
             log.debug("No sales tax for shipping fee");
             return 0;
         }

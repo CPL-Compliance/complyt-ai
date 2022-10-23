@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.checker.ItemsTaxableCheck;
+import com.complyt.business.sales_tax.checker.TaxableItemExistCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -33,7 +33,7 @@ public class ShippingFeeSalesTaxCalculatorTest {
     ShippingFeeSalesTaxCalculator shippingFeeSalesTaxCalculator;
 
     @Mock
-    ItemsTaxableCheck itemsTaxableCheck;
+    TaxableItemExistCheck taxableItemExistCheck;
 
     ShippingFee shippingFee;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
@@ -72,7 +72,7 @@ public class ShippingFeeSalesTaxCalculatorTest {
         amount += shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
 
         // When
-        when(itemsTaxableCheck.hasTaxableItem(items)).thenReturn(true);
+        when(taxableItemExistCheck.hasTaxableItem(items)).thenReturn(true);
         float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFee, items);
 
         // Then
@@ -88,7 +88,7 @@ public class ShippingFeeSalesTaxCalculatorTest {
         amount += shippingFeeWithManualSalesTax.getManualSalesTaxAmount();
 
         // When
-        when(itemsTaxableCheck.hasTaxableItem(items)).thenReturn(true);
+        when(taxableItemExistCheck.hasTaxableItem(items)).thenReturn(true);
 
         float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFeeWithManualSalesTax, items);
 
@@ -108,7 +108,7 @@ public class ShippingFeeSalesTaxCalculatorTest {
         float amount = 0;
 
         // When
-        when(itemsTaxableCheck.hasTaxableItem(items)).thenReturn(false);
+        when(taxableItemExistCheck.hasTaxableItem(items)).thenReturn(false);
         float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFee, items);
 
         // Then
