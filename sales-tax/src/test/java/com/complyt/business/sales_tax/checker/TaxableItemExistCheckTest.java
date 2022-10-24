@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TaxableItemExistCheckTest {
 
-    TaxableItemExistCheck taxableItemExistCheck;
+    TaxableItemExistenceCheck taxableItemExistenceCheck;
 
     @BeforeEach
     void setUp() {
-        taxableItemExistCheck = new TaxableItemExistCheck();
+        taxableItemExistenceCheck = new TaxableItemExistenceCheck();
     }
 
     private Item createTaxableItem() {
@@ -51,7 +51,7 @@ public class TaxableItemExistCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = taxableItemExistCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistenceCheck.hasTaxableItem(items);
         assertTrue(hasTaxable);
     }
 
@@ -64,7 +64,7 @@ public class TaxableItemExistCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = taxableItemExistCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistenceCheck.hasTaxableItem(items);
         assertFalse(hasTaxable);
     }
 
@@ -75,7 +75,7 @@ public class TaxableItemExistCheckTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            taxableItemExistCheck.hasTaxableItem(nullItems);
+            taxableItemExistenceCheck.hasTaxableItem(nullItems);
         });
 
         // Then
