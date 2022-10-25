@@ -18,6 +18,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -69,7 +70,7 @@ public class TransactionsFilterByNexusRulesTest {
     }
 
     private Customer createCustomer(ObjectId customerId, ObjectId clientId, Address shippingAddress) {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL, null);
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -101,12 +102,12 @@ public class TransactionsFilterByNexusRulesTest {
         transactions.add(transactionWithCustomerThatDoesNotExist);
 
         // When
-        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions,nexusStateRule);
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
         // Then
         assertNotNull(filteredTransactions);
-        assertEquals(1,filteredTransactions.size());
-        assertEquals(filteredTransactions.get(0),invoiceTransaction);
+        assertEquals(1, filteredTransactions.size());
+        assertEquals(filteredTransactions.get(0), invoiceTransaction);
     }
 
     @Test
@@ -114,12 +115,12 @@ public class TransactionsFilterByNexusRulesTest {
         // Given
 
         // When
-        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions,nexusStateRule);
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
         // Then
         assertNotNull(filteredTransactions);
-        assertEquals(1,filteredTransactions.size());
-        assertEquals(filteredTransactions.get(0),invoiceTransaction);
+        assertEquals(1, filteredTransactions.size());
+        assertEquals(filteredTransactions.get(0), invoiceTransaction);
     }
 
     @Test
@@ -130,13 +131,13 @@ public class TransactionsFilterByNexusRulesTest {
         transactions.add(secondInvoiceTransaction);
 
         // When
-        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions,nexusStateRule);
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
         // Then
         assertNotNull(filteredTransactions);
-        assertEquals(2,filteredTransactions.size());
-        assertEquals(filteredTransactions.get(0),invoiceTransaction);
-        assertEquals(filteredTransactions.get(1),secondInvoiceTransaction);
+        assertEquals(2, filteredTransactions.size());
+        assertEquals(filteredTransactions.get(0), invoiceTransaction);
+        assertEquals(filteredTransactions.get(1), secondInvoiceTransaction);
     }
 
 }

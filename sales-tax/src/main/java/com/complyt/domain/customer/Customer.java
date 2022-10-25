@@ -23,5 +23,4 @@ public class Customer {
     private final Address address;
     private final ObjectId clientId;
     private final CustomerType customerType;
-    private final Map<String, ExemptionType> exemptionsStates;
 }

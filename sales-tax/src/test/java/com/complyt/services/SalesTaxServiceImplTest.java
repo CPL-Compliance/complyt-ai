@@ -83,10 +83,7 @@ public class SalesTaxServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Map<String, ExemptionType> exemptionsStates = new HashMap<>() {{
-            put("State", ExemptionType.FULLY);
-        }};
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL, exemptionsStates);
+        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
     private SalesTaxTracking createSalesTaxTracking() {

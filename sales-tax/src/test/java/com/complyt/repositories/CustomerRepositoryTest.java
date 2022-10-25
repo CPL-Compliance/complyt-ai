@@ -51,7 +51,7 @@ class CustomerRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL,null);
+        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")

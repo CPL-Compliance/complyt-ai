@@ -69,10 +69,7 @@ public class SalesTaxRatesManagerTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Map<String, ExemptionType> exemptionsStates = new HashMap<String, ExemptionType>() {{
-            put("State", ExemptionType.FULLY);
-        }};
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL, exemptionsStates);
+        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
     @Test

@@ -57,7 +57,7 @@ public class NexusCalculatorTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL, null);
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, null);
     }
 
@@ -100,7 +100,7 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule();
 
         // When
-        when(transactionNexusFilter.filter(transactions,nexusStateRule)).thenReturn(transactions);
+        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
         when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
         when(nexusTransactionAmountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());

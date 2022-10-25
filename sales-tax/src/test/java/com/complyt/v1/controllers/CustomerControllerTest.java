@@ -60,12 +60,12 @@ class CustomerControllerTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL,null);
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
     @Test
-    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException(){
+    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
         CustomerFacade facade = null;
 
@@ -195,7 +195,7 @@ class CustomerControllerTest {
     void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
-        List<Customer> customersFoundByName = new ArrayList<Customer> (){{
+        List<Customer> customersFoundByName = new ArrayList<Customer>() {{
             add(customer);
         }};
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
@@ -209,8 +209,8 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk().
-                 expectBodyList(Customer.class)
-                .value(customers -> customers , equalTo(customersFoundByName));
+                expectBodyList(Customer.class)
+                .value(customers -> customers, equalTo(customersFoundByName));
     }
 
     @Test
@@ -236,6 +236,6 @@ class CustomerControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Customer.class)
-                .value(customers -> customers , equalTo(allCustomers));
+                .value(customers -> customers, equalTo(allCustomers));
     }
 }

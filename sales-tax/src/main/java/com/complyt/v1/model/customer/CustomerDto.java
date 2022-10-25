@@ -19,5 +19,4 @@ public class CustomerDto {
     private final String name;
     private final AddressDto address;
     private final CustomerTypeDto customerType;
-    private final Map<String, ExemptionType> exemptionsStates;
 }

@@ -90,8 +90,8 @@ class TransactionServiceImplTest {
                 "name",
                 null,
                 new ObjectId(),
-                CustomerType.RETAIL,
-                null);
+                CustomerType.RETAIL
+        );
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -285,7 +285,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), new ObjectId(), CustomerType.RETAIL, null);
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), new ObjectId(), CustomerType.RETAIL);
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);

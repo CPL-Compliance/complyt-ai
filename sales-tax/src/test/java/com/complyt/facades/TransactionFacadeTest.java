@@ -80,8 +80,8 @@ public class TransactionFacadeTest {
                 "name",
                 null,
                 new ObjectId(),
-                CustomerType.RETAIL,
-                null);
+                CustomerType.RETAIL
+        );
     }
 
     private Transaction createTransaction() {
@@ -95,7 +95,7 @@ public class TransactionFacadeTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, new ObjectId(), CustomerType.RETAIL, null);
+        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, new ObjectId(), CustomerType.RETAIL);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, null);
     }
 
