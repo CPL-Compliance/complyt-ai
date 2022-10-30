@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class SalesTaxRatesManagerTest {
 
     @InjectMocks
-    private SalesTaxRatesManager salesTaxRatesManager;
+    private SalesTaxRatesHandler salesTaxRatesManager;
 
     @Mock
     private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;

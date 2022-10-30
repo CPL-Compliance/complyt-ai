@@ -1,41 +1,34 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.domain.Item;
-import com.complyt.domain.ShippingFee;
+import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
+import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.utils.factory.SalesTaxAggregatorFactory;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class SalesTaxCalculationManagerTest {
+public class SalesTaxAggregatorTest {
 
-    @InjectMocks
-    SalesTaxCalculationManager salesTaxCalculationManager;
-
-    @Mock
-    ItemsSalesTaxCalculator itemsSalesTaxCalculator;
-
-    @Mock
-    ShippingFeeSalesTaxCalculator shippingFeeSalesTaxCalculator;
+    SalesTaxAggregator salesTaxAggregator;
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     ShippingFee shippingFee;
@@ -46,6 +39,13 @@ public class SalesTaxCalculationManagerTest {
         jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         shippingFee = createShippingFee();
         items = createItems();
+        salesTaxAggregator = createSalesTaxAggregator();
+    }
+
+    private SalesTaxAggregator createSalesTaxAggregator() {
+        Transaction transaction = createTransaction();
+        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
+                .createSalesTaxAggregator(transaction);
     }
 
     private ShippingFee createShippingFee() {
@@ -67,49 +67,31 @@ public class SalesTaxCalculationManagerTest {
                 CalculationType.FIXED, "description", 0.5f, null);
     }
 
+    private Transaction createTransaction() {
+        String id = null;
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
+        List<Item> items = createItems();
+        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        ShippingFee shippingFee = createShippingFee();
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+    }
+
     @Test
-    void calculate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
+    void aggregate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
         // Given
-        float expectedItemsSalesTaxAmount = 1000;
-        float expectedShippingFeeSalesTaxAmount = 100;
+        float expectedItemsSalesTaxAmount = items.stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
+        float expectedShippingFeeSalesTaxAmount = shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
 
         // When
-        when(itemsSalesTaxCalculator.calculate(items)).thenReturn(expectedItemsSalesTaxAmount);
-        when(shippingFeeSalesTaxCalculator.calculate(shippingFee, items)).thenReturn(expectedShippingFeeSalesTaxAmount);
-
-        float actualAmount = salesTaxCalculationManager.calculate(items, shippingFee);
+        float actualAmount = salesTaxAggregator.aggregate();
 
         // Then
         assertEquals(expectedAmount, actualAmount);
-    }
-
-    @Test
-    void calculate_NullShippingFeePassed_CalculatesSalesTaxAmountOnlyForItems() {
-        // Given
-        ShippingFee nullShippingFee = null;
-        float expectedItemsSalesTaxAmount = 1000;
-
-        // When
-        when(itemsSalesTaxCalculator.calculate(items)).thenReturn(expectedItemsSalesTaxAmount);
-
-        float actualAmount = salesTaxCalculationManager.calculate(items, nullShippingFee);
-
-        // Then
-        assertEquals(expectedItemsSalesTaxAmount, actualAmount);
-    }
-
-    @Test
-    void calculate_NullItemsPassed_ThrowsException() {
-        // Given
-        List<Item> nullItems = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxCalculationManager.calculate(nullItems,shippingFee);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "items is marked non-null but is null");
     }
 
 }

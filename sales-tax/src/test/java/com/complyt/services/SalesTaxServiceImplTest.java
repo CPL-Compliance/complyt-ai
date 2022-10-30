@@ -1,12 +1,12 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxCalculationManager;
-import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
+import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
+import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
+import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -15,6 +15,7 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,13 +50,16 @@ public class SalesTaxServiceImplTest {
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
 
     @Mock
+    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
+
+    @Mock
     ExemptionService exemptionService;
 
     @Mock
-    private SalesTaxCalculationManager salesTaxCalculationManager;
+    private SalesTaxAggregator salesTaxAggregator;
 
     @Mock
-    private SalesTaxRatesManager salesTaxRatesController;
+    private SalesTaxRatesHandler salesTaxRatesHandler;
 
     Transaction transaction;
 
@@ -61,6 +67,13 @@ public class SalesTaxServiceImplTest {
     void setUp() {
         transaction = createTransaction();
     }
+
+    private SalesTaxAggregator createSalesTaxAggregator() {
+        Transaction transaction = createTransaction();
+        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
+                .createSalesTaxAggregator(transaction);
+    }
+
 
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
@@ -92,30 +105,6 @@ public class SalesTaxServiceImplTest {
                 new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
                 true, transaction.getExternalTimeStamps().getCreatedDate().minusYears(1));
 
-    }
-
-    @Test
-    void initService_NullClientWrapper_ThrowsException() {
-        // Given
-        salesTaxWebClientWrapper = null;
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, exemptionService, salesTaxCalculationManager, salesTaxRatesController);
-        });
-        assertEquals(nullPointerException.getMessage(), "salesTaxWebClientWrapper is marked non-null but is null");
-    }
-
-    @Test
-    void initService_NullSalesTaxMapper_ThrowsException() {
-        // Given
-        salesTaxDataToSalesTaxRate = null;
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            new SalesTaxServiceImpl(salesTaxWebClientWrapper, salesTaxDataToSalesTaxRate, exemptionService, salesTaxCalculationManager, salesTaxRatesController);
-        });
-        assertEquals(nullPointerException.getMessage(), "salesTaxDataToSalesTaxRate is marked non-null but is null");
     }
 
     @Test
@@ -164,9 +153,10 @@ public class SalesTaxServiceImplTest {
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRatesController.setRates(transaction, salesTaxRate))
+        when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
-        when(salesTaxCalculationManager.calculate(itemsWithRates, transaction.getShippingFee())).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregatorFactory.createSalesTaxAggregator(transaction.withItems(itemsWithRates))).thenReturn(salesTaxAggregator);
+        when(salesTaxAggregator.aggregate()).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -195,9 +185,10 @@ public class SalesTaxServiceImplTest {
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRatesController.setRates(transaction, salesTaxRate))
+        when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
-        when(salesTaxCalculationManager.calculate(itemsWithRates, transaction.getShippingFee())).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregatorFactory.createSalesTaxAggregator(transaction.withItems(itemsWithRates))).thenReturn(salesTaxAggregator);
+        when(salesTaxAggregator.aggregate()).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then

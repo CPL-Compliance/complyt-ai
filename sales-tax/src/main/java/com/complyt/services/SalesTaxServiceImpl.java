@@ -1,8 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxCalculationManager;
-import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesManager;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -10,6 +9,7 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +35,10 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private ExemptionService exemptionService;
 
     @NonNull
-    private SalesTaxCalculationManager salesTaxCalculationManager;
+    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
 
     @NonNull
-    private SalesTaxRatesManager salesTaxRatesManager;
+    private SalesTaxRatesHandler salesTaxRatesHandler;
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
@@ -60,9 +60,10 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return salesTaxData -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
 
-            Transaction transactionWithItemsWithRates = salesTaxRatesManager.setRates(transaction, salesTaxRate);
+            Transaction transactionWithItemsWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
-            float salesTaxAmount = salesTaxCalculationManager.calculate(transactionWithItemsWithRates.getItems(), transactionWithItemsWithRates.getShippingFee());
+            float salesTaxAmount = salesTaxAggregatorFactory.createSalesTaxAggregator(transactionWithItemsWithRates).aggregate();
+
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             return transactionWithItemsWithRates.withSalesTax(salesTax);

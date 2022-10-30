@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -28,10 +27,13 @@ public class ItemsSalesTaxCalculatorTest {
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
+    List<Item> items;
+
     @BeforeEach
     void setUp() {
-        itemsSalesTaxCalculator = new ItemsSalesTaxCalculator();
         jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        items = createItems();
+        itemsSalesTaxCalculator = new ItemsSalesTaxCalculator(items);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -39,15 +41,20 @@ public class ItemsSalesTaxCalculatorTest {
                 CalculationType.FIXED, "description", 0.5f, null);
     }
 
+    private List<Item> createItems() {
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+
+        return new ArrayList<>() {{
+            add(new Item(1000, 2, 2000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+            add(new Item(3000, 3, 9000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+        }};
+    }
+
     @Test
     void calculate_SalesTaxBeingCalculated_SalesTaxAmountReturned() {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
 
-        List<Item> items = new ArrayList<>() {{
-            add(new Item(1000, 2, 2000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-            add(new Item(3000, 3, 9000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-        }};
         float amount = 0;
 
         // When
@@ -55,7 +62,7 @@ public class ItemsSalesTaxCalculatorTest {
             amount += salesTaxRate.getTaxRate() * item.getTotalPrice();
         }
 
-        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate(items);
+        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
@@ -68,14 +75,14 @@ public class ItemsSalesTaxCalculatorTest {
         List<Item> items = new ArrayList<>() {{
             add(new Item(1000, 2, 2000, "description", "name", "taxCode", null, salesTaxRate, true, 0.5f, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
+        ItemsSalesTaxCalculator itemsSalesTaxCalculator = new ItemsSalesTaxCalculator(items);
         float amount = items.get(0).getTotalPrice() * 0.5f;
 
         // When
-        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate(items);
+        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
-
     }
 
     @Test
@@ -87,25 +94,16 @@ public class ItemsSalesTaxCalculatorTest {
             add(new Item(1000, 2, 2000, "description", "name", "taxCode",
                     jurisdictionalSalesTaxRulesByPercentage, salesTaxRate, false, 0.5f, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
+        ItemsSalesTaxCalculator itemsSalesTaxCalculator = new ItemsSalesTaxCalculator(items);
+
         float partialTotalPrice = items.get(0).getTotalPrice() * jurisdictionalSalesTaxRulesByPercentage.getCalculationValue();
-        float amount = partialTotalPrice * items.get(0).getSalesTaxRate().getTaxRate();
+        float expectedAmount = partialTotalPrice * items.get(0).getSalesTaxRate().getTaxRate();
 
         // When
-        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate(items);
+        float salesTaxAmountReturnedFromCalculation = itemsSalesTaxCalculator.calculate();
 
         // Then
-        assertEquals(amount, salesTaxAmountReturnedFromCalculation);
+        assertEquals(expectedAmount, salesTaxAmountReturnedFromCalculation);
     }
 
-    @Test
-    void calculate_NullItemsPassed_ThrowsException() {
-        // Given
-        List<Item> nullItems = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> itemsSalesTaxCalculator.calculate(nullItems));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "items is marked non-null but is null");
-    }
 }

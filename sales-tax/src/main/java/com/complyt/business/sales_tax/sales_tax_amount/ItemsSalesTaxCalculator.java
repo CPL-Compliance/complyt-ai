@@ -12,9 +12,12 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class ItemsSalesTaxCalculator {
+public class ItemsSalesTaxCalculator implements ISalesTaxCalculator<List<Item>> {
 
-    public float calculate(@NonNull List<Item> items) {
+    @NonNull
+    List<Item> items;
+
+    public float calculate() {
         log.info("Calculating total sales tax amount for items");
         float amount = 0;
         for (Item item : items) {

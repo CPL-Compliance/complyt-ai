@@ -25,7 +25,7 @@ public class SalesTaxRatesCalculator {
             log.info("None taxable rule - returning sales tax rate that is set to 0");
             return new SalesTaxRate(0, 0, 0, 0, 0, 0);
         }
-
+        
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
             log.info("None special treatment for rule - returning original sales tax rate");
             return originalSalesTaxRate;

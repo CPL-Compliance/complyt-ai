@@ -1,6 +1,5 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -21,19 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShippingFeeSalesTaxCalculatorTest {
 
-    @InjectMocks
     ShippingFeeSalesTaxCalculator shippingFeeSalesTaxCalculator;
-
-    @Mock
-    TaxableItemExistenceCheck taxableItemExistenceCheck;
 
     ShippingFee shippingFee;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
@@ -42,6 +33,7 @@ public class ShippingFeeSalesTaxCalculatorTest {
     void setUp() {
         jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         shippingFee = createShippingFee();
+        shippingFeeSalesTaxCalculator = new ShippingFeeSalesTaxCalculator(shippingFee);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -66,14 +58,12 @@ public class ShippingFeeSalesTaxCalculatorTest {
     @Test
     void calculate_ShippingFeeHasSalesTax_SalesTaxAmountReturned() {
         // Given
-        List<Item> items = createItems();
         float amount = 0;
 
         amount += shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
 
         // When
-        when(taxableItemExistenceCheck.hasTaxableItem(items)).thenReturn(true);
-        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFee, items);
+        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
@@ -88,9 +78,8 @@ public class ShippingFeeSalesTaxCalculatorTest {
         amount += shippingFeeWithManualSalesTax.getManualSalesTaxAmount();
 
         // When
-        when(taxableItemExistenceCheck.hasTaxableItem(items)).thenReturn(true);
 
-        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFeeWithManualSalesTax, items);
+        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
@@ -101,44 +90,12 @@ public class ShippingFeeSalesTaxCalculatorTest {
         // Given
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         ShippingFee shippingFee = createShippingFee();
-        List<Item> items = new ArrayList<>() {{
-            add(new Item(1000, 2, 2000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-            add(new Item(3000, 3, 9000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-        }};
-        float amount = 0;
+        float amount = shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
 
         // When
-        when(taxableItemExistenceCheck.hasTaxableItem(items)).thenReturn(false);
-        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate(shippingFee, items);
+        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
-    }
-
-    @Test
-    void calculate_NullItemsPassed_ThrowsException() {
-        // Given
-        List<Item> nullItems = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            shippingFeeSalesTaxCalculator.calculate(shippingFee, nullItems);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "items is marked non-null but is null");
-    }
-
-    @Test
-    void calculate_NullShippingFeePassed_ThrowsException() {
-        // Given
-        ShippingFee nullShippingFee = null;
-        List<Item> items = createItems();
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            shippingFeeSalesTaxCalculator.calculate(nullShippingFee, items);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "shippingFee is marked non-null but is null");
     }
 }

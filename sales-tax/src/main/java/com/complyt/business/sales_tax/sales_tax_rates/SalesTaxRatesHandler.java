@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class SalesTaxRatesManager {
+public class SalesTaxRatesHandler {
 
     @NonNull
     private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;

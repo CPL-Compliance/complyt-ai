@@ -1,34 +1,24 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
-import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-@Component
 @AllArgsConstructor
 @Slf4j
-public class ShippingFeeSalesTaxCalculator {
+public class ShippingFeeSalesTaxCalculator implements ISalesTaxCalculator<ShippingFee> {
 
     @NonNull
-    private TaxableItemExistenceCheck taxableItemExistenceCheck;
+    ShippingFee shippingFee;
 
-    public float calculate(@NonNull ShippingFee shippingFee, @NonNull List<Item> items) {
+    public float calculate() {
         log.info("Calculating total sales tax amount for shipping fee");
 
-        return handleSalesTaxAmountCalculationForShippingFee(shippingFee, items);
+        return handleSalesTaxAmountCalculationForShippingFee(shippingFee);
     }
 
-    private float handleSalesTaxAmountCalculationForShippingFee(ShippingFee shippingFee, List<Item> items) {
-        if (!taxableItemExistenceCheck.hasTaxableItem(items)) {
-            log.debug("No sales tax for shipping fee");
-            return 0;
-        }
+    private float handleSalesTaxAmountCalculationForShippingFee(ShippingFee shippingFee) {
 
         if (shippingFee.isManualSalesTax()) {
             log.debug("Shipping fee Sales tax was set manually, amount : " + shippingFee.getManualSalesTaxAmount());
