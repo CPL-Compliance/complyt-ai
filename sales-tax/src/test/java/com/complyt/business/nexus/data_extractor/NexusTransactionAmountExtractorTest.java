@@ -12,6 +12,8 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,22 +105,52 @@ public class NexusTransactionAmountExtractorTest {
                 ));
             }
         };
-
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        ShippingFee shippingFee = createShippingFee();
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, shippingFee);
     }
+
+    private ShippingFee createShippingFee() {
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
+                new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
+                CalculationType.FIXED, "description", 0.5f, null);
+    }
+
 
     @Test
     void extract_ExtractsTransactionItemsAmount_ReturnsAmount() {
+        // Given
+        ShippingFee nullShippingFee = null;
+        Transaction transactionWithNoShippingFee = transaction.withShippingFee(nullShippingFee);
+
+        // When
+        when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transactionWithNoShippingFee.getShippingFee(), nexusStateRule)).thenReturn(false);
+        float amount = nexusTransactionAmountExtractor.extract(transactionWithNoShippingFee, nexusStateRule);
+        float expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
+
+        // Then
+        assertEquals(amount, expectedAmount);
+    }
+
+    @Test
+    void extract_ExtractsTransactionItemsAndShippingFeeAmount_ReturnsAmount() {
         // Given
 
         // When
         when(itemQualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(itemQualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
-        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(false);
+        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
         float amount = nexusTransactionAmountExtractor.extract(transaction, nexusStateRule);
+        float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getPrice();
 
         // Then
-        assertEquals(amount, transaction.getItems().get(0).getTotalPrice());
+        assertEquals(amount, expectedAmount);
     }
 
     @Test

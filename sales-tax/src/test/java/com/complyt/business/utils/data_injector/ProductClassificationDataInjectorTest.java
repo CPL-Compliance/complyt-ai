@@ -105,7 +105,7 @@ public class ProductClassificationDataInjectorTest {
         Map<String, ProductClassification> productClassifications = createClassificationsMap(firstRule, secondRule);
 
         List<Item> itemsWithRules = createItemsWithRules(itemsNoRules, firstRule, secondRule);
-
+        
         Transaction transactionWithItemsWithRules = transaction.withItems(itemsNoRules);
         TransactionProductClassificationDataInjectionManager transactionProductClassificationInjector = new TransactionProductClassificationDataInjectionManager(transactionWithItemsWithRules);
 

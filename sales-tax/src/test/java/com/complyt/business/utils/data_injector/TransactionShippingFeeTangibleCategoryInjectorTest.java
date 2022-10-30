@@ -1,6 +1,6 @@
 package com.complyt.business.utils.data_injector;
 
-import com.complyt.business.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
+import com.complyt.business.data_injector.TransactionShippingFeeTangibleCategoryInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -11,25 +11,21 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
+public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
-    TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector;
+    TransactionShippingFeeTangibleCategoryInjector transactionShippingFeeTangibleCategoryInjector;
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionShippingFeeJurisdictionalRulesInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+        transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -53,7 +49,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
     private ShippingFee createShippingFee() {
         return new ShippingFee(false, 0, 1000, null,
-                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C7S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
@@ -76,22 +72,18 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, false,
-                CalculationType.FIXED, "description", 0, null);
+        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
+                CalculationType.FIXED, "description", 0.5f, null);
     }
 
-
     @Test
-    void inject_InjectsDataToTransactionWithShippingFee_ReturnsModifiedTransaction() {
+    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
         // Given
-        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassifications();
-        ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(createJurisdictionalSalesTaxRules());
-
-        Transaction transactionWithRules = transaction.withShippingFee(shippingFeeWithRules);
+        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
 
         // When + Then
-        Mono<Transaction> actualTransactionMono = transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications);
+        Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);
 
-        StepVerifier.create(actualTransactionMono).expectNext(transactionWithRules).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 }

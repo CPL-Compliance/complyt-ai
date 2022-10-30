@@ -11,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -72,5 +75,31 @@ public class SalesTaxRatesCalculatorTest {
         // When + Then
         SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
         Assertions.assertEquals(salesTaxRateByService, returnedRate);
+    }
+
+    @Test
+    void calculateSalesTaxRate_NullJurisdictionalSalesTaxRulesPassed_ThrowsException() {
+        // Given
+        JurisdictionalSalesTaxRules nullJurisdictionalSalesTaxRules = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRateCalculator.calculateSalesTaxRate(nullJurisdictionalSalesTaxRules, salesTaxRateByService);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
+    }
+
+    @Test
+    void calculateSalesTaxRate_NullSalesTaxRatesPassed_ThrowsException() {
+        // Given
+        SalesTaxRate nullSalesTaxRate = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, nullSalesTaxRate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxRate is marked non-null but is null");
     }
 }
