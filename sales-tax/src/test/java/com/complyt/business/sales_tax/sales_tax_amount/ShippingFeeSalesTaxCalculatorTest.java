@@ -72,14 +72,14 @@ public class ShippingFeeSalesTaxCalculatorTest {
     @Test
     void calculate_ShippingFeeHasManualSalesTax_SalesTaxAmountReturned() {
         // Given
-        List<Item> items = createItems();
         float amount = 0;
         ShippingFee shippingFeeWithManualSalesTax = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
+        ShippingFeeSalesTaxCalculator calculator = new ShippingFeeSalesTaxCalculator(shippingFeeWithManualSalesTax);
         amount += shippingFeeWithManualSalesTax.getManualSalesTaxAmount();
 
         // When
 
-        float salesTaxAmountReturnedFromCalculation = shippingFeeSalesTaxCalculator.calculate();
+        float salesTaxAmountReturnedFromCalculation = calculator.calculate();
 
         // Then
         assertEquals(amount, salesTaxAmountReturnedFromCalculation);
