@@ -21,9 +21,11 @@ public class TransactionProductClassificationDataInjectionManager implements Tra
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return new TransactionItemsJurisdictionalRulesInjector(transaction).inject(mapTaxCodesToClassifications)
-                .map(transactionWithRules -> new TransactionTangibleCategoryInjector(transactionWithRules))
+                .map(transactionWithItemsWithRules -> new TransactionItemsTangibleCategoryInjector(transactionWithItemsWithRules))
                 .flatMap(transactionTangibleCategoryInjector -> transactionTangibleCategoryInjector.inject(mapTaxCodesToClassifications))
-                .map(transactionWithTangibleCategoriesAndRules -> new TransactionShippingFeeJurisdictionalRulesInjector(transactionWithTangibleCategoriesAndRules))
-                .flatMap(transactionShippingFeeJurisdictionalRulesInjector -> transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications));
+                .map(transactionWithModifiedItems -> new TransactionShippingFeeJurisdictionalRulesInjector(transactionWithModifiedItems))
+                .flatMap(transactionShippingFeeJurisdictionalRulesInjector -> transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications))
+                .map(transactionWithModifiedItemsAndShippingFeeWithRules -> new TransactionShippingFeeTangibleCategoryInjector(transactionWithModifiedItemsAndShippingFeeWithRules))
+                .flatMap(transactionShippingFeeTangibleCategoryInjector -> transactionShippingFeeTangibleCategoryInjector.inject(mapTaxCodesToClassifications));
     }
 }

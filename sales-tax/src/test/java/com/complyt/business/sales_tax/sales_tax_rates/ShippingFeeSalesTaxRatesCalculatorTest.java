@@ -1,6 +1,8 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.ShippingFee;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -48,7 +50,7 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
     }
 
     private ShippingFee createShippingFee() {
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1");
+        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     @Test

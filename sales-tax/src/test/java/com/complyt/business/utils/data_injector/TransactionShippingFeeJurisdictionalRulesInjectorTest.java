@@ -56,7 +56,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
     private ShippingFee createShippingFee() {
         return new ShippingFee(false, 0, 1000, null,
-                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1");
+                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {

@@ -20,5 +20,6 @@ public class ShippingFeeDto {
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRate salesTaxRate;
     private String taxCode;
-    
+    private final TaxableCategoryDto taxableCategory;
+    private final TangibleCategoryDto tangibleCategory;
 }

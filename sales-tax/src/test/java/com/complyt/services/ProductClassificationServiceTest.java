@@ -38,13 +38,15 @@ public class ProductClassificationServiceTest {
     @Mock
     ProductClassificationRepository productClassificationRepository;
 
-    ProductClassification productClassification;
+    ProductClassification itemProductClassification;
+    ProductClassification shippingFeeProductClassification;
     ObjectId customerId;
     ObjectId clientId;
 
     @BeforeEach
     void setUp() {
-        productClassification = createItemProductClassification();
+        itemProductClassification = createItemProductClassification();
+        shippingFeeProductClassification = createShippingFeeProductClassification();
         customerId = new ObjectId();
         clientId = new ObjectId();
     }
@@ -57,15 +59,15 @@ public class ProductClassificationServiceTest {
 
     private ProductClassification createShippingFeeProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
-        return new ProductClassification("id", "C1S1", "description",
-                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+        return new ProductClassification("id", "C6S1", "description",
+                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.INTANGIBLE);
     }
 
     private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA", true, false, CalculationType.FIXED, "description", 0, null);
 
-        return new HashMap<String, JurisdictionalSalesTaxRules>() {{
+        return new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
     }
@@ -106,11 +108,11 @@ public class ProductClassificationServiceTest {
     void getTransactionWithRelevantProductClassificationData_InjectsDataToTransaction_ReturnsTransaction() {
         // Given
         Transaction transaction = createTransaction();
-        String taxCode = transaction.getItems().get(0).getTaxCode();
+        String itemTaxCode = transaction.getItems().get(0).getTaxCode();
         Transaction transactionWithData = createTransactionWithProductClassificationData();
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.findOneByTaxCode(itemTaxCode)).thenReturn(Mono.just(itemProductClassification));
         Mono<Transaction> actualtransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(transaction);
 
         // Then
@@ -122,14 +124,14 @@ public class ProductClassificationServiceTest {
         // Given
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1");
+        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
         Transaction transaction = createTransaction().withShippingFee(shippingFee);
         String taxCode = transaction.getItems().get(0).getTaxCode();
         ProductClassification shippingClassification = createShippingFeeProductClassification();
         Transaction transactionWithData = createTransactionWithProductClassificationData().withShippingFee(shippingFee);
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(itemProductClassification));
         when(productClassificationRepository.findOneByTaxCode(transaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
         Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(transaction);
 
@@ -157,14 +159,14 @@ public class ProductClassificationServiceTest {
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne() {
         // Given
-        String taxCode = productClassification.getTaxCode();
+        String taxCode = itemProductClassification.getTaxCode();
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(itemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.findOneByTaxCode(taxCode);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification).verifyComplete();
     }
 
     @Test
@@ -184,9 +186,9 @@ public class ProductClassificationServiceTest {
     @Test
     void findAll_FindsAllClassifications_ReturnsAllClassifications() {
         // Given
-        ProductClassification otherProductClassification = productClassification.withDescription("second classification").withTaxCode("C2S1");
+        ProductClassification otherProductClassification = itemProductClassification.withDescription("second classification").withTaxCode("C2S1");
         List<ProductClassification> productClassifications = new ArrayList<ProductClassification>() {{
-            add(productClassification);
+            add(itemProductClassification);
             add(otherProductClassification);
         }};
 
@@ -195,33 +197,33 @@ public class ProductClassificationServiceTest {
         Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll();
 
         // Then
-        StepVerifier.create(productClassificationFlux).expectNext(productClassification, otherProductClassification).verifyComplete();
+        StepVerifier.create(productClassificationFlux).expectNext(itemProductClassification, otherProductClassification).verifyComplete();
     }
 
     @Test
     void save_SavesClassification_ReturnsClassification() {
         // Given
-        ProductClassification productClassificationNoId = productClassification.withId(null);
+        ProductClassification productClassificationNoId = itemProductClassification.withId(null);
 
         // When
-        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(itemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.save(productClassificationNoId);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification).verifyComplete();
     }
 
     @Test
     void findById_FindClassification_ReturnsClassification() {
         // Given
-        String id = productClassification.getId();
+        String id = itemProductClassification.getId();
 
         // When
-        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(productClassification));
+        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(itemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.findById(id);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(productClassification).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification).verifyComplete();
     }
 
     @Test

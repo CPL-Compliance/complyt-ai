@@ -61,7 +61,7 @@ public class SalesTaxRatesManagerTest {
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA", true, false, CalculationType.FIXED, "description", 0, null);
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1");
+        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private Customer createCustomer(ObjectId customerId) {

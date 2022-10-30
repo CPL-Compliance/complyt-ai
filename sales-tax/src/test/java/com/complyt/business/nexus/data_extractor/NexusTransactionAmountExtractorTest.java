@@ -1,6 +1,7 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
+import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -39,7 +40,10 @@ public class NexusTransactionAmountExtractorTest {
     NexusTransactionAmountExtractor nexusTransactionAmountExtractor;
 
     @Mock
-    ItemStateThresholdQualifier itemStateThresholdQualifier;
+    ItemQualificationCheck itemQualificationCheck;
+
+    @Mock
+    ShippingFeeQualificationCheck shippingFeeNexusStateRuleQualificationCheck;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -108,8 +112,9 @@ public class NexusTransactionAmountExtractorTest {
         // Given
 
         // When
-        when(itemStateThresholdQualifier.isCounted(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(itemStateThresholdQualifier.isCounted(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(itemQualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(itemQualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(false);
         float amount = nexusTransactionAmountExtractor.extract(transaction, nexusStateRule);
 
         // Then

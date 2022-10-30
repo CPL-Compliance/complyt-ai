@@ -1,5 +1,7 @@
 package com.complyt.domain;
 
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.*;
@@ -15,7 +17,9 @@ public class ShippingFee {
     private final float price;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRate salesTaxRate;
-    private String taxCode;
+    private final String taxCode;
+    private final TaxableCategory taxableCategory;
+    private final TangibleCategory tangibleCategory;
 
     public float getManualSalesTaxAmount(){
         return manualSalesTaxRate * price;

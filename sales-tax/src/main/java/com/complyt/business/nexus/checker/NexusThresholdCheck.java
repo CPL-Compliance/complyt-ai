@@ -46,21 +46,11 @@ class ThresholdStrategy {
         log.debug("Checking if nexus has been exceeded, threshold definition : " + definition);
 
         switch (definition) {
-            case AMOUNT:
-                exceeded = exceededAmount(calculationSummary, stateRule);
-                return;
-
-            case COUNT:
-                exceeded = exceededCount(calculationSummary, stateRule);
-                return;
-
-            case AMOUNT_AND_COUNT:
-                exceeded = exceededAmountAndCount(calculationSummary, stateRule);
-                return;
-
+            case AMOUNT -> exceeded = exceededAmount(calculationSummary, stateRule);
+            case COUNT -> exceeded = exceededCount(calculationSummary, stateRule);
+            case AMOUNT_AND_COUNT -> exceeded = exceededAmountAndCount(calculationSummary, stateRule);
             // AMOUNT_OR_COUNT
-            default:
-                exceeded = exceededAmountOrCount(calculationSummary, stateRule);
+            default -> exceeded = exceededAmountOrCount(calculationSummary, stateRule);
         }
     }
 
