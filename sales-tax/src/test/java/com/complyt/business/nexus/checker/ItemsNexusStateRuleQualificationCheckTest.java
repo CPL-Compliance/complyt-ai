@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ItemsCheckTest {
+public class ItemsNexusStateRuleQualificationCheckTest {
 
     @InjectMocks
     ItemsNexusStateRuleQualificationCheck itemsNexusStateRuleQualificationCheck;

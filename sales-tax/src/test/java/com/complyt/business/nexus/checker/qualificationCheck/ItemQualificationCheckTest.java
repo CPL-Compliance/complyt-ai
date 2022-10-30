@@ -12,6 +12,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class ItemQualificationCheckTest {
         // Given
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(item,nexusStateRule);
+        boolean isQualified = itemQualificationCheck.isQualified(item, nexusStateRule);
 
         // Then
         assertTrue(isQualified);
@@ -75,7 +76,7 @@ public class ItemQualificationCheckTest {
         Item notTaxableItem = item.withTaxableCategory(TaxableCategory.NOT_TAXABLE);
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(notTaxableItem,nexusStateRule);
+        boolean isQualified = itemQualificationCheck.isQualified(notTaxableItem, nexusStateRule);
 
         // Then
         assertFalse(isQualified);
@@ -87,9 +88,35 @@ public class ItemQualificationCheckTest {
         Item inTangibleItem = item.withTangibleCategory(TangibleCategory.INTANGIBLE);
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(inTangibleItem,nexusStateRule);
+        boolean isQualified = itemQualificationCheck.isQualified(inTangibleItem, nexusStateRule);
 
         // Then
         assertFalse(isQualified);
+    }
+
+    @Test
+    void isQualified_NullItemPassed_ThrowsException() {
+        // Given
+        Item nullItem = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            itemQualificationCheck.isQualified(nullItem, nexusStateRule);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "item is marked non-null but is null");
+    }
+
+    @Test
+    void isQualified_NullNexusStateRulePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            itemQualificationCheck.isQualified(item, nullNexusStateRule);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
 }

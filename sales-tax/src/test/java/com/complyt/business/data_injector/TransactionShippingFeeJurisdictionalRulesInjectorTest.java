@@ -1,4 +1,4 @@
-package com.complyt.business.utils.data_injector;
+package com.complyt.business.data_injector;
 
 import com.complyt.business.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
@@ -93,5 +93,21 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
         Mono<Transaction> actualTransactionMono = transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications);
 
         StepVerifier.create(actualTransactionMono).expectNext(transactionWithRules).verifyComplete();
+    }
+
+    @Test
+    void inject_DoesNotInjectDataToTransactionBecauseShippingFessTaxCodeIsUnrecognized_ReturnsUnModifiedTransaction() {
+        // Given
+        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassifications();
+        ShippingFee shippingFeeWithUnrecognizedTaxCode = createShippingFee().withTaxCode("C7S1");
+
+        Transaction transactionWithShippingFeeWithUnrecognizedTaxCode = transaction.withShippingFee(shippingFeeWithUnrecognizedTaxCode);
+        TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector =
+                new TransactionShippingFeeJurisdictionalRulesInjector(transactionWithShippingFeeWithUnrecognizedTaxCode);
+
+        // When + Then
+        Mono<Transaction> actualTransactionMono = transactionShippingFeeJurisdictionalRulesInjector.inject(mapTaxCodesToClassifications);
+
+        StepVerifier.create(actualTransactionMono).expectNext(transactionWithShippingFeeWithUnrecognizedTaxCode).verifyComplete();
     }
 }

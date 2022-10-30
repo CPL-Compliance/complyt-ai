@@ -1,4 +1,4 @@
-package com.complyt.business.utils.data_injector;
+package com.complyt.business.data_injector;
 
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;

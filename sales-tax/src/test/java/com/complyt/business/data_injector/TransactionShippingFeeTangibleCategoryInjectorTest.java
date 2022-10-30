@@ -1,4 +1,4 @@
-package com.complyt.business.utils.data_injector;
+package com.complyt.business.data_injector;
 
 import com.complyt.business.data_injector.TransactionShippingFeeTangibleCategoryInjector;
 import com.complyt.domain.*;
