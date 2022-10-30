@@ -1,6 +1,5 @@
 package com.complyt.business.data_injector;
 
-import com.complyt.business.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -11,10 +10,6 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -56,13 +51,9 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
                 new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
-    private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
+    private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithTaxableRule() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        Map<String, JurisdictionalSalesTaxRules> itemJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
-            put("CA", jurisdictionalSalesTaxRules);
-        }};
-        ProductClassification itemProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C1S1", "item", "title", itemJurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
+
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -70,7 +61,20 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
                 , "C6S1", "item", "title", shippingJurisdictionalSalesTaxRulesMap, TangibleCategory.INTANGIBLE);
 
         return new HashMap<>() {{
-            put("C1S1", itemProductClassification);
+            put("C6S1", shippingProductClassification);
+        }};
+    }
+
+    private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithNotTaxableRule() {
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules().withTaxable(false);
+
+        Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
+            put("CA", jurisdictionalSalesTaxRules);
+        }};
+        ProductClassification shippingProductClassification = new ProductClassification(UUID.randomUUID().toString()
+                , "C6S1", "item", "title", shippingJurisdictionalSalesTaxRulesMap, TangibleCategory.INTANGIBLE);
+
+        return new HashMap<>() {{
             put("C6S1", shippingProductClassification);
         }};
     }
@@ -80,11 +84,18 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
                 CalculationType.FIXED, "description", 0, null);
     }
 
+    private Transaction createTransactionWithNotTaxableShippingFee() {
+        JurisdictionalSalesTaxRules notTaxableRules = createJurisdictionalSalesTaxRules().withTaxable(false);
+        ShippingFee notTaxableShippingFee = transaction.getShippingFee()
+                .withJurisdictionalSalesTaxRules(notTaxableRules)
+                .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
+        return transaction.withShippingFee(notTaxableShippingFee);
+    }
 
     @Test
-    void inject_InjectsDataToTransactionWithShippingFee_ReturnsModifiedTransaction() {
+    void inject_InjectsDataToTransactionWithShippingFeeWithTaxableCategory_ReturnsModifiedTransaction() {
         // Given
-        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassifications();
+        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
         ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(createJurisdictionalSalesTaxRules());
 
         Transaction transactionWithRules = transaction.withShippingFee(shippingFeeWithRules);
@@ -96,9 +107,24 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
+    void inject_InjectsDataToTransactionWithShippingFeeWithNotTaxableCategory_ReturnsModifiedTransaction() {
+        // Given
+        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithNotTaxableRule();
+
+        Transaction transactionWithNotTaxableShippingFee = createTransactionWithNotTaxableShippingFee();
+        TransactionShippingFeeJurisdictionalRulesInjector injector =
+                new TransactionShippingFeeJurisdictionalRulesInjector(transactionWithNotTaxableShippingFee);
+
+        // When + Then
+        Mono<Transaction> actualTransactionMono = injector.inject(mapTaxCodesToClassifications);
+
+        StepVerifier.create(actualTransactionMono).expectNext(transactionWithNotTaxableShippingFee).verifyComplete();
+    }
+
+    @Test
     void inject_DoesNotInjectDataToTransactionBecauseShippingFessTaxCodeIsUnrecognized_ReturnsUnModifiedTransaction() {
         // Given
-        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassifications();
+        Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
         ShippingFee shippingFeeWithUnrecognizedTaxCode = createShippingFee().withTaxCode("C7S1");
 
         Transaction transactionWithShippingFeeWithUnrecognizedTaxCode = transaction.withShippingFee(shippingFeeWithUnrecognizedTaxCode);
