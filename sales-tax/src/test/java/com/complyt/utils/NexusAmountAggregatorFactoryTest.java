@@ -149,8 +149,6 @@ public class NexusAmountAggregatorFactoryTest {
         Transaction nullTransaction = null;
 
         // When
-
-        // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(nullTransaction,nexusStateRule);
         });
@@ -163,8 +161,6 @@ public class NexusAmountAggregatorFactoryTest {
     void createNexusTransactionAmountAggregator_NullNexusStateRulePassed_ThrowsException() {
         // Given
         NexusStateRule nullNexusStateRule = null;
-
-        // When
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {

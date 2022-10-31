@@ -104,4 +104,19 @@ public class ShippingFeeQualificationCheckTest {
         assertFalse(isQualified);
     }
 
+    @Test
+    void isQualified_NullStateRulePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullStateRule = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            shippingFeeQualificationCheck.isQualified(shippingFee, nullStateRule);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
+    }
+
+
 }
