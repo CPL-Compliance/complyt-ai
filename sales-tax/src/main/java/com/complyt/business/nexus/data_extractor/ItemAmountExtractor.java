@@ -27,7 +27,6 @@ public class ItemAmountExtractor implements IAmountExtractor {
     public float extract() {
         float amount = 0;
         for (Item item : items) {
-            System.out.println("here1:  " + item);
             if (itemQualificationCheck.isQualified(item, nexusStateRule)) {
                 amount += item.getTotalPrice();
             }
