@@ -4,8 +4,10 @@ import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualifi
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 public class ShippingFeeAmountExtractor implements IAmountExtractor {
 

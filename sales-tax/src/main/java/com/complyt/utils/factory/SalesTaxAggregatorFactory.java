@@ -24,9 +24,8 @@ public class SalesTaxAggregatorFactory {
     public SalesTaxAggregator createSalesTaxAggregator(@NonNull Transaction transaction) {
         List<ISalesTaxCalculator> calculators = new ArrayList<>();
 
-        if (transaction.getItems() != null) {
-            calculators.add(new ItemsSalesTaxCalculator(transaction.getItems()));
-        }
+        calculators.add(new ItemsSalesTaxCalculator(transaction.getItems()));
+
 
         if (transaction.getShippingFee() != null && taxableItemExistenceCheck.hasTaxableItem(transaction.getItems())) {
             calculators.add(new ShippingFeeSalesTaxCalculator(transaction.getShippingFee()));

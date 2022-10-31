@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax.sales_tax_amount;
 import com.complyt.domain.Item;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
+@EqualsAndHashCode
 @Component
 public class ItemsSalesTaxCalculator implements ISalesTaxCalculator<List<Item>> {
 

@@ -1,0 +1,178 @@
+package com.complyt.utils;
+
+import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.data_extractor.IAmountExtractor;
+import com.complyt.business.nexus.data_extractor.ItemAmountExtractor;
+import com.complyt.business.nexus.data_extractor.NexusTransactionAmountAggregator;
+import com.complyt.business.nexus.data_extractor.ShippingFeeAmountExtractor;
+import com.complyt.business.sales_tax.sales_tax_amount.ISalesTaxCalculator;
+import com.complyt.business.sales_tax.sales_tax_amount.ItemsSalesTaxCalculator;
+import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
+import com.complyt.domain.*;
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusThreshold;
+import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.utils.factory.NexusAmountAggregatorFactory;
+import com.complyt.utils.factory.SalesTaxAggregatorFactory;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@ExtendWith(MockitoExtension.class)
+public class NexusAmountAggregatorFactoryTest {
+
+    @InjectMocks
+    NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
+
+    @Mock
+    ItemQualificationCheck itemQualificationCheck;
+
+    @Mock
+    ShippingFeeQualificationCheck shippingFeeQualificationCheck;
+
+    Transaction transaction;
+    NexusStateRule nexusStateRule;
+
+    @BeforeEach
+    void setUp() {
+        transaction = createTransaction();
+        nexusStateRule = createNexusStateRule();
+    }
+
+    private NexusStateRule createNexusStateRule() {
+        State state = new State("CA", "02", "California");
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategory.TAXABLE);
+        }};
+
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategory.TANGIBLE);
+        }};
+
+        List<CustomerType> customerTypes = new ArrayList<>() {{
+            add(CustomerType.RETAIL);
+        }};
+
+        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
+    }
+
+    private Transaction createTransaction() {
+        String id = null;
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        ObjectId clientId = new ObjectId();
+        List<Item> items = new ArrayList<Item>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                ));
+            }
+        };
+        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        ShippingFee shippingFee = createShippingFee();
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+    }
+
+    private ShippingFee createShippingFee() {
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
+                new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
+    }
+
+    @Test
+    void createNexusTransactionAmountAggregator_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsAggregator() {
+        // Given
+        List<IAmountExtractor> extractors = new ArrayList<>() {{
+            add(new ItemAmountExtractor(itemQualificationCheck,transaction.getItems(),nexusStateRule));
+            add(new ShippingFeeAmountExtractor(shippingFeeQualificationCheck,transaction.getShippingFee(),nexusStateRule));
+        }};
+        NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(extractors);
+
+        // When
+        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(itemQualificationCheck,shippingFeeQualificationCheck)
+                .createNexusTransactionAmountAggregator(transaction,nexusStateRule);
+
+        // Then
+        assertEquals(expectedAggregator, actualAggregator);
+    }
+
+    @Test
+    void createNexusTransactionAmountAggregator_ShippingFeeIsNull_DoesNotInitializeShippingFeeTaxExtractor() {
+        // Given
+        List<IAmountExtractor> onlyItemExtractorList = new ArrayList<>() {{
+            add(new ItemAmountExtractor(itemQualificationCheck,transaction.getItems(),nexusStateRule));
+        }};
+        Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
+        NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(onlyItemExtractorList);
+
+        // When
+        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(itemQualificationCheck,shippingFeeQualificationCheck)
+                .createNexusTransactionAmountAggregator(transactionWithNullShippingFee,nexusStateRule);
+
+        // Then
+        assertEquals(expectedAggregator, actualAggregator);
+    }
+
+    @Test
+    void createNexusTransactionAmountAggregator_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(nullTransaction,nexusStateRule);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void createNexusTransactionAmountAggregator_NullNexusStateRulePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+
+        // When
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transaction,nullNexusStateRule);
+        });
+
+        // Then
+        assertEquals("nexusStateRule is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+}

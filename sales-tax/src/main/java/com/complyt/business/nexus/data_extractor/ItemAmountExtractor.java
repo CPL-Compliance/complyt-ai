@@ -4,11 +4,13 @@ import com.complyt.business.nexus.checker.qualification_check.ItemQualificationC
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @Component
 public class ItemAmountExtractor implements IAmountExtractor {

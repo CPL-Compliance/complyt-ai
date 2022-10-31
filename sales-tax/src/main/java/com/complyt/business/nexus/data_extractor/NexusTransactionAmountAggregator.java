@@ -1,6 +1,7 @@
 package com.complyt.business.nexus.data_extractor;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@EqualsAndHashCode
 @Getter
 @AllArgsConstructor
 public class NexusTransactionAmountAggregator {

@@ -1,7 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,8 @@ import java.util.Optional;
 @Component
 @AllArgsConstructor
 @Slf4j
+@EqualsAndHashCode
+@ToString
 public class SalesTaxAggregator {
 
     @NonNull
