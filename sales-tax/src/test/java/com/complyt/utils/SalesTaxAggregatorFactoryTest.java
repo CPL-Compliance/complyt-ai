@@ -56,7 +56,6 @@ public class SalesTaxAggregatorFactoryTest {
                 false, CalculationType.FIXED, "description", 0, null);
     }
 
-
     private Transaction createTransaction() {
         String id = null;
         String externalId = UUID.randomUUID().toString();
@@ -64,7 +63,7 @@ public class SalesTaxAggregatorFactoryTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE

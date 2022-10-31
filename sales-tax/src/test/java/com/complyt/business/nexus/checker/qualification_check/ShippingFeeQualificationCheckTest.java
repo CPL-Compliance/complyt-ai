@@ -1,6 +1,5 @@
-package com.complyt.business.nexus.checker.qualificationCheck;
+package com.complyt.business.nexus.checker.qualification_check;
 
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
