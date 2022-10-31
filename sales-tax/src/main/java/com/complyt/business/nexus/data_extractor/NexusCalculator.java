@@ -1,5 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
+import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusCalculationSummary;
@@ -17,7 +18,7 @@ import java.util.List;
 public class NexusCalculator {
 
     @NonNull
-    private NexusTransactionAmountExtractor nexusTransactionAmountExtractor;
+    private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @NonNull
     private NexusTransactionCountExtractor nexusTransactionCountExtractor;
@@ -34,7 +35,7 @@ public class NexusCalculator {
 
         for (Transaction filteredTransaction : filteredTransactions) {
             count += nexusTransactionCountExtractor.extract(filteredTransaction, nexusStateRule);
-            amount += nexusTransactionAmountExtractor.extract(filteredTransaction, nexusStateRule);
+            amount += nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(filteredTransaction, nexusStateRule).aggregate();
         }
 
         log.debug("Calculated total amount of : " + amount + ", and count : " + count);

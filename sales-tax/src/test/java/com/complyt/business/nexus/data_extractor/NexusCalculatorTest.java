@@ -1,6 +1,8 @@
 package com.complyt.business.nexus.data_extractor;
 
-
+import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
@@ -39,13 +41,20 @@ public class NexusCalculatorTest {
     NexusCalculator nexusCalculator;
 
     @Mock
-    NexusTransactionAmountExtractor nexusTransactionAmountExtractor;
+    NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
+
+    @Mock
+    ItemQualificationCheck itemQualificationCheck;
+
+    @Mock
+    ShippingFeeQualificationCheck shippingFeeQualificationCheck;
 
     @Mock
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
 
     @Mock
     TransactionsFilterByNexusRules transactionNexusFilter;
+
 
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
@@ -63,15 +72,15 @@ public class NexusCalculatorTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -94,17 +103,22 @@ public class NexusCalculatorTest {
     void calculate_CalculatesNexusData_ReturnsSummary() {
         // Given
         List<Transaction> transactions = createTransactionsList();
+
         int count = transactions.size();
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
+        NexusTransactionAmountAggregator agg1 = new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeQualificationCheck).createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule);
+        NexusTransactionAmountAggregator agg2 = new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeQualificationCheck).createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule);
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
         when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
-        when(nexusTransactionAmountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(transactions.get(0).getItems().get(0).getTotalPrice());
-        when(nexusTransactionAmountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(transactions.get(1).getItems().get(0).getTotalPrice());
+        when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule)).thenReturn(agg1);
+        when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule)).thenReturn(agg2);
+        when(itemQualificationCheck.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(itemQualificationCheck.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
 
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
@@ -119,7 +133,7 @@ public class NexusCalculatorTest {
         int count = 0;
         float amount = 0;
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
-        List<CustomerType> resellerCustomerOnly = new ArrayList<CustomerType>() {{
+        List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
             add(CustomerType.RESELLER);
         }};
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);

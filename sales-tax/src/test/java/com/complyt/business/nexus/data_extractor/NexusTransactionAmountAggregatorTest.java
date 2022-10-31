@@ -14,32 +14,30 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NexusTransactionAmountExtractorTest {
+public class NexusTransactionAmountAggregatorTest {
 
-    @InjectMocks
-    NexusTransactionAmountExtractor nexusTransactionAmountExtractor;
+    NexusTransactionAmountAggregator nexusTransactionAmountAggregator;
 
     @Mock
     ItemQualificationCheck itemQualificationCheck;
@@ -57,6 +55,12 @@ public class NexusTransactionAmountExtractorTest {
         customer = createCustomer();
         transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
+        nexusTransactionAmountAggregator = createNexusTransactionAmountAggregator();
+    }
+
+    private NexusTransactionAmountAggregator createNexusTransactionAmountAggregator() {
+        return new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeNexusStateRuleQualificationCheck)
+                .createNexusTransactionAmountAggregator(transaction, nexusStateRule);
     }
 
     private Customer createCustomer() {
@@ -70,15 +74,15 @@ public class NexusTransactionAmountExtractorTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -95,7 +99,7 @@ public class NexusTransactionAmountExtractorTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
@@ -120,7 +124,6 @@ public class NexusTransactionAmountExtractorTest {
                 CalculationType.FIXED, "description", 0.5f, null);
     }
 
-
     @Test
     void extract_ExtractsTransactionItemsAmount_ReturnsAmount() {
         // Given
@@ -130,9 +133,8 @@ public class NexusTransactionAmountExtractorTest {
         // When
         when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
-        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transactionWithNoShippingFee.getShippingFee(), nexusStateRule)).thenReturn(false);
-        float amount = nexusTransactionAmountExtractor.extract(transactionWithNoShippingFee, nexusStateRule);
         float expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
+        float amount = nexusTransactionAmountAggregator.aggregate();
 
         // Then
         assertEquals(amount, expectedAmount);
@@ -146,39 +148,11 @@ public class NexusTransactionAmountExtractorTest {
         when(itemQualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(itemQualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
         when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
-        float amount = nexusTransactionAmountExtractor.extract(transaction, nexusStateRule);
+        float amount = nexusTransactionAmountAggregator.aggregate();
         float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getPrice();
 
         // Then
         assertEquals(amount, expectedAmount);
-    }
-
-    @Test
-    void extract_NullTransactionPassed_ThrowsException() {
-        // Given
-        Transaction nullTransaction = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionAmountExtractor.extract(nullTransaction, nexusStateRule);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
-    }
-
-    @Test
-    void extract_NullStateRulePassed_ThrowsException() {
-        // Given
-        NexusStateRule nullNexusStateRule = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionAmountExtractor.extract(transaction, nullNexusStateRule);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
 
 }
