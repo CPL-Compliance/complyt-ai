@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
+import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
@@ -14,7 +15,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ public class SalesTaxServiceImplTest {
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @Mock
-    SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
+    SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @Mock
     private SalesTaxAggregatorFactory salesTaxAggregatorFactory;

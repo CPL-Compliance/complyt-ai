@@ -26,7 +26,6 @@ public class SalesTaxAggregatorFactory {
 
         calculators.add(new ItemsSalesTaxCalculator(transaction.getItems()));
 
-
         if (transaction.getShippingFee() != null && taxableItemExistenceCheck.hasTaxableItem(transaction.getItems())) {
             calculators.add(new ShippingFeeSalesTaxCalculator(transaction.getShippingFee()));
         }

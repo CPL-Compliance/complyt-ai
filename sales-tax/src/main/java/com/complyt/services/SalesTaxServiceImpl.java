@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
+import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Transaction;
@@ -8,7 +9,6 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -28,7 +28,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    private SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRate;
+    private SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
     @Qualifier("exemptionServiceImpl")
@@ -58,25 +58,13 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxData -> {
-            SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate(salesTaxData);
-
+            SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
             Transaction transactionWithItemsWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
-
             float salesTaxAmount = salesTaxAggregatorFactory.createSalesTaxAggregator(transactionWithItemsWithRates).aggregate();
-
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             return transactionWithItemsWithRates.withSalesTax(salesTax);
         };
-    }
-
-    private SalesTaxRate salesTaxDataToSalesTaxRate(SalesTaxData salesTaxData) {
-        SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
-
-        if (salesTaxData.isUnincorporated()) {
-            return salesTaxRate.withCityRate(0).withCityDistrictRate(0);
-        }
-        return salesTaxRate;
     }
 
 }
