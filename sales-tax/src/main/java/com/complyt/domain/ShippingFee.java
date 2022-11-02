@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @With
 @AllArgsConstructor
-public class ShippingFee implements ITaxAble {
+public class ShippingFee implements Taxable {
     private final boolean manualSalesTax;
     private final float manualSalesTaxRate;
     private final float price;
@@ -30,14 +30,17 @@ public class ShippingFee implements ITaxAble {
     @Override
     public float calculateSalesTaxAmount() {
         log.info("Calculating total sales tax amount for shipping fee");
+        if (isManualSalesTax()) {
+            log.debug("Shipping fee Sales tax was set manually, amount : " + getManualSalesTaxAmount());
+            return getManualSalesTaxAmount();
+        }
 
         return handleSalesTaxAmountCalculationForShippingFee();
     }
 
     private float handleSalesTaxAmountCalculationForShippingFee() {
-        if (isManualSalesTax()) {
-            log.debug("Shipping fee Sales tax was set manually, amount : " + getManualSalesTaxAmount());
-            return getManualSalesTaxAmount();
+        if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
+            return this.getPrice() * jurisdictionalSalesTaxRules.getCalculationValue();
         }
 
         float amount = salesTaxRate.getTaxRate() * price;

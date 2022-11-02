@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 public class ShippingFeeSalesTaxRatesCalculator {
 
     @NonNull
-    private SalesTaxRatesCalculator salesTaxRateCalculator;
+    private SalesTaxRatesProvider salesTaxRatesProvider;
 
     public ShippingFee setSalesTaxRates(ShippingFee shippingFee, SalesTaxRate salesTaxRate) {
-        SalesTaxRate shippingFeeSalesTaxRate = salesTaxRateCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate);
+        SalesTaxRate shippingFeeSalesTaxRate = salesTaxRatesProvider.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate);
         return shippingFee.withSalesTaxRate(shippingFeeSalesTaxRate);
     }
 }

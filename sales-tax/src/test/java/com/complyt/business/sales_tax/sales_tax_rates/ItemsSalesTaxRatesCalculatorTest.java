@@ -31,7 +31,7 @@ public class ItemsSalesTaxRatesCalculatorTest {
     ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
 
     @Mock
-    SalesTaxRatesCalculator salesTaxRateCalculator;
+    SalesTaxRatesProvider salesTaxRateCalculator;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 

@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ItemsSalesTaxRatesCalculator {
+public class ItemsSalesTaxRatesCalculator  {
 
     @NonNull
-    private SalesTaxRatesCalculator salesTaxRateCalculator;
+    private SalesTaxRatesProvider salesTaxRatesProvider;
 
     public List<Item> setSalesTaxRates(List<Item> items, SalesTaxRate salesTaxRate) {
         return items.stream()
-                .map(item -> item.withSalesTaxRate(salesTaxRateCalculator.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
+                .map(item -> item.withSalesTaxRate(salesTaxRatesProvider.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
                 .collect(Collectors.toList());
     }
 }

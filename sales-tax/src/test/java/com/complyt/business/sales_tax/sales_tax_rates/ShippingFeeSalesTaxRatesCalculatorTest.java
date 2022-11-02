@@ -27,7 +27,7 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
     ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
 
     @Mock
-    SalesTaxRatesCalculator salesTaxRatesCalculator;
+    SalesTaxRatesProvider salesTaxRatesCalculator;
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;

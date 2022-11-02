@@ -76,7 +76,7 @@ public class SalesTaxAggregatorTest {
         float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
         float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRate().getTaxRate() * transaction.getShippingFee().getPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
-        List<ITaxAble> taxAbles = transaction.getTaxAbles();
+        List<Taxable> taxAbles = transaction.getTaxables();
 
         // When
         float actualAmount = salesTaxAggregator.aggregate(taxAbles);

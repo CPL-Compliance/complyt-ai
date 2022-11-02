@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @With
 @AllArgsConstructor
-public class Item implements ITaxAble {
+public class Item implements Taxable {
     private float unitPrice;
     private int quantity;
     private float totalPrice;

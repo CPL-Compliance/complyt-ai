@@ -334,7 +334,6 @@ class TransactionServiceImplTest {
     @Test
     void injectDataToNewTransaction_InjectsDateToNewTransaction_ReturnsTransaction() {
         // Given
-        Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
 
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
@@ -344,10 +343,10 @@ class TransactionServiceImplTest {
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
-        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transactionWithCustomer))
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
                 .thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
-        Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction, customer);
+        Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
         StepVerifier.create(transactionMono)
@@ -446,7 +445,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.injectDataToNewTransaction(nullTransaction, null);
+            transactionService.injectDataToNewTransaction(nullTransaction);
         });
 
         // Then

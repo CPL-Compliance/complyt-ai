@@ -34,12 +34,11 @@ public class Transaction {
     private final TransactionType transactionType;
     private final ShippingFee shippingFee;
 
-    public List<ITaxAble> getTaxAbles() {
-        List<ITaxAble> taxAbles = new ArrayList<>(items);
+    public List<Taxable> getTaxables() {
+        List<Taxable> taxables = new ArrayList<>(items);
         if (shippingFee != null)
-            taxAbles.add(shippingFee);
+            taxables.add(shippingFee);
 
-        return taxAbles;
+        return taxables;
     }
-
 }

@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.domain.ITaxAble;
+import com.complyt.domain.Taxable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -18,8 +18,8 @@ import java.util.Optional;
 @ToString
 public class SalesTaxAggregator {
 
-    public float aggregate(@NonNull List<ITaxAble> taxAbles) {
-        Optional<Float> amount = taxAbles.stream().map(ITaxAble::calculateSalesTaxAmount).reduce(Float::sum);
+    public float aggregate(@NonNull List<Taxable> taxAbles) {
+        Optional<Float> amount = taxAbles.stream().map(Taxable::calculateSalesTaxAmount).reduce(Float::sum);
         log.debug("Sales tax amount calculated : " + amount);
 
         return amount.get();

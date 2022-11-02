@@ -17,10 +17,10 @@ import java.util.List;
 public class SalesTaxRatesHandler {
 
     @NonNull
-    private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+    private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
 
     @NonNull
-    private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
 
     public Transaction setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
         log.info("Setting sales tax rates for transaction");
@@ -29,7 +29,7 @@ public class SalesTaxRatesHandler {
 
         if (transaction.getShippingFee() != null) {
             ShippingFee shippingFeeWithRates = shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(transaction.getShippingFee(), salesTaxRate);
-            return transaction.withItems(itemsWithRates).withShippingFee(shippingFeeWithRates);
+            transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 
         return transaction.withItems(itemsWithRates);

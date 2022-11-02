@@ -81,6 +81,7 @@ public class TransactionRepository {
                 .flatMapMany(user -> {
                     Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
                     log.debug("Executing find client's related transactions");
+
                     return reactiveMongoTemplate.find(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
                                     .map(transaction::withCustomer));

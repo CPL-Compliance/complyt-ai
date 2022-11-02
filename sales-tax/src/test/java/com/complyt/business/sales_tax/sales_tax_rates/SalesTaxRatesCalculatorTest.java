@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SalesTaxRatesCalculatorTest {
 
-    private SalesTaxRatesCalculator salesTaxRateCalculator;
+    private SalesTaxRatesProvider salesTaxRateCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
@@ -28,7 +28,7 @@ public class SalesTaxRatesCalculatorTest {
     @BeforeEach
     void set_up(){
         salesTaxRateByService = new SalesTaxRate(0.05f,0.05f,0.05f,0.05f,0.05f,0.25f);
-        salesTaxRateCalculator = new SalesTaxRatesCalculator();
+        salesTaxRateCalculator = new SalesTaxRatesProvider();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
                 "California","CA", true,true, CalculationType.FIXED,
                 "description",0.07f,null);

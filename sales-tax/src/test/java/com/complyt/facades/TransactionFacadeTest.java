@@ -141,18 +141,6 @@ public class TransactionFacadeTest {
     }
 
     @Test
-    void initFacade_NullTransactionServiceInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        transactionService = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> new TransactionFacade(transactionService, salesTaxService, nexusService, null));
-
-        assertEquals(nullPointerException.getMessage(), "transactionService is marked non-null but is null");
-    }
-
-    @Test
     public void saveTransaction_NexusIsNotEstablished_TransactionSavedAndReturned() {
         // Given
         Transaction transactionWithClassificationData = createTransactionWithProductClassificationData();
@@ -162,8 +150,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
-        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer)).thenReturn(Mono.just(transactionWithClassificationDataAndId));
         when(nexusService.isNexusTrackingCalculationRequired(transactionWithCustomer)).thenReturn(true);
@@ -187,8 +174,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
-        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTax));
         when(transactionService.save(transactionWithClassificationDataAndSalesTax)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTaxAndId));

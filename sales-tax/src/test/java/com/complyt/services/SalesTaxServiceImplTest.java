@@ -143,7 +143,7 @@ public class SalesTaxServiceImplTest {
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
-        List<ITaxAble> taxAbles = transactionWithSalesTax.getTaxAbles();
+        List<Taxable> taxAbles = transactionWithSalesTax.getTaxables();
         SalesTaxTracking tracking = createSalesTaxTracking();
 
         // When
@@ -176,7 +176,7 @@ public class SalesTaxServiceImplTest {
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         SalesTaxTracking tracking = createSalesTaxTracking();
-        List<ITaxAble> taxAbles = transactionWithSalesTax.getTaxAbles();
+        List<Taxable> taxAbles = transactionWithSalesTax.getTaxables();
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
