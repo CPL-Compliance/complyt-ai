@@ -16,7 +16,7 @@ public class SalesTaxDataToSalesTaxRate {
     @NonNull
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
 
-    public SalesTaxRate map(SalesTaxData salesTaxData) {
+    public SalesTaxRate map(@NonNull SalesTaxData salesTaxData) {
         SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRateMapper.map(salesTaxData);
 
         if (salesTaxData.isUnincorporated()) {
