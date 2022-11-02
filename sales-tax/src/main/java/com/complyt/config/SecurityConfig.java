@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -44,26 +45,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        // CSRF
+        http.csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
+                .pathMatchers("/token/**")
+                .matches(serverWebExchange));
+
+        // Authentication and Authorization
         http.authorizeExchange()
-                .pathMatchers("/api/public").permitAll()
-                .anyExchange().authenticated()
-                .and().cors()
-                .and().oauth2ResourceServer().jwt();
+                .pathMatchers("/login", "/logout", "/", "/actuator/health").permitAll()
+                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
+                .anyExchange().authenticated();
+
+
+        // OAuth2
+
+        http.oauth2ResourceServer().jwt();
 
         return http.build();
-
-//        return http
-//                .csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
-//                        .pathMatchers("/token/**")
-//                        .matches(serverWebExchange))
-//                .and()
-//                .authorizeExchange(authorize -> authorize
-//                        .pathMatchers("/login", "/logout", "/", "/actuator/health").permitAll()
-//                        .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
-//                        .anyExchange().authenticated())
-//                .httpBasic(withDefaults())
-//                .formLogin(withDefaults())
-//                .logout(withDefaults())
-//                .build();
     }
 }

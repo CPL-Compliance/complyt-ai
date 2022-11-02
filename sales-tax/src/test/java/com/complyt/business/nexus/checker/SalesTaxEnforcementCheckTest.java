@@ -32,7 +32,7 @@ public class SalesTaxEnforcementCheckTest {
         // Given
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(),
-                state, new ObjectId(), true, null, null, null,
+                state, (new ObjectId()).toString(), true, null, null, null,
                 true, LocalDateTime.now());
 
         // When + Then

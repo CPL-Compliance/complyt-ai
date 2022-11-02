@@ -3,7 +3,6 @@ package com.complyt.domain.customer;
 import com.complyt.domain.Address;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +20,7 @@ public class Customer {
     private final String externalId;
     private final String name;
     private final Address address;
-    private final ObjectId clientId;
+    private final String tenantId;
     private final CustomerType customerType;
     private final Map<String, ExemptionType> exemptionsStates;
 }

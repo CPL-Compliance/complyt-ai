@@ -21,7 +21,7 @@ class TransactionMapperTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        ObjectId tenantId = new ObjectId();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000,4,8000,"description","name","taxCode",
@@ -30,7 +30,7 @@ class TransactionMapperTest {
             }
         };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, clientId,null,null, TransactionType.INVOICE);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null,null, TransactionStatus.ACTIVE, tenantId.toString(),null,null, TransactionType.INVOICE);
         TransactionDto transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
     }

@@ -2,7 +2,6 @@ package com.complyt.domain.nexus;
 
 import com.complyt.domain.State;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,7 +17,7 @@ public class SalesTaxTracking {
     @Id
     private String id;
     private State state;
-    private final ObjectId clientId;
+    private final String tenantId;
     private boolean enforcesSalesTax;
     private PhysicalNexusTracker physicalNexusTracker;
     private EconomicNexusTracker economicNexusTracker;

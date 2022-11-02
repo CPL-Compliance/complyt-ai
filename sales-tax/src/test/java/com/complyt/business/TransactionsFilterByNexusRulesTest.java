@@ -46,7 +46,7 @@ public class TransactionsFilterByNexusRulesTest {
 
     private List<Transaction> createTransactionList() {
         String id = UUID.randomUUID().toString();
-        ObjectId clientId = new ObjectId();
+        ObjectId tenantId = new ObjectId();
         ObjectId customerId = new ObjectId();
         String externalId = UUID.randomUUID().toString();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -54,8 +54,8 @@ public class TransactionsFilterByNexusRulesTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        customer = createCustomer(customerId, clientId, shippingAddress);
-        invoiceTransaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE);
+        customer = createCustomer(customerId, tenantId, shippingAddress);
+        invoiceTransaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE);
         salesOrderTransaction = invoiceTransaction
                 .withId(UUID.randomUUID().toString())
                 .withExternalId(UUID.randomUUID().toString())
@@ -68,8 +68,8 @@ public class TransactionsFilterByNexusRulesTest {
         }};
     }
 
-    private Customer createCustomer(ObjectId customerId, ObjectId clientId, Address shippingAddress) {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL, null);
+    private Customer createCustomer(ObjectId customerId, ObjectId tenantId, Address shippingAddress) {
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId.toString(), CustomerType.RETAIL, null);
     }
 
     private NexusStateRule createNexusStateRule() {

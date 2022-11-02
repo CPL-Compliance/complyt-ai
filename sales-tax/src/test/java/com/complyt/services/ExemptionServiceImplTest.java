@@ -41,7 +41,7 @@ public class ExemptionServiceImplTest {
     Exemption exemption;
     Customer customer;
     ObjectId customerId = new ObjectId();
-    ObjectId clientId = new ObjectId();
+    String tenantId = UUID.randomUUID().toString();
 
     @BeforeEach
     void setUp() {
@@ -51,7 +51,7 @@ public class ExemptionServiceImplTest {
     }
 
     private Customer createCustomer() {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, clientId, CustomerType.RETAIL, null);
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null);
     }
 
     private Exemption createExemption() {
@@ -62,7 +62,7 @@ public class ExemptionServiceImplTest {
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
-        return new Exemption(UUID.randomUUID().toString(), new ObjectId(), new ObjectId(),
+        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 
@@ -77,7 +77,7 @@ public class ExemptionServiceImplTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE);
     }
 
     @Test

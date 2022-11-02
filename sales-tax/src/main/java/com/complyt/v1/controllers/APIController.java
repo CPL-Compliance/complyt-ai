@@ -3,7 +3,6 @@ package com.complyt.v1.controllers;
 import com.complyt.security.permissions.customer.ReadMessagesPermission;
 import com.complyt.v1.model.Message;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +28,6 @@ public class APIController {
     @ReadMessagesPermission
     @GetMapping(value = "/private-scoped")
     public Mono<Message> privateScopedEndpoint() {
-        return Mono.just(new Message("All good. You can see this because you are Authenticated with a Token granted the 'read:messages' scope"));
-    }
-
-    @ReadMessagesPermission
-    @PreAuthorize("hasAuthority('SCOPE_read2:messages')")
-    @GetMapping(value = "/private-scoped2")
-    public Mono<Message> privateScopedEndpoint2() {
         return Mono.just(new Message("All good. You can see this because you are Authenticated with a Token granted the 'read:messages' scope"));
     }
 }

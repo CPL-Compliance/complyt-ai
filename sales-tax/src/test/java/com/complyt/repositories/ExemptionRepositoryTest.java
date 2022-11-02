@@ -2,11 +2,10 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.security.User;
+import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,16 +44,19 @@ public class ExemptionRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    User user;
+    @Mock
+    TenantResolver tenantResolver;
+
+    private String tenantId;
+
     Exemption exemption;
+
     Transaction transaction;
-    ObjectId clientId;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        clientId = new ObjectId("507f191e810c19729de860ea");
-        user = User.builder().username("user").password("password").clientId(clientId).build();
+        tenantId = UUID.randomUUID().toString();
         exemption = createExemption();
         transaction = createTransaction();
     }
@@ -71,7 +72,7 @@ public class ExemptionRepositoryTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getClientId(), null, externalTimeStamps, TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE);
     }
 
     private Exemption createExemption() {
@@ -82,106 +83,104 @@ public class ExemptionRepositoryTest {
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
-        return new Exemption(UUID.randomUUID().toString(), clientId, new ObjectId(),
+        return new Exemption(UUID.randomUUID().toString(), tenantId, new ObjectId(),
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findByClientCustomerAndState_FindsExemption_ReturnsExemption() {
         // Given
         Query query = Query.query(Criteria
-                .where("clientId").is(user.getClientId())
+                .where("tenantId").is(tenantId)
                 .and("customerId").is(transaction.getCustomerId())
                 .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
-        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         Query query = Query.query(Criteria
-                .where("clientId").is(user.getClientId())
+                .where("tenantId").is(tenantId)
                 .and("customerId").is(transaction.getCustomerId())
                 .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
-        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
         StepVerifier.create(exemptionMono).verifyComplete();
     }
 
-
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void save_ExemptionSaved_ExemptionReturned() {
         // Given
         Exemption exemptionNoId = exemption.withId(null);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.save(exemptionNoId)).thenReturn(Mono.just(exemption));
-        Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void save_NoExemptionReturned_EmptyMonoReturned() {
         // Given
         Exemption exemptionNoId = exemption;
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.save(exemptionNoId)).thenReturn(Mono.empty());
-        Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
         StepVerifier.create(exemptionMono).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findById_FindsExemption_ReturnsExemption() {
         // Given
         String id = exemption.getId();
         Query query = Query.query(Criteria.where("_id").is(id)
-                .and("clientId").is(user.getClientId()));
+                .and("tenantId").is(tenantId));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
-        Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findById_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         String id = exemption.getId();
         Query query = Query.query(Criteria.where("_id").is(id)
-                .and("clientId").is(user.getClientId()));
+                .and("tenantId").is(tenantId));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.findOne(query,Exemption.class)).thenReturn(Mono.empty());
-        Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
 
         // Then
+        Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
         StepVerifier.create(exemptionMono).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findAll_FindsTwoExemptions_ReturnsTwoExemptions() {
         // Given
@@ -191,63 +190,63 @@ public class ExemptionRepositoryTest {
             add(exemption);
             add(secondExemption);
         }};
-        Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.fromIterable(exemptions));
-        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
 
         // Then
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
         StepVerifier.create(exemptionFlux).expectNext(exemption, secondExemption).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findAll_NoExemptionReturned_EmptyFluxReturned() {
         // Given
         String id = exemption.getId();
-        Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.find(query,Exemption.class)).thenReturn(Flux.empty());
-        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
 
         // Then
+        Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
         StepVerifier.create(exemptionFlux).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void delete_DeletesExemption_ReturnsDeleteResult() {
         // Given
         String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("clientId").is(user.getClientId()));
+        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
 
         // Then
+        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void delete_ExemptionDoesNotExistInDB_ReturnsEmptyMono() {
         // Given
         String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("clientId").is(user.getClientId()));
+        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
         // When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.empty());
-        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
 
         // Then
+        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
         StepVerifier.create(deleteResultMono).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findById_NullIdPassed_ThrowsException() {
         // Given
@@ -262,7 +261,6 @@ public class ExemptionRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void delete_NullIdPassed_ThrowsException() {
         // Given
@@ -276,5 +274,4 @@ public class ExemptionRepositoryTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
-
 }
