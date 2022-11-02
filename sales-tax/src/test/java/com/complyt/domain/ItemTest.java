@@ -3,80 +3,37 @@ package com.complyt.domain;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.v1.model.AddressDto;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ItemTest {
 
     private Item item;
-    private Item anotherItem;
 
     @BeforeEach
     void setUp() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f,0.5f,0.5f,0.5f,0.5f,0.5f);
-        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        item = new Item(2000,4,8000,"description","name","taxCode",null, salesTaxRate,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-        anotherItem = item.withName("anotherName");
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
+                "California", "CA", true, true, CalculationType.FIXED,
+                "description", 0.07f, null);
+        item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
     }
 
     @Test
-    void equals_IdenticalCustomers_Equal() {
-        anotherItem = anotherItem.withName(item.getName());
-        assertEquals(item, anotherItem);
+    void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
+        // Given
+        Item itemWithManualRate = item.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
+        float expectedAmount = itemWithManualRate.getManualSalesTaxRate() * itemWithManualRate.getTotalPrice();
+
+        // When + Then
+        float actualAmount = itemWithManualRate.calculateSalesTaxAmount();
+        assertEquals(expectedAmount, actualAmount);
     }
 
-    @Test
-    void hashCode_IdenticalCustomers_Equal() {
-        anotherItem = anotherItem.withName(item.getName());
-        assertEquals(item.hashCode(), anotherItem.hashCode());
-    }
 
 
-    @Test
-    void testEquals() {
-    }
-
-    @Test
-    void canEqual() {
-    }
-
-    @Test
-    void testHashCode() {
-    }
-
-    @Test
-    void getUnitPrice() {
-    }
-
-    @Test
-    void getQuantity() {
-    }
-
-    @Test
-    void getTotalPrice() {
-    }
-
-    @Test
-    void getDescription() {
-    }
-
-    @Test
-    void getName() {
-    }
-
-    @Test
-    void getTaxCode() {
-    }
-
-    @Test
-    void testToString() {
-    }
 }
