@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 @ToString
+@With
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
