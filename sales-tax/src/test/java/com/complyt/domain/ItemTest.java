@@ -34,6 +34,20 @@ class ItemTest {
         assertEquals(expectedAmount, actualAmount);
     }
 
+    @Test
+    void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentage_ReturnsAmount() {
+        // Given
+        JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
+                .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
+
+        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage);
+        float expectedAmount = itemWithRuleByPercentage.getTotalPrice() *
+                itemWithRuleByPercentage.getJurisdictionalSalesTaxRules().getCalculationValue() * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+
+        // When + Then
+        float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
+        assertEquals(expectedAmount, actualAmount);
+    }
 
 
 }
