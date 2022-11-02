@@ -30,7 +30,7 @@ public class ShippingFeeTest {
         float expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getPrice();
 
         // When + Then
-        float actualAmount = shippingFee.calculateSalesTaxAmount();
+        float actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 
