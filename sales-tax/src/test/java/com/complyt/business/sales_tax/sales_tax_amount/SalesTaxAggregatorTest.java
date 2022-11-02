@@ -1,13 +1,11 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
-import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,21 +29,13 @@ public class SalesTaxAggregatorTest {
     SalesTaxAggregator salesTaxAggregator;
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    ShippingFee shippingFee;
-    List<Item> items;
+    Transaction transaction;
 
     @BeforeEach
     void setUp() {
         jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        shippingFee = createShippingFee();
-        items = createItems();
-        salesTaxAggregator = createSalesTaxAggregator();
-    }
-
-    private SalesTaxAggregator createSalesTaxAggregator() {
-        Transaction transaction = createTransaction();
-        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
-                .createSalesTaxAggregator(transaction);
+        salesTaxAggregator = new SalesTaxAggregator();
+        transaction = createTransaction();
     }
 
     private ShippingFee createShippingFee() {
@@ -83,15 +73,15 @@ public class SalesTaxAggregatorTest {
     @Test
     void aggregate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
         // Given
-        float expectedItemsSalesTaxAmount = items.stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
-        float expectedShippingFeeSalesTaxAmount = shippingFee.getSalesTaxRate().getTaxRate() * shippingFee.getPrice();
+        float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
+        float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRate().getTaxRate() * transaction.getShippingFee().getPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
+        List<ITaxAble> taxAbles = transaction.getTaxAbles();
 
         // When
-        float actualAmount = salesTaxAggregator.aggregate();
+        float actualAmount = salesTaxAggregator.aggregate(taxAbles);
 
         // Then
         assertEquals(expectedAmount, actualAmount);
     }
-
 }

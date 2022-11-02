@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -32,4 +33,16 @@ public class Transaction {
     private final TimeStamps externalTimeStamps;
     private final TransactionType transactionType;
     private final ShippingFee shippingFee;
+
+    public List<ITaxAble> getTaxAbles() {
+        List<ITaxAble> taxAbles = new ArrayList<>();
+
+        for (Item item : items)
+            taxAbles.add(item);
+        if (shippingFee != null)
+            taxAbles.add(shippingFee);
+
+        return taxAbles;
+    }
+
 }

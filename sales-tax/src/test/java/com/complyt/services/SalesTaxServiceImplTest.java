@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.business.sales_tax.checker.TaxableItemExistenceCheck;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
@@ -15,7 +14,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,8 +47,8 @@ public class SalesTaxServiceImplTest {
     @Mock
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
-    @Mock
-    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
+//    @Mock
+//    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
 
     @Mock
     ExemptionService exemptionService;
@@ -68,11 +66,11 @@ public class SalesTaxServiceImplTest {
         transaction = createTransaction();
     }
 
-    private SalesTaxAggregator createSalesTaxAggregator() {
-        Transaction transaction = createTransaction();
-        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
-                .createSalesTaxAggregator(transaction);
-    }
+//    private SalesTaxAggregator createSalesTaxAggregator() {
+//        Transaction transaction = createTransaction();
+//        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
+//                .createSalesTaxAggregator(transaction);
+//    }
 
 
     private Transaction createTransaction() {
@@ -110,10 +108,8 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_StateDoesntEnforceNexus_ReturnsSameTransaction() {
         // Given
-        State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = createSalesTaxTracking()
                 .withEnforcesSalesTax(false);
-
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
@@ -147,6 +143,7 @@ public class SalesTaxServiceImplTest {
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
+        List<ITaxAble> taxAbles = transactionWithSalesTax.getTaxAbles();
         SalesTaxTracking tracking = createSalesTaxTracking();
 
         // When
@@ -155,8 +152,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
-        when(salesTaxAggregatorFactory.createSalesTaxAggregator(transaction.withItems(itemsWithRates))).thenReturn(salesTaxAggregator);
-        when(salesTaxAggregator.aggregate()).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -180,6 +176,7 @@ public class SalesTaxServiceImplTest {
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         SalesTaxTracking tracking = createSalesTaxTracking();
+        List<ITaxAble> taxAbles = transactionWithSalesTax.getTaxAbles();
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
@@ -187,8 +184,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
-        when(salesTaxAggregatorFactory.createSalesTaxAggregator(transaction.withItems(itemsWithRates))).thenReturn(salesTaxAggregator);
-        when(salesTaxAggregator.aggregate()).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -227,7 +223,6 @@ public class SalesTaxServiceImplTest {
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.calculate(nullTransaction));
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
-
     }
 
     @Test

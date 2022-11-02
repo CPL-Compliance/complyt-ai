@@ -2,6 +2,7 @@ package com.complyt.services;
 
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
+import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Transaction;
@@ -9,7 +10,6 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.utils.factory.SalesTaxAggregatorFactory;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private ExemptionService exemptionService;
 
     @NonNull
-    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
+    private SalesTaxAggregator salesTaxAggregator;
 
     @NonNull
     private SalesTaxRatesHandler salesTaxRatesHandler;
@@ -59,11 +59,13 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
         return salesTaxData -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
-            Transaction transactionWithItemsWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
-            float salesTaxAmount = salesTaxAggregatorFactory.createSalesTaxAggregator(transactionWithItemsWithRates).aggregate();
+
+            Transaction transactionWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
+
+            float salesTaxAmount = salesTaxAggregator.aggregate(transactionWithRates.getTaxAbles());
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
-            return transactionWithItemsWithRates.withSalesTax(salesTax);
+            return transactionWithRates.withSalesTax(salesTax);
         };
     }
 

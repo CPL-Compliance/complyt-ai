@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @With
 @AllArgsConstructor
-public class Item {
+public class Item implements ITaxAble {
     private float unitPrice;
     private int quantity;
     private float totalPrice;
@@ -24,8 +24,26 @@ public class Item {
     private float manualSalesTaxRate;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
-    
-    public float getManualSalesTaxAmount(){
+
+    public float getManualSalesTaxAmount() {
         return manualSalesTaxRate * totalPrice;
+    }
+
+    @Override
+    public float calculateSalesTaxAmount() {
+        if (isManualSalesTax()) {
+            return getManualSalesTaxAmount();
+        }
+        float totalPrice = calculateTotalPrice();
+
+        return salesTaxRate.getTaxRate() * totalPrice;
+    }
+
+    private float calculateTotalPrice() {
+        if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
+            return getTotalPrice() * jurisdictionalSalesTaxRules.getCalculationValue();
+        }
+
+        return totalPrice;
     }
 }

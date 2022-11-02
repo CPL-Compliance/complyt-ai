@@ -6,13 +6,11 @@ import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-@Component
 public class ItemAmountExtractor implements IAmountExtractor {
 
     @NonNull
