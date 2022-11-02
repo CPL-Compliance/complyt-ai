@@ -40,7 +40,7 @@ public class ShippingFee implements Taxable {
 
     private float handleSalesTaxAmountCalculationForShippingFee() {
         if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
-            return this.getPrice() * jurisdictionalSalesTaxRules.getCalculationValue();
+            return price * jurisdictionalSalesTaxRules.getCalculationValue() * salesTaxRate.getTaxRate();
         }
 
         float amount = salesTaxRate.getTaxRate() * price;
