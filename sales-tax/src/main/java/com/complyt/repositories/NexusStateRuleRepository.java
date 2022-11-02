@@ -20,7 +20,7 @@ public class NexusStateRuleRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return reactiveMongoTemplate.findById(id, NexusStateRule.class);
+        return reactiveMongoTemplate.findById(id, NexusStateRule.class).log();
     }
 
     public Mono<NexusStateRule> findByState(@NonNull String state) {

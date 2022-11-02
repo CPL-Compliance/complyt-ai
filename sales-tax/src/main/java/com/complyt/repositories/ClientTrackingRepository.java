@@ -28,8 +28,8 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    log.debug("Searching for a Client with id of : " + tenantId);
-                    return reactiveMongoTemplate.findOne(query, ClientTracking.class);
+                    log.debug("Searching for a Client with tenant ID of : " + tenantId);
+                    return reactiveMongoTemplate.findOne(query, ClientTracking.class).log();
                 });
     }
 

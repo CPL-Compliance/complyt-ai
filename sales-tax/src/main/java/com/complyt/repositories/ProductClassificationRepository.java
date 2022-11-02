@@ -23,7 +23,7 @@ public class ProductClassificationRepository {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
         log.debug("Searching for product classification for tax code : " + taxCode);
 
-        return reactiveMongoTemplate.findOne(query, ProductClassification.class);
+        return reactiveMongoTemplate.findOne(query, ProductClassification.class).log();
     }
 
     public Flux<ProductClassification> findAll() {

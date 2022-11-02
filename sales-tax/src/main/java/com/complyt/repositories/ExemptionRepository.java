@@ -70,7 +70,7 @@ public class ExemptionRepository {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
                     log.debug("Deleting exemption with id : " + id);
 
-                    return reactiveMongoTemplate.remove(query, Exemption.class);
+                    return reactiveMongoTemplate.remove(query, Exemption.class).log();
                 });
     }
 }

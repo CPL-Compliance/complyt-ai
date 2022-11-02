@@ -23,17 +23,17 @@ public class StateRepository {
     }
 
     public Mono<State> save(@NonNull State state) {
-        return reactiveMongoTemplate.save(state);
+        return reactiveMongoTemplate.save(state).log();
     }
 
     public Mono<State> findById(String id) {
-        return reactiveMongoTemplate.findById(id, State.class);
+        return reactiveMongoTemplate.findById(id, State.class).log();
     }
 
     public Flux<State> findByName(String name) {
         Query query = Query.query(Criteria.where("name").regex("^" + name, "i"));
 
-        return reactiveMongoTemplate.find(query, State.class);
+        return reactiveMongoTemplate.find(query, State.class).log();
     }
 
     public Flux<State> findAll() {

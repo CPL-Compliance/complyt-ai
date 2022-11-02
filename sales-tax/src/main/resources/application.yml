@@ -56,13 +56,13 @@ spring.security:
 logging:
   level:
     root: INFO
-    web: DEBUG
+    web: INFO
     org:
       springframework:
-        security: TRACE
+        security: INFO
     reactor:
       netty:
-        http: DEBUG
+        http: INFO
 
 management:
   endpoints:

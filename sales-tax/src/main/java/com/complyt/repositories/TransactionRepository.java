@@ -38,7 +38,7 @@ public class TransactionRepository {
                 .map(tenantId -> transactions.stream().map(transaction -> transaction.withTenantId(tenantId)).collect(Collectors.toList()))
                 .flatMapMany(transactionsWithClientId -> reactiveMongoTemplate.insertAll(transactionsWithClientId)
                         .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
-                                .map(transaction::withCustomer))).log();
+                                .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction)))).log();
     }
 
     public Mono<Transaction> findById(@NonNull String transactionId) {
@@ -47,13 +47,13 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("_id").is(transactionId)
                             .and("tenantId").is(tenantId));
 
-                    log.debug("Searching for an transaction with id of : " + transactionId);
+                    log.debug("Searching for transaction with id of : " + transactionId);
 
                     return reactiveMongoTemplate
                             .findOne(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate
                                     .findById(transaction.getCustomerId(), Customer.class)
-                                    .map(transaction::withCustomer));
+                                    .map(transaction::withCustomer)).log();
                 });
     }
 
@@ -68,7 +68,7 @@ public class TransactionRepository {
                             .findOne(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate
                                     .findById(transaction.getCustomerId(), Customer.class)
-                                    .map(transaction::withCustomer)).log();
+                                    .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
                 });
     }
 
@@ -76,22 +76,22 @@ public class TransactionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-                    log.debug("Executing find client's related transactions");
+                    log.debug("Executing find tenant's related transactions");
                     return reactiveMongoTemplate.find(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
-                                    .map(transaction::withCustomer));
+                                    .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
                 });
     }
 
     public Flux<Transaction> findAllByQuery(Query query) {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
-                    log.debug("Executing find client's related transactions by query : " + query);
+                    log.debug("Executing find tenant's related transactions by query : " + query);
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
 
-                    return reactiveMongoTemplate.find(updatedQuery, Transaction.class).log()
-                            .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class).log()
-                                    .map(transaction::withCustomer));
+                    return reactiveMongoTemplate.find(updatedQuery, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
+                                    .map(transaction::withCustomer)).log();
                 });
     }
 }

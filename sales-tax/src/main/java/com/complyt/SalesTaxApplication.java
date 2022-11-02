@@ -14,10 +14,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         }
 )
 @SpringBootApplication
-public class ComplytApplication implements CommandLineRunner {
+public class SalesTaxApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(ComplytApplication.class, args);
+        SpringApplication.run(SalesTaxApplication.class, args);
     }
 
     @Override

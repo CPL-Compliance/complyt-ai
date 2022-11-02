@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
@@ -11,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 public class SalesTaxTrackingRepositoryTest {
 
     @InjectMocks
@@ -77,15 +74,14 @@ public class SalesTaxTrackingRepositoryTest {
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findByState_NullState_ThrowsException() {
         // Given
         String nullStateAbbreviation = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingRepository.findByState(nullStateAbbreviation);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByState(nullStateAbbreviation));
 
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
@@ -105,15 +101,14 @@ public class SalesTaxTrackingRepositoryTest {
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void save_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingRepository.save(nullSalesTaxTracking);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.save(nullSalesTaxTracking));
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }

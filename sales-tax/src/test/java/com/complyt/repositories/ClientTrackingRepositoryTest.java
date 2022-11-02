@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.security.TenantResolver;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,7 +27,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 public class ClientTrackingRepositoryTest {
 
     @InjectMocks
@@ -85,15 +82,14 @@ public class ClientTrackingRepositoryTest {
         StepVerifier.create(actualClientTracking).expectNext(clientTracking).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void save_NullClientTrackingPassed_ThrowsException() {
         // Given
         ClientTracking nullClientTrackingNoId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingRepository.save(nullClientTrackingNoId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.save(nullClientTrackingNoId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -119,7 +115,9 @@ public class ClientTrackingRepositoryTest {
     @Test
     void findAll_FindsTwoClient_ReturnsTwoClients() {
         // Given
-        List<ClientTracking> clientTrackingList = new ArrayList<ClientTracking>(){{add(clientTracking);}};
+        List<ClientTracking> clientTrackingList = new ArrayList<>() {{
+            add(clientTracking);
+        }};
         Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
         // When
