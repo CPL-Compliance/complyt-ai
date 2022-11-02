@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 class CustomerRepositoryTest {
     @InjectMocks
     CustomerRepository customerRepository;
@@ -190,6 +187,7 @@ class CustomerRepositoryTest {
         StepVerifier.create(monoSavedCustomer).expectNext(dbCustomer).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void saveCustomer_Null_ThrowsNullPointerException() {
         // Given
@@ -198,13 +196,12 @@ class CustomerRepositoryTest {
         // When
 
         // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.save(customer);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerRepository.save(customer));
 
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findByName_NullGiven_ThrowsNullPointerException() {
         // Given
@@ -213,13 +210,12 @@ class CustomerRepositoryTest {
         // When
 
         // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.findByName(name);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerRepository.findByName(name));
 
         assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findOneByName_NullGiven_ThrowsNullPointerException() {
         // Given
@@ -228,9 +224,7 @@ class CustomerRepositoryTest {
         // When
 
         // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerRepository.findOneByName(name);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerRepository.findOneByName(name));
 
         assertEquals(nullPointerException.getMessage(), "name is marked non-null but is null");
     }

@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -15,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -35,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 public class ExemptionRepositoryTest {
 
     @InjectMocks
@@ -186,7 +183,7 @@ public class ExemptionRepositoryTest {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
                 .withState(new State("NY", "05", "New York"));
-        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+        List<Exemption> exemptions = new ArrayList<>() {{
             add(exemption);
             add(secondExemption);
         }};
@@ -204,7 +201,6 @@ public class ExemptionRepositoryTest {
     @Test
     void findAll_NoExemptionReturned_EmptyFluxReturned() {
         // Given
-        String id = exemption.getId();
         Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
         // When
@@ -247,29 +243,27 @@ public class ExemptionRepositoryTest {
         StepVerifier.create(deleteResultMono).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findById_NullIdPassed_ThrowsException() {
         // Given
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRepository.findById(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findById(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void delete_NullIdPassed_ThrowsException() {
         // Given
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRepository.delete(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.delete(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
