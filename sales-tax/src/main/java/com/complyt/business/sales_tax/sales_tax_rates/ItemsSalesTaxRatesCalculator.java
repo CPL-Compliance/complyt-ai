@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ItemsSalesTaxRatesCalculator  {
+public class ItemsSalesTaxRatesCalculator {
 
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;
