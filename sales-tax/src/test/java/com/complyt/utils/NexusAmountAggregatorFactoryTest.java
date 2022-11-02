@@ -1,7 +1,6 @@
 package com.complyt.utils;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.business.nexus.data_extractor.IAmountExtractor;
 import com.complyt.business.nexus.data_extractor.ItemAmountExtractor;
 import com.complyt.business.nexus.data_extractor.NexusTransactionAmountAggregator;
@@ -41,10 +40,7 @@ public class NexusAmountAggregatorFactoryTest {
     NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Mock
-    ItemQualificationCheck itemQualificationCheck;
-
-    @Mock
-    ShippingFeeQualificationCheck shippingFeeQualificationCheck;
+    QualificationCheck qualificationCheck;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -109,14 +105,14 @@ public class NexusAmountAggregatorFactoryTest {
     void createNexusTransactionAmountAggregator_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsAggregator() {
         // Given
         List<IAmountExtractor> extractors = new ArrayList<>() {{
-            add(new ItemAmountExtractor(itemQualificationCheck,transaction.getItems(),nexusStateRule));
-            add(new ShippingFeeAmountExtractor(shippingFeeQualificationCheck,transaction.getShippingFee(),nexusStateRule));
+            add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
+            add(new ShippingFeeAmountExtractor(qualificationCheck, transaction.getShippingFee(), nexusStateRule));
         }};
         NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(extractors);
 
         // When
-        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(itemQualificationCheck,shippingFeeQualificationCheck)
-                .createNexusTransactionAmountAggregator(transaction,nexusStateRule);
+        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(qualificationCheck)
+                .createNexusTransactionAmountAggregator(transaction, nexusStateRule);
 
         // Then
         assertEquals(expectedAggregator, actualAggregator);
@@ -126,14 +122,14 @@ public class NexusAmountAggregatorFactoryTest {
     void createNexusTransactionAmountAggregator_ShippingFeeIsNull_DoesNotInitializeShippingFeeTaxExtractor() {
         // Given
         List<IAmountExtractor> onlyItemExtractorList = new ArrayList<>() {{
-            add(new ItemAmountExtractor(itemQualificationCheck,transaction.getItems(),nexusStateRule));
+            add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
         }};
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
         NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(onlyItemExtractorList);
 
         // When
-        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(itemQualificationCheck,shippingFeeQualificationCheck)
-                .createNexusTransactionAmountAggregator(transactionWithNullShippingFee,nexusStateRule);
+        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(qualificationCheck)
+                .createNexusTransactionAmountAggregator(transactionWithNullShippingFee, nexusStateRule);
 
         // Then
         assertEquals(expectedAggregator, actualAggregator);
@@ -146,7 +142,7 @@ public class NexusAmountAggregatorFactoryTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(nullTransaction,nexusStateRule);
+            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(nullTransaction, nexusStateRule);
         });
 
         // Then
@@ -160,7 +156,7 @@ public class NexusAmountAggregatorFactoryTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transaction,nullNexusStateRule);
+            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transaction, nullNexusStateRule);
         });
 
         // Then

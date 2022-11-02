@@ -25,4 +25,3 @@ public class SalesTaxAggregator {
         return amount.get();
     }
 }
-

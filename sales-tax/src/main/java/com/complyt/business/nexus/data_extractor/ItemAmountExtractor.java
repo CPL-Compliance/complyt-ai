@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ItemAmountExtractor implements IAmountExtractor {
 
     @NonNull
-    private ItemQualificationCheck itemQualificationCheck;
+    private QualificationCheck qualificationCheck;
 
     @NonNull
     private List<Item> items;
@@ -25,7 +25,7 @@ public class ItemAmountExtractor implements IAmountExtractor {
     public float extract() {
         float amount = 0;
         for (Item item : items) {
-            if (itemQualificationCheck.isQualified(item, nexusStateRule)) {
+            if (qualificationCheck.isQualified(item, nexusStateRule)) {
                 amount += item.getTotalPrice();
             }
         }

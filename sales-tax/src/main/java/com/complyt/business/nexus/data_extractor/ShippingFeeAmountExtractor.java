@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.NonNull;
 public class ShippingFeeAmountExtractor implements IAmountExtractor {
 
     @NonNull
-    private ShippingFeeQualificationCheck shippingFeeQualificationCheck;
+    private QualificationCheck qualificationCheck;
 
     @NonNull
     private ShippingFee shippingFee;
@@ -21,7 +21,7 @@ public class ShippingFeeAmountExtractor implements IAmountExtractor {
     private NexusStateRule nexusStateRule;
 
     public float extract() {
-        if (shippingFeeQualificationCheck.isQualified(shippingFee, nexusStateRule)) {
+        if (qualificationCheck.isQualified(shippingFee, nexusStateRule)) {
             return shippingFee.getPrice();
         }
 

@@ -20,13 +20,13 @@ import java.util.UUID;
 
 public class ItemQualificationCheckTest {
 
-    ItemQualificationCheck itemQualificationCheck;
+    QualificationCheck qualificationCheck;
     Item item;
     NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
-        itemQualificationCheck = new ItemQualificationCheck();
+        qualificationCheck = new QualificationCheck();
         item = createItem();
         nexusStateRule = createNexusStateRule();
 
@@ -40,15 +40,15 @@ public class ItemQualificationCheckTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -63,7 +63,7 @@ public class ItemQualificationCheckTest {
         // Given
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(item, nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(item, nexusStateRule);
 
         // Then
         assertTrue(isQualified);
@@ -75,7 +75,7 @@ public class ItemQualificationCheckTest {
         Item notTaxableItem = item.withTaxableCategory(TaxableCategory.NOT_TAXABLE);
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(notTaxableItem, nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(notTaxableItem, nexusStateRule);
 
         // Then
         assertFalse(isQualified);
@@ -87,23 +87,10 @@ public class ItemQualificationCheckTest {
         Item inTangibleItem = item.withTangibleCategory(TangibleCategory.INTANGIBLE);
 
         // When
-        boolean isQualified = itemQualificationCheck.isQualified(inTangibleItem, nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(inTangibleItem, nexusStateRule);
 
         // Then
         assertFalse(isQualified);
-    }
-
-    @Test
-    void isQualified_NullItemPassed_ThrowsException() {
-        // Given
-        Item nullItem = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemQualificationCheck.isQualified(nullItem, nexusStateRule);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "item is marked non-null but is null");
     }
 
     @Test
@@ -113,7 +100,7 @@ public class ItemQualificationCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemQualificationCheck.isQualified(item, nullNexusStateRule);
+            qualificationCheck.isQualified(item, nullNexusStateRule);
         });
 
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");

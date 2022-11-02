@@ -1,7 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.*;
@@ -44,10 +43,7 @@ public class NexusCalculatorTest {
     NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Mock
-    ItemQualificationCheck itemQualificationCheck;
-
-    @Mock
-    ShippingFeeQualificationCheck shippingFeeQualificationCheck;
+    QualificationCheck qualificationCheck;
 
     @Mock
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
@@ -108,8 +104,8 @@ public class NexusCalculatorTest {
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        NexusTransactionAmountAggregator agg1 = new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeQualificationCheck).createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule);
-        NexusTransactionAmountAggregator agg2 = new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeQualificationCheck).createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule);
+        NexusTransactionAmountAggregator agg1 = new NexusAmountAggregatorFactory(qualificationCheck).createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule);
+        NexusTransactionAmountAggregator agg2 = new NexusAmountAggregatorFactory(qualificationCheck).createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule);
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
@@ -117,8 +113,8 @@ public class NexusCalculatorTest {
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
         when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule)).thenReturn(agg1);
         when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule)).thenReturn(agg2);
-        when(itemQualificationCheck.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(itemQualificationCheck.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
 
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 

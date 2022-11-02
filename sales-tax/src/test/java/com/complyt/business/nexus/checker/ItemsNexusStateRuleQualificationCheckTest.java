@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.domain.Item;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -33,7 +33,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     ItemsNexusStateRuleQualificationCheck itemsNexusStateRuleQualificationCheck;
 
     @Mock
-    ItemQualificationCheck itemQualificationCheck;
+    QualificationCheck qualificationCheck;
 
     private List<Item> items;
     private NexusStateRule nexusStateRule;
@@ -81,7 +81,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         Item itemThatCounts = items.get(0).withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         items.add(itemThatCounts);
 
-        when(itemQualificationCheck.isQualified(items.get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(items.get(0), nexusStateRule)).thenReturn(true);
 
         Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair(items, nexusStateRule);
 

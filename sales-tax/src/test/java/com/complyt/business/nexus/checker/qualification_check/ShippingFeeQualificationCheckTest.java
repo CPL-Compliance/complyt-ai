@@ -21,13 +21,13 @@ import java.util.UUID;
 
 public class ShippingFeeQualificationCheckTest {
 
-    ShippingFeeQualificationCheck shippingFeeQualificationCheck;
+    QualificationCheck qualificationCheck;
     NexusStateRule nexusStateRule;
     ShippingFee shippingFee;
 
     @BeforeEach
     void setUp() {
-        shippingFeeQualificationCheck = new ShippingFeeQualificationCheck();
+        qualificationCheck = new QualificationCheck();
         nexusStateRule = createNexusStateRule();
         shippingFee = createShippingFee();
     }
@@ -68,7 +68,7 @@ public class ShippingFeeQualificationCheckTest {
         // Given
 
         // When + Then
-        boolean isQualified = shippingFeeQualificationCheck.isQualified(shippingFee,nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(shippingFee,nexusStateRule);
         assertTrue(isQualified);
     }
 
@@ -79,7 +79,7 @@ public class ShippingFeeQualificationCheckTest {
         ShippingFee notTaxableShippingFee = shippingFee.withTaxableCategory(TaxableCategory.NOT_TAXABLE);
 
         // When + Then
-        boolean isQualified = shippingFeeQualificationCheck.isQualified(notTaxableShippingFee,nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(notTaxableShippingFee,nexusStateRule);
         assertFalse(isQualified);
     }
 
@@ -89,7 +89,7 @@ public class ShippingFeeQualificationCheckTest {
         ShippingFee notTangibleShippingFee = shippingFee.withTangibleCategory(TangibleCategory.INTANGIBLE);
 
         // When + Then
-        boolean isQualified = shippingFeeQualificationCheck.isQualified(notTangibleShippingFee,nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(notTangibleShippingFee,nexusStateRule);
         assertFalse(isQualified);
     }
 
@@ -99,7 +99,7 @@ public class ShippingFeeQualificationCheckTest {
         ShippingFee nullShippingFee = null;
 
         // When + Then
-        boolean isQualified = shippingFeeQualificationCheck.isQualified(nullShippingFee,nexusStateRule);
+        boolean isQualified = qualificationCheck.isQualified(nullShippingFee,nexusStateRule);
         assertFalse(isQualified);
     }
 
@@ -110,12 +110,11 @@ public class ShippingFeeQualificationCheckTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            shippingFeeQualificationCheck.isQualified(shippingFee, nullStateRule);
+            qualificationCheck.isQualified(shippingFee, nullStateRule);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
-
 
 }

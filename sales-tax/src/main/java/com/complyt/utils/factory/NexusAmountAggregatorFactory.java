@@ -1,7 +1,6 @@
 package com.complyt.utils.factory;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.business.nexus.data_extractor.IAmountExtractor;
 import com.complyt.business.nexus.data_extractor.ItemAmountExtractor;
 import com.complyt.business.nexus.data_extractor.NexusTransactionAmountAggregator;
@@ -22,18 +21,16 @@ import java.util.List;
 public class NexusAmountAggregatorFactory {
 
     @NonNull
-    private ItemQualificationCheck itemQualificationCheck;
+    private QualificationCheck qualificationCheck;
 
-    @NonNull
-    private ShippingFeeQualificationCheck shippingFeeQualificationCheck;
 
     public NexusTransactionAmountAggregator createNexusTransactionAmountAggregator(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
         List<IAmountExtractor> amountExtractors = new ArrayList<>();
 
-        amountExtractors.add(new ItemAmountExtractor(itemQualificationCheck, transaction.getItems(), nexusStateRule));
+        amountExtractors.add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
 
         if (transaction.getShippingFee() != null) {
-            amountExtractors.add(new ShippingFeeAmountExtractor(shippingFeeQualificationCheck, transaction.getShippingFee(), nexusStateRule));
+            amountExtractors.add(new ShippingFeeAmountExtractor(qualificationCheck, transaction.getShippingFee(), nexusStateRule));
         }
         
         return new NexusTransactionAmountAggregator(amountExtractors);

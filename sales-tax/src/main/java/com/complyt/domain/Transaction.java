@@ -35,10 +35,7 @@ public class Transaction {
     private final ShippingFee shippingFee;
 
     public List<ITaxAble> getTaxAbles() {
-        List<ITaxAble> taxAbles = new ArrayList<>();
-
-        for (Item item : items)
-            taxAbles.add(item);
+        List<ITaxAble> taxAbles = new ArrayList<>(items);
         if (shippingFee != null)
             taxAbles.add(shippingFee);
 

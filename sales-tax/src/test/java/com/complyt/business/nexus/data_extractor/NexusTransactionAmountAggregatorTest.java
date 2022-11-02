@@ -1,7 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.ItemQualificationCheck;
-import com.complyt.business.nexus.checker.qualification_check.ShippingFeeQualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -40,10 +39,7 @@ public class NexusTransactionAmountAggregatorTest {
     NexusTransactionAmountAggregator nexusTransactionAmountAggregator;
 
     @Mock
-    ItemQualificationCheck itemQualificationCheck;
-
-    @Mock
-    ShippingFeeQualificationCheck shippingFeeNexusStateRuleQualificationCheck;
+    QualificationCheck qualificationCheck;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -59,7 +55,7 @@ public class NexusTransactionAmountAggregatorTest {
     }
 
     private NexusTransactionAmountAggregator createNexusTransactionAmountAggregator() {
-        return new NexusAmountAggregatorFactory(itemQualificationCheck, shippingFeeNexusStateRuleQualificationCheck)
+        return new NexusAmountAggregatorFactory(qualificationCheck)
                 .createNexusTransactionAmountAggregator(transaction, nexusStateRule);
     }
 
@@ -131,8 +127,8 @@ public class NexusTransactionAmountAggregatorTest {
         Transaction transactionWithNoShippingFee = transaction.withShippingFee(nullShippingFee);
 
         // When
-        when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(itemQualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(qualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
         float expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
         float amount = nexusTransactionAmountAggregator.aggregate();
 
@@ -145,9 +141,9 @@ public class NexusTransactionAmountAggregatorTest {
         // Given
 
         // When
-        when(itemQualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(itemQualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
-        when(shippingFeeNexusStateRuleQualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
+        when(qualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
         float amount = nexusTransactionAmountAggregator.aggregate();
         float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getPrice();
 
