@@ -47,9 +47,6 @@ public class SalesTaxServiceImplTest {
     @Mock
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
-//    @Mock
-//    private SalesTaxAggregatorFactory salesTaxAggregatorFactory;
-
     @Mock
     ExemptionService exemptionService;
 
@@ -65,13 +62,6 @@ public class SalesTaxServiceImplTest {
     void setUp() {
         transaction = createTransaction();
     }
-
-//    private SalesTaxAggregator createSalesTaxAggregator() {
-//        Transaction transaction = createTransaction();
-//        return new SalesTaxAggregatorFactory(new TaxableItemExistenceCheck())
-//                .createSalesTaxAggregator(transaction);
-//    }
-
 
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
@@ -121,7 +111,6 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
-        State state = new State("CA", "02", "California");
         SalesTaxTracking tracking = createSalesTaxTracking()
                 .withAppliedDate(transaction.getExternalTimeStamps().getCreatedDate().plusYears(1));
 

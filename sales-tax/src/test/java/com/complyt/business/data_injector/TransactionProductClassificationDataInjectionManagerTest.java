@@ -11,6 +11,7 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,12 +26,16 @@ import java.util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProductClassificationDataInjectorTest {
+public class TransactionProductClassificationDataInjectionManagerTest {
 
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
+        transaction = createTransaction();
+    }
+
+    private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -45,7 +50,7 @@ public class ProductClassificationDataInjectorTest {
             }
         };
 
-        transaction = Transaction.builder()
+        return Transaction.builder()
                 .id(id)
                 .externalId(externalId)
                 .items(items)
@@ -104,7 +109,7 @@ public class ProductClassificationDataInjectorTest {
         Map<String, ProductClassification> productClassifications = createClassificationsMap(firstRule, secondRule);
 
         List<Item> itemsWithRules = createItemsWithRules(itemsNoRules, firstRule, secondRule);
-        
+
         Transaction transactionWithItemsWithRules = transaction.withItems(itemsNoRules);
         TransactionProductClassificationDataInjectionManager transactionProductClassificationInjector = new TransactionProductClassificationDataInjectionManager(transactionWithItemsWithRules);
 
@@ -113,5 +118,22 @@ public class ProductClassificationDataInjectorTest {
         Mono<Transaction> transactionMono = transactionProductClassificationInjector.inject(productClassifications);
 
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
+    }
+
+    @Test
+    void shouldInject_DefaultMethodGetExecuted_ReturnsTrue() {
+        TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
+
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+                CalculationType.FIXED, "rule1", 0, null);
+        JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
+                CalculationType.FIXED, "rule2", 0, null);
+        Map<String, ProductClassification> mapTaxCodesToClassifications = createClassificationsMap(firstRule, secondRule);
+        
+        boolean shouldInject = injector.shouldInject(mapTaxCodesToClassifications);
+
+        Assertions.assertTrue(shouldInject);
+
+
     }
 }
