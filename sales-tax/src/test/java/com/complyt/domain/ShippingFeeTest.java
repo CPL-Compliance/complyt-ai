@@ -16,7 +16,7 @@ public class ShippingFeeTest {
 
     @BeforeEach
     void setUp() {
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         JurisdictionalSalesTaxRules rules = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", 0.07f, null);
