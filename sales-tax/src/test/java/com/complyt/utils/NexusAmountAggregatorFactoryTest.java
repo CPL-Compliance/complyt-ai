@@ -1,7 +1,7 @@
 package com.complyt.utils;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
-import com.complyt.business.nexus.data_extractor.IAmountExtractor;
+import com.complyt.business.nexus.data_extractor.AmountExtractor;
 import com.complyt.business.nexus.data_extractor.ItemAmountExtractor;
 import com.complyt.business.nexus.data_extractor.NexusTransactionAmountAggregator;
 import com.complyt.business.nexus.data_extractor.ShippingFeeAmountExtractor;
@@ -104,7 +104,7 @@ public class NexusAmountAggregatorFactoryTest {
     @Test
     void createNexusTransactionAmountAggregator_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsAggregator() {
         // Given
-        List<IAmountExtractor> extractors = new ArrayList<>() {{
+        List<AmountExtractor> extractors = new ArrayList<>() {{
             add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
             add(new ShippingFeeAmountExtractor(qualificationCheck, transaction.getShippingFee(), nexusStateRule));
         }};
@@ -121,7 +121,7 @@ public class NexusAmountAggregatorFactoryTest {
     @Test
     void createNexusTransactionAmountAggregator_ShippingFeeIsNull_DoesNotInitializeShippingFeeTaxExtractor() {
         // Given
-        List<IAmountExtractor> onlyItemExtractorList = new ArrayList<>() {{
+        List<AmountExtractor> onlyItemExtractorList = new ArrayList<>() {{
             add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
         }};
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);

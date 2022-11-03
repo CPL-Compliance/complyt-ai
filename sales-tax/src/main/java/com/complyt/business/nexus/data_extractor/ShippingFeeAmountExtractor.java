@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-public class ShippingFeeAmountExtractor implements IAmountExtractor {
+public class ShippingFeeAmountExtractor implements AmountExtractor {
 
     @NonNull
     private QualificationCheck qualificationCheck;

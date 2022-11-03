@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SalesTaxRatesCalculatorTest {
 
-    private SalesTaxRatesProvider salesTaxRateCalculator;
+    private SalesTaxRatesProvider salesTaxRatesProvider;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
@@ -28,7 +28,7 @@ public class SalesTaxRatesCalculatorTest {
     @BeforeEach
     void set_up(){
         salesTaxRateByService = new SalesTaxRate(0.05f,0.05f,0.05f,0.05f,0.05f,0.25f);
-        salesTaxRateCalculator = new SalesTaxRatesProvider();
+        salesTaxRatesProvider = new SalesTaxRatesProvider();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
                 "California","CA", true,true, CalculationType.FIXED,
                 "description",0.07f,null);
@@ -41,7 +41,7 @@ public class SalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
-        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(notTaxableRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(notTaxableRule, salesTaxRateByService);
         Assertions.assertEquals(returnedRate, zeroSalesTaxRate);
     }
 
@@ -51,7 +51,7 @@ public class SalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules noSpecialTreatmentRule = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
 
         // When + Then
-        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(noSpecialTreatmentRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(noSpecialTreatmentRule, salesTaxRateByService);
         Assertions.assertEquals(returnedRate, salesTaxRateByService);
     }
 
@@ -63,7 +63,7 @@ public class SalesTaxRatesCalculatorTest {
         SalesTaxRate expectedSalesTaxRate = salesTaxRateByService.withTaxRate(newTaxRate).withStateRate(newStateRate);
 
         // When + Then
-        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRateByService);
         Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
     }
 
@@ -73,7 +73,7 @@ public class SalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
 
         // When + Then
-        SalesTaxRate returnedRate = salesTaxRateCalculator.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
+        SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
         Assertions.assertEquals(salesTaxRateByService, returnedRate);
     }
 
@@ -84,7 +84,7 @@ public class SalesTaxRatesCalculatorTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRateCalculator.calculateSalesTaxRate(nullJurisdictionalSalesTaxRules, salesTaxRateByService);
+            salesTaxRatesProvider.calculateSalesTaxRate(nullJurisdictionalSalesTaxRules, salesTaxRateByService);
         });
 
         assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
@@ -97,7 +97,7 @@ public class SalesTaxRatesCalculatorTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, nullSalesTaxRate);
+            salesTaxRatesProvider.calculateSalesTaxRate(jurisdictionalSalesTaxRules, nullSalesTaxRate);
         });
 
         assertEquals(nullPointerException.getMessage(), "originalSalesTaxRate is marked non-null but is null");

@@ -11,7 +11,7 @@ import java.util.List;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-public class ItemAmountExtractor implements IAmountExtractor {
+public class ItemAmountExtractor implements AmountExtractor {
 
     @NonNull
     private QualificationCheck qualificationCheck;

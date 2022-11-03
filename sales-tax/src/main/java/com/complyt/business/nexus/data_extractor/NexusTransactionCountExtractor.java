@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class NexusTransactionCountExtractor implements INexusDataExtractor<Integer, Transaction> {
+public class NexusTransactionCountExtractor implements NexusDataExtractor<Integer, Transaction> {
 
     @NonNull
     private ItemsNexusStateRuleQualificationCheck itemsNexusStateRuleQualificationCheck;

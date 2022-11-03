@@ -16,10 +16,10 @@ import java.util.Optional;
 public class NexusTransactionAmountAggregator {
 
     @NonNull
-    private List<IAmountExtractor> amountExtractors;
+    private List<AmountExtractor> amountExtractors;
 
     public float aggregate() {
-        Optional<Float> amount = amountExtractors.stream().map(IAmountExtractor::extract).reduce(Float::sum);
+        Optional<Float> amount = amountExtractors.stream().map(AmountExtractor::extract).reduce(Float::sum);
 
         return amount.get();
     }

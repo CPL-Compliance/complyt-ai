@@ -1,5 +1,5 @@
 package com.complyt.business.nexus.data_extractor;
 
-public interface IAmountExtractor {
+public interface AmountExtractor {
     float extract();
 }
