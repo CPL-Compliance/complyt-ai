@@ -1,6 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
 import com.complyt.domain.*;
+import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -83,5 +85,19 @@ public class SalesTaxAggregatorTest {
 
         // Then
         assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void createTaxableCollectionAmountExtractor_NullNexusStateRulePassed_ThrowsException() {
+        // Given
+        List<Taxable> nullTaxAbles = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxAggregator.aggregate(nullTaxAbles);
+        });
+
+        // Then
+        assertEquals("taxAbles is marked non-null but is null", nullPointerException.getMessage());
     }
 }
