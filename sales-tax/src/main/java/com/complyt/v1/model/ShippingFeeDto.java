@@ -16,7 +16,7 @@ import lombok.ToString;
 public class ShippingFeeDto {
     private final boolean manualSalesTax;
     private final float manualSalesTaxRate;
-    private final float price;
+    private final float totalPrice;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRate salesTaxRate;
     private String taxCode;

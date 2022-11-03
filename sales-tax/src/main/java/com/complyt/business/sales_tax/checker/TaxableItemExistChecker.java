@@ -10,7 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class TaxableItemExistenceCheck {
+public class TaxableItemExistChecker {
 
     public boolean hasTaxableItem(@NonNull List<Item> items) {
         for (Item item : items) {

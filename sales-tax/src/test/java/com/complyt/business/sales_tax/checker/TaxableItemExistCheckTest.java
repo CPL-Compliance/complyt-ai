@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TaxableItemExistCheckTest {
 
-    TaxableItemExistenceCheck taxableItemExistenceCheck;
+    TaxableItemExistChecker taxableItemExistenceCheck;
 
     @BeforeEach
     void setUp() {
-        taxableItemExistenceCheck = new TaxableItemExistenceCheck();
+        taxableItemExistenceCheck = new TaxableItemExistChecker();
     }
 
     private Item createTaxableItem() {

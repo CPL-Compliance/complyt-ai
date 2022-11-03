@@ -1,5 +1,6 @@
 package com.complyt.utils;
 
+import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.business.nexus.data_extractor.TaxableCollectionAmountExtractor;
 import com.complyt.domain.*;
@@ -29,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class NexusAmountAggregatorFactoryTest {
@@ -38,6 +40,9 @@ public class NexusAmountAggregatorFactoryTest {
 
     @Mock
     QualificationCheck qualificationCheck;
+
+    @Mock
+    TaxableCollectionBuilder taxableCollectionBuilder;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -101,12 +106,14 @@ public class NexusAmountAggregatorFactoryTest {
     @Test
     void createTaxableCollectionAmountExtractor_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsExtractor() {
         // Given
-        List<Taxable> taxables = transaction.getTaxables();
+        List<Taxable> taxables = new ArrayList<>(transaction.getItems());
+        taxables.add(transaction.getShippingFee());
         TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
 
         // When
-        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction,nexusStateRule);
-        
+        when(taxableCollectionBuilder.build(transaction)).thenReturn(taxables);
+        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
+
         // Then
         assertEquals(expectedExtractor, actualExtractor);
     }
@@ -116,13 +123,15 @@ public class NexusAmountAggregatorFactoryTest {
         // Given
 
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
-        List<Taxable> taxables = transactionWithNullShippingFee.getTaxables();
+        List<Taxable> taxables = new ArrayList<>(transactionWithNullShippingFee.getItems());
+
         TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
 
         // When
-        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactionWithNullShippingFee,nexusStateRule);
+        when(taxableCollectionBuilder.build(transactionWithNullShippingFee)).thenReturn(taxables);
+        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactionWithNullShippingFee, nexusStateRule);
 
-                // Then
+        // Then
         assertEquals(expectedExtractor, actualExtractor);
     }
 

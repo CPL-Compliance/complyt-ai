@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
@@ -51,10 +52,13 @@ public class SalesTaxServiceImplTest {
     ExemptionService exemptionService;
 
     @Mock
-    private SalesTaxAggregator salesTaxAggregator;
+    SalesTaxAggregator salesTaxAggregator;
 
     @Mock
-    private SalesTaxRatesHandler salesTaxRatesHandler;
+    SalesTaxRatesHandler salesTaxRatesHandler;
+
+    @Mock
+    TaxableCollectionBuilder taxableCollectionBuilder;
 
     Transaction transaction;
 
@@ -141,6 +145,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
+        when(taxableCollectionBuilder.build(transaction)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
@@ -165,7 +170,9 @@ public class SalesTaxServiceImplTest {
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         SalesTaxTracking tracking = createSalesTaxTracking();
-        List<Taxable> taxAbles = transactionWithSalesTax.getTaxables();
+        List<Taxable> taxAbles = new ArrayList<>() {{
+            add(transaction.getItems().get(0));
+        }};
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
@@ -173,6 +180,7 @@ public class SalesTaxServiceImplTest {
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transaction.withItems(itemsWithRates));
+        when(taxableCollectionBuilder.build(transaction)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 

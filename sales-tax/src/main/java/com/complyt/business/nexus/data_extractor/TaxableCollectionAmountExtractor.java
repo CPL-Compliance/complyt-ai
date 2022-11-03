@@ -6,12 +6,14 @@ import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 
 import java.util.Collection;
 import java.util.List;
 
 @EqualsAndHashCode
 @AllArgsConstructor
+@ToString
 public class TaxableCollectionAmountExtractor implements AmountExtractor {
 
     @NonNull

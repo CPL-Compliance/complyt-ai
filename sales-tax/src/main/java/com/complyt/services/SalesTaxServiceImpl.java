@@ -1,10 +1,12 @@
 package com.complyt.services;
 
+import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -40,6 +43,9 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @NonNull
     private SalesTaxRatesHandler salesTaxRatesHandler;
 
+    @NonNull
+    private TaxableCollectionBuilder taxableCollectionBuilder;
+
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
         SalesTaxApplyCheck salesTaxApplyCheck = new SalesTaxApplyCheck(transactionWithOutSalesTax);
@@ -61,8 +67,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
             Transaction transactionWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
-
-            float salesTaxAmount = salesTaxAggregator.aggregate(transactionWithRates.getTaxables());
+            List<Taxable> taxables = taxableCollectionBuilder.build(transaction);
+            float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             return transactionWithRates.withSalesTax(salesTax);

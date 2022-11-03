@@ -1,5 +1,6 @@
 package com.complyt.utils.factory;
 
+import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
 import com.complyt.business.nexus.data_extractor.TaxableCollectionAmountExtractor;
 import com.complyt.domain.Taxable;
@@ -20,8 +21,11 @@ public class NexusAmountAggregatorFactory {
     @NonNull
     private QualificationCheck qualificationCheck;
 
+    @NonNull
+    private TaxableCollectionBuilder taxableCollectionBuilder;
+
     public TaxableCollectionAmountExtractor createTaxableCollectionAmountExtractor(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
-        List<Taxable> taxables = transaction.getTaxables();
+        List<Taxable> taxables = taxableCollectionBuilder.build(transaction);
 
         return new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
     }
