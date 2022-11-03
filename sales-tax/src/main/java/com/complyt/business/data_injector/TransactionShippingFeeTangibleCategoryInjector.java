@@ -1,6 +1,5 @@
 package com.complyt.business.data_injector;
 
-import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -12,7 +11,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
