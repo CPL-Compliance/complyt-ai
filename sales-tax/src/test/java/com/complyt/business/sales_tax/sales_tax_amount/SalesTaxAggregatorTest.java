@@ -1,7 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_amount;
 
 import com.complyt.domain.*;
-import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -38,6 +37,12 @@ public class SalesTaxAggregatorTest {
         jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
         transaction = createTransaction();
+    }
+
+    private List<Taxable> createTaxables() {
+        List<Taxable> taxables = new ArrayList<>(transaction.getItems());
+        taxables.add(transaction.getShippingFee());
+        return taxables;
     }
 
     private ShippingFee createShippingFee() {
@@ -78,7 +83,7 @@ public class SalesTaxAggregatorTest {
         float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
         float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRate().getTaxRate() * transaction.getShippingFee().getTotalPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
-        List<Taxable> taxAbles = transaction.getTaxables();
+        List<Taxable> taxAbles = createTaxables();
 
         // When
         float actualAmount = salesTaxAggregator.aggregate(taxAbles);

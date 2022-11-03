@@ -136,7 +136,7 @@ public class SalesTaxServiceImplTest {
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
-        List<Taxable> taxAbles = transactionWithSalesTax.getTaxables();
+        List<Taxable> taxAbles = new ArrayList<>(transaction.getItems());
         SalesTaxTracking tracking = createSalesTaxTracking();
 
         // When

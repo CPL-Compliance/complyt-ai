@@ -39,7 +39,6 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     @Mock
     QualificationCheck qualificationCheck;
 
-    private List<Taxable> taxables;
     private NexusStateRule nexusStateRule;
     Transaction transaction;
 
@@ -47,7 +46,6 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        taxables = transaction.getTaxables();
         nexusStateRule = createNexusStateRule();
     }
 
@@ -66,10 +64,10 @@ public class ItemsNexusStateRuleQualificationCheckTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, null, null, null);
@@ -97,9 +95,8 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     @Test
     void check_NoItemsThatCountsRegardingToNexusRule_ReturnsFalse() {
         // Given
-        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(taxables, nexusStateRule);
+        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
         when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(false);
-        when(qualificationCheck.isQualified(transaction.getShippingFee(),nexusStateRule)).thenReturn(false);
 
         // When + Then
         boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
@@ -116,7 +113,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
 
         when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
 
-        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(taxables, nexusStateRule);
+        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 
         // When + Then
         boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
@@ -124,22 +121,20 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     }
 
     @Test
-    void check_OnlyShippingFeeQualifies_ReturnsTrue() {
+    void check_OnlyShippingFeeQualifies_ReturnsFalse() {
         // Given
         TangibleCategory tangibleCategory = nexusStateRule.getTangibleCategories().get(0);
         TaxableCategory taxableCategory = nexusStateRule.getTaxableCategories().get(0);
         ShippingFee shippingFeeThatCounts = transaction.getShippingFee().withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         Transaction transactionWithShippingFeeThatCounts = transaction.withShippingFee(shippingFeeThatCounts);
-        List<Taxable> taxables = transactionWithShippingFeeThatCounts.getTaxables();
 
         when(qualificationCheck.isQualified(transactionWithShippingFeeThatCounts.getItems().get(0), nexusStateRule)).thenReturn(false);
-        when(qualificationCheck.isQualified(transactionWithShippingFeeThatCounts.getShippingFee(),nexusStateRule)).thenReturn(true);
 
-        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(taxables, nexusStateRule);
+        Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 
         // When + Then
         boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
-        assertTrue(doItemsCount);
+        assertFalse(doItemsCount);
     }
 
     @Test

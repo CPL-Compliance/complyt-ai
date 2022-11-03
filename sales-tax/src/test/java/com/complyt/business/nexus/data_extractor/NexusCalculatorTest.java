@@ -104,8 +104,8 @@ public class NexusCalculatorTest {
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        List<Taxable> firstTaxables = transactions.get(0).getTaxables();
-        List<Taxable> secondTaxables = transactions.get(1).getTaxables();
+        List<Taxable> firstTaxables = new ArrayList<>(transactions.get(0).getItems());
+        List<Taxable> secondTaxables = new ArrayList<>(transactions.get(1).getItems());
         TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, firstTaxables, nexusStateRule);
         TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, secondTaxables, nexusStateRule);
 

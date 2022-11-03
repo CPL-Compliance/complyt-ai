@@ -34,11 +34,4 @@ public class Transaction {
     private final TransactionType transactionType;
     private final ShippingFee shippingFee;
 
-    public List<Taxable> getTaxables() {
-        List<Taxable> taxables = new ArrayList<>(items);
-        if (shippingFee != null)
-            taxables.add(shippingFee);
-
-        return taxables;
-    }
 }

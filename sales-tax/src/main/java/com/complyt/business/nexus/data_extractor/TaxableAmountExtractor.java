@@ -1,7 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
-import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;

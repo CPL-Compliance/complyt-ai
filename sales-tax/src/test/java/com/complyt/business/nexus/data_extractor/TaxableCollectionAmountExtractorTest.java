@@ -50,8 +50,14 @@ public class TaxableCollectionAmountExtractorTest {
         customer = createCustomer();
         transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
-        List<Taxable> taxables = transaction.getTaxables();
+        List<Taxable> taxables = createTaxables();
         taxableCollectionAmountExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
+    }
+
+    private List<Taxable> createTaxables() {
+        List<Taxable> taxables = new ArrayList<>(transaction.getItems());
+        taxables.add(transaction.getShippingFee());
+        return taxables;
     }
 
     private Customer createCustomer() {
