@@ -20,7 +20,7 @@ public class NexusTransactionCountExtractor implements NexusDataExtractor<Intege
     @Override
     public Integer extract(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
         final int COUNTED = 1, NOT_COUNTED = 0;
-        boolean itemsQualify = itemsNexusStateRuleQualificationCheck.check(new Pair(transaction.getItems(), nexusStateRule));
+        boolean itemsQualify = itemsNexusStateRuleQualificationCheck.check(new Pair(transaction.getTaxables(), nexusStateRule));
 
         return itemsQualify ? COUNTED : NOT_COUNTED;
     }
