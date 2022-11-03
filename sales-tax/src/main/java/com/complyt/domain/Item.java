@@ -25,26 +25,4 @@ public class Item implements Taxable {
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 
-    public float getManualSalesTaxAmount() {
-        return manualSalesTaxRate * totalPrice;
-    }
-
-    @Override
-    public float calculateSalesTaxAmount() {
-        if (isManualSalesTax()) {
-            return getManualSalesTaxAmount();
-        }
-        float totalPrice = calculateTotalPrice();
-
-        return salesTaxRate.getTaxRate() * totalPrice;
-    }
-
-    private float calculateTotalPrice() {
-        if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
-            return getTotalPrice() * jurisdictionalSalesTaxRules.getCalculationValue();
-        }
-
-        return totalPrice;
-    }
-
 }

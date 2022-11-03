@@ -115,7 +115,6 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         transaction.getItems().add(itemThatCounts);
 
         when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(qualificationCheck.isQualified(transaction.getShippingFee(),nexusStateRule)).thenReturn(false);
 
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(taxables, nexusStateRule);
 

@@ -23,29 +23,4 @@ public class ShippingFee implements Taxable {
     private final TaxableCategory taxableCategory;
     private final TangibleCategory tangibleCategory;
 
-    public float getManualSalesTaxAmount() {
-        return manualSalesTaxRate * totalPrice;
-    }
-
-    @Override
-    public float calculateSalesTaxAmount() {
-        log.info("Calculating total sales tax amount for shipping fee");
-        if (isManualSalesTax()) {
-            log.debug("Shipping fee Sales tax was set manually, amount : " + getManualSalesTaxAmount());
-            return getManualSalesTaxAmount();
-        }
-
-        return handleSalesTaxAmountCalculationForShippingFee();
-    }
-
-    private float handleSalesTaxAmountCalculationForShippingFee() {
-        if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
-            return totalPrice * jurisdictionalSalesTaxRules.getCalculationValue() * salesTaxRate.getTaxRate();
-        }
-
-        float amount = salesTaxRate.getTaxRate() * totalPrice;
-        log.debug("Shipping fee Sales tax amount calculated : " + amount);
-
-        return amount;
-    }
 }

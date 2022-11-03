@@ -6,11 +6,35 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 
 public interface Taxable {
-    float calculateSalesTaxAmount();
     TaxableCategory getTaxableCategory();
     TangibleCategory getTangibleCategory();
     String getTaxCode();
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
     Taxable withSalesTaxRate(SalesTaxRate salesTaxRate);
     float getTotalPrice();
+    boolean isManualSalesTax();
+    SalesTaxRate getSalesTaxRate();
+    float getManualSalesTaxRate();
+
+    default float getManualSalesTaxAmount(){
+        return getManualSalesTaxRate() * getTotalPrice();
+    }
+
+    default float calculateSalesTaxAmount() {
+        if (isManualSalesTax()) {
+            return getManualSalesTaxAmount();
+        }
+
+        return handleSalesTaxAmountCalculationForShippingFee();
+    }
+
+    private float handleSalesTaxAmountCalculationForShippingFee() {
+        if (getJurisdictionalSalesTaxRules().calculatedByPercentageCheck()) {
+            return getTotalPrice() * getJurisdictionalSalesTaxRules().getCalculationValue() * getSalesTaxRate().getTaxRate();
+        }
+
+        float amount = getSalesTaxRate().getTaxRate() * getTotalPrice();
+
+        return amount;
+    }
 }
