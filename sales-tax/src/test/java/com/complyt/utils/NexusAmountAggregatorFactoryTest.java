@@ -1,10 +1,7 @@
 package com.complyt.utils;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
-import com.complyt.business.nexus.data_extractor.AmountExtractor;
-import com.complyt.business.nexus.data_extractor.ItemAmountExtractor;
-import com.complyt.business.nexus.data_extractor.NexusTransactionAmountAggregator;
-import com.complyt.business.nexus.data_extractor.ShippingFeeAmountExtractor;
+import com.complyt.business.nexus.data_extractor.TaxableCollectionAmountExtractor;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -102,47 +99,41 @@ public class NexusAmountAggregatorFactoryTest {
     }
 
     @Test
-    void createNexusTransactionAmountAggregator_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsAggregator() {
+    void createTaxableCollectionAmountExtractor_CreatesAggregatorWithItemsAndShippingFeeExtractors_ReturnsExtractor() {
         // Given
-        List<AmountExtractor> extractors = new ArrayList<>() {{
-            add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
-            add(new ShippingFeeAmountExtractor(qualificationCheck, transaction.getShippingFee(), nexusStateRule));
-        }};
-        NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(extractors);
+        List<Taxable> taxables = transaction.getTaxables();
+        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
 
         // When
-        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(qualificationCheck)
-                .createNexusTransactionAmountAggregator(transaction, nexusStateRule);
-
+        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction,nexusStateRule);
+        
         // Then
-        assertEquals(expectedAggregator, actualAggregator);
+        assertEquals(expectedExtractor, actualExtractor);
     }
 
     @Test
-    void createNexusTransactionAmountAggregator_ShippingFeeIsNull_DoesNotInitializeShippingFeeTaxExtractor() {
+    void createTaxableCollectionAmountExtractor_ShippingFeeIsNull_ReturnsExtractorWithoutShippingFeeInTaxableList() {
         // Given
-        List<AmountExtractor> onlyItemExtractorList = new ArrayList<>() {{
-            add(new ItemAmountExtractor(qualificationCheck, transaction.getItems(), nexusStateRule));
-        }};
+
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
-        NexusTransactionAmountAggregator expectedAggregator = new NexusTransactionAmountAggregator(onlyItemExtractorList);
+        List<Taxable> taxables = transactionWithNullShippingFee.getTaxables();
+        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
 
         // When
-        NexusTransactionAmountAggregator actualAggregator = new NexusAmountAggregatorFactory(qualificationCheck)
-                .createNexusTransactionAmountAggregator(transactionWithNullShippingFee, nexusStateRule);
+        TaxableCollectionAmountExtractor actualExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactionWithNullShippingFee,nexusStateRule);
 
-        // Then
-        assertEquals(expectedAggregator, actualAggregator);
+                // Then
+        assertEquals(expectedExtractor, actualExtractor);
     }
 
     @Test
-    void createNexusTransactionAmountAggregator_NullTransactionPassed_ThrowsException() {
+    void createTaxableCollectionAmountExtractor_NullTransactionPassed_ThrowsException() {
         // Given
         Transaction nullTransaction = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(nullTransaction, nexusStateRule);
+            nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(nullTransaction, nexusStateRule);
         });
 
         // Then
@@ -150,13 +141,13 @@ public class NexusAmountAggregatorFactoryTest {
     }
 
     @Test
-    void createNexusTransactionAmountAggregator_NullNexusStateRulePassed_ThrowsException() {
+    void createTaxableCollectionAmountExtractor_NullNexusStateRulePassed_ThrowsException() {
         // Given
         NexusStateRule nullNexusStateRule = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transaction, nullNexusStateRule);
+            nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nullNexusStateRule);
         });
 
         // Then

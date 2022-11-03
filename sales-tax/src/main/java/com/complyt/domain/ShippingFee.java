@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ShippingFee implements Taxable {
     private final boolean manualSalesTax;
     private final float manualSalesTaxRate;
-    private final float price;
+    private final float totalPrice;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRate salesTaxRate;
     private final String taxCode;
@@ -24,7 +24,7 @@ public class ShippingFee implements Taxable {
     private final TangibleCategory tangibleCategory;
 
     public float getManualSalesTaxAmount() {
-        return manualSalesTaxRate * price;
+        return manualSalesTaxRate * totalPrice;
     }
 
     @Override
@@ -40,10 +40,10 @@ public class ShippingFee implements Taxable {
 
     private float handleSalesTaxAmountCalculationForShippingFee() {
         if (jurisdictionalSalesTaxRules.calculatedByPercentageCheck()) {
-            return price * jurisdictionalSalesTaxRules.getCalculationValue() * salesTaxRate.getTaxRate();
+            return totalPrice * jurisdictionalSalesTaxRules.getCalculationValue() * salesTaxRate.getTaxRate();
         }
 
-        float amount = salesTaxRate.getTaxRate() * price;
+        float amount = salesTaxRate.getTaxRate() * totalPrice;
         log.debug("Shipping fee Sales tax amount calculated : " + amount);
 
         return amount;

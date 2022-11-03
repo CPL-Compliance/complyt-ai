@@ -12,4 +12,5 @@ public interface Taxable {
     String getTaxCode();
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
     Taxable withSalesTaxRate(SalesTaxRate salesTaxRate);
+    float getTotalPrice();
 }

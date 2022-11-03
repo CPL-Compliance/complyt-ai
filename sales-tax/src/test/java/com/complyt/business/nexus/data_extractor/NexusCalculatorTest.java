@@ -104,15 +104,17 @@ public class NexusCalculatorTest {
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        NexusTransactionAmountAggregator agg1 = new NexusAmountAggregatorFactory(qualificationCheck).createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule);
-        NexusTransactionAmountAggregator agg2 = new NexusAmountAggregatorFactory(qualificationCheck).createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule);
+        List<Taxable> firstTaxables = transactions.get(0).getTaxables();
+        List<Taxable> secondTaxables = transactions.get(1).getTaxables();
+        TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, firstTaxables, nexusStateRule);
+        TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, secondTaxables, nexusStateRule);
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
         when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
-        when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(0), nexusStateRule)).thenReturn(agg1);
-        when(nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(transactions.get(1), nexusStateRule)).thenReturn(agg2);
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(0), nexusStateRule)).thenReturn(firstExtractor);
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(1), nexusStateRule)).thenReturn(secondExtractor);
         when(qualificationCheck.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationCheck.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
 

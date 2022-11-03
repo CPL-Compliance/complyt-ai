@@ -27,7 +27,7 @@ public class ShippingFeeTest {
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
         ShippingFee shippingFeeWithManualRate = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
-        float expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getPrice();
+        float expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getTotalPrice();
 
         // When + Then
         float actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
@@ -41,7 +41,7 @@ public class ShippingFeeTest {
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
 
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage);
-        float expectedAmount = shippingFeeWithRuleByPercentage.getPrice() *
+        float expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
                 shippingFeeWithRuleByPercentage.getJurisdictionalSalesTaxRules().getCalculationValue() * shippingFeeWithRuleByPercentage.getSalesTaxRate().getTaxRate();
 
         // When + Then

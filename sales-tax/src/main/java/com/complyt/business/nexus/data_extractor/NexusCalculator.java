@@ -35,7 +35,7 @@ public class NexusCalculator {
 
         for (Transaction filteredTransaction : filteredTransactions) {
             count += nexusTransactionCountExtractor.extract(filteredTransaction, nexusStateRule);
-            amount += nexusAmountAggregatorFactory.createNexusTransactionAmountAggregator(filteredTransaction, nexusStateRule).aggregate();
+            amount += nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(filteredTransaction, nexusStateRule).extract();
         }
 
         log.debug("Calculated total amount of : " + amount + ", and count : " + count);

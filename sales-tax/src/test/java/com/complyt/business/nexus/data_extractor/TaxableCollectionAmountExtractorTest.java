@@ -13,7 +13,6 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,9 +33,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NexusTransactionAmountAggregatorTest {
+public class TaxableCollectionAmountExtractorTest {
 
-    NexusTransactionAmountAggregator nexusTransactionAmountAggregator;
+    TaxableCollectionAmountExtractor taxableCollectionAmountExtractor;
 
     @Mock
     QualificationCheck qualificationCheck;
@@ -51,12 +50,8 @@ public class NexusTransactionAmountAggregatorTest {
         customer = createCustomer();
         transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
-        nexusTransactionAmountAggregator = createNexusTransactionAmountAggregator();
-    }
-
-    private NexusTransactionAmountAggregator createNexusTransactionAmountAggregator() {
-        return new NexusAmountAggregatorFactory(qualificationCheck)
-                .createNexusTransactionAmountAggregator(transaction, nexusStateRule);
+        List<Taxable> taxables = transaction.getTaxables();
+        taxableCollectionAmountExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
     }
 
     private Customer createCustomer() {
@@ -130,7 +125,7 @@ public class NexusTransactionAmountAggregatorTest {
         when(qualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationCheck.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
         float expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
-        float amount = nexusTransactionAmountAggregator.aggregate();
+        float amount = taxableCollectionAmountExtractor.extract();
 
         // Then
         assertEquals(amount, expectedAmount);
@@ -144,8 +139,8 @@ public class NexusTransactionAmountAggregatorTest {
         when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationCheck.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
         when(qualificationCheck.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
-        float amount = nexusTransactionAmountAggregator.aggregate();
-        float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getPrice();
+        float amount = taxableCollectionAmountExtractor.extract();
+        float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getTotalPrice();
 
         // Then
         assertEquals(amount, expectedAmount);
