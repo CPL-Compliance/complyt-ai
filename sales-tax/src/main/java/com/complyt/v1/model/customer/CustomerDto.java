@@ -1,11 +1,8 @@
 package com.complyt.v1.model.customer;
 
-import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.v1.model.AddressDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor

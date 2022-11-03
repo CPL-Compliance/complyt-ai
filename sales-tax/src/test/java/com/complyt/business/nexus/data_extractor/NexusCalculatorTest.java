@@ -1,8 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
-import com.complyt.utils.factory.NexusAmountAggregatorFactory;
-import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -14,26 +12,23 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.utils.factory.NexusAmountAggregatorFactory;
+import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NexusCalculatorTest {
 
     @InjectMocks
@@ -137,7 +132,6 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
 
         // When
-
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
