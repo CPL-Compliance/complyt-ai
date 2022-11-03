@@ -67,7 +67,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
             Transaction transactionWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
-            List<Taxable> taxables = taxableCollectionBuilder.build(transaction);
+            List<Taxable> taxables = taxableCollectionBuilder.build(transactionWithRates);
             float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 

@@ -135,6 +135,7 @@ public class SalesTaxServiceImplTest {
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
+        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         List<Taxable> taxAbles = new ArrayList<>(transaction.getItems());
         SalesTaxTracking tracking = createSalesTaxTracking();
@@ -144,8 +145,8 @@ public class SalesTaxServiceImplTest {
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transaction.withItems(itemsWithRates));
-        when(taxableCollectionBuilder.build(transaction)).thenReturn(taxAbles);
+                .thenReturn(transactionWithRates);
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
@@ -168,6 +169,7 @@ public class SalesTaxServiceImplTest {
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRate(salesTaxRate));
         }};
+        Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         SalesTaxTracking tracking = createSalesTaxTracking();
         List<Taxable> taxAbles = new ArrayList<>() {{
@@ -179,8 +181,8 @@ public class SalesTaxServiceImplTest {
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
         when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transaction.withItems(itemsWithRates));
-        when(taxableCollectionBuilder.build(transaction)).thenReturn(taxAbles);
+                .thenReturn(transactionWithRates);
+        when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
