@@ -4,10 +4,13 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -37,7 +40,9 @@ public class TransactionTest {
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ObjectId customerId = new ObjectId();
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        ShippingFee shippingFee = createShippingFee();
+
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, shippingFee);
     }
 
     private Customer createCustomer(ObjectId customerId) {
@@ -48,5 +53,21 @@ public class TransactionTest {
         return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
     }
 
+    private ShippingFee createShippingFee() {
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
+                new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
+                CalculationType.FIXED, "description", 0.5f, null);
+    }
+
+    @Test
+    void test() {
+        Field[] fields = Transaction.class.getDeclaredFields();
+        Assertions.assertEquals(14, fields.length);
+    }
 }
 
