@@ -25,12 +25,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjector implements Transa
 
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        if (transaction.getShippingFee() == null) {
-            log.debug("Transaction doesn't have shipping fee");
-            return Mono.just(transaction);
-        }
-        if (!mapTaxCodesToClassifications.containsKey(transaction.getShippingFee().getTaxCode())) {
-            log.debug("Shipping fee's tax code does not exist in given classifications list - not injecting jurisdictional rules to it");
+        if (!shouldInject(mapTaxCodesToClassifications)) {
             return Mono.just(transaction);
         }
 
@@ -49,5 +44,19 @@ public class TransactionShippingFeeJurisdictionalRulesInjector implements Transa
 
             return transaction.withShippingFee(shippingFeeWithTaxableCategory);
         });
+    }
+
+    @Override
+    public boolean shouldInject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+        if (transaction.getShippingFee() == null) {
+            log.debug("Transaction doesn't have shipping fee");
+            return false;
+        }
+        if (!mapTaxCodesToClassifications.containsKey(transaction.getShippingFee().getTaxCode())) {
+            log.debug("Shipping fee's tax code does not exist in given classifications list - not injecting jurisdictional rules to it");
+            return false;
+        }
+
+        return true;
     }
 }
