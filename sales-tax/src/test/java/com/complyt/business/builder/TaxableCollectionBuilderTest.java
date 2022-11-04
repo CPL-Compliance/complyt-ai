@@ -95,7 +95,7 @@ public class TaxableCollectionBuilderTest {
     }
 
     @Test
-    void build_TransactionDoesNotHaveTaxAbleItems_ReturnTaxableListOfOnlyItems() {
+    void build_TransactionDoesNotHaveTaxAbleItems_ReturnTaxableListWithOutShippingFee() {
         // Given
         List<Taxable> expectedTaxables = new ArrayList<>(transaction.getItems());
 

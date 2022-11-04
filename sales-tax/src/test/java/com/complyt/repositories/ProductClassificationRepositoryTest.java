@@ -49,8 +49,8 @@ public class ProductClassificationRepositoryTest {
         user = User.builder().username("user").password("password").clientId(clientId).build();
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA",true,false, CalculationType.FIXED,"description",0,null);
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<String,JurisdictionalSalesTaxRules>(){{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(),jurisdictionalSalesTaxRules);
+        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
+            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
         productClassification = new ProductClassification(UUID.randomUUID().toString(),"C1S1","description",
                 "title",jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
@@ -74,7 +74,7 @@ public class ProductClassificationRepositoryTest {
     void findAll_FindsAllClassifications_ReturnsAllClassifications(){
         // Given
         ProductClassification otherProductClassification = productClassification.withDescription("second classification").withTaxCode("C2S1");
-        List<ProductClassification> productClassifications =  new ArrayList<ProductClassification>(){{
+        List<ProductClassification> productClassifications = new ArrayList<>() {{
             add(productClassification);
             add(otherProductClassification);
         }};
@@ -108,9 +108,7 @@ public class ProductClassificationRepositoryTest {
         String nullId = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            productClassificationRepository.findById(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> productClassificationRepository.findById(nullId));
 
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
@@ -135,9 +133,7 @@ public class ProductClassificationRepositoryTest {
         ProductClassification nullClassification = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            productClassificationRepository.save(nullClassification);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> productClassificationRepository.save(nullClassification));
 
         assertEquals(nullPointerException.getMessage(), "productClassification is marked non-null but is null");
     }

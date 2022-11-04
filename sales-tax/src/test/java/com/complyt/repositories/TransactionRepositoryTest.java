@@ -52,7 +52,7 @@ class TransactionRepositoryTest {
     User user;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
         user = User.builder().username("user").password("password").clientId(clientId).build();
 
@@ -70,19 +70,6 @@ class TransactionRepositoryTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, user.getClientId(), null, null, TransactionType.INVOICE, null);
-    }
-
-    @Test
-    void init_NullReactiveMongoTemplateGiven_ThrowsException() {
-        // Given
-        reactiveMongoTemplate = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            TransactionRepository transactionRepository = new TransactionRepository(reactiveMongoTemplate);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
     }
 
     @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
@@ -176,9 +163,7 @@ class TransactionRepositoryTest {
         // When
 
         // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionRepository.save(transaction);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionRepository.save(transaction));
 
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
@@ -214,7 +199,7 @@ class TransactionRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
-        List<Transaction> allTransactions = new ArrayList<Transaction>() {{
+        List<Transaction> allTransactions = new ArrayList<>() {{
             add(transaction);
             add(secondTransaction);
         }};

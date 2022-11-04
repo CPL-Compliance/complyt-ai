@@ -71,7 +71,7 @@ class TransactionFastTaxCountyFetcherTest {
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
-        List<TaxInfoItem> taxInfoItems = new ArrayList<TaxInfoItem>() {{
+        List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
             add(taxInfoItem);
         }};
         FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems);

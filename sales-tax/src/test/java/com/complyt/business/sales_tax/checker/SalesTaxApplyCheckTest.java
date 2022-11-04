@@ -30,7 +30,6 @@ public class SalesTaxApplyCheckTest {
 
     private SalesTaxApplyCheck salesTaxApplyCheck;
     private SalesTaxTracking salesTaxTracking;
-    private Transaction transaction;
 
     @Mock
     private CustomerFullyExemptionCheck customerFullyExemptionCheck;
@@ -57,7 +56,7 @@ public class SalesTaxApplyCheckTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
@@ -141,26 +140,13 @@ public class SalesTaxApplyCheckTest {
     }
 
     @Test
-    void initChecker_NullTransactionPassed_ThrowsException() {
+    void isApplied_NullTransactionPassed_ThrowsException() {
         // Given
         Transaction nullTransaction = null;
 
-
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxApplyCheck = new SalesTaxApplyCheck(transaction);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
-    }
-
-    @Test
-    void isApplied_NullTransactionPassed_ThrowsException() {
-        // Given
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxApplyCheck = new SalesTaxApplyCheck(null);
+            salesTaxApplyCheck = new SalesTaxApplyCheck(nullTransaction);
         });
 
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");

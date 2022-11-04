@@ -89,9 +89,7 @@ public class ClientTrackingRepositoryTest {
         ClientTracking nullClientTrackingNoId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            clientTrackingRepository.save(nullClientTrackingNoId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> clientTrackingRepository.save(nullClientTrackingNoId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "clientTracking is marked non-null but is null");
@@ -117,7 +115,9 @@ public class ClientTrackingRepositoryTest {
     @Test
     void findAll_FindsTwoClient_ReturnsTwoClients() {
         // Given
-        List<ClientTracking> clientTrackingList = new ArrayList<ClientTracking>(){{add(clientTracking);}};
+        List<ClientTracking> clientTrackingList = new ArrayList<>() {{
+            add(clientTracking);
+        }};
         Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
         // When

@@ -130,9 +130,7 @@ public class NexusCheckerTest {
         SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusChecker.hasNexus(nullSalesTaxTracking);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusChecker.hasNexus(nullSalesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");

@@ -50,20 +50,6 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void initFacade_NullServiceInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        CustomerService service = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerFacade facade = new CustomerFacade(service);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
-    }
-
-    @Test
     void saveCustomer_CustomerSaved_CustomerReturned() throws InterruptedException {
         // Given
 

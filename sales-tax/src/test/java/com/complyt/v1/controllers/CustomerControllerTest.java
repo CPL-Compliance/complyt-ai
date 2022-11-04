@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -55,21 +53,6 @@ class CustomerControllerTest {
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
         customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-    }
-
-    @Test
-    void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        CustomerFacade facade = null;
-
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerController controller = new CustomerController(facade);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customerfacade is marked non-null but is null");
     }
 
     @Test
@@ -188,7 +171,7 @@ class CustomerControllerTest {
     void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
-        List<Customer> customersFoundByName = new ArrayList<Customer>() {{
+        List<Customer> customersFoundByName = new ArrayList<>() {{
             add(customer);
         }};
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
@@ -212,7 +195,7 @@ class CustomerControllerTest {
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);
 
-        List<Customer> allCustomers = new ArrayList<Customer>() {{
+        List<Customer> allCustomers = new ArrayList<>() {{
             add(customer);
             add(secondCustomer);
         }};

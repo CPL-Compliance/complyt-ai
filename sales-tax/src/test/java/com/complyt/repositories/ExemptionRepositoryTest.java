@@ -2,7 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -187,7 +186,7 @@ public class ExemptionRepositoryTest {
         // Given
         Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
                 .withState(new State("NY", "05", "New York"));
-        List<Exemption> exemptions = new ArrayList<Exemption>() {{
+        List<Exemption> exemptions = new ArrayList<>() {{
             add(exemption);
             add(secondExemption);
         }};
@@ -205,7 +204,6 @@ public class ExemptionRepositoryTest {
     @Test
     void findAll_NoExemptionReturned_EmptyFluxReturned() {
         // Given
-        String id = exemption.getId();
         Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
         // When
@@ -254,9 +252,7 @@ public class ExemptionRepositoryTest {
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRepository.findById(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findById(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
@@ -269,9 +265,7 @@ public class ExemptionRepositoryTest {
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRepository.delete(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.delete(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");

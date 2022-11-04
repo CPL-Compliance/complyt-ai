@@ -7,7 +7,6 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
-import com.complyt.business.data_fetcher.TransactionZipTaxCountyFetcher;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,7 @@ class TransactionZipTaxCountyFetcherTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
         ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
@@ -75,7 +74,7 @@ class TransactionZipTaxCountyFetcherTest {
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
         Result result = createResult();
-        List<Result> results = new ArrayList<Result>() {{
+        List<Result> results = new ArrayList<>() {{
             add(result);
         }};
         ZipTaxData zipTaxData = new ZipTaxData("version", 0, results);

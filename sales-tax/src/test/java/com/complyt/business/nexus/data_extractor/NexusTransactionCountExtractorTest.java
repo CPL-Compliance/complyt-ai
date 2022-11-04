@@ -65,15 +65,15 @@ public class NexusTransactionCountExtractorTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -90,7 +90,7 @@ public class NexusTransactionCountExtractorTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         ObjectId clientId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
@@ -116,7 +116,7 @@ public class NexusTransactionCountExtractorTest {
     @Test
     void extract_ExtractsTransactionItemsCount_ReturnsShouldNotBeCountedBecauseItemsDontQualify() {
         // Given
-        List<Item> items = new ArrayList<Item>() {{
+        List<Item> items = new ArrayList<>() {{
             add(transaction.getItems().get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
         }};
         Transaction otherTransaction = transaction.withItems(items);

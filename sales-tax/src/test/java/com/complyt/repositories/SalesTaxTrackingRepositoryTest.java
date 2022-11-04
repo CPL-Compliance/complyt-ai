@@ -108,9 +108,7 @@ public class SalesTaxTrackingRepositoryTest {
         SalesTaxTracking nullSalesTaxTracking = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingRepository.save(nullSalesTaxTracking);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.save(nullSalesTaxTracking));
 
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }
@@ -134,7 +132,9 @@ public class SalesTaxTrackingRepositoryTest {
     @Test
     void findAll_FindsTwoSalesTaxTracking_ReturnsTwoSalesTaxTracking() {
         // given
-        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<SalesTaxTracking>(){{add(salesTaxTracking);}};
+        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
+            add(salesTaxTracking);
+        }};
         Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
 
         // When

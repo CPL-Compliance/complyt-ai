@@ -60,15 +60,15 @@ public class NexusStateRuleRepositoryTest {
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -98,9 +98,7 @@ public class NexusStateRuleRepositoryTest {
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusStateRuleRepository.findById(nullId);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findById(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
@@ -127,9 +125,7 @@ public class NexusStateRuleRepositoryTest {
         String nullStateAbbreviation = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusStateRuleRepository.findByState(nullStateAbbreviation);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.findByState(nullStateAbbreviation));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
@@ -154,9 +150,7 @@ public class NexusStateRuleRepositoryTest {
         NexusStateRule nullNexusStateRule = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusStateRuleRepository.save(nullNexusStateRule);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusStateRuleRepository.save(nullNexusStateRule));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
@@ -168,7 +162,7 @@ public class NexusStateRuleRepositoryTest {
         // Given
         State secondState = new State("NY", "04", "New-York");
         NexusStateRule secondStateRule = nexusStateRule.withState(secondState);
-        List<NexusStateRule> nexusStateRules = new ArrayList<NexusStateRule>() {{
+        List<NexusStateRule> nexusStateRules = new ArrayList<>() {{
             add(nexusStateRule);
             add(secondStateRule);
         }};

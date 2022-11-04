@@ -33,9 +33,8 @@ public class ItemQualificationCheckTest {
     }
 
     private Item createItem() {
-        Item item = new Item(1000, 5, 5000, "description", "item", "C1S1",
+        return new Item(1000, 5, 5000, "description", "item", "C1S1",
                 null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
-        return item;
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -99,9 +98,7 @@ public class ItemQualificationCheckTest {
         NexusStateRule nullNexusStateRule = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            qualificationCheck.isQualified(item, nullNexusStateRule);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> qualificationCheck.isQualified(item, nullNexusStateRule));
 
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }

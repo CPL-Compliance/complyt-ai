@@ -121,7 +121,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     }
 
     @Test
-    void shouldInject_DefaultMethodGetExecuted_ReturnsTrue() {
+    void shouldInject_DefaultMethodGetsExecuted_ReturnsTrue() {
         TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
 
         JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,

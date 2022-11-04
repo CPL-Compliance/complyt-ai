@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -58,10 +57,9 @@ public class SalesTaxDtoTest {
         assertNotEquals(salesTaxDto.hashCode(), anotherSalesTaxDto.hashCode());
     }
 
-
     @Test
     void toString_StringMatches_Equal(){
-        String salesTaxDtoToString = "SalesTaxDto(amount=" + salesTaxDto.getAmount() + ", salesTaxRate=" + salesTaxDto.getSalesTaxRate() + ")";;
+        String salesTaxDtoToString = "SalesTaxDto(amount=" + salesTaxDto.getAmount() + ", salesTaxRate=" + salesTaxDto.getSalesTaxRate() + ")";
         assertEquals(salesTaxDto.toString(),salesTaxDtoToString);
     }
 
