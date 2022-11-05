@@ -27,13 +27,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NexusThresholdCheckTest {
 
-    NexusThresholdCheck nexusThresholdCheck;
+    NexusThresholdChecker nexusThresholdChecker;
     NexusStateRule nexusStateRule;
     NexusCalculationSummary nexusCalculationSummary;
 
     @BeforeEach
     void setUp() {
-        nexusThresholdCheck = new NexusThresholdCheck();
+        nexusThresholdChecker = new NexusThresholdChecker();
         nexusStateRule = createNexusStateRule();
         nexusCalculationSummary = createNexusCalculationSummary();
     }
@@ -70,7 +70,7 @@ public class NexusThresholdCheckTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusThresholdCheck.check(nullSummaryAndRule);
+            nexusThresholdChecker.check(nullSummaryAndRule);
         });
 
         // Then
@@ -87,7 +87,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary,nexusStateRuleWithAmountDefinition);
 
         // When
-        boolean exceededAmount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededAmount);
@@ -106,7 +106,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithAmountDefinition);
 
         // When
-        boolean exceededAmount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertFalse(exceededAmount);
@@ -122,7 +122,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededCount);
@@ -140,7 +140,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertFalse(exceededCount);
@@ -160,7 +160,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountAndCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountAndCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededAmountAndCount);
@@ -179,7 +179,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountAndCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountAndCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertFalse(exceededAmountAndCount);
@@ -198,7 +198,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountAndCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountAndCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertFalse(exceededAmountAndCount);
@@ -219,7 +219,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountOrCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededAmountOrCount);
@@ -240,7 +240,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountOrCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededAmountOrCount);
@@ -261,7 +261,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountOrCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertTrue(exceededAmountOrCount);
@@ -282,7 +282,7 @@ public class NexusThresholdCheckTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(summary,nexusStateRuleWithCountDefinition);
 
         // When
-        boolean exceededAmountOrCount = nexusThresholdCheck.check(summaryAndRule);
+        boolean exceededAmountOrCount = nexusThresholdChecker.check(summaryAndRule);
 
         // Then
         assertFalse(exceededAmountOrCount);

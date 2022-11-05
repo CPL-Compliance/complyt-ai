@@ -30,16 +30,16 @@ public class NexusCheckerTest {
     NexusChecker nexusChecker;
 
     @Mock
-    PhysicalNexusCheck physicalNexusCheck;
+    PhysicalNexusChecker physicalNexusChecker;
 
     @Mock
-    EconomicNexusCheck economicNexusCheck;
+    EconomicNexusChecker economicNexusChecker;
 
     @Mock
-    SalesTaxEnforcementCheck salesTaxEnforcementCheck;
+    SalesTaxEnforcementChecker salesTaxEnforcementChecker;
 
     @Mock
-    NexusThresholdCheck nexusThresholdCheck;
+    NexusThresholdChecker nexusThresholdChecker;
 
     SalesTaxTracking salesTaxTracking;
     NexusCalculationSummary nexusCalculationSummary;
@@ -76,8 +76,8 @@ public class NexusCheckerTest {
         // Given
 
         // When
-        when(salesTaxEnforcementCheck.check(salesTaxTracking)).thenReturn(true);
-        when(physicalNexusCheck.check(salesTaxTracking)).thenReturn(true);
+        when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(true);
+        when(physicalNexusChecker.check(salesTaxTracking)).thenReturn(true);
         boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
 
         // Then
@@ -89,9 +89,9 @@ public class NexusCheckerTest {
         // Given
 
         // When
-        when(salesTaxEnforcementCheck.check(salesTaxTracking)).thenReturn(true);
-        when(physicalNexusCheck.check(salesTaxTracking)).thenReturn(false);
-        when(economicNexusCheck.check(salesTaxTracking)).thenReturn(true);
+        when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(true);
+        when(physicalNexusChecker.check(salesTaxTracking)).thenReturn(false);
+        when(economicNexusChecker.check(salesTaxTracking)).thenReturn(true);
         boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
 
         // Then
@@ -103,9 +103,9 @@ public class NexusCheckerTest {
         // Given
 
         // When
-        when(salesTaxEnforcementCheck.check(salesTaxTracking)).thenReturn(true);
-        when(physicalNexusCheck.check(salesTaxTracking)).thenReturn(false);
-        when(economicNexusCheck.check(salesTaxTracking)).thenReturn(false);
+        when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(true);
+        when(physicalNexusChecker.check(salesTaxTracking)).thenReturn(false);
+        when(economicNexusChecker.check(salesTaxTracking)).thenReturn(false);
         boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
 
         // Then
@@ -117,7 +117,7 @@ public class NexusCheckerTest {
         // Given
 
         // When
-        when(salesTaxEnforcementCheck.check(salesTaxTracking)).thenReturn(false);
+        when(salesTaxEnforcementChecker.check(salesTaxTracking)).thenReturn(false);
         boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
 
         // Then
@@ -142,7 +142,7 @@ public class NexusCheckerTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
 
         // When
-        when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(true);
+        when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(true);
         boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
 
         // Then
@@ -155,7 +155,7 @@ public class NexusCheckerTest {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(nexusCalculationSummary, nexusStateRule);
 
         // When
-        when(nexusThresholdCheck.check(summaryAndRule)).thenReturn(false);
+        when(nexusThresholdChecker.check(summaryAndRule)).thenReturn(false);
         boolean passedThreshold = nexusChecker.passedThreshold(nexusCalculationSummary, nexusStateRule);
 
         // Then

@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class ItemsNexusStateRuleQualificationCheck implements NexusCheck<Pair<List<Taxable>, NexusStateRule>> {
+public class ItemsNexusStateRuleQualificationChecker implements NexusCheck<Pair<List<Taxable>, NexusStateRule>> {
 
     /*
      * Checks if there is an item from the given list that should be counted

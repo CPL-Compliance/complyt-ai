@@ -15,16 +15,16 @@ import org.springframework.stereotype.Component;
 public class NexusChecker {
 
     @NonNull
-    private PhysicalNexusCheck physicalNexusChecker;
+    private PhysicalNexusChecker physicalNexusChecker;
 
     @NonNull
-    private EconomicNexusCheck economicNexusChecker;
+    private EconomicNexusChecker economicNexusChecker;
 
     @NonNull
-    private SalesTaxEnforcementCheck salesTaxEnforcementChecker;
+    private SalesTaxEnforcementChecker salesTaxEnforcementChecker;
 
     @NonNull
-    private NexusThresholdCheck nexusThresholdCheck;
+    private NexusThresholdChecker nexusThresholdChecker;
 
     public boolean hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
         boolean hasNexus = salesTaxEnforcementChecker.check(salesTaxTracking) &&
@@ -37,7 +37,7 @@ public class NexusChecker {
 
     public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule) {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(calculationSummary, stateRule);
-        boolean passedThreshold = nexusThresholdCheck.check(summaryAndRule);
+        boolean passedThreshold = nexusThresholdChecker.check(summaryAndRule);
         log.debug("Checking if client passed nexus' threshold in state : " + stateRule.getState().getAbbreviation()
                 + " Has given a result of : " + passedThreshold);
 

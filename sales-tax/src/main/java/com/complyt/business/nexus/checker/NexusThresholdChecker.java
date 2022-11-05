@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class NexusThresholdCheck implements NexusCheck<Pair<NexusCalculationSummary, NexusStateRule>> {
+public class NexusThresholdChecker implements NexusCheck<Pair<NexusCalculationSummary, NexusStateRule>> {
 
     @Override
     public boolean check(@NonNull Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule) {

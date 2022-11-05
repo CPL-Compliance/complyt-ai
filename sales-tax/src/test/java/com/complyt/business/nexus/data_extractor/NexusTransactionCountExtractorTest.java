@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationCheck;
+import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationChecker;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -40,7 +40,7 @@ public class NexusTransactionCountExtractorTest {
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
 
     @Mock
-    ItemsNexusStateRuleQualificationCheck itemsNexusStateRuleQualificationCheck;
+    ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -106,7 +106,7 @@ public class NexusTransactionCountExtractorTest {
         // Given
 
         // When
-        when(itemsNexusStateRuleQualificationCheck.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
         int count = nexusTransactionCountExtractor.extract(transaction, nexusStateRule);
 
         // Then
@@ -122,7 +122,7 @@ public class NexusTransactionCountExtractorTest {
         Transaction otherTransaction = transaction.withItems(items);
 
         // When
-        when(itemsNexusStateRuleQualificationCheck.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
         int count = nexusTransactionCountExtractor.extract(otherTransaction, nexusStateRule);
 
         // Then

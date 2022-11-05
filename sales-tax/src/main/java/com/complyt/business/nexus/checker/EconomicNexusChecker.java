@@ -5,12 +5,11 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
-public class SalesTaxEnforcementCheck implements NexusCheck<SalesTaxTracking> {
-
+@Component
+public class EconomicNexusChecker implements NexusCheck<SalesTaxTracking> {
     @Override
     public boolean check(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTracking.isEnforcesSalesTax();
+        return salesTaxTracking.getEconomicNexusTracker().isEstablished();
     }
 }

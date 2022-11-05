@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ItemsNexusStateRuleQualificationCheckTest {
 
     @InjectMocks
-    ItemsNexusStateRuleQualificationCheck itemsNexusStateRuleQualificationCheck;
+    ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     @Mock
     QualificationCheck qualificationCheck;
@@ -99,7 +99,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(false);
 
         // When + Then
-        boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
+        boolean doItemsCount = itemsNexusStateRuleQualificationChecker.check(nexusStateRulePair);
         assertFalse(doItemsCount);
     }
 
@@ -116,7 +116,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 
         // When + Then
-        boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
+        boolean doItemsCount = itemsNexusStateRuleQualificationChecker.check(nexusStateRulePair);
         assertTrue(doItemsCount);
     }
 
@@ -133,7 +133,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 
         // When + Then
-        boolean doItemsCount = itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
+        boolean doItemsCount = itemsNexusStateRuleQualificationChecker.check(nexusStateRulePair);
         assertFalse(doItemsCount);
     }
 
@@ -144,7 +144,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemsNexusStateRuleQualificationCheck.check(nexusStateRulePair);
+            itemsNexusStateRuleQualificationChecker.check(nexusStateRulePair);
         });
 
         assertEquals(nullPointerException.getMessage(), "itemsAndRule is marked non-null but is null");

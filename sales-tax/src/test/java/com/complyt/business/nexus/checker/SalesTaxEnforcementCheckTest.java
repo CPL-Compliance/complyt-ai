@@ -20,11 +20,11 @@ import java.util.UUID;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SalesTaxEnforcementCheckTest {
 
-    SalesTaxEnforcementCheck salesTaxEnforcementCheck;
+    SalesTaxEnforcementChecker salesTaxEnforcementChecker;
 
     @BeforeEach
     void setUp() {
-        salesTaxEnforcementCheck = new SalesTaxEnforcementCheck();
+        salesTaxEnforcementChecker = new SalesTaxEnforcementChecker();
     }
 
     @Test
@@ -36,7 +36,7 @@ public class SalesTaxEnforcementCheckTest {
                 true, LocalDateTime.now());
 
         // When + Then
-        boolean isEnforcesSalesTax = salesTaxEnforcementCheck.check(salesTaxTracking);
+        boolean isEnforcesSalesTax = salesTaxEnforcementChecker.check(salesTaxTracking);
         assertTrue(isEnforcesSalesTax);
     }
 
@@ -47,7 +47,7 @@ public class SalesTaxEnforcementCheckTest {
 
         //When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxEnforcementCheck.check(nullSalesTaxTracking);
+            salesTaxEnforcementChecker.check(nullSalesTaxTracking);
         });
 
         // Then

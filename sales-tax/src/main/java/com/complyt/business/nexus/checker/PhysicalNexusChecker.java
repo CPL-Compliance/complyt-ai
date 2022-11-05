@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PhysicalNexusCheck implements NexusCheck<SalesTaxTracking> {
+public class PhysicalNexusChecker implements NexusCheck<SalesTaxTracking> {
     @Override
     public boolean check(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTracking.getPhysicalNexusTracker().isEstablished();

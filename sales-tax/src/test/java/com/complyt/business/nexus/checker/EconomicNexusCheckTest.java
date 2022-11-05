@@ -6,10 +6,6 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EconomicNexusCheckTest {
 
-    EconomicNexusCheck economicNexusCheck;
+    EconomicNexusChecker economicNexusChecker;
 
     @BeforeEach
     void setUp() {
-        economicNexusCheck = new EconomicNexusCheck();
+        economicNexusChecker = new EconomicNexusChecker();
     }
 
     @Test
@@ -34,7 +30,7 @@ public class EconomicNexusCheckTest {
                 true, null, economicNexusTracker, LocalDateTime.now(), true, LocalDateTime.now());
 
         // When + Then
-        boolean hasEconomicNexus = economicNexusCheck.check(salesTaxTracking);
+        boolean hasEconomicNexus = economicNexusChecker.check(salesTaxTracking);
         assertTrue(hasEconomicNexus);
 
     }
@@ -46,7 +42,7 @@ public class EconomicNexusCheckTest {
 
         //When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            economicNexusCheck.check(nullSalesTaxTracking);
+            economicNexusChecker.check(nullSalesTaxTracking);
         });
 
         // Then
