@@ -24,7 +24,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)

@@ -2,7 +2,6 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -14,6 +13,7 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
+import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

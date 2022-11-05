@@ -1,6 +1,5 @@
 package com.complyt.business.sales_tax.sales_tax_web_clients;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
@@ -13,13 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
