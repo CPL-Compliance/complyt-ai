@@ -25,7 +25,7 @@ public class NexusAmountAggregatorFactory {
     private TaxableCollectionBuilder taxableCollectionBuilder;
 
     public TaxableCollectionAmountExtractor createTaxableCollectionAmountExtractor(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
-        List<Taxable> taxables = taxableCollectionBuilder.build(transaction);
+        List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         return new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
     }

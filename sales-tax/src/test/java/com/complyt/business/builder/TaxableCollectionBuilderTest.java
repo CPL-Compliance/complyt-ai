@@ -75,7 +75,7 @@ public class TaxableCollectionBuilderTest {
 
         // When
         when(taxableItemExistChecker.hasTaxableItem(transaction.getItems())).thenReturn(true);
-        List<Taxable> actualTaxables = taxableCollectionBuilder.build(transaction);
+        List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
         Assertions.assertEquals(expectedTaxables,actualTaxables);
@@ -88,7 +88,7 @@ public class TaxableCollectionBuilderTest {
         List<Taxable> expectedTaxables = new ArrayList<>(transactionWithNullSippingFee.getItems());
 
         // When
-        List<Taxable> actualTaxables = taxableCollectionBuilder.build(transactionWithNullSippingFee);
+        List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithNullSippingFee);
 
         // Then
         Assertions.assertEquals(expectedTaxables,actualTaxables);
@@ -101,7 +101,7 @@ public class TaxableCollectionBuilderTest {
 
         // When
         when(taxableItemExistChecker.hasTaxableItem(transaction.getItems())).thenReturn(false);
-        List<Taxable> actualTaxables = taxableCollectionBuilder.build(transaction);
+        List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
         Assertions.assertEquals(expectedTaxables,actualTaxables);

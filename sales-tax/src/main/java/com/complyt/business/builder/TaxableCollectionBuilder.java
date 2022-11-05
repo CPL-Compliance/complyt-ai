@@ -8,7 +8,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 @Component
 @AllArgsConstructor
@@ -17,9 +17,8 @@ public class TaxableCollectionBuilder {
     @NonNull
     TaxableItemExistChecker taxableItemExistChecker;
 
-    public List<Taxable> build(@NonNull Transaction transaction) {
-        List<Taxable> taxables = new ArrayList<>(transaction.getItems());
-
+    public Collection<Taxable> build(@NonNull Transaction transaction) {
+        Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
         if (transaction.getShippingFee() != null && taxableItemExistChecker.hasTaxableItem(transaction.getItems())) {
             taxables.add(transaction.getShippingFee());
         }
