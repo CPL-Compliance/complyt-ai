@@ -52,7 +52,7 @@ public class SecurityConfig {
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/login", "/logout", "/", "/actuator/health").permitAll()
-                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
+//                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
                 .anyExchange().authenticated();
 
 
