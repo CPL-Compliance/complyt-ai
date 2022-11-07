@@ -17,7 +17,7 @@ public class TenantResolver {
                         return (String) token.getTokenAttributes().get("tenant_id");
                     }
 
-                    return "all";
+                    return "none";
                 });
     }
 }

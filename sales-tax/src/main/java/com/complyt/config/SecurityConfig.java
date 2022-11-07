@@ -45,13 +45,25 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         // CSRF
-        http.csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
-                .pathMatchers("/token/**")
-                .matches(serverWebExchange));
+//        http.csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
+//                .pathMatchers("/token/**")
+//                .matches(serverWebExchange));
 
+        http.cors().and().csrf().disable();
         // Authentication and Authorization
         http.authorizeExchange()
-                .pathMatchers("/login", "/logout", "/", "/actuator/health").permitAll()
+                .pathMatchers("/actuator/health",
+                        "/v3/api-docs/**",
+//                        "/v3/api-docs/swagger-config",
+//                        "v3/api-docs/swagger-config",
+                        "/webjars/swagger-ui/index.html",
+                        "/swagger-ui**",
+                        "/swagger-ui.html/**",
+                        "/configuration/**",
+                        "/swagger-resources/**",
+//                        "/v2/api-docs",
+                        "/webjars/**"
+                ).permitAll()
 //                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
                 .anyExchange().authenticated();
 

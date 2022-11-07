@@ -51,7 +51,7 @@ spring.security:
   oauth2:
     resourceserver:
       jwt:
-        issuer-uri: https://dev--lwppdup.us.auth0.com/
+        issuer-uri: ${ISSUER_URI}
 
 logging:
   level:
