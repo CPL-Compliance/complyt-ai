@@ -101,6 +101,19 @@ public class ExemptionRepositoryTest {
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    void findByClientCustomerAndState_NullIdPassed_ThrowsException() {
+        // Given
+        Transaction transactionNull = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByClientCustomerAndState(transactionNull));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
     @Test
     void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
@@ -144,6 +157,19 @@ public class ExemptionRepositoryTest {
         // Then
         Mono<Exemption> exemptionMono = exemptionRepository.save(exemptionNoId);
         StepVerifier.create(exemptionMono).verifyComplete();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    void save_NullIdPassed_ThrowsException() {
+        // Given
+        Exemption exemptionNull = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.save(exemptionNull));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
     @Test
