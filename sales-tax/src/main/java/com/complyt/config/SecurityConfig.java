@@ -54,14 +54,11 @@ public class SecurityConfig {
         http.authorizeExchange()
                 .pathMatchers("/actuator/health",
                         "/v3/api-docs/**",
-//                        "/v3/api-docs/swagger-config",
-//                        "v3/api-docs/swagger-config",
                         "/webjars/swagger-ui/index.html",
                         "/swagger-ui**",
                         "/swagger-ui.html/**",
                         "/configuration/**",
                         "/swagger-resources/**",
-//                        "/v2/api-docs",
                         "/webjars/**"
                 ).permitAll()
 //                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")

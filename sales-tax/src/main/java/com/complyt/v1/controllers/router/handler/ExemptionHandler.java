@@ -9,6 +9,8 @@ import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,8 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 @AllArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Exemption", description = "This is the Exemption controller")
 public class ExemptionHandler {
 
     @NonNull

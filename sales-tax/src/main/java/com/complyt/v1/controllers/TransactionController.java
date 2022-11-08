@@ -8,6 +8,7 @@ import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.model.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Transaction", description = "This is the Transaction controller")
 @RestController
 @RequestMapping(TransactionController.BASE_URL)
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionController {
     public static final String BASE_URL = "/v1/transactions";
 
