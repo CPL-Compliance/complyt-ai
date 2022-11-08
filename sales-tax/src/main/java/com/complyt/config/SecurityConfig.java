@@ -12,6 +12,12 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.server.ServerWebExchange;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -44,26 +50,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        // CORS
+
         // CSRF
-//        http.csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
-//                .pathMatchers("/token/**")
-//                .matches(serverWebExchange));
+        http.csrf().requireCsrfProtectionMatcher(serverWebExchange -> ServerWebExchangeMatchers
+                .pathMatchers("/token/**")
+                .matches(serverWebExchange));
 
         http.cors().and().csrf().disable();
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/actuator/health",
                         "/v3/api-docs/**",
-                        "/webjars/swagger-ui/index.html",
-                        "/swagger-ui**",
-                        "/swagger-ui.html/**",
-                        "/configuration/**",
-                        "/swagger-resources/**",
-                        "/webjars/**"
+                        "/webjars/**",
+                        "/swagger-ui*/**"
                 ).permitAll()
-//                .pathMatchers("/webjars/swagger-ui/index.html", "/swagger-ui.html").hasAuthority("swagger.read")
                 .anyExchange().authenticated();
-
 
         // OAuth2
         http.oauth2ResourceServer().jwt();
