@@ -79,7 +79,7 @@ public class NexusAmountAggregatorFactoryTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -89,7 +89,7 @@ public class NexusAmountAggregatorFactoryTest {
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
     }
 
     private ShippingFee createShippingFee() {

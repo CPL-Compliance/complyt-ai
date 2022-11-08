@@ -70,11 +70,11 @@ public class SalesTaxAggregatorTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = createItems();
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
     }
 
     @Test

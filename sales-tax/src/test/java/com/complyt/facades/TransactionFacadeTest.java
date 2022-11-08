@@ -79,7 +79,7 @@ public class TransactionFacadeTest {
                 UUID.randomUUID().toString(),
                 "name",
                 null,
-                new ObjectId(),
+                UUID.randomUUID().toString(),
                 CustomerType.RETAIL
         );
     }
@@ -91,12 +91,12 @@ public class TransactionFacadeTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, new ObjectId(), CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, null);
+        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -107,7 +107,7 @@ public class TransactionFacadeTest {
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = new ArrayList<Item>() {{
+        List<Item> modifiedItems = new ArrayList<>() {{
             add(item);
         }};
         return transactionNoId.withItems(modifiedItems);
@@ -124,7 +124,7 @@ public class TransactionFacadeTest {
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
 
         State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state, UUID.randomUUID().toString(),
                 true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 

@@ -38,7 +38,7 @@ public class CustomerFullyExemptionCheckTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
         List<Item> items = new ArrayList<>();
@@ -46,8 +46,8 @@ public class CustomerFullyExemptionCheckTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, clientId, CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
     @Test

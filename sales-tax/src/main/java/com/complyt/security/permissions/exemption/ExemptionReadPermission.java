@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('exemption.read') OR hasAuthority('customer.exemption.read') OR hasAuthority('user.exemption.read')")
+@PreAuthorize("hasAuthority('SCOPE_read:exemption')")
 public @interface ExemptionReadPermission {
 }

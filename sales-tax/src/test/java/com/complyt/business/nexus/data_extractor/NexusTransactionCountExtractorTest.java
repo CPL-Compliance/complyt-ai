@@ -56,11 +56,11 @@ public class NexusTransactionCountExtractorTest {
 
     private Customer createCustomer() {
         customerId = new ObjectId();
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -89,7 +89,7 @@ public class NexusTransactionCountExtractorTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -98,7 +98,7 @@ public class NexusTransactionCountExtractorTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
     }
 
     @Test

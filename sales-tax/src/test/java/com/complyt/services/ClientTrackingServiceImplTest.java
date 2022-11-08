@@ -38,7 +38,7 @@ class ClientTrackingServiceImplTest {
     @BeforeEach
     void setUp() {
         Nexus nexus = new Nexus(null);
-        clientTracking = new ClientTracking(UUID.randomUUID().toString(),new ObjectId(), nexus);
+        clientTracking = new ClientTracking(UUID.randomUUID().toString(),UUID.randomUUID().toString(), nexus);
     }
 
     @Test

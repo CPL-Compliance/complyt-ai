@@ -21,10 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,14 +41,14 @@ public class ProductClassificationServiceTest {
     ProductClassification itemProductClassification;
     ProductClassification shippingFeeProductClassification;
     ObjectId customerId;
-    ObjectId clientId;
+    String tenantId;
 
     @BeforeEach
     void setUp() {
         itemProductClassification = createItemProductClassification();
         shippingFeeProductClassification = createShippingFeeProductClassification();
         customerId = new ObjectId();
-        clientId = new ObjectId();
+        tenantId = UUID.randomUUID().toString();
     }
 
     private ProductClassification createItemProductClassification() {
@@ -84,7 +81,7 @@ public class ProductClassificationServiceTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {

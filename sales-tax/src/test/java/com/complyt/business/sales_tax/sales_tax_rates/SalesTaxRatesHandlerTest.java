@@ -52,11 +52,10 @@ public class SalesTaxRatesHandlerTest {
                     jurisdictionalSalesTaxRules, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
             ));
         }};
-        ObjectId clientId = new ObjectId();
         ObjectId customerId = new ObjectId();
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
     private ShippingFee createShippingFee() {
@@ -66,11 +65,11 @@ public class SalesTaxRatesHandlerTest {
     }
 
     private Customer createCustomer(ObjectId customerId) {
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     @Test

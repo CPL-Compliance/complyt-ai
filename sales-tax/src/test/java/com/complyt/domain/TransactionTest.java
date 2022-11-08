@@ -33,7 +33,6 @@ public class TransactionTest {
         Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        ObjectId clientId = new ObjectId();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
@@ -42,15 +41,15 @@ public class TransactionTest {
         Customer customer = createCustomer(customerId);
         ShippingFee shippingFee = createShippingFee();
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, shippingFee);
     }
 
     private Customer createCustomer(ObjectId customerId) {
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     private ShippingFee createShippingFee() {

@@ -1,23 +1,18 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.security.User;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 public class ProductClassificationRepositoryTest {
     @InjectMocks
     ProductClassificationRepository productClassificationRepository;
@@ -41,17 +35,14 @@ public class ProductClassificationRepositoryTest {
 
     ProductClassification productClassification;
 
-    User user;
-
     @BeforeEach
     void setUp(){
-        ObjectId clientId = new ObjectId();
-        user = User.builder().username("user").password("password").clientId(clientId).build();
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
                 "CA",true,false, CalculationType.FIXED,"description",0,null);
         Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
+
         productClassification = new ProductClassification(UUID.randomUUID().toString(),"C1S1","description",
                 "title",jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
@@ -87,7 +78,6 @@ public class ProductClassificationRepositoryTest {
         StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findById_FindsClassification_ReturnsClassification() {
         // Given
@@ -102,6 +92,7 @@ public class ProductClassificationRepositoryTest {
         StepVerifier.create(actualClassification).expectNext(productClassification).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findById_NullIdPassed_ThrowsException() {
         // Given
@@ -113,7 +104,6 @@ public class ProductClassificationRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void save_SavesClassification_ReturnsClassification() {
         // Given
@@ -127,6 +117,7 @@ public class ProductClassificationRepositoryTest {
         StepVerifier.create(actualClassification).expectNext(productClassification).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void save_NullClassificationPassed_ThrowsException() {
         // Given

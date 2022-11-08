@@ -32,7 +32,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "C1S1",
@@ -42,7 +42,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
     }
 
     private ShippingFee createShippingFee() {

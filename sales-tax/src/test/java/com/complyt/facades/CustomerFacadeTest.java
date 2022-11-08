@@ -4,7 +4,6 @@ import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.services.CustomerService;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -39,16 +38,16 @@ class CustomerFacadeTest {
 
     @BeforeAll
     void setUp() {
-        ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
+        String tenantId = UUID.randomUUID().toString();
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, clientId, CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     @Test
-    void saveCustomer_CustomerSaved_CustomerReturned() throws InterruptedException {
+    void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
 
         // When
@@ -60,7 +59,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned() throws InterruptedException {
+    void upsertCustomer_CustomerInserted_CustomerReturned() {
         // Given
 
         // When
@@ -77,7 +76,7 @@ class CustomerFacadeTest {
         String name = "NameToSearchFor";
 
         // When
-        when(customerService.findByName(name)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        when(customerService.findByName(name)).thenReturn(Flux.fromIterable(List.of(customer)));
         Flux<Customer> customers = customerFacade.findByName(name);
 
         // Then
@@ -85,7 +84,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void getCustomerByExternalId_CustomerFound_CustomerReturned() throws InterruptedException {
+    void getCustomerByExternalId_CustomerFound_CustomerReturned() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);

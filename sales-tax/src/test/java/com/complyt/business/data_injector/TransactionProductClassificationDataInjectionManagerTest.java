@@ -39,7 +39,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -56,9 +56,8 @@ public class TransactionProductClassificationDataInjectionManagerTest {
                 .items(items)
                 .billingAddress(billingAddress)
                 .shippingAddress(shippingAddress)
-                .clientId(customerId)
+                .tenantId(tenantId)
                 .transactionStatus(TransactionStatus.ACTIVE)
-                .clientId(clientId)
                 .build();
     }
 

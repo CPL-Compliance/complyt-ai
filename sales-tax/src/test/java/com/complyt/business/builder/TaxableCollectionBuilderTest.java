@@ -44,7 +44,7 @@ public class TaxableCollectionBuilderTest {
 
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -52,9 +52,9 @@ public class TaxableCollectionBuilderTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, clientId, CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId, CustomerType.RETAIL);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, null, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, shippingFee);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {

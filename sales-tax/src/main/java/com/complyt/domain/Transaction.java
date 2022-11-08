@@ -28,7 +28,7 @@ public class Transaction {
     private final Customer customer;
     private final SalesTax salesTax;
     private final TransactionStatus transactionStatus;
-    private final ObjectId clientId;
+    private final String tenantId;
     private final TimeStamps internalTimeStamps;
     private final TimeStamps externalTimeStamps;
     private final TransactionType transactionType;

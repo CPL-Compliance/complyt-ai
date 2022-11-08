@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('transaction.read') OR hasAuthority('customer.transaction.read') OR hasAuthority('user.transaction.read')")
+@PreAuthorize("hasAuthority('SCOPE_read:transaction')")
 public @interface TransactionReadPermission {
 }

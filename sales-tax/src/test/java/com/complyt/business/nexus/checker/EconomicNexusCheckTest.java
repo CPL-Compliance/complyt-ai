@@ -26,7 +26,7 @@ public class EconomicNexusCheckTest {
         // Given
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
         State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(), state, (new ObjectId()).toString(),
                 true, null, economicNexusTracker, LocalDateTime.now(), true, LocalDateTime.now());
 
         // When + Then

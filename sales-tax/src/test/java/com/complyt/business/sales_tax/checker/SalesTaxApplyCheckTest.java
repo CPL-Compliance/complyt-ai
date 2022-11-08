@@ -42,7 +42,7 @@ public class SalesTaxApplyCheckTest {
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                new ObjectId(), true,
+                UUID.randomUUID().toString(), true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null), LocalDateTime.now(),
                 true, LocalDateTime.now());
@@ -55,7 +55,7 @@ public class SalesTaxApplyCheckTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -64,7 +64,7 @@ public class SalesTaxApplyCheckTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)), TransactionType.INVOICE, null);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
@@ -73,7 +73,7 @@ public class SalesTaxApplyCheckTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -82,7 +82,7 @@ public class SalesTaxApplyCheckTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)), TransactionType.INVOICE, null);
     }
 
     @Test

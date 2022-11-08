@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.config.SecurityConfigMockTest;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -9,8 +8,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.security.User;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Import(SecurityConfigMockTest.class)
 public class NexusStateRuleRepositoryTest {
 
     @InjectMocks
@@ -47,14 +41,11 @@ public class NexusStateRuleRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    User user;
     NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ObjectId clientId = new ObjectId("507f191e810c19729de860ea");
-        user = User.builder().username("user").password("password").clientId(clientId).build();
         nexusStateRule = createNexusStateRule();
     }
 
@@ -78,7 +69,6 @@ public class NexusStateRuleRepositoryTest {
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findById_FindsStateRule_ReturnsStateRule() {
         // Given
@@ -92,6 +82,7 @@ public class NexusStateRuleRepositoryTest {
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findById_NullIdPassed_ThrowsException() {
         // Given
@@ -104,7 +95,6 @@ public class NexusStateRuleRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findByState_FindsRule_ReturnsRule() {
         // Given
@@ -119,6 +109,7 @@ public class NexusStateRuleRepositoryTest {
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void findByState_NullStatePassed_ThrowsException() {
         // Given
@@ -131,7 +122,6 @@ public class NexusStateRuleRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void save_SavesStateRule_ReturnsStateRule() {
         // Given
@@ -144,6 +134,7 @@ public class NexusStateRuleRepositoryTest {
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void save_NullStateRule_ThrowsException() {
         // Given
@@ -156,7 +147,6 @@ public class NexusStateRuleRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
 
-    @WithUserDetails(value = "test", userDetailsServiceBeanName = "userDetailsService")
     @Test
     void findAll_FindsTwoStateRules_ReturnsTwoStateRules() {
         // Given

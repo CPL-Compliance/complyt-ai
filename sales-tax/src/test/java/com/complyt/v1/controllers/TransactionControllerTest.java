@@ -61,7 +61,7 @@ class TransactionControllerTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
-        ObjectId clientId = new ObjectId();
+        ObjectId tenantId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -80,7 +80,7 @@ class TransactionControllerTest {
                 .shippingAddress(shippingAddress)
                 .customerId(customerId)
                 .transactionStatus(TransactionStatus.ACTIVE)
-                .clientId(clientId)
+                .tenantId(tenantId.toString())
                 .build();
 
         transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithId);

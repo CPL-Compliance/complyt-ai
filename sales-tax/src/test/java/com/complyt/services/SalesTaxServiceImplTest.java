@@ -62,6 +62,8 @@ public class SalesTaxServiceImplTest {
 
     Transaction transaction;
 
+    String tenantId;
+
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
@@ -73,14 +75,14 @@ public class SalesTaxServiceImplTest {
         Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        ObjectId clientId = new ObjectId();
+        tenantId = UUID.randomUUID().toString();
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ObjectId customerId = new ObjectId();
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, clientId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
     private Customer createCustomer(ObjectId customerId) {
@@ -88,13 +90,13 @@ public class SalesTaxServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, clientId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                new ObjectId(), true, null, null, LocalDateTime.now().minusYears(1),
+                UUID.randomUUID().toString(), true, null, null, LocalDateTime.now().minusYears(1),
                 true, transaction.getExternalTimeStamps().getCreatedDate().minusYears(1));
 
     }
