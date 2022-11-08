@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Exemption {
     @Id
     private final String id;
-    private final ObjectId clientId;
+    private final String tenantId;
     private final ObjectId customerId;
     private final State state;
     private final Classification classification;

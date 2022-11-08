@@ -52,7 +52,7 @@ public class ExemptionFacadeTest {
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
-        return new Exemption(UUID.randomUUID().toString(), new ObjectId(), new ObjectId(),
+        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 

@@ -64,7 +64,7 @@ public class ExemptionHandlerTest {
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
-        return new Exemption(UUID.randomUUID().toString(), new ObjectId(), new ObjectId(),
+        return new Exemption(UUID.randomUUID().toString(), (new ObjectId()).toString(), new ObjectId(),
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 
@@ -109,7 +109,7 @@ public class ExemptionHandlerTest {
     @Test
     public void create_CreatesExemption_ReturnsExemption() {
         // Given
-        Exemption exemptionNoId = exemption.withId(null).withClientId(null);
+        Exemption exemptionNoId = exemption.withId(null).withTenantId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
 
         // When
@@ -132,7 +132,7 @@ public class ExemptionHandlerTest {
     @WithUserDetails()
     void update_UpdatesExemption_ReturnsExemption() {
         // Given
-        Exemption exemptionNoClientId = exemption.withClientId(null);
+        Exemption exemptionNoClientId = exemption.withTenantId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoClientId);
 
         // When
@@ -156,7 +156,7 @@ public class ExemptionHandlerTest {
     @WithUserDetails()
     void update_ExemptionDoesNotExistInDB_Throws404NotFound() {
         // Given
-        Exemption exemptionWithIdThatDoesNotExist = exemption.withClientId(null).withId(UUID.randomUUID().toString());
+        Exemption exemptionWithIdThatDoesNotExist = exemption.withTenantId(null).withId(UUID.randomUUID().toString());
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);
 
         // When

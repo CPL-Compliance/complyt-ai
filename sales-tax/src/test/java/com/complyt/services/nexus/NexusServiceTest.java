@@ -79,7 +79,7 @@ class NexusServiceTest {
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                new ObjectId(), true,
+                UUID.randomUUID().toString(), true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null),
                 LocalDateTime.now(), true, LocalDateTime.now());
@@ -111,7 +111,7 @@ class NexusServiceTest {
         ObjectId customerId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        ObjectId clientId = new ObjectId();
+        String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -120,7 +120,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, clientId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
@@ -128,7 +128,7 @@ class NexusServiceTest {
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
 
         State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state, UUID.randomUUID().toString(),
                 true, physicalNexusTracker, economicNexusTracker,
                 LocalDateTime.now(), true, LocalDateTime.now());
     }

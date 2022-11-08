@@ -37,22 +37,30 @@ public class ItemsCheckTest {
     }
 
     private NexusStateRule createNexusStateRule() {
-        State state = new State("CA","02","California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{add(TaxableCategory.TAXABLE);}};
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{add(TangibleCategory.TANGIBLE);}};
-        return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,null,null,null);
+        State state = new State("CA", "02", "California");
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategory.TAXABLE);
+        }};
+
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategory.TANGIBLE);
+        }};
+
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, null, null, null);
     }
 
     private List<Item> createItems() {
-        Item item = new Item(10,5,50,"description","name","C1S1",null,
-                null,false,0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-        return new ArrayList<Item>() {{add(item);}};
+        Item item = new Item(10, 5, 50, "description", "name", "C1S1", null,
+                null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+        return new ArrayList<>() {{
+            add(item);
+        }};
     }
 
     @Test
     void check_NoItemsThatCountsRegardingToNexusRule_ReturnsFalse() {
         // Given
-        Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair(items,nexusStateRule);
+        Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair<>(items, nexusStateRule);
 
         // When + Then
         boolean doItemsCount = itemStateThresholdQualifier.check(nexusStateRulePair);
@@ -67,7 +75,7 @@ public class ItemsCheckTest {
         Item itemThatCounts = items.get(0).withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         items.add(itemThatCounts);
 
-        Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair(items,nexusStateRule);
+        Pair<List<Item>, NexusStateRule> nexusStateRulePair = new Pair<>(items, nexusStateRule);
 
         // When + Then
         boolean doItemsCount = itemStateThresholdQualifier.check(nexusStateRulePair);
@@ -80,9 +88,7 @@ public class ItemsCheckTest {
         Pair<List<Item>, NexusStateRule> nexusStateRulePair = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            itemStateThresholdQualifier.check(nexusStateRulePair);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> itemStateThresholdQualifier.check(nexusStateRulePair));
 
         assertEquals(nullPointerException.getMessage(), "itemsAndRule is marked non-null but is null");
     }

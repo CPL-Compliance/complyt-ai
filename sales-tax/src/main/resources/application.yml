@@ -45,16 +45,24 @@ spring.cloud.vault:
 
 spring.config.import: vault://
 
+auth0:
+  audience: https://sales-tax-service/
+spring.security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: ${ISSUER_URI}
+
 logging:
   level:
     root: INFO
-    web: DEBUG
+    web: INFO
     org:
       springframework:
-        security: TRACE
+        security: INFO
     reactor:
       netty:
-        http: DEBUG
+        http: INFO
 
 management:
   endpoints:

@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('customer.create') OR hasAuthority('customer.customer.create')")
+@PreAuthorize("hasAuthority('SCOPE_create:customer')")
 public @interface CustomerCreatePermission {
 }

@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('transaction.delete') OR hasAuthority('customer.transaction.delete')")
+@PreAuthorize("hasAuthority('SCOPE_delete:transaction')")
 public @interface TransactionDeletePermission {
 }

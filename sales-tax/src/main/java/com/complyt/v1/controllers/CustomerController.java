@@ -8,6 +8,7 @@ import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Customer", description = "This is the Customer controller")
 @AllArgsConstructor
 @RestController

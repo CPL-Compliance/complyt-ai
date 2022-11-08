@@ -67,7 +67,7 @@ public class NexusCheckerTest {
         State state = new State("CA", "02", "California");
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, new ObjectId(),
+        return new SalesTaxTracking(UUID.randomUUID().toString(), state, (new ObjectId()).toString(),
                 true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 

@@ -1,14 +1,13 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.security.User;
+import com.complyt.security.TenantResolver;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,33 +20,34 @@ public class SalesTaxTrackingRepository {
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @NonNull
+    private TenantResolver tenantResolver;
+
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMap(user -> {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("state.abbreviation").is(state)
-                            .and("clientId").is(user.getClientId()));
+                            .and("tenantId").is(tenantId));
 
                     return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
                 });
     }
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMap(user -> {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
                     log.debug("Saving modified nexus tracking : " + salesTaxTracking);
 
-                    return reactiveMongoTemplate.save(salesTaxTracking).log();
+                    return reactiveMongoTemplate.save(salesTaxTracking.withTenantId(tenantId)).log();
                 });
     }
 
     public Mono<SalesTaxTracking> findById(String id) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMap(user -> {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
-                            .and("clientId").is(user.getClientId()));
+                            .and("tenantId").is(tenantId));
+
                     log.debug("Searching for a sales tax tracking with id of : " + id);
 
                     return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
@@ -55,10 +55,9 @@ public class SalesTaxTrackingRepository {
     }
 
     public Flux<SalesTaxTracking> findAll() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> (User) securityContext.getAuthentication().getPrincipal())
-                .flatMapMany(user -> {
-                    Query query = Query.query(Criteria.where("clientId").is(user.getClientId()));
+        return tenantResolver.resolve()
+                .flatMapMany(tenantId -> {
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
                     log.debug("Executing findAll sales tax tracking");
 
                     return reactiveMongoTemplate.find(query, SalesTaxTracking.class).log();
