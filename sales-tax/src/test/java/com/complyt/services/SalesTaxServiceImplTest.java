@@ -3,7 +3,7 @@ package com.complyt.services;
 import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
-import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
+import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
@@ -55,7 +55,7 @@ public class SalesTaxServiceImplTest {
     SalesTaxAggregator salesTaxAggregator;
 
     @Mock
-    SalesTaxRatesHandler salesTaxRatesHandler;
+    TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @Mock
     TaxableCollectionBuilder taxableCollectionBuilder;
@@ -86,7 +86,6 @@ public class SalesTaxServiceImplTest {
     }
 
     private Customer createCustomer(ObjectId customerId) {
-        ObjectId clientId = new ObjectId();
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -146,7 +145,7 @@ public class SalesTaxServiceImplTest {
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
+        when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transactionWithRates);
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
@@ -182,7 +181,7 @@ public class SalesTaxServiceImplTest {
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
-        when(salesTaxRatesHandler.setRates(transaction, salesTaxRate))
+        when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
                 .thenReturn(transactionWithRates);
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());

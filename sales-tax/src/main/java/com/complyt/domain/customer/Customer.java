@@ -1,12 +1,9 @@
 package com.complyt.domain.customer;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.customer.exemption.ExemptionType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor

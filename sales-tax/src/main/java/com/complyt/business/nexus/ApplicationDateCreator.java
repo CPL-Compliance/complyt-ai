@@ -1,12 +1,13 @@
 package com.complyt.business.nexus;
 
 import com.complyt.domain.nexus.enums.TimeFrame;
-import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+
+import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 
 @Component
 @Slf4j

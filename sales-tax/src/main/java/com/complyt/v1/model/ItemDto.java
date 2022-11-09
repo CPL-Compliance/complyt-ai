@@ -2,7 +2,10 @@ package com.complyt.v1.model;
 
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor

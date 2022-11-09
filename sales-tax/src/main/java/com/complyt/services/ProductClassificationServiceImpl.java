@@ -1,7 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.domain.Transaction;
 import com.complyt.business.data_injector.TransactionProductClassificationDataInjectionManager;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.enums.Definition;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;

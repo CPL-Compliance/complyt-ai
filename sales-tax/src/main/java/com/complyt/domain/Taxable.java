@@ -16,7 +16,7 @@ public interface Taxable {
     SalesTaxRate getSalesTaxRate();
     float getManualSalesTaxRate();
 
-    default float getManualSalesTaxAmount(){
+    default float getManualSalesTaxAmount() {
         return getManualSalesTaxRate() * getTotalPrice();
     }
 
@@ -25,16 +25,14 @@ public interface Taxable {
             return getManualSalesTaxAmount();
         }
 
-        return handleSalesTaxAmountCalculationForShippingFee();
+        return handleSalesTaxAmountCalculation();
     }
 
-    private float handleSalesTaxAmountCalculationForShippingFee() {
+    private float handleSalesTaxAmountCalculation() {
         if (getJurisdictionalSalesTaxRules().calculatedByPercentageCheck()) {
             return getTotalPrice() * getJurisdictionalSalesTaxRules().getCalculationValue() * getSalesTaxRate().getTaxRate();
         }
 
-        float amount = getSalesTaxRate().getTaxRate() * getTotalPrice();
-
-        return amount;
+        return getTotalPrice() * getSalesTaxRate().getTaxRate();
     }
 }

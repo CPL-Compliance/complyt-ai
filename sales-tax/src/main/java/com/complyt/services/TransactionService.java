@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.Customer;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Query;

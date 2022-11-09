@@ -4,7 +4,7 @@ import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
-import com.complyt.business.sales_tax.sales_tax_rates.SalesTaxRatesHandler;
+import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
@@ -41,7 +41,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private SalesTaxAggregator salesTaxAggregator;
 
     @NonNull
-    private SalesTaxRatesHandler salesTaxRatesHandler;
+    private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @NonNull
     private TaxableCollectionBuilder taxableCollectionBuilder;
@@ -66,7 +66,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         return salesTaxData -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
-            Transaction transactionWithRates = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
+            Transaction transactionWithRates = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
             float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);

@@ -1,7 +1,6 @@
 package com.complyt.business.data_injector;
 
 import com.complyt.domain.Item;
-import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;

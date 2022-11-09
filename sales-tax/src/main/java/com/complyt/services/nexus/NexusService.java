@@ -2,7 +2,6 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -11,6 +10,7 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
+import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

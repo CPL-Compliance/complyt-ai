@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class SalesTaxRatesHandlerTest {
 
     @InjectMocks
-    private SalesTaxRatesHandler salesTaxRatesHandler;
+    private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @Mock
     private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
@@ -85,7 +85,7 @@ public class SalesTaxRatesHandlerTest {
 
         // When
         when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
-        Transaction actualTransaction = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
         assertEquals(actualTransaction, expectedTransaction);
@@ -107,7 +107,7 @@ public class SalesTaxRatesHandlerTest {
         // When
         when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
         when(shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(shippingFee, salesTaxRate)).thenReturn(shippingFeeWithRates);
-        Transaction actualTransaction = salesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
         assertEquals(actualTransaction, expectedTransaction);
@@ -120,7 +120,7 @@ public class SalesTaxRatesHandlerTest {
         Transaction nullTransaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesHandler.setRates(nullTransaction, salesTaxRate));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(nullTransaction, salesTaxRate));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -133,7 +133,7 @@ public class SalesTaxRatesHandlerTest {
         Transaction transaction = createTransaction();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxRate is marked non-null but is null");

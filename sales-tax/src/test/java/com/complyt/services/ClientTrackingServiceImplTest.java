@@ -3,7 +3,6 @@ package com.complyt.services;
 import com.complyt.domain.ClientTracking;
 import com.complyt.domain.Nexus;
 import com.complyt.repositories.ClientTrackingRepository;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
