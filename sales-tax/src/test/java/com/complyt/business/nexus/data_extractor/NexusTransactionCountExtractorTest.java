@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.ItemStateThresholdQualifier;
+import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationChecker;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -40,7 +40,7 @@ public class NexusTransactionCountExtractorTest {
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
 
     @Mock
-    ItemStateThresholdQualifier itemStateThresholdQualifier;
+    ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
@@ -60,20 +60,20 @@ public class NexusTransactionCountExtractorTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL, null);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
+        List<CustomerType> customerTypes = new ArrayList<>() {{
             add(CustomerType.RETAIL);
         }};
 
@@ -90,7 +90,7 @@ public class NexusTransactionCountExtractorTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
@@ -98,7 +98,7 @@ public class NexusTransactionCountExtractorTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class NexusTransactionCountExtractorTest {
         // Given
 
         // When
-        when(itemStateThresholdQualifier.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
         int count = nexusTransactionCountExtractor.extract(transaction, nexusStateRule);
 
         // Then
@@ -116,13 +116,13 @@ public class NexusTransactionCountExtractorTest {
     @Test
     void extract_ExtractsTransactionItemsCount_ReturnsShouldNotBeCountedBecauseItemsDontQualify() {
         // Given
-        List<Item> items = new ArrayList<Item>() {{
+        List<Item> items = new ArrayList<>() {{
             add(transaction.getItems().get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
         }};
         Transaction otherTransaction = transaction.withItems(items);
 
         // When
-        when(itemStateThresholdQualifier.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
         int count = nexusTransactionCountExtractor.extract(otherTransaction, nexusStateRule);
 
         // Then

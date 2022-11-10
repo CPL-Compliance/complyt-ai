@@ -80,8 +80,8 @@ public class TransactionFacadeTest {
                 "name",
                 null,
                 UUID.randomUUID().toString(),
-                CustomerType.RETAIL,
-                null);
+                CustomerType.RETAIL
+        );
     }
 
     private Transaction createTransaction() {
@@ -95,8 +95,8 @@ public class TransactionFacadeTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL, null);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE);
+        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -107,7 +107,7 @@ public class TransactionFacadeTest {
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = new ArrayList<Item>() {{
+        List<Item> modifiedItems = new ArrayList<>() {{
             add(item);
         }};
         return transactionNoId.withItems(modifiedItems);
@@ -141,18 +141,6 @@ public class TransactionFacadeTest {
     }
 
     @Test
-    void initFacade_NullTransactionServiceInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        transactionService = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> new TransactionFacade(transactionService, salesTaxService, nexusService, null));
-
-        assertEquals(nullPointerException.getMessage(), "transactionService is marked non-null but is null");
-    }
-
-    @Test
     public void saveTransaction_NexusIsNotEstablished_TransactionSavedAndReturned() {
         // Given
         Transaction transactionWithClassificationData = createTransactionWithProductClassificationData();
@@ -162,8 +150,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
-        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer)).thenReturn(Mono.just(transactionWithClassificationDataAndId));
         when(nexusService.isNexusTrackingCalculationRequired(transactionWithCustomer)).thenReturn(true);
@@ -187,8 +174,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
-        when(customerService.findById(transaction.getCustomerId())).thenReturn(Mono.just(customer));
-        when(transactionService.injectDataToNewTransaction(transactionNoId, customer)).thenReturn(Mono.just(transactionWithCustomer));
+        when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTax));
         when(transactionService.save(transactionWithClassificationDataAndSalesTax)).thenReturn(Mono.just(transactionWithClassificationDataAndSalesTaxAndId));
@@ -382,7 +368,7 @@ public class TransactionFacadeTest {
         // Given
         String anotherTransactionId = UUID.randomUUID().toString();
         Transaction anotherTransactionWithSameClientId = transaction.withId(anotherTransactionId);
-        List<Transaction> transactions = new ArrayList<Transaction>() {{
+        List<Transaction> transactions = new ArrayList<>() {{
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};

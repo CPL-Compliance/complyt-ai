@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.Customer;
 import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,5 +13,5 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Mono<Transaction> markAsCancelled(@NonNull final String transactionId);
     Flux<Transaction> getTransactionsByQuery(@NonNull Query query);
     Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
-    Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction, @NonNull Customer customer);
+    Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
 }

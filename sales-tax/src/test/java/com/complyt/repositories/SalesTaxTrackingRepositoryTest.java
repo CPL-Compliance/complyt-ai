@@ -134,6 +134,7 @@ public class SalesTaxTrackingRepositoryTest {
         // given
         List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
             add(salesTaxTracking);
+
         }};
 
         Query query = Query.query(Criteria.where("tenantId").is(tenantId));

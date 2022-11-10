@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @With
 @AllArgsConstructor
-public class Item {
+public class Item implements Taxable {
     private float unitPrice;
     private int quantity;
     private float totalPrice;
@@ -25,7 +25,4 @@ public class Item {
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 
-    public float getManualSalesTaxAmount(){
-        return manualSalesTaxRate * totalPrice;
-    }
 }

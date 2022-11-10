@@ -1,12 +1,10 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.data_injector.TransactionCustomerInjector;
 import com.complyt.business.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.date_injector.NewTransactionInternalDateInjector;
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -48,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
         return transactionRepository.findByExternalId(externalId)
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
-                .map(createUpdateTransactionFunction(transaction))
+                .map(createFunctionUpdateTransaction(transaction))
                 .flatMap(transactionRepository::save);
     }
 
@@ -57,19 +55,15 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction newTransactionWithInternalTimeStamps = modifiedTransaction
                 .withInternalTimeStamps(originalTransaction.getInternalTimeStamps());
 
-        return new TransactionCustomerInjector(newTransactionWithInternalTimeStamps)
-                .inject(originalTransaction.getCustomer())
-                .flatMap(productClassificationService::getTransactionWithRelevantProductClassificationData)
+        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
                 .flatMap(countyProvider::provide)
                 .map(ModifiedTransactionInternalDateInjector::new)
                 .map(ModifiedTransactionInternalDateInjector::inject);
     }
 
     @Override
-    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction, @NonNull Customer customer) {
-        return new TransactionCustomerInjector(transaction)
-                .inject(customer)
-                .flatMap(productClassificationService::getTransactionWithRelevantProductClassificationData)
+    public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
+        return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
                 .map(NewTransactionInternalDateInjector::new)
                 .map(NewTransactionInternalDateInjector::inject);
@@ -97,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll();
     }
 
-    private Function<Transaction, Transaction> createUpdateTransactionFunction(@NonNull final Transaction transaction) {
+    private Function<Transaction, Transaction> createFunctionUpdateTransaction(@NonNull final Transaction transaction) {
         return transactionInfo -> transactionInfo
                 .withExternalId(transaction.getExternalId())
                 .withItems(transaction.getItems())
@@ -109,7 +103,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .withTransactionStatus(transaction.getTransactionStatus())
                 .withInternalTimeStamps(transaction.getInternalTimeStamps())
                 .withExternalTimeStamps(transaction.getExternalTimeStamps())
-                .withTransactionType(transaction.getTransactionType());
+                .withTransactionType(transaction.getTransactionType())
+                .withShippingFee(transaction.getShippingFee());
     }
 
 }

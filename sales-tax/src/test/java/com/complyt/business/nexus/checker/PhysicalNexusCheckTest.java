@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PhysicalNexusCheckTest {
 
-    PhysicalNexusCheck physicalNexusCheck;
+    PhysicalNexusChecker physicalNexusChecker;
 
     @BeforeEach
     void setUp() {
-        physicalNexusCheck = new PhysicalNexusCheck();
+        physicalNexusChecker = new PhysicalNexusChecker();
     }
 
     @Test
@@ -37,7 +37,7 @@ public class PhysicalNexusCheckTest {
                 true, physicalNexusTracker, null, LocalDateTime.now(), true, LocalDateTime.now());
 
         // When + Then
-        boolean hasPhysicalNexus = physicalNexusCheck.check(salesTaxTracking);
+        boolean hasPhysicalNexus = physicalNexusChecker.check(salesTaxTracking);
         assertTrue(hasPhysicalNexus);
     }
 
@@ -48,7 +48,7 @@ public class PhysicalNexusCheckTest {
 
         //When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            physicalNexusCheck.check(nullSalesTaxTracking);
+            physicalNexusChecker.check(nullSalesTaxTracking);
         });
 
         // Then

@@ -17,12 +17,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -45,25 +42,11 @@ class CustomerFacadeTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null);
+        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL);
     }
 
     @Test
-    void initFacade_NullServiceInstanceGiven_ThrowsNullPointerException() {
-        // Given
-        CustomerService service = null;
-        // When
-
-        // Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            CustomerFacade facade = new CustomerFacade(service);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "customerService is marked non-null but is null");
-    }
-
-    @Test
-    void saveCustomer_CustomerSaved_CustomerReturned() throws InterruptedException {
+    void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
 
         // When
@@ -75,7 +58,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned() throws InterruptedException {
+    void upsertCustomer_CustomerInserted_CustomerReturned() {
         // Given
 
         // When
@@ -92,7 +75,7 @@ class CustomerFacadeTest {
         String name = "NameToSearchFor";
 
         // When
-        when(customerService.findByName(name)).thenReturn(Flux.fromIterable(Arrays.asList(customer)));
+        when(customerService.findByName(name)).thenReturn(Flux.fromIterable(List.of(customer)));
         Flux<Customer> customers = customerFacade.findByName(name);
 
         // Then
@@ -100,7 +83,7 @@ class CustomerFacadeTest {
     }
 
     @Test
-    void getCustomerByExternalId_CustomerFound_CustomerReturned() throws InterruptedException {
+    void getCustomerByExternalId_CustomerFound_CustomerReturned() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);

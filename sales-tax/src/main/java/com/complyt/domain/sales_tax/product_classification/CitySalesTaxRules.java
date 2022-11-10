@@ -1,6 +1,9 @@
 package com.complyt.domain.sales_tax.product_classification;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor

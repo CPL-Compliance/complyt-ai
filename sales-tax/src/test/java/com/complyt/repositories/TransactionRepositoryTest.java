@@ -54,7 +54,7 @@ class TransactionRepositoryTest {
     void setUp() {
         tenantId = UUID.randomUUID().toString();
         transaction = createTransaction();
-        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), tenantId, CustomerType.RETAIL, null);
+        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), tenantId, CustomerType.RETAIL);
     }
 
     private Transaction createTransaction() {
@@ -64,20 +64,9 @@ class TransactionRepositoryTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         List<Item> items = new ArrayList<>();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE);
-    }
-
-    @Test
-    void init_NullReactiveMongoTemplateGiven_ThrowsException() {
-        // Given
-        reactiveMongoTemplate = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> new TransactionRepository(reactiveMongoTemplate, tenantResolver));
-
-        assertEquals(nullPointerException.getMessage(), "reactiveMongoTemplate is marked non-null but is null");
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null);
     }
 
     @Test

@@ -21,7 +21,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,7 +53,7 @@ public class ExemptionServiceImplTest {
     }
 
     private Customer createCustomer() {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null);
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
     }
 
     private Exemption createExemption() {
@@ -77,7 +79,7 @@ public class ExemptionServiceImplTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
     @Test
@@ -153,7 +155,7 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void update_IdDoesntExist_ReturnsEmptyMono() {
+    void update_IdDoesNotExist_ReturnsEmptyMono() {
         // Given
         String id = exemption.getId();
 
@@ -166,46 +168,13 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void isFullyExempted_NoExemptionStatesToCustomer_ReturnsFalse() {
-        // Given
-
-        // When
-        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
-
-        // Then
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
-    void isFullyExempted_StateDoesNotExistInCustomersExemptionsList_ReturnsFalse() {
-        // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("NY", ExemptionType.PARTIALLY);
-        }};
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
-
-        // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithNewCustomer)).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithNewCustomer);
-
-        // Then
-        StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
-    }
-
-    @Test
     void isFullyExempted_CustomerHasPartiallyExemptionInState_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("CA", ExemptionType.PARTIALLY);
-        }};
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
+        Exemption partialExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithNewCustomer)).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithNewCustomer);
+        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(partialExemption));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
@@ -214,15 +183,10 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_CustomerHasFullyExemptionInState_ReturnsTrue() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("CA", ExemptionType.FULLY);
-        }};
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithNewCustomer)).thenReturn(Mono.just(exemption));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithNewCustomer);
+        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(exemption));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
         StepVerifier.create(isFullyExemptedMono).expectNext(true).verifyComplete();
@@ -231,12 +195,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("CA", ExemptionType.FULLY);
-        }};
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
-        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
+        Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getToDate().plusYears(1), LocalDateTime.now()));
 
         // When
@@ -250,12 +209,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("CA", ExemptionType.FULLY);
-        }};
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
-        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
+        Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1), LocalDateTime.now()));
 
         // When
@@ -269,19 +223,11 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_ExemptionTypeIsPartially_ReturnsFalse() {
         // Given
-        Map<String, ExemptionType> exemptionStates = new HashMap<>() {{
-            put("CA", ExemptionType.FULLY);
-        }};
         Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
-        Customer newCustomer = customer.withExemptionsStates(exemptionStates);
-        Transaction transactionWithNewCustomer = transaction.withCustomer(newCustomer);
-        Transaction transactionWithDateLaterThanExemptionDate = transactionWithNewCustomer
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1), LocalDateTime.now()));
-
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemptionWithPartiallyType));
-        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
+        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(exemptionWithPartiallyType));
+        Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();

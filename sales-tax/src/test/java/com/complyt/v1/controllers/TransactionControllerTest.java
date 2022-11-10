@@ -199,7 +199,7 @@ class TransactionControllerTest {
         TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
         Transaction firstTransaction = transactionWithId.withExternalId(firstId);
         Transaction secondTransaction = transactionWithId.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<TransactionDto>() {{
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
             add(transactionNoId);
             add(secondTransactionNoId);
         }};

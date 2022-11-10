@@ -1,12 +1,9 @@
 package com.complyt.domain.customer;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.customer.exemption.ExemptionType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Map;
 
 @Getter
 @AllArgsConstructor
@@ -22,5 +19,4 @@ public class Customer {
     private final Address address;
     private final String tenantId;
     private final CustomerType customerType;
-    private final Map<String, ExemptionType> exemptionsStates;
 }

@@ -1,9 +1,9 @@
 package com.complyt.utils.query;
 
-import com.complyt.utils.factory.DateRange;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.utils.factory.DateRange;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;

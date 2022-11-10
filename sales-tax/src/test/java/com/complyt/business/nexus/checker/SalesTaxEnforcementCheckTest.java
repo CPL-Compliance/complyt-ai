@@ -10,21 +10,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SalesTaxEnforcementCheckTest {
 
-    SalesTaxEnforcementCheck salesTaxEnforcementCheck;
+    SalesTaxEnforcementChecker salesTaxEnforcementChecker;
 
     @BeforeEach
     void setUp() {
-        salesTaxEnforcementCheck = new SalesTaxEnforcementCheck();
+        salesTaxEnforcementChecker = new SalesTaxEnforcementChecker();
     }
 
     @Test
@@ -36,7 +36,7 @@ public class SalesTaxEnforcementCheckTest {
                 true, LocalDateTime.now());
 
         // When + Then
-        boolean isEnforcesSalesTax = salesTaxEnforcementCheck.check(salesTaxTracking);
+        boolean isEnforcesSalesTax = salesTaxEnforcementChecker.check(salesTaxTracking);
         assertTrue(isEnforcesSalesTax);
     }
 
@@ -47,7 +47,7 @@ public class SalesTaxEnforcementCheckTest {
 
         //When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxEnforcementCheck.check(nullSalesTaxTracking);
+            salesTaxEnforcementChecker.check(nullSalesTaxTracking);
         });
 
         // Then

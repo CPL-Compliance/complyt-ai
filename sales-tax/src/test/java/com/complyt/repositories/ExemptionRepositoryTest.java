@@ -69,7 +69,7 @@ public class ExemptionRepositoryTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, null);
     }
 
     private Exemption createExemption() {

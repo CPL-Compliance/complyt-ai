@@ -26,4 +26,5 @@ public class TransactionDto {
     private final TimeStampsDto internalTimeStamps;
     private final TimeStampsDto externalTimeStamps;
     private final TransactionTypeDto transactionType;
+    private final ShippingFeeDto shippingFee;
 }

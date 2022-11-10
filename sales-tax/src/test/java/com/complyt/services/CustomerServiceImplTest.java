@@ -19,7 +19,8 @@ import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +42,7 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL,null);
+        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL);
     }
 
     @Test
