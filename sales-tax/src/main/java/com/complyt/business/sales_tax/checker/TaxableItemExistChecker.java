@@ -10,9 +10,9 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class TaxableItemExistChecker {
+public class TaxableItemExistChecker implements SalesTaxApplyChecker<List<Item>> {
 
-    public boolean hasTaxableItem(@NonNull List<Item> items) {
+    public boolean check(@NonNull List<Item> items) {
         for (Item item : items) {
             if (item.getTaxableCategory().equals(TaxableCategory.TAXABLE)) {
                 log.debug("Taxable item found : " + item);
@@ -22,4 +22,5 @@ public class TaxableItemExistChecker {
         log.debug("No Taxable items found");
         return false;
     }
+
 }

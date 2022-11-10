@@ -19,7 +19,7 @@ public class TaxableCollectionBuilder {
 
     public Collection<Taxable> build(@NonNull Transaction transaction) {
         Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
-        if (transaction.getShippingFee() != null && taxableItemExistChecker.hasTaxableItem(transaction.getItems())) {
+        if (transaction.getShippingFee() != null && taxableItemExistChecker.check(transaction.getItems())) {
             taxables.add(transaction.getShippingFee());
         }
 

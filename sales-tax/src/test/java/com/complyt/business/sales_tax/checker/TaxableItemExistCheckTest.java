@@ -51,7 +51,7 @@ public class TaxableItemExistCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = taxableItemExistenceCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistenceCheck.check(items);
         assertTrue(hasTaxable);
     }
 
@@ -64,7 +64,7 @@ public class TaxableItemExistCheckTest {
         }};
 
         // When + Then
-        boolean hasTaxable = taxableItemExistenceCheck.hasTaxableItem(items);
+        boolean hasTaxable = taxableItemExistenceCheck.check(items);
         assertFalse(hasTaxable);
     }
 
@@ -75,7 +75,7 @@ public class TaxableItemExistCheckTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            taxableItemExistenceCheck.hasTaxableItem(nullItems);
+            taxableItemExistenceCheck.check(nullItems);
         });
 
         // Then

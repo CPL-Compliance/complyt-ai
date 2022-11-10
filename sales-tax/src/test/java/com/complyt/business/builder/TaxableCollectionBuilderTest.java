@@ -74,7 +74,7 @@ public class TaxableCollectionBuilderTest {
         expectedTaxables.add(transaction.getShippingFee());
 
         // When
-        when(taxableItemExistChecker.hasTaxableItem(transaction.getItems())).thenReturn(true);
+        when(taxableItemExistChecker.check(transaction.getItems())).thenReturn(true);
         List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
@@ -100,7 +100,7 @@ public class TaxableCollectionBuilderTest {
         List<Taxable> expectedTaxables = new ArrayList<>(transaction.getItems());
 
         // When
-        when(taxableItemExistChecker.hasTaxableItem(transaction.getItems())).thenReturn(false);
+        when(taxableItemExistChecker.check(transaction.getItems())).thenReturn(false);
         List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
