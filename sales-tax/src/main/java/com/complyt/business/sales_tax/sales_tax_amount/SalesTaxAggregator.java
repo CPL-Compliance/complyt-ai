@@ -18,8 +18,8 @@ import java.util.Optional;
 @ToString
 public class SalesTaxAggregator {
 
-    public float aggregate(@NonNull List<Taxable> taxAbles) {
-        Optional<Float> amount = taxAbles.stream().map(Taxable::calculateSalesTaxAmount).reduce(Float::sum);
+    public float aggregate(@NonNull List<Taxable> taxables) {
+        Optional<Float> amount = taxables.stream().map(Taxable::calculateSalesTaxAmount).reduce(Float::sum);
         log.debug("Sales tax amount calculated : " + amount);
 
         return amount.get();
