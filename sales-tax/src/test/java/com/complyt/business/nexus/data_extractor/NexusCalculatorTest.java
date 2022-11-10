@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -38,7 +38,7 @@ public class NexusCalculatorTest {
     NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Mock
-    QualificationCheck qualificationCheck;
+    QualificationChecker qualificationChecker;
 
     @Mock
     NexusTransactionCountExtractor nexusTransactionCountExtractor;
@@ -101,8 +101,8 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule();
         List<Taxable> firstTaxables = new ArrayList<>(transactions.get(0).getItems());
         List<Taxable> secondTaxables = new ArrayList<>(transactions.get(1).getItems());
-        TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, firstTaxables, nexusStateRule);
-        TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, secondTaxables, nexusStateRule);
+        TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, firstTaxables, nexusStateRule);
+        TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, secondTaxables, nexusStateRule);
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
@@ -110,8 +110,8 @@ public class NexusCalculatorTest {
         when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
         when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(0), nexusStateRule)).thenReturn(firstExtractor);
         when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(1), nexusStateRule)).thenReturn(secondExtractor);
-        when(qualificationCheck.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(qualificationCheck.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
 
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 

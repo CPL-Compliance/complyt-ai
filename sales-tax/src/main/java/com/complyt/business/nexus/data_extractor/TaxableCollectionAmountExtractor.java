@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.List;
 public class TaxableCollectionAmountExtractor implements AmountExtractor {
 
     @NonNull
-    private QualificationCheck qualificationCheck;
+    private QualificationChecker qualificationChecker;
 
     @NonNull
     private Collection<Taxable> taxables;
@@ -26,7 +26,7 @@ public class TaxableCollectionAmountExtractor implements AmountExtractor {
     private NexusStateRule nexusStateRule;
 
     public float extract() {
-        List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationCheck.isQualified(item, nexusStateRule)).toList();
+        List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationChecker.isQualified(item, nexusStateRule)).toList();
         float amount = 0;
 
         for(Taxable taxable : qualifiedTaxables)

@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -30,13 +30,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ItemsNexusStateRuleQualificationCheckTest {
+public class ItemsNexusStateRuleQualificationCheckerTest {
 
     @InjectMocks
     ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     @Mock
-    QualificationCheck qualificationCheck;
+    QualificationChecker qualificationChecker;
 
     private NexusStateRule nexusStateRule;
     Transaction transaction;
@@ -95,7 +95,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
     void check_NoItemsThatCountsRegardingToNexusRule_ReturnsFalse() {
         // Given
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
-        when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(false);
+        when(qualificationChecker.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(false);
 
         // When + Then
         boolean doItemsCount = itemsNexusStateRuleQualificationChecker.check(nexusStateRulePair);
@@ -110,7 +110,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         Item itemThatCounts = transaction.getItems().get(0).withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         transaction.getItems().add(itemThatCounts);
 
-        when(qualificationCheck.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
 
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 
@@ -127,7 +127,7 @@ public class ItemsNexusStateRuleQualificationCheckTest {
         ShippingFee shippingFeeThatCounts = transaction.getShippingFee().withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         Transaction transactionWithShippingFeeThatCounts = transaction.withShippingFee(shippingFeeThatCounts);
 
-        when(qualificationCheck.isQualified(transactionWithShippingFeeThatCounts.getItems().get(0), nexusStateRule)).thenReturn(false);
+        when(qualificationChecker.isQualified(transactionWithShippingFeeThatCounts.getItems().get(0), nexusStateRule)).thenReturn(false);
 
         Pair<List<Taxable>, NexusStateRule> nexusStateRulePair = new Pair(transaction.getItems(), nexusStateRule);
 

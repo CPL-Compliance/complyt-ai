@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class ItemsNexusStateRuleQualificationChecker implements NexusCheck<Pair<
      */
 
     @NonNull
-    private QualificationCheck qualificationCheck;
+    private QualificationChecker qualificationChecker;
 
     @Override
     public boolean check(@NonNull Pair<List<Taxable>, NexusStateRule> itemsAndRule) {
@@ -33,7 +33,7 @@ public class ItemsNexusStateRuleQualificationChecker implements NexusCheck<Pair<
                 + nexusStateRule.getTangibleCategories());
 
         for (Taxable item : items) {
-            if (qualificationCheck.isQualified(item, nexusStateRule)) {
+            if (qualificationChecker.isQualified(item, nexusStateRule)) {
                 return true;
             }
         }

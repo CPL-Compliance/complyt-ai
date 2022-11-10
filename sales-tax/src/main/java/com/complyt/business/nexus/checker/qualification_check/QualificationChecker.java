@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class QualificationCheck {
+public class QualificationChecker {
 
     public boolean isQualified(Taxable taxAble, @NonNull NexusStateRule nexusStateRule) {
         if (taxAble == null) {

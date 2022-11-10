@@ -1,7 +1,7 @@
 package com.complyt.utils;
 
 import com.complyt.business.builder.TaxableCollectionBuilder;
-import com.complyt.business.nexus.checker.qualification_check.QualificationCheck;
+import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.business.nexus.data_extractor.TaxableCollectionAmountExtractor;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.CustomerType;
@@ -39,7 +39,7 @@ public class NexusAmountAggregatorFactoryTest {
     NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Mock
-    QualificationCheck qualificationCheck;
+    QualificationChecker qualificationChecker;
 
     @Mock
     TaxableCollectionBuilder taxableCollectionBuilder;
@@ -108,7 +108,7 @@ public class NexusAmountAggregatorFactoryTest {
         // Given
         List<Taxable> taxables = new ArrayList<>(transaction.getItems());
         taxables.add(transaction.getShippingFee());
-        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
+        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, taxables, nexusStateRule);
 
         // When
         when(taxableCollectionBuilder.build(transaction)).thenReturn(taxables);
@@ -125,7 +125,7 @@ public class NexusAmountAggregatorFactoryTest {
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
         List<Taxable> taxables = new ArrayList<>(transactionWithNullShippingFee.getItems());
 
-        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationCheck, taxables, nexusStateRule);
+        TaxableCollectionAmountExtractor expectedExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, taxables, nexusStateRule);
 
         // When
         when(taxableCollectionBuilder.build(transactionWithNullShippingFee)).thenReturn(taxables);
