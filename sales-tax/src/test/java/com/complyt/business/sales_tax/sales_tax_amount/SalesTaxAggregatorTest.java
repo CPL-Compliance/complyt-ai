@@ -103,6 +103,6 @@ public class SalesTaxAggregatorTest {
         });
 
         // Then
-        assertEquals("taxAbles is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("taxables is marked non-null but is null", nullPointerException.getMessage());
     }
 }

@@ -23,7 +23,8 @@ public class SalesTaxRatesProvider {
     public SalesTaxRate calculateSalesTaxRate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules,@NonNull SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
             log.info("None taxable rule - returning sales tax rate that is set to 0");
-            return new SalesTaxRate(0, 0, 0, 0, 0, 0);
+
+            return SalesTaxRate.zeroSalesTaxRate();
         }
         
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
