@@ -15,7 +15,7 @@ import java.util.Collection;
 public class TaxableCollectionBuilder {
 
     @NonNull
-    TaxableItemExistChecker taxableItemExistChecker;
+    private final TaxableItemExistChecker taxableItemExistChecker;
 
     public Collection<Taxable> build(@NonNull Transaction transaction) {
         Collection<Taxable> taxables = new ArrayList<>(transaction.getItems());
