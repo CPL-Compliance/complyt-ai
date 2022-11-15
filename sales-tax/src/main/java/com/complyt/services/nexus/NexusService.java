@@ -73,7 +73,8 @@ public class NexusService {
     }
 
     public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction) {
-        return transaction.getTransactionType() == TransactionType.INVOICE;
+        return transaction.getTransactionType() == TransactionType.INVOICE ||
+                transaction.getTransactionType() == TransactionType.REFUND;
     }
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
