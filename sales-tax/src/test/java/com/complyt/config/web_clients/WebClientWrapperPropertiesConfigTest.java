@@ -42,11 +42,13 @@ class WebClientWrapperPropertiesConfigTest {
 
     @Test
     void stubFastTaxWebClientWrapperProperties_createStubFastTaxWebClientWrapperProperties_getStubFastTaxWebClientWrapperProperties() {
-        String licenseKey = "License Key";
-        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("", "", "", new Pair<String, String>("", ""));
+        // Given
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
+        // When
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.stubFastTaxWebClientWrapperProperties();
 
+        // Then
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
 }

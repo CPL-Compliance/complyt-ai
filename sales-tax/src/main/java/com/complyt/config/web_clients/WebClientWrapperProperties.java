@@ -18,6 +18,6 @@ public class WebClientWrapperProperties {
     private final Pair<String, String> key;
 
     public static WebClientWrapperProperties WebClientWrapperPropertiesStub(){
-        return new WebClientWrapperProperties("", "", "", new Pair<String, String>("", ""));
+        return new WebClientWrapperProperties("", "", "", new Pair<>("", ""));
     }
 }
