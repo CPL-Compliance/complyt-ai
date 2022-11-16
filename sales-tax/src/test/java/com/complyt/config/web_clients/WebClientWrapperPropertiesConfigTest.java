@@ -15,7 +15,7 @@ class WebClientWrapperPropertiesConfigTest {
     }
 
     @Test
-    void fastTaxWebClientWrapper() {
+    void fastTaxWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "ws.serviceobjects.com",
@@ -28,7 +28,7 @@ class WebClientWrapperPropertiesConfigTest {
     }
 
     @Test
-    void zipTaxWebClientWrapper() {
+    void zipTaxWebClientWrapperProperties_createZipTaxWebClientWrapperProperties_getZipTaxWebClientWrapperProperties() {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "api.zip-tax.com",
@@ -36,6 +36,16 @@ class WebClientWrapperPropertiesConfigTest {
                 new Pair<>("key", licenseKey));
 
         WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.zipTaxWebClientWrapperProperties(licenseKey);
+
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
+
+    @Test
+    void stubFastTaxWebClientWrapperProperties_createStubFastTaxWebClientWrapperProperties_getStubFastTaxWebClientWrapperProperties() {
+        String licenseKey = "License Key";
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("", "", "", new Pair<String, String>("", ""));
+
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
