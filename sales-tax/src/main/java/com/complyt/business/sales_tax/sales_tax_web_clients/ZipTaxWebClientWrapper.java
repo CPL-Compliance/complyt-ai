@@ -2,6 +2,7 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
+import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
@@ -25,26 +26,19 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase impleme
     @Override
     public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
         URI uri = buildUri(zip, address, city, state);
-        WebClient webClient = buildWebClient(uri);
 
         return webClient
                 .get()
+                .uri(uri)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(ZipTaxData.class)
-                .cast(SalesTaxData.class);
+                .cast(SalesTaxData.class).log();
     }
 
     @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
         return findByAddress(address.getZip(), address.getStreet(), address.getCity(), address.getState());
-    }
-
-    private WebClient buildWebClient(URI uri) {
-        return WebClient
-                .builder()
-                .baseUrl(uri.toString())
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
     }
 
     protected URI buildUri(String zip, String address, String city, String state) {
