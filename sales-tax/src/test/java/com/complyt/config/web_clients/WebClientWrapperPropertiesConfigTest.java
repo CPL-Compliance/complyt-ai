@@ -22,7 +22,7 @@ class WebClientWrapperPropertiesConfigTest {
                 "FT/web.svc/json/GetBestMatch",
                 new Pair<>("licensekey", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxWebClientWrapper(licenseKey);
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxWebClientWrapperProperties(licenseKey);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
@@ -35,7 +35,7 @@ class WebClientWrapperPropertiesConfigTest {
                 "request/v40",
                 new Pair<>("key", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.zipTaxWebClientWrapper(licenseKey);
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.zipTaxWebClientWrapperProperties(licenseKey);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }

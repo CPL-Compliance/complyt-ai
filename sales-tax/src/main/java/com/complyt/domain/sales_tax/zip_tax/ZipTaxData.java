@@ -10,6 +10,7 @@ import java.util.List;
 @ToString
 @With
 @AllArgsConstructor
+@NoArgsConstructor
 public class ZipTaxData implements SalesTaxData {
     private String version;
     private long rCode;

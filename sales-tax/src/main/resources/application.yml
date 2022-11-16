@@ -1,17 +1,10 @@
-spring.application.name: sales-tax-service
+spring.application.name: sales-tax
+
 spring:
   profiles:
     active:
-      # local - to run your application directly on the OS
-      # local-docker - to run your application in a docker container
-      # connected to a MongoDB that runs in a docker container as well.
-      # To run in this profile execute ./mvnw clean package docker:build docker:run
-      # production - This is for production only
-      - production
-      # fastTax - to use FastTax service
-      # stubFastTax - to use stub method of FastTax
-      # zipTax - to use Zip Tax Service
-      - fastTax
+      - @activeEnv@
+      - @activeTaxClient@
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
@@ -52,20 +45,3 @@ spring.security:
     resourceserver:
       jwt:
         issuer-uri: ${ISSUER_URI}
-
-logging:
-  level:
-    root: INFO
-    web: INFO
-    org:
-      springframework:
-        security: INFO
-    reactor:
-      netty:
-        http: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
