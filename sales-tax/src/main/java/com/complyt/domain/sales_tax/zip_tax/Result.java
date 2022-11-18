@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Result {
     private String geoPostalCode;
     private String geoCity;

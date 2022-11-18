@@ -40,7 +40,7 @@ public class ZipTaxWebClientWrapper extends SalesTaxWebClientWrapperBase impleme
     public Mono<SalesTaxData> findByAddress(Address address) {
         return findByAddress(address.getZip(), address.getStreet(), address.getCity(), address.getState());
     }
-    
+
     protected URI buildUri(String zip, String address, String city, String state) {
         List<String> params = Arrays.asList(address, city, state, zip);
         String addressParam = String.join(",", params);

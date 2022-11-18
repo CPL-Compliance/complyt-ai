@@ -17,7 +17,7 @@ public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRa
     @Mapping(target = "cityRate", source = "citySalesTax")
     @Mapping(target = "taxRate", source = "taxSales")
     @Mapping(target = "countyRate", source = "countySalesTax")
-    @Mapping(target = "countyDistrictRate", source = "districtSalesTax")
+    @Mapping(target = "countyDistrictRate", source = "district5SalesTax")
     @Mapping(target = "stateRate", source = "stateSalesTax")
     SalesTaxRate map(Result result);
 
