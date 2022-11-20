@@ -22,6 +22,7 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -83,8 +84,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, new NexusStateRule(
-                null,false,null,null, null, null, null, null),LocalDateTime.now());
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule,dateReference);
         });
 
         // Then
@@ -93,11 +93,11 @@ public class NexusTransactionsSearchQueryBuilderTest {
     @Test
     void buildNexusTransactionsSearch_NexusStateRuleIsNull_ThrowsException() {
         // Given
-        NexusStateRule nullNesusStateRule = null;
+        NexusStateRule nullNexusStateRule = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(new Nexus(LocalDateTime.now()), nullNesusStateRule,LocalDateTime.now());
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule,dateReference);
         });
 
         // Then
@@ -110,8 +110,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(new Nexus(LocalDateTime.now()), new NexusStateRule(
-                    null,false,null,null, null, null, null, null),nullLocalDateTime);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule,nullLocalDateTime);
         });
 
         // Then
