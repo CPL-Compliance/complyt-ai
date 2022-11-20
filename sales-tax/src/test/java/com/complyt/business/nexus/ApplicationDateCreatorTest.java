@@ -113,5 +113,18 @@ public class ApplicationDateCreatorTest {
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
 
     }
+    @Test
+    void create_NullTimeFramePassed_ThrowsException() {
+        // Given
+        TimeFrame nullTimeFrame = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            applicationDateCreator.create(nullTimeFrame, referenceDate);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "timeFrame is marked non-null but is null");
+    }
 
 }
