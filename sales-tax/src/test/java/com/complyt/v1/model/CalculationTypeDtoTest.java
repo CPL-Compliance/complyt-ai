@@ -9,7 +9,7 @@ public class CalculationTypeDtoTest {
     @Test
     public void CalculationTypeDto_getFixed_gotFixed() {
         CalculationTypeDto calculationTypeDto = CalculationTypeDto.FIXED;
-        assertEquals(CalculationTypeDto.FIXED, calculationTypeDto);
+        assertEquals(CalculationTypeDto.FIXED, calculationTypeDto); 
     }
 
     @Test
