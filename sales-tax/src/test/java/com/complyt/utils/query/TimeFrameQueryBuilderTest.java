@@ -1,4 +1,4 @@
-package com.complyt.business.query;
+package com.complyt.utils.query;
 
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;

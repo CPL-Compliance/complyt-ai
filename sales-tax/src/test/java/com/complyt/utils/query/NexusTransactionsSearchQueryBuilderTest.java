@@ -1,11 +1,9 @@
-package com.complyt.business.query;
+package com.complyt.utils.query;
 
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.utils.query.TimeFrameQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,6 +21,7 @@ import java.util.UUID;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -77,5 +76,45 @@ public class NexusTransactionsSearchQueryBuilderTest {
         // Then
         assertEquals(expectedQuery, actualQuery);
     }
+    @Test
+    void buildNexusTransactionsSearch_NexusInfoIsNull_ThrowsException() {
+        // Given
+        Nexus nullNexusInfo = null;
 
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, new NexusStateRule(
+                null,false,null,null, null, null, null, null),LocalDateTime.now());
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusInfo is marked non-null but is null");
+    }
+    @Test
+    void buildNexusTransactionsSearch_NexusStateRuleIsNull_ThrowsException() {
+        // Given
+        NexusStateRule nullNesusStateRule = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(new Nexus(LocalDateTime.now()), nullNesusStateRule,LocalDateTime.now());
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
+    }
+    @Test
+    void buildNexusTransactionsSearch_ReferenceDateIsNull_ThrowsException() {
+        // Given
+        LocalDateTime nullLocalDateTime = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(new Nexus(LocalDateTime.now()), new NexusStateRule(
+                    null,false,null,null, null, null, null, null),nullLocalDateTime);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
 }
