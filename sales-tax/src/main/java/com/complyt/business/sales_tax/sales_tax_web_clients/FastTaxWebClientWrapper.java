@@ -30,8 +30,7 @@ public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implem
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(FastTaxData.class)
-                .cast(SalesTaxData.class)
-                .log();
+                .cast(SalesTaxData.class);
     }
 
     @Override

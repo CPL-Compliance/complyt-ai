@@ -40,6 +40,7 @@
 
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
         <!-- Plugins -->
     </properties>
 
@@ -159,6 +160,11 @@
                     <autoVersionSubmodules>false</autoVersionSubmodules>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -176,4 +182,59 @@
             <url>https://maven.pkg.github.com/Complyt/complyt</url>
         </repository>
     </distributionManagement>
+
+    <profiles>
+        <!-- Environment Profiles -->
+        <profile>
+            <id>production</id>
+            <properties>
+                <activeEnv>production</activeEnv>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>development</id>
+            <properties>
+                <activeEnv>development</activeEnv>
+            </properties>
+        </profile>
+        <profile>
+            <id>demo</id>
+            <properties>
+                <activeEnv>demo</activeEnv>
+            </properties>
+        </profile>
+        <profile>
+            <id>penetration-test</id>
+            <properties>
+                <activeEnv>penetration-test</activeEnv>
+            </properties>
+        </profile>
+        <!-- Environment Profiles -->
+        <!-- Tax Client Profiles -->
+        <profile>
+            <id>fastTax</id>
+            <properties>
+                <activeTaxClient>fastTax</activeTaxClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>zipTax</id>
+            <properties>
+                <activeTaxClient>zipTax</activeTaxClient>
+            </properties>
+        </profile>
+        <profile>
+            <id>stubFastTax</id>
+            <properties>
+                <activeTaxClient>stubFastTax</activeTaxClient>
+            </properties>
+        </profile>
+        <!-- Tax Client Profiles -->
+    </profiles>
 </project>

@@ -11,6 +11,7 @@ import java.util.List;
 @With
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class TaxInfoItem {
     private String city;

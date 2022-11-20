@@ -2,7 +2,7 @@ package com.complyt.config;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
-import com.complyt.config.web_clients.WebClientWrapperConfig;
+import com.complyt.config.web_clients.SalesTaxWebClientWrapperConfig;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class WebClientWrapperConfigTest {
+public class SalesTaxWebClientWrapperConfigTest {
 
     @InjectMocks
-    WebClientWrapperConfig webClientWrapperConfig;
+    SalesTaxWebClientWrapperConfig salesTaxWebClientWrapperConfig;
 
     @Mock
     WebClient webClient;
@@ -46,7 +46,7 @@ public class WebClientWrapperConfigTest {
                 zipTaxWebClientWrapperProperties.getKey());
 
         ZipTaxWebClientWrapper actualZipTaxWebClientWrapper =
-                webClientWrapperConfig.zipTaxWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.zipTaxWebClientWrapper(webClient);
 
         assertEquals(expectedZipTaxWebClientWrapper, actualZipTaxWebClientWrapper);
     }
@@ -66,7 +66,7 @@ public class WebClientWrapperConfigTest {
                 fastTaxWebClientWrapperProperties.getKey());
 
         FastTaxWebClientWrapper actualFastTaxWebClientWrapper =
-                webClientWrapperConfig.fastTaxWebClientWrapper(webClient);
+                salesTaxWebClientWrapperConfig.fastTaxWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }

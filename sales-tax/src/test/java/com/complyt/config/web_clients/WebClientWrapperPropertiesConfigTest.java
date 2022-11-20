@@ -15,28 +15,40 @@ class WebClientWrapperPropertiesConfigTest {
     }
 
     @Test
-    void fastTaxWebClientWrapper() {
+    void fastTaxWebClientWrapperProperties_createFastTaxWebClientWrapperProperties_getFastTaxWebClientWrapperProperties() {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "ws.serviceobjects.com",
                 "FT/web.svc/json/GetBestMatch",
                 new Pair<>("licensekey", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxWebClientWrapper(licenseKey);
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.fastTaxWebClientWrapperProperties(licenseKey);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
 
     @Test
-    void zipTaxWebClientWrapper() {
+    void zipTaxWebClientWrapperProperties_createZipTaxWebClientWrapperProperties_getZipTaxWebClientWrapperProperties() {
         String licenseKey = "License Key";
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = new WebClientWrapperProperties("https",
                 "api.zip-tax.com",
                 "request/v40",
                 new Pair<>("key", licenseKey));
 
-        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.zipTaxWebClientWrapper(licenseKey);
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.zipTaxWebClientWrapperProperties(licenseKey);
 
+        assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
+
+    @Test
+    void stubFastTaxWebClientWrapperProperties_createStubFastTaxWebClientWrapperProperties_getStubFastTaxWebClientWrapperProperties() {
+        // Given
+        WebClientWrapperProperties expectedFastTaxWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
+
+        // When
+        WebClientWrapperProperties actualFastTaxWebClientWrapper = webClientWrapperPropertiesConfig.stubFastTaxWebClientWrapperProperties();
+
+        // Then
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
     }
 }
