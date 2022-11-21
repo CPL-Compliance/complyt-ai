@@ -62,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.findById(id);
     }
 
-    private Function<Customer, Customer> createFunctionUpdateCustomer(@NonNull final Customer customer) {
+    private Function<Customer, Customer> createFunctionUpdateCustomer( final Customer customer) {
         return customerInfo -> customerInfo.withExternalId(customer.getExternalId())
                 .withAddress(customer.getAddress())
                 .withName(customer.getName());
