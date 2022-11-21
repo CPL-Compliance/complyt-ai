@@ -31,6 +31,10 @@ public class SecurityConfig {
         indeed intended for our app. Adding our own validator is easy to do:
         */
 
+        System.out.println("*****************" + issuer);
+        System.out.println("*****************" + issuer);
+        System.out.println("*****************" + issuer);
+        System.out.println("*****************" + issuer);
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);

@@ -15,5 +15,6 @@ public class SalesTaxApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+
     }
 }
