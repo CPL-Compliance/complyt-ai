@@ -2,6 +2,7 @@ package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationChecker;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionType;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -21,7 +22,8 @@ public class NexusTransactionCountExtractor implements NexusDataExtractor<Intege
     public Integer extract(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
         final int COUNTED = 1, NOT_COUNTED = 0;
         boolean itemsQualify = itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule));
+        boolean transactionIsNotOfTypeRefund = transaction.getTransactionType() != TransactionType.REFUND;
 
-        return itemsQualify ? COUNTED : NOT_COUNTED;
+        return itemsQualify && transactionIsNotOfTypeRefund ? COUNTED : NOT_COUNTED;
     }
 }
