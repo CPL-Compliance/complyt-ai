@@ -25,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class CustomerFullyExemptionCheckTest {
 
-    CustomerFullyExemptionCheck customerFullyExemptionCheck;
+    CustomerFullyExemptionChecker customerFullyExemptionChecker;
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
+        customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
     }
 
     private Transaction createTransaction() {
@@ -57,7 +57,7 @@ public class CustomerFullyExemptionCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
+            customerFullyExemptionChecker.check(nullExemption);
         });
 
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
@@ -70,7 +70,7 @@ public class CustomerFullyExemptionCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
+            customerFullyExemptionChecker.check(nullExemption);
         });
 
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");

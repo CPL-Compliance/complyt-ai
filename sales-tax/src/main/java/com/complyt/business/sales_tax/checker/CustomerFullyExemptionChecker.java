@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerFullyExemptionCheck implements SalesTaxApplyCheck<Exemption> {
+public class CustomerFullyExemptionChecker implements SalesTaxApplyCheck<Exemption> {
 
     @NonNull
     private Transaction transaction;
