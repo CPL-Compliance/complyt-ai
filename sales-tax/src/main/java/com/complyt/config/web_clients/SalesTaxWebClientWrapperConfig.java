@@ -10,13 +10,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class WebClientWrapperConfig {
+public class SalesTaxWebClientWrapperConfig {
 
     @Autowired
     private WebClientWrapperProperties fastTaxWebClientWrapperProperties;
 
     @Autowired
     private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
+
+    @Autowired
+    private WebClientWrapperProperties stubFastTaxWebClientWrapperProperties;
 
     @Profile({"fastTax", "default"})
     @Bean("salesTaxWebClientWrapper")
@@ -40,7 +43,7 @@ public class WebClientWrapperConfig {
 
     @Profile("stubFastTax")
     @Bean("salesTaxWebClientWrapper")
-    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper() {
+    public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
         return new StubFastTaxWebClientWrapper();
     }
 }

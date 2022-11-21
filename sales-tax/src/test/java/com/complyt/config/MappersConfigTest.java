@@ -1,6 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.sales_tax.mappers.ZipTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -18,7 +19,7 @@ public class MappersConfigTest {
     MappersConfig mappersConfig;
 
     @Test
-    void fastTaxDataToSalesTaxRateMapper_CreatesMapperInstance_ReturnsMapperInstance(){
+    void fastTaxDataToSalesTaxRateMapper_CreatesFastTaxDataToSalesTaxRateMapper_ReturnFastTaxDataToSalesTaxRateMapper(){
         // Given
         FastTaxDataToSalesTaxRateMapper fastTaxDataToSalesTaxRateMapper = FastTaxDataToSalesTaxRateMapper.INSTANCE;
 
@@ -27,5 +28,17 @@ public class MappersConfigTest {
 
         // Then
         Assertions.assertEquals(fastTaxDataToSalesTaxRateMapper, secondFastTaxDataToSalesTaxRateMapper);
+    }
+
+    @Test
+    void zipTaxDataToSalesTaxRateMapper_CreatesZipTaxDataToSalesTaxRateMapper_ReturnZipTaxDataToSalesTaxRateMapper(){
+        // Given
+        ZipTaxDataToSalesTaxRateMapper zipTaxDataToSalesTaxRateMapper = ZipTaxDataToSalesTaxRateMapper.INSTANCE;
+
+        // When
+        ZipTaxDataToSalesTaxRateMapper secondZipTaxDataToSalesTaxRateMapper = mappersConfig.zipTaxDataToSalesTaxRateMapper();
+
+        // Then
+        Assertions.assertEquals(zipTaxDataToSalesTaxRateMapper, secondZipTaxDataToSalesTaxRateMapper);
     }
 }

@@ -4,18 +4,18 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/sales_tax
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/alex
 
 logging:
   level:
-    root: INFO
-    web: INFO
+    root: DEBUG
+    web: DEBUG
     org:
       springframework:
-        security: INFO
+        security: DEBUG
     reactor:
       netty:
-        http: INFO
+        http: DEBUG
 
 management:
   endpoints:

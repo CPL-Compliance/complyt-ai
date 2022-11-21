@@ -1,15 +1,14 @@
 package com.complyt.domain.sales_tax.zip_tax;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Result {
     private String geoPostalCode;
     private String geoCity;
