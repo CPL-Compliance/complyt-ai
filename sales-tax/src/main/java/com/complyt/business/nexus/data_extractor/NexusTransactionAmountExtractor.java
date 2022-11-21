@@ -17,7 +17,8 @@ public class NexusTransactionAmountExtractor implements NexusDataExtractor<Float
 
     @Override
     public Float extract(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
-        float totalAmount = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule).extract();
+        TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
+        float totalAmount = amountExtractor.extract();
 
         return transaction.getTransactionType() == TransactionType.REFUND ? -1 * totalAmount : totalAmount;
     }
