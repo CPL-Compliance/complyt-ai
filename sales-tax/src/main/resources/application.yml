@@ -40,6 +40,9 @@ spring.config.import: vault://
 
 auth0:
   audience: https://sales-tax-service/
+
+# This property sets the issuer URI
+# for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security:
   oauth2:
     resourceserver:
