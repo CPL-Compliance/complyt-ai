@@ -1,4 +1,4 @@
-package com.complyt.business.data_fetcher;
+package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
