@@ -56,6 +56,8 @@ class TransactionControllerTest {
 
     TransactionDto transactionDto;
 
+    TransactionController transactionController;
+
     @BeforeEach
     void cleanUp() {
         MockitoAnnotations.openMocks(this);
@@ -240,17 +242,20 @@ class TransactionControllerTest {
                 .expectStatus().isNoContent();
     }
 
+    @WithUserDetails()
     @Test
     void getOne_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
-        TransactionController transactionController = new TransactionController(transactionFacade);
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.getOne(nullExternalId);
-        });
-        // Then
-        assertEquals( "externalId is marked non-null but is null", nullPointerException.getMessage());
+        // When + Then
+        webTestClient.mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionController.BASE_URL + "/" + nullExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -285,7 +290,7 @@ class TransactionControllerTest {
     void delete_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
-        TransactionController transactionController = new TransactionController(transactionFacade);
+        transactionController = new TransactionController(transactionFacade);
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.delete(nullExternalId);
