@@ -18,11 +18,12 @@ import java.util.List;
 public class NexusCalculator {
 
     @NonNull
-    private NexusTransactionsAmountExtractor nexusTransactionsAmountExtractor;
+    @Qualifier("nexusTransactionsAmountExtractor")
+    private NexusDataExtractor<Float, List<Transaction>> nexusTransactionsAmountExtractor;
 
     @NonNull
     @Qualifier("nexusTransactionsCountExtractor")
-    private NexusTransactionsCountExtractor nexusTransactionsCountExtractor;
+    private NexusDataExtractor<Integer, List<Transaction>> nexusTransactionsCountExtractor;
 
     @NonNull
     @Qualifier("transactionsFilterByNexusRules")

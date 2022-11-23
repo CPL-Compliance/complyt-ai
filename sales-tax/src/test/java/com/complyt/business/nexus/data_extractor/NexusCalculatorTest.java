@@ -41,6 +41,7 @@ public class NexusCalculatorTest {
     @Mock
     TransactionsFilterByNexusRules transactionNexusFilter;
 
+
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         ObjectId tenantId = new ObjectId();
@@ -89,7 +90,7 @@ public class NexusCalculatorTest {
         // Given
         List<Transaction> transactions = createTransactionsList();
 
-        long count = transactions.size();
+        int count = transactions.size();
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
@@ -109,7 +110,7 @@ public class NexusCalculatorTest {
     void calculate_CustomerTypeDoesNotExist_ReturnsSummary() {
         // Given
         List<Transaction> transactions = createTransactionsList();
-        long count = 0;
+        int count = 0;
         float amount = 0;
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
@@ -118,9 +119,6 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
 
         // When
-        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionsCountExtractor.extract(transactions, nexusStateRule)).thenReturn(count);
-        when(nexusTransactionsAmountExtractor.extract(transactions, nexusStateRule)).thenReturn(amount);
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
