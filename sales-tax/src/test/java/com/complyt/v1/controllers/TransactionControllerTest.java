@@ -247,15 +247,13 @@ class TransactionControllerTest {
     void getOne_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
-        // When + Then
-        webTestClient.mutateWith(csrf())
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionController.BASE_URL + "/" + nullExternalId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
+        TransactionController transactionController = new TransactionController(transactionFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.getOne(nullExternalId);
+        });
+        // Then
+        assertEquals( "externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
