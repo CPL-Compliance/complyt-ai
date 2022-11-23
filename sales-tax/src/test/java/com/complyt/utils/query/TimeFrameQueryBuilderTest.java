@@ -163,7 +163,7 @@ public class TimeFrameQueryBuilderTest {
         //Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
-    @Test void buildNexusTimeFrame_NullRefferenceDate_ThrowsException() {
+    @Test void buildNexusTimeFrame_NullReferenceDate_ThrowsException() {
         // Given
         LocalDateTime nullReferenceDate = null;
 
