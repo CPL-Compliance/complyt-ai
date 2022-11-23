@@ -63,7 +63,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
 
     private List<Item> createItemsNoRules() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
                 null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
         return new ArrayList<>() {{
@@ -100,7 +100,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     @Test
     void inject_InjectsDataToTransaction_ReturnsTransaction() {
         List<Item> itemsNoRules = createItemsNoRules();
-        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
                 CalculationType.FIXED, "rule1", 0, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
                 CalculationType.FIXED, "rule2", 0, null);
@@ -123,7 +123,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     void shouldInject_DefaultMethodGetsExecuted_ReturnsTrue() {
         TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
 
-        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
                 CalculationType.FIXED, "rule1", 0, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
                 CalculationType.FIXED, "rule2", 0, null);
