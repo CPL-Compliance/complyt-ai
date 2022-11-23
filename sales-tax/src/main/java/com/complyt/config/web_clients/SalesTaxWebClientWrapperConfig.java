@@ -21,7 +21,7 @@ public class SalesTaxWebClientWrapperConfig {
     @Autowired
     private WebClientWrapperProperties stubFastTaxWebClientWrapperProperties;
 
-    @Profile({"fastTax", "default"})
+    @Profile({"fastTax"})
     @Bean("salesTaxWebClientWrapper")
     public FastTaxWebClientWrapper fastTaxWebClientWrapper(WebClient webClient) {
         return new FastTaxWebClientWrapper(webClient,
@@ -41,7 +41,7 @@ public class SalesTaxWebClientWrapperConfig {
                 zipTaxWebClientWrapperProperties.getKey());
     }
 
-    @Profile("stubFastTax")
+    @Profile({"stubFastTax", "default"})
     @Bean("salesTaxWebClientWrapper")
     public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
         return new StubFastTaxWebClientWrapper();
