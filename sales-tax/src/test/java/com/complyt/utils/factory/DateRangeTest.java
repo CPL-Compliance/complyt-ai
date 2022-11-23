@@ -1,4 +1,4 @@
-package com.complyt.business.factory;
+package com.complyt.utils.factory;
 
 import com.complyt.utils.factory.DateRange;
 import org.junit.jupiter.api.Test;

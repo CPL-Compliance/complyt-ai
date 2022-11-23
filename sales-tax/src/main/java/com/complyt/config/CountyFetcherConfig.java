@@ -1,7 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.business.data_fetcher.TransactionFastTaxCountyFetcher;
-import com.complyt.business.data_fetcher.TransactionZipTaxCountyFetcher;
+import com.complyt.business.transaction.data_fetcher.TransactionFastTaxCountyFetcher;
+import com.complyt.business.transaction.data_fetcher.TransactionZipTaxCountyFetcher;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;

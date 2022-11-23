@@ -1,12 +1,13 @@
-package com.complyt.business.data_fetcher;
+package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.transaction.data_fetcher.TransactionZipTaxCountyFetcher;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.sales_tax.zip_tax.Result;
+import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +30,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TransactionFastTaxCountyFetcherTest {
+class TransactionZipTaxCountyFetcherTest {
 
     @InjectMocks
-    private TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher;
+    private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
@@ -62,25 +63,28 @@ class TransactionFastTaxCountyFetcherTest {
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId.toString(), null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
     }
 
-    private TaxInfoItem createTaxInfoItem() {
-        return new TaxInfoItem("city", "", "", "injectedCounty", "", "", null, "", "", "", "", "", "", "", "", "");
+    private Result createResult() {
+        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
+                0f, 0f, 0f, 0f, "", 0f, 0, "",
+                0f, 0f, "", 0, 0, "", 0,
+                0, "", 0, 0, "", 0, 0, "",
+                0, 0, "");
     }
 
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
-        TaxInfoItem taxInfoItem = createTaxInfoItem();
-        List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
-            add(taxInfoItem);
+        Result result = createResult();
+        List<Result> results = new ArrayList<>() {{
+            add(result);
         }};
-        FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems);
+        ZipTaxData zipTaxData = new ZipTaxData("version", 0, results);
         Transaction transactionWithInjectedCounty = transaction
                 .withShippingAddress(transaction.getShippingAddress()
-                        .withCounty(fastTaxData.getTaxInfoItems().get(0).getCounty()));
+                        .withCounty(zipTaxData.getResults().get(0).getGeoCounty()));
 
-        // When
-        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        Mono<String> countyMono = transactionFastTaxCountyFetcher.fetch(transaction.getShippingAddress());
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(zipTaxData));
+        Mono<String> countyMono = transactionZipTaxCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
         StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().getCounty()).verifyComplete();
