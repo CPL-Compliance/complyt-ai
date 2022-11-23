@@ -110,7 +110,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(transactions.get(0).getItems(), nexusStateRule))).thenReturn(true);
-        int count = nexusTransactionsCountExtractor.extract(transactions, nexusStateRule);
+        long count = nexusTransactionsCountExtractor.extract(transactions, nexusStateRule);
 
         // Then
         assertEquals(count, 1);
@@ -129,7 +129,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
-        int count = nexusTransactionsCountExtractor.extract(otherList, nexusStateRule);
+        long count = nexusTransactionsCountExtractor.extract(otherList, nexusStateRule);
 
         // Then
         assertEquals(count, 0);

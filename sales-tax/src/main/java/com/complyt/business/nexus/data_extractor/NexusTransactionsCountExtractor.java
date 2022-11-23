@@ -13,14 +13,14 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsCountExtractor implements NexusDataExtractor<Integer, List<Transaction>> {
+public class NexusTransactionsCountExtractor implements NexusDataExtractor<Long, List<Transaction>> {
 
     @NonNull
     private ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     @Override
-    public Integer extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
-        int count = 0;
+    public Long extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
+        long count = 0;
 
         for (Transaction transaction : transactions) {
             boolean itemsQualify = itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule));
