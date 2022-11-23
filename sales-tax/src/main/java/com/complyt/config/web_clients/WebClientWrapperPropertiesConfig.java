@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class WebClientWrapperPropertiesConfig {
 
-    @Profile({"fastTax", "default"})
+    @Profile("fastTax")
     @Bean("fastTaxWebClientWrapperProperties")
     public WebClientWrapperProperties fastTaxWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
         return WebClientWrapperProperties.builder()
@@ -29,7 +29,7 @@ public class WebClientWrapperPropertiesConfig {
                 .key(new Pair<>("key", licenseKey)).build();
     }
 
-    @Profile("stubFastTax")
+    @Profile({"stubFastTax", "default"})
     @Bean("stubFastTaxWebClientWrapperProperties")
     public WebClientWrapperProperties stubFastTaxWebClientWrapperProperties() {
         return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
