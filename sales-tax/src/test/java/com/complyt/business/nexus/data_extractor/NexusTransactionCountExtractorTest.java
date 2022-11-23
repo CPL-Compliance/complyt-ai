@@ -37,12 +37,12 @@ import static org.mockito.Mockito.when;
 public class NexusTransactionCountExtractorTest {
 
     @InjectMocks
-    NexusTransactionCountExtractor nexusTransactionCountExtractor;
+    NexusTransactionsCountExtractor nexusTransactionsCountExtractor;
 
     @Mock
     ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
-    Transaction transaction;
+    List<Transaction> transactions;
     NexusStateRule nexusStateRule;
     Customer customer;
     ObjectId customerId;
@@ -50,7 +50,7 @@ public class NexusTransactionCountExtractorTest {
     @BeforeEach
     void setUp() {
         customer = createCustomer();
-        transaction = createTransaction();
+        transactions = createTransactions();
         nexusStateRule = createNexusStateRule();
     }
 
@@ -83,7 +83,7 @@ public class NexusTransactionCountExtractorTest {
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
-    private Transaction createTransaction() {
+    private List<Transaction> createTransactions() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -98,7 +98,10 @@ public class NexusTransactionCountExtractorTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        return new ArrayList<>() {{
+            add(transaction);
+        }};
     }
 
     @Test
@@ -106,8 +109,8 @@ public class NexusTransactionCountExtractorTest {
         // Given
 
         // When
-        when(itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule))).thenReturn(true);
-        int count = nexusTransactionCountExtractor.extract(transaction, nexusStateRule);
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(transactions.get(0).getItems(), nexusStateRule))).thenReturn(true);
+        int count = nexusTransactionsCountExtractor.extract(transactions, nexusStateRule);
 
         // Then
         assertEquals(count, 1);
@@ -117,13 +120,16 @@ public class NexusTransactionCountExtractorTest {
     void extract_ExtractsTransactionItemsCount_ReturnsShouldNotBeCountedBecauseItemsDontQualify() {
         // Given
         List<Item> items = new ArrayList<>() {{
-            add(transaction.getItems().get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
+            add(transactions.get(0).getItems().get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
         }};
-        Transaction otherTransaction = transaction.withItems(items);
+        Transaction otherTransaction = transactions.get(0).withItems(items);
+        List<Transaction> otherList = new ArrayList<>() {{
+            add(otherTransaction);
+        }};
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
-        int count = nexusTransactionCountExtractor.extract(otherTransaction, nexusStateRule);
+        int count = nexusTransactionsCountExtractor.extract(otherList, nexusStateRule);
 
         // Then
         assertEquals(count, 0);
@@ -132,15 +138,15 @@ public class NexusTransactionCountExtractorTest {
     @Test
     void extract_NullTransactionPassed_ThrowsException() {
         // Given
-        Transaction nullTransaction = null;
+        List<Transaction> nullTransactions = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionCountExtractor.extract(nullTransaction, nexusStateRule);
+            nexusTransactionsCountExtractor.extract(nullTransactions, nexusStateRule);
         });
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "transactions is marked non-null but is null");
     }
 
     @Test
@@ -150,7 +156,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionCountExtractor.extract(transaction, nullNexusStateRule);
+            nexusTransactionsCountExtractor.extract(transactions, nullNexusStateRule);
         });
 
         // Then
