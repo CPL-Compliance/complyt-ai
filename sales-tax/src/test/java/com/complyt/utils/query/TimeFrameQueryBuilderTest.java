@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +29,7 @@ public class TimeFrameQueryBuilderTest {
     TimeFrameQueryBuilder timeFrameQueryBuilder;
     Nexus nexusInfo;
     NexusStateRule nexusStateRule;
+
 
     @BeforeEach
     void setUp() {
@@ -122,5 +124,55 @@ public class TimeFrameQueryBuilderTest {
         // When + Then
         Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame,referenceDate);
         assertEquals(expectedQuery, actualQuery);
+    }
+    @Test void Build_NullDateRangePassed_ThrowsException() {
+        //Given
+        DateRange nullDateRange = null;
+
+        //When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            timeFrameQueryBuilder.build(nullDateRange);
+        });
+
+        //Then
+        assertEquals(nullPointerException.getMessage(), "dateRange is marked non-null but is null");
+    }
+    @Test void buildNexusTimeFrame_NullNexusInfo_ThrowsException() {
+        // Given
+        Nexus nullNexusInfo = null;
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            timeFrameQueryBuilder.buildNexusTimeFrame(nullNexusInfo, nexusStateRule, referenceDate);
+        });
+
+        //Then
+        assertEquals(nullPointerException.getMessage(), "nexusInfo is marked non-null but is null");
+    }
+    @Test void buildNexusTimeFrame_NullNexusStateRule_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+        LocalDateTime referenceDate = LocalDateTime.now();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nullNexusStateRule, referenceDate);
+        });
+
+        //Then
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
+    }
+    @Test void buildNexusTimeFrame_NullRefferenceDate_ThrowsException() {
+        // Given
+        LocalDateTime nullReferenceDate = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, nexusStateRule, nullReferenceDate);
+        });
+
+        //Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
 }

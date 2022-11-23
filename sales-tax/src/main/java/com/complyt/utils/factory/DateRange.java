@@ -21,7 +21,7 @@ public class DateRange {
     private final LocalDateTime start;
     private final LocalDateTime end;
 
-    private DateRange(@NonNull LocalDateTime start, @NonNull LocalDateTime end) {
+    private DateRange( LocalDateTime start, LocalDateTime end) {
         this.start = start;
         this.end = end;
     }

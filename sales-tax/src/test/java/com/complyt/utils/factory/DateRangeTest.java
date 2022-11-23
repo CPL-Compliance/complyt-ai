@@ -1,9 +1,11 @@
-package com.complyt.business.factory;
+package com.complyt.utils.factory;
 
 import com.complyt.utils.factory.DateRange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -15,11 +17,15 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DateRangeTest {
+
+
 
     @Test
     void newPrevCalenderYear_DateRangeCreated_DateRangeReturned() {
@@ -236,5 +242,8 @@ public class DateRangeTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
-
+    @Test void DateRangeFactoryConstructor_DefaultConstructor_gotInstance() {
+        DateRange.Factory factory = new DateRange.Factory();
+        assertEquals(factory.getClass(), DateRange.Factory.class);
+    }
 }
