@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsCountExtractor implements NexusDataExtractor<Integer, List<Transaction>> {
+public class NexusTransactionsCountCalculator implements NexusDataExtractor<Integer, List<Transaction>> {
 
     @NonNull
     private ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;

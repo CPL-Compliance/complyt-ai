@@ -12,7 +12,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsAmountExtractor implements NexusDataExtractor<Float, List<Transaction>> {
+public class NexusTransactionsAmountCalculator implements NexusDataExtractor<Float, List<Transaction>> {
 
     @NonNull
     private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;

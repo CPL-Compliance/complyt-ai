@@ -33,10 +33,10 @@ public class NexusCalculatorTest {
     NexusCalculator nexusCalculator;
 
     @Mock
-    NexusTransactionsAmountExtractor nexusTransactionsAmountExtractor;
+    NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
 
     @Mock
-    NexusTransactionsCountExtractor nexusTransactionsCountExtractor;
+    NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @Mock
     TransactionsFilterByNexusRules transactionNexusFilter;
@@ -97,8 +97,8 @@ public class NexusCalculatorTest {
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionsCountExtractor.extract(transactions, nexusStateRule)).thenReturn(count);
-        when(nexusTransactionsAmountExtractor.extract(transactions, nexusStateRule)).thenReturn(amount);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(count);
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(amount);
 
         NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 

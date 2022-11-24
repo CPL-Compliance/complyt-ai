@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NexusTransactionCountExtractorTest {
+public class NexusTransactionCountCalculatorTest {
 
     @InjectMocks
-    NexusTransactionsCountExtractor nexusTransactionsCountExtractor;
+    NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @Mock
     ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
@@ -110,7 +110,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(transactions.get(0).getItems(), nexusStateRule))).thenReturn(true);
-        int count = nexusTransactionsCountExtractor.extract(transactions, nexusStateRule);
+        int count = nexusTransactionsCountCalculator.extract(transactions, nexusStateRule);
 
         // Then
         assertEquals(count, 1);
@@ -129,7 +129,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
-        int count = nexusTransactionsCountExtractor.extract(otherList, nexusStateRule);
+        int count = nexusTransactionsCountCalculator.extract(otherList, nexusStateRule);
 
         // Then
         assertEquals(count, 0);
@@ -142,7 +142,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsCountExtractor.extract(nullTransactions, nexusStateRule);
+            nexusTransactionsCountCalculator.extract(nullTransactions, nexusStateRule);
         });
 
         // Then
@@ -156,7 +156,7 @@ public class NexusTransactionCountExtractorTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsCountExtractor.extract(transactions, nullNexusStateRule);
+            nexusTransactionsCountCalculator.extract(transactions, nullNexusStateRule);
         });
 
         // Then
