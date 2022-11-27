@@ -1,4 +1,4 @@
-package com.complyt.business.data_injector;
+package com.complyt.business.transaction.data_injector;
 
 import com.complyt.domain.Transaction;
 import reactor.core.publisher.Mono;
