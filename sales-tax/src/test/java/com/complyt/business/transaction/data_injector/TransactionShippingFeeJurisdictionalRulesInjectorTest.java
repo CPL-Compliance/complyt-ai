@@ -1,5 +1,6 @@
-package com.complyt.business.data_injector;
+package com.complyt.business.transaction.data_injector;
 
+import com.complyt.business.transaction.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

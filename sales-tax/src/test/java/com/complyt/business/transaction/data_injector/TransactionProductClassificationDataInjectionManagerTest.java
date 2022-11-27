@@ -1,5 +1,6 @@
-package com.complyt.business.data_injector;
+package com.complyt.business.transaction.data_injector;
 
+import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjectionManager;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
