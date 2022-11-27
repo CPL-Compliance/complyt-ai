@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -44,6 +46,8 @@ class CustomerControllerTest {
     Customer customer;
 
     CustomerDto customerDto;
+
+    CustomerController customerController;
 
     @BeforeEach
     void setUp() {
@@ -213,5 +217,71 @@ class CustomerControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(Customer.class)
                 .value(customers -> customers, equalTo(allCustomers));
+    }
+
+    @Test
+    void upsertCustomer_NullExternalId_ThrowsNullPointerException() {
+        //Given
+        String nullExternalId = null;
+        customerController = new CustomerController(customerFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerController.upsertCustomer(nullExternalId, customerDto);
+        });
+        // Then
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsertCustomer_NullCustomerDto_ThrowsNullPointerException() {
+        //Given
+        String externalId = UUID.randomUUID().toString();
+        CustomerDto nullCustomerDto = null;
+        customerController = new CustomerController(customerFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerController.upsertCustomer(externalId, nullCustomerDto);
+        });
+        // Then
+        assertEquals("customerDto is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void create_NullCustomerDto_ThrowsNullPointerException() {
+        //Given
+        CustomerDto nullCustomerDto = null;
+        customerController = new CustomerController(customerFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerController.create(nullCustomerDto);
+        });
+        // Then
+        assertEquals("customerDto is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getByExternalId_NullExternalId_ThrowsNullPointerException() {
+        //Given
+        String nullExternalId = null;
+        customerController = new CustomerController(customerFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerController.getByExternalId(nullExternalId);
+        });
+        // Then
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getByName_NullName_ThrowsNullPointerException() {
+        //Given
+        String nullName = null;
+        customerController = new CustomerController(customerFacade);
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerController.getByName(nullName);
+        });
+        // Then
+        assertEquals("name is marked non-null but is null", nullPointerException.getMessage());
     }
 }
