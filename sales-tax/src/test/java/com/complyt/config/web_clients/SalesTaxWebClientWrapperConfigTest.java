@@ -1,6 +1,7 @@
 package com.complyt.config.web_clients;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import com.complyt.config.web_clients.SalesTaxWebClientWrapperConfig;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
@@ -69,5 +70,16 @@ public class SalesTaxWebClientWrapperConfigTest {
                 salesTaxWebClientWrapperConfig.fastTaxWebClientWrapper(webClient);
 
         assertEquals(expectedFastTaxWebClientWrapper, actualFastTaxWebClientWrapper);
+    }
+    @Test
+    void stubFastTaxWebClientWrapper_SetInstance_ReturnInstance() {
+
+
+        StubFastTaxWebClientWrapper expectedStubFastTaxWebClientWrapper = new StubFastTaxWebClientWrapper();
+
+        StubFastTaxWebClientWrapper actualStubFastTaxWebClientWrapper =
+                salesTaxWebClientWrapperConfig.stubFastTaxWebClientWrapper(webClient);
+
+        assertEquals(expectedStubFastTaxWebClientWrapper, actualStubFastTaxWebClientWrapper);
     }
 }
