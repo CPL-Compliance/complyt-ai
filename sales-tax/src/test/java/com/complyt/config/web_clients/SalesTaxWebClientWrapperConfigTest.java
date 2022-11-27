@@ -1,4 +1,4 @@
-package com.complyt.config;
+package com.complyt.config.web_clients;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ZipTaxWebClientWrapper;
