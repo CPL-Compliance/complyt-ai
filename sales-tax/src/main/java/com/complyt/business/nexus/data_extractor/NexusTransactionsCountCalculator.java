@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.javatuples.Pair;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -19,15 +20,17 @@ public class NexusTransactionsCountCalculator implements NexusDataExtractor<Inte
     private ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
 
     @Override
-    public Integer extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
-        int count = 0;
+    public Mono<Integer> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
+        return Mono.fromCallable(() -> {
+            int count = 0;
+            for (Transaction transaction : transactions) {
+                boolean itemsQualify = itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule));
+                boolean transactionIsNotOfTypeRefund = transaction.getTransactionType() != TransactionType.REFUND;
+                count += itemsQualify && transactionIsNotOfTypeRefund ? 1 : 0;
+            }
 
-        for (Transaction transaction : transactions) {
-            boolean itemsQualify = itemsNexusStateRuleQualificationChecker.check(new Pair(transaction.getItems(), nexusStateRule));
-            boolean transactionIsNotOfTypeRefund = transaction.getTransactionType() != TransactionType.REFUND;
-            count += itemsQualify && transactionIsNotOfTypeRefund ? 1 : 0;
-        }
-
-        return count;
+            return count;
+        });
     }
+
 }

@@ -18,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,13 +99,13 @@ public class NexusCalculatorTest {
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(count);
-        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(amount);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary, actualSummary);
+        StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
     }
 
     @Test
@@ -119,10 +121,13 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
 
         // When
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary, actualSummary);
+        StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
     }
 
 }

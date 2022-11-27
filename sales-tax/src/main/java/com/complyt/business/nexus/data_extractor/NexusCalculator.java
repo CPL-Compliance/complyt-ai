@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,16 +26,16 @@ public class NexusCalculator {
     @NonNull
     private TransactionsFilterByNexusRules transactionsFilterByNexusRules;
 
-    public NexusCalculationSummary calculate(List<Transaction> transactions, NexusStateRule nexusStateRule) {
+    public Mono<NexusCalculationSummary> calculate(List<Transaction> transactions, NexusStateRule nexusStateRule) {
         log.debug("Calculating amount and count for all transactions on timeframe : " + nexusStateRule.getTimeFrame());
 
         List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
-        long count = nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule);
-        float amount = nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule);
-
-        log.debug("Calculated total amount of : " + amount + ", and count : " + count);
-        return new NexusCalculationSummary(count, amount);
+        return nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule)
+                .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule)
+                        .map(amount -> {
+                            log.debug("Calculated total amount of : " + amount + ", and count : " + count);
+                            return new NexusCalculationSummary(count, amount);
+                        }));
     }
-
 }

@@ -21,6 +21,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -110,10 +112,10 @@ public class NexusTransactionCountCalculatorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(transactions.get(0).getItems(), nexusStateRule))).thenReturn(true);
-        int count = nexusTransactionsCountCalculator.extract(transactions, nexusStateRule);
+        Mono<Integer> count = nexusTransactionsCountCalculator.extract(transactions, nexusStateRule);
 
         // Then
-        assertEquals(count, 1);
+        StepVerifier.create(count).expectNext(1).verifyComplete();
     }
 
     @Test
@@ -129,10 +131,10 @@ public class NexusTransactionCountCalculatorTest {
 
         // When
         when(itemsNexusStateRuleQualificationChecker.check(new Pair(otherTransaction.getItems(), nexusStateRule))).thenReturn(false);
-        int count = nexusTransactionsCountCalculator.extract(otherList, nexusStateRule);
+        Mono<Integer> count = nexusTransactionsCountCalculator.extract(otherList, nexusStateRule);
 
         // Then
-        assertEquals(count, 0);
+        StepVerifier.create(count).expectNext(0).verifyComplete();
     }
 
     @Test

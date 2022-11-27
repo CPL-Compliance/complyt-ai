@@ -159,7 +159,7 @@ class NexusServiceTest {
         Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
-        List<Transaction> transactionList = new ArrayList<Transaction>() {{
+        List<Transaction> transactionList = new ArrayList<>() {{
             add(transaction);
         }};
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
@@ -176,7 +176,7 @@ class NexusServiceTest {
         when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
-        when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(summary);
+        when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(false);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
 
@@ -214,7 +214,7 @@ class NexusServiceTest {
         when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
-        when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(summary);
+        when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(true);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
         when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished, nexusStateRule, referenceDate))
