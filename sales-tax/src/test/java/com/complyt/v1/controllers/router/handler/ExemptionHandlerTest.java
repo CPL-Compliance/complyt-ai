@@ -55,6 +55,8 @@ ExemptionHandlerTest {
 
     Exemption exemption;
 
+    ExemptionRouter exemptionRouter;
+
     @BeforeEach
     public void setUp() {
         exemption = createExemption();
@@ -249,4 +251,5 @@ ExemptionHandlerTest {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
 }
