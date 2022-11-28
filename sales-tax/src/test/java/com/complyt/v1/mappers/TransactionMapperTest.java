@@ -54,7 +54,7 @@ public class TransactionMapperTest {
         
         // When
         TransactionDto actualTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(givenTransaction);
-
+        
         // Then
         assertEquals(transactionDto, actualTransactionDto);
     }
@@ -64,10 +64,10 @@ public class TransactionMapperTest {
 
         // Given
         TransactionDto givenTransactionDto = transactionDto;
-
+        
         // When
         Transaction actualTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-
+        
         // Then
         assertEquals(transactionNoTenant, actualTransaction);
     }
