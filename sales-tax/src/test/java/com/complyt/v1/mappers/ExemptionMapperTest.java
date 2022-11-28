@@ -51,8 +51,10 @@ public class ExemptionMapperTest {
 
         // Given
         Exemption givenExemption = exemption;
+
         // When
         ExemptionDto exemptionDtoResult = ExemptionMapper.INSTANCE.exemptionToExemptionDto(givenExemption);
+
         // Then
         assertEquals(exemptionDto, exemptionDtoResult);
     }

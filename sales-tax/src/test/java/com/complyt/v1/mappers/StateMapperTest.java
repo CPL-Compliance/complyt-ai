@@ -28,8 +28,10 @@ public class StateMapperTest {
 
         // Given
         State givenState = state;
+
         // When
         StateDto actualStateDto = StateMapper.INSTANCE.stateToStateDto(givenState);
+
         // Then
         assertEquals(stateDto, actualStateDto);
     }
@@ -39,8 +41,10 @@ public class StateMapperTest {
 
         // Given
         StateDto givenStateDto = stateDto;
+
         // When
         State actualState = StateMapper.INSTANCE.stateDtoToState(givenStateDto);
+
         // Then
         assertEquals(state, actualState);
     }

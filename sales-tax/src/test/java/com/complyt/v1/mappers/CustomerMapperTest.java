@@ -45,8 +45,10 @@ public class CustomerMapperTest {
 
         // Given
         Customer givenCustomer = customer;
+
         // When
         CustomerDto actualCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(givenCustomer);
+
         // Then
         assertEquals(customerDto, actualCustomerDto);
     }
