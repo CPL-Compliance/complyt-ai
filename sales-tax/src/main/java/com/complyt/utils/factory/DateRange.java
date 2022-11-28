@@ -21,7 +21,7 @@ public class DateRange {
     private final LocalDateTime start;
     private final LocalDateTime end;
 
-    private DateRange( LocalDateTime start, LocalDateTime end) {
+    private DateRange(LocalDateTime start, LocalDateTime end) {
         this.start = start;
         this.end = end;
     }
@@ -42,7 +42,7 @@ public class DateRange {
                     .withNano(0);
 
             LocalDateTime lastDayOfLastYear = firstDayOfLastYear.with(lastDayOfYear())
-                    .with(LocalTime.of(23,59,59));
+                    .with(LocalTime.of(23, 59, 59));
 
             return new DateRange(firstDayOfLastYear, lastDayOfLastYear);
         }
@@ -56,7 +56,7 @@ public class DateRange {
                     .withNano(0);
 
             LocalDateTime lastDayOfThisYear = firstDayOfTheYear.with(lastDayOfYear())
-                    .with(LocalTime.of(23,59,59));
+                    .with(LocalTime.of(23, 59, 59));
 
             return new DateRange(firstDayOfTheYear, lastDayOfThisYear);
         }
@@ -84,10 +84,9 @@ public class DateRange {
             LocalDateTime startDate, endDate;
 
             // from october 1st to december 31st
-            if(referenceDate.compareTo(september30) < 0) {
+            if (referenceDate.compareTo(september30) < 0) {
                 startDate = september30.minusYears(1);
-            }
-            else {
+            } else {
                 startDate = september30;
             }
 
@@ -95,7 +94,7 @@ public class DateRange {
             return new DateRange(startDate, endDate);
         }
 
-        public static DateRange newTaxableYear(@NonNull LocalDateTime taxableDate,@NonNull LocalDateTime referenceDate) {
+        public static DateRange newTaxableYear(@NonNull LocalDateTime taxableDate, @NonNull LocalDateTime referenceDate) {
             LocalDateTime startDate, endDate;
             LocalDateTime taxableDateWithSameYearAsReferenceDate = taxableDate.withYear(referenceDate.getYear());
             int minusYears;

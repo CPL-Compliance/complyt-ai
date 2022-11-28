@@ -41,25 +41,27 @@ public class CustomerMapperTest {
     }
 
     @Test
-    void customerToCustomerDto_Customer_gotCustomerDto() {
+    void customerToCustomerDto_Customer_returnCustomerDto() {
 
         // Given
-        Customer exampleCustomer = customer;
+        Customer givenCustomer = customer;
         // When
-        CustomerDto customerDtoResult = CustomerMapper.INSTANCE.customerToCustomerDto(customer);
+        CustomerDto actualCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(givenCustomer);
         // Then
-        assertEquals(customerDto, customerDtoResult);
+        assertEquals(customerDto, actualCustomerDto);
     }
 
     @Test
-    void customerDtoToCustomer_CustomerDto_gotCustomer() {
+    void customerDtoToCustomer_CustomerDto_returnCustomer() {
 
         // Given
-        CustomerDto exampleCustomerDto = customerDto;
+        CustomerDto givenCustomerDto = customerDto;
+
         // When
-        Customer customerResult = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Customer actualCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+
         // Then
-        assertEquals(customerNoTenant, customerResult);
+        assertEquals(customerNoTenant, actualCustomer);
     }
 
     private Customer createCustomer(String tenantId) {
@@ -67,6 +69,7 @@ public class CustomerMapperTest {
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
         return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
     }
+
     private CustomerDto createCustomerDto() {
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");

@@ -340,7 +340,14 @@ class TransactionServiceImplTest {
             LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
             LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
 
-            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() && expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() && expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() && expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() && expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() && expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() && expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() && expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
         }).expectComplete().verify();
     }
 
@@ -368,7 +375,14 @@ class TransactionServiceImplTest {
             LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
             LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
 
-            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() && expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() && expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() && expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() && expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() && expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() && expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() && expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
         }).expectComplete().verify();
     }
 

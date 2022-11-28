@@ -19,29 +19,29 @@ public class StateMapperTest {
 
     @BeforeEach
     void setup() {
-        state =  new State("CA", "02", "California");
+        state = new State("CA", "02", "California");
         stateDto = new StateDto("CA", "02", "California");
     }
 
     @Test
-    void stateToStateDto_State_gotStateDto() {
+    void stateToStateDto_State_returnStateDto() {
 
         // Given
-        State exampleState = state;
+        State givenState = state;
         // When
-        StateDto stateDtoResult = StateMapper.INSTANCE.stateToStateDto(exampleState);
+        StateDto actualStateDto = StateMapper.INSTANCE.stateToStateDto(givenState);
         // Then
-        assertEquals(stateDto, stateDtoResult);
+        assertEquals(stateDto, actualStateDto);
     }
 
     @Test
-    void stateDtoToState_StateDto_gotState() {
+    void stateDtoToState_StateDto_returnState() {
 
         // Given
-        StateDto exampleStateDto = stateDto;
+        StateDto givenStateDto = stateDto;
         // When
-        State stateResult = StateMapper.INSTANCE.stateDtoToState(exampleStateDto);
+        State actualState = StateMapper.INSTANCE.stateDtoToState(givenStateDto);
         // Then
-        assertEquals(state, stateResult);
+        assertEquals(state, actualState);
     }
 }

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 public class DateRangeTest {
 
 
-
     @Test
     void newPrevCalenderYear_DateRangeCreated_DateRangeReturned() {
         // Given
@@ -132,7 +131,7 @@ public class DateRangeTest {
         //When + Then
         DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
-        assertEquals(expectedStartDate.getYear(),actualDateRange.getStart().getYear());
+        assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
         assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
         assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
     }
@@ -242,7 +241,9 @@ public class DateRangeTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
-    @Test void DateRangeFactoryConstructor_DefaultConstructor_gotInstance() {
+
+    @Test
+    void DateRangeFactoryConstructor_DefaultConstructor_gotInstance() {
         DateRange.Factory factory = new DateRange.Factory();
         assertEquals(factory.getClass(), DateRange.Factory.class);
     }

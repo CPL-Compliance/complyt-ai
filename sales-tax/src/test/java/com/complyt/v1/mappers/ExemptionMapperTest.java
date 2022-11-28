@@ -47,25 +47,27 @@ public class ExemptionMapperTest {
     }
 
     @Test
-    void ExemptionToExemptionDto_Exemption_gotExemptionDto() {
+    void ExemptionToExemptionDto_Exemption_returnExemptionDto() {
 
         // Given
-        Exemption exampleExemption = exemption;
+        Exemption givenExemption = exemption;
         // When
-        ExemptionDto exemptionDtoResult = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exampleExemption);
+        ExemptionDto exemptionDtoResult = ExemptionMapper.INSTANCE.exemptionToExemptionDto(givenExemption);
         // Then
         assertEquals(exemptionDto, exemptionDtoResult);
     }
 
     @Test
-    void ExemptionDtoToExemption_ExemptionDto_gotExemption() {
+    void ExemptionDtoToExemption_ExemptionDto_returnExemption() {
 
         // Given
-        ExemptionDto exampleExemptionDto = exemptionDto;
+        ExemptionDto givenExemptionDto = exemptionDto;
+
         // When
-        Exemption exemptionResult = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exampleExemptionDto);
+        Exemption actualExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
         // Then
-        assertEquals(exemptionNoTenant, exemptionResult);
+        assertEquals(exemptionNoTenant, actualExemption);
     }
 
     private Exemption createExemption(String tenantId) {

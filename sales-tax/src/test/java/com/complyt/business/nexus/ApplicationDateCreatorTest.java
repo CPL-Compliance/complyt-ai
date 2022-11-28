@@ -113,6 +113,7 @@ public class ApplicationDateCreatorTest {
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
 
     }
+
     @Test
     void create_NullTimeFramePassed_ThrowsException() {
         // Given

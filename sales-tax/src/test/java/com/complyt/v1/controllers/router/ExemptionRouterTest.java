@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 public class ExemptionRouterTest {
+
     ExemptionRouter exemptionRouter;
 
     @Test
@@ -20,11 +21,13 @@ public class ExemptionRouterTest {
         // Given
         ExemptionHandler nullExemptionHandler = null;
         exemptionRouter = new ExemptionRouter();
+
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             exemptionRouter.exemptionsRoute(nullExemptionHandler);
         });
+
         // Then
-        assertEquals("exemptionHandler is marked non-null but is null",nullPointerException.getMessage());
+        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
     }
 }

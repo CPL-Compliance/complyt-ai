@@ -35,7 +35,7 @@ public class TimeFrameQueryBuilderTest {
     void setUp() {
         timeFrameQueryBuilder = new TimeFrameQueryBuilder();
         nexusStateRule = createNexusStateRule();
-        nexusInfo = new Nexus( LocalDateTime.now());
+        nexusInfo = new Nexus(LocalDateTime.now());
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -71,7 +71,7 @@ public class TimeFrameQueryBuilderTest {
                 .lte(dateRange.getEnd()));
 
         // When + Then
-        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, ruleWithPrevCalenderYearTimeFrame,referenceDate);
+        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, ruleWithPrevCalenderYearTimeFrame, referenceDate);
         assertEquals(expectedQuery, actualQuery);
     }
 
@@ -87,7 +87,7 @@ public class TimeFrameQueryBuilderTest {
                 .lte(dateRange.getEnd()));
 
         // When + Then
-        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, ruleWithSeptemberToSeptemberTimeFrame,referenceDate);
+        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, ruleWithSeptemberToSeptemberTimeFrame, referenceDate);
         assertEquals(expectedQuery, actualQuery);
     }
 
@@ -99,13 +99,13 @@ public class TimeFrameQueryBuilderTest {
         LocalDateTime referenceDate = LocalDateTime.now();
         LocalDateTime localDateTimeTaxableDate = nexusWithTaxableDate.getTaxableDate();
 
-        DateRange dateRange = DateRange.Factory.newTaxableYear(localDateTimeTaxableDate,referenceDate);
+        DateRange dateRange = DateRange.Factory.newTaxableYear(localDateTimeTaxableDate, referenceDate);
         Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
 
         // When + Then
-        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame,referenceDate);
+        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame, referenceDate);
         assertEquals(expectedQuery, actualQuery);
     }
 
@@ -122,10 +122,12 @@ public class TimeFrameQueryBuilderTest {
                 .lte(dateRange.getEnd()));
 
         // When + Then
-        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame,referenceDate);
+        Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusWithTaxableDate, ruleWithTaxableYearTimeFrame, referenceDate);
         assertEquals(expectedQuery, actualQuery);
     }
-    @Test void Build_NullDateRangePassed_ThrowsException() {
+
+    @Test
+    void Build_NullDateRangePassed_ThrowsException() {
         //Given
         DateRange nullDateRange = null;
 
@@ -137,7 +139,9 @@ public class TimeFrameQueryBuilderTest {
         //Then
         assertEquals(nullPointerException.getMessage(), "dateRange is marked non-null but is null");
     }
-    @Test void buildNexusTimeFrame_NullNexusInfo_ThrowsException() {
+
+    @Test
+    void buildNexusTimeFrame_NullNexusInfo_ThrowsException() {
         // Given
         Nexus nullNexusInfo = null;
         LocalDateTime referenceDate = LocalDateTime.now();
@@ -150,7 +154,9 @@ public class TimeFrameQueryBuilderTest {
         //Then
         assertEquals(nullPointerException.getMessage(), "nexusInfo is marked non-null but is null");
     }
-    @Test void buildNexusTimeFrame_NullNexusStateRule_ThrowsException() {
+
+    @Test
+    void buildNexusTimeFrame_NullNexusStateRule_ThrowsException() {
         // Given
         NexusStateRule nullNexusStateRule = null;
         LocalDateTime referenceDate = LocalDateTime.now();
@@ -163,7 +169,9 @@ public class TimeFrameQueryBuilderTest {
         //Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
-    @Test void buildNexusTimeFrame_NullReferenceDate_ThrowsException() {
+
+    @Test
+    void buildNexusTimeFrame_NullReferenceDate_ThrowsException() {
         // Given
         LocalDateTime nullReferenceDate = null;
 

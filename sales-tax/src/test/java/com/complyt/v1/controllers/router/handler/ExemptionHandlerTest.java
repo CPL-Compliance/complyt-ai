@@ -44,8 +44,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @Import(JacksonConfig.class)
 @Slf4j
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
-public class
-ExemptionHandlerTest {
+public class ExemptionHandlerTest {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -54,8 +53,6 @@ ExemptionHandlerTest {
     private ExemptionFacade exemptionFacade;
 
     Exemption exemption;
-
-    ExemptionRouter exemptionRouter;
 
     @BeforeEach
     public void setUp() {

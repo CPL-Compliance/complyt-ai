@@ -47,25 +47,25 @@ public class TransactionMapperTest {
     }
 
     @Test
-    void transactionToTransactionDto_Transaction_gotTransactionDto() {
+    void transactionToTransactionDto_Transaction_returnTransactionDto() {
 
         // Given
-        Transaction exampleTransaction = transaction;
+        Transaction givenTransaction = transaction;
         // When
-        TransactionDto transactionDtoResult = TransactionMapper.INSTANCE.transactionToTransactionDto(exampleTransaction);
+        TransactionDto actualTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(givenTransaction);
         // Then
-        assertEquals(transactionDto, transactionDtoResult);
+        assertEquals(transactionDto, actualTransactionDto);
     }
 
     @Test
-    void transactionDtoToTransaction_TransactionDto_gotTransaction() {
+    void transactionDtoToTransaction_TransactionDto_returnTransaction() {
 
         // Given
-        TransactionDto exampleTransactionDto = transactionDto;
+        TransactionDto givenTransactionDto = transactionDto;
         // When
-        Transaction transactionResult = TransactionMapper.INSTANCE.transactionDtoToTransaction(exampleTransactionDto);
+        Transaction actualTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
         // Then
-        assertEquals(transactionNoTenant, transactionResult);
+        assertEquals(transactionNoTenant, actualTransaction);
     }
 
     private Transaction createTransaction(String tenantId) {
@@ -99,6 +99,7 @@ public class TransactionMapperTest {
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
         return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto);
     }
+
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, 0, 1000, rules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);

@@ -77,6 +77,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
         // Then
         assertEquals(expectedQuery, actualQuery);
     }
+
     @Test
     void buildNexusTransactionsSearch_NexusInfoIsNull_ThrowsException() {
         // Given
@@ -84,12 +85,13 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule,dateReference);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, dateReference);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusInfo is marked non-null but is null");
     }
+
     @Test
     void buildNexusTransactionsSearch_NexusStateRuleIsNull_ThrowsException() {
         // Given
@@ -97,12 +99,13 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule,dateReference);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, dateReference);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
+
     @Test
     void buildNexusTransactionsSearch_ReferenceDateIsNull_ThrowsException() {
         // Given
@@ -110,7 +113,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule,nullLocalDateTime);
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, nullLocalDateTime);
         });
 
         // Then
