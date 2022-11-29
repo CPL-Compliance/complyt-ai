@@ -23,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -168,5 +170,33 @@ public class NexusTransactionsAmountCalculatorTest {
 
         // Then
         StepVerifier.create(actualTotalAmount).expectNext(expectedTotalAmount).verifyComplete();
+    }
+
+    @Test
+    void extract_NullTransactionPassed_ThrowsException() {
+        // Given
+        List<Transaction> nullTransactions = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsAmountCalculator.extract(nullTransactions, nexusStateRule);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transactions is marked non-null but is null");
+    }
+
+    @Test
+    void extract_NullStateRulePassed_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsAmountCalculator.extract(transactions, nullNexusStateRule);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
     }
 }
