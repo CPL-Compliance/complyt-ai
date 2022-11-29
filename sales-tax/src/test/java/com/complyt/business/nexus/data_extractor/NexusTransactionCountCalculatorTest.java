@@ -138,6 +138,22 @@ public class NexusTransactionCountCalculatorTest {
     }
 
     @Test
+    void extract_ExtractsTransactionItemsCount_ReturnsShouldNotBeCountedBecauseTransactionIsOfTypeRefund() {
+        // Given
+        Transaction refundTransaction = transactions.get(0).withTransactionType(TransactionType.REFUND);
+        List<Transaction> transactions = new ArrayList<>() {{
+            add(refundTransaction);
+        }};
+
+        // When
+        when(itemsNexusStateRuleQualificationChecker.check(new Pair(refundTransaction.getItems(), nexusStateRule))).thenReturn(true);
+        Mono<Integer> count = nexusTransactionsCountCalculator.extract(transactions, nexusStateRule);
+
+        // Then
+        StepVerifier.create(count).expectNext(0).verifyComplete();
+    }
+
+    @Test
     void extract_NullTransactionPassed_ThrowsException() {
         // Given
         List<Transaction> nullTransactions = null;
