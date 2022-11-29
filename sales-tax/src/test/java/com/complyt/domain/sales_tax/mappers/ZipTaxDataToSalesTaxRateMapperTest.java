@@ -42,20 +42,20 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_ZipTaxData_SalesTaxRate() {
         // Given + When
-        SalesTaxRate actulalSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
         // Then
-        assertEquals(expectedSalesTaxRate, actulalSalesTaxRate);
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
     }
 
     @Test
     void map_Result_SalesTaxRate() {
         // Given + When
-        SalesTaxRate actulalSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
         // Then
-        assertEquals(expectedSalesTaxRate, actulalSalesTaxRate);
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
     }
 }
