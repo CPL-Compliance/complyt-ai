@@ -35,7 +35,7 @@ class ItemTest {
     }
 
     @Test
-    void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentage_ReturnsAmount() {
+    public void calculateSalesTaxAmount_RuleIsSetToCalculateByPercentage_ReturnsAmount() {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
