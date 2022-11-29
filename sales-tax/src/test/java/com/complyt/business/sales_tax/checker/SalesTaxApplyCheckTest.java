@@ -136,6 +136,23 @@ public class SalesTaxApplyCheckTest {
     }
 
     @Test
+    void isApplied_SalesTaxNotAppliedBecauseTransactionIsOfTypeRefund_ReturnsFalse() {
+        // Given
+        Transaction transaction = createTransactionWithAppliedReferenceDate()
+                .withTransactionType(TransactionType.REFUND);
+        salesTaxApplyCheck = new SalesTaxApplyCheck(transaction);
+
+        SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
+                .withApproved(true);
+
+        // When
+        boolean isApplied = salesTaxApplyCheck.check(salesTaxTrackingWithNoSalesTax);
+
+        // Then
+        assertFalse(isApplied);
+    }
+
+    @Test
     void isApplied_NullTransactionPassed_ThrowsException() {
         // Given
         Transaction nullTransaction = null;
