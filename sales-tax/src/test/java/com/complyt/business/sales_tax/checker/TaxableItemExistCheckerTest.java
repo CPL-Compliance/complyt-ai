@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TaxableItemExistCheckTest {
+public class TaxableItemExistCheckerTest {
 
     TaxableItemExistChecker taxableItemExistenceCheck;
 

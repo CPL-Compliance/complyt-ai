@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.domain.sales_tax.fast_tax;
 
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;

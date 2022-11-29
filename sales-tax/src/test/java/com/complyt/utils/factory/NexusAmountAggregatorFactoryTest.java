@@ -1,4 +1,4 @@
-package com.complyt.utils;
+package com.complyt.utils.factory;
 
 import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;

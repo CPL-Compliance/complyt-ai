@@ -5,10 +5,13 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.v1.model.TangibleCategoryDto;
+import com.complyt.v1.model.TaxableCategoryDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ShippingFeeTest {
 
@@ -16,11 +19,7 @@ public class ShippingFeeTest {
 
     @BeforeEach
     void setUp() {
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
-        JurisdictionalSalesTaxRules rules = new JurisdictionalSalesTaxRules(
-                "California", "CA", true, true, CalculationType.FIXED,
-                "description", 0.07f, null);
-        shippingFee = new ShippingFee(false, 0, 1000, rules, salesTaxRate, "taxCode", TaxableCategory.NOT_TAXABLE, TangibleCategory.INTANGIBLE);
+        shippingFee = createShippingFee();
     }
 
     @Test
@@ -47,5 +46,39 @@ public class ShippingFeeTest {
         // When + Then
         float actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void Equals_sameShippingFee_ReturnsTrue() {
+        // Given
+        ShippingFee givenShippingFee = createShippingFee();
+
+        // When
+        boolean expectedBoolean = shippingFee.equals(givenShippingFee);
+
+        // Then
+        assertTrue(expectedBoolean);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.0, cities=null), salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE)";
+
+        // When
+        String actualString = shippingFee.toString();
+
+        // Then
+        assertEquals(expectedString,actualString);
+    }
+
+    private ShippingFee createShippingFee() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        return new ShippingFee(false, 0, 1000, rules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
     }
 }

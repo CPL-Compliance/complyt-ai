@@ -1,11 +1,13 @@
-package com.complyt.domain.sales_tax;
+package com.complyt.domain.sales_tax.zip_tax;
 
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -47,6 +49,18 @@ public class ZipTaxDataTest {
     void hashCode_IdenticalCustomers_Equal() {
         ZipTaxData anotherZipTaxData = zipTaxData.withRCode(zipTaxData.getRCode());
         assertEquals(zipTaxData.hashCode(), anotherZipTaxData.hashCode());
+    }
+
+    @Test
+    void isUnincorporated_ZipTaxDataIsNotUnincorporated_ReturnsFalse() {
+        // Given
+        ZipTaxData givenZipTaxData = new ZipTaxData("version", 0L, null);
+
+        // When
+        boolean isUnincorporated = givenZipTaxData.isUnincorporated();
+
+        // Then
+        Assertions.assertFalse(isUnincorporated);
     }
 
 }

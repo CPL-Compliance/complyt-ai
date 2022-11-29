@@ -8,13 +8,19 @@ public class CalculationTypeDtoTest {
 
     @Test
     public void CalculationTypeDto_getFixed_gotFixed() {
+        // Given + When
         CalculationTypeDto calculationTypeDto = CalculationTypeDto.FIXED;
-        assertEquals(CalculationTypeDto.FIXED, calculationTypeDto); 
+
+        // Then
+        assertEquals(CalculationTypeDto.valueOf("FIXED"), calculationTypeDto);
     }
 
     @Test
     public void CalculationTypeDto_getPercentage_gotPercentage() {
+        // Given + When
         CalculationTypeDto calculationTypeDto = CalculationTypeDto.PERCENTAGE;
-        assertEquals(CalculationTypeDto.PERCENTAGE, calculationTypeDto);
+
+        // Then
+        assertEquals(CalculationTypeDto.valueOf("PERCENTAGE"), calculationTypeDto);
     }
 }

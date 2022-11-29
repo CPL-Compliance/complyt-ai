@@ -19,17 +19,17 @@ public class SalesTaxDtoTest {
     private SalesTaxDto anotherSalesTaxDto;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         // Given
-        salesTaxDto = new SalesTaxDto(5000,null);
+        salesTaxDto = new SalesTaxDto(5000, null);
 
         // Then
-        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getAmount(),null);
+        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getAmount(), null);
     }
 
     @Test
     void equals_IdenticalCustomers_Equal() {
-        assertEquals(salesTaxDto,anotherSalesTaxDto);
+        assertEquals(salesTaxDto, anotherSalesTaxDto);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class SalesTaxDtoTest {
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then
-        assertNotEquals(salesTaxDto,anotherSalesTaxDto);
+        assertNotEquals(salesTaxDto, anotherSalesTaxDto);
     }
 
     @Test
@@ -58,9 +58,9 @@ public class SalesTaxDtoTest {
     }
 
     @Test
-    void toString_StringMatches_Equal(){
+    void toString_StringMatches_Equal() {
         String salesTaxDtoToString = "SalesTaxDto(amount=" + salesTaxDto.getAmount() + ", salesTaxRate=" + salesTaxDto.getSalesTaxRate() + ")";
-        assertEquals(salesTaxDto.toString(),salesTaxDtoToString);
+        assertEquals(salesTaxDto.toString(), salesTaxDtoToString);
     }
 
 }

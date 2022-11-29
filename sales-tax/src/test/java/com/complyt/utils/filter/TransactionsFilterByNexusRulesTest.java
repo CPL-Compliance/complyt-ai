@@ -1,4 +1,4 @@
-package com.complyt.business;
+package com.complyt.utils.filter;
 
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;

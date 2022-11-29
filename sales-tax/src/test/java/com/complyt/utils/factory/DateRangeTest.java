@@ -137,6 +137,24 @@ public class DateRangeTest {
     }
 
     @Test
+    void newTaxableYear_AfterTaxableDate_DateRangeReturned() {
+        // Given
+        LocalDateTime taxableDate = LocalDateTime.now().withMonth(12).withDayOfMonth(25);
+        LocalDateTime referenceDate = taxableDate.plusDays(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0);
+        LocalDateTime expectedStartDate = taxableDate.plusYears(0);
+
+        //When + Then
+        DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
+
+        assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
+        assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
+        assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
+    }
+
+    @Test
     void newTaxableYear_ReferenceDateLaterThanTaxableDate_DateRangeReturned() {
         // Given
         LocalDateTime taxableDate = LocalDateTime.now().withMonth(12).withDayOfMonth(25);
@@ -246,5 +264,16 @@ public class DateRangeTest {
     void DateRangeFactoryConstructor_DefaultConstructor_gotInstance() {
         DateRange.Factory factory = new DateRange.Factory();
         assertEquals(factory.getClass(), DateRange.Factory.class);
+    }
+    @Test void toString_DateRange_gotString() {
+        // Given
+        String expectedString = "DateRange(start=2000-01-01T00:00, end=2000-12-31T23:59:59)";
+        DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(LocalDateTime.of(2000,5,1,1,1));
+
+        // When
+        String actualString = dateRange.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
     }
 }
