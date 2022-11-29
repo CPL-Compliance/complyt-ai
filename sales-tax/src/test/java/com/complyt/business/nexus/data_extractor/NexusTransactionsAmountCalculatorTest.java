@@ -71,7 +71,7 @@ public class NexusTransactionsAmountCalculatorTest {
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
-    private List<Transaction> createTransactions() {
+    private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
@@ -86,10 +86,27 @@ public class NexusTransactionsAmountCalculatorTest {
             }
         };
         Customer customer = createCustomer(customerId);
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+    }
+
+    private Transaction createRefundTransaction() {
+        return transactions.get(0)
+                .withId(UUID.randomUUID().toString())
+                .withExternalId(UUID.randomUUID().toString())
+                .withTransactionType(TransactionType.REFUND);
+    }
+
+    private List<Transaction> createTransactions() {
+        Transaction transaction = createTransaction();
+        List<Item> secondTransactionItems = new ArrayList<>() {{
+            add(transaction.getItems().get(0).withUnitPrice(1000).withTotalPrice(4000));
+        }};
+
         Transaction secondTransaction = transaction
                 .withId(UUID.randomUUID().toString())
-                .withExternalId(UUID.randomUUID().toString());
+                .withExternalId(UUID.randomUUID().toString())
+                .withItems(secondTransactionItems);
+
         return new ArrayList<>() {{
             add(transaction);
             add(secondTransaction);
@@ -117,9 +134,37 @@ public class NexusTransactionsAmountCalculatorTest {
         // When
         when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(0), nexusStateRule)).thenReturn(firstExtractor);
         when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(1), nexusStateRule)).thenReturn(secondExtractor);
-        when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0),nexusStateRule)).thenReturn(true);
-        when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0),nexusStateRule)).thenReturn(true);
-        Mono<Float> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions,nexusStateRule);
+        when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
+        Mono<Float> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
+
+        // Then
+        StepVerifier.create(actualTotalAmount).expectNext(expectedTotalAmount).verifyComplete();
+    }
+
+    @Test
+    void extract_ThirdTransactionIsRefund_ReturnsAmount() {
+        // Given
+        Transaction refundTransaction = createRefundTransaction();
+        transactions.add(refundTransaction);
+        float expectedTotalAmount = transactions.get(0).getItems().get(0).getTotalPrice() +
+                transactions.get(1).getItems().get(0).getTotalPrice() - refundTransaction.getItems().get(0).getTotalPrice();
+        List<Taxable> firstTransactionTaxables = new ArrayList<>(transactions.get(0).getItems());
+        List<Taxable> secondTransactionTaxables = new ArrayList<>(transactions.get(1).getItems());
+        List<Taxable> thirdTransactionTaxables = new ArrayList<>(transactions.get(2).getItems());
+        TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, firstTransactionTaxables, nexusStateRule);
+        TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, secondTransactionTaxables, nexusStateRule);
+        TaxableCollectionAmountExtractor thirdExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, thirdTransactionTaxables, nexusStateRule);
+
+
+        // When
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(0), nexusStateRule)).thenReturn(firstExtractor);
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(1), nexusStateRule)).thenReturn(secondExtractor);
+        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(2), nexusStateRule)).thenReturn(thirdExtractor);
+        when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(qualificationChecker.isQualified(transactions.get(2).getItems().get(0), nexusStateRule)).thenReturn(true);
+        Mono<Float> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
 
         // Then
         StepVerifier.create(actualTotalAmount).expectNext(expectedTotalAmount).verifyComplete();
