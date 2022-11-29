@@ -63,7 +63,7 @@ public class ShippingFeeTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.0, cities=null), salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE)";
+        String expectedString = "ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.0, cities=null), salesTaxRate=SalesTaxRate(cityDistrictRate=0.0, cityRate=0.0, countyDistrictRate=0.0, countyRate=0.0, stateRate=0.0, taxRate=0.0), taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE)";
 
         // When
         String actualString = shippingFee.toString();
@@ -74,7 +74,7 @@ public class ShippingFeeTest {
 
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, rules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        return new ShippingFee(false, 0, 1000, rules, SalesTaxRate.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
