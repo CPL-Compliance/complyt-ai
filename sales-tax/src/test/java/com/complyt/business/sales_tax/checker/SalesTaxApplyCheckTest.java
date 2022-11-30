@@ -60,7 +60,7 @@ public class SalesTaxApplyCheckTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)), TransactionType.INVOICE, null, null);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
@@ -78,7 +78,7 @@ public class SalesTaxApplyCheckTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)), TransactionType.INVOICE, null, null);
     }
 
     @Test

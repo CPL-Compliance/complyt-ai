@@ -120,7 +120,7 @@ class NexusServiceTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
@@ -271,7 +271,7 @@ class NexusServiceTest {
         // Given
         Transaction transaction = createTransaction();
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
-        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
