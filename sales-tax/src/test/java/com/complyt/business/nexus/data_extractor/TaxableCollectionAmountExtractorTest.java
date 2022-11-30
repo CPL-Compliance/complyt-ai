@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -45,8 +46,11 @@ public class TaxableCollectionAmountExtractorTest {
     Customer customer;
     ObjectId customerId;
 
+    String nexusStateRuleId;
+
     @BeforeEach
     void setUp() {
+        nexusStateRuleId = UUID.randomUUID().toString();
         customer = createCustomer();
         transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
@@ -85,7 +89,7 @@ public class TaxableCollectionAmountExtractorTest {
 
         NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+        return new NexusStateRule(nexusStateRuleId, true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
@@ -152,4 +156,28 @@ public class TaxableCollectionAmountExtractorTest {
         assertEquals(amount, expectedAmount);
     }
 
+    @Test
+    void equals_sameExtractor_ReturnTrue() {
+        // Given
+        TaxableCollectionAmountExtractor givenTaxableCollectionAmountExtractor =
+                new TaxableCollectionAmountExtractor(qualificationChecker, createTaxables(), nexusStateRule);
+
+        // When
+        boolean expectedBoolean = taxableCollectionAmountExtractor.equals(givenTaxableCollectionAmountExtractor);
+
+        // Then
+        assertTrue(expectedBoolean);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "TaxableCollectionAmountExtractor(qualificationChecker=qualificationChecker, taxables=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=null, salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=null, salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=NOT_TAXABLE), ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=true, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=TANGIBLE)], nexusStateRule=NexusStateRule(id=" + nexusStateRuleId + ", enforcesSalesTax=true, state=State(abbreviation=CA, code=02, name=California), taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL], timeFrame=PREVIOUS_TWELVE_MONTHS, nexusThreshold=NexusThreshold(amount=1000.0, count=2, definition=AMOUNT_OR_COUNT)))";
+
+        // When
+        String actualString = taxableCollectionAmountExtractor.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
 }

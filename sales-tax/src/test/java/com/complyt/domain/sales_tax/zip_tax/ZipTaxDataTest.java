@@ -1,13 +1,10 @@
 package com.complyt.domain.sales_tax.zip_tax;
 
-import com.complyt.domain.sales_tax.zip_tax.Result;
-import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ public class ZipTaxDataTest {
     ZipTaxData zipTaxData;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         String version = "version";
         long rCode = 0;
         List<Result> results = new ArrayList<>();
@@ -33,10 +30,10 @@ public class ZipTaxDataTest {
     }
 
     @Test
-    void testToString(){
+    void testToString() {
         String zipTaxDataStr = "ZipTaxData(version=" + zipTaxData.getVersion() + ", rCode=" + zipTaxData.getRCode() + ", results=" + zipTaxData.getResults() + ")";
 
-        assertEquals(zipTaxDataStr,zipTaxData.toString());
+        assertEquals(zipTaxDataStr, zipTaxData.toString());
     }
 
     @Test
@@ -61,6 +58,17 @@ public class ZipTaxDataTest {
 
         // Then
         Assertions.assertFalse(isUnincorporated);
+    }
+
+    @Test
+    void noArgsConstructor_ReturnEmptyZipTaxData() {
+        // Given + When
+        ZipTaxData givenZipTaxData = new ZipTaxData();
+
+        // Then
+        assertEquals(null, givenZipTaxData.getVersion());
+        assertEquals(0f, givenZipTaxData.getRCode());
+        assertEquals(null, givenZipTaxData.getResults());
     }
 
 }

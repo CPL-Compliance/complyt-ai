@@ -7,6 +7,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JurisdictionalSalesTaxRulesTest {
@@ -28,7 +31,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = notTaxAbleJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertEquals(false,isCalculatedByPercentage);
     }
 
     @Test
@@ -40,7 +43,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = noSpecialTreatmentJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertEquals(false,isCalculatedByPercentage);
     }
 
     @Test
@@ -52,7 +55,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = fixedCalculationTypeJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertEquals(false,isCalculatedByPercentage);
     }
 
     @Test
@@ -63,7 +66,30 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = jurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(true,isCalculatedByPercentage);
+        assertEquals(true,isCalculatedByPercentage);
+    }
+
+    @Test void toString_ReturnString() {
+        // Given
+        String expectedString = "JurisdictionalSalesTaxRules(name=name, abbreviation=abbreviation, taxable=true, specialTreatment=true, calculationType=PERCENTAGE, description=description, calculationValue=0.0, cities=null)";
+
+        // When
+        String actualString = jurisdictionalSalesTaxRules.toString();
+
+        // Then
+        assertEquals(expectedString,actualString);
+    }
+
+    @Test void Equals_SameJurisdictionalSalesTaxRules_ReturnTrue() {
+        // Given
+        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name","abbreviation",
+                true,true,CalculationType.PERCENTAGE,"description",0f,null);
+
+        // When
+        boolean actualBoolean = jurisdictionalSalesTaxRules.equals(givenJurisdictionalSalesTaxRules);
+
+        // Then
+        assertTrue(actualBoolean);
     }
 
 }

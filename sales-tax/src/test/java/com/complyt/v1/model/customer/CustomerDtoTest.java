@@ -1,8 +1,6 @@
 package com.complyt.v1.model.customer;
 
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.customer.CustomerDto;
-import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,4 +38,16 @@ public class CustomerDtoTest {
         assertEquals(customerDto.hashCode(), anotherCustomerDto.hashCode());
     }
 
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "CustomerDto(id=" + customerDto.getId() + ", externalId=" + customerDto.getExternalId() + ", name=Existing Customer, address=AddressDto(city=City, country=Country, county=County, state=State, street=Street, zip=Zip), customerType=RETAIL)";
+
+        // When
+        String actualString = customerDto.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+
+    }
 }

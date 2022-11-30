@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ItemTest {
 
@@ -47,6 +48,34 @@ class ItemTest {
         // When + Then
         float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void Equals_sameItem_ReturnsTrue() {
+        // Given
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
+                "California", "CA", true, true, CalculationType.FIXED,
+                "description", 0.07f, null);
+        Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+
+        // When
+        boolean expectedBoolean = item.equals(givenItem);
+
+        // Then
+        assertTrue(expectedBoolean);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=true, calculationType=FIXED, description=description, calculationValue=0.07, cities=null), salesTaxRate=SalesTaxRate(cityDistrictRate=0.01, cityRate=0.01, countyDistrictRate=0.01, countyRate=0.01, stateRate=0.01, taxRate=0.05), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=NOT_TAXABLE)";
+
+        // When
+        String actualString = item.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
     }
 
 }
