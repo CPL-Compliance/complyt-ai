@@ -52,9 +52,10 @@ public class ExemptionRouterTest {
         // Given
         RouterFunction<ServerResponse> responseRouterFunction = exemptionRouter.exemptionsRoute(exemptionHandler);
         WebTestClient webTestClient = WebTestClient.bindToRouterFunction(responseRouterFunction).build();
+        //ServerRequest.Builder buidler = DefaultServe
 
         // When
-        when(exemptionHandler.getAll(Mockito.any(ServerRequest.class)))
+        when( exemptionHandler.getAll(Mockito.any(ServerRequest.class)))
                 .thenReturn(ServerResponse.ok().body(Mono.just("hello"), String.class));
 
         // Then
