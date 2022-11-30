@@ -121,7 +121,6 @@ public class NexusAmountAggregatorFactoryTest {
     @Test
     void createTaxableCollectionAmountExtractor_ShippingFeeIsNull_ReturnsExtractorWithoutShippingFeeInTaxableList() {
         // Given
-
         Transaction transactionWithNullShippingFee = transaction.withShippingFee(null);
         List<Taxable> taxables = new ArrayList<>(transactionWithNullShippingFee.getItems());
 
@@ -141,9 +140,7 @@ public class NexusAmountAggregatorFactoryTest {
         Transaction nullTransaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(nullTransaction, nexusStateRule);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(nullTransaction, nexusStateRule));
 
         // Then
         assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
@@ -155,9 +152,7 @@ public class NexusAmountAggregatorFactoryTest {
         NexusStateRule nullNexusStateRule = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nullNexusStateRule);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nullNexusStateRule));
 
         // Then
         assertEquals("nexusStateRule is marked non-null but is null", nullPointerException.getMessage());
