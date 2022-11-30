@@ -2,7 +2,6 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
 import com.complyt.v1.model.StateDto;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

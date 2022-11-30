@@ -7,7 +7,6 @@ import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.TimeStampsDto;
 import com.complyt.v1.model.customer.exemption.*;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

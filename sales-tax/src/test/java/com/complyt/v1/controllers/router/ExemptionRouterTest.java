@@ -1,19 +1,23 @@
 package com.complyt.v1.controllers.router;
 
-import com.complyt.facades.ExemptionFacade;
-import com.complyt.repositories.ExemptionRepository;
-import com.complyt.services.ExemptionService;
-import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.controllers.router.handler.ExemptionHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -21,13 +25,18 @@ public class ExemptionRouterTest {
 
     ExemptionRouter exemptionRouter;
 
-    ExemptionService exemptionService;
+    @Mock
+    ExemptionHandler exemptionHandler;
+
+    @BeforeEach
+    void setup() {
+        exemptionRouter = new ExemptionRouter();
+    }
 
     @Test
     void exemptionRoute_nullExemptionHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
-        exemptionRouter = new ExemptionRouter();
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
@@ -37,13 +46,22 @@ public class ExemptionRouterTest {
         // Then
         assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
     }
-    /*@Test void exemptionRoute_ExemptionHandler_ReturnRouterFunction() {
+
+    @Test
+    void exemptionRoute_ExemptionHandler_RoutingToExemptionHandler() {
         // Given
-        ExemptionHandler nullExemptionHandler = new ExemptionHandler(new ExemptionFacade(exemptionService));
-        exemptionRouter = new ExemptionRouter();
+        RouterFunction<ServerResponse> responseRouterFunction = exemptionRouter.exemptionsRoute(exemptionHandler);
+        WebTestClient webTestClient = WebTestClient.bindToRouterFunction(responseRouterFunction).build();
 
         // When
+        when(exemptionHandler.getAll(Mockito.any(ServerRequest.class)))
+                .thenReturn(ServerResponse.ok().body(Mono.just("hello"), String.class));
 
         // Then
-    } */
+        webTestClient.get()
+                .uri(ExemptionRouter.BASE_URL + "")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange().expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("hello");
+    }
 }
