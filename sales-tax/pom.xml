@@ -34,6 +34,10 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
         <!-- Plugins -->
+
+        <!-- Dependencies -->
+        <feign-reactor.version>3.2.0</feign-reactor.version>
+        <!-- Dependencies -->
     </properties>
 
     <dependencies>
@@ -68,7 +72,7 @@
         </dependency>
         <!-- Spring Boot Starter Dependencies -->
 
-        <!-- Spring Cloud Starter Dependencies -->
+        <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-vault-config</artifactId>
@@ -79,7 +83,38 @@
             <artifactId>spring-cloud-vault-config-databases</artifactId>
             <version>${org.springframework.cloud.version}</version>
         </dependency>
-        <!-- Spring Cloud Starter Dependencies -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <version>3.1.4</version>
+        </dependency>
+        <!-- Spring Cloud Vault -->
+
+        <!-- Spring Cloud Feign Dependencies -->
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-webclient</artifactId>
+            <version>${feign-reactor.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-cloud</artifactId>
+            <version>${feign-reactor.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-spring-configuration</artifactId>
+            <version>${feign-reactor.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-slf4j</artifactId>
+            <version>11.2</version>
+        </dependency>
+        <!-- Spring Cloud Feign Dependencies -->
 
         <!-- Test Dependencies -->
         <dependency>

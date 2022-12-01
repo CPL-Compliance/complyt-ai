@@ -1,6 +1,12 @@
 server:
   port: ${PORT:9898}
 
+# Change to secret
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
 spring:
   data:
     mongodb:
