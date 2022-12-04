@@ -7,7 +7,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="naming-server" />
+        <module name="api-gateway" />
+        <module name="discovery-service" />
       </profile>
       <profile name="Annotation profile for Complyt" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -25,19 +26,22 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="config-server" target="17" />
-      <module name="discovery-service" target="17" />
+      <module name="naming-server" target="17" />
       <module name="salestax" target="17" />
+      <module name="temp" target="17" />
       <module name="testService" target="17" />
       <module name="testToRemove" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="naming-server" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
       <module name="salestax" options="-parameters" />
+      <module name="temp" options="-parameters" />
       <module name="test-service" options="-parameters" />
       <module name="testService" options="-parameters" />
       <module name="testToRemove" options="-parameters" />

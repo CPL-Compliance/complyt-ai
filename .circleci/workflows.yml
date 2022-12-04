@@ -23,7 +23,10 @@ parameters:
   run-sales-tax-workflow:
     type: boolean
     default: false
-  run-test-service-workflow:
+  run-api-gateway-workflow:
+    type: boolean
+    default: false
+  run-discovery-service-workflow:
     type: boolean
     default: false
 
@@ -169,31 +172,60 @@ workflows:
             - deploy
           service_name: "sales-tax"
 
-  test-service-workflow:
-    when: << pipeline.parameters.run-test-service-workflow >>
+  api-gateway-workflow:
+    when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
       - verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
-          service_directory: "test-service"
+          service_directory: "api-gateway"
 
       - deploy:
           filters:
             branches:
               only:
                 - main
-          service_directory: "test-service"
+          service_directory: "api-gateway"
 
 
       - send-test-coverage-reports:
           requires:
             - verify
             - deploy
-          service_directory: "test-service"
+          service_directory: "api-gateway"
 
       - update-ecs-service:
           requires:
             - deploy
-          service_name: "test-service"
+          service_name: "api-gateway"
+
+  discovery-service-workflow:
+    when: << pipeline.parameters.run-discovery-service-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "discovery-service"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "discovery-service"
+
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "discovery-service"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "discovery-service"
