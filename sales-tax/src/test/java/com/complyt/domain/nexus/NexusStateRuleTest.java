@@ -1,0 +1,76 @@
+package com.complyt.domain.nexusStateRule;
+
+import com.complyt.domain.State;
+import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusThreshold;
+import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.domain.nexus.enums.TangibleCategory;
+import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.nexus.enums.TimeFrame;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class NexusStateRuleTest {
+
+    private NexusStateRule nexusStateRule;
+
+    private String id;
+
+    @BeforeEach
+    void setup() {
+        id = UUID.randomUUID().toString();
+        nexusStateRule = createNexusStateRule();
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "NexusStateRule(id=" + id + ", enforcesSalesTax=true, state=State(abbreviation=CA, code=02, name=California), taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL], timeFrame=CURRENT_CALENDER_YEAR, nexusThreshold=NexusThreshold(amount=1000.0, count=2, definition=AMOUNT_OR_COUNT))";
+
+        // When
+        String actualString = nexusStateRule.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameNexusStateRule_ReturnTrue() {
+        // Given
+        NexusStateRule givenNexusStateRule = createNexusStateRule();
+
+        // When
+        boolean actualBoolean = nexusStateRule.equals(givenNexusStateRule);
+
+        // Then
+        assertTrue(actualBoolean);
+    }
+
+    private NexusStateRule createNexusStateRule() {
+        State state = new State("CA", "02", "California");
+        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategory.TAXABLE);
+        }};
+
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategory.TANGIBLE);
+        }};
+
+        List<CustomerType> customerTypes = new ArrayList<>() {{
+            add(CustomerType.RETAIL);
+        }};
+
+        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+
+        return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
+    }
+}

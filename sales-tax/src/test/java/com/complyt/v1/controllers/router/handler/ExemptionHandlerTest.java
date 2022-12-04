@@ -1,7 +1,6 @@
 package com.complyt.v1.controllers.router.handler;
 
 import com.complyt.config.JacksonConfig;
-import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.exemption.*;
@@ -33,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 

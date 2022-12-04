@@ -1,36 +1,64 @@
 package com.complyt.v1.controllers.router;
 
+import com.complyt.config.JacksonConfig;
+import com.complyt.domain.State;
+import com.complyt.domain.TimeStamps;
+import com.complyt.domain.customer.exemption.*;
+import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.handler.ExemptionHandler;
+import com.complyt.v1.mappers.ExemptionMapper;
+import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
+@WebFluxTest(ExemptionHandler.class)
 @ExtendWith(MockitoExtension.class)
+@Import(JacksonConfig.class)
+@ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
 public class ExemptionRouterTest {
 
     ExemptionRouter exemptionRouter;
 
-    @Mock
-    ExemptionHandler exemptionHandler;
+    @Autowired
+    WebTestClient webTestClient;
+
+    //@Autowired
+    //ExemptionHandler exemptionHandler;
+
+    @MockBean
+    ExemptionFacade exemptionFacade;
+
+    String exemptionId;
 
     @BeforeEach
     void setup() {
+        exemptionId = UUID.randomUUID().toString();
         exemptionRouter = new ExemptionRouter();
+        //RouterFunction<ServerResponse> responseRouterFunction = exemptionRouter.exemptionsRoute(exemptionHandler);
+        //webTestClient = WebTestClient.bindToRouterFunction(responseRouterFunction).build();
     }
 
     @Test
@@ -48,21 +76,36 @@ public class ExemptionRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void exemptionRoute_ExemptionHandler_RoutingToExemptionHandler() {
         // Given
-        RouterFunction<ServerResponse> responseRouterFunction = exemptionRouter.exemptionsRoute(exemptionHandler);
-        WebTestClient webTestClient = WebTestClient.bindToRouterFunction(responseRouterFunction).build();
-        //ServerRequest.Builder buidler = DefaultServe
+        Exemption expectedExemption = createExemption();
+        ExemptionDto expectedExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(expectedExemption);
 
         // When
-        when( exemptionHandler.getAll(Mockito.any(ServerRequest.class)))
-                .thenReturn(ServerResponse.ok().body(Mono.just("hello"), String.class));
+        when(exemptionFacade.findById(exemptionId)).thenReturn(Mono.just(expectedExemption));
 
         // Then
-        webTestClient.get()
-                .uri(ExemptionRouter.BASE_URL + "")
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemptionId).build())
                 .accept(MediaType.APPLICATION_JSON)
-                .exchange().expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("hello");
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemptionDto);
     }
+
+    private Exemption createExemption() {
+        State state = new State("CA", "02", "California");
+        Classification classification = new Classification("code", "description");
+        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
+        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Status status = new Status("code", "name");
+        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
+
+        return new Exemption(exemptionId, UUID.randomUUID().toString(), new ObjectId(),
+                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+    }
+
 }

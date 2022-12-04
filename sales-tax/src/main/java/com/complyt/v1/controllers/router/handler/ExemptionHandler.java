@@ -44,6 +44,7 @@ public class ExemptionHandler {
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + "not found"))), ExemptionDto.class);
     }
 
+
     @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
     @ResponseStatus(HttpStatus.OK)
     @ExemptionCreatePermission

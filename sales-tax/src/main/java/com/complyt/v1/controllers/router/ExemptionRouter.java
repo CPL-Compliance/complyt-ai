@@ -21,7 +21,7 @@ public class ExemptionRouter {
                         .GET("", exemptionHandler::getAll)
                         .POST("", exemptionHandler::create)
                         .PUT("/{id}", exemptionHandler::update)
-                        .DELETE("/{id}",exemptionHandler::delete))
+                        .DELETE("/{id}", exemptionHandler::delete))
                 .build();
     }
 }
