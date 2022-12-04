@@ -20,7 +20,7 @@
     <modules>
         <module>sales-tax</module>
         <module>test-service</module>
-        <module>naming-server</module>
+        <module>discovery-service</module>
     </modules>
 
     <name>Complyt</name>
