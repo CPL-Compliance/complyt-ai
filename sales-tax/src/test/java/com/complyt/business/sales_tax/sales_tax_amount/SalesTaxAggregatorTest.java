@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -104,5 +103,27 @@ public class SalesTaxAggregatorTest {
 
         // Then
         assertEquals("taxables is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test void toString_ReturnString() {
+        // Given
+        String expectedString = "SalesTaxAggregator()";
+
+        // When
+        String actualString = salesTaxAggregator.toString();
+
+        // Then
+        assertEquals(expectedString,actualString);
+    }
+
+    @Test void equals_SameSalesTaxAggregator_ReturnTrue() {
+        // Given
+        SalesTaxAggregator actualSalesTaxAggregator = new SalesTaxAggregator();
+
+        // When
+        boolean expectedBoolean = salesTaxAggregator.equals(actualSalesTaxAggregator);
+
+        // Then
+        assertTrue(expectedBoolean);
     }
 }
