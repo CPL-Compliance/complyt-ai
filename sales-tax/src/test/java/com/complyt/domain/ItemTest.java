@@ -39,10 +39,14 @@ class ItemTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
+        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRate().getTaxRate();
+        SalesTaxRate salesTaxRate = item.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
 
-        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage);
-        float expectedAmount = itemWithRuleByPercentage.getTotalPrice() *
-                itemWithRuleByPercentage.getJurisdictionalSalesTaxRules().getCalculationValue() * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
+                .withSalesTaxRate(salesTaxRate);
+
+        float expectedAmount = itemWithRuleByPercentage.getTotalPrice()
+                * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
 
         // When + Then
         float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();

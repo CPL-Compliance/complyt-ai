@@ -42,7 +42,7 @@ public class ShippingFeeTest {
 
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage);
         float expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
-                shippingFeeWithRuleByPercentage.getJurisdictionalSalesTaxRules().getCalculationValue() * shippingFeeWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+                shippingFeeWithRuleByPercentage.getSalesTaxRate().getTaxRate();
 
         // When + Then
         float actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
