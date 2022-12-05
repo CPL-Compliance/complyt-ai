@@ -25,10 +25,10 @@ class CertificateDtoTest {
         CertificateDto givenCertificateDto = new CertificateDto(certificateId, "url", "name");
 
         // When
-        boolean expectedBoolean = certificateDto.equals(givenCertificateDto);
+        boolean actualBoolean = certificateDto.equals(givenCertificateDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

@@ -41,10 +41,10 @@ class ExemptionTest {
         Exemption givenExemption = createExemption();
 
         // When
-        boolean expectedBoolean = exemption.equals(givenExemption);
+        boolean actualBoolean = exemption.equals(givenExemption);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

@@ -22,10 +22,10 @@ class ShippingFeeDtoTest {
         ShippingFeeDto givenShippingFeeDto = createShippingFeeDto();
 
         // When
-        boolean expectedBoolean = shippingFeeDto.equals(givenShippingFeeDto);
+        boolean actualBoolean = shippingFeeDto.equals(givenShippingFeeDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

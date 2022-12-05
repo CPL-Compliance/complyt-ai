@@ -163,10 +163,10 @@ public class TaxableCollectionAmountExtractorTest {
                 new TaxableCollectionAmountExtractor(qualificationChecker, createTaxables(), nexusStateRule);
 
         // When
-        boolean expectedBoolean = taxableCollectionAmountExtractor.equals(givenTaxableCollectionAmountExtractor);
+        boolean actualBoolean = taxableCollectionAmountExtractor.equals(givenTaxableCollectionAmountExtractor);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

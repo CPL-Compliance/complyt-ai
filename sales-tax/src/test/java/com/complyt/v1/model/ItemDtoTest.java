@@ -25,10 +25,10 @@ class ItemDtoTest {
         );
 
         // When
-        boolean expectedBoolean = itemDto.equals(givenItemDto);
+        boolean actualBoolean = itemDto.equals(givenItemDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

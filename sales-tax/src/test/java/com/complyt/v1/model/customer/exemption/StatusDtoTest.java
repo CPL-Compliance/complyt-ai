@@ -19,9 +19,9 @@ class StatusDtoTest {
          StatusDto givenStatusDto = new StatusDto("code","name");
 
          // When
-        boolean expectedBoolean = statusDto.equals(givenStatusDto);
+        boolean actualBoolean = statusDto.equals(givenStatusDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 }

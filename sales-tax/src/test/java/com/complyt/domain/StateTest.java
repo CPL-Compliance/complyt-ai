@@ -21,10 +21,10 @@ class StateTest {
         State givenState = new State("CA", "02", "California");
 
         // When
-        boolean expectedBoolean = state.equals(givenState);
+        boolean actualBoolean = state.equals(givenState);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

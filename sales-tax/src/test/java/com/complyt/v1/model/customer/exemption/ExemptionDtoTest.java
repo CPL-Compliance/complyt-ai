@@ -38,10 +38,10 @@ class ExemptionDtoTest {
         ExemptionDto givenExemptionDto = createExemptionDto();
 
         // When
-        boolean expectedBoolean = exemptionDto.equals(givenExemptionDto);
+        boolean actualBoolean = exemptionDto.equals(givenExemptionDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

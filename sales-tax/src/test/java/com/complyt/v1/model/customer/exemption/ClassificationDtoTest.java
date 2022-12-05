@@ -21,10 +21,10 @@ class ClassificationDtoTest {
         ClassificationDto givenClassificationDto = new ClassificationDto("code","description");
 
         // When
-        boolean expectedBoolean = classificationDto.equals(givenClassificationDto);
+        boolean actualBoolean = classificationDto.equals(givenClassificationDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

@@ -55,10 +55,10 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption;
 
         // When
-        boolean expectedBoolean = customerFullyExemptionCheck.check(expectedExemption);
+        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test
@@ -67,10 +67,10 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When
-        boolean expectedBoolean = customerFullyExemptionCheck.check(expectedExemption);
+        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
 
         // Then
-        assertFalse(expectedBoolean);
+        assertFalse(actualBoolean);
     }
 
     @Test
@@ -79,10 +79,10 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
 
         // When
-        boolean expectedBoolean = customerFullyExemptionCheck.check(expectedExemption);
+        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
 
         // Then
-        assertFalse(expectedBoolean);
+        assertFalse(actualBoolean);
     }
 
     @Test
@@ -91,10 +91,10 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
 
         // When
-        boolean expectedBoolean = customerFullyExemptionCheck.check(expectedExemption);
+        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
 
         // Then
-        assertFalse(expectedBoolean);
+        assertFalse(actualBoolean);
     }
 
     private Transaction createTransaction() {

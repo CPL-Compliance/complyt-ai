@@ -18,15 +18,15 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TransactionShippingFeeTangibleCategoryInjectorTest {
+class TransactionItemsJurisdictionalRulesInjectorTest {
 
-    TransactionShippingFeeTangibleCategoryInjector transactionShippingFeeTangibleCategoryInjector;
+    TransactionItemsJurisdictionalRulesInjector transactionItemsJurisdictionalRulesInjector;
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        transactionItemsJurisdictionalRulesInjector = new TransactionItemsJurisdictionalRulesInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -54,20 +54,20 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        Map<String, JurisdictionalSalesTaxRules> itemJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
+        Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
-        ProductClassification itemProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C1S1", "item", "title", itemJurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
-        Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
+        ProductClassification item1ProductClassification = new ProductClassification(UUID.randomUUID().toString()
+                , "C1S1", "item", "title", item1JurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
+        Map<String, JurisdictionalSalesTaxRules> item2JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
-        ProductClassification shippingProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C6S1", "item", "title", shippingJurisdictionalSalesTaxRulesMap, TangibleCategory.INTANGIBLE);
+        ProductClassification item2ProductClassification = new ProductClassification(UUID.randomUUID().toString()
+                , "C2S1", "item", "title", item2JurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
 
         return new HashMap<>() {{
-            put("C1S1", itemProductClassification);
-            put("C6S1", shippingProductClassification);
+            put("C1S1", item1ProductClassification);
+            put("C6S1", item2ProductClassification);
         }};
     }
 
@@ -77,46 +77,58 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
+    void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        Transaction expectedTransaction = transaction.withItems(new ArrayList<>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
+                        createJurisdictionalSalesTaxRules(), new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
+                ));
+            }
+        });
 
         // When
-        Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);
-
-        // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
-    }
-
-    @Test
-    void inject_ClassificationsMapContainShippingFeeTaxCode_TransactionModified() {
-        // Given
-        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction givenTransaction = transaction.withShippingFee(transaction.getShippingFee().withTaxCode("C1S1"));
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(givenTransaction);
-        Transaction expectedTransaction = givenTransaction.withShippingFee(givenTransaction.getShippingFee().withTangibleCategory(TangibleCategory.TANGIBLE));
-
-        // When
-        Mono<Transaction> transactionMono = injector.inject(classifications);
+        Mono<Transaction> transactionMono = transactionItemsJurisdictionalRulesInjector.inject(classifications);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(expectedTransaction).verifyComplete();
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionShippingFeeTangibleCategoryInjector() {
+    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() { // Need update after error handling feature
+        // Given
+        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        Transaction givenTransaction = transaction.withItems(new ArrayList<>() {
+            {
+                add(new Item(2000, 4, 8000, "description", "name", "C3S1",
+                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
+                ));
+            }
+        });
+        TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(givenTransaction);
+
+        // When
+        Mono<Transaction> transactionMono = injector.inject(classifications);
+
+        // Then
+        StepVerifier.create(transactionMono).expectErrorMessage("Cannot invoke \"com.complyt.domain.sales_tax.product_classification.ProductClassification.getJurisdictionalSalesTaxRules()\" because \"classification\" is null").verify();
+    }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnTransactionItemsJurisdictionalRulesInjector() {
         // Given + When
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(transaction);
 
         // Then
         assertEquals(transaction, injector.getTransaction());
     }
 
     @Test
-    void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnTrue() {
+    void equals_SameTransactionItemsJurisdictionalRulesInjector_ReturnTrue() {
         // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(transaction);
+        TransactionItemsJurisdictionalRulesInjector secondInjector = new TransactionItemsJurisdictionalRulesInjector(transaction);
 
         // When
         boolean actualBoolean = injector.equals(secondInjector);
@@ -124,31 +136,5 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         // Then
         assertTrue(actualBoolean);
 
-    }
-
-    @Test
-    void shouldInject_NullShippingFee_ReturnFalse() {
-        // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction.withShippingFee(null));
-
-        // When
-        boolean actualBoolean = injector.shouldInject(null);
-
-        // Then
-        assertFalse(actualBoolean);
-    }
-
-    @Test
-    void shouldInject_TaxCodeExistInMap_ReturnTrue() {
-        // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        HashMap<String, ProductClassification> givenMap = new HashMap<String, ProductClassification>();
-        givenMap.put(transaction.getShippingFee().getTaxCode(), null);
-
-        // When
-        boolean actualBoolean = injector.shouldInject(givenMap);
-
-        // Then
-        assertTrue(actualBoolean);
     }
 }

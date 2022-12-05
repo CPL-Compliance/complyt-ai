@@ -21,10 +21,10 @@ class StatusTest {
         Status givenStatus = new Status("code", "name");
 
         // When
-        boolean expectedBoolean = status.equals(givenStatus);
+        boolean actualBoolean = status.equals(givenStatus);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test void toString_ReturnString() {

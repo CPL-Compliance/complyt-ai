@@ -30,10 +30,10 @@ class ClientTrackingTest {
         ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate));
 
         // When
-        boolean expectedBoolean = clientTracking.equals(givenClientTracking);
+        boolean actualBoolean = clientTracking.equals(givenClientTracking);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

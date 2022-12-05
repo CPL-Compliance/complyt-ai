@@ -25,10 +25,10 @@ class CertificateTest {
         Certificate givenCertificate = new Certificate(certificateId, "url", "name");
 
         // When
-        boolean expectedBoolean = certificate.equals(givenCertificate);
+        boolean actualBoolean = certificate.equals(givenCertificate);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

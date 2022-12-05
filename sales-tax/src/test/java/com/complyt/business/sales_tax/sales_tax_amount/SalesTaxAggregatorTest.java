@@ -121,9 +121,9 @@ public class SalesTaxAggregatorTest {
         SalesTaxAggregator actualSalesTaxAggregator = new SalesTaxAggregator();
 
         // When
-        boolean expectedBoolean = salesTaxAggregator.equals(actualSalesTaxAggregator);
+        boolean actualBoolean = salesTaxAggregator.equals(actualSalesTaxAggregator);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 }

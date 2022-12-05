@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjectionManager;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
@@ -23,6 +22,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -129,11 +131,34 @@ public class TransactionProductClassificationDataInjectionManagerTest {
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
                 CalculationType.FIXED, "rule2", 0, null);
         Map<String, ProductClassification> mapTaxCodesToClassifications = createClassificationsMap(firstRule, secondRule);
-        
+
         boolean shouldInject = injector.shouldInject(mapTaxCodesToClassifications);
 
         Assertions.assertTrue(shouldInject);
 
 
+    }
+
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnTransactionProductClassificationDataInjectionManager() {
+        // Given + When
+        TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
+
+        // Then
+        assertEquals(transaction, injector.getTransaction());
     }
 }

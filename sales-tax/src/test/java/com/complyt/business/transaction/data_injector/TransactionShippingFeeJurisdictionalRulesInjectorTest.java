@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.transaction.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -16,6 +15,8 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
@@ -136,4 +137,40 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
         StepVerifier.create(actualTransactionMono).expectNext(transactionWithShippingFeeWithUnrecognizedTaxCode).verifyComplete();
     }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnTransactionShippingFeeJurisdictionalRulesInjector() {
+        // Given + When
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+
+        // Then
+        assertEquals(transaction, injector.getTransaction());
+    }
+
+    @Test
+    void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnTrue() {
+        // Given
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+        TransactionShippingFeeJurisdictionalRulesInjector secondInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+
+        // When
+        boolean actualBoolean = injector.equals(secondInjector);
+
+        // Then
+        assertTrue(actualBoolean);
+
+    }
+
+    @Test
+    void shouldInject_NullShippingFee_ReturnFalse() {
+        // Given
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction.withShippingFee(null));
+
+        // When
+        boolean actualBoolean = injector.shouldInject(null);
+
+        // Then
+        assertFalse(actualBoolean);
+    }
+
 }

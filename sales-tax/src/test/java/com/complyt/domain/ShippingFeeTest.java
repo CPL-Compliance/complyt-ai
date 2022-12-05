@@ -54,10 +54,10 @@ public class ShippingFeeTest {
         ShippingFee givenShippingFee = createShippingFee();
 
         // When
-        boolean expectedBoolean = shippingFee.equals(givenShippingFee);
+        boolean actualBoolean = shippingFee.equals(givenShippingFee);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

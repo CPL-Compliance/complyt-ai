@@ -60,10 +60,10 @@ class ItemTest {
         Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
 
         // When
-        boolean expectedBoolean = item.equals(givenItem);
+        boolean actualBoolean = item.equals(givenItem);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
     @Test

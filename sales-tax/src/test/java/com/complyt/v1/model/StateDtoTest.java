@@ -20,10 +20,10 @@ class StateDtoTest {
         StateDto givenStateDto = new StateDto("CA", "02", "California");
 
         // When
-        boolean expectedBoolean = stateDto.equals(givenStateDto);
+        boolean actualBoolean = stateDto.equals(givenStateDto);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(actualBoolean);
     }
 
 }

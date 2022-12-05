@@ -1,7 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.transaction.data_fetcher.TransactionFastTaxCountyFetcher;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -85,5 +85,17 @@ class TransactionFastTaxCountyFetcherTest {
 
         // Then
         StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().getCounty()).verifyComplete();
+    }
+
+    @Test
+    void equals_SameTransactionFastTaxCountyFetcher_ReturnTrue() {
+        // Given
+        TransactionFastTaxCountyFetcher givenTransactionFastTaxCountyFetcher = transactionFastTaxCountyFetcher;
+
+        // When
+        boolean actualBoolean = transactionFastTaxCountyFetcher.equals(givenTransactionFastTaxCountyFetcher);
+
+        // Then
+        assertTrue(actualBoolean);
     }
 }
