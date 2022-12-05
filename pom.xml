@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -7,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>2.7.6</version>
     </parent>
 
     <!-- Maven Coordinates -->
@@ -16,7 +17,6 @@
     <version>0.0.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <packaging>pom</packaging>
     <modules>
         <module>sales-tax</module>
         <module>test-service</module>
@@ -26,6 +26,7 @@
 
     <name>Complyt</name>
     <description>This is a product made by Complyt</description>
+    <packaging>pom</packaging>
 
     <properties>
         <java.version>17</java.version>
@@ -36,23 +37,99 @@
         <java-tuples.version>1.2</java-tuples.version>
         <springdoc-openapi-webflux-ui.version>1.6.9</springdoc-openapi-webflux-ui.version>
         <reactor-test.version>3.4.18</reactor-test.version>
+        <spring-cloud-starter-netflix-eureka-client.version>3.1.4</spring-cloud-starter-netflix-eureka-client.version>
+        <spring-cloud-starter-netflix-eureka-server.version>3.1.4</spring-cloud-starter-netflix-eureka-server.version>
         <spring-security-test.version>5.6.3</spring-security-test.version>
         <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
+        <feign-reactor.version>3.2.0</feign-reactor.version>
+        <spring-cloud-starter-vault-config.version>3.1.1</spring-cloud-starter-vault-config.version>
+        <spring-cloud-vault-config-databases.version>3.1.1</spring-cloud-vault-config-databases.version>
+        <spring-cloud.version>2021.0.5</spring-cloud.version>
+        <feign-slf4j.version>11.2</feign-slf4j.version>
         <!-- Dependencies -->
 
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <!-- Plugins -->
+        <netty-resolver-dns-native-macos.version>4.1.76.Final</netty-resolver-dns-native-macos.version>
     </properties>
 
+    <!-- All the dependencies under dependencyManagement aren't transitive. -->
+    <!-- To use the dependency in the module you just need to declare it in the module but don't include the version. -->
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Cloud Dependencies -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud Dependencies -->
+
+            <!-- Spring Cloud Vault Dependencies -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-vault-config</artifactId>
+                <version>${spring-cloud-starter-vault-config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-vault-config-databases</artifactId>
+                <version>${spring-cloud-vault-config-databases.version}</version>
+            </dependency>
+            <!-- Spring Cloud Vault Dependencies -->
+
+            <!-- Spring Cloud Feign Dependencies -->
+            <dependency>
+                <groupId>com.playtika.reactivefeign</groupId>
+                <artifactId>feign-reactor-webclient</artifactId>
+                <version>${feign-reactor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.playtika.reactivefeign</groupId>
+                <artifactId>feign-reactor-cloud</artifactId>
+                <version>${feign-reactor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.playtika.reactivefeign</groupId>
+                <artifactId>feign-reactor-spring-configuration</artifactId>
+                <version>${feign-reactor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.openfeign</groupId>
+                <artifactId>feign-slf4j</artifactId>
+                <version>${feign-slf4j.version}</version>
+            </dependency>
+            <!-- Spring Cloud Feign Dependencies -->
+
+            <!-- Spring Cloud Eureka Dependencies -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                <version>${spring-cloud-starter-netflix-eureka-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>${spring-cloud-starter-netflix-eureka-server.version}</version>
+            </dependency>
+            <!-- Spring Cloud Eureka Dependencies -->
+
             <!-- Test Dependencies -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.6</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -75,6 +152,7 @@
             </dependency>
             <!-- Test Dependencies -->
 
+            <!-- Other Dependencies -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
@@ -96,10 +174,314 @@
                 <artifactId>springdoc-openapi-webflux-ui</artifactId>
                 <version>${springdoc-openapi-webflux-ui.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns-native-macos</artifactId>
+                <version>${netty-resolver-dns-native-macos.version}</version>
+                <classifier>osx-aarch_64</classifier>
+            </dependency>
         </dependencies>
+        <!-- Other Dependencies -->
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>1.5</version>
+                    <executions>
+                        <execution>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scripts>
+                            <script>file:///${project.basedir}/src/main/scripts/BuildDockerfile.groovy</script>
+                        </scripts>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <!-- any version of Groovy \>= 1.5.0 should work here -->
+                            <version>2.4.8</version>
+                            <scope>runtime</scope>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.40.1</version>
+                    <configuration>
+                        <!--For Linux users us the tag below-->
+                        <!--<dockerHost>http://127.0.0.1:2375</dockerHost>-->
+                        <dockerHost>unix:///var/run/docker.sock</dockerHost>
+                        <verbose>true</verbose>
+                        <images>
+                            <!--Complyt Application Container-->
+                            <image>
+                                <name>${docker.image.prefix}/${docker.image.name}</name>
+                                <alias>complyt</alias>
+                                <build>
+                                    <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
+                                    <!--copies artifact to docker build directory in target-->
+                                    <assembly>
+                                        <descriptorRef>artifact</descriptorRef>
+                                    </assembly>
+                                    <tags>
+                                        <tag>latest</tag>
+                                        <tag>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</tag>
+                                    </tags>
+                                </build>
+                                <run>
+                                    <env>
+                                        <SPRING_PROFILES_ACTIVE>local-docker, stubFastTax</SPRING_PROFILES_ACTIVE>
+                                        <SPRING_DATA_MONGODB_URI>mongodb://mongo:27017/complyt</SPRING_DATA_MONGODB_URI>
+                                    </env>
+                                    <ports>
+                                        <port>9898:9898</port>
+                                    </ports>
+                                    <links>
+                                        <link>mongo</link>
+                                    </links>
+                                    <dependsOn>
+                                        <container>mongo</container>
+                                    </dependsOn>
+                                </run>
+                            </image>
+                            <!--MongoDB container-->
+                            <image>
+                                <name>mongo:4.4.6</name>
+                                <alias>mongo</alias>
+                                <run>
+                                    <ports>
+                                        <port>27017:27017</port>
+                                    </ports>
+                                    <volumes>
+                                        <bind>
+                                            <volume>${project.basedir}/dockerdata:/data/db</volume>
+                                        </bind>
+                                    </volumes>
+                                    <wait>
+                                        <log>Waiting for connections</log>
+                                        <time>10000</time>
+                                    </wait>
+                                </run>
+                            </image>
+                        </images>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>start</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                                <goal>remove</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>build-and-push-to-container-registry</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>push</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>parse-version</id>
+                            <goals>
+                                <goal>parse-version</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                    <configuration>
+                        <file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <!--
+                            Prepares the property pointing to the JaCoCo runtime agent which
+                            is passed as VM argument when Maven the Surefire plugin is executed.
+                        -->
+                        <execution>
+                            <id>pre-unit-test</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the path to the file which contains the execution data. -->
+                                <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                                <!--
+                                    Sets the name of the property containing the settings
+                                    for JaCoCo runtime agent.
+                                -->
+                                <propertyName>surefireArgLine</propertyName>
+                            </configuration>
+                        </execution>
+                        <!--
+                            Ensures that the code coverage report for unit tests is created after
+                            unit tests have been run.
+                        -->
+                        <execution>
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the path to the file which contains the execution data. -->
+                                <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                                <!-- Sets the output directory for the code coverage report. -->
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <!-- The Executions required by unit tests are omitted. -->
+                        <!--
+                            Prepares the property pointing to the JaCoCo runtime agent which
+                            is passed as VM argument when Maven the Failsafe plugin is executed.
+                        -->
+                        <execution>
+                            <id>pre-integration-test</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the path to the file which contains the execution data. -->
+                                <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                                <!--
+                                    Sets the name of the property containing the settings
+                                    for JaCoCo runtime agent.
+                                -->
+                                <propertyName>failsafeArgLine</propertyName>
+                            </configuration>
+                        </execution>
+                        <!--
+                            Ensures that the code coverage report for integration tests after
+                            integration tests have been run.
+                        -->
+                        <execution>
+                            <id>post-integration-test</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the path to the file which contains the execution data. -->
+                                <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+                                <!-- Sets the output directory for the code coverage report. -->
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <!-- Sets the VM argument line used when unit tests are run. -->
+                        <argLine>${surefireArgLine}</argLine>
+                        <!-- Skips unit tests if the value of skip.unit.tests property is true -->
+                        <!--                    <skipTests>${skip.unit.tests}</skipTests>-->
+                        <!-- Excludes integration tests when unit tests are run. -->
+                        <excludes>
+                            <exclude>**/*IT*.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                    <executions>
+                        <!--
+                            Ensures that both integration-test and verify goals of the Failsafe Maven
+                            plugin are executed.
+                        -->
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the VM argument line used when integration tests are run. -->
+                                <argLine>${failsafeArgLine}</argLine>
+                                <!--
+                                    Skips integration tests if the value of skip.integration.tests property
+                                    is true
+                                -->
+                                <skipTests>${skip.integration.tests}</skipTests>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>17</source>
+                        <target>17</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok-mapstruct-binding</artifactId>
+                                <version>0.2.0</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -161,11 +543,6 @@
                     <pushChanges>true</pushChanges>
                     <autoVersionSubmodules>false</autoVersionSubmodules>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>

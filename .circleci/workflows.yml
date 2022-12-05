@@ -160,7 +160,6 @@ workflows:
                 - main
           service_directory: "sales-tax"
 
-
       - send-test-coverage-reports:
           requires:
             - verify
@@ -189,7 +188,6 @@ workflows:
                 - main
           service_directory: "api-gateway"
 
-
       - send-test-coverage-reports:
           requires:
             - verify
@@ -217,7 +215,6 @@ workflows:
               only:
                 - main
           service_directory: "discovery-service"
-
 
       - send-test-coverage-reports:
           requires:
