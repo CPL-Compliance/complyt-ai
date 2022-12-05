@@ -3,8 +3,6 @@ package com.complyt.domain.sales_tax.mappers;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.sales_tax.zip_tax.Result;
-import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,15 +11,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class FastTaxDataToSalesTaxRateMapperTest {
     private FastTaxData fastTaxData;
     private TaxInfoItem taxInfoItem;
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         taxInfoItem = TaxInfoItem.builder()
                 .cityDistrictRate("0")
                 .cityRate("0")
@@ -38,9 +37,11 @@ class FastTaxDataToSalesTaxRateMapperTest {
     }
 
     @Test
-    void map_TaxInfoItem_SalesTaxRate() {
-        // Given + When
+    void map_TaxInfoItem_ReturnSalesTaxRate() {
+        // Given
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+
+        // When
         SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
 
         // Then
@@ -48,9 +49,11 @@ class FastTaxDataToSalesTaxRateMapperTest {
     }
 
     @Test
-    void map_FastTaxData_SalesTaxRate() {
+    void map_FastTaxData_ReturnSalesTaxRate() {
         // Given + When
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+
+        // When
         SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(fastTaxData);
 
         // Then

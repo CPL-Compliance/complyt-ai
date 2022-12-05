@@ -1,13 +1,14 @@
 package com.complyt.domain.sales_tax.fast_tax;
 
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FastTaxDataTest {
 
@@ -16,10 +17,7 @@ public class FastTaxDataTest {
 
     @BeforeEach
     void setUp() {
-        List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
-            add(new TaxInfoItem().withNotesCodes(UNINCORPORATED_CODE));
-        }};
-        fastTaxData = new FastTaxData().withTaxInfoItems(taxInfoItemList);
+        fastTaxData = createFastTaxData();
     }
 
     @Test
@@ -62,7 +60,45 @@ public class FastTaxDataTest {
         Assertions.assertFalse(isUnincorporated);
     }
 
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "FastTaxData(matchLevel=lvl, taxInfoItems=[TaxInfoItem(city=null, cityDistrictRate=null, cityRate=null, county=null, countyDistrictRate=null, countyRate=null, informationComponents=null, notesCodes=1, notesDesc=null, specialDistrictRate=null, stateAbbreviation=null, stateName=null, stateRate=null, taxRate=null, totalTaxExempt=null, zip=null)], UNINCORPORATED_CODE=1)";
 
+        // When
+        String actualString = fastTaxData.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameFastTaxData_ReturnTrue() {
+        // Given
+        FastTaxData givenFastTaxData = createFastTaxData();
+
+        // When
+        boolean actualBoolean = fastTaxData.equals(givenFastTaxData);
+
+        // Then
+        assertTrue(actualBoolean);
+    }
+
+    private FastTaxData createFastTaxData() {
+        List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
+            add(new TaxInfoItem().withNotesCodes(UNINCORPORATED_CODE));
+        }};
+        return new FastTaxData().withTaxInfoItems(taxInfoItemList).withMatchLevel("lvl");
+    }
+
+    @Test
+    void Builder_build() {
+        // Given + When
+        FastTaxData actualFastTaxData = FastTaxData.builder().taxInfoItems(fastTaxData.getTaxInfoItems()).matchLevel("lvl").build();
+
+        // Then
+        assertEquals(fastTaxData,actualFastTaxData);
+    }
 
 
 }

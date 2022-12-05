@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SalesTaxDataToSalesTaxRateMapperTest {
 
@@ -33,13 +34,28 @@ public class SalesTaxDataToSalesTaxRateMapperTest {
                 .taxInfoItems(Arrays.asList(taxInfoItem))
                 .build();
     }
+
     @Test
-    void map_TaxInfoItem_SalesTaxRate() {
-        // Given + When
+    void map_SalesTaxData_ReturnSalesTaxRate() {
+        // Given
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+
+        // When
         SalesTaxRate actualSalesTaxRate = SalesTaxDataToSalesTaxRateMapper.INSTANCE.map(salesTaxData);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void map_nullSalesTaxData_ReturnNull() {
+        // Given
+        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+
+        // When
+        SalesTaxRate actualSalesTaxRate = SalesTaxDataToSalesTaxRateMapper.INSTANCE.map(null);
+
+        // Then
+        assertNull(actualSalesTaxRate);
     }
 }

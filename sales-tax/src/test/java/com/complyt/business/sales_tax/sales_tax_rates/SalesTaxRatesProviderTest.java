@@ -64,21 +64,7 @@ class SalesTaxRatesProviderTest {
 
     }
 
-    /*@Test
-    void calculateSalesTaxRate_percentageCalculation_ReturnModifiedTaxRate() {
-        // Given
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withTaxRate(0.025f);
-        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
 
-        // When
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.calculateSalesTaxRate(givenJurisdictionalSalesTaxRules, salesTaxRate);
-
-        // Then
-        assertEquals(expectedSalesTaxRate,actualSalesTaxRate);
-
-    }
-
-     */
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true, true,
