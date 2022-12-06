@@ -139,7 +139,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionShippingFeeJurisdictionalRulesInjector() {
+    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeJurisdictionalRulesInjector() {
         // Given + When
         TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
 
@@ -148,29 +148,29 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnTrue() {
+    void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
         TransactionShippingFeeJurisdictionalRulesInjector secondInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
 
         // When
-        boolean actualBoolean = injector.equals(secondInjector);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
 
     }
 
     @Test
-    void shouldInject_NullShippingFee_ReturnFalse() {
+    void shouldInject_NullShippingFee_ReturnsFalse() {
         // Given
         TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction.withShippingFee(null));
 
         // When
-        boolean actualBoolean = injector.shouldInject(null);
+        boolean shouldBeInjected = injector.shouldInject(null);
 
         // Then
-        assertFalse(actualBoolean);
+        assertFalse(shouldBeInjected);
     }
 
 }

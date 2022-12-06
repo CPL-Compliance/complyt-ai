@@ -21,10 +21,10 @@ class InformationComponentTest {
         InformationComponent givenInformationComponent = new InformationComponent("name", "value");
 
         // When
-        boolean actualBoolean = informationComponent.equals(givenInformationComponent);
+        boolean isEquals = informationComponent.equals(givenInformationComponent);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
@@ -48,7 +48,7 @@ class InformationComponentTest {
         InformationComponent actualInformationComponent = new InformationComponent();
 
         // Then
-        assertEquals(expectedInformationComponent,actualInformationComponent);
+        assertEquals(expectedInformationComponent, actualInformationComponent);
     }
 
 }

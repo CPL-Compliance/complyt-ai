@@ -25,14 +25,14 @@ class CertificateTest {
         Certificate givenCertificate = new Certificate(certificateId, "url", "name");
 
         // When
-        boolean actualBoolean = certificate.equals(givenCertificate);
+        boolean isEquals = certificate.equals(givenCertificate);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "Certificate(certificateId=" + certificateId + ", url=url, name=name)";
 

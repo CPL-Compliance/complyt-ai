@@ -2,11 +2,11 @@ package com.complyt.domain.nexus.enums;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimeFrameTest {
     @Test
-    public void TimeFrame_GetCurrent_calender_year_ReturnCurrent_calender_year() {
+    public void TimeFrame_GetCurrent_calender_year_ReturnsCurrent_calender_year() {
         // Given + When
         TimeFrame timeFrame = TimeFrame.CURRENT_CALENDER_YEAR;
 
@@ -15,7 +15,7 @@ class TimeFrameTest {
     }
 
     @Test
-    public void TimeFrame_GetPrevious_twelve_months_ReturnPrevious_twelve_months() {
+    public void TimeFrame_GetPrevious_twelve_months_ReturnsPrevious_twelve_months() {
         // Given + When
         TimeFrame timeFrame = TimeFrame.PREVIOUS_TWELVE_MONTHS;
 
@@ -24,7 +24,7 @@ class TimeFrameTest {
     }
 
     @Test
-    public void TimeFrame_GetCurrent_taxable_year_ReturnCurrent_taxable_year() {
+    public void TimeFrame_GetCurrent_taxable_year_ReturnsCurrent_taxable_year() {
         // Given + When
         TimeFrame timeFrame = TimeFrame.CURRENT_TAXABLE_YEAR;
 
@@ -33,7 +33,7 @@ class TimeFrameTest {
     }
 
     @Test
-    public void TimeFrame_GetPrevious_calender_year_ReturnPrevious_calender_year() {
+    public void TimeFrame_GetPrevious_calender_year_ReturnsPrevious_calender_year() {
         // Given + When
         TimeFrame timeFrame = TimeFrame.PREVIOUS_CALENDER_YEAR;
 
@@ -42,7 +42,7 @@ class TimeFrameTest {
     }
 
     @Test
-    public void TimeFrame_GetYear_from_september_to_september_ReturnYear_from_september_to_september() {
+    public void TimeFrame_GetYear_from_september_to_september_ReturnsYear_from_september_to_september() {
         // Given + When
         TimeFrame timeFrame = TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER;
 

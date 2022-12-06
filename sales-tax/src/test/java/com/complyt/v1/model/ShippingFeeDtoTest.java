@@ -16,16 +16,26 @@ class ShippingFeeDtoTest {
         shippingFeeDto = createShippingFeeDto();
     }
 
+    private ShippingFeeDto createShippingFeeDto() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        return new ShippingFeeDto(false, 0, 1000, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0, null);
+    }
+
     @Test
     void Equals_sameShippingFeeDto_ReturnsTrue() {
         // Given
         ShippingFeeDto givenShippingFeeDto = createShippingFeeDto();
 
         // When
-        boolean actualBoolean = shippingFeeDto.equals(givenShippingFeeDto);
+        boolean isEquals = shippingFeeDto.equals(givenShippingFeeDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
@@ -37,17 +47,7 @@ class ShippingFeeDtoTest {
         String actualString = shippingFeeDto.toString();
 
         // Then
-        assertEquals(expectedString,actualString);
-    }
-
-    private ShippingFeeDto createShippingFeeDto() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, 0, 1000, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+        assertEquals(expectedString, actualString);
     }
 
 }

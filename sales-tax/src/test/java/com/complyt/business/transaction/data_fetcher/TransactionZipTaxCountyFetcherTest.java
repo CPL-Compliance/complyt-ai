@@ -32,12 +32,10 @@ import static org.mockito.Mockito.when;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransactionZipTaxCountyFetcherTest {
 
-    @InjectMocks
-    private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
-
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
-
+    @InjectMocks
+    private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
     private Transaction transaction;
 
     @BeforeEach
@@ -91,14 +89,14 @@ class TransactionZipTaxCountyFetcherTest {
     }
 
     @Test
-    void equals_SameTransactionZipTaxCountyFetcher_ReturnTrue() {
+    void equals_SameTransactionZipTaxCountyFetcher_ReturnsTrue() {
         // Given
         TransactionZipTaxCountyFetcher givenTransactionZipTaxCountyFetcher = transactionZipTaxCountyFetcher;
 
         // When
-        boolean actualBoolean = transactionZipTaxCountyFetcher.equals(givenTransactionZipTaxCountyFetcher);
+        boolean isEquals = transactionZipTaxCountyFetcher.equals(givenTransactionZipTaxCountyFetcher);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 }

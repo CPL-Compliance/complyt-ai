@@ -12,19 +12,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FastTaxDataTest {
 
-    private FastTaxData fastTaxData;
     private final String UNINCORPORATED_CODE = "1";
+    private FastTaxData fastTaxData;
 
     @BeforeEach
     void setUp() {
         fastTaxData = createFastTaxData();
     }
 
-    @Test
-    void isUnincorporated_FastTaxDataIsUnincorporated_ReturnsTrue() {
-        // Given
+    private FastTaxData createFastTaxData() {
+        List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
+            add(new TaxInfoItem().withNotesCodes(UNINCORPORATED_CODE));
+        }};
+        return new FastTaxData().withTaxInfoItems(taxInfoItemList).withMatchLevel("lvl");
+    }
 
-        // When
+    @Test
+    void isUnincorporated_FastTaxDataIsUnincorporated_ReturnTrue() {
+
+        // Given + When
         boolean isUnincorporated = fastTaxData.isUnincorporated();
 
         // Then
@@ -32,7 +38,7 @@ public class FastTaxDataTest {
     }
 
     @Test
-    void isUnincorporated_TaxInfoItemsIsNull_Returnsfalse() {
+    void isUnincorporated_TaxInfoItemsIsNull_ReturnFalse() {
         // Given
         fastTaxData = fastTaxData.withTaxInfoItems(null);
 
@@ -44,7 +50,7 @@ public class FastTaxDataTest {
     }
 
     @Test
-    void isUnincorporated_FastTaxDataIsNotUnincorporated_ReturnsFalse() {
+    void isUnincorporated_FastTaxDataIsNotUnincorporated_ReturnFalse() {
         // Given
         String INCORPORATED_CODE = "2";
         List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
@@ -78,26 +84,19 @@ public class FastTaxDataTest {
         FastTaxData givenFastTaxData = createFastTaxData();
 
         // When
-        boolean actualBoolean = fastTaxData.equals(givenFastTaxData);
+        boolean isEquals = fastTaxData.equals(givenFastTaxData);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private FastTaxData createFastTaxData() {
-        List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
-            add(new TaxInfoItem().withNotesCodes(UNINCORPORATED_CODE));
-        }};
-        return new FastTaxData().withTaxInfoItems(taxInfoItemList).withMatchLevel("lvl");
+        assertTrue(isEquals);
     }
 
     @Test
-    void Builder_build() {
+    void Builder_Build_ReturnFastTaxData() {
         // Given + When
         FastTaxData actualFastTaxData = FastTaxData.builder().taxInfoItems(fastTaxData.getTaxInfoItems()).matchLevel("lvl").build();
 
         // Then
-        assertEquals(fastTaxData,actualFastTaxData);
+        assertEquals(fastTaxData, actualFastTaxData);
     }
 
 

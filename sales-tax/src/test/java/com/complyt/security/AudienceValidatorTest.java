@@ -19,7 +19,7 @@ class AudienceValidatorTest {
     AudienceValidator audienceValidator;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         audienceValidator = new AudienceValidator("Good");
     }
 
@@ -41,7 +41,7 @@ class AudienceValidatorTest {
                         error.getErrorCode().equals("invalid_token") &&
                                 error.getDescription().equals("The required audience is missing")).count();
 
-        Assertions.assertTrue(count == 1);
+        Assertions.assertEquals(1, count);
     }
 
     @Test

@@ -16,18 +16,19 @@ class StatusTest {
     }
 
     @Test
-    void Equals_sameStatus_ReturnTrue() {
+    void Equals_sameStatus_ReturnsTrue() {
         // Given
         Status givenStatus = new Status("code", "name");
 
         // When
-        boolean actualBoolean = status.equals(givenStatus);
+        boolean isEquals = status.equals(givenStatus);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
-    @Test void toString_ReturnString() {
+    @Test
+    void toString_ReturnString() {
         // Given
         String expectedString = "Status(code=code, name=name)";
 
@@ -35,6 +36,6 @@ class StatusTest {
         String actualString = status.toString();
 
         // Then
-        assertEquals(expectedString,actualString);
+        assertEquals(expectedString, actualString);
     }
 }

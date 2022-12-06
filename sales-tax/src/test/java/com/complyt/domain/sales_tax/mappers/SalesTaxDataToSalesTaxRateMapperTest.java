@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -31,7 +32,7 @@ public class SalesTaxDataToSalesTaxRateMapperTest {
 
         salesTaxData = FastTaxData.builder()
                 .matchLevel("street")
-                .taxInfoItems(Arrays.asList(taxInfoItem))
+                .taxInfoItems(Collections.singletonList(taxInfoItem))
                 .build();
     }
 

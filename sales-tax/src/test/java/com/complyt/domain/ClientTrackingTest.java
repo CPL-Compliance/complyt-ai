@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClientTrackingTest {
 
-    private ClientTracking clientTracking;
-    private LocalDateTime nexusDate;
     String id;
     String tenantId;
+    private ClientTracking clientTracking;
+    private LocalDateTime nexusDate;
 
     @BeforeEach
     void setup() {
@@ -30,14 +30,14 @@ class ClientTrackingTest {
         ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate));
 
         // When
-        boolean actualBoolean = clientTracking.equals(givenClientTracking);
+        boolean isEquals = clientTracking.equals(givenClientTracking);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "ClientTracking(id=" + id + ", tenantId=" + tenantId + ", nexus=Nexus(taxableDate=" + nexusDate + "))";
 

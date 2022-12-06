@@ -10,7 +10,6 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -133,10 +132,10 @@ class TransactionItemsTangibleCategoryInjectorTest {
         TransactionItemsTangibleCategoryInjector secondInjector = new TransactionItemsTangibleCategoryInjector(transaction);
 
         // When
-        boolean actualBoolean = injector.equals(secondInjector);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
 
     }
 }

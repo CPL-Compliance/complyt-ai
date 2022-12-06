@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,8 @@ import reactor.test.StepVerifier;
 import java.net.URI;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -40,18 +40,14 @@ public class ZipTaxWebClientWrapperTest {
 
     @Mock
     WebClient webClient;
-
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
-
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpecMock;
-
     @Mock
     WebClientWrapperProperties zipTaxWebClientWrapperProperties;
+    @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
+    @Mock
+    private WebClient.ResponseSpec responseSpecMock;
 
     @BeforeEach
     void setUp() {

@@ -92,7 +92,8 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void inject_ClassificationsMapContainShippingFeeTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction givenTransaction = transaction.withShippingFee(transaction.getShippingFee().withTaxCode("C1S1"));
+        ShippingFee shippingFeeThatExistInMap = transaction.getShippingFee().withTaxCode("C1S1");
+        Transaction givenTransaction = transaction.withShippingFee(shippingFeeThatExistInMap);
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(givenTransaction);
         Transaction expectedTransaction = givenTransaction.withShippingFee(givenTransaction.getShippingFee().withTangibleCategory(TangibleCategory.TANGIBLE));
 
@@ -104,7 +105,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionShippingFeeTangibleCategoryInjector() {
+    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeTangibleCategoryInjector() {
         // Given + When
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
 
@@ -113,42 +114,42 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnTrue() {
+    void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
         TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
 
         // When
-        boolean actualBoolean = injector.equals(secondInjector);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
 
     }
 
     @Test
-    void shouldInject_NullShippingFee_ReturnFalse() {
+    void shouldInject_NullShippingFee_ReturnsFalse() {
         // Given
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction.withShippingFee(null));
 
         // When
-        boolean actualBoolean = injector.shouldInject(null);
+        boolean shouldBeInjected = injector.shouldInject(null);
 
         // Then
-        assertFalse(actualBoolean);
+        assertFalse(shouldBeInjected);
     }
 
     @Test
-    void shouldInject_TaxCodeExistInMap_ReturnTrue() {
+    void shouldInject_TaxCodeExistInMap_ReturnsTrue() {
         // Given
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
         HashMap<String, ProductClassification> givenMap = new HashMap<String, ProductClassification>();
         givenMap.put(transaction.getShippingFee().getTaxCode(), null);
 
         // When
-        boolean actualBoolean = injector.shouldInject(givenMap);
+        boolean shouldBeInjected = injector.shouldInject(givenMap);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(shouldBeInjected);
     }
 }

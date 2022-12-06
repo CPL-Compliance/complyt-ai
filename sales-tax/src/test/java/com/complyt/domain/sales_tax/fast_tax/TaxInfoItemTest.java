@@ -7,12 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TaxInfoItemTest {
-    private TaxInfoItem taxInfoItem;
     private final String UNINCORPORATED_CODE = "1";
+    private TaxInfoItem taxInfoItem;
 
     @BeforeEach
     void setUp() {
         taxInfoItem = createTaxInfoItem();
+    }
+
+    private TaxInfoItem createTaxInfoItem() {
+        return new TaxInfoItem("city", "", "", "", "", "", null, "", "", "", "", "", "", "", "", "");
     }
 
     @Test
@@ -33,18 +37,14 @@ class TaxInfoItemTest {
         TaxInfoItem givenTaxInfoItem = createTaxInfoItem();
 
         // When
-        boolean actualBoolean = taxInfoItem.equals(givenTaxInfoItem);
+        boolean isEquals = taxInfoItem.equals(givenTaxInfoItem);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private TaxInfoItem createTaxInfoItem() {
-        return new TaxInfoItem("city", "", "", "", "", "", null, "", "", "", "", "", "", "", "", "");
+        assertTrue(isEquals);
     }
 
     @Test
-    void Builder_build() {
+    void Builder_Build_ReturnTaxInfoItemTest() {
         // Given + When
         TaxInfoItem actualTaxInfoItem = TaxInfoItem.builder().city("city").cityDistrictRate("").cityRate("").county("").countyDistrictRate("").countyRate("").informationComponents(null).notesCodes("").notesDesc("").specialDistrictRate("").stateAbbreviation("").stateName("").stateRate("").taxRate("").totalTaxExempt("").zip("").build();
 
@@ -61,7 +61,7 @@ class TaxInfoItemTest {
         TaxInfoItem actualTaxInfoItem = new TaxInfoItem();
 
         // Then
-        assertEquals(expectedTaxInfoItem,actualTaxInfoItem);
+        assertEquals(expectedTaxInfoItem, actualTaxInfoItem);
     }
 
 }

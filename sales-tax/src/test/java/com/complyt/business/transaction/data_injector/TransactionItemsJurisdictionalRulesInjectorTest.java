@@ -16,7 +16,8 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TransactionItemsJurisdictionalRulesInjectorTest {
 
@@ -80,11 +81,11 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        Item itemWithJurisdictionRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
+                createJurisdictionalSalesTaxRules(), new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE);
         Transaction expectedTransaction = transaction.withItems(new ArrayList<>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        createJurisdictionalSalesTaxRules(), new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
+                add(itemWithJurisdictionRule);
             }
         });
 
@@ -96,14 +97,14 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() { // Need update after error handling feature
+    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_ThrowsNullPointerException() { // Need update after error handling feature
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        Item itemWithTaxCodeNotOnMap = new Item(2000, 4, 8000, "description", "name", "C3S1",
+                null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE);
         Transaction givenTransaction = transaction.withItems(new ArrayList<>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "C3S1",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
+                add(itemWithTaxCodeNotOnMap);
             }
         });
         TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(givenTransaction);
@@ -131,10 +132,9 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
         TransactionItemsJurisdictionalRulesInjector secondInjector = new TransactionItemsJurisdictionalRulesInjector(transaction);
 
         // When
-        boolean actualBoolean = injector.equals(secondInjector);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertTrue(actualBoolean);
-
+        assertTrue(isEquals);
     }
 }

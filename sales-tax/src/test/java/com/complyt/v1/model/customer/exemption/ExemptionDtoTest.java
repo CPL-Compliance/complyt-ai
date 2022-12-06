@@ -21,7 +21,7 @@ class ExemptionDtoTest {
 
     private String exemptionId;
 
-    private  String certificateId;
+    private String certificateId;
 
     @BeforeEach
     void setup() {
@@ -30,30 +30,6 @@ class ExemptionDtoTest {
         certificateId = UUID.randomUUID().toString();
         exemptionId = UUID.randomUUID().toString();
         exemptionDto = createExemptionDto();
-    }
-
-    @Test
-    void Equals_sameExemptionDto_ReturnTrue() {
-        // Given
-        ExemptionDto givenExemptionDto = createExemptionDto();
-
-        // When
-        boolean actualBoolean = exemptionDto.equals(givenExemptionDto);
-
-        // Then
-        assertTrue(actualBoolean);
-    }
-
-    @Test
-    void toString_ReturnString() {
-        // Given
-        String expectedString = "ExemptionDto(id=" + exemptionId + ", customerId=" + customerId + ", state=com.complyt.v1.model.StateDto@576a2dbf, classification=ClassificationDto(code=code, description=description), validationDates=ValidationDatesDto(fromDate=" + localDateTime.minusYears(1) + ", toDate=" + localDateTime.plusYears(1) + "), internalTimeStamps=TimeStampsDto(createdDate=" + localDateTime + ", updatedDate=" +localDateTime + "), status=StatusDto(code=code, name=name), certificate=CertificateDto(certificateId=" + certificateId + ", url=url, name=name), exemptionType=FULLY)";
-
-        // When
-        String actualString = exemptionDto.toString();
-
-        // Then
-        assertEquals(expectedString, actualString);
     }
 
     private ExemptionDto createExemptionDto() {
@@ -68,4 +44,37 @@ class ExemptionDtoTest {
         return new ExemptionDto(exemptionId, customerId,
                 stateDto, classificationDto, validationDatesDto, internalTimeStampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
     }
+
+    @Test
+    void Equals_sameExemptionDto_ReturnsTrue() {
+        // Given
+        ExemptionDto givenExemptionDto = createExemptionDto();
+
+        // When
+        boolean isEquals = exemptionDto.equals(givenExemptionDto);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
+    @Test
+    void toString_ReturnsString() {
+        // Given
+        String expectedString = "ExemptionDto(id=" + exemptionDto.getId() +
+                ", customerId=" + exemptionDto.getCustomerId() +
+                ", state=" + exemptionDto.getState() +
+                ", classification=" + exemptionDto.getClassification() +
+                ", validationDates=" + exemptionDto.getValidationDates() +
+                ", internalTimeStamps=" + exemptionDto.getInternalTimeStamps() +
+                ", status=" + exemptionDto.getStatus() +
+                ", certificate=" + exemptionDto.getCertificate() +
+                ", exemptionType=FULLY)";
+
+        // When
+        String actualString = exemptionDto.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
 }

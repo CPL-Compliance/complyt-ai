@@ -25,16 +25,20 @@ class ItemDtoTest {
         );
 
         // When
-        boolean actualBoolean = itemDto.equals(givenItemDto);
+        boolean isEquals = itemDto.equals(givenItemDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ItemDto(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=null, salesTaxRate=SalesTaxRateDto(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=NOT_TAXABLE)";
+        String expectedString = "ItemDto(unitPrice=2000.0, quantity=4, totalPrice=8000.0" +
+                ", description=description, name=name, taxCode=taxCode" +
+                ", jurisdictionalSalesTaxRules=null, salesTaxRate=" + itemDto.getSalesTaxRate() +
+                ", manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE" +
+                ", taxableCategory=NOT_TAXABLE)";
 
         // When
         String actualString = itemDto.toString();

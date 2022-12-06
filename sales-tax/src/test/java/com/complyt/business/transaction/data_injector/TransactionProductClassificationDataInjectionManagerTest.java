@@ -154,7 +154,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnTransactionProductClassificationDataInjectionManager() {
+    void defaultConstructor_Transaction_ReturnsTransactionProductClassificationDataInjectionManager() {
         // Given + When
         TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
 

@@ -15,8 +15,12 @@ class NexusCalculationSummaryTest {
         nexusCalculationSummary = createNexusCalculationSummary();
     }
 
+    private NexusCalculationSummary createNexusCalculationSummary() {
+        return new NexusCalculationSummary(0L, 0f);
+    }
+
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "NexusCalculationSummary(count=0, amount=0.0)";
 
@@ -28,19 +32,15 @@ class NexusCalculationSummaryTest {
     }
 
     @Test
-    void Equals_SameNexusCalculationSummary_ReturnTrue() {
+    void Equals_SameNexusCalculationSummary_ReturnsTrue() {
         // Given
         NexusCalculationSummary givenNexusCalculationSummary = createNexusCalculationSummary();
 
         // When
-        boolean actualBoolean = nexusCalculationSummary.equals(givenNexusCalculationSummary);
+        boolean isEquals = nexusCalculationSummary.equals(givenNexusCalculationSummary);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(0l, 0f);
+        assertTrue(isEquals);
     }
 
 }

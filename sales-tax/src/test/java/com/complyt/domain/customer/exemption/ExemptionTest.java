@@ -35,30 +35,6 @@ class ExemptionTest {
         exemption = createExemption();
     }
 
-    @Test
-    void Equals_sameExemption_ReturnTrue() {
-        // Given
-        Exemption givenExemption = createExemption();
-
-        // When
-        boolean actualBoolean = exemption.equals(givenExemption);
-
-        // Then
-        assertTrue(actualBoolean);
-    }
-
-    @Test
-    void toString_ReturnString() {
-        // Given
-        String expectedString = "Exemption(id=" + exemptionId + ", tenantId=" + tenantId + ", customerId=" + customerId + ", state=State(abbreviation=CA, code=02, name=California), classification=Classification(code=code, description=description), validationDates=ValidationDates(fromDate=" + localDateTime.minusYears(1) + ", toDate=" + localDateTime.plusYears(1) + "), internalTimeStamps=TimeStamps(createdDate=" + localDateTime + ", updatedDate=" + localDateTime + "), status=Status(code=code, name=name), certificate=Certificate(certificateId=" + certificateId + ", url=url, name=name), exemptionType=FULLY)";
-
-        // When
-        String actualString = exemption.toString();
-
-        // Then
-        assertEquals(expectedString, actualString);
-    }
-
     private Exemption createExemption() {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
@@ -71,4 +47,59 @@ class ExemptionTest {
         return new Exemption(exemptionId, tenantId, customerId,
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
+
+    @Test
+    void Equals_sameExemption_ReturnsTrue() {
+        // Given
+        Exemption givenExemption = createExemption();
+
+        // When
+        boolean isEquals = exemption.equals(givenExemption);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "Exemption(id=" + exemption.getId() +
+                ", tenantId=" + exemption.getTenantId() +
+                ", customerId=" + exemption.getCustomerId() +
+                ", state=" + exemption.getState() +
+                ", classification=" + exemption.getClassification() +
+                ", validationDates=" + exemption.getValidationDates() +
+                ", internalTimeStamps=" + exemption.getInternalTimeStamps() +
+                ", status=" + exemption.getStatus() +
+                ", certificate=" + exemption.getCertificate() +
+                ", exemptionType=FULLY)";
+
+        // When
+        String actualString = exemption.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void exemptionBuilder_Build_SameExemption() {
+        // Given + When
+        Exemption actualExemption = Exemption.builder()
+                .id(exemption.getId())
+                .tenantId(exemption.getTenantId())
+                .customerId(exemption.getCustomerId())
+                .state(exemption.getState())
+                .classification(exemption.getClassification())
+                .validationDates(exemption.getValidationDates())
+                .internalTimeStamps(exemption.getInternalTimeStamps())
+                .status(exemption.getStatus())
+                .certificate(exemption.getCertificate())
+                .exemptionType(exemption.getExemptionType())
+                .build();
+
+        // Then
+        assertEquals(exemption, actualExemption);
+
+    }
+
 }

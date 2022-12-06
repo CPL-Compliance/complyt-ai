@@ -27,27 +27,12 @@ class ModifiedTransactionInternalDateInjectorTest {
         modifiedTransactionInternalDateInjector = new ModifiedTransactionInternalDateInjector(transaction);
     }
 
-    @Test
-    void inject_ReturnModifiedTransaction() {
-        // Given
-        LocalDateTime beforeActionTime = LocalDateTime.now();
-
-        // When
-        Transaction actualTransaction = modifiedTransactionInternalDateInjector.inject();
-        LocalDateTime afterActionTime = LocalDateTime.now();
-
-        // Then
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
-
-    }
-
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(),LocalDateTime.now());
+        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -69,4 +54,20 @@ class ModifiedTransactionInternalDateInjectorTest {
                 .internalTimeStamps(internalTimeStamps)
                 .build();
     }
+
+    @Test
+    void inject_CurrentDate_ReturnModifiedTransaction() {
+        // Given
+        LocalDateTime beforeActionTime = LocalDateTime.now();
+
+        // When
+        Transaction actualTransaction = modifiedTransactionInternalDateInjector.inject();
+        LocalDateTime afterActionTime = LocalDateTime.now();
+
+        // Then
+        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
+        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
+
+    }
+
 }

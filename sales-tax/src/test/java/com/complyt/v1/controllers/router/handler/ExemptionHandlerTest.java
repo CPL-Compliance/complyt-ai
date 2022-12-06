@@ -43,13 +43,13 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
 public class ExemptionHandlerTest {
 
+    Exemption exemption;
+
     @Autowired
     private WebTestClient webTestClient;
 
     @MockBean
     private ExemptionFacade exemptionFacade;
-
-    Exemption exemption;
 
     @BeforeEach
     public void setUp() {

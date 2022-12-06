@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefinitionTest {
     @Test
-    public void Definition_GetCount_ReturnCount() {
+    public void Definition_GetCount_ReturnsCount() {
         // Given + When
         Definition definition = Definition.COUNT;
 
@@ -15,7 +15,7 @@ class DefinitionTest {
     }
 
     @Test
-    public void Definition_GetAmount_or_count_ReturnAmount_or_count() {
+    public void Definition_GetAmount_or_count_ReturnsAmount_or_count() {
         // Given + When
         Definition definition = Definition.AMOUNT_OR_COUNT;
 
@@ -24,7 +24,7 @@ class DefinitionTest {
     }
 
     @Test
-    public void Definition_GetAmount_ReturnAmount() {
+    public void Definition_GetAmount_ReturnsAmount() {
         // Given + When
         Definition definition = Definition.AMOUNT;
 
@@ -33,7 +33,7 @@ class DefinitionTest {
     }
 
     @Test
-    public void Definition_GetAmount_and_count_ReturnAmount_and_count() {
+    public void Definition_GetAmount_and_count_ReturnsAmount_and_count() {
         // Given + When
         Definition definition = Definition.AMOUNT_AND_COUNT;
 

@@ -29,7 +29,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -46,17 +45,17 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @Import(JacksonConfig.class)
 class TransactionControllerTest {
 
-    @MockBean
-    private TransactionFacade transactionFacade;
-
-    @Autowired
-    private WebTestClient webTestClient;
-
     Transaction transactionWithId;
 
     TransactionDto transactionDto;
 
     TransactionController transactionController;
+
+    @MockBean
+    private TransactionFacade transactionFacade;
+
+    @Autowired
+    private WebTestClient webTestClient;
 
     @BeforeEach
     void cleanUp() {
@@ -98,7 +97,7 @@ class TransactionControllerTest {
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> new TransactionController(facade));
 
-        assertEquals( "transactionFacade is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("transactionFacade is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @WithUserDetails()
@@ -248,12 +247,14 @@ class TransactionControllerTest {
         //Given
         String nullExternalId = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
+
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.getOne(nullExternalId);
         });
+
         // Then
-        assertEquals( "externalId is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -261,27 +262,30 @@ class TransactionControllerTest {
         //Given
         String nullExternalId = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
+
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.upsert(nullExternalId, transactionDto);
         });
+
         // Then
-        assertEquals( "externalId is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
     void upsert_NullTransactionDto_ThrowsNullPointerException() {
         //Given
         String externalId = UUID.randomUUID().toString();
-        ;
         TransactionDto nullTransactionDto = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
+
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.upsert(transactionDto.getExternalId(), nullTransactionDto);
         });
+
         // Then
-        assertEquals( "transactionDto is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("transactionDto is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -289,11 +293,13 @@ class TransactionControllerTest {
         //Given
         String nullExternalId = null;
         transactionController = new TransactionController(transactionFacade);
+
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.delete(nullExternalId);
         });
+
         // Then
-        assertEquals( "externalId is marked non-null but is null", nullPointerException.getMessage());
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 }

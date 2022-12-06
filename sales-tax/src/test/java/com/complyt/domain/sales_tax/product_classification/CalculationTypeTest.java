@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CalculationTypeTest {
 
     @Test
-    public void CalculationType_getFixed_gotFixed() {
+    public void CalculationType_getFixed_ReturnsFixed() {
         // Given + When
         CalculationType calculationType = CalculationType.FIXED;
 
@@ -16,7 +16,7 @@ class CalculationTypeTest {
     }
 
     @Test
-    public void CalculationType_getPercentage_gotPercentage() {
+    public void CalculationType_getPercentage_ReturnsPercentage() {
         // Given + When
         CalculationType calculationType = CalculationType.PERCENTAGE;
 

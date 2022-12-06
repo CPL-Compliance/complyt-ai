@@ -4,8 +4,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,6 +13,11 @@ class NexusThresholdTest {
     @BeforeEach
     void setup() {
         nexusThreshold = createNexusThreshold();
+    }
+
+    private NexusThreshold createNexusThreshold() {
+
+        return new NexusThreshold(0, 0, Definition.COUNT);
     }
 
     @Test
@@ -35,14 +38,10 @@ class NexusThresholdTest {
         NexusThreshold givenNexusThreshold = createNexusThreshold();
 
         // When
-        boolean actualBoolean = nexusThreshold.equals(givenNexusThreshold);
+        boolean isEquals = nexusThreshold.equals(givenNexusThreshold);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private NexusThreshold createNexusThreshold() {
-        return new NexusThreshold(0, 0, Definition.COUNT);
+        assertTrue(isEquals);
     }
 
 }

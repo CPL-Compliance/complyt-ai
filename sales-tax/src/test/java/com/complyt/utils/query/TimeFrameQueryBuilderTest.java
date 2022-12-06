@@ -5,7 +5,6 @@ import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.utils.factory.DateRange;
-import com.complyt.utils.query.TimeFrameQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

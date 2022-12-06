@@ -21,10 +21,10 @@ class ClassificationTest {
         Classification givenClassification = new Classification("code", "description");
 
         // When
-        boolean actualBoolean = classification.equals(givenClassification);
+        boolean isEquals = classification.equals(givenClassification);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test

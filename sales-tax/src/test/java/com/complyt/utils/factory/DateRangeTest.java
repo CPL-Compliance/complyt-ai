@@ -1,11 +1,8 @@
 package com.complyt.utils.factory;
 
-import com.complyt.utils.factory.DateRange;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -17,8 +14,6 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -33,9 +28,10 @@ public class DateRangeTest {
         LocalDateTime expectedLastDayOfLastYear = expectedFirstDayOfLastYear.with(lastDayOfYear());
         LocalDateTime referenceDate = LocalDateTime.now();
 
-        //When + Then
+        //When
         DateRange expectedDateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
 
+        // Then
         assertEquals(expectedDateRange.getStart().getYear(), expectedFirstDayOfLastYear.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedFirstDayOfLastYear.getMonthValue());
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedFirstDayOfLastYear.getDayOfMonth());
@@ -52,9 +48,10 @@ public class DateRangeTest {
                 .with(LocalTime.of(23, 59, 59));
         LocalDateTime referenceDate = LocalDateTime.now();
 
-        //When + Then
+        //When
         DateRange expectedDateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
 
+        // Then
         assertEquals(expectedDateRange.getStart().getYear(), expectedFirstDayOfTheYear.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedFirstDayOfTheYear.getMonthValue());
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedFirstDayOfTheYear.getDayOfMonth());
@@ -69,9 +66,10 @@ public class DateRangeTest {
         LocalDateTime expectedOneYearAgo = LocalDate.now().minusYears(1).atStartOfDay();
         LocalDateTime referenceDate = LocalDateTime.now();
 
-        //When + Then
+        // When
         DateRange expectedDateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
 
+        // Then
         assertEquals(expectedDateRange.getStart().getYear(), expectedOneYearAgo.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), expectedOneYearAgo.getMonthValue());
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), expectedOneYearAgo.getDayOfMonth());
@@ -88,8 +86,10 @@ public class DateRangeTest {
 
         LocalDateTime expectedEndDate = september30.plusYears(1);
 
-        // When + Thenx
+        // When
         DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
+
+        // Then
         assertEquals(expectedDateRange.getStart().getYear(), september30.getYear());
         assertEquals(expectedDateRange.getStart().getMonthValue(), september30.getMonthValue());
         assertEquals(expectedDateRange.getStart().getDayOfMonth(), september30.getDayOfMonth());
@@ -107,9 +107,10 @@ public class DateRangeTest {
         LocalDateTime expectedStartDate = september30.minusYears(1);
         LocalDateTime expectedEndDate = expectedStartDate.plusYears(1);
 
-        // When + Then
+        // When
         DateRange actualDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
 
+        // Then
         assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
         assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
         assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
@@ -128,9 +129,10 @@ public class DateRangeTest {
                 .withSecond(0);
         LocalDateTime expectedStartDate = taxableDate.minusYears(1);
 
-        //When + Then
+        //When
         DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
+        // Then
         assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
         assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
         assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
@@ -146,9 +148,10 @@ public class DateRangeTest {
                 .withSecond(0);
         LocalDateTime expectedStartDate = taxableDate.plusYears(0);
 
-        //When + Then
+        //When
         DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
+        // Then
         assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
         assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
         assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
@@ -165,9 +168,10 @@ public class DateRangeTest {
                 .withNano(0);
         LocalDateTime expectedStartDate = taxableDate.minusYears(0);
 
-        //When + Then
+        //When
         DateRange actualDateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
 
+        // Then
         assertEquals(expectedStartDate.getYear(), actualDateRange.getStart().getYear());
         assertEquals(expectedStartDate.getMonthValue(), actualDateRange.getStart().getMonthValue());
         assertEquals(expectedStartDate.getDayOfMonth(), actualDateRange.getStart().getDayOfMonth());
@@ -261,14 +265,16 @@ public class DateRangeTest {
     }
 
     @Test
-    void DateRangeFactoryConstructor_DefaultConstructor_gotInstance() {
+    void DateRangeFactoryConstructor_DefaultConstructor_ReturnsInstance() {
         DateRange.Factory factory = new DateRange.Factory();
         assertEquals(factory.getClass(), DateRange.Factory.class);
     }
-    @Test void toString_DateRange_gotString() {
+
+    @Test
+    void toString_DateRange_ReturnsString() {
         // Given
         String expectedString = "DateRange(start=2000-01-01T00:00, end=2000-12-31T23:59:59)";
-        DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(LocalDateTime.of(2000,5,1,1,1));
+        DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(LocalDateTime.of(2000, 5, 1, 1, 1));
 
         // When
         String actualString = dateRange.toString();

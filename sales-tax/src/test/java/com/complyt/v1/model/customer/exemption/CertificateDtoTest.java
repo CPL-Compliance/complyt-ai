@@ -25,14 +25,14 @@ class CertificateDtoTest {
         CertificateDto givenCertificateDto = new CertificateDto(certificateId, "url", "name");
 
         // When
-        boolean actualBoolean = certificateDto.equals(givenCertificateDto);
+        boolean isEquals = certificateDto.equals(givenCertificateDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "CertificateDto(certificateId=" + certificateId + ", url=url, name=name)";
 

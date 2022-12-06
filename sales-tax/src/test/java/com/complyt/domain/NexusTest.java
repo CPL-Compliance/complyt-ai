@@ -1,12 +1,12 @@
 package com.complyt.domain;
 
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NexusTest {
 
@@ -31,14 +31,15 @@ class NexusTest {
         assertEquals(expectedString, actualString);
     }
 
-    @Test void Equals_SameNexus_ReturnTrue() {
+    @Test
+    void Equals_SameNexus_ReturnTrue() {
         // Given
-         Nexus givenNexus = new Nexus(nexusDate);
+        Nexus givenNexus = new Nexus(nexusDate);
 
         // When
-        boolean actualBoolean = nexus.equals(givenNexus);
+        boolean isEquals = nexus.equals(givenNexus);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 }

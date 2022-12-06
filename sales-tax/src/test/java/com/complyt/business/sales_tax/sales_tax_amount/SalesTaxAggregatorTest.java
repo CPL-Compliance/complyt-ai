@@ -105,7 +105,8 @@ public class SalesTaxAggregatorTest {
         assertEquals("taxables is marked non-null but is null", nullPointerException.getMessage());
     }
 
-    @Test void toString_ReturnString() {
+    @Test
+    void toString_ReturnsString() {
         // Given
         String expectedString = "SalesTaxAggregator()";
 
@@ -113,17 +114,18 @@ public class SalesTaxAggregatorTest {
         String actualString = salesTaxAggregator.toString();
 
         // Then
-        assertEquals(expectedString,actualString);
+        assertEquals(expectedString, actualString);
     }
 
-    @Test void equals_SameSalesTaxAggregator_ReturnTrue() {
+    @Test
+    void equals_SameSalesTaxAggregator_ReturnsTrue() {
         // Given
         SalesTaxAggregator actualSalesTaxAggregator = new SalesTaxAggregator();
 
         // When
-        boolean actualBoolean = salesTaxAggregator.equals(actualSalesTaxAggregator);
+        boolean isEquals = salesTaxAggregator.equals(actualSalesTaxAggregator);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 }

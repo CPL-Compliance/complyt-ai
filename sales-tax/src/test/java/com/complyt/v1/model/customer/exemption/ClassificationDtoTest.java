@@ -11,24 +11,24 @@ class ClassificationDtoTest {
     private ClassificationDto classificationDto;
 
     @BeforeEach
-    void setup () {
-        classificationDto = new ClassificationDto("code","description");
+    void setup() {
+        classificationDto = new ClassificationDto("code", "description");
     }
 
     @Test
-    void Equals_sameClassificationDto_ReturnTrue() {
+    void Equals_sameClassificationDto_ReturnsTrue() {
         // Given
-        ClassificationDto givenClassificationDto = new ClassificationDto("code","description");
+        ClassificationDto givenClassificationDto = new ClassificationDto("code", "description");
 
         // When
-        boolean actualBoolean = classificationDto.equals(givenClassificationDto);
+        boolean isEquals = classificationDto.equals(givenClassificationDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "ClassificationDto(code=code, description=description)";
 

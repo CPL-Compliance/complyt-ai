@@ -3,7 +3,7 @@ package com.complyt.v1.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StateDtoTest {
 
@@ -20,10 +20,10 @@ class StateDtoTest {
         StateDto givenStateDto = new StateDto("CA", "02", "California");
 
         // When
-        boolean actualBoolean = stateDto.equals(givenStateDto);
+        boolean isEquals = stateDto.equals(givenStateDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
 }

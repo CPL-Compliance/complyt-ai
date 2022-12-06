@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ class TransactionSalesTaxRatesHandlerTest {
     }
 
     @Test
-    void setRates_NullShippingFee_ReturnTransaction() {
+    void setRates_NullShippingFee_ReturnsTransaction() {
         // Given
         Transaction expectedTransaction = transaction.withShippingFee(null);
 
@@ -59,23 +58,24 @@ class TransactionSalesTaxRatesHandlerTest {
         when(itemsSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
 
         // Then
-        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction,salesTaxRate);
-        assertEquals(expectedTransaction,actualTransaction);
+        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction, salesTaxRate);
+        assertEquals(expectedTransaction, actualTransaction);
 
     }
 
     @Test
-    void setRates_ShippingFeeExist_ReturnTransaction() {
+    void setRates_ShippingFeeExist_ReturnsTransaction() {
         // Given
-        Transaction expectedTransaction = transaction.withShippingFee(createShippingFee());
+        ShippingFee givenShippingFee = createShippingFee();
+        Transaction expectedTransaction = transaction.withShippingFee(givenShippingFee);
 
         // When
         when(itemsSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
         when(shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getShippingFee(), salesTaxRate)).thenReturn(expectedTransaction.getShippingFee());
 
         // Then
-        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction,salesTaxRate);
-        assertEquals(expectedTransaction,actualTransaction);
+        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction, salesTaxRate);
+        assertEquals(expectedTransaction, actualTransaction);
 
     }
 
@@ -97,10 +97,12 @@ class TransactionSalesTaxRatesHandlerTest {
     private SalesTaxRate createSalesTaxRates() {
         return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 2.5f);
     }
+
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, 0, 1000, rules, SalesTaxRate.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
+
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true, true,
                 CalculationType.FIXED, "description", 0.5f, null);

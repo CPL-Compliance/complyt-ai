@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SalesTaxRateDtoTest {
     private SalesTaxRateDto salesTaxRateDto;
 
+    private SalesTaxRateDto createSalesTaxRateDto() {
+        return new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+    }
+
     @BeforeEach
     void setup() {
         salesTaxRateDto = createSalesTaxRateDto();
@@ -32,15 +36,10 @@ class SalesTaxRateDtoTest {
         SalesTaxRateDto givenSalesTaxRateDto = createSalesTaxRateDto();
 
         // When
-        boolean actualBoolean = salesTaxRateDto.equals(givenSalesTaxRateDto);
+        boolean isEquals = salesTaxRateDto.equals(givenSalesTaxRateDto);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
-
-    private SalesTaxRateDto createSalesTaxRateDto() {
-        return new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
-    }
-
 
 }

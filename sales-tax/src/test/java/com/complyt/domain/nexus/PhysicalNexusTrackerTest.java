@@ -19,8 +19,12 @@ class PhysicalNexusTrackerTest {
         physicalNexusTracker = createPhysicalNexusTracker();
     }
 
+    private PhysicalNexusTracker createPhysicalNexusTracker() {
+        return new PhysicalNexusTracker(true, localDateTime);
+    }
+
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "PhysicalNexusTracker(established=true, establishedDate=" + localDateTime + ")";
 
@@ -32,19 +36,15 @@ class PhysicalNexusTrackerTest {
     }
 
     @Test
-    void Equals_SamePhysicalNexusTracker_ReturnTrue() {
+    void Equals_SamePhysicalNexusTracker_ReturnsTrue() {
         // Given
         PhysicalNexusTracker givenPhysicalNexusTracker = createPhysicalNexusTracker();
 
         // When
-        boolean actualBoolean = physicalNexusTracker.equals(givenPhysicalNexusTracker);
+        boolean isEquals = physicalNexusTracker.equals(givenPhysicalNexusTracker);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private PhysicalNexusTracker createPhysicalNexusTracker() {
-        return new PhysicalNexusTracker(true, localDateTime);
+        assertTrue(isEquals);
     }
 
 }

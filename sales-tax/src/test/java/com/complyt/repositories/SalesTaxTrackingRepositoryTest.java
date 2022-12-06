@@ -55,7 +55,7 @@ public class SalesTaxTrackingRepositoryTest {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 tenantId, true, null,
-                null,null,true, LocalDateTime.now());
+                null, null, true, LocalDateTime.now());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class SalesTaxTrackingRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query,SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingRepository.findById(id);
@@ -141,7 +141,7 @@ public class SalesTaxTrackingRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.find(query,SalesTaxTracking.class)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+        when(reactiveMongoTemplate.find(query, SalesTaxTracking.class)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll();

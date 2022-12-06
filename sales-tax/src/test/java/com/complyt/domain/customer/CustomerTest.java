@@ -37,14 +37,17 @@ class CustomerTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Customer(id=" + customer.getId() + ", externalId=" + customer.getExternalId() + ", name=Existing Customer, address=Address(city=City, country=Country, county=County, state=State, street=Street, zip=Zip), tenantId=" + customer.getTenantId() + ", customerType=RETAIL)";
+        String expectedString = "Customer(id=" + customer.getId() +
+                ", externalId=" + customer.getExternalId() +
+                ", name=Existing Customer, address=" + customer.getAddress() +
+                ", tenantId=" + customer.getTenantId() +
+                ", customerType=RETAIL)";
 
         // When
         String actualString = customer.toString();
 
         // Then
-        assertEquals(expectedString,actualString);
-
+        assertEquals(expectedString, actualString);
     }
 
 }

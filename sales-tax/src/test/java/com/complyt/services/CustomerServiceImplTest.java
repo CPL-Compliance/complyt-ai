@@ -58,7 +58,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned(){
+    void upsertCustomer_CustomerInserted_CustomerReturned() {
         // Given
 
         // When
@@ -86,15 +86,15 @@ class CustomerServiceImplTest {
 
     @Test
     void findByExternalId_CustomerFound_ReturnsCustomer() {
-         // Given
-         String id = UUID.randomUUID().toString();
+        // Given
+        String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);
 
-         // When
+        // When
         when(customerRepository.findByExternalId(id)).thenReturn(Mono.just(customerToSearchFor));
         Mono<Customer> customerMono = customerServiceImpl.findByExternalId(id);
 
-         // Then
+        // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
@@ -113,15 +113,15 @@ class CustomerServiceImplTest {
 
     @Test
     void findById_CustomerFound_ReturnsCustomer() {
-         // Given
-         String id = UUID.randomUUID().toString();
-         Customer customerToSearchFor = customer.withId(id);
+        // Given
+        String id = UUID.randomUUID().toString();
+        Customer customerToSearchFor = customer.withId(id);
 
-         // When
-         when(customerRepository.findById(id)).thenReturn(Mono.just(customerToSearchFor));
-         Mono<Customer> customerMono = customerServiceImpl.findById(id);
+        // When
+        when(customerRepository.findById(id)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerServiceImpl.findById(id);
 
-         // Then
+        // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
     }
 
@@ -141,7 +141,7 @@ class CustomerServiceImplTest {
 
     @Test
     void getAllCustomers_AllCustomersReturned() {
-         // Given
+        // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withExternalId(id);
 

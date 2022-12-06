@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TransactionTypeTest {
 
     @Test
-    public void TransactionType_GetInvoice_ReturnInvoice() {
+    public void TransactionType_GetInvoice_ReturnsInvoice() {
         // Given + When
         TransactionType transactionType = TransactionType.INVOICE;
 
@@ -16,7 +16,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void TransactionType_GetEstimate_ReturnEstimate() {
+    public void TransactionType_GetEstimate_ReturnsEstimate() {
         // Given + When
         TransactionType transactionType = TransactionType.ESTIMATE;
 
@@ -25,7 +25,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void TransactionType_GetSales_order_ReturnSales_order() {
+    public void TransactionType_GetSales_order_ReturnsSales_order() {
         // Given + When
         TransactionType transactionType = TransactionType.SALES_ORDER;
 

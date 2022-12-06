@@ -15,6 +15,10 @@ class CitySalesTaxRulesTest {
         citySalesTaxRules = createCitySalesTaxRulesRates();
     }
 
+    private CitySalesTaxRules createCitySalesTaxRulesRates() {
+        return new CitySalesTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", 1000f);
+    }
+
     @Test
     void toString_ReturnString() {
         // Given
@@ -33,13 +37,10 @@ class CitySalesTaxRulesTest {
         CitySalesTaxRules givenCitySalesTaxRules = createCitySalesTaxRulesRates();
 
         // When
-        boolean actualBoolean = citySalesTaxRules.equals(givenCitySalesTaxRules);
+        boolean isEquals = citySalesTaxRules.equals(givenCitySalesTaxRules);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
-    private CitySalesTaxRules createCitySalesTaxRulesRates() {
-        return new CitySalesTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", 1000f);
-    }
 }

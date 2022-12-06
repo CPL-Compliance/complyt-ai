@@ -22,15 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class ExemptionMapperTest {
 
+    String certificateId;
+    String exemptionId;
     private Exemption exemption;
     private Exemption exemptionNoTenant;
     private ExemptionDto exemptionDto;
     private String tenantId;
     private LocalDateTime localDateTime;
     private ObjectId customerId;
-    String certificateId;
-    String exemptionId;
-
 
     @BeforeEach
     void setup() {
@@ -43,6 +42,31 @@ public class ExemptionMapperTest {
         exemption = createExemption(tenantId);
         exemptionDto = createExemptionDto();
         exemptionNoTenant = createExemption(null);
+    }
+
+    private Exemption createExemption(String tenantId) {
+        State state = new State("CA", "02", "California");
+        Classification classification = new Classification("code", "description");
+        ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
+        TimeStamps internalTimeStamps = new TimeStamps(localDateTime, localDateTime);
+        Status status = new Status("code", "name");
+        Certificate certificate = new Certificate(certificateId, "url", "name");
+
+        return new Exemption(exemptionId, tenantId, customerId,
+                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+    }
+
+    private ExemptionDto createExemptionDto() {
+        StateDto stateDto = new StateDto("CA", "02", "California");
+        ClassificationDto classificationDto = new ClassificationDto("code", "description");
+        ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
+        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime, localDateTime);
+        StatusDto statusDto = new StatusDto("code", "name");
+        CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
+
+
+        return new ExemptionDto(exemptionId, customerId,
+                stateDto, classificationDto, validationDatesDto, internalTimeStampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
     }
 
     @Test
@@ -71,28 +95,5 @@ public class ExemptionMapperTest {
         assertEquals(exemptionNoTenant, actualExemption);
     }
 
-    private Exemption createExemption(String tenantId) {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStamps internalTimeStamps = new TimeStamps(localDateTime, localDateTime);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(certificateId, "url", "name");
 
-        return new Exemption(exemptionId, tenantId, customerId,
-                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
-    }
-
-    private ExemptionDto createExemptionDto() {
-        StateDto stateDto = new StateDto("CA", "02", "California");
-        ClassificationDto classificationDto = new ClassificationDto("code", "description");
-        ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime, localDateTime);
-        StatusDto statusDto = new StatusDto("code", "name");
-        CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
-
-
-        return new ExemptionDto(exemptionId, customerId,
-                stateDto, classificationDto, validationDatesDto, internalTimeStampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
-    }
 }

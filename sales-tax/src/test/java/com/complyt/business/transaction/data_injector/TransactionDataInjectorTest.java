@@ -1,22 +1,21 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.Transaction;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TransactionDataInjectorTest {
 
     @Test
     void shouldInject_ReturnTrue() {
         // Given
-        TransactionDataInjector<String> injector = t -> null;
+        String genericObject = "Object";
+        TransactionDataInjector<String> genericDataInjector = t -> null;
 
         // When
-        boolean expectedBoolean = injector.shouldInject("");
+        boolean shouldBeInjected = genericDataInjector.shouldInject(genericObject);
 
         // Then
-        assertTrue(expectedBoolean);
+        assertTrue(shouldBeInjected);
     }
 }

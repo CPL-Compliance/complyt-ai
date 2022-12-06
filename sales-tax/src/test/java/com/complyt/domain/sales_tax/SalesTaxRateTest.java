@@ -10,6 +10,10 @@ class SalesTaxRateTest {
 
     private SalesTaxRate salesTaxRate;
 
+    private SalesTaxRate createSalesTaxRates() {
+        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+    }
+
     @BeforeEach
     void setup() {
         salesTaxRate = createSalesTaxRates();
@@ -33,10 +37,10 @@ class SalesTaxRateTest {
         SalesTaxRate givenSalesTaxRate = createSalesTaxRates();
 
         // When
-        boolean actualBoolean = salesTaxRate.equals(givenSalesTaxRate);
+        boolean isEquals = salesTaxRate.equals(givenSalesTaxRate);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
@@ -45,16 +49,12 @@ class SalesTaxRateTest {
         SalesTaxRate givenSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
         // Then
-        assertEquals(0,givenSalesTaxRate.getTaxRate());
-        assertEquals(0,givenSalesTaxRate.getStateRate());
-        assertEquals(0,givenSalesTaxRate.getCityRate());
-        assertEquals(0,givenSalesTaxRate.getCityDistrictRate());
-        assertEquals(0,givenSalesTaxRate.getCountyRate());
-        assertEquals(0,givenSalesTaxRate.getCountyDistrictRate());
-    }
-
-    private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        assertEquals(0, givenSalesTaxRate.getTaxRate());
+        assertEquals(0, givenSalesTaxRate.getStateRate());
+        assertEquals(0, givenSalesTaxRate.getCityRate());
+        assertEquals(0, givenSalesTaxRate.getCityDistrictRate());
+        assertEquals(0, givenSalesTaxRate.getCountyRate());
+        assertEquals(0, givenSalesTaxRate.getCountyDistrictRate());
     }
 
 }

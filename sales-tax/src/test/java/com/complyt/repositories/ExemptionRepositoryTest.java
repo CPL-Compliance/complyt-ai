@@ -43,12 +43,9 @@ public class ExemptionRepositoryTest {
 
     @Mock
     TenantResolver tenantResolver;
-
-    private String tenantId;
-
     Exemption exemption;
-
     Transaction transaction;
+    private String tenantId;
 
     @BeforeEach
     void setUp() {
@@ -197,7 +194,7 @@ public class ExemptionRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query,Exemption.class)).thenReturn(Mono.empty());
+        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
 
         // Then
         Mono<Exemption> exemptionMono = exemptionRepository.findById(id);
@@ -231,7 +228,7 @@ public class ExemptionRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.find(query,Exemption.class)).thenReturn(Flux.empty());
+        when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.empty());
 
         // Then
         Flux<Exemption> exemptionFlux = exemptionRepository.findAll();

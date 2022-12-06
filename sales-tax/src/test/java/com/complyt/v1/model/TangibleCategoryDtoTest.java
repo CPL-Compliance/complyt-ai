@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TangibleCategoryDtoTest {
 
     @Test
-    public void TangibleCategoryDto_GetTangible_ReturnTangible() {
+    public void TangibleCategoryDto_GetTangible_ReturnsTangible() {
         // Given + When
         TangibleCategoryDto tangibleCategoryDto = TangibleCategoryDto.TANGIBLE;
 
@@ -16,7 +16,7 @@ class TangibleCategoryDtoTest {
     }
 
     @Test
-    public void TangibleCategoryDto_GetIntangible_ReturnIntangible() {
+    public void TangibleCategoryDto_GetIntangible_ReturnsIntangible() {
         // Given + When
         TangibleCategoryDto tangibleCategoryDto = TangibleCategoryDto.INTANGIBLE;
 

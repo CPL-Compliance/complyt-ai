@@ -69,6 +69,7 @@ public class ApplicationDateCreatorTest {
 
     @Test
     void create_YearFromSeptemberToSeptemberPassedAndDateIsLaterThenSeptember30Th_ReturnsApplyNextSeptember() {
+        // Given
         TimeFrame timeFrame = TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER;
         LocalDateTime nextSeptember30 = LocalDateTime.now()
                 .withMonth(9)
@@ -95,7 +96,6 @@ public class ApplicationDateCreatorTest {
 
         // When + Then
         assertEquals(actualApplicationDate, referenceDate);
-
     }
 
     @Test
@@ -111,7 +111,6 @@ public class ApplicationDateCreatorTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
-
     }
 
     @Test

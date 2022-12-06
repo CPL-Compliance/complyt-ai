@@ -60,16 +60,21 @@ class ItemTest {
         Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
 
         // When
-        boolean actualBoolean = item.equals(givenItem);
+        boolean isEquals = item.equals(givenItem);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
-        String expectedString = "Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=true, calculationType=FIXED, description=description, calculationValue=0.07, cities=null), salesTaxRate=SalesTaxRate(cityDistrictRate=0.01, cityRate=0.01, countyDistrictRate=0.01, countyRate=0.01, stateRate=0.01, taxRate=0.05), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=NOT_TAXABLE)";
+        String expectedString = "Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0" +
+                ", description=description, name=name, taxCode=taxCode" +
+                ", jurisdictionalSalesTaxRules=" + item.getJurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + item.getSalesTaxRate() +
+                ", manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE" +
+                ", taxableCategory=NOT_TAXABLE)";
 
         // When
         String actualString = item.toString();

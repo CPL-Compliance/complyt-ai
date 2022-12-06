@@ -21,14 +21,14 @@ class StateTest {
         State givenState = new State("CA", "02", "California");
 
         // When
-        boolean actualBoolean = state.equals(givenState);
+        boolean isEquals = state.equals(givenState);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "State(abbreviation=CA, code=02, name=California)";
 

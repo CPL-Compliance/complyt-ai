@@ -33,30 +33,6 @@ class NexusStateRuleTest {
         nexusStateRule = createNexusStateRule();
     }
 
-    @Test
-    void toString_ReturnString() {
-        // Given
-        String expectedString = "NexusStateRule(id=" + id + ", enforcesSalesTax=true, state=State(abbreviation=CA, code=02, name=California), taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL], timeFrame=CURRENT_CALENDER_YEAR, nexusThreshold=NexusThreshold(amount=1000.0, count=2, definition=AMOUNT_OR_COUNT))";
-
-        // When
-        String actualString = nexusStateRule.toString();
-
-        // Then
-        assertEquals(expectedString, actualString);
-    }
-
-    @Test
-    void Equals_SameNexusStateRule_ReturnTrue() {
-        // Given
-        NexusStateRule givenNexusStateRule = createNexusStateRule();
-
-        // When
-        boolean actualBoolean = nexusStateRule.equals(givenNexusStateRule);
-
-        // Then
-        assertTrue(actualBoolean);
-    }
-
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<>() {{
@@ -76,4 +52,32 @@ class NexusStateRuleTest {
         return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
     }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "NexusStateRule(id=" + nexusStateRule.getId() +
+                ", enforcesSalesTax=true, state=" + nexusStateRule.getState() +
+                ", taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL]" +
+                ", timeFrame=CURRENT_CALENDER_YEAR, nexusThreshold=" + nexusStateRule.getNexusThreshold() + ")";
+
+        // When
+        String actualString = nexusStateRule.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameNexusStateRule_ReturnTrue() {
+        // Given
+        NexusStateRule givenNexusStateRule = createNexusStateRule();
+
+        // When
+        boolean isEquals = nexusStateRule.equals(givenNexusStateRule);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
 }

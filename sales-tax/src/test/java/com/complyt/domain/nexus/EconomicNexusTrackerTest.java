@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EconomicNexusTrackerTest {
     private EconomicNexusTracker economicNexusTracker;
@@ -18,8 +19,12 @@ class EconomicNexusTrackerTest {
         economicNexusTracker = createEconomicNexusTracker();
     }
 
+    private EconomicNexusTracker createEconomicNexusTracker() {
+        return new EconomicNexusTracker(true, localDateTime);
+    }
+
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
         String expectedString = "EconomicNexusTracker(established=true, establishedDate=" + localDateTime + ")";
 
@@ -31,19 +36,15 @@ class EconomicNexusTrackerTest {
     }
 
     @Test
-    void Equals_SameEconomicNexusTracker_ReturnTrue() {
+    void Equals_SameEconomicNexusTracker_ReturnsTrue() {
         // Given
         EconomicNexusTracker givenEconomicNexusTracker = createEconomicNexusTracker();
 
         // When
-        boolean actualBoolean = economicNexusTracker.equals(givenEconomicNexusTracker);
+        boolean isEquals = economicNexusTracker.equals(givenEconomicNexusTracker);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private EconomicNexusTracker createEconomicNexusTracker() {
-        return new EconomicNexusTracker(true, localDateTime);
+        assertTrue(isEquals);
     }
 
 }

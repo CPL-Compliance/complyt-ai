@@ -36,67 +36,6 @@ public class CustomerFullyExemptionCheckTest {
         customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
     }
 
-    @Test
-    void check_NullExemptionPassed_ThrowsException() {
-        // Given
-        Exemption nullExemption = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
-    }
-
-    @Test
-    void check_TransactionFullyExempted_ReturnTrue() {
-        // Given
-        Exemption expectedExemption = exemption;
-
-        // When
-        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
-
-        // Then
-        assertTrue(actualBoolean);
-    }
-
-    @Test
-    void check_TransactionIsNotFullyExempted_ReturnFalse() {
-        // Given
-        Exemption expectedExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
-
-        // When
-        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
-
-        // Then
-        assertFalse(actualBoolean);
-    }
-
-    @Test
-    void check_TransactionIsBeforeTimeFrame_ReturnFalse() {
-        // Given
-        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
-
-        // When
-        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
-
-        // Then
-        assertFalse(actualBoolean);
-    }
-
-    @Test
-    void check_TransactionIsAfterTimeFrame_ReturnFalse() {
-        // Given
-        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
-
-        // When
-        boolean actualBoolean = customerFullyExemptionCheck.check(expectedExemption);
-
-        // Then
-        assertFalse(actualBoolean);
-    }
-
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
@@ -125,5 +64,65 @@ public class CustomerFullyExemptionCheckTest {
                 state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 
+    @Test
+    void check_NullExemptionPassed_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerFullyExemptionCheck.check(nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void check_TransactionFullyExempted_ReturnsTrue() {
+        // Given
+        Exemption expectedExemption = exemption;
+
+        // When
+        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+
+        // Then
+        assertTrue(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsNotFullyExempted_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
+
+        // When
+        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsBeforeTimeFrame_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
+
+        // When
+        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsAfterTimeFrame_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
+
+        // When
+        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
+    }
 
 }

@@ -26,8 +26,10 @@ public class CountyFetcherConfigTest {
         // Given
         salesTaxWebClientWrapper = new StubFastTaxWebClientWrapper(); // any salesTaxWebClientWrapper
         TransactionFastTaxCountyFetcher expectedTransactionFastTaxCountyFetcher = new TransactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
+
         // When
         TransactionFastTaxCountyFetcher actualTransactionFastTaxCountyFetcher = countyFetcherConfig.transactionFastTaxCountyFetcher(salesTaxWebClientWrapper);
+
         // Then
         assertEquals(expectedTransactionFastTaxCountyFetcher, actualTransactionFastTaxCountyFetcher);
     }
@@ -37,8 +39,10 @@ public class CountyFetcherConfigTest {
         // Given
         salesTaxWebClientWrapper = new StubFastTaxWebClientWrapper(); // any salesTaxWebClientWrapper
         TransactionZipTaxCountyFetcher expectedTransactionZipTaxCountyFetcher = new TransactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
+
         // When
         TransactionZipTaxCountyFetcher actualTransactionZipTaxCountyFetcher = countyFetcherConfig.transactionZipTaxCountyFetcher(salesTaxWebClientWrapper);
+
         // Then
         assertEquals(expectedTransactionZipTaxCountyFetcher, actualTransactionZipTaxCountyFetcher);
     }

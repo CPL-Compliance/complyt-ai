@@ -271,7 +271,7 @@ class NexusServiceTest {
         // Given
         Transaction transaction = createTransaction();
         SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
-        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking,true);
+        SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);

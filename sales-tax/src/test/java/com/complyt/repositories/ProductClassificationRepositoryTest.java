@@ -36,25 +36,25 @@ public class ProductClassificationRepositoryTest {
     ProductClassification productClassification;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                "CA",true,false, CalculationType.FIXED,"description",0,null);
-        Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
+                "CA", true, false, CalculationType.FIXED, "description", 0, null);
+        Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};
 
-        productClassification = new ProductClassification(UUID.randomUUID().toString(),"C1S1","description",
-                "title",jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
+        productClassification = new ProductClassification(UUID.randomUUID().toString(), "C1S1", "description",
+                "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
 
     @Test
-    void findOneByTaxCode_FindsClassification_ReturnsClassification(){
+    void findOneByTaxCode_FindsClassification_ReturnsClassification() {
         // Given
         String taxCode = productClassification.getTaxCode();
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
 
         // When
-        when(reactiveMongoTemplate.findOne(query,ProductClassification.class)).thenReturn(Mono.just(productClassification));
+        when(reactiveMongoTemplate.findOne(query, ProductClassification.class)).thenReturn(Mono.just(productClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationRepository.findOneByTaxCode(taxCode);
 
         // Then
@@ -62,7 +62,7 @@ public class ProductClassificationRepositoryTest {
     }
 
     @Test
-    void findAll_FindsAllClassifications_ReturnsAllClassifications(){
+    void findAll_FindsAllClassifications_ReturnsAllClassifications() {
         // Given
         ProductClassification otherProductClassification = productClassification.withDescription("second classification").withTaxCode("C2S1");
         List<ProductClassification> productClassifications = new ArrayList<>() {{
@@ -75,7 +75,7 @@ public class ProductClassificationRepositoryTest {
         Flux<ProductClassification> productClassificationFlux = productClassificationRepository.findAll();
 
         // Then
-        StepVerifier.create(productClassificationFlux).expectNext(productClassification,otherProductClassification).verifyComplete();
+        StepVerifier.create(productClassificationFlux).expectNext(productClassification, otherProductClassification).verifyComplete();
     }
 
     @Test

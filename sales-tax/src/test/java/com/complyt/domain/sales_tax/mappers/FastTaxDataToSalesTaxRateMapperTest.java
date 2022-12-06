@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,7 +33,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
 
         fastTaxData = FastTaxData.builder()
                 .matchLevel("street")
-                .taxInfoItems(Arrays.asList(taxInfoItem))
+                .taxInfoItems(Collections.singletonList(taxInfoItem))
                 .build();
     }
 

@@ -36,7 +36,7 @@ class TimeStampsDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TimeStampsDto(createdDate=2002-02-02T02:02:02, updatedDate=2003-03-03T03:03:03)";
+        String expectedString = "TimeStampsDto(createdDate=" + timeStampsDto.getCreatedDate() + ", updatedDate=" + timeStampsDto.getUpdatedDate() + ")";
 
         // When
         String actualString = timeStampsDto.toString();

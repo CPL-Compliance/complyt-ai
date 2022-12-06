@@ -33,44 +33,6 @@ public class TransactionMapperTest {
     private String tenantId;
     private ObjectId customerId;
 
-    @BeforeEach
-    void setup() {
-        externalId = UUID.randomUUID().toString();
-        localDateTime = LocalDateTime.now();
-        tenantId = UUID.randomUUID().toString();
-        customerId = new ObjectId();
-
-        transaction = createTransaction(tenantId);
-        transactionNoTenant = createTransaction(null);
-        transactionDto = createTransactionDto();
-    }
-
-    @Test
-    void transactionToTransactionDto_Transaction_returnTransactionDto() {
-
-        // Given
-        Transaction givenTransaction = transaction;
-
-        // When
-        TransactionDto actualTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(givenTransaction);
-
-        // Then
-        assertEquals(transactionDto, actualTransactionDto);
-    }
-
-    @Test
-    void transactionDtoToTransaction_TransactionDto_returnTransaction() {
-
-        // Given
-        TransactionDto givenTransactionDto = transactionDto;
-
-        // When
-        Transaction actualTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-
-        // Then
-        assertEquals(transactionNoTenant, actualTransaction);
-    }
-
     private Transaction createTransaction(String tenantId) {
         String id = null;
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
@@ -117,4 +79,43 @@ public class TransactionMapperTest {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
                 false, CalculationType.FIXED, "description", 0, null);
     }
+
+    @BeforeEach
+    void setup() {
+        externalId = UUID.randomUUID().toString();
+        localDateTime = LocalDateTime.now();
+        tenantId = UUID.randomUUID().toString();
+        customerId = new ObjectId();
+
+        transaction = createTransaction(tenantId);
+        transactionNoTenant = createTransaction(null);
+        transactionDto = createTransactionDto();
+    }
+
+    @Test
+    void transactionToTransactionDto_Transaction_returnTransactionDto() {
+
+        // Given
+        Transaction givenTransaction = transaction;
+
+        // When
+        TransactionDto actualTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(givenTransaction);
+
+        // Then
+        assertEquals(transactionDto, actualTransactionDto);
+    }
+
+    @Test
+    void transactionDtoToTransaction_TransactionDto_returnTransaction() {
+
+        // Given
+        TransactionDto givenTransactionDto = transactionDto;
+
+        // When
+        Transaction actualTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+
+        // Then
+        assertEquals(transactionNoTenant, actualTransaction);
+    }
+
 }

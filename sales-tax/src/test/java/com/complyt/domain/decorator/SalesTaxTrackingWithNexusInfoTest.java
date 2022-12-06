@@ -1,6 +1,5 @@
 package com.complyt.domain.decorator;
 
-import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
@@ -29,18 +28,6 @@ class SalesTaxTrackingWithNexusInfoTest {
         salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(createSalesTaxTracking(), false);
     }
 
-    @Test
-    void Equals_SameNexus_ReturnTrue() {
-        // Given
-        SalesTaxTrackingWithNexusInfo givenSalesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(createSalesTaxTracking(), false);
-
-        // When
-        boolean actualBoolean = salesTaxTrackingWithNexusInfo.equals(givenSalesTaxTrackingWithNexusInfo);
-
-        // Then
-        assertTrue(actualBoolean);
-    }
-
     private SalesTaxTracking createSalesTaxTracking() {
         State state = new State("CA", "02", "California");
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
@@ -48,4 +35,18 @@ class SalesTaxTrackingWithNexusInfoTest {
         return new SalesTaxTracking(id, state, tenantId, true,
                 physicalNexusTracker, economicNexusTracker, null, true, approvalDate);
     }
+
+    @Test
+    void Equals_SameNexus_ReturnTrue() {
+        // Given
+        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+        SalesTaxTrackingWithNexusInfo givenSalesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
+
+        // When
+        boolean isEquals = salesTaxTrackingWithNexusInfo.equals(givenSalesTaxTrackingWithNexusInfo);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
 }

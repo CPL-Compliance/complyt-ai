@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class CustomerMapperTest {
 
+    String tenantId;
+    String externalId;
     private Customer customer;
     private Customer customerNoTenant;
     private CustomerDto customerDto;
     private ObjectId customerId;
-    String tenantId;
-    String externalId;
 
     @BeforeEach
     void setup() {
@@ -37,6 +37,18 @@ public class CustomerMapperTest {
         customer = createCustomer(tenantId);
         customerNoTenant = createCustomer(null);
         customerDto = createCustomerDto();
+    }
+
+    private Customer createCustomer(String tenantId) {
+        String name = "Existing Customer";
+        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
+    }
+
+    private CustomerDto createCustomerDto() {
+        String name = "Existing Customer";
+        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
+        return new CustomerDto(customerId.toString(), externalId, name, address, CustomerTypeDto.RETAIL);
     }
 
     @Test
@@ -65,15 +77,4 @@ public class CustomerMapperTest {
         assertEquals(customerNoTenant, actualCustomer);
     }
 
-    private Customer createCustomer(String tenantId) {
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
-    }
-
-    private CustomerDto createCustomerDto() {
-        String name = "Existing Customer";
-        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        return new CustomerDto(customerId.toString(), externalId, name, address, CustomerTypeDto.RETAIL);
-    }
 }

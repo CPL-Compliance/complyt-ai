@@ -1,6 +1,9 @@
 package com.complyt.business.transaction.date_injector;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Address;
+import com.complyt.domain.Item;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -13,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NewTransactionInternalDateInjectorTest {
 
@@ -25,23 +28,6 @@ class NewTransactionInternalDateInjectorTest {
     void setup() {
         transaction = createTransactionWithoutTimeStamps();
         newTransactionInternalDateInjector = new NewTransactionInternalDateInjector(transaction);
-    }
-
-    @Test
-    void inject_ReturnModifiedTransaction() {
-        // Given
-        LocalDateTime beforeActionTime = LocalDateTime.now();
-
-        // When
-        Transaction actualTransaction = newTransactionInternalDateInjector.inject();
-        LocalDateTime afterActionTime = LocalDateTime.now();
-
-        // Then
-        assertTrue(actualTransaction.getInternalTimeStamps().getCreatedDate().compareTo(beforeActionTime) >= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getCreatedDate().compareTo(afterActionTime) <= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
-
     }
 
     private Transaction createTransactionWithoutTimeStamps() {
@@ -69,6 +55,23 @@ class NewTransactionInternalDateInjectorTest {
                 .transactionStatus(TransactionStatus.ACTIVE)
                 .internalTimeStamps(null)
                 .build();
+    }
+
+    @Test
+    void inject_ReturnModifiedTransaction() {
+        // Given
+        LocalDateTime beforeActionTime = LocalDateTime.now();
+
+        // When
+        Transaction actualTransaction = newTransactionInternalDateInjector.inject();
+        LocalDateTime afterActionTime = LocalDateTime.now();
+
+        // Then
+        assertTrue(actualTransaction.getInternalTimeStamps().getCreatedDate().compareTo(beforeActionTime) >= 0);
+        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
+        assertTrue(actualTransaction.getInternalTimeStamps().getCreatedDate().compareTo(afterActionTime) <= 0);
+        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
+
     }
 
 }

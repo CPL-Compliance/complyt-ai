@@ -10,8 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -66,9 +65,9 @@ public class ZipTaxDataTest {
         ZipTaxData givenZipTaxData = new ZipTaxData();
 
         // Then
-        assertEquals(null, givenZipTaxData.getVersion());
+        assertNull(givenZipTaxData.getVersion());
         assertEquals(0f, givenZipTaxData.getRCode());
-        assertEquals(null, givenZipTaxData.getResults());
+        assertNull(givenZipTaxData.getResults());
     }
 
 }

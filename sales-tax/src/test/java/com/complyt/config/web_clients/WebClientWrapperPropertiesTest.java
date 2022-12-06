@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WebClientWrapperPropertiesTest {
 
-    private WebClientWrapperProperties webClientWrapperProperties;
     String id;
+    private WebClientWrapperProperties webClientWrapperProperties;
 
     @BeforeEach
     void setup() {
@@ -26,16 +26,16 @@ class WebClientWrapperPropertiesTest {
         WebClientWrapperProperties givenWebClientWrapperProperties = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
 
         // When
-        boolean actualBoolean = webClientWrapperProperties.equals(givenWebClientWrapperProperties);
+        boolean isEquals = webClientWrapperProperties.equals(givenWebClientWrapperProperties);
 
         // Then
-        assertTrue(actualBoolean);
+        assertTrue(isEquals);
     }
 
     @Test
     void Builder_build() {
         // Given + When
-        WebClientWrapperProperties actualWebClientWrapperProperties = WebClientWrapperProperties.builder().scheme("").path("").host("").key(new Pair<>("","")).build();
+        WebClientWrapperProperties actualWebClientWrapperProperties = WebClientWrapperProperties.builder().scheme("").path("").host("").key(new Pair<>("", "")).build();
 
         // Then
         assertEquals(webClientWrapperProperties, actualWebClientWrapperProperties);

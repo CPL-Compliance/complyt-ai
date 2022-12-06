@@ -26,10 +26,20 @@ class SalesTaxTrackingTest {
         salesTaxTracking = createSalesTaxTracking();
     }
 
+    private SalesTaxTracking createSalesTaxTracking() {
+        return new SalesTaxTracking(id,
+                new State("CA", "code", "California"), tenantId.toString(), true, null, null, null,
+                true, localDateTime);
+    }
+
     @Test
-    void toString_ReturnString() {
+    void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTaxTracking(id=" + id + ", state=State(abbreviation=CA, code=code, name=California), tenantId=" + tenantId.toString() + ", enforcesSalesTax=true, physicalNexusTracker=null, economicNexusTracker=null, appliedDate=null, isApproved=true, approvalDate=" + localDateTime + ")";
+        String expectedString = "SalesTaxTracking(id=" + salesTaxTracking.getId() +
+                ", state=" + salesTaxTracking.getState() +
+                ", tenantId=" + salesTaxTracking.getTenantId() +
+                ", enforcesSalesTax=true, physicalNexusTracker=null, economicNexusTracker=null, appliedDate=null" +
+                ", isApproved=true, approvalDate=" + localDateTime + ")";
 
         // When
         String actualString = salesTaxTracking.toString();
@@ -39,21 +49,15 @@ class SalesTaxTrackingTest {
     }
 
     @Test
-    void Equals_SameSalesTaxTracking_ReturnTrue() {
+    void Equals_SameSalesTaxTracking_ReturnsTrue() {
         // Given
         SalesTaxTracking givenSalesTaxTracking = createSalesTaxTracking();
 
         // When
-        boolean actualBoolean = salesTaxTracking.equals(givenSalesTaxTracking);
+        boolean isEquals = salesTaxTracking.equals(givenSalesTaxTracking);
 
         // Then
-        assertTrue(actualBoolean);
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        return new SalesTaxTracking(id,
-                new State("CA", "code", "California"), tenantId.toString(), true, null, null, null,
-                true, localDateTime);
+        assertTrue(isEquals);
     }
 
 }

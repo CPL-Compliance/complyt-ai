@@ -78,7 +78,7 @@ public class TaxableCollectionBuilderTest {
         List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
-        Assertions.assertEquals(expectedTaxables,actualTaxables);
+        Assertions.assertEquals(expectedTaxables, actualTaxables);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class TaxableCollectionBuilderTest {
         List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithNullSippingFee);
 
         // Then
-        Assertions.assertEquals(expectedTaxables,actualTaxables);
+        Assertions.assertEquals(expectedTaxables, actualTaxables);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class TaxableCollectionBuilderTest {
         List<Taxable> actualTaxables = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
         // Then
-        Assertions.assertEquals(expectedTaxables,actualTaxables);
+        Assertions.assertEquals(expectedTaxables, actualTaxables);
     }
 
     @Test

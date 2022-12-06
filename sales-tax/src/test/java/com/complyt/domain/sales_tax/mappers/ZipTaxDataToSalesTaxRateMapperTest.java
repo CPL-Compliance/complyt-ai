@@ -25,12 +25,12 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @BeforeEach
     void setUp() {
         result = Result.builder()
-                .districtSalesTax(0l)
-                .citySalesTax(0l)
-                .taxSales(0l)
-                .countySalesTax(0l)
-                .district5SalesTax(0l)
-                .stateSalesTax(0l)
+                .districtSalesTax(0L)
+                .citySalesTax(0L)
+                .taxSales(0L)
+                .countySalesTax(0L)
+                .district5SalesTax(0L)
+                .stateSalesTax(0L)
                 .build();
 
         zipTaxData = new ZipTaxData();

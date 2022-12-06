@@ -1,6 +1,5 @@
 package com.complyt.v1.model.customer.exemption;
 
-import com.complyt.v1.model.customer.exemption.ExemptionTypeDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +12,7 @@ public class ExemptionTypeDtoTest {
         ExemptionTypeDto exemptionTypeDto = ExemptionTypeDto.FULLY;
 
         // Then
-        assertEquals(ExemptionTypeDto.valueOf("FULLY"),exemptionTypeDto);
+        assertEquals(ExemptionTypeDto.valueOf("FULLY"), exemptionTypeDto);
     }
 
     @Test
@@ -22,6 +21,6 @@ public class ExemptionTypeDtoTest {
         ExemptionTypeDto exemptionTypeDto = ExemptionTypeDto.PARTIALLY;
 
         // Then
-        assertEquals(ExemptionTypeDto.valueOf("PARTIALLY"),exemptionTypeDto);
+        assertEquals(ExemptionTypeDto.valueOf("PARTIALLY"), exemptionTypeDto);
     }
 }
