@@ -31,15 +31,18 @@ public class SalesTaxRatesProvider {
 
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
             log.info("None special treatment for rule - returning original sales tax rate");
+
             return originalSalesTaxRate;
         }
 
         if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
             log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.getCalculationValue());
+
             return modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
         }
 
         log.info("Returning sales tax rate by percentage cut of : " + jurisdictionalSalesTaxRules.getCalculationValue());
+
         return modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
     }
 
@@ -47,6 +50,7 @@ public class SalesTaxRatesProvider {
         float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + jurisdictionalRuleStateRate;
         SalesTaxRate calculatedRate = salesTaxRate.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
         log.info("Sales tax rate after fixed modification : " + calculatedRate);
+
         return calculatedRate;
     }
 
@@ -54,6 +58,7 @@ public class SalesTaxRatesProvider {
         float newTaxRate = salesTaxRate.getTaxRate() * percentageToCut;
         SalesTaxRate calculatedRate = salesTaxRate.withTaxRate(newTaxRate);
         log.info("Sales tax rate after percentage modification : " + calculatedRate);
+
         return calculatedRate;
     }
 
