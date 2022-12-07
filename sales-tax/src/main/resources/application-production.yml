@@ -22,9 +22,3 @@ logging:
     reactor:
       netty:
         http: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"

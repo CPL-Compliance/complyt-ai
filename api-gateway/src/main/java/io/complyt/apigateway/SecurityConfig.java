@@ -1,7 +1,5 @@
-package com.complyt.config;
+package io.complyt.apigateway;
 
-import com.complyt.annotations.Generated;
-import com.complyt.security.AudienceValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -11,13 +9,11 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.server.resource.web.access.server.BearerTokenServerAccessDeniedHandler;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-@Generated
 public class SecurityConfig {
 
     @Value("${auth0.audience}")
