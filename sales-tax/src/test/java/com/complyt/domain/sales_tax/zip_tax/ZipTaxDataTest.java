@@ -30,7 +30,9 @@ public class ZipTaxDataTest {
 
     @Test
     void testToString() {
-        String zipTaxDataStr = "ZipTaxData(version=" + zipTaxData.getVersion() + ", rCode=" + zipTaxData.getRCode() + ", results=" + zipTaxData.getResults() + ")";
+        String zipTaxDataStr = "ZipTaxData(version=" + zipTaxData.getVersion() +
+                ", rCode=" + zipTaxData.getRCode() +
+                ", results=" + zipTaxData.getResults() + ")";
 
         assertEquals(zipTaxDataStr, zipTaxData.toString());
     }

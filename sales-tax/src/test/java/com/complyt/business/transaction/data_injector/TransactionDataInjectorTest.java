@@ -9,8 +9,8 @@ class TransactionDataInjectorTest {
     @Test
     void shouldInject_ReturnTrue() {
         // Given
-        String genericObject = "Object";
-        TransactionDataInjector<String> genericDataInjector = t -> null;
+        Object genericObject = new Object();
+        TransactionDataInjector<Object> genericDataInjector = t -> null;
 
         // When
         boolean shouldBeInjected = genericDataInjector.shouldInject(genericObject);

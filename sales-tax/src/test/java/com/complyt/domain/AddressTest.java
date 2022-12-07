@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class AddressTest {
-    private Address address;
-    private Address referenceAddress;
     private final String city = "City";
     private final String country = "Country";
     private final String county = "County";
     private final String state = "State";
     private final String street = "Street";
     private final String zip = "ZIP";
+    private Address address;
+    private Address referenceAddress;
 
     @BeforeEach
     void setUp() {
@@ -74,7 +74,12 @@ class AddressTest {
 
     @Test
     void toString_SameStrings_Equal() {
-        String referenceString = "Address(city=" + city + ", country=" + country + ", county=" + county + ", state=" + state + ", street=" + street + ", zip=" + zip + ")";
+        String referenceString = "Address(city=" + city +
+                ", country=" + country +
+                ", county=" + county +
+                ", state=" + state +
+                ", street=" + street +
+                ", zip=" + zip + ")";
 
         assertEquals(referenceString, address.toString());
     }

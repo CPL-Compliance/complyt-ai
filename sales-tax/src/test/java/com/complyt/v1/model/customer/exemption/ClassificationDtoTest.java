@@ -30,7 +30,7 @@ class ClassificationDtoTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ClassificationDto(code=code, description=description)";
+        String expectedString = "ClassificationDto(code=" + classificationDto.getCode() + ", description=" + classificationDto.getDescription() + ")";
 
         // When
         String actualString = classificationDto.toString();

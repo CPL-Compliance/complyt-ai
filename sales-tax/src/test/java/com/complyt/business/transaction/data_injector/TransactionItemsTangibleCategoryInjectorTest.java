@@ -97,26 +97,6 @@ class TransactionItemsTangibleCategoryInjectorTest {
     }
 
     @Test
-    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() { // Need update after error handling feature
-        // Given
-        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction givenTransaction = transaction.withItems(new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "C3S1",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        });
-        TransactionItemsTangibleCategoryInjector injector = new TransactionItemsTangibleCategoryInjector(givenTransaction);
-
-        // When
-        Mono<Transaction> transactionMono = injector.inject(classifications);
-
-        // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("Cannot invoke \"com.complyt.domain.sales_tax.product_classification.ProductClassification.getTangibleCategory()\" because \"productClassification\" is null").verify();
-    }
-
-    @Test
     void defaultConstructor_Transaction_ReturnTransactionItemsTangibleCategoryInjector() {
         // Given + When
         TransactionItemsTangibleCategoryInjector injector = new TransactionItemsTangibleCategoryInjector(transaction);

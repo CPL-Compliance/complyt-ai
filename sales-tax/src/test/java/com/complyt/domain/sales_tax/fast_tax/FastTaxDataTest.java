@@ -69,7 +69,9 @@ public class FastTaxDataTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "FastTaxData(matchLevel=lvl, taxInfoItems=[TaxInfoItem(city=null, cityDistrictRate=null, cityRate=null, county=null, countyDistrictRate=null, countyRate=null, informationComponents=null, notesCodes=1, notesDesc=null, specialDistrictRate=null, stateAbbreviation=null, stateName=null, stateRate=null, taxRate=null, totalTaxExempt=null, zip=null)], UNINCORPORATED_CODE=1)";
+        String expectedString = "FastTaxData(matchLevel=" + fastTaxData.getMatchLevel() +
+                ", taxInfoItems=" + fastTaxData.getTaxInfoItems() +
+                ", UNINCORPORATED_CODE=" + fastTaxData.getUNINCORPORATED_CODE() + ")";
 
         // When
         String actualString = fastTaxData.toString();

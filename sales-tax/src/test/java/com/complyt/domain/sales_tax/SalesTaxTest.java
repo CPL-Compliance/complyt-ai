@@ -28,7 +28,8 @@ public class SalesTaxTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTax(amount=1000.0, salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5))";
+        String expectedString = "SalesTax(amount=" + salesTax.getAmount() +
+                ", salesTaxRate=" + salesTax.getSalesTaxRate() + ")";
 
         // When
         String actualString = salesTax.toString();
@@ -40,7 +41,8 @@ public class SalesTaxTest {
     @Test
     void Equals_SameSalesTax_ReturnsTrue() {
         // Given
-        SalesTax givenSalesTax = new SalesTax(1000, createSalesTaxRates());
+        SalesTaxRate salesTaxRate = createSalesTaxRates();
+        SalesTax givenSalesTax = new SalesTax(1000, salesTaxRate);
 
         // When
         boolean isEquals = salesTax.equals(givenSalesTax);

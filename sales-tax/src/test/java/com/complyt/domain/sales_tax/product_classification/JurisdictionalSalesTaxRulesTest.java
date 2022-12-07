@@ -70,7 +70,14 @@ public class JurisdictionalSalesTaxRulesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "JurisdictionalSalesTaxRules(name=name, abbreviation=abbreviation, taxable=true, specialTreatment=true, calculationType=PERCENTAGE, description=description, calculationValue=0.0, cities=null)";
+        String expectedString = "JurisdictionalSalesTaxRules(name=" + jurisdictionalSalesTaxRules.getName() +
+                ", abbreviation=" + jurisdictionalSalesTaxRules.getAbbreviation() +
+                ", taxable=" + jurisdictionalSalesTaxRules.isTaxable() +
+                ", specialTreatment=" + jurisdictionalSalesTaxRules.isSpecialTreatment() +
+                ", calculationType=" + jurisdictionalSalesTaxRules.getCalculationType() +
+                ", description=" + jurisdictionalSalesTaxRules.getDescription() +
+                ", calculationValue=" + jurisdictionalSalesTaxRules.getCalculationValue() +
+                ", cities=" + jurisdictionalSalesTaxRules.getCities() + ")";
 
         // When
         String actualString = jurisdictionalSalesTaxRules.toString();

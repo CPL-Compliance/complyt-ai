@@ -30,7 +30,9 @@ class StateTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "State(abbreviation=CA, code=02, name=California)";
+        String expectedString = "State(abbreviation=" + state.getAbbreviation() +
+                ", code=" + state.getCode() +
+                ", name=" + state.getName() + ")";
 
         // When
         String actualString = state.toString();

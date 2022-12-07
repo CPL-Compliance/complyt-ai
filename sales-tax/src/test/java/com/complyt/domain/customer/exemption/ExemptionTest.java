@@ -72,7 +72,7 @@ class ExemptionTest {
                 ", internalTimeStamps=" + exemption.getInternalTimeStamps() +
                 ", status=" + exemption.getStatus() +
                 ", certificate=" + exemption.getCertificate() +
-                ", exemptionType=FULLY)";
+                ", exemptionType=" + exemption.getExemptionType() + ")";
 
         // When
         String actualString = exemption.toString();

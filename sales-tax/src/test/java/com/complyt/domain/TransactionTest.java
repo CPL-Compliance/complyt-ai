@@ -25,6 +25,7 @@ public class TransactionTest {
     private LocalDateTime localDateTime;
     private ObjectId customerId;
     private String tenantId;
+    private String transactionId;
 
     @Test
     void test() {
@@ -39,7 +40,8 @@ public class TransactionTest {
         externalId = UUID.randomUUID().toString();
         localDateTime = LocalDateTime.now();
         customerId = new ObjectId();
-        transaction = createTransaction("1111");
+        transactionId = UUID.randomUUID().toString();
+        transaction = createTransaction(transactionId);
     }
 
     private Transaction createTransaction(String id) {
@@ -76,11 +78,14 @@ public class TransactionTest {
                 ", billingAddress=" + transaction.getBillingAddress() +
                 ", shippingAddress=" + transaction.getShippingAddress() +
                 ", customerId=" + transaction.getCustomerId() +
-                ", customer=null, salesTax=null, transactionStatus=" + transaction.getTransactionStatus() +
+                ", customer=" + transaction.getCustomer() +
+                ", salesTax=" + transaction.getSalesTax() +
+                ", transactionStatus=" + transaction.getTransactionStatus() +
                 ", tenantId=" + transaction.getTenantId() +
                 ", internalTimeStamps=" + transaction.getInternalTimeStamps() +
                 ", externalTimeStamps=" + transaction.getExternalTimeStamps() +
-                ", transactionType=INVOICE, shippingFee=" + transaction.getShippingFee() + ")";
+                ", transactionType=" + transaction.getTransactionType() +
+                ", shippingFee=" + transaction.getShippingFee() + ")";
 
         // When
         String actualString = transaction.toString();
@@ -92,10 +97,13 @@ public class TransactionTest {
     @Test
     void withId_DifferentId_ReturnTransaction() {
         // Given
-        Transaction expectedTransaction = createTransaction("2222");
+        String differentId;
+        do differentId = UUID.randomUUID().toString();
+        while (differentId == transactionId);
+        Transaction expectedTransaction = createTransaction(differentId);
 
         // When
-        Transaction actualTransaction = transaction.withId("2222");
+        Transaction actualTransaction = transaction.withId(differentId);
 
         // Then
         assertEquals(expectedTransaction, actualTransaction);
@@ -118,7 +126,7 @@ public class TransactionTest {
 
         // When
         Transaction actualTransaction = transactionBuilder
-                .id("1111")
+                .id(transactionId)
                 .externalId(externalId)
                 .items(items)
                 .billingAddress(billingAddress)
@@ -140,7 +148,11 @@ public class TransactionTest {
     @Test
     void builder_ToString_ReturnString() {
         // Given
-        String expectedString = "Transaction.TransactionBuilder(id=null, externalId=null, items=null, billingAddress=null, shippingAddress=null, customerId=null, customer=null, salesTax=null, transactionStatus=null, tenantId=null, internalTimeStamps=null, externalTimeStamps=null, transactionType=null, shippingFee=null)";
+        String expectedString = "Transaction.TransactionBuilder(id=" + null + ", externalId=" + null + ", items=" + null + "" +
+                ", billingAddress=" + null + ", shippingAddress=" + null + ", customerId=" + null + "" +
+                ", customer=" + null + ", salesTax=" + null + ", transactionStatus=" + null + "" +
+                ", tenantId=" + null + ", internalTimeStamps=" + null + ", externalTimeStamps=" + null + "" +
+                ", transactionType=" + null + ", shippingFee=" + null + ")";
         Transaction.TransactionBuilder transactionBuilder = new Transaction.TransactionBuilder();
 
         // When

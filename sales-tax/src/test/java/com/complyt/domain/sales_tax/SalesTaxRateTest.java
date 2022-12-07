@@ -8,10 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRateTest {
 
+    private final float rate = 0.5f;
     private SalesTaxRate salesTaxRate;
 
     private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        return new SalesTaxRate(rate, rate, rate, rate, rate, rate);
     }
 
     @BeforeEach
@@ -22,7 +23,12 @@ class SalesTaxRateTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5)";
+        String expectedString = "SalesTaxRate(cityDistrictRate=" + rate +
+                ", cityRate=" + rate +
+                ", countyDistrictRate=" + rate +
+                ", countyRate=" + rate +
+                ", stateRate=" + rate +
+                ", taxRate=" + rate + ")";
 
         // When
         String actualString = salesTaxRate.toString();

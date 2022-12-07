@@ -30,7 +30,8 @@ class StatusTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Status(code=code, name=name)";
+        String expectedString = "Status(code=" + status.getCode() +
+                ", name=" + status.getName() + ")";
 
         // When
         String actualString = status.toString();

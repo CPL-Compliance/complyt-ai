@@ -69,12 +69,18 @@ class ItemTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0" +
-                ", description=description, name=name, taxCode=taxCode" +
+        String expectedString = "Item(unitPrice=" + item.getUnitPrice() +
+                ", quantity=" + item.getQuantity() +
+                ", totalPrice=" + item.getTotalPrice() +
+                ", description=" + item.getDescription() +
+                ", name=" + item.getName() +
+                ", taxCode=" + item.getTaxCode() +
                 ", jurisdictionalSalesTaxRules=" + item.getJurisdictionalSalesTaxRules() +
                 ", salesTaxRate=" + item.getSalesTaxRate() +
-                ", manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE" +
-                ", taxableCategory=NOT_TAXABLE)";
+                ", manualSalesTax=" + item.isManualSalesTax() +
+                ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
+                ", tangibleCategory=" + item.getTangibleCategory() +
+                ", taxableCategory=" + item.getTaxableCategory() + ")";
 
         // When
         String actualString = item.toString();

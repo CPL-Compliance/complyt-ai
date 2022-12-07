@@ -7,10 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRateDtoTest {
+    private final float rate = 0.5f;
     private SalesTaxRateDto salesTaxRateDto;
 
     private SalesTaxRateDto createSalesTaxRateDto() {
-        return new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        return new SalesTaxRateDto(rate, rate, rate, rate, rate, rate);
     }
 
     @BeforeEach
@@ -21,7 +22,9 @@ class SalesTaxRateDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRateDto(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5)";
+        String expectedString = "SalesTaxRateDto(cityDistrictRate=" + rate +
+                ", cityRate=" + rate + ", countyDistrictRate=" + rate +
+                ", countyRate=" + rate + ", stateRate=" + rate + ", taxRate=" + rate + ")";
 
         // When
         String actualString = salesTaxRateDto.toString();

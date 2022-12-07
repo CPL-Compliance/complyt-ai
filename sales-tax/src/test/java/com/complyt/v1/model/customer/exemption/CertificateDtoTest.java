@@ -34,7 +34,9 @@ class CertificateDtoTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "CertificateDto(certificateId=" + certificateId + ", url=url, name=name)";
+        String expectedString = "CertificateDto(certificateId=" + certificateId +
+                ", url=" + certificateDto.getUrl() +
+                ", name=" + certificateDto.getName() + ")";
 
         // When
         String actualString = certificateDto.toString();

@@ -41,7 +41,14 @@ class ShippingFeeDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ShippingFeeDto(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.0, cities=null), salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE)";
+        String expectedString = "ShippingFeeDto(manualSalesTax=" + shippingFeeDto.isManualSalesTax()
+                + ", manualSalesTaxRate=" + shippingFeeDto.getManualSalesTaxRate() +
+                ", totalPrice=" + shippingFeeDto.getTotalPrice() +
+                ", jurisdictionalSalesTaxRules=" + shippingFeeDto.getJurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + shippingFeeDto.getSalesTaxRate() +
+                ", taxCode=" + shippingFeeDto.getTaxCode() +
+                ", taxableCategory=" + shippingFeeDto.getTaxableCategory() +
+                ", tangibleCategory=" + shippingFeeDto.getTangibleCategory() + ")";
 
         // When
         String actualString = shippingFeeDto.toString();

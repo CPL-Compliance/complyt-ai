@@ -58,7 +58,7 @@ class NewTransactionInternalDateInjectorTest {
     }
 
     @Test
-    void inject_ReturnModifiedTransaction() {
+    void inject_CurrentDate_ReturnModifiedTransaction() {
         // Given
         LocalDateTime beforeActionTime = LocalDateTime.now();
 

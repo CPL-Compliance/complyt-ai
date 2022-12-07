@@ -34,11 +34,18 @@ class ItemDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ItemDto(unitPrice=2000.0, quantity=4, totalPrice=8000.0" +
-                ", description=description, name=name, taxCode=taxCode" +
-                ", jurisdictionalSalesTaxRules=null, salesTaxRate=" + itemDto.getSalesTaxRate() +
-                ", manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE" +
-                ", taxableCategory=NOT_TAXABLE)";
+        String expectedString = "ItemDto(unitPrice=" + itemDto.getUnitPrice() +
+                ", quantity=" + itemDto.getQuantity() +
+                ", totalPrice=" + itemDto.getTotalPrice() +
+                ", description=" + itemDto.getDescription() +
+                ", name=" + itemDto.getName() +
+                ", taxCode=" + itemDto.getTaxCode() +
+                ", jurisdictionalSalesTaxRules=" + itemDto.getJurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + itemDto.getSalesTaxRate() +
+                ", manualSalesTax=" + itemDto.isManualSalesTax() +
+                ", manualSalesTaxRate=" + itemDto.getManualSalesTaxRate() +
+                ", tangibleCategory=" + itemDto.getTangibleCategory() +
+                ", taxableCategory=" + itemDto.getTaxableCategory() + ")";
 
         // When
         String actualString = itemDto.toString();

@@ -35,7 +35,8 @@ class TimeStampsTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TimeStamps(createdDate=" + timeStamps.getCreatedDate() + ", updatedDate=" + timeStamps.getUpdatedDate() + ")";
+        String expectedString = "TimeStamps(createdDate=" + timeStamps.getCreatedDate() +
+                ", updatedDate=" + timeStamps.getUpdatedDate() + ")";
 
         // When
         String actualString = timeStamps.toString();

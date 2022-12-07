@@ -26,7 +26,8 @@ class PhysicalNexusTrackerTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "PhysicalNexusTracker(established=true, establishedDate=" + localDateTime + ")";
+        String expectedString = "PhysicalNexusTracker(established=" + physicalNexusTracker.isEstablished() +
+                ", establishedDate=" + physicalNexusTracker.getEstablishedDate() + ")";
 
         // When
         String actualString = physicalNexusTracker.toString();

@@ -41,8 +41,10 @@ class ProductClassificationTest {
         // Given
         String expectedString = "ProductClassification(id=" + productClassification.getId() +
                 ", taxCode=" + productClassification.getTaxCode() +
-                ", description=item, title=title, jurisdictionalSalesTaxRules=" + productClassification.getJurisdictionalSalesTaxRules() +
-                ", tangibleCategory=TANGIBLE)";
+                ", description=" + productClassification.getDescription() +
+                ", title=" + productClassification.getTitle() +
+                ", jurisdictionalSalesTaxRules=" + productClassification.getJurisdictionalSalesTaxRules() +
+                ", tangibleCategory=" + productClassification.getTangibleCategory() + ")";
 
         // When
         String actualString = productClassification.toString();

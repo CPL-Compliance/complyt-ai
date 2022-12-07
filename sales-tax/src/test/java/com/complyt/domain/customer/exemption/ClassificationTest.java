@@ -30,7 +30,8 @@ class ClassificationTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Classification(code=code, description=description)";
+        String expectedString = "Classification(code=" + classification.getCode() +
+                ", description=" + classification.getDescription() + ")";
 
         // When
         String actualString = classification.toString();

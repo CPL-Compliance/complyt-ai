@@ -57,9 +57,13 @@ class NexusStateRuleTest {
     void toString_ReturnString() {
         // Given
         String expectedString = "NexusStateRule(id=" + nexusStateRule.getId() +
-                ", enforcesSalesTax=true, state=" + nexusStateRule.getState() +
-                ", taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL]" +
-                ", timeFrame=CURRENT_CALENDER_YEAR, nexusThreshold=" + nexusStateRule.getNexusThreshold() + ")";
+                ", enforcesSalesTax=" + nexusStateRule.isEnforcesSalesTax() +
+                ", state=" + nexusStateRule.getState() +
+                ", taxableCategories=" + nexusStateRule.getTaxableCategories() +
+                ", tangibleCategories=" + nexusStateRule.getTangibleCategories() +
+                ", customerTypes=" + nexusStateRule.getCustomerTypes() +
+                ", timeFrame=" + nexusStateRule.getTimeFrame() +
+                ", nexusThreshold=" + nexusStateRule.getNexusThreshold() + ")";
 
         // When
         String actualString = nexusStateRule.toString();

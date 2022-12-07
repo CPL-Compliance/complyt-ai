@@ -68,7 +68,7 @@ class ExemptionDtoTest {
                 ", internalTimeStamps=" + exemptionDto.getInternalTimeStamps() +
                 ", status=" + exemptionDto.getStatus() +
                 ", certificate=" + exemptionDto.getCertificate() +
-                ", exemptionType=FULLY)";
+                ", exemptionType=" + exemptionDto.getExemptionType() + ")";
 
         // When
         String actualString = exemptionDto.toString();

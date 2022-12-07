@@ -22,7 +22,13 @@ class CitySalesTaxRulesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "CitySalesTaxRules(name=California, abbreviation=Ca, taxable=false, specialTreatment=false, calculationType=FIXED, description=, calculationValue=1000.0)";
+        String expectedString = "CitySalesTaxRules(name=" + citySalesTaxRules.getName() +
+                ", abbreviation=" + citySalesTaxRules.getAbbreviation() +
+                ", taxable=" + citySalesTaxRules.isTaxable() +
+                ", specialTreatment=" + citySalesTaxRules.isSpecialTreatment() +
+                ", calculationType=" + citySalesTaxRules.getCalculationType() +
+                ", description=" + citySalesTaxRules.getDescription() +
+                ", calculationValue=" + citySalesTaxRules.getCalculationValue() + ")";
 
         // When
         String actualString = citySalesTaxRules.toString();

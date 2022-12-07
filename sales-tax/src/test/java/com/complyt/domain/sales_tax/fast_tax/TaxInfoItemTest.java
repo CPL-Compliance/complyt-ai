@@ -22,7 +22,22 @@ class TaxInfoItemTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TaxInfoItem(city=city, cityDistrictRate=, cityRate=, county=, countyDistrictRate=, countyRate=, informationComponents=null, notesCodes=, notesDesc=, specialDistrictRate=, stateAbbreviation=, stateName=, stateRate=, taxRate=, totalTaxExempt=, zip=)";
+        String expectedString = "TaxInfoItem(city=" + taxInfoItem.getCity() +
+                ", cityDistrictRate=" + taxInfoItem.getCityDistrictRate() +
+                ", cityRate=" + taxInfoItem.getCityRate() +
+                ", county=" + taxInfoItem.getCounty() +
+                ", countyDistrictRate=" + taxInfoItem.getCountyDistrictRate() +
+                ", countyRate=" + taxInfoItem.getCityRate() +
+                ", informationComponents=" + taxInfoItem.getInformationComponents() +
+                ", notesCodes=" + taxInfoItem.getNotesCodes() +
+                ", notesDesc=" + taxInfoItem.getNotesDesc() +
+                ", specialDistrictRate=" + taxInfoItem.getSpecialDistrictRate() +
+                ", stateAbbreviation=" + taxInfoItem.getStateAbbreviation() +
+                ", stateName=" + taxInfoItem.getStateName() +
+                ", stateRate=" + taxInfoItem.getStateRate() +
+                ", taxRate=" + taxInfoItem.getTaxRate() +
+                ", totalTaxExempt=" + taxInfoItem.getTotalTaxExempt() +
+                ", zip=" + taxInfoItem.getZip() + ")";
 
         // When
         String actualString = taxInfoItem.toString();

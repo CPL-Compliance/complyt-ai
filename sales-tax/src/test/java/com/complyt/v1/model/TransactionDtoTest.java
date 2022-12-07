@@ -19,13 +19,15 @@ class TransactionDtoTest {
     private String externalId;
     private LocalDateTime localDateTime;
     private ObjectId customerId;
+    private String transactionId;
 
     @BeforeEach
     void setup() {
         externalId = UUID.randomUUID().toString();
         localDateTime = LocalDateTime.now();
         customerId = new ObjectId();
-        transactionDto = createTransactionDto("1111");
+        transactionId = UUID.randomUUID().toString();
+        transactionDto = createTransactionDto(transactionId);
     }
 
     private TransactionDto createTransactionDto(String id) {
@@ -77,10 +79,13 @@ class TransactionDtoTest {
     @Test
     void withId_DifferentId_ReturnTransactionDto() {
         // Given
-        TransactionDto expectedTransactionDto = createTransactionDto("2222");
+        String differentId;
+        do differentId = UUID.randomUUID().toString();
+        while (differentId == transactionId);
+        TransactionDto expectedTransactionDto = createTransactionDto(differentId);
 
         // When
-        TransactionDto actualTransactionDto = transactionDto.withId("2222");
+        TransactionDto actualTransactionDto = transactionDto.withId(differentId);
 
         // Then
         assertEquals(expectedTransactionDto, actualTransactionDto);

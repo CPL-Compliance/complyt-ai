@@ -39,7 +39,9 @@ class ClientTrackingTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ClientTracking(id=" + id + ", tenantId=" + tenantId + ", nexus=Nexus(taxableDate=" + nexusDate + "))";
+        String expectedString = "ClientTracking(id=" + clientTracking.getId() +
+                ", tenantId=" + clientTracking.getTenantId() +
+                ", nexus=" + clientTracking.getNexus() + ")";
 
         // When
         String actualString = clientTracking.toString();

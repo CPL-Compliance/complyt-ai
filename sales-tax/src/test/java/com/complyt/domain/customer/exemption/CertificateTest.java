@@ -34,7 +34,9 @@ class CertificateTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "Certificate(certificateId=" + certificateId + ", url=url, name=name)";
+        String expectedString = "Certificate(certificateId=" + certificate.getCertificateId() +
+                ", url=" + certificate.getUrl() +
+                ", name=" + certificate.getName() + ")";
 
         // When
         String actualString = certificate.toString();

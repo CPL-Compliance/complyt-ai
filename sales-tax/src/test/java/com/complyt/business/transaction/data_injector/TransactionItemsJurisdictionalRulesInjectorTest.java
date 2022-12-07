@@ -97,26 +97,6 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_ThrowsNullPointerException() { // Need update after error handling feature
-        // Given
-        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Item itemWithTaxCodeNotOnMap = new Item(2000, 4, 8000, "description", "name", "C3S1",
-                null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE);
-        Transaction givenTransaction = transaction.withItems(new ArrayList<>() {
-            {
-                add(itemWithTaxCodeNotOnMap);
-            }
-        });
-        TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(givenTransaction);
-
-        // When
-        Mono<Transaction> transactionMono = injector.inject(classifications);
-
-        // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("Cannot invoke \"com.complyt.domain.sales_tax.product_classification.ProductClassification.getJurisdictionalSalesTaxRules()\" because \"classification\" is null").verify();
-    }
-
-    @Test
     void defaultConstructor_Transaction_ReturnTransactionItemsJurisdictionalRulesInjector() {
         // Given + When
         TransactionItemsJurisdictionalRulesInjector injector = new TransactionItemsJurisdictionalRulesInjector(transaction);

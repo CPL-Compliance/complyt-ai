@@ -38,8 +38,12 @@ class SalesTaxTrackingTest {
         String expectedString = "SalesTaxTracking(id=" + salesTaxTracking.getId() +
                 ", state=" + salesTaxTracking.getState() +
                 ", tenantId=" + salesTaxTracking.getTenantId() +
-                ", enforcesSalesTax=true, physicalNexusTracker=null, economicNexusTracker=null, appliedDate=null" +
-                ", isApproved=true, approvalDate=" + localDateTime + ")";
+                ", enforcesSalesTax=" + salesTaxTracking.isEnforcesSalesTax() +
+                ", physicalNexusTracker=" + salesTaxTracking.getPhysicalNexusTracker() +
+                ", economicNexusTracker=" + salesTaxTracking.getEconomicNexusTracker() +
+                ", appliedDate=" + salesTaxTracking.getAppliedDate() +
+                ", isApproved=" + salesTaxTracking.isApproved() +
+                ", approvalDate=" + salesTaxTracking.getApprovalDate() + ")";
 
         // When
         String actualString = salesTaxTracking.toString();

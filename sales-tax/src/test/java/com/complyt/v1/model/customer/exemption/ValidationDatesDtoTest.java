@@ -35,7 +35,8 @@ class ValidationDatesDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ValidationDatesDto(fromDate=" + validationDatesDto.getFromDate() + ", toDate=" + validationDatesDto.getToDate() + ")";
+        String expectedString = "ValidationDatesDto(fromDate=" + validationDatesDto.getFromDate() +
+                ", toDate=" + validationDatesDto.getToDate() + ")";
 
         // When
         String actualString = validationDatesDto.toString();

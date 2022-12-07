@@ -22,7 +22,8 @@ class NexusCalculationSummaryTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "NexusCalculationSummary(count=0, amount=0.0)";
+        String expectedString = "NexusCalculationSummary(count=" + nexusCalculationSummary.getCount() +
+                ", amount=" + nexusCalculationSummary.getAmount() + ")";
 
         // When
         String actualString = nexusCalculationSummary.toString();

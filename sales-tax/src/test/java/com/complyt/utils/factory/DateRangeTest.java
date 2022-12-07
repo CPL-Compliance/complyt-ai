@@ -273,8 +273,9 @@ public class DateRangeTest {
     @Test
     void toString_DateRange_ReturnsString() {
         // Given
-        String expectedString = "DateRange(start=2000-01-01T00:00, end=2000-12-31T23:59:59)";
         DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(LocalDateTime.of(2000, 5, 1, 1, 1));
+        String expectedString = "DateRange(start=" + dateRange.getStart() +
+                ", end=" + dateRange.getEnd() + ")";
 
         // When
         String actualString = dateRange.toString();

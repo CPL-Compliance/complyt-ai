@@ -168,16 +168,4 @@ public class TaxableCollectionAmountExtractorTest {
         // Then
         assertTrue(isEquals);
     }
-
-    @Test
-    void toString_ReturnsString() {
-        // Given
-        String expectedToString = "TaxableCollectionAmountExtractor(qualificationChecker=qualificationChecker, taxables=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=null, salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=taxCode, jurisdictionalSalesTaxRules=null, salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=NOT_TAXABLE), ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=true, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=SalesTaxRate(cityDistrictRate=0.5, cityRate=0.5, countyDistrictRate=0.5, countyRate=0.5, stateRate=0.5, taxRate=0.5), taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=TANGIBLE)], nexusStateRule=NexusStateRule(id=" + nexusStateRuleId + ", enforcesSalesTax=true, state=State(abbreviation=CA, code=02, name=California), taxableCategories=[TAXABLE], tangibleCategories=[TANGIBLE], customerTypes=[RETAIL], timeFrame=PREVIOUS_TWELVE_MONTHS, nexusThreshold=NexusThreshold(amount=1000.0, count=2, definition=AMOUNT_OR_COUNT)))";
-
-        // When
-        String actualToString = taxableCollectionAmountExtractor.toString();
-
-        // Then
-        assertEquals(expectedToString, actualToString);
-    }
 }

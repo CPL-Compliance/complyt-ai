@@ -13,7 +13,6 @@ import java.util.List;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-@ToString
 public class TaxableCollectionAmountExtractor implements AmountExtractor {
 
     @NonNull

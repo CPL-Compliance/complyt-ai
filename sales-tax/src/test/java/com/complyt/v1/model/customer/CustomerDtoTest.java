@@ -43,8 +43,9 @@ public class CustomerDtoTest {
         // Given
         String expectedString = "CustomerDto(id=" + customerDto.getId() +
                 ", externalId=" + customerDto.getExternalId() +
-                ", name=Existing Customer, address=" + customerDto.getAddress() +
-                ", customerType=RETAIL)";
+                ", name=" + customerDto.getName() +
+                ", address=" + customerDto.getAddress() +
+                ", customerType=" + customerDto.getCustomerType() + ")";
 
         // When
         String actualString = customerDto.toString();

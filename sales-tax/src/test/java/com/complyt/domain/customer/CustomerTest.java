@@ -39,7 +39,8 @@ class CustomerTest {
         // Given
         String expectedString = "Customer(id=" + customer.getId() +
                 ", externalId=" + customer.getExternalId() +
-                ", name=Existing Customer, address=" + customer.getAddress() +
+                ", name=" + customer.getName() +
+                ", address=" + customer.getAddress() +
                 ", tenantId=" + customer.getTenantId() +
                 ", customerType=RETAIL)";
 
