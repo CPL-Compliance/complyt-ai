@@ -24,10 +24,6 @@ public class SecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        /*
-        By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
-        indeed intended for our app. Adding our own validator is easy to do:
-        */
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
@@ -51,7 +47,7 @@ public class SecurityConfig {
 
         // Authentication and Authorization
         http.authorizeExchange()
-                .pathMatchers("/actuator/health", "/actuator/info").permitAll()
+                .pathMatchers("/actuator/health", "/actuator/info", "/actuator/").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 

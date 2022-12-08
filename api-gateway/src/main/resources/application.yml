@@ -6,7 +6,7 @@ spring:
     name: api-gateway
   profiles:
     active:
-    - @activeEnv@
+      - @activeEnv@
   cloud:
     gateway:
       discovery:
@@ -15,79 +15,116 @@ spring:
           lower-case-service-id: true
       metrics.enabled: true
       routes:
-      # ==== Sales Tax Service ====
-      # ---- Transaction ----
-      - id: sales-tax-get-transactions
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/transactions
-        filters:
-          - SetPath=/v1/transactions
-      - id: sales-tax-get-transaction-by-external-id
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/transactions/{segment}
-        filters:
-          - SetPath=/v1/transactions/{segment}
-      - id: sales-tax-get-transaction-by-external-id
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/transactions/{segment}
-        filters:
-          - SetPath=/v1/transactions/{segment}
-      - id: sales-tax-put-transaction
-        uri: lb://sales-tax
-        predicates:
-          - Method=PUT
-          - Path=/v1/transactions/{segment}
-        filters:
-          - SetPath=/v1/transactions/{segment}
-      - id: sales-tax-delete-transaction
-        uri: lb://sales-tax
-        predicates:
-          - Method=DELETE
-          - Path=/v1/transactions/{segment}
-        filters:
-          - SetPath=/v1/transactions/{segment}
-      # ---- Transaction ----
-      # ---- Customer ----
-      - id: sales-tax-get-customers
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/customers
-        filters:
-          - SetPath=/v1/customers
-      - id: sales-tax-get-customer-by-name
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/customers/name/{name}
-        filters:
-          - SetPath=/v1/customers/name/{name}
-      - id: sales-tax-get-customer-by-external-id
-        uri: lb://sales-tax
-        predicates:
-          - Method=GET
-          - Path=/v1/customers/{segment}
-        filters:
-          - SetPath=/v1/customers/{segment}
-      - id: sales-tax-put-customer
-        uri: lb://sales-tax
-        predicates:
-          - Method=PUT
-          - Path=/v1/customers/{segment}
-        filters:
-          - SetPath=/v1/customers/{segment}
-      - id: sales-tax-post-customer
-        uri: lb://sales-tax
-        predicates:
-          - Method=POST
-          - Path=/v1/customers
-        filters:
-          - SetPath=/v1/customers
-      # ---- Customer ----
+        # ==== Sales Tax Service ====
+        # ---- Transaction ----
+        - id: sales-tax-swagger
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions
+          filters:
+            - SetPath=/v1/transactions
+        - id: sales-tax-get-transactions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions
+          filters:
+            - SetPath=/v1/transactions
+        - id: sales-tax-get-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        - id: sales-tax-put-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        - id: sales-tax-delete-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        # ---- Transaction ----
+        # ---- Customer ----
+        - id: sales-tax-get-customers
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers
+          filters:
+            - SetPath=/v1/customers
+        - id: sales-tax-get-customer-by-name
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/name/{name}
+          filters:
+            - SetPath=/v1/customers/name/{name}
+        - id: sales-tax-get-customer-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/{external_id}
+          filters:
+            - SetPath=/v1/customers/{external_id}
+        - id: sales-tax-put-customer-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/customers/{external_id}
+          filters:
+            - SetPath=/v1/customers/{external_id}
+        - id: sales-tax-post-customer
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/customers
+          filters:
+            - SetPath=/v1/customers
+        # ---- Customer ----
+        # ---- Exemption ----
+        - id: sales-tax-get-exemptions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-get-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+        - id: sales-tax-post-exemption
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-put-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+        - id: sales-tax-delete-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+      # ---- Exemption ----
       # ==== Sales Tax Service ====
