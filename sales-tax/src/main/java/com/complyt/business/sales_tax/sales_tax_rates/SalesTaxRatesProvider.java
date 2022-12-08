@@ -25,8 +25,9 @@ public class SalesTaxRatesProvider {
     public SalesTaxRate calculateSalesTaxRate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.isTaxable()) {
             log.info("None taxable rule - returning sales tax rate that is set to 0");
+            SalesTaxRate zeroSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
-            return SalesTaxRate.zeroSalesTaxRate();
+            return zeroSalesTaxRate;
         }
 
         if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
@@ -37,13 +38,15 @@ public class SalesTaxRatesProvider {
 
         if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
             log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.getCalculationValue());
+            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
 
-            return modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+            return modifiedRateByFixedTreatment;
         }
 
         log.info("Returning sales tax rate by percentage cut of : " + jurisdictionalSalesTaxRules.getCalculationValue());
+        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
 
-        return modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+        return modifiedRateByPercentageTreatment;
     }
 
     private SalesTaxRate modifyRateByFixedTreatment(float jurisdictionalRuleStateRate, SalesTaxRate salesTaxRate) {
