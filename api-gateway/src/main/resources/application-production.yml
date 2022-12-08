@@ -31,6 +31,6 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${discovery_service_uri}
+      defaultZone: ${discovery-service-uri}
 
 auth0.audience: ${audience}
