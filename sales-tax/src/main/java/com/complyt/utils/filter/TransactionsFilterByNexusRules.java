@@ -1,6 +1,7 @@
 package com.complyt.utils.filter;
 
 import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -32,6 +33,13 @@ public class TransactionsFilterByNexusRules implements ListFilter<Transaction, N
         boolean transactionTypeIsNotRequired = !List.of(TransactionType.INVOICE, TransactionType.REFUND).contains(transactionType);
         if (transactionTypeIsNotRequired) {
             log.debug("Transaction of type " + transactionType + " is not being included in nexus' calculation");
+            return false;
+        }
+
+        TransactionStatus transactionStatus = transaction.getTransactionStatus();
+        boolean transactionIsCancelled = transactionStatus.equals(TransactionStatus.CANCELLED);
+        if (transactionIsCancelled) {
+            log.debug("Transaction is cancelled therefore is not being included in nexus' calculation");
             return false;
         }
 

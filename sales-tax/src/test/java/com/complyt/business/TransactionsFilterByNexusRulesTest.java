@@ -124,6 +124,22 @@ public class TransactionsFilterByNexusRulesTest {
     }
 
     @Test
+    void filter_FiltersBecauseTransactionIsOfStatusCancelled_ReturnsZeroTransactions() {
+        // Given
+        Transaction transaction = invoiceTransaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        List<Transaction> transactions = new ArrayList<>() {{
+            add(transaction);
+        }};
+
+        // When
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
+
+        // Then
+        assertNotNull(filteredTransactions);
+        assertEquals(0, filteredTransactions.size());
+    }
+
+    @Test
     void filter_BothTransactionsQualify_ReturnsTwoTransactions() {
         // Given
         Transaction secondInvoiceTransaction = salesOrderTransaction.withTransactionType(TransactionType.INVOICE);
