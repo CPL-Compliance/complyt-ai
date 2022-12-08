@@ -1,5 +1,7 @@
-package io.complyt.apigateway;
+package io.complyt.apigateway.config;
 
+import io.complyt.apigateway.security.AudienceValidator;
+import io.complyt.apigateway.annotations.Generated;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +16,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
+@Generated
 public class SecurityConfig {
 
     @Value("${auth0.audience}")

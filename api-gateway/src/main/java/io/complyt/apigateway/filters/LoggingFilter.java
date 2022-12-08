@@ -1,8 +1,6 @@
-package io.complyt.apigateway;
+package io.complyt.apigateway.filters;
 
 import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.stereotype.Component;
