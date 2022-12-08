@@ -55,7 +55,7 @@ public class SalesTaxRatesHandlerTest {
         ObjectId customerId = new ObjectId();
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, null, null);
     }
 
     private ShippingFee createShippingFee() {

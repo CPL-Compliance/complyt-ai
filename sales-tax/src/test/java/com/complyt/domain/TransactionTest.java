@@ -7,9 +7,9 @@ import java.lang.reflect.Field;
 public class TransactionTest {
 
     @Test
-    void test() {
+    void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(14, fields.length);
+        Assertions.assertEquals(15, fields.length);
     }
 }
