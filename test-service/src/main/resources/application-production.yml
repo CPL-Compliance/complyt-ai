@@ -1,0 +1,15 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service-load-balancer-1610939268.us-east-1.elb.amazonaws.com//eureka
+
+auth0:
+  audience: https://sales-tax-service/
+
+# This property sets the issuer URI
+# for the application to interact with the Resource Server for authentication and authorization purposes
+spring.security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: https://production-complyt.us.auth0.com/

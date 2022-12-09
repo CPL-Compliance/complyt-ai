@@ -1,11 +1,12 @@
 server:
   port: ${PORT:9898}
 
-# Change to secret
 eureka:
+  instance:
+    ip-address:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${discovery-service-uri}
 
 spring:
   data:
