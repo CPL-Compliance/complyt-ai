@@ -46,7 +46,35 @@ class TransactionSalesTaxRatesHandlerTest {
     void setup() {
         transaction = createTransaction();
         salesTaxRate = createSalesTaxRates();
+    }
 
+    private Transaction createTransaction() {
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        ObjectId customerId = new ObjectId();
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
+        List<Item> items = new ArrayList<>();
+        String tenantId = UUID.randomUUID().toString();
+        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
+                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+        ));
+        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null, null);
+    }
+
+    private SalesTaxRate createSalesTaxRates() {
+        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 2.5f);
+    }
+
+    private ShippingFee createShippingFee() {
+        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        return new ShippingFee(false, 0, 1000, rules, SalesTaxRate.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
+                CalculationType.FIXED, "description", 0.5f, null);
     }
 
     @Test
@@ -77,34 +105,5 @@ class TransactionSalesTaxRatesHandlerTest {
         Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction, salesTaxRate);
         assertEquals(expectedTransaction, actualTransaction);
 
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        String tenantId = UUID.randomUUID().toString();
-        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-        ));
-        Customer customer = new Customer(UUID.randomUUID().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null, null);
-    }
-
-    private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 2.5f);
-    }
-
-    private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, rules, SalesTaxRate.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
     }
 }
