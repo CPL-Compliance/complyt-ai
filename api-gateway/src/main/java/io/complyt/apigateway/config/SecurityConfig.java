@@ -3,6 +3,8 @@ package io.complyt.apigateway.config;
 import io.complyt.apigateway.security.AudienceValidator;
 import io.complyt.apigateway.annotations.Generated;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -13,6 +15,9 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity

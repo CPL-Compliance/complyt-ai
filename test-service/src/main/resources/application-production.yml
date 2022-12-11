@@ -1,7 +1,9 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://discovery-service-load-balancer-1610939268.us-east-1.elb.amazonaws.com//eureka
+      defaultZone: http://service-discovery-load-balancer-1787375561.us-east-1.elb.amazonaws.com/eureka
+  instance:
+    prefer-ip-address: true
 
 auth0:
   audience: https://sales-tax-service/
