@@ -79,9 +79,7 @@ class TransactionDtoTest {
     @Test
     void withId_DifferentId_ReturnTransactionDto() {
         // Given
-        String differentId;
-        do differentId = UUID.randomUUID().toString();
-        while (differentId == transactionId);
+        String differentId = UUID.randomUUID().toString();
         TransactionDto expectedTransactionDto = createTransactionDto(differentId);
 
         // When

@@ -42,7 +42,7 @@ class CustomerTest {
                 ", name=" + customer.getName() +
                 ", address=" + customer.getAddress() +
                 ", tenantId=" + customer.getTenantId() +
-                ", customerType=RETAIL)";
+                ", customerType=" + customer.getCustomerType() + ")";
 
         // When
         String actualString = customer.toString();

@@ -123,6 +123,7 @@ public class TransactionTest {
         };
         TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
         Transaction.TransactionBuilder transactionBuilder = Transaction.builder();
+        ShippingFee shippingFee = createShippingFee();
 
         // When
         Transaction actualTransaction = transactionBuilder
@@ -139,27 +140,9 @@ public class TransactionTest {
                 .internalTimeStamps(timeStamps)
                 .externalTimeStamps(timeStamps)
                 .transactionType(TransactionType.INVOICE)
-                .shippingFee(createShippingFee()).build();
+                .shippingFee(shippingFee).build();
 
         // Then
         assertEquals(transaction, actualTransaction);
     }
-
-    @Test
-    void builder_ToString_ReturnString() {
-        // Given
-        String expectedString = "Transaction.TransactionBuilder(id=" + null + ", externalId=" + null + ", items=" + null + "" +
-                ", billingAddress=" + null + ", shippingAddress=" + null + ", customerId=" + null + "" +
-                ", customer=" + null + ", salesTax=" + null + ", transactionStatus=" + null + "" +
-                ", tenantId=" + null + ", internalTimeStamps=" + null + ", externalTimeStamps=" + null + "" +
-                ", transactionType=" + null + ", shippingFee=" + null + ")";
-        Transaction.TransactionBuilder transactionBuilder = new Transaction.TransactionBuilder();
-
-        // When
-        String actualString = transactionBuilder.toString();
-
-        // Then
-        assertEquals(expectedString, actualString);
-    }
-
 }
