@@ -4,8 +4,6 @@ import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.utils.query.TimeFrameQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,6 +21,7 @@ import java.util.UUID;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -78,4 +77,45 @@ public class NexusTransactionsSearchQueryBuilderTest {
         assertEquals(expectedQuery, actualQuery);
     }
 
+    @Test
+    void buildNexusTransactionsSearch_NexusInfoIsNull_ThrowsException() {
+        // Given
+        Nexus nullNexusInfo = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nullNexusInfo, nexusStateRule, dateReference);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusInfo is marked non-null but is null");
+    }
+
+    @Test
+    void buildNexusTransactionsSearch_NexusStateRuleIsNull_ThrowsException() {
+        // Given
+        NexusStateRule nullNexusStateRule = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nullNexusStateRule, dateReference);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "nexusStateRule is marked non-null but is null");
+    }
+
+    @Test
+    void buildNexusTransactionsSearch_ReferenceDateIsNull_ThrowsException() {
+        // Given
+        LocalDateTime nullLocalDateTime = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexus, nexusStateRule, nullLocalDateTime);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
 }

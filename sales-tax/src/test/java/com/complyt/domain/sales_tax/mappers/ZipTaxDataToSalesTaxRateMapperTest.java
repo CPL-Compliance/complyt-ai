@@ -25,12 +25,12 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @BeforeEach
     void setUp() {
         result = Result.builder()
-                .districtSalesTax(0l)
-                .citySalesTax(0l)
-                .taxSales(0l)
-                .countySalesTax(0l)
-                .district5SalesTax(0l)
-                .stateSalesTax(0l)
+                .districtSalesTax(0L)
+                .citySalesTax(0L)
+                .taxSales(0L)
+                .countySalesTax(0L)
+                .district5SalesTax(0L)
+                .stateSalesTax(0L)
                 .build();
 
         zipTaxData = new ZipTaxData();
@@ -40,22 +40,26 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     }
 
     @Test
-    void map_ZipTaxData_SalesTaxRate() {
-        // Given + When
-        SalesTaxRate actulalSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
+    void map_ZipTaxData_ReturnSalesTaxRate() {
+        // Given
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
+        // When
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
+
         // Then
-        assertEquals(expectedSalesTaxRate, actulalSalesTaxRate);
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
     }
 
     @Test
-    void map_Result_SalesTaxRate() {
-        // Given + When
-        SalesTaxRate actulalSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
+    void map_Result_ReturnSalesTaxRate() {
+        // Given
         SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
+        // When
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
+
         // Then
-        assertEquals(expectedSalesTaxRate, actulalSalesTaxRate);
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
     }
 }

@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.transaction.data_injector.TransactionShippingFeeJurisdictionalRulesInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -16,6 +15,8 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
@@ -43,7 +44,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
 
     private ShippingFee createShippingFee() {
@@ -136,4 +137,40 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
         StepVerifier.create(actualTransactionMono).expectNext(transactionWithShippingFeeWithUnrecognizedTaxCode).verifyComplete();
     }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeJurisdictionalRulesInjector() {
+        // Given + When
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+
+        // Then
+        assertEquals(transaction, injector.getTransaction());
+    }
+
+    @Test
+    void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnsTrue() {
+        // Given
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+        TransactionShippingFeeJurisdictionalRulesInjector secondInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+
+        // When
+        boolean isEquals = injector.equals(secondInjector);
+
+        // Then
+        assertTrue(isEquals);
+
+    }
+
+    @Test
+    void shouldInject_NullShippingFee_ReturnsFalse() {
+        // Given
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction.withShippingFee(null));
+
+        // When
+        boolean shouldBeInjected = injector.shouldInject(null);
+
+        // Then
+        assertFalse(shouldBeInjected);
+    }
+
 }

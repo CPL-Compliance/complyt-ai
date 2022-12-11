@@ -79,7 +79,7 @@ public class ExemptionServiceImplTest {
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
     }
 
     @Test
@@ -345,6 +345,18 @@ public class ExemptionServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
+
+    @Test
+    void save_NullExemption_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.save(nullExemption));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
 }

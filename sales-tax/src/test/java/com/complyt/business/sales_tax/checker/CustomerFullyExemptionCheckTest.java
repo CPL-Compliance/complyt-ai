@@ -3,7 +3,7 @@ package com.complyt.business.sales_tax.checker;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import org.bson.types.ObjectId;
@@ -18,20 +18,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 public class CustomerFullyExemptionCheckTest {
 
-    CustomerFullyExemptionCheck customerFullyExemptionCheck;
+    CustomerFullyExemptionChecker customerFullyExemptionChecker;
     Transaction transaction;
+
+    Exemption exemption;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
+        customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
+        exemption = createExemption();
     }
 
     private Transaction createTransaction() {
@@ -47,7 +49,19 @@ public class CustomerFullyExemptionCheckTest {
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
+    }
+
+    private Exemption createExemption() {
+        State state = new State("CA", "02", "California");
+        Classification classification = new Classification("code", "description");
+        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
+        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Status status = new Status("code", "name");
+        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
+
+        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
+                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
     }
 
     @Test
@@ -57,23 +71,58 @@ public class CustomerFullyExemptionCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
+            customerFullyExemptionChecker.check(nullExemption);
         });
 
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
     @Test
-    void isFullyExemptionActive_NullExemptionPassed_ThrowsException() {
+    void check_TransactionFullyExempted_ReturnsTrue() {
         // Given
-        Exemption nullExemption = null;
+        Exemption expectedExemption = exemption;
 
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
-        });
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
 
-        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+        // Then
+        assertTrue(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsNotFullyExempted_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
+
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsBeforeTimeFrame_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
+
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
+    }
+
+    @Test
+    void check_TransactionIsAfterTimeFrame_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
+
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
+
+        // Then
+        assertFalse(isExempted);
     }
 
 }

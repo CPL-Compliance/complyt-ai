@@ -26,18 +26,18 @@ public class SalesTaxRatesCalculatorTest {
     private SalesTaxRate salesTaxRateByService;
 
     @BeforeEach
-    void set_up(){
-        salesTaxRateByService = new SalesTaxRate(0.05f,0.05f,0.05f,0.05f,0.05f,0.25f);
+    void set_up() {
+        salesTaxRateByService = new SalesTaxRate(0.05f, 0.05f, 0.05f, 0.05f, 0.05f, 0.25f);
         salesTaxRatesProvider = new SalesTaxRatesProvider();
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules(
-                "California","CA", true,true, CalculationType.FIXED,
-                "description",0.07f,null);
+                "California", "CA", true, true, CalculationType.FIXED,
+                "description", 0.07f, null);
     }
 
     @Test
-    void getRateByRules_NotTaxable_ReturnsZeroRate(){
+    void getRateByRules_NotTaxable_ReturnsZeroRate() {
         // Given
-        SalesTaxRate zeroSalesTaxRate = new SalesTaxRate(0,0,0,0,0,0);
+        SalesTaxRate zeroSalesTaxRate = new SalesTaxRate(0, 0, 0, 0, 0, 0);
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
@@ -46,7 +46,7 @@ public class SalesTaxRatesCalculatorTest {
     }
 
     @Test
-    void getRateByRules_NoSpecialTreatment_ReturnsRateGivenBySalesTaxEngine(){
+    void getRateByRules_NoSpecialTreatment_ReturnsRateGivenBySalesTaxEngine() {
         // Given
         JurisdictionalSalesTaxRules noSpecialTreatmentRule = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
 
@@ -56,7 +56,7 @@ public class SalesTaxRatesCalculatorTest {
     }
 
     @Test
-    void getRateByRules_CalculationTypeSetToFixed_OverridesStateRate(){
+    void getRateByRules_CalculationTypeSetToFixed_OverridesStateRate() {
         // Given
         float newStateRate = jurisdictionalSalesTaxRules.getCalculationValue();
         float newTaxRate = salesTaxRateByService.getTaxRate() - salesTaxRateByService.getStateRate() + newStateRate;
@@ -68,13 +68,15 @@ public class SalesTaxRatesCalculatorTest {
     }
 
     @Test
-    void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate(){
+    void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate() {
         // Given
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
+        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRateByService.getTaxRate();
+        SalesTaxRate expectedSalesTaxRate = salesTaxRateByService.withTaxRate(calculatedRate);
 
         // When + Then
         SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
-        Assertions.assertEquals(salesTaxRateByService, returnedRate);
+        Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
     }
 
     @Test

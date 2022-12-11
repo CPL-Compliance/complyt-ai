@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll();
     }
 
-    private Function<Transaction, Transaction> createFunctionUpdateTransaction(@NonNull final Transaction transaction) {
+    private Function<Transaction, Transaction> createFunctionUpdateTransaction(final Transaction transaction) {
         return transactionInfo -> transactionInfo
                 .withExternalId(transaction.getExternalId())
                 .withItems(transaction.getItems())

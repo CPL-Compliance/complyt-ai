@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -45,8 +46,11 @@ public class TaxableCollectionAmountExtractorTest {
     Customer customer;
     ObjectId customerId;
 
+    String nexusStateRuleId;
+
     @BeforeEach
     void setUp() {
+        nexusStateRuleId = UUID.randomUUID().toString();
         customer = createCustomer();
         transaction = createTransaction();
         nexusStateRule = createNexusStateRule();
@@ -85,7 +89,7 @@ public class TaxableCollectionAmountExtractorTest {
 
         NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+        return new NexusStateRule(nexusStateRuleId, true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
     }
 
@@ -107,7 +111,7 @@ public class TaxableCollectionAmountExtractorTest {
             }
         };
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, shippingFee, null);
     }
 
     private ShippingFee createShippingFee() {
@@ -152,4 +156,16 @@ public class TaxableCollectionAmountExtractorTest {
         assertEquals(amount, expectedAmount);
     }
 
+    @Test
+    void equals_sameExtractor_ReturnsTrue() {
+        // Given
+        TaxableCollectionAmountExtractor givenTaxableCollectionAmountExtractor =
+                new TaxableCollectionAmountExtractor(qualificationChecker, createTaxables(), nexusStateRule);
+
+        // When
+        boolean isEquals = taxableCollectionAmountExtractor.equals(givenTaxableCollectionAmountExtractor);
+
+        // Then
+        assertTrue(isEquals);
+    }
 }

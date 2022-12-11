@@ -13,11 +13,11 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 @Slf4j
 public class ApplicationDateCreator {
 
-    public LocalDateTime create(@NonNull TimeFrame timeFrame,@NonNull LocalDateTime referenceDate) {
-        if(timeFrame.equals(TimeFrame.PREVIOUS_CALENDER_YEAR)) {
+    public LocalDateTime create(@NonNull TimeFrame timeFrame, @NonNull LocalDateTime referenceDate) {
+        if (timeFrame.equals(TimeFrame.PREVIOUS_CALENDER_YEAR)) {
             return applyNextCalenderYear(referenceDate);
         }
-        if(timeFrame.equals(TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER)) {
+        if (timeFrame.equals(TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER)) {
             return applyNextSeptember(referenceDate);
         }
         log.info("Creating sales tax application date : " + referenceDate);
@@ -25,7 +25,7 @@ public class ApplicationDateCreator {
         return referenceDate;
     }
 
-    private LocalDateTime applyNextCalenderYear(@NonNull LocalDateTime referenceDate) {
+    private LocalDateTime applyNextCalenderYear(LocalDateTime referenceDate) {
         LocalDateTime applicationDate = referenceDate
                 .plusYears(1)
                 .with(firstDayOfYear())
@@ -39,7 +39,7 @@ public class ApplicationDateCreator {
         return applicationDate;
     }
 
-    private LocalDateTime applyNextSeptember(@NonNull LocalDateTime referenceDate) {
+    private LocalDateTime applyNextSeptember(LocalDateTime referenceDate) {
 
         LocalDateTime september30 = referenceDate
                 .withMonth(9)
@@ -51,10 +51,9 @@ public class ApplicationDateCreator {
         LocalDateTime applicationDate;
 
         // from october 1st to december 31st
-        if(referenceDate.compareTo(september30) >= 0) {
+        if (referenceDate.compareTo(september30) >= 0) {
             applicationDate = september30.plusYears(1);
-        }
-        else {
+        } else {
             applicationDate = september30;
         }
         log.info("Creating sales tax application date : " + applicationDate);

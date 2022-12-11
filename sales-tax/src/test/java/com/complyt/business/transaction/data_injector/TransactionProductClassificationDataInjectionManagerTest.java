@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.transaction.data_injector.TransactionProductClassificationDataInjectionManager;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
@@ -23,6 +22,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -64,7 +66,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
 
     private List<Item> createItemsNoRules() {
         Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE);
         Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
                 null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
         return new ArrayList<>() {{
@@ -101,7 +103,7 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     @Test
     void inject_InjectsDataToTransaction_ReturnsTransaction() {
         List<Item> itemsNoRules = createItemsNoRules();
-        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
                 CalculationType.FIXED, "rule1", 0, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
                 CalculationType.FIXED, "rule2", 0, null);
@@ -124,16 +126,39 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     void shouldInject_DefaultMethodGetsExecuted_ReturnsTrue() {
         TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
 
-        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", true, false,
+        JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
                 CalculationType.FIXED, "rule1", 0, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
                 CalculationType.FIXED, "rule2", 0, null);
         Map<String, ProductClassification> mapTaxCodesToClassifications = createClassificationsMap(firstRule, secondRule);
-        
+
         boolean shouldInject = injector.shouldInject(mapTaxCodesToClassifications);
 
         Assertions.assertTrue(shouldInject);
 
 
+    }
+
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnsTransactionProductClassificationDataInjectionManager() {
+        // Given + When
+        TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
+
+        // Then
+        assertEquals(transaction, injector.getTransaction());
     }
 }

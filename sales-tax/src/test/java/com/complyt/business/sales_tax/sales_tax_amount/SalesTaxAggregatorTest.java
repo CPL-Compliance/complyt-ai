@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -74,7 +73,7 @@ public class SalesTaxAggregatorTest {
         List<Item> items = createItems();
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
 
     @Test
@@ -104,5 +103,29 @@ public class SalesTaxAggregatorTest {
 
         // Then
         assertEquals("taxables is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void toString_ReturnsString() {
+        // Given
+        String expectedString = "SalesTaxAggregator()";
+
+        // When
+        String actualString = salesTaxAggregator.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void equals_SameSalesTaxAggregator_ReturnsTrue() {
+        // Given
+        SalesTaxAggregator actualSalesTaxAggregator = new SalesTaxAggregator();
+
+        // When
+        boolean isEquals = salesTaxAggregator.equals(actualSalesTaxAggregator);
+
+        // Then
+        assertTrue(isEquals);
     }
 }

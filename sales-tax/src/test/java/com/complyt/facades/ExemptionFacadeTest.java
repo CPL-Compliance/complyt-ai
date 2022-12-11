@@ -212,7 +212,7 @@ public class ExemptionFacadeTest {
         String id = UUID.randomUUID().toString();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(nullExemption,id));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(nullExemption, id));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
@@ -224,7 +224,7 @@ public class ExemptionFacadeTest {
         String nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(exemption,nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(exemption, nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");

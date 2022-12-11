@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ItemTest {
 
@@ -39,14 +40,57 @@ class ItemTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
+        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRate().getTaxRate();
+        SalesTaxRate salesTaxRate = item.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
 
-        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage);
-        float expectedAmount = itemWithRuleByPercentage.getTotalPrice() *
-                itemWithRuleByPercentage.getJurisdictionalSalesTaxRules().getCalculationValue() * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+        Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
+                .withSalesTaxRate(salesTaxRate);
+
+        float expectedAmount = itemWithRuleByPercentage.getTotalPrice()
+                * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
 
         // When + Then
         float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
+    }
+
+    @Test
+    void Equals_sameItem_ReturnsTrue() {
+        // Given
+        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
+                "California", "CA", true, true, CalculationType.FIXED,
+                "description", 0.07f, null);
+        Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+
+        // When
+        boolean isEquals = item.equals(givenItem);
+
+        // Then
+        assertTrue(isEquals);
+    }
+
+    @Test
+    void toString_ReturnsString() {
+        // Given
+        String expectedString = "Item(unitPrice=" + item.getUnitPrice() +
+                ", quantity=" + item.getQuantity() +
+                ", totalPrice=" + item.getTotalPrice() +
+                ", description=" + item.getDescription() +
+                ", name=" + item.getName() +
+                ", taxCode=" + item.getTaxCode() +
+                ", jurisdictionalSalesTaxRules=" + item.getJurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + item.getSalesTaxRate() +
+                ", manualSalesTax=" + item.isManualSalesTax() +
+                ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
+                ", tangibleCategory=" + item.getTangibleCategory() +
+                ", taxableCategory=" + item.getTaxableCategory() + ")";
+
+        // When
+        String actualString = item.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
     }
 
 }

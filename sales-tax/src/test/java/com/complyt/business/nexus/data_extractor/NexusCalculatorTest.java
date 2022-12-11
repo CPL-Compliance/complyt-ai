@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.data_extractor;
 
-import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -12,7 +11,6 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -20,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +35,10 @@ public class NexusCalculatorTest {
     NexusCalculator nexusCalculator;
 
     @Mock
-    NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
+    NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
 
     @Mock
-    QualificationChecker qualificationChecker;
-
-    @Mock
-    NexusTransactionCountExtractor nexusTransactionCountExtractor;
+    NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @Mock
     TransactionsFilterByNexusRules transactionNexusFilter;
@@ -58,7 +55,7 @@ public class NexusCalculatorTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId.toString(), CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE, null, null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -99,24 +96,16 @@ public class NexusCalculatorTest {
         float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        List<Taxable> firstTaxables = new ArrayList<>(transactions.get(0).getItems());
-        List<Taxable> secondTaxables = new ArrayList<>(transactions.get(1).getItems());
-        TaxableCollectionAmountExtractor firstExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, firstTaxables, nexusStateRule);
-        TaxableCollectionAmountExtractor secondExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, secondTaxables, nexusStateRule);
 
         // When
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionCountExtractor.extract(transactions.get(0), nexusStateRule)).thenReturn(1);
-        when(nexusTransactionCountExtractor.extract(transactions.get(1), nexusStateRule)).thenReturn(1);
-        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(0), nexusStateRule)).thenReturn(firstExtractor);
-        when(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transactions.get(1), nexusStateRule)).thenReturn(secondExtractor);
-        when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
-        when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
 
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary, actualSummary);
+        StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
     }
 
     @Test
@@ -132,10 +121,13 @@ public class NexusCalculatorTest {
         NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
 
         // When
-        NexusCalculationSummary actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
 
         // Then
-        assertEquals(summary, actualSummary);
+        StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
     }
 
 }

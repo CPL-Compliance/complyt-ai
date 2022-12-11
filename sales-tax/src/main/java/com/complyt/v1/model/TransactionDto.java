@@ -27,4 +27,5 @@ public class TransactionDto {
     private final TimeStampsDto externalTimeStamps;
     private final TransactionTypeDto transactionType;
     private final ShippingFeeDto shippingFee;
+    private final String createdFrom;
 }

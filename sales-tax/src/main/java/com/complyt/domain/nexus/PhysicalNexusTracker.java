@@ -1,9 +1,6 @@
 package com.complyt.domain.nexus;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @With
 @ToString
+@EqualsAndHashCode
 public class PhysicalNexusTracker {
     private boolean established;
     private LocalDateTime establishedDate;
