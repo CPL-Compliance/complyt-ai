@@ -40,18 +40,14 @@ public class FastTaxWebClientWrapperTest {
 
     @Mock
     WebClient webClient;
-
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
-
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpecMock;
-
     @Mock
     WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+    @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpecMock;
+    @Mock
+    private WebClient.ResponseSpec responseSpecMock;
 
     @BeforeEach
     void setUp() {

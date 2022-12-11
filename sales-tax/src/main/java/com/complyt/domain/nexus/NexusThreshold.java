@@ -1,13 +1,11 @@
 package com.complyt.domain.nexus;
 
 import com.complyt.domain.nexus.enums.Definition;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 @With
 @ToString
 public class NexusThreshold {

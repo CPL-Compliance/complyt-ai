@@ -43,12 +43,9 @@ public class ExemptionRepositoryTest {
 
     @Mock
     TenantResolver tenantResolver;
-
-    private String tenantId;
-
     Exemption exemption;
-
     Transaction transaction;
+    private String tenantId;
 
     @BeforeEach
     void setUp() {

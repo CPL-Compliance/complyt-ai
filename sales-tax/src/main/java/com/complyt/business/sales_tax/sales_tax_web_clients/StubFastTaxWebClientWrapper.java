@@ -5,10 +5,12 @@ import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
 @Generated
+@EqualsAndHashCode
 public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
     public StubFastTaxWebClientWrapper() {
         super(null, null, null, null, null);

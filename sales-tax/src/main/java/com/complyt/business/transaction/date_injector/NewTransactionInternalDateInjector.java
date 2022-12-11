@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class NewTransactionInternalDateInjector implements DateInjector<Transaction> {
 
     @NonNull
-    private Transaction transaction;
+    private final Transaction transaction;
 
     @Override
     public Transaction inject() {

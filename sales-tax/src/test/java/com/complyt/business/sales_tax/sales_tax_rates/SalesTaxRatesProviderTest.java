@@ -1,0 +1,76 @@
+package com.complyt.business.sales_tax.sales_tax_rates;
+
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class SalesTaxRatesProviderTest {
+
+    private SalesTaxRatesProvider salesTaxRatesProvider;
+
+    private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
+
+    private SalesTaxRate salesTaxRate;
+
+    @BeforeEach
+    void setup() {
+        jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        salesTaxRate = new SalesTaxRate(0.05f, 0.05f, 0.05f, 0.05f, 0.05f, 0.25f);
+        salesTaxRatesProvider = new SalesTaxRatesProvider();
+    }
+
+    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
+                CalculationType.FIXED, "description", 0.1f, null);
+    }
+
+    @Test
+    void calculateSalesTaxRate_NotTaxable_ReturnsZeroTaxRate() {
+        // Given
+        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withTaxable(false);
+
+        // When
+        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.calculateSalesTaxRate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+
+        // Then
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void calculateSalesTaxRate_NoSpecialTreatment_ReturnsSameTaxRate() {
+        // Given
+        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
+
+        // When
+        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.calculateSalesTaxRate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+
+        // Then
+        assertEquals(salesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
+        // Given
+        float fixedStateRateValue = 0.1f;
+        float calculatedTaxRateValue =
+                salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + fixedStateRateValue;
+        SalesTaxRate expectedSalesTaxRate = salesTaxRate
+                .withStateRate(fixedStateRateValue)
+                .withTaxRate(calculatedTaxRateValue);
+        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules
+                .withCalculationType(CalculationType.FIXED)
+                .withCalculationValue(fixedStateRateValue);
+
+        // When
+        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.calculateSalesTaxRate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+
+        // Then
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+}

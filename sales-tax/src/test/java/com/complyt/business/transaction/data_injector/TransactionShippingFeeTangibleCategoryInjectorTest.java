@@ -1,6 +1,5 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.business.transaction.data_injector.TransactionShippingFeeTangibleCategoryInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -16,6 +15,8 @@ import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
@@ -80,9 +81,75 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
 
-        // When + Then
+        // When
         Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);
 
+        // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void inject_ClassificationsMapContainShippingFeeTaxCode_TransactionModified() {
+        // Given
+        Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        ShippingFee shippingFeeThatExistInMap = transaction.getShippingFee().withTaxCode("C1S1");
+        Transaction givenTransaction = transaction.withShippingFee(shippingFeeThatExistInMap);
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(givenTransaction);
+        Transaction expectedTransaction = givenTransaction.withShippingFee(givenTransaction.getShippingFee().withTangibleCategory(TangibleCategory.TANGIBLE));
+
+        // When
+        Mono<Transaction> transactionMono = injector.inject(classifications);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(expectedTransaction).verifyComplete();
+    }
+
+    @Test
+    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeTangibleCategoryInjector() {
+        // Given + When
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+
+        // Then
+        assertEquals(transaction, injector.getTransaction());
+    }
+
+    @Test
+    void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnsTrue() {
+        // Given
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+
+        // When
+        boolean isEquals = injector.equals(secondInjector);
+
+        // Then
+        assertTrue(isEquals);
+
+    }
+
+    @Test
+    void shouldInject_NullShippingFee_ReturnsFalse() {
+        // Given
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction.withShippingFee(null));
+
+        // When
+        boolean shouldBeInjected = injector.shouldInject(null);
+
+        // Then
+        assertFalse(shouldBeInjected);
+    }
+
+    @Test
+    void shouldInject_TaxCodeExistInMap_ReturnsTrue() {
+        // Given
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        HashMap<String, ProductClassification> givenMap = new HashMap<String, ProductClassification>();
+        givenMap.put(transaction.getShippingFee().getTaxCode(), null);
+
+        // When
+        boolean shouldBeInjected = injector.shouldInject(givenMap);
+
+        // Then
+        assertTrue(shouldBeInjected);
     }
 }

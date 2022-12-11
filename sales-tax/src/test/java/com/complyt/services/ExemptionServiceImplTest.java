@@ -347,4 +347,16 @@ public class ExemptionServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
 
+    @Test
+    void save_NullExemption_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.save(nullExemption));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
 }

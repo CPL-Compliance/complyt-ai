@@ -1,11 +1,12 @@
 package com.complyt.domain.sales_tax.product_classification;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -15,8 +16,8 @@ public class JurisdictionalSalesTaxRulesTest {
 
     @BeforeEach
     void setUp() {
-        jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name","abbreviation",
-                true,true,CalculationType.PERCENTAGE,"description",0f,null);
+        jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name", "abbreviation",
+                true, true, CalculationType.PERCENTAGE, "description", 0f, null);
     }
 
     @Test
@@ -28,7 +29,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = notTaxAbleJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertFalse(isCalculatedByPercentage);
     }
 
     @Test
@@ -40,7 +41,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = noSpecialTreatmentJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertFalse(isCalculatedByPercentage);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = fixedCalculationTypeJurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(false,isCalculatedByPercentage);
+        assertFalse(isCalculatedByPercentage);
     }
 
     @Test
@@ -63,7 +64,39 @@ public class JurisdictionalSalesTaxRulesTest {
         boolean isCalculatedByPercentage = jurisdictionalSalesTaxRules.calculatedByPercentageCheck();
 
         // Then
-        Assertions.assertEquals(true,isCalculatedByPercentage);
+        assertTrue(isCalculatedByPercentage);
+    }
+
+    @Test
+    void toString_ReturnString() {
+        // Given
+        String expectedString = "JurisdictionalSalesTaxRules(name=" + jurisdictionalSalesTaxRules.getName() +
+                ", abbreviation=" + jurisdictionalSalesTaxRules.getAbbreviation() +
+                ", taxable=" + jurisdictionalSalesTaxRules.isTaxable() +
+                ", specialTreatment=" + jurisdictionalSalesTaxRules.isSpecialTreatment() +
+                ", calculationType=" + jurisdictionalSalesTaxRules.getCalculationType() +
+                ", description=" + jurisdictionalSalesTaxRules.getDescription() +
+                ", calculationValue=" + jurisdictionalSalesTaxRules.getCalculationValue() +
+                ", cities=" + jurisdictionalSalesTaxRules.getCities() + ")";
+
+        // When
+        String actualString = jurisdictionalSalesTaxRules.toString();
+
+        // Then
+        assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    void Equals_SameJurisdictionalSalesTaxRules_ReturnTrue() {
+        // Given
+        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name", "abbreviation",
+                true, true, CalculationType.PERCENTAGE, "description", 0f, null);
+
+        // When
+        boolean isEquals = jurisdictionalSalesTaxRules.equals(givenJurisdictionalSalesTaxRules);
+
+        // Then
+        assertTrue(isEquals);
     }
 
 }

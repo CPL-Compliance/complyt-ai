@@ -45,15 +45,17 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @Import(JacksonConfig.class)
 class TransactionControllerTest {
 
+    Transaction transactionWithId;
+
+    TransactionDto transactionDto;
+
+    TransactionController transactionController;
+
     @MockBean
     private TransactionFacade transactionFacade;
 
     @Autowired
     private WebTestClient webTestClient;
-
-    Transaction transactionWithId;
-
-    TransactionDto transactionDto;
 
     @BeforeEach
     void cleanUp() {
@@ -95,7 +97,7 @@ class TransactionControllerTest {
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> new TransactionController(facade));
 
-        assertEquals(nullPointerException.getMessage(), "transactionFacade is marked non-null but is null");
+        assertEquals("transactionFacade is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @WithUserDetails()
@@ -237,5 +239,67 @@ class TransactionControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @WithUserDetails()
+    @Test
+    void getOne_NullExternalId_ThrowsNullPointerException() {
+        //Given
+        String nullExternalId = null;
+        TransactionController transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.getOne(nullExternalId);
+        });
+
+        // Then
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsert_NullExternalId_ThrowsNullPointerException() {
+        //Given
+        String nullExternalId = null;
+        TransactionController transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.upsert(nullExternalId, transactionDto);
+        });
+
+        // Then
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsert_NullTransactionDto_ThrowsNullPointerException() {
+        //Given
+        String externalId = UUID.randomUUID().toString();
+        TransactionDto nullTransactionDto = null;
+        TransactionController transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.upsert(transactionDto.getExternalId(), nullTransactionDto);
+        });
+
+        // Then
+        assertEquals("transactionDto is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void delete_NullExternalId_ThrowsNullPointerException() {
+        //Given
+        String nullExternalId = null;
+        transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.delete(nullExternalId);
+        });
+
+        // Then
+        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
     }
 }

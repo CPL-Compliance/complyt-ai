@@ -37,10 +37,8 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
 
     @Mock
     QualificationChecker qualificationChecker;
-
-    private NexusStateRule nexusStateRule;
     Transaction transaction;
-
+    private NexusStateRule nexusStateRule;
 
     @BeforeEach
     void setUp() {

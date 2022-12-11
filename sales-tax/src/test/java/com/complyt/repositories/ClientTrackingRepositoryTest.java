@@ -49,7 +49,7 @@ public class ClientTrackingRepositoryTest {
     }
 
     private ClientTracking createClientTracking() {
-        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus( null));
+        return new ClientTracking(tenantId, UUID.randomUUID().toString(), new Nexus(null));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ClientTrackingRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query,ClientTracking.class)).thenReturn(Mono.just(clientTracking));
+        when(reactiveMongoTemplate.findOne(query, ClientTracking.class)).thenReturn(Mono.just(clientTracking));
 
         // Then
         Mono<ClientTracking> actualClientTracking = clientTrackingRepository.findClient();
@@ -104,7 +104,7 @@ public class ClientTrackingRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query,ClientTracking.class)).thenReturn(Mono.just(clientTracking));
+        when(reactiveMongoTemplate.findOne(query, ClientTracking.class)).thenReturn(Mono.just(clientTracking));
 
         // Then
         Mono<ClientTracking> actualClientTracking = clientTrackingRepository.findById(id);
@@ -122,7 +122,7 @@ public class ClientTrackingRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.find(query,ClientTracking.class)).thenReturn(Flux.fromIterable(clientTrackingList));
+        when(reactiveMongoTemplate.find(query, ClientTracking.class)).thenReturn(Flux.fromIterable(clientTrackingList));
 
         // Then
         Flux<ClientTracking> clientTrackingFlux = clientTrackingRepository.findAll();

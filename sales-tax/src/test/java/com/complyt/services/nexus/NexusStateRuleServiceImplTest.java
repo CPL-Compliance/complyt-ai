@@ -47,7 +47,7 @@ class NexusStateRuleServiceImplTest {
     }
 
     private NexusStateRule createNexusStateRule() {
-        State state = new State("CA","02","California");
+        State state = new State("CA", "02", "California");
         List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
             add(TaxableCategory.TAXABLE);
         }};
@@ -60,10 +60,10 @@ class NexusStateRuleServiceImplTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000,2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
 
-        return new NexusStateRule(UUID.randomUUID().toString(),true,state,taxableCategories,tangibleCategories,customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR,nexusThreshold);
+        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
     }
 
     @Test
@@ -117,7 +117,7 @@ class NexusStateRuleServiceImplTest {
     @Test
     void findAll_FindsTwoRules_ReturnsTwoRules() {
         // Given
-        State secondState = new State("NY","04","New-York");
+        State secondState = new State("NY", "04", "New-York");
         NexusStateRule secondRule = nexusStateRule
                 .withId(UUID.randomUUID().toString())
                 .withState(secondState);

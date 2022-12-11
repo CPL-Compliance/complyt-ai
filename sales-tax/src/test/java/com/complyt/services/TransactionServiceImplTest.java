@@ -1,8 +1,8 @@
 package com.complyt.services;
 
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.transaction.date_injector.ModifiedTransactionInternalDateInjector;
 import com.complyt.business.transaction.date_injector.NewTransactionInternalDateInjector;
-import com.complyt.business.transaction.CountyProvider;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -67,9 +67,7 @@ class TransactionServiceImplTest {
         String tenantId = UUID.randomUUID().toString();
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-                ));
+                add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
             }
         };
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
@@ -79,23 +77,13 @@ class TransactionServiceImplTest {
 
     private Customer createCustomer() {
 
-        return new Customer(
-                transaction.getCustomerId().toString(),
-                UUID.randomUUID().toString(),
-                "name",
-                null,
-                UUID.randomUUID().toString(),
-                CustomerType.RETAIL
-        );
+        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
 
-        Item item = transaction.getItems().get(0)
-                .withTaxableCategory(TaxableCategory.TAXABLE)
-                .withTangibleCategory(TangibleCategory.TANGIBLE)
-                .withJurisdictionalSalesTaxRules(rules);
+        Item item = transaction.getItems().get(0).withTaxableCategory(TaxableCategory.TAXABLE).withTangibleCategory(TangibleCategory.TANGIBLE).withJurisdictionalSalesTaxRules(rules);
 
         List<Item> modifiedItems = new ArrayList<Item>() {{
             add(item);
@@ -105,8 +93,7 @@ class TransactionServiceImplTest {
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+        return new JurisdictionalSalesTaxRules("California", "CA", true, false, CalculationType.FIXED, "description", 0, null);
     }
 
     @Test
@@ -291,8 +278,7 @@ class TransactionServiceImplTest {
         }};
         LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
         LocalDateTime end = start.plusYears(1);
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
-                .gte(start).lte(end));
+        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate").gte(start).lte(end));
 
         // When
         when(transactionRepository.findAllByQuery(query)).thenReturn(Flux.fromIterable(allTransactions));
@@ -336,38 +322,33 @@ class TransactionServiceImplTest {
         // Given
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
 
-        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
-                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
         NewTransactionInternalDateInjector injector = new NewTransactionInternalDateInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
-        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction))
-                .thenReturn(Mono.just(transactionWithProductClassification));
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)).thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
-        StepVerifier.create(transactionMono)
-                .expectNextMatches(transaction -> {
-                    LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-                    LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
 
-                    LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
-                    LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
 
-                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
-                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
-                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
-                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
-                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
-                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
-                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
-                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
-                })
-                .expectComplete()
-                .verify();
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
+        }).expectComplete().verify();
     }
 
     @Test
@@ -376,38 +357,33 @@ class TransactionServiceImplTest {
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction newTransaction = transactionWithCustomer.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
-        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification
-                .withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
+        Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
         ModifiedTransactionInternalDateInjector injector = new ModifiedTransactionInternalDateInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
-        when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction))
-                .thenReturn(Mono.just(transactionWithProductClassification));
+        when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction)).thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transactionWithCustomer);
 
         // Then
-        StepVerifier.create(transactionMono)
-                .expectNextMatches(transaction -> {
-                    LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-                    LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+        StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
 
-                    LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
-                    LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
 
-                    return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
-                            expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
-                            expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
-                            expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
-                            expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
-                            expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
-                            expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
-                            expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
-                })
-                .expectComplete()
-                .verify();
+            return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
+                    expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
+                    expectedUpdatedDateTime.getDayOfYear() == actualUpdatedDateTime.getDayOfYear() &&
+                    expectedUpdatedDateTime.getHour() == actualUpdatedDateTime.getHour() &&
+                    expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
+                    expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
+                    expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
+        }).expectComplete().verify();
     }
 
     @Test

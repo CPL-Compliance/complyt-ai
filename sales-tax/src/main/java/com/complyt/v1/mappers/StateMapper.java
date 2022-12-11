@@ -11,5 +11,6 @@ public interface StateMapper {
     StateMapper INSTANCE = Mappers.getMapper(StateMapper.class);
 
     StateDto stateToStateDto(State state);
+
     State stateDtoToState(StateDto stateDto);
 }

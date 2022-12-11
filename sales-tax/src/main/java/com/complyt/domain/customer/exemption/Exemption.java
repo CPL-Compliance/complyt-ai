@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 @With
 @ToString
+@Builder
 @Document(collection = "exemption")
 public class Exemption {
     @Id

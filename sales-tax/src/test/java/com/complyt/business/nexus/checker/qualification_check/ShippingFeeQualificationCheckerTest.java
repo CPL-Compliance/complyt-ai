@@ -70,7 +70,7 @@ public class ShippingFeeQualificationCheckerTest {
         // Given
 
         // When + Then
-        boolean isQualified = qualificationChecker.isQualified(shippingFee,nexusStateRule);
+        boolean isQualified = qualificationChecker.isQualified(shippingFee, nexusStateRule);
         assertTrue(isQualified);
     }
 
@@ -81,7 +81,7 @@ public class ShippingFeeQualificationCheckerTest {
         ShippingFee notTaxableShippingFee = shippingFee.withTaxableCategory(TaxableCategory.NOT_TAXABLE);
 
         // When + Then
-        boolean isQualified = qualificationChecker.isQualified(notTaxableShippingFee,nexusStateRule);
+        boolean isQualified = qualificationChecker.isQualified(notTaxableShippingFee, nexusStateRule);
         assertFalse(isQualified);
     }
 
@@ -91,7 +91,7 @@ public class ShippingFeeQualificationCheckerTest {
         ShippingFee notTangibleShippingFee = shippingFee.withTangibleCategory(TangibleCategory.INTANGIBLE);
 
         // When + Then
-        boolean isQualified = qualificationChecker.isQualified(notTangibleShippingFee,nexusStateRule);
+        boolean isQualified = qualificationChecker.isQualified(notTangibleShippingFee, nexusStateRule);
         assertFalse(isQualified);
     }
 
@@ -101,7 +101,7 @@ public class ShippingFeeQualificationCheckerTest {
         ShippingFee nullShippingFee = null;
 
         // When + Then
-        boolean isQualified = qualificationChecker.isQualified(nullShippingFee,nexusStateRule);
+        boolean isQualified = qualificationChecker.isQualified(nullShippingFee, nexusStateRule);
         assertFalse(isQualified);
     }
 
