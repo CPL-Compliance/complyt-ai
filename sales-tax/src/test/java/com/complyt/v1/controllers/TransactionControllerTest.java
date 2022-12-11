@@ -110,7 +110,7 @@ class TransactionControllerTest {
         when(transactionFacade.findByExternalId(transactionDto.getExternalId())).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transactionWithSalesTax));
 
-        TransactionDto transactionDtoWithSalesTax = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithSalesTax);
+        TransactionDto expectedTransactionDtoWithSalesTax = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithSalesTax);
 
         webTestClient
                 .mutateWith(csrf())
@@ -123,7 +123,7 @@ class TransactionControllerTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDtoItem -> transactionDtoItem, equalTo(transactionDtoWithSalesTax));
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransactionDtoWithSalesTax));
     }
 
     @WithUserDetails()

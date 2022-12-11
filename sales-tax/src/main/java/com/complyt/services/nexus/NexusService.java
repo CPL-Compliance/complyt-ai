@@ -90,13 +90,13 @@ public class NexusService {
     }
 
     public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule, LocalDateTime referenceDate, String state) {
-        NexusCalculationSummary summary = nexusCalculator.calculate(transactions, stateRule);
-        boolean passedThreshold = nexusChecker.passedThreshold(summary, stateRule);
-
-        return findTrackingByState(state)
-                .flatMap(salesTaxTracking -> passedThreshold ?
-                        salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate) :
-                        Mono.just(salesTaxTracking)
-                );
+        return nexusCalculator.calculate(transactions, stateRule)
+                .map(nexusCalculationSummary -> nexusChecker.passedThreshold(nexusCalculationSummary, stateRule))
+                .flatMap(passedThreshold -> findTrackingByState(state)
+                        .flatMap(salesTaxTracking -> passedThreshold ?
+                                salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate) :
+                                Mono.just(salesTaxTracking)
+                        ));
     }
+
 }

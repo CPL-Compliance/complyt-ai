@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class CustomerFullyExemptionCheckTest {
 
-    CustomerFullyExemptionCheck customerFullyExemptionCheck;
+    CustomerFullyExemptionChecker customerFullyExemptionChecker;
     Transaction transaction;
 
     Exemption exemption;
@@ -32,8 +32,8 @@ public class CustomerFullyExemptionCheckTest {
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
+        customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
         exemption = createExemption();
-        customerFullyExemptionCheck = new CustomerFullyExemptionCheck(transaction);
     }
 
     private Transaction createTransaction() {
@@ -49,7 +49,7 @@ public class CustomerFullyExemptionCheckTest {
         ));
         TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
     }
 
     private Exemption createExemption() {
@@ -71,7 +71,7 @@ public class CustomerFullyExemptionCheckTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerFullyExemptionCheck.check(nullExemption);
+            customerFullyExemptionChecker.check(nullExemption);
         });
 
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
@@ -83,7 +83,7 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption;
 
         // When
-        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
 
         // Then
         assertTrue(isExempted);
@@ -95,7 +95,7 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When
-        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
 
         // Then
         assertFalse(isExempted);
@@ -107,7 +107,7 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
 
         // When
-        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
 
         // Then
         assertFalse(isExempted);
@@ -119,7 +119,7 @@ public class CustomerFullyExemptionCheckTest {
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
 
         // When
-        boolean isExempted = customerFullyExemptionCheck.check(expectedExemption);
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
 
         // Then
         assertFalse(isExempted);

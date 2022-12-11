@@ -32,5 +32,5 @@ public class Transaction {
     private final TimeStamps externalTimeStamps;
     private final TransactionType transactionType;
     private final ShippingFee shippingFee;
-
+    private final String createdFrom;
 }

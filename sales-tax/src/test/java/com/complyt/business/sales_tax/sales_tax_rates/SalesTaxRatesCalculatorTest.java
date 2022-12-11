@@ -71,10 +71,12 @@ public class SalesTaxRatesCalculatorTest {
     void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate() {
         // Given
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules.withCalculationType(CalculationType.PERCENTAGE);
+        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRateByService.getTaxRate();
+        SalesTaxRate expectedSalesTaxRate = salesTaxRateByService.withTaxRate(calculatedRate);
 
         // When + Then
         SalesTaxRate returnedRate = salesTaxRatesProvider.calculateSalesTaxRate(percentageCalculationTypeRule, salesTaxRateByService);
-        Assertions.assertEquals(salesTaxRateByService, returnedRate);
+        Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
     }
 
     @Test

@@ -46,7 +46,7 @@ public class TransactionMapperTest {
         };
         TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
 
     private TransactionDto createTransactionDto() {
@@ -62,7 +62,7 @@ public class TransactionMapperTest {
         };
         TimeStampsDto timeStamps = new TimeStampsDto(localDateTime, localDateTime);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
-        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto);
+        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
 
     private ShippingFee createShippingFee() {

@@ -55,7 +55,7 @@ public class TransactionsFilterByNexusRulesTest {
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
         customer = createCustomer(customerId, tenantId, shippingAddress);
-        invoiceTransaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE, null);
+        invoiceTransaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE, null, null);
         salesOrderTransaction = invoiceTransaction
                 .withId(UUID.randomUUID().toString())
                 .withExternalId(UUID.randomUUID().toString())
@@ -120,6 +120,22 @@ public class TransactionsFilterByNexusRulesTest {
         assertNotNull(filteredTransactions);
         assertEquals(1, filteredTransactions.size());
         assertEquals(filteredTransactions.get(0), invoiceTransaction);
+    }
+
+    @Test
+    void filter_FiltersBecauseTransactionIsOfStatusCancelled_ReturnsZeroTransactions() {
+        // Given
+        Transaction transaction = invoiceTransaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        List<Transaction> transactions = new ArrayList<>() {{
+            add(transaction);
+        }};
+
+        // When
+        List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
+
+        // Then
+        assertNotNull(filteredTransactions);
+        assertEquals(0, filteredTransactions.size());
     }
 
     @Test

@@ -25,14 +25,7 @@ public interface Taxable {
             return getManualSalesTaxAmount();
         }
 
-        return handleSalesTaxAmountCalculation();
-    }
-
-    private float handleSalesTaxAmountCalculation() {
-        if (getJurisdictionalSalesTaxRules().calculatedByPercentageCheck()) {
-            return getTotalPrice() * getJurisdictionalSalesTaxRules().getCalculationValue() * getSalesTaxRate().getTaxRate();
-        }
-
         return getTotalPrice() * getSalesTaxRate().getTaxRate();
     }
+
 }

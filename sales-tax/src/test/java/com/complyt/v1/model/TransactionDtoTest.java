@@ -2,6 +2,8 @@ package com.complyt.v1.model;
 
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +44,7 @@ class TransactionDtoTest {
         };
         TimeStampsDto timeStamps = new TimeStampsDto(localDateTime, localDateTime);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
-        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto);
+        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
 
     private ShippingFeeDto createShippingFeeDto() {
@@ -64,10 +66,14 @@ class TransactionDtoTest {
                 ", billingAddress=" + transactionDto.getBillingAddress() +
                 ", shippingAddress=" + transactionDto.getShippingAddress() +
                 ", customerId=" + transactionDto.getCustomerId() +
-                ", customer=null, salesTax=null, transactionStatus=" + transactionDto.getTransactionStatus() +
+                ", customer=" + transactionDto.getCustomer() +
+                ", salesTax=" + transactionDto.getSalesTax() +
+                ", transactionStatus=" + transactionDto.getTransactionStatus() +
                 ", internalTimeStamps=" + transactionDto.getInternalTimeStamps() +
                 ", externalTimeStamps=" + transactionDto.getExternalTimeStamps() +
-                ", transactionType=INVOICE, shippingFee=" + transactionDto.getShippingFee() + ")";
+                ", transactionType=" + transactionDto.getTransactionType() +
+                ", shippingFee=" + transactionDto.getShippingFee() +
+                ", createdFrom=" + transactionDto.getCreatedFrom() + ")";
 
         // When
         String actualString = transactionDto.toString();
