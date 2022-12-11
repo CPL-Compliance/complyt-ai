@@ -1,5 +1,4 @@
 spring:
-  security.oauth2.resourceserver.jwt.issuer-uri: https://development-complyt.us.auth0.com/
   cloud:
     vault:
       enabled: false
@@ -21,5 +20,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 management.endpoints.web.exposure.include: "*"
-
-auth0.audience: https://sales-tax-service/

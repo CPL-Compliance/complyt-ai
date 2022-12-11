@@ -4,35 +4,3 @@ eureka:
       defaultZone: ${discovery-service-uri}
   instance:
     prefer-ip-address: true
-
-spring:
-  security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
-  config.import: vault://
-  cloud:
-    # Spring Cloud Vault configuration
-    # To understand what every field stands for visit
-    # https://cloud.spring.io/spring-cloud-vault/reference/html/
-    vault:
-      enabled: true
-      application-name: api-gateway-service
-      host: vault-cluster-public-vault-136adda2.66341e3c.z1.hashicorp.cloud
-      port: 8200
-      scheme: https
-      namespace: admin
-      fail-fast: true
-      config:
-        lifecycle:
-          enabled: true
-          min-renewal: 10s
-          expiry-threshold: 1m
-      authentication: APPROLE
-      app-role:
-        role-id: 7fef17fe-e7f7-17f6-7b25-e7a05ab68204
-        secret-id: 4a4411da-bff4-d51a-9a9a-5561031b5260
-        role: api-gateway-role
-        app-role-path: approle
-      kv:
-        enabled: true
-        default-context:
-
-auth0.audience: https://production-complyt.us.auth0.com/
