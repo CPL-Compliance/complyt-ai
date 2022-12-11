@@ -1,12 +1,9 @@
-server:
-  port: ${PORT:9898}
-
 eureka:
-  instance:
-    ip-address:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+  instance:
+    prefer-ip-address: true
 
 spring:
   data:

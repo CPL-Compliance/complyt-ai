@@ -1,6 +1,3 @@
-server:
-  port: ${PORT:9898}
-
 eureka:
   client:
     serviceUrl:

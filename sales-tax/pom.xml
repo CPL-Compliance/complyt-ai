@@ -29,7 +29,7 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Boot Starter Dependencies -->
+        <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
@@ -58,9 +58,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        <!-- Spring Boot Starter Dependencies -->
+        <!-- Spring Boot Starter -->
 
-        <!-- Spring Cloud Vault Dependencies -->
+        <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-vault-config</artifactId>
@@ -69,9 +69,9 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-vault-config-databases</artifactId>
         </dependency>
-        <!-- Spring Cloud Vault Dependencies -->
+        <!-- Spring Cloud Vault -->
 
-        <!-- Spring Cloud Feign Dependencies -->
+        <!-- Spring Cloud Feign -->
         <dependency>
             <groupId>com.playtika.reactivefeign</groupId>
             <artifactId>feign-reactor-webclient</artifactId>
@@ -91,14 +91,14 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-slf4j</artifactId>
         </dependency>
-        <!-- Spring Cloud Feign Dependencies -->
+        <!-- Spring Cloud Feign -->
 
-        <!-- Spring Cloud Eureka Dependencies -->
+        <!-- Spring Cloud Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-        <!-- Spring Cloud Eureka Dependencies -->
+        <!-- Spring Cloud Eureka -->
 
         <!-- Test Dependencies -->
         <dependency>
@@ -121,9 +121,9 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Test Dependencies -->
+        <!-- Test -->
 
-        <!-- Other Dependencies -->
+        <!-- Other -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -141,7 +141,7 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
         </dependency>
-        <!-- Other Dependencies -->
+        <!-- Other -->
     </dependencies>
 
     <build>
