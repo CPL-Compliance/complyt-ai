@@ -3,6 +3,17 @@ spring:
   cloud:
     vault:
       enabled: false
+    gateway:
+      routes:
+        # ==== Test Service ====
+        - id: test-app-hi
+          uri: lb://test-application
+          predicates:
+            - Method=GET
+            - Path=/hi
+          filters:
+            - SetPath=/hi
+        # ==== Test Service ====
 
 eureka:
   client:

@@ -127,11 +127,4 @@ spring:
           filters:
             - SetPath=/v1/exemptions/{id}
       # ---- Exemption ----
-        - id: test-app-hi
-          uri: lb://test-application
-          predicates:
-            - Method=GET
-            - Path=/hi
-          filters:
-            - SetPath=/hi
       # ==== Sales Tax Service ====
