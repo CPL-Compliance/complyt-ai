@@ -1,7 +1,5 @@
-server:
-  port: 8765
-
-auth0.audience: https://sales-tax-service/
+server.port: ${PORT:8765}
+auth0.audience: ${audience}
 
 spring:
   application:

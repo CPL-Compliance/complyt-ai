@@ -1,13 +1,10 @@
 spring.application.name: sales-tax
 
-server:
-  port: ${PORT:9898}
+server.port: ${PORT:9898}
 
-spring:
-  profiles:
-    active:
-      - @activeEnv@
-      - @activeTaxClient@
+spring.profiles.active:
+  - @activeEnv@
+  - @activeTaxClient@
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
@@ -41,13 +38,8 @@ spring.cloud.vault:
 
 spring.config.import: vault://
 
-auth0:
-  audience: https://sales-tax-service/
+auth0.audience: ${audience}
 
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
-spring.security:
-  oauth2:
-    resourceserver:
-      jwt:
-        issuer-uri: ${issuer-uri}
+spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
