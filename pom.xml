@@ -57,6 +57,7 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <!-- Plugins -->
         <netty-resolver-dns-native-macos.version>4.1.76.Final</netty-resolver-dns-native-macos.version>
+        <mockito-inline.version>4.2.0</mockito-inline.version>
     </properties>
 
     <!-- All the dependencies under dependencyManagement aren't transitive. -->
@@ -92,19 +93,16 @@
                 <artifactId>feign-reactor-webclient</artifactId>
                 <version>${feign-reactor.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.playtika.reactivefeign</groupId>
                 <artifactId>feign-reactor-cloud</artifactId>
                 <version>${feign-reactor.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.playtika.reactivefeign</groupId>
                 <artifactId>feign-reactor-spring-configuration</artifactId>
                 <version>${feign-reactor.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-slf4j</artifactId>
@@ -149,6 +147,12 @@
                 <artifactId>mockito-junit-jupiter</artifactId>
                 <scope>test</scope>
                 <version>${mockito-junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito-inline.version}</version>
+                <scope>test</scope>
             </dependency>
             <!-- Test Dependencies -->
 
