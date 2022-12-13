@@ -4,7 +4,6 @@ import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,14 +12,15 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@AllArgsConstructor
+
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionShippingFeeTangibleCategoryInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeDataInjector {
 
-    @NonNull
-    private final Transaction transaction;
+    public TransactionShippingFeeTangibleCategoryInjector(@NonNull Transaction transaction) {
+        super(transaction);
+    }
 
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
@@ -36,20 +36,6 @@ public class TransactionShippingFeeTangibleCategoryInjector implements Transacti
 
             return transaction.withShippingFee(shippingFee);
         });
-    }
-
-    @Override
-    public boolean shouldInject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        if (transaction.getShippingFee() == null) {
-            log.debug("Transaction doesn't have shipping fee");
-            return false;
-        }
-        if (!mapTaxCodesToClassifications.containsKey(transaction.getShippingFee().getTaxCode())) {
-            log.debug("Shipping fee's tax code does not exist in given classifications list - not injecting jurisdictional rules to it");
-            return false;
-        }
-
-        return true;
     }
 }
 

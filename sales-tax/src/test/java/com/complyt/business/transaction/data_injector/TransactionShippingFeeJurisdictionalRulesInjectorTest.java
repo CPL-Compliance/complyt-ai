@@ -16,7 +16,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
@@ -139,15 +139,6 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeJurisdictionalRulesInjector() {
-        // Given + When
-        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
-
-        // Then
-        assertEquals(transaction, injector.getTransaction());
-    }
-
-    @Test
     void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
@@ -158,19 +149,5 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
         // Then
         assertTrue(isEquals);
-
     }
-
-    @Test
-    void shouldInject_NullShippingFee_ReturnsFalse() {
-        // Given
-        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction.withShippingFee(null));
-
-        // When
-        boolean shouldBeInjected = injector.shouldInject(null);
-
-        // Then
-        assertFalse(shouldBeInjected);
-    }
-
 }

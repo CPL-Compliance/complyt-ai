@@ -4,7 +4,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/alex
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/tomer
 
 logging:
   level:

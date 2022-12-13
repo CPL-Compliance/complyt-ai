@@ -16,7 +16,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
@@ -105,15 +105,6 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeTangibleCategoryInjector() {
-        // Given + When
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-
-        // Then
-        assertEquals(transaction, injector.getTransaction());
-    }
-
-    @Test
     void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
@@ -124,32 +115,5 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
         // Then
         assertTrue(isEquals);
-
-    }
-
-    @Test
-    void shouldInject_NullShippingFee_ReturnsFalse() {
-        // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction.withShippingFee(null));
-
-        // When
-        boolean shouldBeInjected = injector.shouldInject(null);
-
-        // Then
-        assertFalse(shouldBeInjected);
-    }
-
-    @Test
-    void shouldInject_TaxCodeExistInMap_ReturnsTrue() {
-        // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        HashMap<String, ProductClassification> givenMap = new HashMap<String, ProductClassification>();
-        givenMap.put(transaction.getShippingFee().getTaxCode(), null);
-
-        // When
-        boolean shouldBeInjected = injector.shouldInject(givenMap);
-
-        // Then
-        assertTrue(shouldBeInjected);
     }
 }
