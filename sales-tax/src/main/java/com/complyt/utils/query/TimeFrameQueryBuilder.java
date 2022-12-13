@@ -28,10 +28,10 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
     public Query buildNexusTimeFrame(@NonNull Nexus nexusInfo, @NonNull NexusStateRule nexusStateRule, @NonNull LocalDateTime referenceDate) {
         TimeFrame timeFrame = nexusStateRule.getTimeFrame();
         LocalDateTime taxableDate = nexusInfo.getTaxableDate();
-        
+
         DateRangeStrategy dateRangeStrategy = new DateRangeStrategy(timeFrame, taxableDate, referenceDate);
         DateRange dateRange = dateRangeStrategy.getDateRange();
-        
+
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() +
                 " , end date : " + dateRange.getEnd());
 

@@ -5,6 +5,6 @@ import com.complyt.services.crud.CrudService;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-public interface NexusStateRuleService extends CrudService <NexusStateRule,String> {
+public interface NexusStateRuleService extends CrudService<NexusStateRule, String> {
     Mono<NexusStateRule> findByState(@NonNull String state);
 }

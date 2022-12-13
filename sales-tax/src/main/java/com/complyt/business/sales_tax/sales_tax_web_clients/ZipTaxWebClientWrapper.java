@@ -2,7 +2,6 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;

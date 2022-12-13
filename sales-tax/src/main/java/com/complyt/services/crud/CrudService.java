@@ -6,6 +6,8 @@ import reactor.core.publisher.Mono;
 
 public interface CrudService<T, ID> {
     Mono<T> save(T object);
+
     Mono<T> findById(@NonNull final ID id);
+
     Flux<T> findAll();
 }

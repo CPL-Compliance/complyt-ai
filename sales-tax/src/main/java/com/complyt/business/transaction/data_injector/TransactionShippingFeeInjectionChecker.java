@@ -13,7 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Getter
 @Slf4j
-public abstract class TransactionShippingFeeDataInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+public abstract class TransactionShippingFeeInjectionChecker implements TransactionDataInjector<Map<String, ProductClassification>> {
 
     @NonNull
     protected final Transaction transaction;

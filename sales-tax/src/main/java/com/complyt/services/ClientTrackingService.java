@@ -5,7 +5,8 @@ import com.complyt.domain.Nexus;
 import com.complyt.services.crud.CrudService;
 import reactor.core.publisher.Mono;
 
-public interface ClientTrackingService extends CrudService<ClientTracking,String> {
+public interface ClientTrackingService extends CrudService<ClientTracking, String> {
     Mono<Nexus> getNexusInfo();
+
     Mono<ClientTracking> getClientTracking();
 }

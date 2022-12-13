@@ -7,7 +7,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface SalesTaxDataToSalesTaxRateMapper {
-    SalesTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper( SalesTaxDataToSalesTaxRateMapper.class );
+    SalesTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(SalesTaxDataToSalesTaxRateMapper.class);
 
     SalesTaxRate map(SalesTaxData salesTaxData);
 }

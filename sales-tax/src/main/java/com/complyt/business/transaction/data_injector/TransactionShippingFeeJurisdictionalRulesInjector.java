@@ -7,7 +7,6 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -17,9 +16,9 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeDataInjector {
+public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeInjectionChecker {
 
-    public TransactionShippingFeeJurisdictionalRulesInjector( Transaction transaction) {
+    public TransactionShippingFeeJurisdictionalRulesInjector(Transaction transaction) {
         super(transaction);
     }
 

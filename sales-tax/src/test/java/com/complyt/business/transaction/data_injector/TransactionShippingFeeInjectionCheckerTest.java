@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionShippingFeeDataInjectorTest {
+class TransactionShippingFeeInjectionCheckerTest {
 
 
     @Mock
-    private TransactionShippingFeeDataInjector injector;
+    private TransactionShippingFeeInjectionChecker injector;
 
     private Transaction transaction;
 
@@ -48,7 +47,7 @@ class TransactionShippingFeeDataInjectorTest {
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                        null, new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
                 ));
             }
         };
@@ -107,7 +106,7 @@ class TransactionShippingFeeDataInjectorTest {
     }
 
     @Test
-    void shouldInject_TransactionWithoutShippingFree_ReturnsFalse() {
+    void shouldInject_TransactionWithoutShippingFee_ReturnsFalse() {
         // Given
         Map<String, ProductClassification> map = createMapTaxCodesToClassificationsWithTaxableRule("C6S1");
         ShippingFee nullShippingFee = null;
@@ -123,23 +122,7 @@ class TransactionShippingFeeDataInjectorTest {
     }
 
     @Test
-    void defaultConstructor_NullTransaction_ReturnsNullException() {
-        // Given + When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            new TransactionShippingFeeDataInjector(null) {
-                @Override
-                public Mono<Transaction> inject(Map<String, ProductClassification> stringProductClassificationMap) {
-                    return null;
-                }
-            };
-        });
-
-        // Then
-        assertEquals("transaction is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void getTransaction_OkTransaction_ReturnsInstance() {
+    void getTransaction_InjectorContainInitiatedTransactionObject_ReturnsInstance() {
         // Given + When
         when(injector.getTransaction()).thenCallRealMethod();
         Transaction receivedTransaction = injector.getTransaction();

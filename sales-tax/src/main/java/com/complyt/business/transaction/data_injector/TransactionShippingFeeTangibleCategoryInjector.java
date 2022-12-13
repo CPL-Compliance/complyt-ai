@@ -6,7 +6,6 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -16,9 +15,9 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeDataInjector {
+public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeInjectionChecker {
 
-    public TransactionShippingFeeTangibleCategoryInjector( Transaction transaction) {
+    public TransactionShippingFeeTangibleCategoryInjector(Transaction transaction) {
         super(transaction);
     }
 
