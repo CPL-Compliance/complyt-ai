@@ -118,7 +118,7 @@ class TransactionShippingFeeDataInjectorTest {
     void defaultConstructor_NullTransaction_ReturnsNullException() {
         // Given + When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            TransactionShippingFeeDataInjector givenInjector = new TransactionShippingFeeDataInjector(null) {
+            new TransactionShippingFeeDataInjector(null) {
                 @Override
                 public Mono<Transaction> inject(Map<String, ProductClassification> stringProductClassificationMap) {
                     return null;
