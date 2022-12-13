@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeDataInjector {
 
-    public TransactionShippingFeeJurisdictionalRulesInjector(@NonNull Transaction transaction) {
+    public TransactionShippingFeeJurisdictionalRulesInjector( Transaction transaction) {
         super(transaction);
     }
 

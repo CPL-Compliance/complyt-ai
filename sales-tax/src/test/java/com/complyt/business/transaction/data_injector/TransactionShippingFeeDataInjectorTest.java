@@ -10,6 +10,9 @@ import com.complyt.domain.sales_tax.product_classification.ProductClassification
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Mono;
 
@@ -17,20 +20,21 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class TransactionShippingFeeDataInjectorTest {
 
 
-    TransactionShippingFeeDataInjector injector;
+    @Mock
+    private TransactionShippingFeeDataInjector injector;
 
-    Transaction transaction;
+    private Transaction transaction;
 
     @BeforeEach
     void setup() {
-        transaction = createTransaction(createShippingFee("C6S1"));
-        injector = mock(TransactionShippingFeeDataInjector.class);
+        ShippingFee shippingFee = createShippingFee("C6S1");
+        transaction = createTransaction(shippingFee);
         ReflectionTestUtils.setField(injector, "transaction", transaction, Transaction.class);
     }
 
@@ -83,9 +87,10 @@ class TransactionShippingFeeDataInjectorTest {
 
         // When
         when(injector.shouldInject(map)).thenCallRealMethod();
+        boolean shouldInject = injector.shouldInject(map);
 
         // Then
-        assertTrue(injector.shouldInject(map));
+        assertTrue(shouldInject);
     }
 
     @Test
@@ -95,23 +100,26 @@ class TransactionShippingFeeDataInjectorTest {
 
         // When
         when(injector.shouldInject(map)).thenCallRealMethod();
+        boolean shouldInject = injector.shouldInject(map);
 
         // Then
-        assertFalse(injector.shouldInject(map));
+        assertFalse(shouldInject);
     }
 
     @Test
     void shouldInject_TransactionWithoutShippingFree_ReturnsFalse() {
         // Given
         Map<String, ProductClassification> map = createMapTaxCodesToClassificationsWithTaxableRule("C6S1");
-        Transaction givenTransaction = transaction.withShippingFee(null);
+        ShippingFee nullShippingFee = null;
+        Transaction givenTransaction = transaction.withShippingFee(nullShippingFee);
         ReflectionTestUtils.setField(injector, "transaction", givenTransaction, Transaction.class);
 
         // When
         when(injector.shouldInject(map)).thenCallRealMethod();
+        boolean shouldInject = injector.shouldInject(map);
 
         // Then
-        assertFalse(injector.shouldInject(map));
+        assertFalse(shouldInject);
     }
 
     @Test
@@ -134,8 +142,9 @@ class TransactionShippingFeeDataInjectorTest {
     void getTransaction_OkTransaction_ReturnsInstance() {
         // Given + When
         when(injector.getTransaction()).thenCallRealMethod();
+        Transaction receivedTransaction = injector.getTransaction();
 
         // Then
-        assertEquals(transaction, injector.getTransaction());
+        assertEquals(transaction, receivedTransaction);
     }
 }

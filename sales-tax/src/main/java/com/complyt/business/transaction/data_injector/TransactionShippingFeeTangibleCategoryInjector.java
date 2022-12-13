@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeDataInjector {
 
-    public TransactionShippingFeeTangibleCategoryInjector(@NonNull Transaction transaction) {
+    public TransactionShippingFeeTangibleCategoryInjector( Transaction transaction) {
         super(transaction);
     }
 
