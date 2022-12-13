@@ -16,7 +16,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
@@ -115,5 +115,19 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
         // Then
         assertTrue(isEquals);
+    }
+
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new TransactionShippingFeeTangibleCategoryInjector(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
 }

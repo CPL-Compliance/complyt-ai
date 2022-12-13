@@ -16,7 +16,7 @@ import reactor.test.StepVerifier;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
@@ -149,5 +149,19 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
         // Then
         assertTrue(isEquals);
+    }
+
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new TransactionShippingFeeJurisdictionalRulesInjector(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
 }
