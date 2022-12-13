@@ -61,15 +61,19 @@ public class SalesTaxTrackingRepositoryTest {
     @Test
     void findByState_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        String stateAbbreviation = salesTaxTracking.getState().getAbbreviation();
-        Query query = Query.query(Criteria.where("state.abbreviation").is(stateAbbreviation).and("tenantId").is(tenantId));
+        String state = salesTaxTracking.getState().getAbbreviation();
+        Criteria stateSearchCriteria = new Criteria()
+                .orOperator(Criteria.where("state.abbreviation").is(state),
+                        Criteria.where("state.name").is(state));
+
+        Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
         when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByState(stateAbbreviation);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingRepository.findByState(state);
 
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
