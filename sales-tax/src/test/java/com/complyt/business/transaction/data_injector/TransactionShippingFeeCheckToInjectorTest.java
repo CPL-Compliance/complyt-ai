@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionShippingFeeInjectionCheckerTest {
+class TransactionShippingFeeCheckToInjectorTest {
 
 
     @Mock
-    private TransactionShippingFeeInjectionChecker injector;
+    private TransactionShippingFeeCheckToInjector injector;
 
     private Transaction transaction;
 

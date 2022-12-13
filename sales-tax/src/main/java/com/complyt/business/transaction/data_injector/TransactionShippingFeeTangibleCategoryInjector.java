@@ -15,7 +15,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Slf4j
-public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeInjectionChecker {
+public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeCheckToInjector {
 
     public TransactionShippingFeeTangibleCategoryInjector(Transaction transaction) {
         super(transaction);

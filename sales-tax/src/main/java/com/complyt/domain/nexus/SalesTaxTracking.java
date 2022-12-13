@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @ToString
 @Document(collection = "sales_tax_tracking")
 public class SalesTaxTracking {
-    private final String tenantId;
     @Id
     private String id;
     private State state;
+    private final String tenantId;
     private boolean enforcesSalesTax;
     private PhysicalNexusTracker physicalNexusTracker;
     private EconomicNexusTracker economicNexusTracker;

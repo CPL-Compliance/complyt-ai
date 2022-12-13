@@ -19,7 +19,7 @@ public class ShippingFeeDto {
     private final float totalPrice;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRate salesTaxRate;
+    private String taxCode;
     private final TaxableCategoryDto taxableCategory;
     private final TangibleCategoryDto tangibleCategory;
-    private String taxCode;
 }

@@ -14,11 +14,11 @@ import java.util.Map;
 @ToString
 @Document(collection = "product_classification")
 public class ProductClassification {
+    @Id
+    private String id;
     private final String taxCode;
     private final String description;
     private final String title;
-    private final Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
-    @Id
-    private String id;
+    private final Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
     private TangibleCategory tangibleCategory;
 }
