@@ -3,6 +3,7 @@ package com.complyt.business.transaction.data_injector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @Getter
 @Slf4j
-public abstract class TransactionShippingFeeCheckToInjector implements TransactionDataInjector<Map<String, ProductClassification>> {
+public abstract class TransactionShippingFeeInjectionChecker implements TransactionDataInjector<Map<String, ProductClassification>> {
 
     @NonNull
     protected final Transaction transaction;

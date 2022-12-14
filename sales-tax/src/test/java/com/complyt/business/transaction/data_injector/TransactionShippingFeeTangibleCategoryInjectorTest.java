@@ -118,6 +118,20 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
+    void equals_DifferentTransactionShippingFeeTangibleCategoryInjector_ReturnsFalse() {
+        // Given
+        Transaction differentTransaction = transaction.withId(UUID.randomUUID().toString());
+        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
+        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(differentTransaction);
+
+        // When
+        boolean isEquals = injector.equals(secondInjector);
+
+        // Then
+        assertFalse(isEquals);
+    }
+
+    @Test
     void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
         // Given
         Transaction nullTransaction = null;

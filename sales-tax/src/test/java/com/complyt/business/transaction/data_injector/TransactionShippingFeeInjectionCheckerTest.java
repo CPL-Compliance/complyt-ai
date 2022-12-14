@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -22,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionShippingFeeCheckToInjectorTest {
+class TransactionShippingFeeInjectionCheckerTest {
 
 
     @Mock
-    private TransactionShippingFeeCheckToInjector injector;
+    private TransactionShippingFeeInjectionChecker injector;
 
     private Transaction transaction;
 
@@ -129,5 +130,29 @@ class TransactionShippingFeeCheckToInjectorTest {
 
         // Then
         assertEquals(transaction, receivedTransaction);
+    }
+
+    @Test
+    void Equals_SameInjector_ReturnsTrue() {
+        // Given
+        class InheritingTransactionShippingFeeInjector extends TransactionShippingFeeInjectionChecker {
+
+            public InheritingTransactionShippingFeeInjector(Transaction transaction) {
+                super(transaction);
+            }
+
+            public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
+                return null;
+            }
+        }
+
+        InheritingTransactionShippingFeeInjector inheritingInjector = new InheritingTransactionShippingFeeInjector(transaction);
+        InheritingTransactionShippingFeeInjector sameInheritingInjector = new InheritingTransactionShippingFeeInjector(transaction);
+
+        // When
+        boolean isEquals = inheritingInjector.equals(sameInheritingInjector);
+
+        // Then
+        assertTrue(isEquals);
     }
 }

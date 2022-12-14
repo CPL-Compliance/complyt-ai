@@ -12,10 +12,10 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @Slf4j
-public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeCheckToInjector {
+public class TransactionShippingFeeTangibleCategoryInjector extends TransactionShippingFeeInjectionChecker {
 
     public TransactionShippingFeeTangibleCategoryInjector(Transaction transaction) {
         super(transaction);

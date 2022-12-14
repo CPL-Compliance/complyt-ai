@@ -152,6 +152,20 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
+    void equals_DifferentTransactionShippingFeeJurisdictionalRulesInjector_ReturnsFalse() {
+        // Given
+        Transaction differentTransaction = transaction.withId(UUID.randomUUID().toString());
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+        TransactionShippingFeeJurisdictionalRulesInjector secondInjector = new TransactionShippingFeeJurisdictionalRulesInjector(differentTransaction);
+
+        // When
+        boolean isEquals = injector.equals(secondInjector);
+
+        // Then
+        assertFalse(isEquals);
+    }
+
+    @Test
     void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
         // Given
         Transaction nullTransaction = null;

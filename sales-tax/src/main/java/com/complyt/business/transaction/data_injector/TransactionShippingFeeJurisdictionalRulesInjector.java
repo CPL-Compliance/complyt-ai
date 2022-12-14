@@ -13,10 +13,10 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Getter
 @Slf4j
-public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeCheckToInjector {
+public class TransactionShippingFeeJurisdictionalRulesInjector extends TransactionShippingFeeInjectionChecker {
 
     public TransactionShippingFeeJurisdictionalRulesInjector(Transaction transaction) {
         super(transaction);
