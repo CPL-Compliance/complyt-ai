@@ -60,7 +60,7 @@ public class ExemptionMapperTest {
         StateDto stateDto = new StateDto("CA", "02", "California");
         ClassificationDto classificationDto = new ClassificationDto("code", "description");
         ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime, localDateTime);
+        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime.toString(), localDateTime.toString());
         StatusDto statusDto = new StatusDto("code", "name");
         CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
 

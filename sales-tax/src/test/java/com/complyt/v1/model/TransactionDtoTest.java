@@ -42,7 +42,7 @@ class TransactionDtoTest {
                 ));
             }
         };
-        TimeStampsDto timeStamps = new TimeStampsDto(localDateTime, localDateTime);
+        TimeStampsDto timeStamps = new TimeStampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
         return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
