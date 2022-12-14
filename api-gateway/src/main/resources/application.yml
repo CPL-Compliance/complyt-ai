@@ -44,13 +44,6 @@ spring:
       routes:
         # ==== Sales Tax Service ====
         # ---- Transaction ----
-        - id: sales-tax-swagger
-          uri: lb://sales-tax
-          predicates:
-            - Method=GET
-            - Path=/v1/transactions
-          filters:
-            - SetPath=/v1/transactions
         - id: sales-tax-get-transactions
           uri: lb://sales-tax
           predicates:

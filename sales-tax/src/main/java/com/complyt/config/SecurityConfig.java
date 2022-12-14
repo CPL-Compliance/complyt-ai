@@ -78,7 +78,6 @@ public class SecurityConfig {
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/actuator/health",
-                        "/actuator/health",
                         "/v3/api-docs/**",
                         "/webjars/**",
                         "/swagger-ui*/**"
