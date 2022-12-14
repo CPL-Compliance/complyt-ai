@@ -20,16 +20,9 @@ public class EurekaConfig {
 
     @Profile({"production"})
     @Bean
-    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) {
+    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
         EurekaInstanceConfigBean config = new EurekaInstanceConfigBean(inetUtils);
-        String ip = null;
-
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        String ip = InetAddress.getLocalHost().getHostAddress();
 
         String port = environment.getProperty("server.port");
         config.setNonSecurePort(Integer.parseInt(port));
