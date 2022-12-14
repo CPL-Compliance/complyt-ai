@@ -31,11 +31,6 @@ public class EurekaConfigTest {
     @Mock
     InetUtils inetUtils;
 
-    @BeforeEach
-    void setUp() {
-
-    }
-
     @Test
     void eurekaInstanceConfig() throws UnknownHostException {
         // Given
