@@ -23,33 +23,32 @@ public class TimeStampsDto {
     private String createdDate;
     private String updatedDate;
 
-    public TimeStampsDto(String createdDate, String updatedDate) {
-        this.createdDate = parseDate(createdDate);
-        this.updatedDate = parseDate(updatedDate);
+    public TimeStampsDto(String createdDateAsString, String updatedDateAsString) {
+        this.createdDate = parseDate(createdDateAsString);
+        this.updatedDate = parseDate(updatedDateAsString);
     }
 
-    private String parseDate(String date) {
-        String localDateTime = null;
+    private String parseDate(String dateAsString) {
         try {
-            LocalDateTime localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
-            log.debug("Input is a LocalDate: " + localDateTime);
+            LocalDateTime date = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
+            log.debug("Input is a LocalDate: " + date);
 
-            return localDate.toString();
+            return date.toString();
         } catch (Exception ignored) {}
         try {
-            LocalDateTime localDate = LocalDateTime.parse(date, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            log.debug("Input is a LocalDateTime: " + localDateTime);
+            LocalDateTime date = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            log.debug("Input is a LocalDateTime: " + date);
 
-            return localDate.toString();
+            return date.toString();
         } catch (Exception ignored) {}
         try {
-            LocalDateTime localDate = ZonedDateTime.parse(date, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDateTime();
-            log.debug("Input is a ZonedDateTime: " + localDateTime);
+            LocalDateTime date = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDateTime();
+            log.debug("Input is a ZonedDateTime: " + date);
 
-            return localDate.toString();
+            return date.toString();
         } catch (Exception ignored) {}
 
-        return localDateTime;
+        return null;
     }
 
     public LocalDateTime getCreatedDate() {
