@@ -1,6 +1,8 @@
 spring.application.name: discovery-service
 server.port: 8761
 
+# We set these two parameters to prevent from the Discovery Service to look for a discovery service
+# (because this is who he is) and fetch its registry
 eureka.client:
   register-with-eureka: false
   fetch-registry: false
