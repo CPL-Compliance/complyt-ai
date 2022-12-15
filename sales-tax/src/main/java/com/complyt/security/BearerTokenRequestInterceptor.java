@@ -1,4 +1,4 @@
-package com.complyt.proxies;
+package com.complyt.security;
 
 import com.complyt.annotations.Generated;
 import org.springframework.http.HttpHeaders;
