@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,32 +24,33 @@ public class TimeStampsDto {
     private String createdDate;
     private String updatedDate;
 
-    public TimeStampsDto(String createdDateAsString, String updatedDateAsString) {
-        this.createdDate = parseDate(createdDateAsString);
-        this.updatedDate = parseDate(updatedDateAsString);
+    public TimeStampsDto(String createdDate, String updatedDate) {
+        this.createdDate = parseDate(createdDate);
+        this.updatedDate = parseDate(updatedDate);
     }
 
     private String parseDate(String dateAsString) {
+        String parsedDate = null;
         try {
-            LocalDateTime date = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
-            log.debug("Input is a LocalDate: " + date);
+            parsedDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
+            log.debug("Input received as a LocalDate: " + parsedDate);
 
-            return date.toString();
-        } catch (Exception ignored) {}
+        } catch (Exception ignore) {
+        }
         try {
-            LocalDateTime date = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            log.debug("Input is a LocalDateTime: " + date);
+            parsedDate = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString();
+            log.debug("Input received as a LocalDateTime: " + parsedDate);
 
-            return date.toString();
-        } catch (Exception ignored) {}
+        } catch (Exception ignore) {
+        }
         try {
-            LocalDateTime date = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDateTime();
-            log.debug("Input is a ZonedDateTime: " + date);
+            ZonedDateTime zonedDate = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+            parsedDate = LocalDateTime.ofInstant(zonedDate.toInstant(), ZoneOffset.UTC).toString();
+            log.debug("Input received as a ZonedDateTime: " + zonedDate);
 
-            return date.toString();
-        } catch (Exception ignored) {}
-
-        return null;
+        } catch (Exception ignore) {
+        }
+        return parsedDate;
     }
 
     public LocalDateTime getCreatedDate() {
