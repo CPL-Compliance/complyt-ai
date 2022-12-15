@@ -98,12 +98,15 @@ public class NexusStateRuleRepositoryTest {
     @Test
     void findByState_FindsRule_ReturnsRule() {
         // Given
-        String stateAbbreviation = nexusStateRule.getState().getAbbreviation();
-        Query query = Query.query(Criteria.where("state.abbreviation").is(stateAbbreviation));
+        String state = nexusStateRule.getState().getAbbreviation();
+        Criteria stateSearchCriteria = new Criteria()
+                .orOperator(Criteria.where("state.abbreviation").is(state),
+                        Criteria.where("state.name").is(state));
+        Query query = Query.query(stateSearchCriteria);
 
         // When
         when(reactiveMongoTemplate.findOne(query, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
-        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByState(stateAbbreviation);
+        Mono<NexusStateRule> actualStateRule = nexusStateRuleRepository.findByState(state);
 
         // Then
         StepVerifier.create(actualStateRule).expectNext(nexusStateRule).verifyComplete();
