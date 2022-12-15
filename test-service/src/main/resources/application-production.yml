@@ -1,12 +1,12 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://service-discovery-load-balancer-1787375561.us-east-1.elb.amazonaws.com/eureka
+      defaultZone: ${discovery-service-uri}
   instance:
     prefer-ip-address: true
 
 auth0:
-  audience: https://sales-tax-service/
+  audience: ${audience}
 
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
@@ -14,4 +14,4 @@ spring.security:
   oauth2:
     resourceserver:
       jwt:
-        issuer-uri: https://production-complyt.us.auth0.com/
+        issuer-uri: ${issuer-uri}
