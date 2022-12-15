@@ -41,7 +41,7 @@ public class ExemptionHandler {
         return ServerResponse.ok()
                 .body(exemptionFacade.findById(id)
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + "not found"))), ExemptionDto.class);
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + " not found"))), ExemptionDto.class);
     }
 
     @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
