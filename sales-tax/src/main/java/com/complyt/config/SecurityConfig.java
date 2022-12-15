@@ -55,7 +55,7 @@ public class SecurityConfig {
 
         // Authentication and Authorization
         http.authorizeExchange()
-                .pathMatchers("/actuator/health").permitAll()
+                .pathMatchers("/actuator/health", "/actuator/info").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 
@@ -90,5 +90,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }

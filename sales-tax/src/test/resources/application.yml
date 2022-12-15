@@ -1,2 +1,3 @@
 # To avoid from Spring Cloud Vault initiate during UTs we disable it
 spring.cloud.vault.enabled: false
+eureka.client.enabled: false

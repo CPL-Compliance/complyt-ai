@@ -1,0 +1,150 @@
+server.port: ${PORT:8765}
+auth0.audience: ${audience}
+
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active:
+      - @activeEnv@
+  security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
+  config.import: vault://
+  cloud:
+    # Spring Cloud Vault configuration
+    # To understand what every field stands for visit
+    # https://cloud.spring.io/spring-cloud-vault/reference/html/
+    vault:
+      enabled: true
+      application-name: api-gateway-service
+      host: vault-cluster-public-vault-136adda2.66341e3c.z1.hashicorp.cloud
+      port: 8200
+      scheme: https
+      namespace: admin
+      fail-fast: true
+      config:
+        lifecycle:
+          enabled: true
+          min-renewal: 10s
+          expiry-threshold: 1m
+      authentication: APPROLE
+      app-role:
+        role-id: 7fef17fe-e7f7-17f6-7b25-e7a05ab68204
+        secret-id: 4a4411da-bff4-d51a-9a9a-5561031b5260
+        role: api-gateway-role
+        app-role-path: approle
+      kv:
+        enabled: true
+        default-context:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      metrics.enabled: true
+      routes:
+        # ==== Sales Tax Service ====
+        # ---- Transaction ----
+        - id: sales-tax-get-transactions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions
+          filters:
+            - SetPath=/v1/transactions
+        - id: sales-tax-get-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        - id: sales-tax-put-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        - id: sales-tax-delete-transaction-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/transactions/{external_id}
+          filters:
+            - SetPath=/v1/transactions/{external_id}
+        # ---- Transaction ----
+        # ---- Customer ----
+        - id: sales-tax-get-customers
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers
+          filters:
+            - SetPath=/v1/customers
+        - id: sales-tax-get-customer-by-name
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/name/{name}
+          filters:
+            - SetPath=/v1/customers/name/{name}
+        - id: sales-tax-get-customer-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/{external_id}
+          filters:
+            - SetPath=/v1/customers/{external_id}
+        - id: sales-tax-put-customer-by-external-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/customers/{external_id}
+          filters:
+            - SetPath=/v1/customers/{external_id}
+        - id: sales-tax-post-customer
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/customers
+          filters:
+            - SetPath=/v1/customers
+        # ---- Customer ----
+        # ---- Exemption ----
+        - id: sales-tax-get-exemptions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-get-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+        - id: sales-tax-post-exemption
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-put-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+        - id: sales-tax-delete-exemption-by-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/exemptions/{id}
+          filters:
+            - SetPath=/v1/exemptions/{id}
+      # ---- Exemption ----
+      # ==== Sales Tax Service ====
