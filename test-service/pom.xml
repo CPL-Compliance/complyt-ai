@@ -17,7 +17,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<!-- Maven Coordinates -->
 
-	<name>tes-service</name>
+	<name>test-service</name>
 	<description>This is a test Service made by Complyt</description>
 
 	<properties>
