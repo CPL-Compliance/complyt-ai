@@ -24,7 +24,11 @@ public class NexusStateRuleRepository {
     }
 
     public Mono<NexusStateRule> findByState(@NonNull String state) {
-        Query query = Query.query(Criteria.where("state.abbreviation").is(state));
+        Criteria stateSearchCriteria = new Criteria()
+                .orOperator(Criteria.where("state.abbreviation").is(state),
+                        Criteria.where("state.name").is(state));
+
+        Query query = Query.query(stateSearchCriteria);
 
         return reactiveMongoTemplate.findOne(query, NexusStateRule.class).log();
     }
