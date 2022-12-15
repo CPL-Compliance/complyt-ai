@@ -1,12 +1,14 @@
 package io.complyt.namingserver.config;
 
 import com.netflix.appinfo.AmazonInfo;
+import io.complyt.namingserver.annotations.Generated;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+@Generated
 @Configuration
 public class EurekaConfig {
     @Bean
