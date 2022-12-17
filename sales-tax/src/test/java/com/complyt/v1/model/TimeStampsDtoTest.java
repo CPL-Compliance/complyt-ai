@@ -86,23 +86,7 @@ class TimeStampsDtoTest {
         Assertions.assertEquals(expectedCreatedDate,actualCreatedDate);
         Assertions.assertEquals(expectedUpdatedDate,actualUpdatedDate);
     }
-
-    @Test
-    void init_DatesReceivedAsInvalidFormat_AssignsNullDated() {
-        // Given
-        String createdDate = "2015-05-25T13:05:45-05:00asd";
-        String updatedDate = "2015-05-25T13:05:45-05:00sadda";
-
-        // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate,updatedDate);
-        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getCreatedDate();
-
-        // Then
-        Assertions.assertNull(actualCreatedDate);
-        Assertions.assertNull(actualUpdatedDate);
-    }
-
+    
     @Test
     void withUpdateDate_DifferentDate_ReturnTimeStampsDto() {
         // Given
