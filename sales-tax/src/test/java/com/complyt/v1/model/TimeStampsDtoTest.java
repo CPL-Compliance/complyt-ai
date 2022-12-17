@@ -86,7 +86,7 @@ class TimeStampsDtoTest {
         Assertions.assertEquals(expectedCreatedDate,actualCreatedDate);
         Assertions.assertEquals(expectedUpdatedDate,actualUpdatedDate);
     }
-    
+
     @Test
     void withUpdateDate_DifferentDate_ReturnTimeStampsDto() {
         // Given
