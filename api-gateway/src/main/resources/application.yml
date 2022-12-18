@@ -16,7 +16,7 @@ spring:
     vault:
       enabled: true
       application-name: api-gateway-service
-      host: vault-cluster-public-vault-136adda2.66341e3c.z1.hashicorp.cloud
+      host: ${VAULT_HOST}
       port: 8200
       scheme: https
       namespace: admin
@@ -28,9 +28,9 @@ spring:
           expiry-threshold: 1m
       authentication: APPROLE
       app-role:
-        role-id: 7fef17fe-e7f7-17f6-7b25-e7a05ab68204
-        secret-id: 4a4411da-bff4-d51a-9a9a-5561031b5260
-        role: api-gateway-role
+        role-id: ${VAULT_ROLE_ID}
+        secret-id: ${VAULT_SECRET_ID}
+        role: ${VAULT_ROLE}
         app-role-path: approle
       kv:
         enabled: true
