@@ -18,11 +18,9 @@ class TimeStampsDtoTest {
 
     @BeforeEach
     void setup() {
-        String createdDate = LocalDateTime.of(2002, 2, 2, 2, 2, 2).toString();
-        String updatedDate = LocalDateTime.of(2003, 3, 3, 3, 3, 3).toString();
-        timeStampsDto = new TimeStampsDto(
-                createdDate,
-                updatedDate);
+        String createdDate = "2002-02-02T02:02:02";
+        String updatedDate = "2003-03-03T03:03:03";
+        timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
     }
 
     @Test
@@ -90,11 +88,11 @@ class TimeStampsDtoTest {
     @Test
     void withUpdateDate_DifferentDate_ReturnTimeStampsDto() {
         // Given
-        String createdDate = LocalDateTime.of(2002, 2, 2, 2, 2, 2).toString();
-        String updatedDate = LocalDateTime.of(2004, 4, 4, 4, 4, 4).toString();
+        String createdDate = "2002-02-02T02:02:02";
+        String updatedDate = "2004-04-04T04:04:04";
 
         TimeStampsDto expectedTimeStampsDto = new TimeStampsDto(createdDate, updatedDate);
-        String differentDate = LocalDateTime.of(2004, 4, 4, 4, 4, 4).toString();
+        String differentDate = "2004-04-04T04:04:04";
 
         // When
         TimeStampsDto actualTimeStampsDto = timeStampsDto.withUpdatedDate(differentDate);
