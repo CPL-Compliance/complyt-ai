@@ -30,27 +30,28 @@ public class TimeStampsDto {
     }
 
     private String parseDate(String dateAsString) {
-        String parsedDate = null;
         try {
-            parsedDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
-            log.debug("Input received as a LocalDate: " + parsedDate);
-
+            String parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
+            log.debug("Input received as a LocalDate: " + parsedLocalDate);
+            return parsedLocalDate;
         } catch (Exception ignore) {
         }
         try {
-            parsedDate = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString();
-            log.debug("Input received as a LocalDateTime: " + parsedDate);
+            String parsedLocalDateTime = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString();
+            log.debug("Input received as a LocalDateTime: " + parsedLocalDateTime);
+            return parsedLocalDateTime;
 
         } catch (Exception ignore) {
         }
         try {
             ZonedDateTime zonedDate = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-            parsedDate = LocalDateTime.ofInstant(zonedDate.toInstant(), ZoneOffset.UTC).toString();
+            String parsedDateWithOffset = LocalDateTime.ofInstant(zonedDate.toInstant(), ZoneOffset.UTC).toString();
             log.debug("Input received as a ZonedDateTime: " + zonedDate);
+            return parsedDateWithOffset;
 
         } catch (Exception ignore) {
         }
-        return parsedDate;
+        return null;
     }
 
     public LocalDateTime getCreatedDate() {
