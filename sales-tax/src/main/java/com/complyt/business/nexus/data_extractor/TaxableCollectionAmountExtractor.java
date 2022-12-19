@@ -6,7 +6,6 @@ import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.ToString;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +27,7 @@ public class TaxableCollectionAmountExtractor implements AmountExtractor {
         List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationChecker.isQualified(item, nexusStateRule)).toList();
         float amount = 0;
 
-        for(Taxable taxable : qualifiedTaxables)
+        for (Taxable taxable : qualifiedTaxables)
             amount += taxable.getTotalPrice();
 
         return amount;

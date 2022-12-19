@@ -105,15 +105,6 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeTangibleCategoryInjector() {
-        // Given + When
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-
-        // Then
-        assertEquals(transaction, injector.getTransaction());
-    }
-
-    @Test
     void equals_SameTransactionShippingFeeTangibleCategoryInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
@@ -124,32 +115,33 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
         // Then
         assertTrue(isEquals);
-
     }
 
     @Test
-    void shouldInject_NullShippingFee_ReturnsFalse() {
+    void equals_DifferentTransactionShippingFeeTangibleCategoryInjector_ReturnsFalse() {
         // Given
-        TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction.withShippingFee(null));
-
-        // When
-        boolean shouldBeInjected = injector.shouldInject(null);
-
-        // Then
-        assertFalse(shouldBeInjected);
-    }
-
-    @Test
-    void shouldInject_TaxCodeExistInMap_ReturnsTrue() {
-        // Given
+        Transaction differentTransaction = transaction.withId(UUID.randomUUID().toString());
         TransactionShippingFeeTangibleCategoryInjector injector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
-        HashMap<String, ProductClassification> givenMap = new HashMap<String, ProductClassification>();
-        givenMap.put(transaction.getShippingFee().getTaxCode(), null);
+        TransactionShippingFeeTangibleCategoryInjector secondInjector = new TransactionShippingFeeTangibleCategoryInjector(differentTransaction);
 
         // When
-        boolean shouldBeInjected = injector.shouldInject(givenMap);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertTrue(shouldBeInjected);
+        assertFalse(isEquals);
+    }
+
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new TransactionShippingFeeTangibleCategoryInjector(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
 }

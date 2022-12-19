@@ -16,11 +16,11 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder.clientConnector(
-                new ReactorClientHttpConnector(
-                        HttpClient.create()
-                                .wiretap("reactor.netty.client.HttpClient",
-                                LogLevel.DEBUG,
-                                AdvancedByteBufFormat.TEXTUAL)))
+                        new ReactorClientHttpConnector(
+                                HttpClient.create()
+                                        .wiretap("reactor.netty.client.HttpClient",
+                                                LogLevel.DEBUG,
+                                                AdvancedByteBufFormat.TEXTUAL)))
                 .build();
     }
 }

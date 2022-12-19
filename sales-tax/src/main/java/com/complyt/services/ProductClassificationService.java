@@ -9,5 +9,6 @@ import reactor.core.publisher.Mono;
 
 public interface ProductClassificationService extends CrudService<ProductClassification, String> {
     Mono<ProductClassification> findOneByTaxCode(@NonNull String taxCode);
+
     Mono<Transaction> getTransactionWithRelevantProductClassificationData(Transaction transaction);
 }
