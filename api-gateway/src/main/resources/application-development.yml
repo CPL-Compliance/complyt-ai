@@ -1,0 +1,22 @@
+spring:
+  cloud:
+    vault:
+      enabled: false
+    gateway:
+      routes:
+        # ==== Test Service ====
+        - id: test-app-hi
+          uri: lb://test-application
+          predicates:
+            - Method=GET
+            - Path=/hi
+          filters:
+            - SetPath=/hi
+        # ==== Test Service ====
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+management.endpoints.web.exposure.include: "*"
