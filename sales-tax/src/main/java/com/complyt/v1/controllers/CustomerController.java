@@ -2,7 +2,6 @@ package com.complyt.v1.controllers;
 
 
 import com.complyt.facades.CustomerFacade;
-import com.complyt.security.permissions.customer.CustomerCreatePermission;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Customer", description = "This is the Customer controller")
