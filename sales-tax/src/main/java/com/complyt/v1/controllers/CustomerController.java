@@ -56,18 +56,6 @@ public class CustomerController {
                 .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build())).log();
     }
 
-    @Operation(summary = "This will create a customer")
-    @CustomerCreatePermission
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ResponseEntity<CustomerDto>> create(@NonNull @RequestBody CustomerDto customerDto) {
-        log.debug("Create customer - DTO received in request body : " + customerDto);
-
-        return customerfacade.save(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
-                .map(customer -> ResponseEntity.created(URI.create(BASE_URL + "/" + customer.getExternalId()))
-                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(customer)));
-    }
-
     @Operation(summary = "Gets all matching customers by name")
     @CustomerReadPermission
     @GetMapping("name/{name}")
