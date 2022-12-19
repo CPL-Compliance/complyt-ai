@@ -7,13 +7,21 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 
 public interface Taxable {
     TaxableCategory getTaxableCategory();
+
     TangibleCategory getTangibleCategory();
+
     String getTaxCode();
+
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
+
     Taxable withSalesTaxRate(SalesTaxRate salesTaxRate);
+
     float getTotalPrice();
+
     boolean isManualSalesTax();
+
     SalesTaxRate getSalesTaxRate();
+
     float getManualSalesTaxRate();
 
     default float getManualSalesTaxAmount() {

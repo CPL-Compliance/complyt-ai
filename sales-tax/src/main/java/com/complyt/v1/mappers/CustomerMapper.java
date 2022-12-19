@@ -10,10 +10,13 @@ import java.util.List;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface CustomerMapper {
-    CustomerMapper INSTANCE = Mappers.getMapper( CustomerMapper.class );
+    CustomerMapper INSTANCE = Mappers.getMapper(CustomerMapper.class);
 
     Customer customerDtoToCustomer(CustomerDto customerDto);
+
     CustomerDto customerToCustomerDto(Customer customer);
+
     List<CustomerDto> customersToCustomerDtos(List<Customer> customers);
+
     List<Customer> customerDtosToCustomers(List<CustomerDto> customerDtos);
 }

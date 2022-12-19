@@ -24,10 +24,15 @@ public class SalesTaxTrackingRepository {
     private TenantResolver tenantResolver;
 
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
+
+
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("state.abbreviation").is(state)
-                            .and("tenantId").is(tenantId));
+                    Criteria stateSearchCriteria = new Criteria()
+                            .orOperator(Criteria.where("state.abbreviation").is(state),
+                                    Criteria.where("state.name").is(state));
+
+                    Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
 
                     return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
                 });
@@ -36,7 +41,7 @@ public class SalesTaxTrackingRepository {
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    log.debug("Saving modified nexus tracking : " + salesTaxTracking);
+                    log.debug("Saving modified sales tax tracking : " + salesTaxTracking);
 
                     return reactiveMongoTemplate.save(salesTaxTracking.withTenantId(tenantId)).log();
                 });

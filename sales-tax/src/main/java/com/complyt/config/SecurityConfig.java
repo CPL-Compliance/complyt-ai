@@ -11,7 +11,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
-import org.springframework.security.oauth2.server.resource.web.access.server.BearerTokenServerAccessDeniedHandler;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
@@ -55,7 +54,7 @@ public class SecurityConfig {
 
         // Authentication and Authorization
         http.authorizeExchange()
-                .pathMatchers("/actuator/health").permitAll()
+                .pathMatchers("/actuator/health", "/actuator/info").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 
@@ -90,5 +89,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
