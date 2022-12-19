@@ -59,6 +59,7 @@ public class TimeStampsDto {
             return LocalDateTime.parse(createdDate);
         }
         catch (Exception e) {
+            log.debug("Created date has been received in invalid format");
             return null;
         }
     }
@@ -68,6 +69,7 @@ public class TimeStampsDto {
             return LocalDateTime.parse(updatedDate);
         }
         catch (Exception e) {
+            log.debug("Updated date has been received in invalid format");
             return null;
         }
     }
