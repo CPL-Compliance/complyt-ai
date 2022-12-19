@@ -40,7 +40,6 @@ public class TimeStampsDto {
             String parsedLocalDateTime = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString();
             log.debug("Input received as a LocalDateTime: " + parsedLocalDateTime);
             return parsedLocalDateTime;
-
         } catch (Exception ignore) {
         }
         try {
@@ -57,8 +56,7 @@ public class TimeStampsDto {
     public LocalDateTime getCreatedDate() {
         try {
             return LocalDateTime.parse(createdDate);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.debug("Created date has been received in invalid format");
             return null;
         }
@@ -67,8 +65,7 @@ public class TimeStampsDto {
     public LocalDateTime getUpdatedDate() {
         try {
             return LocalDateTime.parse(updatedDate);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.debug("Updated date has been received in invalid format");
             return null;
         }

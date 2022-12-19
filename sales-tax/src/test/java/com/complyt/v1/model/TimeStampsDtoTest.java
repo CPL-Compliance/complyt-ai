@@ -53,9 +53,24 @@ class TimeStampsDtoTest {
 
         // When
         TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        LocalDateTime expectedCreatedDate = timeStampsDto.getCreatedDate();
 
         // Then
-        assertNull(timeStampsDto.getCreatedDate());
+        assertNull(expectedCreatedDate);
+    }
+
+    @Test
+    void init_InvalidFormatOfUpdatedDate_CreatedDateIsSetToNull() {
+        // Given
+        String createdDate = "2015-05-25";
+        String updatedDate = "2015-05-25asd";
+
+        // When
+        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        LocalDateTime expectedUpdatedDate = timeStampsDto.getUpdatedDate();
+
+        // Then
+        assertNull(expectedUpdatedDate);
     }
 
     @Test
