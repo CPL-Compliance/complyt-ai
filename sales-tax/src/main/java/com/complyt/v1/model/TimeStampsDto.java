@@ -55,10 +55,20 @@ public class TimeStampsDto {
     }
 
     public LocalDateTime getCreatedDate() {
-        return LocalDateTime.parse(createdDate);
+        try {
+            return LocalDateTime.parse(createdDate);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     public LocalDateTime getUpdatedDate() {
-        return LocalDateTime.parse(updatedDate);
+        try {
+            return LocalDateTime.parse(updatedDate);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TimeStampsDtoTest {
 
@@ -34,15 +34,28 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate,updatedDate);
+        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getCreatedDate();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
         Assertions.assertNotNull(actualUpdatedDate);
-        Assertions.assertEquals(expectedCreatedDate,actualCreatedDate);
-        Assertions.assertEquals(expectedUpdatedDate,actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
+    }
+
+    @Test
+    void init_InvalidFormatOfCreatedDate_CreatedDateIsSetToNull() {
+        // Given
+        String createdDate = "2015-05-25asd";
+        String updatedDate = "2015-05-25";
+
+        // When
+        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+
+        // Then
+        assertNull(timeStampsDto.getCreatedDate());
     }
 
     @Test
@@ -54,15 +67,15 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate,updatedDate);
+        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getCreatedDate();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
         Assertions.assertNotNull(actualUpdatedDate);
-        Assertions.assertEquals(expectedCreatedDate,actualCreatedDate);
-        Assertions.assertEquals(expectedUpdatedDate,actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
     }
 
     @Test
@@ -74,15 +87,15 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDate.parse(updatedDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate,updatedDate);
+        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getCreatedDate();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
         Assertions.assertNotNull(actualUpdatedDate);
-        Assertions.assertEquals(expectedCreatedDate,actualCreatedDate);
-        Assertions.assertEquals(expectedUpdatedDate,actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
     }
 
     @Test
