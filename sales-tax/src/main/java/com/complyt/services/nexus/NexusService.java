@@ -5,7 +5,6 @@ import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
-import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;

@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 @Getter
 @AllArgsConstructor
-public class TransactionCountyInjector implements TransactionDataInjector<String>{
+public class TransactionCountyInjector implements TransactionDataInjector<String> {
 
     @NonNull
     private final Transaction transaction;

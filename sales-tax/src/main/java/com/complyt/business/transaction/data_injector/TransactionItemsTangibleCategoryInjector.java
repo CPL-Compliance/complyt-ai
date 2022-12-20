@@ -39,7 +39,7 @@ public class TransactionItemsTangibleCategoryInjector implements TransactionData
     private List<Item> createItemsWithTangibleCategories(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         List<Item> modifiedItems = new ArrayList<>();
 
-        for(Item item : transaction.getItems()) {
+        for (Item item : transaction.getItems()) {
             ProductClassification productClassification = mapTaxCodesToClassifications.get(item.getTaxCode());
             TangibleCategory category = productClassification.getTangibleCategory();
             Item newItem = item.withTangibleCategory(category);

@@ -8,5 +8,6 @@ import reactor.core.publisher.Mono;
 
 public interface SalesTaxService {
     Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking);
+
     Mono<Transaction> calculate(@NonNull Transaction transaction);
 }

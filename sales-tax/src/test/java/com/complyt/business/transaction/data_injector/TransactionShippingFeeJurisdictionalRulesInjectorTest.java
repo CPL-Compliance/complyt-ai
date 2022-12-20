@@ -139,15 +139,6 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     @Test
-    void defaultConstructor_Transaction_ReturnsTransactionShippingFeeJurisdictionalRulesInjector() {
-        // Given + When
-        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
-
-        // Then
-        assertEquals(transaction, injector.getTransaction());
-    }
-
-    @Test
     void equals_SameTransactionShippingFeeJurisdictionalRulesInjector_ReturnsTrue() {
         // Given
         TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
@@ -158,19 +149,33 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
         // Then
         assertTrue(isEquals);
-
     }
 
     @Test
-    void shouldInject_NullShippingFee_ReturnsFalse() {
+    void equals_DifferentTransactionShippingFeeJurisdictionalRulesInjector_ReturnsFalse() {
         // Given
-        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction.withShippingFee(null));
+        Transaction differentTransaction = transaction.withId(UUID.randomUUID().toString());
+        TransactionShippingFeeJurisdictionalRulesInjector injector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
+        TransactionShippingFeeJurisdictionalRulesInjector secondInjector = new TransactionShippingFeeJurisdictionalRulesInjector(differentTransaction);
 
         // When
-        boolean shouldBeInjected = injector.shouldInject(null);
+        boolean isEquals = injector.equals(secondInjector);
 
         // Then
-        assertFalse(shouldBeInjected);
+        assertFalse(isEquals);
     }
 
+    @Test
+    void defaultConstructor_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new TransactionShippingFeeJurisdictionalRulesInjector(nullTransaction);
+        });
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", exception.getMessage());
+    }
 }

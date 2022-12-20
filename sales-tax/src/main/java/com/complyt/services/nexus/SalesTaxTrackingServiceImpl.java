@@ -46,9 +46,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking,@NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
+    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.getTimeFrame(),referenceDate);
+        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)

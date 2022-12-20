@@ -98,44 +98,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    void create_NewCustomerCreated_SavesCustomer() {
-        // Given
-        when(customerFacade.save(customer)).thenReturn(Mono.just(customer));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
-                        .build())
-                .bodyValue(customerDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(CustomerDto.class)
-                .value(customerItem -> customerItem, equalTo(customerDto));
-    }
-
-    @Test
-    void create_CreateFails_Returns5xxServerError() {
-        // Given
-        when(customerFacade.save(customer)).thenThrow(OperationFailedException.class);
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL)
-                        .build())
-                .bodyValue(customer)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -244,21 +206,6 @@ class CustomerControllerTest {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             customerController.upsertCustomer(externalId, nullCustomerDto);
-        });
-
-        // Then
-        assertEquals("customerDto is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-    @Test
-    void create_NullCustomerDto_ThrowsNullPointerException() {
-        //Given
-        CustomerDto nullCustomerDto = null;
-        customerController = new CustomerController(customerFacade);
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.create(nullCustomerDto);
         });
 
         // Then

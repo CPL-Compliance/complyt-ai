@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 
-public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking,String> {
+public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, String> {
 
     Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking);
 

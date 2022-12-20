@@ -19,7 +19,7 @@ public class ModifiedTransactionInternalDateInjector implements DateInjector<Tra
     public Transaction inject() {
         LocalDateTime createdDate = transaction.getInternalTimeStamps().getCreatedDate();
         LocalDateTime modifiedDate = LocalDateTime.now();
-        TimeStamps modifiedTimeStamps = new TimeStamps(createdDate,modifiedDate);
+        TimeStamps modifiedTimeStamps = new TimeStamps(createdDate, modifiedDate);
 
         return transaction.withInternalTimeStamps(modifiedTimeStamps);
     }

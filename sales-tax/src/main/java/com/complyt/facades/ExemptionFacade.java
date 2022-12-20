@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class ExemptionFacade {
-    
+
     @NonNull
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;

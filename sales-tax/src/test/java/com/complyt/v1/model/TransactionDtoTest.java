@@ -2,8 +2,6 @@ package com.complyt.v1.model;
 
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.v1.model.customer.CustomerDto;
-import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

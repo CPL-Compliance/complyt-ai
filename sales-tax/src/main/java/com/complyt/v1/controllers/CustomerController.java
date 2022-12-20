@@ -2,7 +2,6 @@ package com.complyt.v1.controllers;
 
 
 import com.complyt.facades.CustomerFacade;
-import com.complyt.security.permissions.customer.CustomerCreatePermission;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Customer", description = "This is the Customer controller")
@@ -54,18 +51,6 @@ public class CustomerController {
         return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
                 .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build())).log();
-    }
-
-    @Operation(summary = "This will create a customer")
-    @CustomerCreatePermission
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ResponseEntity<CustomerDto>> create(@NonNull @RequestBody CustomerDto customerDto) {
-        log.debug("Create customer - DTO received in request body : " + customerDto);
-
-        return customerfacade.save(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
-                .map(customer -> ResponseEntity.created(URI.create(BASE_URL + "/" + customer.getExternalId()))
-                        .body(CustomerMapper.INSTANCE.customerToCustomerDto(customer)));
     }
 
     @Operation(summary = "Gets all matching customers by name")

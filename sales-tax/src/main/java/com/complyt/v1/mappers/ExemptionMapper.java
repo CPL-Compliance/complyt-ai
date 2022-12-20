@@ -11,5 +11,6 @@ public interface ExemptionMapper {
     ExemptionMapper INSTANCE = Mappers.getMapper(ExemptionMapper.class);
 
     Exemption exemptionDtoToExemption(ExemptionDto exemptionDto);
+
     ExemptionDto exemptionToExemptionDto(Exemption exemption);
 }

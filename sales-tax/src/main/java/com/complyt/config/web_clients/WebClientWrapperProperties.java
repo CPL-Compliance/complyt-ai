@@ -17,7 +17,7 @@ public class WebClientWrapperProperties {
     @NonNull
     private final Pair<String, String> key;
 
-    public static WebClientWrapperProperties WebClientWrapperPropertiesStub(){
+    public static WebClientWrapperProperties WebClientWrapperPropertiesStub() {
         return new WebClientWrapperProperties("", "", "", new Pair<>("", ""));
     }
 }
