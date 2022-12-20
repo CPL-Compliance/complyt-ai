@@ -108,24 +108,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    void update_UpdateFails_Returns5xxServerError() {
-        // Given
-        when(customerFacade.upsert(customer)).thenThrow(OperationFailedException.class);
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
-                        .build())
-                .bodyValue(customer)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();

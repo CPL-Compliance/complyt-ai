@@ -1,6 +1,8 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.TimeStamps;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.services.CustomerService;
@@ -16,10 +18,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -48,26 +53,36 @@ class CustomerFacadeTest {
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
+        Customer newCustomerWithUpdatedData = customer.withInternalTimeStamps(
+                new TimeStamps(LocalDateTime.now(), LocalDateTime.now())
+        );
 
         // When
-        when(customerService.save(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerFacade.save(customer);
+        when(customerService.injectDataToNewCustomer(customer)).thenReturn(newCustomerWithUpdatedData);
+        when(customerService.save(newCustomerWithUpdatedData)).thenReturn(Mono.just(newCustomerWithUpdatedData));
+        Mono<Customer> customerMono = customerFacade.saveCustomer(customer);
 
         // Then
-        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+        StepVerifier.create(customerMono).expectNext(newCustomerWithUpdatedData).verifyComplete();
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned() {
+    void updateIfModified_CustomerModified_UpdatesCustomer() {
         // Given
+        Customer newCustomer = customer.withName("newCustomer");
+        Customer newCustomerWithUpdatedData = newCustomer.withInternalTimeStamps(
+                new TimeStamps(LocalDateTime.now().minusDays(3), LocalDateTime.now())
+        );
 
         // When
-        when(customerService.update(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerFacade.upsert(customer);
+        when(customerService.injectDataToModifiedCustomer(newCustomer, customer)).thenReturn(newCustomerWithUpdatedData);
+        when(customerService.update(newCustomerWithUpdatedData)).thenReturn(Mono.just(newCustomerWithUpdatedData));
+        Mono<Customer> customerMono = customerFacade.updateIfModified(newCustomer, customer);
 
         // Then
-        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+        StepVerifier.create(customerMono).expectNext(newCustomerWithUpdatedData).verifyComplete();
     }
+
 
     @Test
     void getCustomerByName_CustomerFound_CustomerReturned() {
@@ -113,4 +128,41 @@ class CustomerFacadeTest {
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
+
+    @Test
+    void saveCustomer_NullCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.saveCustomer(nullCustomer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullNewCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullNewCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.updateIfModified(nullNewCustomer, customer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullOriginalCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullOriginalCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.updateIfModified(customer, nullOriginalCustomer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalCustomer is marked non-null but is null");
+    }
+
 }
