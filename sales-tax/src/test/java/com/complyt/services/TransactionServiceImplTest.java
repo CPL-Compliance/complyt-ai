@@ -318,7 +318,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void injectDataToNewTransaction_InjectsDateToNewTransaction_ReturnsTransaction() {
+    void injectDataToNewTransaction_InjectsDataToNewTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
 
@@ -352,7 +352,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void injectDataToModifiedTransaction_InjectsDateToModifiedTransaction_ReturnsTransaction() {
+    void injectDataToModifiedTransaction_InjectsDataToModifiedTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction newTransaction = transactionWithCustomer.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));

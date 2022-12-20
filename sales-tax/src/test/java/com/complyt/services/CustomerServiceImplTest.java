@@ -1,10 +1,14 @@
 package com.complyt.services;
 
+import com.complyt.business.dates_injection.ModifiedCustomerInternalDateInjector;
+import com.complyt.business.dates_injection.NewCustomerInternalDateInjector;
 import com.complyt.domain.Address;
+import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +47,59 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
+        TimeStamps internalTimestamps = new TimeStamps(LocalDateTime.now(),LocalDateTime.now());
+        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL, internalTimestamps, null);
+    }
+
+    @Test
+    void injectDataToModifiedCustomer_InjectsDataToModifiedCustomer_ReturnsCustomer() {
+        // Given
+        Customer newCustomer = customer.withName("NewName");
+        ModifiedCustomerInternalDateInjector injector = new ModifiedCustomerInternalDateInjector(customer);
+        Customer customerWithUpdatedDates = injector.inject();
+
+        Customer actualCustomer = customerServiceImpl.injectDataToModifiedCustomer(newCustomer, customer);
+
+        // Then
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+
+        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
+        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+    }
+
+    @Test
+    void injectDataToNewCustomer_InjectsDataToNewCustomer_ReturnsCustomer() {
+// Given
+        NewCustomerInternalDateInjector injector = new NewCustomerInternalDateInjector(customer);
+        Customer customerWithUpdatedDates = injector.inject();
+
+        Customer actualCustomer = customerServiceImpl.injectDataToNewCustomer(customer);
+
+        // Then
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+
+        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
+        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
     }
 
     @Test
