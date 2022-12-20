@@ -83,6 +83,18 @@ class CustomerFacadeTest {
         StepVerifier.create(customerMono).expectNext(newCustomerWithUpdatedData).verifyComplete();
     }
 
+    @Test
+    void updateIfModified_CustomerNotModified_ReturnsCustomer() {
+        // Given
+        Customer newCustomer = customer.withName(customer.getName());
+
+        // When
+        Mono<Customer> customerMono = customerFacade.updateIfModified(newCustomer, customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
+    }
+
 
     @Test
     void getCustomerByName_CustomerFound_CustomerReturned() {
