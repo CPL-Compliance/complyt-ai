@@ -48,7 +48,8 @@ public class TimeStampsDto {
             log.debug("Input received as a ZonedDateTime: " + zonedDate);
             return parsedDateWithOffset;
 
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            log.debug("Date has been received in invalid format : " + dateAsString);
         }
         return null;
     }
@@ -57,7 +58,7 @@ public class TimeStampsDto {
         try {
             return LocalDateTime.parse(createdDate);
         } catch (Exception e) {
-            log.debug("Created date has been received in invalid format");
+            log.debug("Created date has invalid format");
             return null;
         }
     }
@@ -66,7 +67,7 @@ public class TimeStampsDto {
         try {
             return LocalDateTime.parse(updatedDate);
         } catch (Exception e) {
-            log.debug("Updated date has been received in invalid format");
+            log.debug("Updated invalid format");
             return null;
         }
     }
