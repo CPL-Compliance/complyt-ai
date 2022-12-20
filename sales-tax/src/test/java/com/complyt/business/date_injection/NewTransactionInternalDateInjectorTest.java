@@ -1,4 +1,4 @@
-package com.complyt.business.transaction.date_injector;
+package com.complyt.business.date_injection;
 
 import com.complyt.business.dates_injection.NewTransactionInternalDateInjector;
 import com.complyt.domain.Address;
