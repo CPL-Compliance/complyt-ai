@@ -1,5 +1,7 @@
 package com.complyt.services;
 
+import com.complyt.business.dates_injection.ModifiedCustomerInternalDateInjector;
+import com.complyt.business.dates_injection.NewCustomerInternalDateInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
@@ -25,11 +27,22 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.save(customer);
     }
 
-    public Mono<Customer> upsert(@NonNull Customer customer) {
+    public Mono<Customer> update(@NonNull Customer customer) {
         return customerRepository.findByExternalId(customer.getExternalId())
                 .switchIfEmpty(customerRepository.save(customer))
                 .map(createFunctionUpdateCustomer(customer))
                 .flatMap(customerRepository::save);
+    }
+
+    public Customer injectDataToNewCustomer(Customer customer) {
+        return new NewCustomerInternalDateInjector(customer).inject();
+    }
+
+    public Customer injectDataToModifiedCustomer(Customer modifiedCustomer, Customer originalCustomer) {
+        Customer modifiedCustomerWithInternalTimeStamps = modifiedCustomer
+                .withInternalTimeStamps(originalCustomer.getInternalTimeStamps());
+
+        return new ModifiedCustomerInternalDateInjector(modifiedCustomerWithInternalTimeStamps).inject();
     }
 
     @Override

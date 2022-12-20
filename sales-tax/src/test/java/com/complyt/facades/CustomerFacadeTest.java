@@ -62,7 +62,7 @@ class CustomerFacadeTest {
         // Given
 
         // When
-        when(customerService.upsert(customer)).thenReturn(Mono.just(customer));
+        when(customerService.update(customer)).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerFacade.upsert(customer);
 
         // Then

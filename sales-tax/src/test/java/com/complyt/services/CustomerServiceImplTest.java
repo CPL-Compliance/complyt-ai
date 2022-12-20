@@ -64,7 +64,7 @@ class CustomerServiceImplTest {
         // When
         when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.just(customer));
         when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerServiceImpl.upsert(customer);
+        Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
@@ -177,7 +177,7 @@ class CustomerServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerServiceImpl.upsert(nullCustomer);
+            customerServiceImpl.update(nullCustomer);
         });
 
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
