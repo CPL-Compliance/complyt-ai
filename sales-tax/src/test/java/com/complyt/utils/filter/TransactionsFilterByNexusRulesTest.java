@@ -69,7 +69,7 @@ public class TransactionsFilterByNexusRulesTest {
     }
 
     private Customer createCustomer(ObjectId customerId, ObjectId tenantId, Address shippingAddress) {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId.toString(), CustomerType.RETAIL);
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId.toString(), CustomerType.RETAIL, null, null);
     }
 
     private NexusStateRule createNexusStateRule() {

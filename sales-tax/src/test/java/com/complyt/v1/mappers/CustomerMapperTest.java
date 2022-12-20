@@ -42,13 +42,13 @@ public class CustomerMapperTest {
     private Customer createCustomer(String tenantId) {
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
     }
 
     private CustomerDto createCustomerDto() {
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        return new CustomerDto(customerId.toString(), externalId, name, address, CustomerTypeDto.RETAIL);
+        return new CustomerDto(customerId.toString(), externalId, name, address, CustomerTypeDto.RETAIL, null, null);
     }
 
     @Test

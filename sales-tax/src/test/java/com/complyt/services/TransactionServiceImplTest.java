@@ -77,7 +77,7 @@ class TransactionServiceImplTest {
 
     private Customer createCustomer() {
 
-        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -267,7 +267,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), UUID.randomUUID().toString(), CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);

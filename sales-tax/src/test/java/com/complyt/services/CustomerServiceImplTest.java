@@ -42,7 +42,7 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
     }
 
     @Test

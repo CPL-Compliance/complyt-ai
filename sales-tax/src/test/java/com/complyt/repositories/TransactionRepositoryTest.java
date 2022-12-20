@@ -54,7 +54,7 @@ class TransactionRepositoryTest {
     void setUp() {
         tenantId = UUID.randomUUID().toString();
         transaction = createTransaction();
-        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), tenantId, CustomerType.RETAIL);
+        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), tenantId, CustomerType.RETAIL, null, null);
     }
 
     private Transaction createTransaction() {
