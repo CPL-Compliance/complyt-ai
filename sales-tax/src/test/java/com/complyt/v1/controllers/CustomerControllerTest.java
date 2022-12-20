@@ -129,6 +129,9 @@ class CustomerControllerTest {
     @Test
     void update_UpdateFails_Returns5xxServerError() {
         // Given
+
+        String externalId = customer.getExternalId();
+        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
 
         // When + Then
@@ -136,14 +139,13 @@ class CustomerControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
-                .bodyValue(customer)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
-
 
     @Test
     void getByExternalId_OperationFails_Returns4xxNotFound() {
