@@ -79,10 +79,10 @@ public class SalesTaxServiceImplTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         ObjectId customerId = new ObjectId();
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     private Customer createCustomer(ObjectId customerId) {
@@ -96,7 +96,7 @@ public class SalesTaxServiceImplTest {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 UUID.randomUUID().toString(), true, null, null, LocalDateTime.now().minusYears(1),
-                true, transaction.getExternalTimeStamps().getCreatedDate().minusYears(1));
+                true, transaction.getExternalTimestamps().getCreatedDate().minusYears(1));
 
     }
 
@@ -117,7 +117,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
         SalesTaxTracking tracking = createSalesTaxTracking()
-                .withAppliedDate(transaction.getExternalTimeStamps().getCreatedDate().plusYears(1));
+                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);

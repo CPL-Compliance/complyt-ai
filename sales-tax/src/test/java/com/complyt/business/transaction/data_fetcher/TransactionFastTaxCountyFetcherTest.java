@@ -58,7 +58,7 @@ class TransactionFastTaxCountyFetcherTest {
             }
         };
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId.toString(), null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId.toString(), null, new Timestamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
     }
 
     private TaxInfoItem createTaxInfoItem() {

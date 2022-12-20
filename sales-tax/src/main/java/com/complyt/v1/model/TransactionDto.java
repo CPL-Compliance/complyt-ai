@@ -23,8 +23,8 @@ public class TransactionDto {
     private final CustomerDto customer;
     private final SalesTaxDto salesTax;
     private final TransactionStatusDto transactionStatus;
-    private final TimeStampsDto internalTimeStamps;
-    private final TimeStampsDto externalTimeStamps;
+    private final TimestampsDto internalTimestamps;
+    private final TimestampsDto externalTimestamps;
     private final TransactionTypeDto transactionType;
     private final ShippingFeeDto shippingFee;
     private final String createdFrom;

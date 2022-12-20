@@ -1,7 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.Timestamps;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -22,7 +22,7 @@ public class Exemption {
     private final State state;
     private final Classification classification;
     private final ValidationDates validationDates;
-    private final TimeStamps internalTimeStamps;
+    private final Timestamps internalTimestamps;
     private final Status status;
     private final Certificate certificate;
     private final ExemptionType exemptionType;

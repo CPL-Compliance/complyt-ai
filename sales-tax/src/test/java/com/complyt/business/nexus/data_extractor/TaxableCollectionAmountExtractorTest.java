@@ -111,7 +111,7 @@ public class TaxableCollectionAmountExtractorTest {
             }
         };
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, shippingFee, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new Timestamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, shippingFee, null);
     }
 
     private ShippingFee createShippingFee() {

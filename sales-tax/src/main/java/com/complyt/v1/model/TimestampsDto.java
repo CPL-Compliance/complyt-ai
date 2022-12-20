@@ -2,7 +2,6 @@ package com.complyt.v1.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
@@ -13,18 +12,17 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Getter
 @EqualsAndHashCode
 @ToString
 @With
 @Slf4j
-@Schema(name = "TimeStamps")
-public class TimeStampsDto {
+@Schema(name = "Timestamps")
+public class TimestampsDto {
 
     private String createdDate;
     private String updatedDate;
 
-    public TimeStampsDto(String createdDate, String updatedDate) {
+    public TimestampsDto(String createdDate, String updatedDate) {
         this.createdDate = parseDate(createdDate);
         this.updatedDate = parseDate(updatedDate);
     }
@@ -33,12 +31,14 @@ public class TimeStampsDto {
         try {
             String parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
             log.debug("Input received as a LocalDate: " + parsedLocalDate);
+
             return parsedLocalDate;
         } catch (Exception ignore) {
         }
         try {
             String parsedLocalDateTime = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toString();
             log.debug("Input received as a LocalDateTime: " + parsedLocalDateTime);
+
             return parsedLocalDateTime;
         } catch (Exception ignore) {
         }
@@ -46,8 +46,8 @@ public class TimeStampsDto {
             ZonedDateTime zonedDate = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
             String parsedDateWithOffset = LocalDateTime.ofInstant(zonedDate.toInstant(), ZoneOffset.UTC).toString();
             log.debug("Input received as a ZonedDateTime: " + zonedDate);
-            return parsedDateWithOffset;
 
+            return parsedDateWithOffset;
         } catch (Exception e) {
             log.debug("Date has been received in invalid format : " + dateAsString);
         }
@@ -59,6 +59,7 @@ public class TimeStampsDto {
             return LocalDateTime.parse(createdDate);
         } catch (Exception e) {
             log.debug("Created date has invalid format");
+
             return null;
         }
     }
@@ -68,6 +69,7 @@ public class TimeStampsDto {
             return LocalDateTime.parse(updatedDate);
         } catch (Exception e) {
             log.debug("Updated invalid format");
+
             return null;
         }
     }

@@ -42,7 +42,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps timeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }

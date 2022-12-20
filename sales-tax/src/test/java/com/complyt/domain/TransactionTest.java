@@ -54,7 +54,7 @@ public class TransactionTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
@@ -82,8 +82,8 @@ public class TransactionTest {
                 ", salesTax=" + transaction.getSalesTax() +
                 ", transactionStatus=" + transaction.getTransactionStatus() +
                 ", tenantId=" + transaction.getTenantId() +
-                ", internalTimeStamps=" + transaction.getInternalTimeStamps() +
-                ", externalTimeStamps=" + transaction.getExternalTimeStamps() +
+                ", internalTimestamps=" + transaction.getInternalTimestamps() +
+                ", externalTimestamps=" + transaction.getExternalTimestamps() +
                 ", transactionType=" + transaction.getTransactionType() +
                 ", shippingFee=" + transaction.getShippingFee() +
                 ", createdFrom=" + transaction.getCreatedFrom() + ")";
@@ -122,7 +122,7 @@ public class TransactionTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         Transaction.TransactionBuilder transactionBuilder = Transaction.builder();
         ShippingFee shippingFee = createShippingFee();
 
@@ -138,8 +138,8 @@ public class TransactionTest {
                 .salesTax(null)
                 .transactionStatus(TransactionStatus.ACTIVE)
                 .tenantId(tenantId)
-                .internalTimeStamps(timeStamps)
-                .externalTimeStamps(timeStamps)
+                .internalTimestamps(timeStamps)
+                .externalTimestamps(timeStamps)
                 .transactionType(TransactionType.INVOICE)
                 .shippingFee(shippingFee).build();
 

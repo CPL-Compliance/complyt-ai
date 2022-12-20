@@ -44,7 +44,7 @@ public class TransactionMapperTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
@@ -60,7 +60,7 @@ public class TransactionMapperTest {
                 ));
             }
         };
-        TimeStampsDto timeStamps = new TimeStampsDto(localDateTime.toString(), localDateTime.toString());
+        TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
         return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }

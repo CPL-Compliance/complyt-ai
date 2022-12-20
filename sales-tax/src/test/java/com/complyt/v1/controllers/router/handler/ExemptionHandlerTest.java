@@ -2,7 +2,7 @@ package com.complyt.v1.controllers.router.handler;
 
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.Timestamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
@@ -60,12 +60,12 @@ public class ExemptionHandlerTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
         return new Exemption(UUID.randomUUID().toString(), (new ObjectId()).toString(), new ObjectId(),
-                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
     @Test

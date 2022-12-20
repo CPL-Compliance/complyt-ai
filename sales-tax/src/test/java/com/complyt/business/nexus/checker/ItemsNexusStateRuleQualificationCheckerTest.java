@@ -54,7 +54,7 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         String tenantId = UUID.randomUUID().toString();
         List<Item> items = createItems();
-        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps timeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }

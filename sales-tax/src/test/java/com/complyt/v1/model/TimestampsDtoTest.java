@@ -12,15 +12,15 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TimeStampsDtoTest {
+class TimestampsDtoTest {
 
-    private TimeStampsDto timeStampsDto;
+    private TimestampsDto timestampsDto;
 
     @BeforeEach
     void setup() {
         String createdDate = "2002-02-02T02:02:02";
         String updatedDate = "2003-03-03T03:03:03";
-        timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        timestampsDto = new TimestampsDto(createdDate, updatedDate);
     }
 
     @Test
@@ -34,7 +34,7 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
         LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
@@ -52,7 +52,7 @@ class TimeStampsDtoTest {
         String updatedDate = "2015-05-25";
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
         LocalDateTime expectedCreatedDate = timeStampsDto.getCreatedDate();
 
         // Then
@@ -66,7 +66,7 @@ class TimeStampsDtoTest {
         String updatedDate = "2015-05-25asd";
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
         LocalDateTime expectedUpdatedDate = timeStampsDto.getUpdatedDate();
 
         // Then
@@ -82,7 +82,7 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
         LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
@@ -102,7 +102,7 @@ class TimeStampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDate.parse(updatedDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
 
         // When
-        TimeStampsDto timeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
         LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
         LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
 
@@ -114,29 +114,29 @@ class TimeStampsDtoTest {
     }
 
     @Test
-    void withUpdateDate_DifferentDate_ReturnTimeStampsDto() {
+    void withUpdateDate_DifferentDate_ReturnTimestampsDto() {
         // Given
         String createdDate = "2002-02-02T02:02:02";
         String updatedDate = "2004-04-04T04:04:04";
 
-        TimeStampsDto expectedTimeStampsDto = new TimeStampsDto(createdDate, updatedDate);
+        TimestampsDto expectedTimestampsDto = new TimestampsDto(createdDate, updatedDate);
         String differentDate = "2004-04-04T04:04:04";
 
         // When
-        TimeStampsDto actualTimeStampsDto = timeStampsDto.withUpdatedDate(differentDate);
+        TimestampsDto actualTimestampsDto = timestampsDto.withUpdatedDate(differentDate);
 
         // Then
-        assertEquals(expectedTimeStampsDto, actualTimeStampsDto);
+        assertEquals(expectedTimestampsDto, actualTimestampsDto);
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TimeStampsDto(createdDate=" + timeStampsDto.getCreatedDate() +
-                ", updatedDate=" + timeStampsDto.getUpdatedDate() + ")";
+        String expectedString = "TimestampsDto(createdDate=" + timestampsDto.getCreatedDate() +
+                ", updatedDate=" + timestampsDto.getUpdatedDate() + ")";
 
         // When
-        String actualString = timeStampsDto.toString();
+        String actualString = timestampsDto.toString();
 
         // Then
         assertEquals(expectedString, actualString);

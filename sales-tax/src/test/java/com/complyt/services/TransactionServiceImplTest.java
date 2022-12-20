@@ -70,7 +70,7 @@ class TransactionServiceImplTest {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps timeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
 
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, null, null);
     }
@@ -278,7 +278,7 @@ class TransactionServiceImplTest {
         }};
         LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
         LocalDateTime end = start.plusYears(1);
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate").gte(start).lte(end));
+        Query query = Query.query(Criteria.where("externalTimestamps.createdDate").gte(start).lte(end));
 
         // When
         when(transactionRepository.findAllByQuery(query)).thenReturn(Flux.fromIterable(allTransactions));
@@ -334,11 +334,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
@@ -369,11 +369,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimeStamps().getCreatedDate();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimeStamps().getUpdatedDate();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&

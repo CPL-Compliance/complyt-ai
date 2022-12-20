@@ -40,7 +40,7 @@ class TransactionDtoTest {
                 ));
             }
         };
-        TimeStampsDto timeStamps = new TimeStampsDto(localDateTime.toString(), localDateTime.toString());
+        TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
         return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
@@ -67,8 +67,8 @@ class TransactionDtoTest {
                 ", customer=" + transactionDto.getCustomer() +
                 ", salesTax=" + transactionDto.getSalesTax() +
                 ", transactionStatus=" + transactionDto.getTransactionStatus() +
-                ", internalTimeStamps=" + transactionDto.getInternalTimeStamps() +
-                ", externalTimeStamps=" + transactionDto.getExternalTimeStamps() +
+                ", internalTimestamps=" + transactionDto.getInternalTimestamps() +
+                ", externalTimestamps=" + transactionDto.getExternalTimestamps() +
                 ", transactionType=" + transactionDto.getTransactionType() +
                 ", shippingFee=" + transactionDto.getShippingFee() +
                 ", createdFrom=" + transactionDto.getCreatedFrom() + ")";

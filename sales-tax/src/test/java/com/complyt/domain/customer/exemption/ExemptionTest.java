@@ -1,7 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,13 +39,13 @@ class ExemptionTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStamps internalTimeStamps = new TimeStamps(localDateTime, localDateTime);
+        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
 
         return new Exemption(exemptionId, tenantId, customerId,
-                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
     @Test
@@ -69,7 +69,7 @@ class ExemptionTest {
                 ", state=" + exemption.getState() +
                 ", classification=" + exemption.getClassification() +
                 ", validationDates=" + exemption.getValidationDates() +
-                ", internalTimeStamps=" + exemption.getInternalTimeStamps() +
+                ", internalTimestamps=" + exemption.getInternalTimestamps() +
                 ", status=" + exemption.getStatus() +
                 ", certificate=" + exemption.getCertificate() +
                 ", exemptionType=" + exemption.getExemptionType() + ")";
@@ -91,7 +91,7 @@ class ExemptionTest {
                 .state(exemption.getState())
                 .classification(exemption.getClassification())
                 .validationDates(exemption.getValidationDates())
-                .internalTimeStamps(exemption.getInternalTimeStamps())
+                .internalTimestamps(exemption.getInternalTimestamps())
                 .status(exemption.getStatus())
                 .certificate(exemption.getCertificate())
                 .exemptionType(exemption.getExemptionType())

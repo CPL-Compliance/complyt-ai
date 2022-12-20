@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 @With
-public class TimeStamps {
+public class Timestamps {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 }

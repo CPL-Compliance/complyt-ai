@@ -32,7 +32,7 @@ class ModifiedTransactionInternalDateInjectorTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps internalTimeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<Item>() {
@@ -51,7 +51,7 @@ class ModifiedTransactionInternalDateInjectorTest {
                 .shippingAddress(shippingAddress)
                 .tenantId(tenantId)
                 .transactionStatus(TransactionStatus.ACTIVE)
-                .internalTimeStamps(internalTimeStamps)
+                .internalTimestamps(internalTimeStamps)
                 .build();
     }
 
@@ -65,8 +65,8 @@ class ModifiedTransactionInternalDateInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
 
     }
 

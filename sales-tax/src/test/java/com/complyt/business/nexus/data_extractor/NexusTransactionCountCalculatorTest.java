@@ -100,7 +100,7 @@ public class NexusTransactionCountCalculatorTest {
             }
         };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new Timestamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
         return new ArrayList<>() {{
             add(transaction);
         }};
