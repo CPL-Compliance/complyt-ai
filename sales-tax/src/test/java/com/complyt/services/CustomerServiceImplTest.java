@@ -104,7 +104,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void saveCustomer_CustomerSaved_CustomerReturned() {
+    void save_CustomerSaved_CustomerReturned() {
         // Given
         Customer customerWithId = customer.withId(UUID.randomUUID().toString());
 
@@ -125,11 +125,10 @@ class CustomerServiceImplTest {
     @Test
     void update_CustomerInserted_CustomerReturned() {
         // Given
-        Customer customerNoId = customer.withId(null);
 
         // When
-        when(customerRepository.findByExternalId(customerNoId.getExternalId())).thenReturn(Mono.just(customer));
-        when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
+        when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.just(customer));
+        when(customerRepository.save(any())).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
         // Then
