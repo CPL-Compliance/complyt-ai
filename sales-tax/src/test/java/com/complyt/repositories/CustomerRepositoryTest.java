@@ -49,7 +49,7 @@ class CustomerRepositoryTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
     }
 
     @Test

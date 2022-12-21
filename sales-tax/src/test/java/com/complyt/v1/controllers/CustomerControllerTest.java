@@ -55,21 +55,49 @@ class CustomerControllerTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, null, null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
     @Test
-    void update_NewCustomerCreated_SavesCustomer() {
+    void upsert_NewCustomerCreated_SavesCustomer() {
         // Given
-        when(customerFacade.upsert(customer)).thenReturn(Mono.just(customer));
+        String externalId = customerDto.getExternalId();
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
         // When + Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
+                        .path(CustomerController.BASE_URL + "/" + externalId)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(CustomerDto.class)
+                .value(customerItem -> customerItem, equalTo(customerDto));
+    }
+
+    @Test
+    void upsert_CustomerExists_UpdatesCustomer() {
+        // Given
+        String externalId = customer.getExternalId();
+        Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Customer originalCustomer = newCustomer.withName("originalCustomer");
+        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.just(originalCustomer));
+        when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerController.BASE_URL + "/" + externalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -77,24 +105,6 @@ class CustomerControllerTest {
                 .expectStatus().isOk()
                 .expectBody(CustomerDto.class)
                 .value(customerItem -> customerItem, equalTo(customerDto));
-    }
-
-    @Test
-    void update_UpdateFails_Returns5xxServerError() {
-        // Given
-        when(customerFacade.upsert(customer)).thenThrow(OperationFailedException.class);
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + customer.getExternalId())
-                        .build())
-                .bodyValue(customer)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -114,6 +124,27 @@ class CustomerControllerTest {
                 .expectStatus().isOk()
                 .expectBody(CustomerDto.class)
                 .value(customerItem -> customerItem, equalTo(customerDto));
+    }
+
+    @Test
+    void update_UpdateFails_Returns5xxServerError() {
+        // Given
+
+        String externalId = customer.getExternalId();
+        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerController.BASE_URL + "/" + externalId)
+                        .build())
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -189,7 +220,7 @@ class CustomerControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.upsertCustomer(nullExternalId, customerDto);
+            customerController.upsert(nullExternalId, customerDto);
         });
 
         // Then
@@ -205,7 +236,7 @@ class CustomerControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.upsertCustomer(externalId, nullCustomerDto);
+            customerController.upsert(externalId, nullCustomerDto);
         });
 
         // Then

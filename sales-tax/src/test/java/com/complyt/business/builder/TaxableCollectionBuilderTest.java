@@ -52,7 +52,7 @@ public class TaxableCollectionBuilderTest {
         List<Item> items = new ArrayList<>();
         SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId, CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId, CustomerType.RETAIL, null, null);
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, shippingFee, null);
     }

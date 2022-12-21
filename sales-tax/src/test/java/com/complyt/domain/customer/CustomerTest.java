@@ -20,8 +20,8 @@ class CustomerTest {
         String tenantId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL);
-        anotherCustomer = new Customer(customer.getId(), customer.getExternalId(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType());
+        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
+        anotherCustomer = new Customer(customer.getId(), customer.getExternalId(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), null, null);
     }
 
     @Test
@@ -42,7 +42,9 @@ class CustomerTest {
                 ", name=" + customer.getName() +
                 ", address=" + customer.getAddress() +
                 ", tenantId=" + customer.getTenantId() +
-                ", customerType=" + customer.getCustomerType() + ")";
+                ", customerType=" + customer.getCustomerType() +
+                ", internalTimeStamps=" + customer.getInternalTimeStamps() +
+                ", externalTimeStamps=" + customer.getExternalTimeStamps() + ")";
 
         // When
         String actualString = customer.toString();

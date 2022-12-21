@@ -10,9 +10,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CustomerService extends CrudService<Customer, String>, FindByName<Customer>, FindOneByName<Customer> {
+
     Mono<Customer> save(@NonNull Customer customer);
 
-    Mono<Customer> upsert(@NonNull Customer customer);
+    Mono<Customer> update(@NonNull Customer customer);
 
     Mono<Customer> findOneByName(String name);
 
@@ -21,4 +22,8 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
     Flux<Customer> findAll();
 
     Mono<Customer> findById(@NonNull ObjectId id);
+
+    Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer);
+
+    Customer injectDataToNewCustomer(Customer customer);
 }

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -42,32 +44,48 @@ class CustomerFacadeTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL);
+        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
     }
 
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
-
+        Customer customerNoId = customer.withId(null);
         // When
-        when(customerService.save(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerFacade.save(customer);
+
+        when(customerService.save(customerNoId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.saveCustomer(customerNoId);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned() {
+    void updateIfModified_CustomerModified_UpdatesCustomer() {
         // Given
+        Customer originalCustomer = customer.withName("originalCustomer");
+        Customer customerNoId = customer.withId(null);
 
         // When
-        when(customerService.upsert(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerFacade.upsert(customer);
+        when(customerService.update(customerNoId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.updateIfModified(customerNoId, originalCustomer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
+
+    @Test
+    void updateIfModified_CustomerNotModified_ReturnsCustomer() {
+        // Given
+        Customer newCustomer = customer.withName(customer.getName());
+
+        // When
+        Mono<Customer> customerMono = customerFacade.updateIfModified(newCustomer, customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
+    }
+
 
     @Test
     void getCustomerByName_CustomerFound_CustomerReturned() {
@@ -113,4 +131,41 @@ class CustomerFacadeTest {
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
     }
+
+    @Test
+    void saveCustomer_NullCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.saveCustomer(nullCustomer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullNewCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullNewCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.updateIfModified(nullNewCustomer, customer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
+    }
+
+    @Test
+    void updateIfModified_NullOriginalCustomerPassed_ThrowsException() {
+        // Given
+        Customer nullOriginalCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.updateIfModified(customer, nullOriginalCustomer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalCustomer is marked non-null but is null");
+    }
+
 }
