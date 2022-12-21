@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +32,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> update(@NonNull Customer newCustomer) {
         return customerRepository.findByExternalId(newCustomer.getExternalId())
                 .map(originalCustomer -> injectDataToExistingCustomer(newCustomer, originalCustomer))
-                .switchIfEmpty(customerRepository.save(newCustomer))
+                .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
                 .map(createFunctionUpdateCustomer(newCustomer))
                 .flatMap(customerRepository::save);
     }

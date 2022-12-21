@@ -137,6 +137,18 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void update_CustomerDoesNotExist_ThrowsNotFoundError() {
+        // Given
+
+        // When
+        when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.empty());
+        Mono<Customer> customerMono = customerServiceImpl.update(customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectError().verify();
+    }
+
+    @Test
     void findOneByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "CustomerToSearchFor";
