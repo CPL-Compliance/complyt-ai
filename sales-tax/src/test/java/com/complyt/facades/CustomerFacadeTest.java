@@ -50,7 +50,7 @@ class CustomerFacadeTest {
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
-       Customer customerNoId = customer.withId(null);
+        Customer customerNoId = customer.withId(null);
         // When
 
         when(customerService.save(customerNoId)).thenReturn(Mono.just(customer));

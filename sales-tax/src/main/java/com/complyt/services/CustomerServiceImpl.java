@@ -32,8 +32,10 @@ public class CustomerServiceImpl implements CustomerService {
     public Mono<Customer> update(@NonNull Customer newCustomer) {
         return customerRepository.findByExternalId(newCustomer.getExternalId())
                 .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
-                .map(originalCustomer -> injectDataToExistingCustomer(newCustomer, originalCustomer))
-                .map(customerWithInjectedData -> createFunctionUpdateCustomer(customerWithInjectedData).apply(newCustomer))
+                .map(originalCustomer -> {
+                    Customer customerWithInjectedData = injectDataToExistingCustomer(newCustomer, originalCustomer);
+                    return createFunctionUpdateCustomer(customerWithInjectedData).apply(originalCustomer);
+                })
                 .flatMap(customerRepository::save);
     }
 

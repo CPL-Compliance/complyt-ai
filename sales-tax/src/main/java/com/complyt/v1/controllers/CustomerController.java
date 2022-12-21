@@ -1,14 +1,11 @@
 package com.complyt.v1.controllers;
 
 
-import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
 import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

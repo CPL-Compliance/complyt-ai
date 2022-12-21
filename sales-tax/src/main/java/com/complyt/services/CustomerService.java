@@ -10,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CustomerService extends CrudService<Customer, String>, FindByName<Customer>, FindOneByName<Customer> {
+
     Mono<Customer> save(@NonNull Customer customer);
 
     Mono<Customer> update(@NonNull Customer customer);

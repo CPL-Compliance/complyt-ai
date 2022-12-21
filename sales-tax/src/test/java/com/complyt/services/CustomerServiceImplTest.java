@@ -246,7 +246,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void upsert_NullGiven_ThrowsNullPointerException() {
+    void upsert_NullCustomerGiven_ThrowsNullPointerException() {
         // Given
         Customer nullCustomer = null;
 

@@ -21,7 +21,7 @@ public class CustomerFacade {
         return customerService.save(customer);
     }
 
-    public Mono<Customer> updateIfModified(@NonNull Customer newCustomer,@NonNull Customer originalCustomer) {
+    public Mono<Customer> updateIfModified(@NonNull Customer newCustomer, @NonNull Customer originalCustomer) {
         return originalCustomer.equals(newCustomer) ?
                 Mono.just(newCustomer) : customerService.update(newCustomer);
     }
