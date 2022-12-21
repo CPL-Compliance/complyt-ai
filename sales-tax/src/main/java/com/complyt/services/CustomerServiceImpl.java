@@ -1,7 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.dates_injection.ModifiedCustomerInternalDateInjector;
-import com.complyt.business.dates_injection.NewCustomerInternalDateInjector;
+import com.complyt.business.dates_injection.ExistingCustomerInternalTimestampsInjector;
+import com.complyt.business.dates_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
@@ -24,25 +24,27 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {
-        return customerRepository.save(customer);
+        Customer customerWithInjectedData = injectDataToNewCustomer(customer);
+        return customerRepository.save(customerWithInjectedData);
     }
 
-    public Mono<Customer> update(@NonNull Customer customer) {
-        return customerRepository.findByExternalId(customer.getExternalId())
-                .switchIfEmpty(customerRepository.save(customer))
-                .map(createFunctionUpdateCustomer(customer))
+    public Mono<Customer> update(@NonNull Customer newCustomer) {
+        return customerRepository.findByExternalId(newCustomer.getExternalId())
+                .map(originalCustomer -> injectDataToExistingCustomer(newCustomer, originalCustomer))
+                .switchIfEmpty(customerRepository.save(newCustomer))
+                .map(createFunctionUpdateCustomer(newCustomer))
                 .flatMap(customerRepository::save);
     }
 
     public Customer injectDataToNewCustomer(Customer customer) {
-        return new NewCustomerInternalDateInjector(customer).inject();
+        return new NewCustomerInternalTimestampsInjector(customer).inject();
     }
 
-    public Customer injectDataToModifiedCustomer(Customer modifiedCustomer, Customer originalCustomer) {
-        Customer modifiedCustomerWithInternalTimeStamps = modifiedCustomer
+    public Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
+        Customer existingCustomerWithInternalTimeStamps = newCustomer
                 .withInternalTimeStamps(originalCustomer.getInternalTimeStamps());
 
-        return new ModifiedCustomerInternalDateInjector(modifiedCustomerWithInternalTimeStamps).inject();
+        return new ExistingCustomerInternalTimestampsInjector(existingCustomerWithInternalTimeStamps).inject();
     }
 
     @Override

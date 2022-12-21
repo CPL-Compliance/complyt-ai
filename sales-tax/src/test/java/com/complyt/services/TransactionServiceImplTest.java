@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.dates_injection.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.dates_injection.NewTransactionInternalDateInjector;
+import com.complyt.business.dates_injection.ExistingTransactionInternalTimestampsInjector;
+import com.complyt.business.dates_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -324,7 +324,7 @@ class TransactionServiceImplTest {
 
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        NewTransactionInternalDateInjector injector = new NewTransactionInternalDateInjector(transactionWithProductClassification);
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
@@ -359,7 +359,7 @@ class TransactionServiceImplTest {
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        ModifiedTransactionInternalDateInjector injector = new ModifiedTransactionInternalDateInjector(transactionWithProductClassification);
+        ExistingTransactionInternalTimestampsInjector injector = new ExistingTransactionInternalTimestampsInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When

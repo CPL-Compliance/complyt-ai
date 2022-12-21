@@ -1,21 +1,23 @@
 package com.complyt.business.dates_injection;
 
 import com.complyt.domain.TimeStamps;
-import com.complyt.domain.customer.Customer;
+import com.complyt.domain.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @AllArgsConstructor
-public class NewCustomerInternalDateInjector implements DateInjector<Customer> {
+public class NewTransactionInternalTimestampsInjector implements DateInjector<Transaction> {
 
     @NonNull
-    private final Customer customer;
+    private final Transaction transaction;
 
     @Override
-    public Customer inject() {
+    public Transaction inject() {
         TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return customer.withInternalTimeStamps(timeStamps);
+        return transaction.withInternalTimeStamps(timeStamps);
     }
 }

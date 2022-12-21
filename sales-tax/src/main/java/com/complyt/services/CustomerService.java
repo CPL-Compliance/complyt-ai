@@ -22,7 +22,7 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
 
     Mono<Customer> findById(@NonNull ObjectId id);
 
-    Customer injectDataToModifiedCustomer(Customer modifiedCustomer, Customer originalCustomer);
+    Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer);
 
     Customer injectDataToNewCustomer(Customer customer);
 }

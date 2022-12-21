@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
-public class ModifiedTransactionInternalDateInjector implements DateInjector<Transaction> {
+public class ExistingTransactionInternalTimestampsInjector implements DateInjector<Transaction> {
 
     @NonNull
     private final Transaction transaction;

@@ -1,8 +1,6 @@
 package com.complyt.facades;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.TimeStamps;
-import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.services.CustomerService;
@@ -18,7 +16,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,34 +50,28 @@ class CustomerFacadeTest {
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
-        Customer newCustomerWithUpdatedData = customer.withInternalTimeStamps(
-                new TimeStamps(LocalDateTime.now(), LocalDateTime.now())
-        );
-
+       Customer customerNoId = customer.withId(null);
         // When
-        when(customerService.injectDataToNewCustomer(customer)).thenReturn(newCustomerWithUpdatedData);
-        when(customerService.save(newCustomerWithUpdatedData)).thenReturn(Mono.just(newCustomerWithUpdatedData));
-        Mono<Customer> customerMono = customerFacade.saveCustomer(customer);
+
+        when(customerService.save(customerNoId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.saveCustomer(customerNoId);
 
         // Then
-        StepVerifier.create(customerMono).expectNext(newCustomerWithUpdatedData).verifyComplete();
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
     void updateIfModified_CustomerModified_UpdatesCustomer() {
         // Given
-        Customer newCustomer = customer.withName("newCustomer");
-        Customer newCustomerWithUpdatedData = newCustomer.withInternalTimeStamps(
-                new TimeStamps(LocalDateTime.now().minusDays(3), LocalDateTime.now())
-        );
+        Customer originalCustomer = customer.withName("originalCustomer");
+        Customer customerNoId = customer.withId(null);
 
         // When
-        when(customerService.injectDataToModifiedCustomer(newCustomer, customer)).thenReturn(newCustomerWithUpdatedData);
-        when(customerService.update(newCustomerWithUpdatedData)).thenReturn(Mono.just(newCustomerWithUpdatedData));
-        Mono<Customer> customerMono = customerFacade.updateIfModified(newCustomer, customer);
+        when(customerService.update(customerNoId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.updateIfModified(customerNoId, originalCustomer);
 
         // Then
-        StepVerifier.create(customerMono).expectNext(newCustomerWithUpdatedData).verifyComplete();
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test

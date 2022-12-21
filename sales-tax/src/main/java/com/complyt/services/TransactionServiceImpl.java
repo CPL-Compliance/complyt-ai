@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.dates_injection.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.dates_injection.NewTransactionInternalDateInjector;
+import com.complyt.business.dates_injection.ExistingTransactionInternalTimestampsInjector;
+import com.complyt.business.dates_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
@@ -57,16 +57,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimeStamps)
                 .flatMap(countyProvider::provide)
-                .map(ModifiedTransactionInternalDateInjector::new)
-                .map(ModifiedTransactionInternalDateInjector::inject);
+                .map(ExistingTransactionInternalTimestampsInjector::new)
+                .map(ExistingTransactionInternalTimestampsInjector::inject);
     }
 
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
-                .map(NewTransactionInternalDateInjector::new)
-                .map(NewTransactionInternalDateInjector::inject);
+                .map(NewTransactionInternalTimestampsInjector::new)
+                .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
     @Override

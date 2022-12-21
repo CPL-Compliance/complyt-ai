@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.ModifiedTransactionInternalDateInjector;
+import com.complyt.business.dates_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -16,16 +16,16 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ModifiedTransactionInternalDateInjectorTest {
+class ExistingTransactionInternalDateInjectorTest {
 
-    ModifiedTransactionInternalDateInjector modifiedTransactionInternalDateInjector;
+    ExistingTransactionInternalTimestampsInjector existingTransactionInternalTimestampsInjector;
 
     Transaction transaction;
 
     @BeforeEach
     void setup() {
         transaction = createTransaction();
-        modifiedTransactionInternalDateInjector = new ModifiedTransactionInternalDateInjector(transaction);
+        existingTransactionInternalTimestampsInjector = new ExistingTransactionInternalTimestampsInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -62,7 +62,7 @@ class ModifiedTransactionInternalDateInjectorTest {
         LocalDateTime beforeActionTime = LocalDateTime.now();
 
         // When
-        Transaction actualTransaction = modifiedTransactionInternalDateInjector.inject();
+        Transaction actualTransaction = existingTransactionInternalTimestampsInjector.inject();
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then

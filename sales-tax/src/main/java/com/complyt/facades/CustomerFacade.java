@@ -18,18 +18,12 @@ public class CustomerFacade {
     private CustomerService customerService;
 
     public Mono<Customer> saveCustomer(@NonNull Customer customer) {
-        Customer customerWithInjectedData = customerService.injectDataToNewCustomer(customer);
-        return customerService.save(customerWithInjectedData);
+        return customerService.save(customer);
     }
 
-    public Mono<Customer> updateIfModified(@NonNull Customer newCustomer, @NonNull Customer originalCustomer) {
+    public Mono<Customer> updateIfModified(@NonNull Customer newCustomer,@NonNull Customer originalCustomer) {
         return originalCustomer.equals(newCustomer) ?
-                Mono.just(newCustomer) : update(newCustomer, originalCustomer);
-    }
-
-    private Mono<Customer> update(Customer modifiedCustomer, Customer originalCustomer) {
-        Customer customerWithInjectedData = customerService.injectDataToModifiedCustomer(modifiedCustomer, originalCustomer);
-        return customerService.update(customerWithInjectedData);
+                Mono.just(newCustomer) : customerService.update(newCustomer);
     }
 
     public Flux<Customer> findByName(String name) {

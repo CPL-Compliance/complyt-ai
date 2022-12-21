@@ -8,7 +8,7 @@ import lombok.NonNull;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
-public class ModifiedCustomerInternalDateInjector implements DateInjector<Customer> {
+public class ExistingCustomerInternalTimestampsInjector implements DateInjector<Customer> {
 
     @NonNull
     private final Customer customer;

@@ -1,7 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.ModifiedCustomerInternalDateInjector;
-import com.complyt.business.dates_injection.NewCustomerInternalDateInjector;
+import com.complyt.business.dates_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -13,16 +12,16 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ModifiedCustomerInternalDateInjectorTest {
+public class ExistingCustomerInternalDateInjectorTest {
 
-    ModifiedCustomerInternalDateInjector modifiedCustomerInternalDateInjector;
+    ExistingCustomerInternalTimestampsInjector existingCustomerInternalTimestampsInjector;
 
     Customer customer;
 
     @BeforeEach
     void setUp() {
         customer = createCustomer();
-        modifiedCustomerInternalDateInjector = new ModifiedCustomerInternalDateInjector(customer);
+        existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
     }
 
     private Customer createCustomer() {
@@ -46,7 +45,7 @@ public class ModifiedCustomerInternalDateInjectorTest {
         LocalDateTime beforeActionTime = LocalDateTime.now();
 
         // When
-        Customer actualCustomer = modifiedCustomerInternalDateInjector.inject();
+        Customer actualCustomer = existingCustomerInternalTimestampsInjector.inject();
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then

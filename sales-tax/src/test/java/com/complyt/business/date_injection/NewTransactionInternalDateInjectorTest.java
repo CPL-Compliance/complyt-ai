@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.NewTransactionInternalDateInjector;
+import com.complyt.business.dates_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NewTransactionInternalDateInjectorTest {
 
-    NewTransactionInternalDateInjector newTransactionInternalDateInjector;
+    NewTransactionInternalTimestampsInjector newTransactionInternalDateInjector;
 
     Transaction transaction;
 
     @BeforeEach
     void setup() {
         transaction = createTransactionWithoutTimeStamps();
-        newTransactionInternalDateInjector = new NewTransactionInternalDateInjector(transaction);
+        newTransactionInternalDateInjector = new NewTransactionInternalTimestampsInjector(transaction);
     }
 
     private Transaction createTransactionWithoutTimeStamps() {

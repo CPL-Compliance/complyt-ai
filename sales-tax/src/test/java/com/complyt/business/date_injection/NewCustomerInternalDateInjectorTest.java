@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.NewCustomerInternalDateInjector;
+import com.complyt.business.dates_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NewCustomerInternalDateInjectorTest {
 
-    NewCustomerInternalDateInjector newCustomerInternalDateInjector;
+    NewCustomerInternalTimestampsInjector newCustomerInternalDateInjector;
 
     Customer customer;
 
     @BeforeEach
     void setUp() {
         customer = createCustomer();
-        newCustomerInternalDateInjector = new NewCustomerInternalDateInjector(customer);
+        newCustomerInternalDateInjector = new NewCustomerInternalTimestampsInjector(customer);
     }
 
     private Customer createCustomer() {
