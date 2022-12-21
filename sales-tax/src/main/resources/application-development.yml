@@ -1,13 +1,12 @@
 eureka:
   client:
-    enabled: false
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
 
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/alex
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/eyal
 
 logging:
   level:
