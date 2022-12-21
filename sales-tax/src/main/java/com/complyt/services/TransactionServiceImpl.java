@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.dates_injection.ExistingTransactionInternalTimestampsInjector;
-import com.complyt.business.dates_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;

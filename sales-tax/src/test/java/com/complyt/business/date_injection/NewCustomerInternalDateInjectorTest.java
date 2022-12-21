@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.NewCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import org.junit.jupiter.api.BeforeEach;

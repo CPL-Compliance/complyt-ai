@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.ExistingTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

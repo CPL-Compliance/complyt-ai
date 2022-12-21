@@ -1,7 +1,7 @@
 package com.complyt.services;
 
-import com.complyt.business.dates_injection.ExistingCustomerInternalTimestampsInjector;
-import com.complyt.business.dates_injection.NewCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;

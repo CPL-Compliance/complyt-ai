@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.ExistingCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;

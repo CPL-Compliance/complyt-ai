@@ -1,4 +1,4 @@
-package com.complyt.business.dates_injection;
+package com.complyt.business.timestamps_injection;
 
 import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
@@ -8,7 +8,7 @@ import lombok.NonNull;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
-public class ExistingCustomerInternalTimestampsInjector implements DateInjector<Customer> {
+public class ExistingCustomerInternalTimestampsInjector implements TimestampsInjector<Customer> {
 
     @NonNull
     private final Customer customer;

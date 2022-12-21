@@ -1,6 +1,6 @@
 package com.complyt.business.date_injection;
 
-import com.complyt.business.dates_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
