@@ -17,12 +17,13 @@ public class CustomerFacade {
     @NonNull
     private CustomerService customerService;
 
-    public Mono<Customer> save(Customer customer) {
+    public Mono<Customer> saveCustomer(@NonNull Customer customer) {
         return customerService.save(customer);
     }
 
-    public Mono<Customer> upsert(Customer customer) {
-        return customerService.upsert(customer);
+    public Mono<Customer> updateIfModified(@NonNull Customer newCustomer, @NonNull Customer originalCustomer) {
+        return originalCustomer.equals(newCustomer) ?
+                Mono.just(newCustomer) : customerService.update(newCustomer);
     }
 
     public Flux<Customer> findByName(String name) {
@@ -36,4 +37,5 @@ public class CustomerFacade {
     public Flux<Customer> getAllCustomers() {
         return customerService.findAll();
     }
+
 }

@@ -1,8 +1,8 @@
 package com.complyt.services;
 
 import com.complyt.business.transaction.CountyProvider;
-import com.complyt.business.transaction.date_injector.ModifiedTransactionInternalDateInjector;
-import com.complyt.business.transaction.date_injector.NewTransactionInternalDateInjector;
+import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -77,7 +77,7 @@ class TransactionServiceImplTest {
 
     private Customer createCustomer() {
 
-        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
     }
 
     private Transaction createTransactionWithProductClassificationData() {
@@ -267,7 +267,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), UUID.randomUUID().toString(), CustomerType.RETAIL);
+        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
@@ -318,13 +318,13 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void injectDataToNewTransaction_InjectsDateToNewTransaction_ReturnsTransaction() {
+    void injectDataToNewTransaction_InjectsDataToNewTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
 
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        NewTransactionInternalDateInjector injector = new NewTransactionInternalDateInjector(transactionWithProductClassification);
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
@@ -352,14 +352,14 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void injectDataToModifiedTransaction_InjectsDateToModifiedTransaction_ReturnsTransaction() {
+    void injectDataToModifiedTransaction_InjectsDataToModifiedTransaction_ReturnsTransaction() {
         // Given
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction newTransaction = transactionWithCustomer.withBillingAddress(transaction.getBillingAddress().withCity("someCity"));
         Transaction transactionWithProductClassification = createTransactionWithProductClassificationData();
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        ModifiedTransactionInternalDateInjector injector = new ModifiedTransactionInternalDateInjector(transactionWithProductClassification);
+        ExistingTransactionInternalTimestampsInjector injector = new ExistingTransactionInternalTimestampsInjector(transactionWithProductClassification);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When

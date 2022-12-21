@@ -1,6 +1,7 @@
 package com.complyt.v1.controllers;
 
 
+import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
@@ -35,10 +36,17 @@ public class CustomerController {
     @CustomerUpdatePermission
     @PutMapping("{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsertCustomer(@PathVariable @NonNull String externalId,
-                                                            @RequestBody @NonNull CustomerDto customerDto) {
-        return customerfacade.upsert(CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
-                .map(item -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(item)));
+    public Mono<ResponseEntity<CustomerDto>> upsert(@PathVariable @NonNull String externalId,
+                                                    @RequestBody @NonNull CustomerDto customerDto) {
+        log.debug("Upsert customer - DTO received in request body : " + customerDto);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+
+        return customerfacade.findByExternalId(externalId)
+                .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer))
+                .map(updatedCustomer -> ResponseEntity.status(HttpStatus.OK).body(CustomerMapper.INSTANCE.customerToCustomerDto(updatedCustomer)))
+                .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer)
+                        .map(customer -> ResponseEntity.status(HttpStatus.CREATED).body(CustomerMapper.INSTANCE.customerToCustomerDto(customer))));
+
     }
 
     @Operation(summary = "Gets customer by externalId")

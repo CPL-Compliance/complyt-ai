@@ -1,4 +1,4 @@
-package com.complyt.business.transaction.date_injector;
+package com.complyt.business.timestamps_injection;
 
 import com.complyt.domain.Timestamps;
 import com.complyt.domain.Transaction;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
-public class ModifiedTransactionInternalDateInjector implements DateInjector<Transaction> {
+public class ExistingTransactionInternalTimestampsInjector implements TimestampsInjector<Transaction> {
 
     @NonNull
     private final Transaction transaction;

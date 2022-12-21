@@ -120,7 +120,7 @@ public class NexusTransactionsAmountCalculatorTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
     }
 
     @Test

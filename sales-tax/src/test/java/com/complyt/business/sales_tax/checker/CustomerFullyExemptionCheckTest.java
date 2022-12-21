@@ -47,9 +47,9 @@ public class CustomerFullyExemptionCheckTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        Timestamps externalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        Timestamps externalTimeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
+        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
     }
 
     private Exemption createExemption() {

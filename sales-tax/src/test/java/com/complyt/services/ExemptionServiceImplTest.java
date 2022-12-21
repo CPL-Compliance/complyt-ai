@@ -53,7 +53,7 @@ public class ExemptionServiceImplTest {
     }
 
     private Customer createCustomer() {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL);
+        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null, null);
     }
 
     private Exemption createExemption() {

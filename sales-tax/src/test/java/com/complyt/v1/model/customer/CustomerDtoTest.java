@@ -24,8 +24,8 @@ public class CustomerDtoTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL);
-        anotherCustomerDto = new CustomerDto(customerDto.getId(), customerDto.getExternalId(), customerDto.getName(), customerDto.getAddress(), customerDto.getCustomerType());
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, null, null);
+        anotherCustomerDto = new CustomerDto(customerDto.getId(), customerDto.getExternalId(), customerDto.getName(), customerDto.getAddress(), customerDto.getCustomerType(), null, null);
     }
 
     @Test
@@ -45,7 +45,9 @@ public class CustomerDtoTest {
                 ", externalId=" + customerDto.getExternalId() +
                 ", name=" + customerDto.getName() +
                 ", address=" + customerDto.getAddress() +
-                ", customerType=" + customerDto.getCustomerType() + ")";
+                ", customerType=" + customerDto.getCustomerType() +
+                ", internalTimeStamps=" + customerDto.getInternalTimeStamps() +
+                ", externalTimeStamps=" + customerDto.getExternalTimeStamps() + ")";
 
         // When
         String actualString = customerDto.toString();

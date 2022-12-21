@@ -1,5 +1,7 @@
 package com.complyt.services;
 
+import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.CustomerRepository;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,14 +25,29 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {
-        return customerRepository.save(customer);
+        Customer customerWithInjectedData = injectDataToNewCustomer(customer);
+        return customerRepository.save(customerWithInjectedData);
     }
 
-    public Mono<Customer> upsert(@NonNull Customer customer) {
-        return customerRepository.findByExternalId(customer.getExternalId())
-                .switchIfEmpty(customerRepository.save(customer))
-                .map(createFunctionUpdateCustomer(customer))
+    public Mono<Customer> update(@NonNull Customer newCustomer) {
+        return customerRepository.findByExternalId(newCustomer.getExternalId())
+                .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
+                .map(originalCustomer -> {
+                    Customer customerWithInjectedData = injectDataToExistingCustomer(newCustomer, originalCustomer);
+                    return createFunctionUpdateCustomer(customerWithInjectedData).apply(originalCustomer);
+                })
                 .flatMap(customerRepository::save);
+    }
+
+    public Customer injectDataToNewCustomer(Customer customer) {
+        return new NewCustomerInternalTimestampsInjector(customer).inject();
+    }
+
+    public Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
+        Customer existingCustomerWithInternalTimeStamps = newCustomer
+                .withInternalTimeStamps(originalCustomer.getInternalTimeStamps());
+
+        return new ExistingCustomerInternalTimestampsInjector(existingCustomerWithInternalTimeStamps).inject();
     }
 
     @Override
@@ -63,8 +81,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Function<Customer, Customer> createFunctionUpdateCustomer(final Customer customer) {
-        return customerInfo -> customerInfo.withExternalId(customer.getExternalId())
+        return customerInfo -> customerInfo
+                .withExternalId(customer.getExternalId())
                 .withAddress(customer.getAddress())
-                .withName(customer.getName());
+                .withName(customer.getName())
+                .withCustomerType(customer.getCustomerType())
+                .withInternalTimeStamps(customer.getInternalTimeStamps())
+                .withExternalTimeStamps(customer.getExternalTimeStamps());
     }
 }

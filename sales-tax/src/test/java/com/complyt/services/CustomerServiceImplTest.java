@@ -1,10 +1,14 @@
 package com.complyt.services;
 
+import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
+import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.Address;
+import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,10 +21,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -42,32 +48,103 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL);
+        TimeStamps internalTimestamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL, internalTimestamps, null);
     }
 
     @Test
-    void saveCustomer_CustomerSaved_CustomerReturned() {
+    void injectDataToExistingCustomer_InjectsDataToExistingCustomer_ReturnsCustomer() {
         // Given
+        Customer newCustomer = customer.withName("NewName");
+        ExistingCustomerInternalTimestampsInjector injector = new ExistingCustomerInternalTimestampsInjector(customer);
+        Customer customerWithUpdatedDates = injector.inject();
+
+        Customer actualCustomer = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer);
+
+        // Then
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+
+        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
+        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+    }
+
+    @Test
+    void injectDataToNewCustomer_InjectsDataToNewCustomer_ReturnsCustomer() {
+        // Given
+        NewCustomerInternalTimestampsInjector injector = new NewCustomerInternalTimestampsInjector(customer);
+        Customer customerWithUpdatedDates = injector.inject();
+
+        Customer actualCustomer = customerServiceImpl.injectDataToNewCustomer(customer);
+
+        // Then
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+
+        Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedUpdatedDateTime.getDayOfYear(), actualUpdatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedUpdatedDateTime.getHour(), actualUpdatedDateTime.getHour());
+        Assertions.assertEquals(expectedCreatedDateTime.getYear(), actualCreatedDateTime.getYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getMonthValue(), actualCreatedDateTime.getMonthValue());
+        Assertions.assertEquals(expectedCreatedDateTime.getDayOfYear(), actualCreatedDateTime.getDayOfYear());
+        Assertions.assertEquals(expectedCreatedDateTime.getHour(), actualCreatedDateTime.getHour());
+    }
+
+    @Test
+    void save_CustomerSaved_CustomerReturned() {
+        // Given
+        Customer customerWithId = customer.withId(UUID.randomUUID().toString());
 
         // When
-        when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
+        when(customerRepository.save(any())).thenReturn(Mono.just(customerWithId));
         Mono<Customer> monoCustomer = customerServiceImpl.save(customer);
 
         // Then
-        StepVerifier.create(monoCustomer).expectNext(customer).verifyComplete();
+        StepVerifier.create(monoCustomer).expectNextMatches(returnedCustomer -> {
+                    TimeStamps internalTimeStamps = returnedCustomer.getInternalTimeStamps();
+                    Customer customerWithIdAndTimeStamps = customerWithId.withInternalTimeStamps(internalTimeStamps);
+                    return customerWithIdAndTimeStamps == customerWithId;
+                })
+                .expectComplete().verify();
+
     }
 
     @Test
-    void upsertCustomer_CustomerInserted_CustomerReturned() {
+    void update_CustomerInserted_CustomerReturned() {
         // Given
 
         // When
         when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.just(customer));
-        when(customerRepository.save(customer)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerServiceImpl.upsert(customer);
+        when(customerRepository.save(any())).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+    }
+
+    @Test
+    void update_CustomerDoesNotExist_ThrowsNotFoundError() {
+        // Given
+
+        // When
+        when(customerRepository.findByExternalId(customer.getExternalId())).thenReturn(Mono.empty());
+        Mono<Customer> customerMono = customerServiceImpl.update(customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectError().verify();
     }
 
     @Test
@@ -169,7 +246,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void upsert_NullGiven_ThrowsNullPointerException() {
+    void upsert_NullCustomerGiven_ThrowsNullPointerException() {
         // Given
         Customer nullCustomer = null;
 
@@ -177,10 +254,10 @@ class CustomerServiceImplTest {
 
         // Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerServiceImpl.upsert(nullCustomer);
+            customerServiceImpl.update(nullCustomer);
         });
 
-        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
     }
 
     @Test
