@@ -1,7 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Timestamps;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -7,6 +7,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -11,6 +11,7 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;

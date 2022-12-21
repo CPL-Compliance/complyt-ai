@@ -3,9 +3,9 @@ package com.complyt.services;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.Address;
-import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
@@ -48,7 +48,7 @@ class CustomerServiceImplTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        TimeStamps internalTimestamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
         customer = new Customer(id, externalId, name, address, UUID.randomUUID().toString(), CustomerType.RETAIL, internalTimestamps, null);
     }
 
@@ -62,11 +62,11 @@ class CustomerServiceImplTest {
         Customer actualCustomer = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer);
 
         // Then
-        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
         Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
         Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
@@ -87,11 +87,11 @@ class CustomerServiceImplTest {
         Customer actualCustomer = customerServiceImpl.injectDataToNewCustomer(customer);
 
         // Then
-        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getCreatedDate();
-        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimeStamps().getUpdatedDate();
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimeStamps().getCreatedDate();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimeStamps().getUpdatedDate();
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
         Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
         Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
@@ -114,8 +114,8 @@ class CustomerServiceImplTest {
 
         // Then
         StepVerifier.create(monoCustomer).expectNextMatches(returnedCustomer -> {
-                    TimeStamps internalTimeStamps = returnedCustomer.getInternalTimeStamps();
-                    Customer customerWithIdAndTimeStamps = customerWithId.withInternalTimeStamps(internalTimeStamps);
+                    Timestamps internalTimeStamps = returnedCustomer.getInternalTimestamps();
+                    Customer customerWithIdAndTimeStamps = customerWithId.withInternalTimestamps(internalTimeStamps);
                     return customerWithIdAndTimeStamps == customerWithId;
                 })
                 .expectComplete().verify();

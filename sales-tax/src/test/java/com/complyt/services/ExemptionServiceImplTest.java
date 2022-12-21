@@ -6,6 +6,7 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;

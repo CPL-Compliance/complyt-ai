@@ -1,7 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Timestamps;
+import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

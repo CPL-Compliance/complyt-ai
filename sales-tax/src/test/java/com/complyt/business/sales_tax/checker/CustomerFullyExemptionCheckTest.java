@@ -6,6 +6,7 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

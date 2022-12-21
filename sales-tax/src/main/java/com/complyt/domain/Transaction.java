@@ -2,6 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

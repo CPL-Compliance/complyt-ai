@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Timestamps;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.TimestampsDto;

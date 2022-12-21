@@ -1,6 +1,6 @@
 package com.complyt.business.timestamps_injection;
 
-import com.complyt.domain.Timestamps;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

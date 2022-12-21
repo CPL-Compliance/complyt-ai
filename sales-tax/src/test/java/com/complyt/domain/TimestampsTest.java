@@ -1,5 +1,6 @@
 package com.complyt.domain;
 
+import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Timestamps;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.services.ExemptionServiceImpl;
 import com.mongodb.client.result.DeleteResult;

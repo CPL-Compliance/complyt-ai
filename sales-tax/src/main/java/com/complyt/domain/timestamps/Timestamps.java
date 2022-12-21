@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.domain.timestamps;
 
 import lombok.*;
 

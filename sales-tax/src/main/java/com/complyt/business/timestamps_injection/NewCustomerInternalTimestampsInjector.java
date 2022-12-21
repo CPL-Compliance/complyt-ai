@@ -1,7 +1,7 @@
 package com.complyt.business.timestamps_injection;
 
-import com.complyt.domain.TimeStamps;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.timestamps.Timestamps;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -15,7 +15,7 @@ public class NewCustomerInternalTimestampsInjector implements TimestampsInjector
 
     @Override
     public Customer inject() {
-        TimeStamps timeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return customer.withInternalTimeStamps(timeStamps);
+        Timestamps timeStamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
+        return customer.withInternalTimestamps(timeStamps);
     }
 }
