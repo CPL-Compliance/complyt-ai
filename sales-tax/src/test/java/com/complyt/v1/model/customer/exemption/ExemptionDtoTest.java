@@ -1,7 +1,8 @@
 package com.complyt.v1.model.customer.exemption;
 
 import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.TimestampsDto;
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,8 @@ class ExemptionDtoTest {
         StateDto stateDto = new StateDto("CA", "02", "California");
         ClassificationDto classificationDto = new ClassificationDto("code", "description");
         ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimestampsDto internalTimestampsDto = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
+        TimestampsDto internalTimestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
         StatusDto statusDto = new StatusDto("code", "name");
         CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
 

@@ -1,5 +1,7 @@
 package com.complyt.v1.model;
 
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,9 @@ class TimestampsDtoTest {
     void setup() {
         String createdDate = "2002-02-02T02:02:02";
         String updatedDate = "2003-03-03T03:03:03";
-        timestampsDto = new TimestampsDto(createdDate, updatedDate);
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        timestampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
     }
 
     @Test
@@ -34,9 +38,11 @@ class TimestampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
 
         // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
+        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate().getTimestamp();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate().getTimestamp();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
@@ -52,8 +58,10 @@ class TimestampsDtoTest {
         String updatedDate = "2015-05-25";
 
         // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime expectedCreatedDate = timeStampsDto.getCreatedDate();
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
+        LocalDateTime expectedCreatedDate = timeStampsDto.getCreatedDate().getTimestamp();
 
         // Then
         assertNull(expectedCreatedDate);
@@ -66,8 +74,10 @@ class TimestampsDtoTest {
         String updatedDate = "2015-05-25asd";
 
         // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime expectedUpdatedDate = timeStampsDto.getUpdatedDate();
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
+        LocalDateTime expectedUpdatedDate = timeStampsDto.getUpdatedDate().getTimestamp();
 
         // Then
         assertNull(expectedUpdatedDate);
@@ -82,9 +92,11 @@ class TimestampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
+        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate().getTimestamp();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate().getTimestamp();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
@@ -102,9 +114,11 @@ class TimestampsDtoTest {
         LocalDateTime expectedUpdatedDate = LocalDate.parse(updatedDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
 
         // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
+        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate().getTimestamp();
+        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate().getTimestamp();
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
@@ -119,11 +133,14 @@ class TimestampsDtoTest {
         String createdDate = "2002-02-02T02:02:02";
         String updatedDate = "2004-04-04T04:04:04";
 
-        TimestampsDto expectedTimestampsDto = new TimestampsDto(createdDate, updatedDate);
+        ComplytTimestampDto createdDateTimestamp = new ComplytTimestampDto(createdDate);
+        ComplytTimestampDto updatedDateTimestamp = new ComplytTimestampDto(updatedDate);
+        TimestampsDto expectedTimestampsDto = new TimestampsDto(createdDateTimestamp, updatedDateTimestamp);
         String differentDate = "2004-04-04T04:04:04";
 
         // When
-        TimestampsDto actualTimestampsDto = timestampsDto.withUpdatedDate(differentDate);
+        ComplytTimestampDto differentDateTimestamp = new ComplytTimestampDto(differentDate);
+        TimestampsDto actualTimestampsDto = timestampsDto.withUpdatedDate(differentDateTimestamp);
 
         // Then
         assertEquals(expectedTimestampsDto, actualTimestampsDto);

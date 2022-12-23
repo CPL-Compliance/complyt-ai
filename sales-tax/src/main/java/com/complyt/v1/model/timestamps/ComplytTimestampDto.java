@@ -1,9 +1,7 @@
-package com.complyt.v1.model;
+package com.complyt.v1.model.timestamps;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -16,18 +14,16 @@ import java.time.format.DateTimeFormatter;
 @ToString
 @With
 @Slf4j
-@Schema(name = "Timestamps")
-public class TimestampsDto {
+@Schema(name = "ComplytTimestamps")
+public class ComplytTimestampDto {
 
-    private String createdDate;
-    private String updatedDate;
+    private String timestamp;
 
-    public TimestampsDto(String createdDate, String updatedDate) {
-        this.createdDate = parseDate(createdDate);
-        this.updatedDate = parseDate(updatedDate);
+    public ComplytTimestampDto(String timestamp) {
+        this.timestamp = parseTimestamp(timestamp);
     }
 
-    private String parseDate(String dateAsString) {
+    private String parseTimestamp(String dateAsString) {
         try {
             String parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
             log.debug("Input received as a LocalDate: " + parsedLocalDate);
@@ -54,21 +50,11 @@ public class TimestampsDto {
         return null;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public LocalDateTime getTimestamp() {
         try {
-            return LocalDateTime.parse(createdDate);
+            return LocalDateTime.parse(timestamp);
         } catch (Exception e) {
-            log.debug("Created date has invalid format");
-
-            return null;
-        }
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        try {
-            return LocalDateTime.parse(updatedDate);
-        } catch (Exception e) {
-            log.debug("Updated invalid format");
+            log.debug("Timestamp has invalid format");
 
             return null;
         }

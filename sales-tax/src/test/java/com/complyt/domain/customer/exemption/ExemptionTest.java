@@ -1,6 +1,7 @@
 package com.complyt.domain.customer.exemption;
 
 import com.complyt.domain.State;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,8 @@ class ExemptionTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 

@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.services.ExemptionServiceImpl;
@@ -47,7 +48,8 @@ public class ExemptionFacadeTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        Timestamps internalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 

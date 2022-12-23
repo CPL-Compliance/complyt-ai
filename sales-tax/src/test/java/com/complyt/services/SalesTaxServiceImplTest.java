@@ -15,6 +15,7 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +81,8 @@ public class SalesTaxServiceImplTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        Timestamps externalTimestamps = new Timestamps(LocalDateTime.now(), LocalDateTime.now());
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         ObjectId customerId = new ObjectId();
         Customer customer = createCustomer(customerId);
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
@@ -97,7 +99,7 @@ public class SalesTaxServiceImplTest {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID().toString(), state,
                 UUID.randomUUID().toString(), true, null, null, LocalDateTime.now().minusYears(1),
-                true, transaction.getExternalTimestamps().getCreatedDate().minusYears(1));
+                true, transaction.getExternalTimestamps().getCreatedDate().getTimestamp().minusYears(1));
 
     }
 
@@ -118,7 +120,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
         SalesTaxTracking tracking = createSalesTaxTracking()
-                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
+                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);

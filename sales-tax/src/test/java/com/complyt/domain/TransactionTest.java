@@ -5,6 +5,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
@@ -55,7 +56,8 @@ public class TransactionTest {
                 ));
             }
         };
-        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
@@ -123,7 +125,8 @@ public class TransactionTest {
                 ));
             }
         };
-        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         Transaction.TransactionBuilder transactionBuilder = Transaction.builder();
         ShippingFee shippingFee = createShippingFee();
 

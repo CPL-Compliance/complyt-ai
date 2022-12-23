@@ -7,6 +7,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,8 +61,9 @@ public class SalesTaxApplyCheckTest {
                 ));
             }
         };
-
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new Timestamps(salesTaxTracking.getAppliedDate().plusYears(1), salesTaxTracking.getAppliedDate().plusYears(1)), TransactionType.INVOICE, null, null);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
@@ -78,8 +80,9 @@ public class SalesTaxApplyCheckTest {
                 ));
             }
         };
-
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new Timestamps(salesTaxTracking.getAppliedDate().minusYears(1), salesTaxTracking.getAppliedDate().minusYears(1)), TransactionType.INVOICE, null, null);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     @Test
@@ -127,7 +130,7 @@ public class SalesTaxApplyCheckTest {
 
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
                 .withApproved(false)
-                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
+                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
 
         // When
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTrackingWithNoSalesTax);
