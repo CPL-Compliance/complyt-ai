@@ -46,8 +46,8 @@ public class CustomerDtoTest {
                 ", name=" + customerDto.getName() +
                 ", address=" + customerDto.getAddress() +
                 ", customerType=" + customerDto.getCustomerType() +
-                ", internalTimeStamps=" + customerDto.getInternalTimestamps() +
-                ", externalTimeStamps=" + customerDto.getExternalTimestamps() + ")";
+                ", internalTimestamps=" + customerDto.getInternalTimestamps() +
+                ", externalTimestamps=" + customerDto.getExternalTimestamps() + ")";
 
         // When
         String actualString = customerDto.toString();
