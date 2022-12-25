@@ -8,11 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 @ToString
 @With
 @Getter
+@RequiredArgsConstructor
 @Slf4j
-@AllArgsConstructor
 @Schema(name = "Timestamps")
 public class TimestampsDto {
-    private ComplytTimestampDto createdDate;
-    private ComplytTimestampDto updatedDate;
+    @NonNull
+    private final ComplytTimestampDto createdDate;
+    @NonNull
+    private final ComplytTimestampDto updatedDate;
 
 }

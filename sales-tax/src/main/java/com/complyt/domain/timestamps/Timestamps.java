@@ -3,11 +3,14 @@ package com.complyt.domain.timestamps;
 import lombok.*;
 
 @Getter
-@AllArgsConstructor
 @EqualsAndHashCode
+@RequiredArgsConstructor
 @ToString
 @With
 public class Timestamps {
-    private ComplytTimestamp createdDate;
-    private ComplytTimestamp updatedDate;
+
+    @NonNull
+    private final ComplytTimestamp createdDate;
+    @NonNull
+    private final ComplytTimestamp updatedDate;
 }

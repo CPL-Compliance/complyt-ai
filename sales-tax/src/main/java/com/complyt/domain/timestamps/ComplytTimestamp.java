@@ -1,17 +1,16 @@
 package com.complyt.domain.timestamps;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Getter
+@RequiredArgsConstructor
 public class ComplytTimestamp {
-    private LocalDateTime timestamp;
+
+    @NonNull
+    private final LocalDateTime timestamp;
 }
