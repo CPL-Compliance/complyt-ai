@@ -12,19 +12,19 @@
     </parent>
 
     <!-- Maven Coordinates -->
-    <artifactId>sales-tax</artifactId>
-    <version>2.3.0-SNAPSHOT</version>
+    <artifactId>filing</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-    <name>sales-tax</name>
-    <description>This is a service for managing sales Tax</description>
-    <packaging>jar</packaging>
+
+    <name>filing</name>
+    <description>This is the Filing Service of Complyt</description>
 
     <properties>
         <java.version>17</java.version>
         <!-- Docker Coordinates -->
         <docker.image.prefix>complyt</docker.image.prefix>
-        <docker.image.name>sales-tax</docker.image.name>
+        <docker.image.name>filing</docker.image.name>
         <!-- Docker Coordinates -->
     </properties>
 
@@ -32,15 +32,11 @@
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,11 +48,13 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
         <!-- Spring Boot Starter -->
 
@@ -97,7 +95,7 @@
         </dependency>
         <!-- Spring Cloud Eureka -->
 
-        <!-- Test Dependencies -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -118,11 +116,6 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- Test -->
 
         <!-- Other -->
@@ -136,10 +129,6 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.javatuples</groupId>
-            <artifactId>javatuples</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webflux-ui</artifactId>
         </dependency>
@@ -151,7 +140,6 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>2.1.0</version>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
