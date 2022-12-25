@@ -17,7 +17,7 @@ public class CustomerFullyExemptionChecker implements SalesTaxApplyChecker<Exemp
     private Transaction transaction;
 
     public boolean check(@NonNull Exemption exemption) {
-        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
         boolean isExemptionInTimeFrame = referenceDate.compareTo(exemption.getValidationDates().getFromDate()) >= 0 &&
                 referenceDate.compareTo(exemption.getValidationDates().getToDate()) <= 0;
         boolean isFullyExemptionType = exemption.getExemptionType() == ExemptionType.FULLY;

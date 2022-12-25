@@ -1,6 +1,7 @@
 package com.complyt.business.timestamps_injection;
 
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,10 +18,10 @@ public class ExistingTransactionInternalTimestampsInjector implements Timestamps
 
     @Override
     public Transaction inject() {
-        LocalDateTime createdDate = transaction.getInternalTimeStamps().getCreatedDate();
-        LocalDateTime modifiedDate = LocalDateTime.now();
-        TimeStamps modifiedTimeStamps = new TimeStamps(createdDate, modifiedDate);
+        ComplytTimestamp createdDate = new ComplytTimestamp(transaction.getInternalTimestamps().getCreatedDate().getTimestamp());
+        ComplytTimestamp modifiedDate = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps modifiedTimeStamps = new Timestamps(createdDate, modifiedDate);
 
-        return transaction.withInternalTimeStamps(modifiedTimeStamps);
+        return transaction.withInternalTimestamps(modifiedTimeStamps);
     }
 }

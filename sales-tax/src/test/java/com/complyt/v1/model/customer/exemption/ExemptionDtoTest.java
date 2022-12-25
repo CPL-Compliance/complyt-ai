@@ -1,7 +1,8 @@
 package com.complyt.v1.model.customer.exemption;
 
 import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.TimeStampsDto;
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,13 +37,14 @@ class ExemptionDtoTest {
         StateDto stateDto = new StateDto("CA", "02", "California");
         ClassificationDto classificationDto = new ClassificationDto("code", "description");
         ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime, localDateTime);
+        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
+        TimestampsDto internalTimestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
         StatusDto statusDto = new StatusDto("code", "name");
         CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
 
 
         return new ExemptionDto(exemptionId, customerId,
-                stateDto, classificationDto, validationDatesDto, internalTimeStampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
+                stateDto, classificationDto, validationDatesDto, internalTimestampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
     }
 
     @Test
@@ -65,7 +67,7 @@ class ExemptionDtoTest {
                 ", state=" + exemptionDto.getState() +
                 ", classification=" + exemptionDto.getClassification() +
                 ", validationDates=" + exemptionDto.getValidationDates() +
-                ", internalTimeStamps=" + exemptionDto.getInternalTimeStamps() +
+                ", internalTimestamps=" + exemptionDto.getInternalTimestamps() +
                 ", status=" + exemptionDto.getStatus() +
                 ", certificate=" + exemptionDto.getCertificate() +
                 ", exemptionType=" + exemptionDto.getExemptionType() + ")";

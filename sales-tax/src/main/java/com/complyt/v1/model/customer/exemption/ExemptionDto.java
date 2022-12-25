@@ -1,7 +1,7 @@
 package com.complyt.v1.model.customer.exemption;
 
 import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.TimeStampsDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -18,7 +18,7 @@ public class ExemptionDto {
     private final StateDto state;
     private final ClassificationDto classification;
     private final ValidationDatesDto validationDates;
-    private final TimeStampsDto internalTimeStamps;
+    private final TimestampsDto internalTimestamps;
     private final StatusDto status;
     private final CertificateDto certificate;
     private final ExemptionTypeDto exemptionType;

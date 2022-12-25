@@ -1,10 +1,12 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
-import com.complyt.domain.TimeStamps;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.TimeStampsDto;
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import com.complyt.v1.model.customer.exemption.*;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,25 +50,27 @@ public class ExemptionMapperTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStamps internalTimeStamps = new TimeStamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
         return new Exemption(exemptionId, tenantId, customerId,
-                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
     private ExemptionDto createExemptionDto() {
         StateDto stateDto = new StateDto("CA", "02", "California");
         ClassificationDto classificationDto = new ClassificationDto("code", "description");
         ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        TimeStampsDto internalTimeStampsDto = new TimeStampsDto(localDateTime, localDateTime);
+        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
+        TimestampsDto internalTimestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
         StatusDto statusDto = new StatusDto("code", "name");
         CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
 
 
         return new ExemptionDto(exemptionId, customerId,
-                stateDto, classificationDto, validationDatesDto, internalTimeStampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
+                stateDto, classificationDto, validationDatesDto, internalTimestampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
     }
 
     @Test

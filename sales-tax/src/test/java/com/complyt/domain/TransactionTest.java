@@ -5,6 +5,8 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +56,8 @@ public class TransactionTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ShippingFee shippingFee = createShippingFee();
         return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
     }
@@ -82,8 +85,8 @@ public class TransactionTest {
                 ", salesTax=" + transaction.getSalesTax() +
                 ", transactionStatus=" + transaction.getTransactionStatus() +
                 ", tenantId=" + transaction.getTenantId() +
-                ", internalTimeStamps=" + transaction.getInternalTimeStamps() +
-                ", externalTimeStamps=" + transaction.getExternalTimeStamps() +
+                ", internalTimestamps=" + transaction.getInternalTimestamps() +
+                ", externalTimestamps=" + transaction.getExternalTimestamps() +
                 ", transactionType=" + transaction.getTransactionType() +
                 ", shippingFee=" + transaction.getShippingFee() +
                 ", createdFrom=" + transaction.getCreatedFrom() + ")";
@@ -122,7 +125,8 @@ public class TransactionTest {
                 ));
             }
         };
-        TimeStamps timeStamps = new TimeStamps(localDateTime, localDateTime);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
+        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         Transaction.TransactionBuilder transactionBuilder = Transaction.builder();
         ShippingFee shippingFee = createShippingFee();
 
@@ -138,8 +142,8 @@ public class TransactionTest {
                 .salesTax(null)
                 .transactionStatus(TransactionStatus.ACTIVE)
                 .tenantId(tenantId)
-                .internalTimeStamps(timeStamps)
-                .externalTimeStamps(timeStamps)
+                .internalTimestamps(timeStamps)
+                .externalTimestamps(timeStamps)
                 .transactionType(TransactionType.INVOICE)
                 .shippingFee(shippingFee).build();
 

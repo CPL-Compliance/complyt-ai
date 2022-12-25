@@ -202,7 +202,7 @@ class TransactionRepositoryTest {
         }};
         LocalDateTime start = LocalDate.now().minusYears(1).atStartOfDay();
         LocalDateTime end = start.plusYears(1);
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query query = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
 
         //When

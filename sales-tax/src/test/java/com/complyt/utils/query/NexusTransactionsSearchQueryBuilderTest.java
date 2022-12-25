@@ -61,10 +61,10 @@ public class NexusTransactionsSearchQueryBuilderTest {
         // Given
         LocalDateTime start = LocalDateTime.now().with(firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime end = LocalDateTime.now().with(lastDayOfYear()).withHour(23).withMinute(59).withSecond(59).withNano(59);
-        Query queryToSend = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query queryToSend = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
 
-        Query queryToAssert = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query queryToAssert = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
         Query expectedQuery = queryToAssert.addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
