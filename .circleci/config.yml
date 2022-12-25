@@ -10,6 +10,7 @@ workflows:
           base-revision: main
           mapping: |
             sales-tax/.* run-sales-tax-workflow true
+            filing/.* run-filing-workflow true
             api-gateway/.* run-api-gateway-workflow true
             discovery-service/.* run-discovery-service-workflow true
           config-path: .circleci/workflows.yml

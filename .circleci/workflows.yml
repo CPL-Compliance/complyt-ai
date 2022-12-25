@@ -23,6 +23,9 @@ parameters:
   run-sales-tax-workflow:
     type: boolean
     default: false
+  run-filing-workflow:
+    type: boolean
+    default: false
   run-api-gateway-workflow:
     type: boolean
     default: false
@@ -170,6 +173,34 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax"
+
+  filing-workflow:
+    when: << pipeline.parameters.run-filing-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "filing"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "filing"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "filing"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "filing"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
