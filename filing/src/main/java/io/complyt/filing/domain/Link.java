@@ -5,9 +5,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
+@AllArgsConstructor
 @EqualsAndHashCode
+@With
 @ToString
-@RequiredArgsConstructor
+@Builder
 @Document(collection = "link")
 public class Link {
     @Id

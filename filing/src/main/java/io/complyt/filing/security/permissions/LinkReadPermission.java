@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('SCOPE_read:filing')")
-public @interface FilingReadPermission {
+@PreAuthorize("hasAuthority('SCOPE_read:link')")
+public @interface LinkReadPermission {
 }
