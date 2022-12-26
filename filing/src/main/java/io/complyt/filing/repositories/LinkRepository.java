@@ -21,7 +21,7 @@ public class LinkRepository {
     @NonNull
     TenantResolver tenantResolver;
 
-    public Mono<Link> getOne() {
+    public Mono<Link> find() {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));

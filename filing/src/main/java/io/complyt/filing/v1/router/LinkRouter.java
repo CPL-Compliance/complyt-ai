@@ -17,7 +17,7 @@ public class LinkRouter {
     public RouterFunction<ServerResponse> exemptionsRoute(@NonNull final LinkHandler linkHandler) {
         return RouterFunctions.route()
                 .path(BASE_URL, builder -> builder
-                        .GET("/", linkHandler::getOne))
+                        .GET("", linkHandler::getAll))
                 .build();
     }
 }

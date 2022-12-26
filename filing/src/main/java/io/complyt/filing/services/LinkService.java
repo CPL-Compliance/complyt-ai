@@ -13,7 +13,7 @@ public class LinkService {
     @NonNull
     LinkRepository linkRepository;
 
-    public Mono<Link> getOne() {
-        return linkRepository.getOne();
+    public Mono<Link> find() {
+        return linkRepository.find();
     }
 }
