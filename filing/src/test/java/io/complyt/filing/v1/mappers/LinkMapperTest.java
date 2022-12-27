@@ -28,13 +28,21 @@ class LinkMapperTest {
 
     @Test
     void linkToLinkDto_Link_returnLinkDto() {
-        // Given
-        Link givenLink = link;
 
         // When
-        LinkDto actualLinkDto = LinkMapper.INSTANCE.linkToLinkDto(givenLink);
+        LinkDto actualLinkDto = LinkMapper.INSTANCE.linkToLinkDto(link);
 
         // Then
         assertEquals(linkDto, actualLinkDto);
+    }
+
+    @Test
+    void linkToLinkDto_LinkIsNull_returnNull() {
+
+        // When
+        LinkDto actualLinkDto = LinkMapper.INSTANCE.linkToLinkDto(null);
+
+        // Then
+        assertEquals(null, actualLinkDto);
     }
 }

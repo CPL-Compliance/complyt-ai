@@ -10,19 +10,19 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-@RequiredArgsConstructor
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+
+
 @Configuration
 @Generated
 public class LinkRouter {
-    @NonNull
-    final LinkHandler linkHandler;
     public static final String BASE_URL = "/v1/links";
 
     @Bean
-    public RouterFunction<ServerResponse> exemptionsRoute() {
+    public RouterFunction<ServerResponse> exemptionsRoute(@NonNull final LinkHandler linkHandler) {
         return RouterFunctions.route()
-                .path(BASE_URL, builder -> builder
-                        .GET("", linkHandler::getAll))
+                .GET(BASE_URL, accept(APPLICATION_JSON), linkHandler::getAll)
                 .build();
     }
 }

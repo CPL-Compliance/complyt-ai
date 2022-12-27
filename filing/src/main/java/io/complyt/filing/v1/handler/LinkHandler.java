@@ -11,27 +11,27 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-@Service
-@Slf4j
+@Component
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Link", description = "This is the Links controller")
 public class LinkHandler {
     @NonNull
-    LinkService linkService;
+    private LinkService linkService;
 
     @Operation(summary = "Gets link to the files")
     @ResponseStatus(HttpStatus.OK)
     @LinkReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
-        return ServerResponse
-                .ok()
-                .body(linkService.find().map(LinkMapper.INSTANCE::linkToLinkDto), LinkDto.class);
+        Mono<LinkDto> value = linkService.find().map(LinkMapper.INSTANCE::linkToLinkDto);
+
+        return ServerResponse.ok().body(value, LinkDto.class);
     }
 }
