@@ -7,19 +7,21 @@ import io.complyt.filing.v1.model.LinkDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-@Service
+@RestController
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Link", description = "This is the Links controller")
 public class LinkHandler {
