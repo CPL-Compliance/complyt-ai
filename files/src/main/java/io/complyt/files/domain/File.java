@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Component
 @Document(collection = "file")
 public class File {
     @Id

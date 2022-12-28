@@ -4,7 +4,6 @@ import io.complyt.files.annotations.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated
-@Component
 public class ObjectNotFoundException extends ComplytException {
     public ObjectNotFoundException(String s) {
         super(s);
