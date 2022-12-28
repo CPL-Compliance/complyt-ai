@@ -11,6 +11,8 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,6 +94,8 @@ public class NexusTransactionCountCalculatorTest {
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         String tenantId = UUID.randomUUID().toString();
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -100,7 +104,7 @@ public class NexusTransactionCountCalculatorTest {
             }
         };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
+        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
         return new ArrayList<>() {{
             add(transaction);
         }};

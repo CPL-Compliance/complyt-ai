@@ -45,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
         Customer existingCustomerWithInternalTimeStamps = newCustomer
-                .withInternalTimeStamps(originalCustomer.getInternalTimeStamps());
+                .withInternalTimestamps(originalCustomer.getInternalTimestamps());
 
         return new ExistingCustomerInternalTimestampsInjector(existingCustomerWithInternalTimeStamps).inject();
     }
@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .withAddress(customer.getAddress())
                 .withName(customer.getName())
                 .withCustomerType(customer.getCustomerType())
-                .withInternalTimeStamps(customer.getInternalTimeStamps())
-                .withExternalTimeStamps(customer.getExternalTimeStamps());
+                .withInternalTimestamps(customer.getInternalTimestamps())
+                .withExternalTimestamps(customer.getExternalTimestamps());
     }
 }

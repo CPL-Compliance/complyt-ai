@@ -2,6 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -28,8 +29,8 @@ public class Transaction {
     private final SalesTax salesTax;
     private final TransactionStatus transactionStatus;
     private final String tenantId;
-    private final TimeStamps internalTimeStamps;
-    private final TimeStamps externalTimeStamps;
+    private final Timestamps internalTimestamps;
+    private final Timestamps externalTimestamps;
     private final TransactionType transactionType;
     private final ShippingFee shippingFee;
     private final String createdFrom;

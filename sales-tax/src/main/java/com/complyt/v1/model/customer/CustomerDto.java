@@ -1,7 +1,7 @@
 package com.complyt.v1.model.customer;
 
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.TimeStampsDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -17,6 +17,6 @@ public class CustomerDto {
     private final String name;
     private final AddressDto address;
     private final CustomerTypeDto customerType;
-    private final TimeStampsDto internalTimeStamps;
-    private final TimeStampsDto externalTimeStamps;
+    private final TimestampsDto internalTimestamps;
+    private final TimestampsDto externalTimestamps;
 }

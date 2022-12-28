@@ -1,6 +1,7 @@
 package com.complyt.v1.model;
 
 import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.bson.types.ObjectId;
@@ -23,8 +24,8 @@ public class TransactionDto {
     private final CustomerDto customer;
     private final SalesTaxDto salesTax;
     private final TransactionStatusDto transactionStatus;
-    private final TimeStampsDto internalTimeStamps;
-    private final TimeStampsDto externalTimeStamps;
+    private final TimestampsDto internalTimestamps;
+    private final TimestampsDto externalTimestamps;
     private final TransactionTypeDto transactionType;
     private final ShippingFeeDto shippingFee;
     private final String createdFrom;

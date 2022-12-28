@@ -43,8 +43,8 @@ class CustomerTest {
                 ", address=" + customer.getAddress() +
                 ", tenantId=" + customer.getTenantId() +
                 ", customerType=" + customer.getCustomerType() +
-                ", internalTimeStamps=" + customer.getInternalTimeStamps() +
-                ", externalTimeStamps=" + customer.getExternalTimeStamps() + ")";
+                ", internalTimestamps=" + customer.getInternalTimestamps() +
+                ", externalTimestamps=" + customer.getExternalTimestamps() + ")";
 
         // When
         String actualString = customer.toString();

@@ -50,7 +50,7 @@ public class TimeFrameQueryBuilderTest {
         LocalDateTime referenceDate = LocalDateTime.now();
 
         DateRange dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
-        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate").gte(dateRange.getStart()).lte(dateRange.getEnd()));
+        Query expectedQuery = Query.query(Criteria.where("externalTimestamps.createdDate").gte(dateRange.getStart()).lte(dateRange.getEnd()));
 
         // When + Then
         Query actualQuery = timeFrameQueryBuilder.buildNexusTimeFrame(nexusInfo, ruleWithPrevCalenderYearTimeFrame, referenceDate);
@@ -65,7 +65,7 @@ public class TimeFrameQueryBuilderTest {
 
         DateRange dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
 
-        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query expectedQuery = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
 
@@ -81,7 +81,7 @@ public class TimeFrameQueryBuilderTest {
         LocalDateTime referenceDate = LocalDateTime.now();
 
         DateRange dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
-        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query expectedQuery = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
 
@@ -99,7 +99,7 @@ public class TimeFrameQueryBuilderTest {
         LocalDateTime localDateTimeTaxableDate = nexusWithTaxableDate.getTaxableDate();
 
         DateRange dateRange = DateRange.Factory.newTaxableYear(localDateTimeTaxableDate, referenceDate);
-        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query expectedQuery = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
 
@@ -116,7 +116,7 @@ public class TimeFrameQueryBuilderTest {
         LocalDateTime referenceDate = LocalDateTime.now();
 
         DateRange dateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
-        Query expectedQuery = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query expectedQuery = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(dateRange.getStart())
                 .lte(dateRange.getEnd()));
 

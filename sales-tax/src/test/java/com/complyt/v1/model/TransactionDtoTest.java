@@ -2,6 +2,8 @@ package com.complyt.v1.model;
 
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +42,8 @@ class TransactionDtoTest {
                 ));
             }
         };
-        TimeStampsDto timeStamps = new TimeStampsDto(localDateTime, localDateTime);
+        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
+        TimestampsDto timeStamps = new TimestampsDto(complytTimestamp, complytTimestamp);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
         return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
@@ -67,8 +70,8 @@ class TransactionDtoTest {
                 ", customer=" + transactionDto.getCustomer() +
                 ", salesTax=" + transactionDto.getSalesTax() +
                 ", transactionStatus=" + transactionDto.getTransactionStatus() +
-                ", internalTimeStamps=" + transactionDto.getInternalTimeStamps() +
-                ", externalTimeStamps=" + transactionDto.getExternalTimeStamps() +
+                ", internalTimestamps=" + transactionDto.getInternalTimestamps() +
+                ", externalTimestamps=" + transactionDto.getExternalTimestamps() +
                 ", transactionType=" + transactionDto.getTransactionType() +
                 ", shippingFee=" + transactionDto.getShippingFee() +
                 ", createdFrom=" + transactionDto.getCreatedFrom() + ")";

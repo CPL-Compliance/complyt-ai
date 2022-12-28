@@ -11,6 +11,8 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
@@ -119,8 +121,9 @@ class NexusServiceTest {
                 ));
             }
         };
-
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, new TimeStamps(LocalDateTime.now(), LocalDateTime.now()), TransactionType.INVOICE, null, null);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
@@ -156,7 +159,7 @@ class NexusServiceTest {
         // Given
         Nexus nexusInfo = new Nexus(null);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query query = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
         List<Transaction> transactionList = new ArrayList<>() {{
@@ -169,7 +172,7 @@ class NexusServiceTest {
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
-        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
@@ -191,7 +194,7 @@ class NexusServiceTest {
         // Given
         Nexus nexusInfo = new Nexus(null);
         NexusStateRule nexusStateRule = createNexusStateRule();
-        Query query = Query.query(Criteria.where("externalTimeStamps.createdDate")
+        Query query = Query.query(Criteria.where("externalTimestamps.createdDate")
                         .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()))
                 .addCriteria(Criteria.where("shippingAddress.state")
                         .is(nexusStateRule.getState().getAbbreviation()));
@@ -206,7 +209,7 @@ class NexusServiceTest {
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = createSalesTaxTrackingWithoutNexusEstablished();
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
-        LocalDateTime referenceDate = transaction.getExternalTimeStamps().getCreatedDate();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
 
 
         // When

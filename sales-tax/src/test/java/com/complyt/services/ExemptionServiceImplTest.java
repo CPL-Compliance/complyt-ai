@@ -6,6 +6,8 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
@@ -60,12 +62,13 @@ public class ExemptionServiceImplTest {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
 
         return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, internalTimeStamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
     private Transaction createTransaction() {
@@ -78,8 +81,9 @@ public class ExemptionServiceImplTest {
         items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
                 null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
         ));
-        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimeStamps, TransactionType.INVOICE, null, null);
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     @Test
@@ -195,8 +199,11 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
+        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().plusYears(1));
+        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+
         Transaction transactionWithDateLaterThanExemptionDate = transaction
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getToDate().plusYears(1), LocalDateTime.now()));
+                .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
 
         // When
         when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
@@ -209,8 +216,11 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
+        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().minusYears(1));
+        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+
         Transaction transactionWithDateLaterThanExemptionDate = transaction
-                .withExternalTimeStamps(new TimeStamps(exemption.getValidationDates().getFromDate().minusYears(1), LocalDateTime.now()));
+                .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
 
         // When
         when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));

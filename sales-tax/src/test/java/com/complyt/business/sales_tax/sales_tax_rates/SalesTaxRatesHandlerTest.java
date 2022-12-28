@@ -8,6 +8,8 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -53,9 +55,10 @@ public class SalesTaxRatesHandlerTest {
             ));
         }};
         ObjectId customerId = new ObjectId();
-        TimeStamps externalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimeStamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimestamps, TransactionType.INVOICE, null, null);
     }
 
     private ShippingFee createShippingFee() {

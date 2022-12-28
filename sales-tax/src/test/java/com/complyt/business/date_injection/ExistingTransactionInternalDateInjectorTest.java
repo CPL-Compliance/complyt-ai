@@ -1,11 +1,15 @@
 package com.complyt.business.date_injection;
 
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
-import com.complyt.domain.*;
+import com.complyt.domain.Address;
+import com.complyt.domain.Item;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import org.bson.types.ObjectId;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,12 +35,12 @@ class ExistingTransactionInternalDateInjectorTest {
     private Transaction createTransaction() {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        TimeStamps internalTimeStamps = new TimeStamps(LocalDateTime.now(), LocalDateTime.now());
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps internalTimeStamps = new Timestamps(complytTimestamp,complytTimestamp);
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0
@@ -52,7 +56,7 @@ class ExistingTransactionInternalDateInjectorTest {
                 .shippingAddress(shippingAddress)
                 .tenantId(tenantId)
                 .transactionStatus(TransactionStatus.ACTIVE)
-                .internalTimeStamps(internalTimeStamps)
+                .internalTimestamps(internalTimeStamps)
                 .build();
     }
 
@@ -66,9 +70,8 @@ class ExistingTransactionInternalDateInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(beforeActionTime) >= 0);
-        assertTrue(actualTransaction.getInternalTimeStamps().getUpdatedDate().compareTo(afterActionTime) <= 0);
-
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().getTimestamp().isAfter(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().getTimestamp().isBefore(afterActionTime));
     }
 
 }

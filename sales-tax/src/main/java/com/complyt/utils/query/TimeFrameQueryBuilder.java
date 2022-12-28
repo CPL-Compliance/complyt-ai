@@ -21,7 +21,7 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
     @Override
     public Query build(@NonNull DateRange dateRange) {
 
-        return Query.query(Criteria.where("externalTimeStamps.createdDate")
+        return Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(dateRange.getStart()).lte(dateRange.getEnd()));
     }
 
