@@ -22,6 +22,6 @@ public class SalesTaxTracking {
     private PhysicalNexusTracker physicalNexusTracker;
     private EconomicNexusTracker economicNexusTracker;
     private LocalDateTime appliedDate;
-    private boolean isApproved;
+    private boolean approved;
     private LocalDateTime approvalDate;
 }

@@ -9,10 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Slf4j
@@ -56,5 +58,24 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
         log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
         return save(modifiedTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
+        return salesTaxTrackingRepository.findByState(state)
+                .switchIfEmpty(Mono.error(new NotFoundException("No SalesTaxTracking with state " + state)))
+                .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
+                .flatMap(salesTaxTrackingRepository::save);
+    }
+
+    private Function<SalesTaxTracking, SalesTaxTracking> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
+        return salesTaxTrackingInfo -> salesTaxTrackingInfo
+                .withAppliedDate(salesTaxTracking.getAppliedDate())
+                .withApprovalDate(salesTaxTracking.getApprovalDate())
+                .withEnforcesSalesTax(salesTaxTracking.isEnforcesSalesTax())
+                .withEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker())
+                .withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker())
+                .withApproved(salesTaxTracking.isApproved())
+                .withState(salesTaxTracking.getState());
     }
 }
