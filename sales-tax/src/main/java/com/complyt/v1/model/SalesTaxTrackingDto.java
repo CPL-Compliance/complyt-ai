@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Schema(name = "SalesTaxTracking")
 public class SalesTaxTrackingDto {
 
+    private String id;
     private StateDto state;
-    private final String tenantId;
     private boolean enforcesSalesTax;
     private PhysicalNexusTrackerDto physicalNexusTracker;
     private EconomicNexusTrackerDto economicNexusTracker;

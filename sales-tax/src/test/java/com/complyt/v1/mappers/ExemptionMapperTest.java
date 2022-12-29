@@ -1,27 +1,22 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.domain.customer.exemption.*;
 import com.complyt.v1.model.StateDto;
+import com.complyt.v1.model.customer.exemption.*;
 import com.complyt.v1.model.timestamps.ComplytTimestampDto;
 import com.complyt.v1.model.timestamps.TimestampsDto;
-import com.complyt.v1.model.customer.exemption.*;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 public class ExemptionMapperTest {
 
     String certificateId;
@@ -76,11 +71,8 @@ public class ExemptionMapperTest {
     @Test
     void ExemptionToExemptionDto_Exemption_returnExemptionDto() {
 
-        // Given
-        Exemption givenExemption = exemption;
-
-        // When
-        ExemptionDto exemptionDtoResult = ExemptionMapper.INSTANCE.exemptionToExemptionDto(givenExemption);
+        // Given + When
+        ExemptionDto exemptionDtoResult = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
         assertEquals(exemptionDto, exemptionDtoResult);
@@ -89,11 +81,8 @@ public class ExemptionMapperTest {
     @Test
     void ExemptionDtoToExemption_ExemptionDto_returnExemption() {
 
-        // Given
-        ExemptionDto givenExemptionDto = exemptionDto;
-
-        // When
-        Exemption actualExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        // Given + When
+        Exemption actualExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
 
         // Then
         assertEquals(exemptionNoTenant, actualExemption);

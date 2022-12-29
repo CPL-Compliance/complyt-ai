@@ -4,14 +4,9 @@ import com.complyt.domain.State;
 import com.complyt.v1.model.StateDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 public class StateMapperTest {
     private State state;
     private StateDto stateDto;
