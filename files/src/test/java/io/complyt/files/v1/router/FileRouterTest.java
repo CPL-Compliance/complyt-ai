@@ -5,17 +5,17 @@ import io.complyt.files.services.FileService;
 import io.complyt.files.v1.handler.FileHandler;
 import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.model.FileDto;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,7 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {FileRouter.class, FileHandler.class, Jackson2JsonDecoder.class})
+@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {FileRouter.class, FileHandler.class})
 @WebFluxTest
 public class FileRouterTest {
     @Autowired
@@ -46,7 +47,7 @@ public class FileRouterTest {
     }
 
     @Test
-    void linkRoute_nullLinkHandler_ThrowsNullPointerException() {
+    public void linkRoute_nullLinkHandler_ThrowsNullPointerException() {
         // Given
         FileRouter fileRouter = new FileRouter();
         FileHandler nullFileHandler = null;
@@ -58,10 +59,9 @@ public class FileRouterTest {
         assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
     }
 
-    @Disabled
     @Test
     @WithUserDetails
-    void exemptionsRoute() {
+    public void exemptionsRoute() {
         // Given
         File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);

@@ -13,7 +13,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 @Configuration
-@Generated
 public class FileRouter {
     public static final String BASE_URL = "/v1/files";
 

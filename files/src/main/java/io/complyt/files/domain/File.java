@@ -1,23 +1,25 @@
 package io.complyt.files.domain;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 @Getter
-@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Document(collection = "file")
 public class File {
     @Id
     @NonNull
-    private final String id;
+    String id;
 
     @NonNull
-    private final String tenantId;
+    String tenantId;
 
     @NonNull
-    private final String link;
+    String link;
 }
