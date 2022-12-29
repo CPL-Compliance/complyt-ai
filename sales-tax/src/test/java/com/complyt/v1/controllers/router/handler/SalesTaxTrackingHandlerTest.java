@@ -164,34 +164,37 @@ public class SalesTaxTrackingHandlerTest {
     }
 
 
-//    @Test
-//    @WithUserDetails
-//    void upsert_SalesTaxTrackingUpdated_SalesTaxTrackingReturned() {
-//        // Given
-//        String state = salesTaxTracking.getState().getName();
-//        SalesTaxTracking originalSalesTaxTracking = salesTaxTracking.withId(UUID.randomUUID().toString());
-//        SalesTaxTracking newSalesTaxTracking = originalSalesTaxTracking.withApprovalDate(LocalDateTime.now());
-//        SalesTaxTrackingDto salesTaxTrackingDtoSent =
-//                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
-//        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
-//                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
-//
-//        // When
-//        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
-//        when(salesTaxTrackingFacade.update(newSalesTaxTracking, state)).thenReturn(Mono.just(newSalesTaxTracking));
-//        when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
-//
-//        // Then
-//        webTestClient
-//                .mutateWith(csrf())
-//                .put()
-//                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
-//                .bodyValue(salesTaxTrackingDtoSent)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .exchange()
-//                .expectStatus().isCreated()
-//                .expectBody(SalesTaxTrackingDto.class)
-//                .isEqualTo(expectedSalesTaxTrackingDto);
-//    }
+    @Test
+    @WithUserDetails
+    void upsert_SalesTaxTrackingUpdated_SalesTaxTrackingReturned() {
+        // Given
+        String state = salesTaxTracking.getState().getName();
+        SalesTaxTracking originalSalesTaxTracking = salesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTrackingDto salesTaxTrackingDtoSent =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDtoSent);
+        SalesTaxTracking receivedSalesTaxTrackingWithId = receivedSalesTaxTracking
+                .withId(UUID.randomUUID().toString());
+
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(receivedSalesTaxTrackingWithId);
+
+        // When
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
+        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
+                .bodyValue(salesTaxTrackingDtoSent)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .isEqualTo(expectedSalesTaxTrackingDto);
+    }
 
 }
