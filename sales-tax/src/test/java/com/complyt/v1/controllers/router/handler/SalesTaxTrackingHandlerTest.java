@@ -22,9 +22,12 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -123,6 +126,43 @@ public class SalesTaxTrackingHandlerTest {
                 .expectBody(SalesTaxTrackingDto.class)
                 .isEqualTo(expectedSalesTaxTrackingDto);
     }
+
+    @Test
+    @WithUserDetails
+    void getAll_GetsAllSalesTaxTracking_ReturnsAllSalesTaxTracking() {
+        // Given
+        SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
+                .withState(new State("NY", "05", "New York"));
+        SalesTaxTrackingDto salesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        SalesTaxTrackingDto secondSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(secondSalesTaxTracking);
+
+        List<SalesTaxTracking> salesTaxTrackingList = new ArrayList<>() {{
+            add(salesTaxTracking);
+            add(secondSalesTaxTracking);
+        }};
+
+        List<SalesTaxTrackingDto> salesTaxTrackingDtoList = new ArrayList<>() {{
+            add(salesTaxTrackingDto);
+            add(secondSalesTaxTrackingDto);
+        }};
+
+        // When
+        when(salesTaxTrackingFacade.findAll()).thenReturn(Flux.fromIterable(salesTaxTrackingList));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(SalesTaxTrackingDto.class)
+                .isEqualTo(salesTaxTrackingDtoList);
+    }
+
 
 //    @Test
 //    @WithUserDetails
