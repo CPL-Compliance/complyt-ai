@@ -112,7 +112,7 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void findByExternalId_TransactionFound_ReturnsTransaction() throws InterruptedException {
+    void findByExternalId_TransactionFound_ReturnsTransaction() {
         // Given
         String id = UUID.randomUUID().toString();
         Transaction transactionToSearchFor = transaction.withExternalId(id);
