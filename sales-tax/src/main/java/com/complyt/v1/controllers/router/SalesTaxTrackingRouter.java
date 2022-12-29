@@ -19,7 +19,7 @@ public class SalesTaxTrackingRouter {
                 .path(BASE_URL, builder -> builder
                         .GET("/{state}", salesTaxTrackingHandler::getOne)
                         .GET("", salesTaxTrackingHandler::getAll)
-                        .PUT("/{state}", salesTaxTrackingHandler::update))
+                        .PUT("/{state}", salesTaxTrackingHandler::upsert))
                 .build();
     }
 }
