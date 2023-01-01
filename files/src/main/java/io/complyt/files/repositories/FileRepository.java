@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 @Repository
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;

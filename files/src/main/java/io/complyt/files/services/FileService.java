@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Service
 public class FileService {

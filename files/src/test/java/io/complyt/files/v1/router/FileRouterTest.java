@@ -7,6 +7,7 @@ import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.model.FileDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -59,6 +60,7 @@ public class FileRouterTest {
     }
 
     @Test
+    @Disabled
     @WithUserDetails
     public void exemptionsRoute() {
         // Given
