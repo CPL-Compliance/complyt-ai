@@ -9,8 +9,10 @@ import com.complyt.v1.model.SalesTaxTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -23,12 +25,13 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "SalesTaxTracking", description = "This is the SalesTaxTracking controller")
 public class SalesTaxTrackingHandler {
 
     @NonNull
-    private SalesTaxTrackingFacade salesTaxTrackingFacade;
+    SalesTaxTrackingFacade salesTaxTrackingFacade;
 
     @Operation(summary = "Gets SalesTaxTracking by id")
     @ResponseStatus(HttpStatus.OK)

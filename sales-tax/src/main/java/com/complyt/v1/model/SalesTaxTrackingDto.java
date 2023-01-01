@@ -2,24 +2,24 @@ package com.complyt.v1.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
-@With
 @Schema(name = "SalesTaxTracking")
 public class SalesTaxTrackingDto {
 
-    private String id;
-    private StateDto state;
-    private boolean enforcesSalesTax;
-    private PhysicalNexusTrackerDto physicalNexusTracker;
-    private EconomicNexusTrackerDto economicNexusTracker;
-    private LocalDateTime appliedDate;
-    private boolean approved;
-    private LocalDateTime approvalDate;
-
+    String id;
+    StateDto state;
+    boolean enforcesSalesTax;
+    PhysicalNexusTrackerDto physicalNexusTracker;
+    EconomicNexusTrackerDto economicNexusTracker;
+    LocalDateTime appliedDate;
+    boolean approved;
+    LocalDateTime approvalDate;
 }

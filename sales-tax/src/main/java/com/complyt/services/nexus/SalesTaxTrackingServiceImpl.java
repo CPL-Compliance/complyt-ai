@@ -5,8 +5,10 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -19,13 +21,12 @@ import java.util.function.Function;
 @AllArgsConstructor
 @Slf4j
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
-
     @NonNull
-    private SalesTaxTrackingRepository salesTaxTrackingRepository;
-
+    SalesTaxTrackingRepository salesTaxTrackingRepository;
     @NonNull
-    private ApplicationDateCreator applicationDateCreator;
+    ApplicationDateCreator applicationDateCreator;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
