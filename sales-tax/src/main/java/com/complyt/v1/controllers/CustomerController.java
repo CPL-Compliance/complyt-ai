@@ -5,6 +5,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
+import com.complyt.v1.exception.ObjectNotFoundException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -70,7 +70,7 @@ public class CustomerController {
 
         return customerfacade.findByName(name)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .switchIfEmpty(Flux.error(new NotFoundException(name))).log();
+                .switchIfEmpty(Flux.error(new ObjectNotFoundException("Customer with name " + name + " not found")));
     }
 
     @Operation(summary = "Gets all the customers")

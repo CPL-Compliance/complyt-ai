@@ -4,6 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.security.permissions.sales_tax_tracking.SalesTaxTrackingReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.SalesTaxTrackingUpdatePermission;
+import com.complyt.v1.exception.ObjectNotFoundException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -42,7 +42,7 @@ public class SalesTaxTrackingHandler {
         return ServerResponse.ok()
                 .body(salesTaxTrackingFacade.findByState(state)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesTaxTracking with state " + state + " not found"))), SalesTaxTrackingDto.class);
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundException("SalesTaxTracking with state " + state + " not found"))), SalesTaxTrackingDto.class);
     }
 
     @Operation(summary = "This will update the SalesTaxTracking if found by id, otherwise it will throw an error")

@@ -5,13 +5,13 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import com.complyt.v1.exception.ObjectNotFoundException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,7 +64,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
         return salesTaxTrackingRepository.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No SalesTaxTracking with state " + state)))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No SalesTaxTracking with state " + state)))
                 .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(salesTaxTrackingRepository::save);
     }
