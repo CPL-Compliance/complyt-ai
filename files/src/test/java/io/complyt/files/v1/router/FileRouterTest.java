@@ -5,7 +5,6 @@ import io.complyt.files.services.FileService;
 import io.complyt.files.v1.handler.FileHandler;
 import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.model.FileDto;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ public class FileRouterTest {
         FileHandler nullFileHandler = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.exemptionsRoute(nullFileHandler));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.fileRoute(nullFileHandler));
 
         // Then
         assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());

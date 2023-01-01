@@ -1,6 +1,5 @@
 package io.complyt.files.v1.handler;
 
-import io.complyt.files.annotations.Generated;
 import io.complyt.files.security.permissions.LinkReadPermission;
 import io.complyt.files.services.FileService;
 import io.complyt.files.v1.exception.ObjectNotFoundException;
@@ -9,8 +8,10 @@ import io.complyt.files.v1.model.FileDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,10 +22,11 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "Link", description = "This is the Links controller")
 public class FileHandler {
     @NonNull
-    private FileService fileService;
+    FileService fileService;
 
     @Operation(summary = "Gets link to the files")
     @ResponseStatus(HttpStatus.OK)

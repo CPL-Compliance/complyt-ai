@@ -1,7 +1,6 @@
 package io.complyt.files.v1.router;
 
 import io.complyt.files.v1.handler.FileHandler;
-import lombok.Generated;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,7 @@ public class FileRouter {
     public static final String BASE_URL = "/v1/files";
 
     @Bean
-    public RouterFunction<ServerResponse> exemptionsRoute(@NonNull final FileHandler fileHandler) {
+    public RouterFunction<ServerResponse> fileRoute(@NonNull final FileHandler fileHandler) {
         return RouterFunctions.route()
                 .GET(BASE_URL, accept(APPLICATION_JSON), fileHandler::getAll)
                 .build();

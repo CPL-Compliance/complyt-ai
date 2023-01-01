@@ -2,8 +2,10 @@ package io.complyt.files.repositories;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.security.TenantResolver;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,12 +16,13 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 @Repository
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileRepository {
     @NonNull
-    private ReactiveMongoTemplate reactiveMongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    TenantResolver tenantResolver;
 
     public Mono<File> find() {
         return tenantResolver.resolve()

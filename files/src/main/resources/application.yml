@@ -1,5 +1,5 @@
 spring.application.name: files
-server.port: ${PORT:9881}
+server.port: ${PORT:9880}
 
 spring.profiles.active:
   - @activeEnv@
