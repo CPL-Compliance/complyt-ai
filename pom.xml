@@ -22,6 +22,7 @@
         <module>test-service</module>
         <module>discovery-service</module>
         <module>api-gateway</module>
+        <module>files</module>
     </modules>
 
     <name>Complyt</name>

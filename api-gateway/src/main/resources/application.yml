@@ -148,3 +148,12 @@ spring:
             - SetPath=/v1/exemptions/{id}
       # ---- Exemption ----
       # ==== Sales Tax Service ====
+      # ==== Files Service ====
+        - id: files-get-link
+          uri: lb://files
+          predicates:
+            - Method=GET
+            - Path=/v1/files
+          filters:
+            - SetPath=/v1/files
+      # ==== Files Service ====

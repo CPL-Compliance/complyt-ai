@@ -1,0 +1,32 @@
+package io.complyt.files.config;
+
+import io.complyt.files.annotations.Generated;
+import io.complyt.files.v1.exception.ObjectNotFoundException;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+
+import java.util.Map;
+
+@Configuration
+@Generated
+public class ApiExceptionConfig {
+
+    @Bean
+    public WebProperties.Resources resources() {
+        return new WebProperties.Resources();
+    }
+
+    @Bean
+    public HttpStatus defaultStatus() {
+        return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    @Bean
+    public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
+        return Map.of(
+                ObjectNotFoundException.class, HttpStatus.NOT_FOUND
+        );
+    }
+}
