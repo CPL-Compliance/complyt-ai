@@ -2,16 +2,12 @@ package com.complyt.facades;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.nexus.SalesTaxTrackingService;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@AllArgsConstructor
-@Slf4j
 @Component
 public class SalesTaxTrackingFacade {
 

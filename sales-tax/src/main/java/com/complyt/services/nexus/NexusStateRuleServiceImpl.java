@@ -4,11 +4,13 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.repositories.NexusStateRuleRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
+@Slf4j
 @Service
 public class NexusStateRuleServiceImpl implements NexusStateRuleService {
 

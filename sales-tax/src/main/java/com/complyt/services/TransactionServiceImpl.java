@@ -6,7 +6,6 @@ import com.complyt.business.timestamps_injection.NewTransactionInternalTimestamp
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
-import com.complyt.v1.exception.ObjectNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
         return transactionRepository.findByExternalId(externalId)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with externalId " + externalId)))
+                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
                 .map(createFunctionUpdateTransaction(transaction))
                 .flatMap(transactionRepository::save);
     }

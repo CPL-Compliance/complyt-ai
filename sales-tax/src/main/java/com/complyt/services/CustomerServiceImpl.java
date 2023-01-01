@@ -4,11 +4,12 @@ import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimesta
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
 import com.complyt.repositories.CustomerRepository;
-import com.complyt.v1.exception.ObjectNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,6 +17,7 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     @NonNull
@@ -29,7 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Mono<Customer> update(@NonNull Customer newCustomer) {
         return customerRepository.findByExternalId(newCustomer.getExternalId())
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No customer with externalId " + newCustomer.getExternalId())))
+                .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
                 .map(originalCustomer -> {
                     Customer customerWithInjectedData = injectDataToExistingCustomer(newCustomer, originalCustomer);
                     return createFunctionUpdateCustomer(customerWithInjectedData).apply(originalCustomer);
