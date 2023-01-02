@@ -20,4 +20,6 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate);
 
+    Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state);
+
 }

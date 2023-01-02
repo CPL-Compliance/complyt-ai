@@ -5,6 +5,7 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
+import com.complyt.v1.exceptions.ObjectNotFoundException;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.model.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +39,7 @@ public class TransactionController {
     public Mono<ResponseEntity<TransactionDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
         return transactionFacade.findByExternalId(externalId)
                 .map(transactionItem -> new ResponseEntity<>(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem), HttpStatus.OK))
-                .switchIfEmpty(Mono.error(new NotFoundException(externalId)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with externalId " + externalId)));
     }
 
     @Operation(summary = "Gets all transactions")

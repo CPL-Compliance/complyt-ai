@@ -15,7 +15,5 @@ public interface ExemptionMapper {
     Exemption exemptionDtoToExemption(ExemptionDto exemptionDto);
 
     ExemptionDto exemptionToExemptionDto(Exemption exemption);
-    ComplytTimestamp map(ComplytTimestampDto value);
 
-    ComplytTimestampDto map(ComplytTimestamp value);
 }

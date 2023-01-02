@@ -2,8 +2,10 @@ package com.complyt.repositories;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.security.TenantResolver;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,16 +17,16 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 @Repository
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SalesTaxTrackingRepository {
 
     @NonNull
-    private ReactiveMongoTemplate reactiveMongoTemplate;
+    ReactiveMongoTemplate reactiveMongoTemplate;
 
     @NonNull
-    private TenantResolver tenantResolver;
+    TenantResolver tenantResolver;
 
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
-
 
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
