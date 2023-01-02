@@ -1,5 +1,6 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.Address;
 import com.complyt.domain.Item;
@@ -10,6 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.TransactionFacade;
+import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.model.TransactionDto;
 import org.bson.types.ObjectId;
@@ -23,7 +25,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -39,10 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@ExtendWith(SpringExtension.class)
-@WebFluxTest(TransactionController.class)
-@ExtendWith(MockitoExtension.class)
 @Import(JacksonConfig.class)
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@WebFluxTest(TransactionController.class)
+@WithMockUser(username = "mock", password = "mock")
+@ContextConfiguration(classes = {TransactionController.class, ApiExceptionConfig.class, GlobalExceptionHandler.class})
 class TransactionControllerTest {
 
     Transaction transactionWithId;
@@ -52,10 +57,10 @@ class TransactionControllerTest {
     TransactionController transactionController;
 
     @MockBean
-    private TransactionFacade transactionFacade;
+    TransactionFacade transactionFacade;
 
     @Autowired
-    private WebTestClient webTestClient;
+    WebTestClient webTestClient;
 
     @BeforeEach
     void cleanUp() {
@@ -66,7 +71,7 @@ class TransactionControllerTest {
         ObjectId tenantId = new ObjectId();
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new ArrayList<Item>() {
+        List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
                         null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
@@ -88,7 +93,6 @@ class TransactionControllerTest {
         transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithId);
     }
 
-    @WithUserDetails()
     @Test
     void initController_NullFacadeInstanceGiven_ThrowsNullPointerException() {
         // Given
@@ -100,7 +104,6 @@ class TransactionControllerTest {
         assertEquals("transactionFacade is marked non-null but is null", nullPointerException.getMessage());
     }
 
-    @WithUserDetails()
     @Test
     void upsert_NewTransactionCreated_ReturnsStatus201Created() {
         // Given
@@ -126,7 +129,6 @@ class TransactionControllerTest {
                 .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransactionDtoWithSalesTax));
     }
 
-    @WithUserDetails()
     @Test
     void update_TransactionExists_ReturnsStatus200() {
         // Given
@@ -153,7 +155,6 @@ class TransactionControllerTest {
                 .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
     }
 
-    @WithUserDetails()
     @Test
     void getOne_FindsTransaction_ReturnsTransaction() {
         // Given
@@ -173,9 +174,8 @@ class TransactionControllerTest {
                 .value(transactionItem -> transactionItem, equalTo(transactionDto));
     }
 
-    @WithUserDetails()
     @Test
-    void getOne_OperationFails_Returns4xxNotFound() {
+    void getOne_FacadeReturnsMonoEmpty_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(transactionFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
@@ -183,15 +183,12 @@ class TransactionControllerTest {
         // When + Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionController.BASE_URL + "/" + externalId)
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path(TransactionController.BASE_URL + "/" + externalId).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
     }
 
-    @WithUserDetails()
     @Test
     void getAll_ExpectTwoTransactions_ReturnsTwoTransactions() {
         // Given
@@ -222,7 +219,6 @@ class TransactionControllerTest {
                 .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
     }
 
-    @WithUserDetails()
     @Test
     void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
         // Given
@@ -241,7 +237,6 @@ class TransactionControllerTest {
                 .expectStatus().isNoContent();
     }
 
-    @WithUserDetails()
     @Test
     void getOne_NullExternalId_ThrowsNullPointerException() {
         //Given
@@ -275,7 +270,6 @@ class TransactionControllerTest {
     @Test
     void upsert_NullTransactionDto_ThrowsNullPointerException() {
         //Given
-        String externalId = UUID.randomUUID().toString();
         TransactionDto nullTransactionDto = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
 

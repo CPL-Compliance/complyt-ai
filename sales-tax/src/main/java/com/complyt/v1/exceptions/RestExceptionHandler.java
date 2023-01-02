@@ -22,7 +22,7 @@ public class RestExceptionHandler {
         return internalServerError().body(operationFailedException);
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(ObjectNotFoundException.class)
     ResponseEntity notFoundException(NotFoundException notFoundException) {
         log.debug(notFoundException.getMessage());
 

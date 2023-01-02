@@ -5,6 +5,7 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
+import com.complyt.v1.exceptions.ObjectNotFoundException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +59,7 @@ public class CustomerController {
 
         return customerfacade.findByExternalId(externalId)
                 .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
-                .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build())).log();
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Customer with externalId " + externalId)));
     }
 
     @Operation(summary = "Gets all matching customers by name")
@@ -70,7 +71,7 @@ public class CustomerController {
 
         return customerfacade.findByName(name)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .switchIfEmpty(Flux.error(new NotFoundException(name))).log();
+                .switchIfEmpty(Flux.error(new ObjectNotFoundException("No Customer with externalId " + name)));
     }
 
     @Operation(summary = "Gets all the customers")
