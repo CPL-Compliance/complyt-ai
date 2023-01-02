@@ -2,8 +2,8 @@ package com.complyt.v1.controllers.router.handler;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.security.permissions.sales_tax_tracking.SalesTaxTrackingReadPermission;
-import com.complyt.security.permissions.sales_tax_tracking.SalesTaxTrackingUpdatePermission;
+import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
+import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.v1.exceptions.ObjectNotFoundException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SecurityRequirement(name = "bearerAuth")
-@Tag(name = "SalesTaxTracking", description = "This is the SalesTaxTracking controller")
+@Tag(name = "Nexus", description = "This is the Nexus controller")
 public class SalesTaxTrackingHandler {
 
     @NonNull
@@ -35,7 +35,7 @@ public class SalesTaxTrackingHandler {
 
     @Operation(summary = "Gets SalesTaxTracking by id")
     @ResponseStatus(HttpStatus.OK)
-    @SalesTaxTrackingReadPermission
+    @NexusReadPermission
     public Mono<ServerResponse> getOne(ServerRequest request) {
         String state = request.pathVariable("state");
 
@@ -47,7 +47,7 @@ public class SalesTaxTrackingHandler {
 
     @Operation(summary = "This will update the SalesTaxTracking if found by id, otherwise it will throw an error")
     @ResponseStatus(HttpStatus.OK)
-    @SalesTaxTrackingUpdatePermission
+    @NexusUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest request) {
         String state = request.pathVariable("state");
 
@@ -66,7 +66,7 @@ public class SalesTaxTrackingHandler {
 
     @Operation(summary = "Gets all sales tax tracking")
     @ResponseStatus(HttpStatus.OK)
-    @SalesTaxTrackingReadPermission
+    @NexusReadPermission
     public Mono<ServerResponse> getAll(ServerRequest request) {
         return ServerResponse
                 .ok()

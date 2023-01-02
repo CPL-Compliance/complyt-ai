@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class SalesTaxTrackingRouter {
 
-    public static final String BASE_URL = "/v1/sales-tax-tracking";
+    public static final String BASE_URL = "/v1/nexus";
 
     @Bean
     public RouterFunction<ServerResponse> salesTaxTrackingRoute(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {

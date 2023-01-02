@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('SCOPE_create:sales_tax_tracking')")
-public @interface SalesTaxTrackingCreatePermission {
+@PreAuthorize("hasAuthority('SCOPE_read:nexus')")
+public @interface NexusReadPermission {
 }
-
