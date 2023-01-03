@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.nexus.SalesTaxTrackingService;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
+@AllArgsConstructor
 public class SalesTaxTrackingFacade {
 
     @NonNull
