@@ -227,5 +227,28 @@ class TransactionRepositoryTest {
         assertEquals(nullPointerException.getMessage(), "transactionId is marked non-null but is null");
     }
 
+    @Test
+    void findByExternalId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        String nullExternalId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionRepository.findByExternalId(nullExternalId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void saveAll_NullListGiven_ThrowsNullPointerException() {
+        // Given
+        List<Transaction> nullTransactions = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionRepository.saveAll(nullTransactions));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transactions is marked non-null but is null");
+    }
 
 }

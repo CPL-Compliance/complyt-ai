@@ -35,7 +35,7 @@ public class TransactionRepository {
                                 .map(savedTransaction -> savedTransaction.withCustomer(customer))));
     }
 
-    public Flux<Transaction> saveAll(List<Transaction> transactions) {
+    public Flux<Transaction> saveAll(@NonNull List<Transaction> transactions) {
         return tenantResolver.resolve()
                 .map(tenantId -> transactions.stream().map(transaction -> transaction.withTenantId(tenantId)).collect(Collectors.toList()))
                 .flatMapMany(transactionsWithClientId -> reactiveMongoTemplate.insertAll(transactionsWithClientId)
@@ -58,7 +58,7 @@ public class TransactionRepository {
                 });
     }
 
-    public Mono<Transaction> findByExternalId(String externalId) {
+    public Mono<Transaction> findByExternalId(@NonNull String externalId) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
@@ -95,7 +95,7 @@ public class TransactionRepository {
                 });
     }
 
-    private Mono<Customer> getCustomerByTransaction(@NonNull Transaction transaction, @NonNull String tenantId) {
+    private Mono<Customer> getCustomerByTransaction(Transaction transaction, String tenantId) {
         Query query = Query.query(Criteria.where("_id").is(transaction.getCustomerId())
                 .and("tenantId").is(tenantId));
 
