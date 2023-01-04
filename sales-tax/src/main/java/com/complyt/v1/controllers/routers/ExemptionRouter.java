@@ -1,6 +1,6 @@
-package com.complyt.v1.controllers.router;
+package com.complyt.v1.controllers.routers;
 
-import com.complyt.v1.controllers.router.handler.ExemptionHandler;
+import com.complyt.v1.controllers.handlers.ExemptionHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

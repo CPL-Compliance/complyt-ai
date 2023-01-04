@@ -1,10 +1,10 @@
-package com.complyt.v1.controllers.router.handler;
+package com.complyt.v1.controllers.handlers;
 
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.facades.ExemptionFacade;
-import com.complyt.v1.controllers.router.ExemptionRouter;
+import com.complyt.v1.controllers.routers.ExemptionRouter;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import com.mongodb.client.result.DeleteResult;

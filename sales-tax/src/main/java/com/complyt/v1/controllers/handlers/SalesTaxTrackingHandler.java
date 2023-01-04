@@ -1,4 +1,4 @@
-package com.complyt.v1.controllers.router.handler;
+package com.complyt.v1.controllers.handlers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;

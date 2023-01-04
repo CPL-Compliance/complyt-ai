@@ -1,6 +1,6 @@
-package com.complyt.v1.controllers.router;
+package com.complyt.v1.controllers.routers;
 
-import com.complyt.v1.controllers.router.handler.SalesTaxTrackingHandler;
+import com.complyt.v1.controllers.handlers.SalesTaxTrackingHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

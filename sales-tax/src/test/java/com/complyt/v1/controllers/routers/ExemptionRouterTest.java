@@ -1,10 +1,10 @@
-package com.complyt.v1.controllers.router;
+package com.complyt.v1.controllers.routers;
 
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.facades.ExemptionFacade;
-import com.complyt.v1.controllers.router.handler.ExemptionHandler;
+import com.complyt.v1.controllers.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import org.bson.types.ObjectId;

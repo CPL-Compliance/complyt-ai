@@ -1,4 +1,4 @@
-package com.complyt.v1.controllers.router.handler;
+package com.complyt.v1.controllers.handlers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
@@ -7,7 +7,7 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.v1.controllers.router.SalesTaxTrackingRouter;
+import com.complyt.v1.controllers.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
