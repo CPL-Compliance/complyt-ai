@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -68,7 +67,7 @@ public class SalesTaxTrackingServiceImplTest {
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
@@ -147,6 +146,19 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByState_RepositoryReturnsMonoEmpty_ThrowsException() {
+        // Given
+        String nonExistingState = "Non existing state";
+
+        // When
+        when(salesTaxTrackingRepository.findByState(nonExistingState)).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByState(nonExistingState);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectError().verify();
     }
 
     @Test
