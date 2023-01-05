@@ -2,7 +2,10 @@ package com.complyt.v1.model.timestamps;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,10 +17,12 @@ import java.time.format.DateTimeFormatter;
 @ToString
 @With
 @Slf4j
-@Schema(name = "ComplytTimestamps")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Schema(name = "ComplytTimestamp")
 public class ComplytTimestampDto {
 
-    private String timestamp;
+    @DateTimeFormat
+    String timestamp;
 
     public ComplytTimestampDto(String timestamp) {
         this.timestamp = parseTimestamp(timestamp);

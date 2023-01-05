@@ -2,6 +2,7 @@ package com.complyt.domain.timestamps;
 
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
@@ -9,8 +10,9 @@ import java.time.LocalDateTime;
 @ToString
 @Getter
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComplytTimestamp {
 
     @NonNull
-    private final LocalDateTime timestamp;
+    LocalDateTime timestamp;
 }
