@@ -19,4 +19,8 @@ public interface TransactionService extends CrudService<Transaction, String> {
     Mono<Transaction> injectDataToModifiedTransaction(@NonNull Transaction newTransaction, @NonNull Transaction oldTransaction);
 
     Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction);
+
+    Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction);
+
+    Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction);
 }

@@ -1,8 +1,9 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
@@ -33,9 +34,18 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     private CountyProvider countyProvider;
 
+    @NonNull
+    private ComplytIdHandler<Transaction> complytIdHandler;
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
+    }
+
+    @Override
+    public Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction) {
+        return complytIdHandler.isNewDontHaveComplytId(newTransaction)
+                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new transaction with complyt id")));
     }
 
     @Override
@@ -48,6 +58,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
                 .map(createFunctionUpdateTransaction(transaction))
                 .flatMap(transactionRepository::save);
+    }
+
+    @Override
+    public Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
+        return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedTransaction, originalTransaction)
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original transaction's complytIds not equal")));
     }
 
     @Override
@@ -65,6 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
+                .map(complytIdHandler::insertComplytIdToNew)
                 .map(NewTransactionInternalTimestampsInjector::new)
                 .map(NewTransactionInternalTimestampsInjector::inject);
     }

@@ -30,11 +30,12 @@ public class TransactionFacade {
     private NexusService nexusService;
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
-        return transactionService.injectDataToNewTransaction(transaction)
+        return  transactionService.checkTransactionNotHavingComplytId(transaction)
+                .flatMap(checkedTransaction -> transactionService.injectDataToNewTransaction(checkedTransaction)
                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                 handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo) :
-                                saveAndHandleNexusTrackingCalculation(setTransaction)));
+                                saveAndHandleNexusTrackingCalculation(setTransaction))));
     }
 
     private Mono<Transaction> handleSalesTaxCalculationAndSave(Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
@@ -54,11 +55,12 @@ public class TransactionFacade {
     }
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
-        return transactionService.injectDataToModifiedTransaction(modifiedTransaction, originalTransaction)
+        return  transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
+                .flatMap(checkedModifiedTransaction -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                 handleSalesTaxCalculationAndUpdate(externalId, setTransaction, salesTaxTrackingWithNexusInfo) :
-                                updateAndHandleNexusTrackingCalculation(externalId, setTransaction)));
+                                updateAndHandleNexusTrackingCalculation(externalId, setTransaction))));
     }
 
     private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {

@@ -15,8 +15,10 @@ public class CustomerCreation {
         ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(LocalDateTime.now().minusMinutes(1));
         Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute, complytTimestamp);
         return new Customer(
+                UUID.randomUUID(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                "1",
                 "name",
                 null,
                 UUID.randomUUID().toString(),
