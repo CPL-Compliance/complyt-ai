@@ -16,12 +16,16 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionItemsAmountsCollector implements TransactionAmountsCollector<Transaction> {
 
+    @NonNull
     AmountCalculator<List<Taxable>> taxableItemsAmountCalculator;
 
+    @NonNull
     AmountCalculator<List<Taxable>> tangibleItemsAmountCalculator;
 
+    @NonNull
     AmountCalculator<List<Taxable>> totalItemsAmountCalculator;
 
+    @NonNull
     CollectionBuilder<Taxable> taxableCollectionBuilder;
 
     public Transaction collect(@NonNull Transaction transaction) {
