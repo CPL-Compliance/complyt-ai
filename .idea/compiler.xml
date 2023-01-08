@@ -5,7 +5,6 @@
     <option name="delegateToJavac" value="true" />
   </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="ajc" />
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
@@ -25,6 +24,7 @@
         </processorPath>
         <module name="test-service" />
         <module name="api-gateway" />
+        <module name="files" />
         <module name="discovery-service" />
         <module name="sales-tax" />
       </profile>
@@ -44,6 +44,7 @@
       <module name="complyt" options="" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
+      <module name="files" options="-parameters" />
       <module name="naming-server" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
       <module name="salestax" options="-parameters" />

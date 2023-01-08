@@ -1,0 +1,43 @@
+package io.complyt.files.v1.handler;
+
+import io.complyt.files.security.permissions.LinkReadPermission;
+import io.complyt.files.services.FileService;
+import io.complyt.files.v1.exception.ObjectNotFoundException;
+import io.complyt.files.v1.mappers.FileMapper;
+import io.complyt.files.v1.model.FileDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.Generated;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+
+@Component
+@Generated
+@RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Link", description = "This is the Links controller")
+public class FileHandler {
+    @NonNull
+    FileService fileService;
+
+    @Operation(summary = "Gets link to the files")
+    @ResponseStatus(HttpStatus.OK)
+    @LinkReadPermission
+    public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
+        Mono<FileDto> value = fileService.find()
+                .map(FileMapper.INSTANCE::fileToFileDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("Link to the files not found")));
+
+        return ServerResponse.ok().body(value, FileDto.class);
+    }
+}

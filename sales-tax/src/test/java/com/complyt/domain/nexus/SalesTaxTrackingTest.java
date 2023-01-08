@@ -42,7 +42,7 @@ class SalesTaxTrackingTest {
                 ", physicalNexusTracker=" + salesTaxTracking.getPhysicalNexusTracker() +
                 ", economicNexusTracker=" + salesTaxTracking.getEconomicNexusTracker() +
                 ", appliedDate=" + salesTaxTracking.getAppliedDate() +
-                ", isApproved=" + salesTaxTracking.isApproved() +
+                ", approved=" + salesTaxTracking.isApproved() +
                 ", approvalDate=" + salesTaxTracking.getApprovalDate() + ")";
 
         // When

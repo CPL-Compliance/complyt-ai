@@ -5,25 +5,28 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Slf4j
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
-
     @NonNull
-    private SalesTaxTrackingRepository salesTaxTrackingRepository;
-
+    SalesTaxTrackingRepository salesTaxTrackingRepository;
     @NonNull
-    private ApplicationDateCreator applicationDateCreator;
+    ApplicationDateCreator applicationDateCreator;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -56,5 +59,24 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
         log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
         return save(modifiedTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
+        return salesTaxTrackingRepository.findByState(state)
+                .switchIfEmpty(Mono.error(new NotFoundException("No SalesTaxTracking with state " + state)))
+                .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
+                .flatMap(salesTaxTrackingRepository::save);
+    }
+
+    private Function<SalesTaxTracking, SalesTaxTracking> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
+        return salesTaxTrackingInfo -> salesTaxTrackingInfo
+                .withAppliedDate(salesTaxTracking.getAppliedDate())
+                .withApprovalDate(salesTaxTracking.getApprovalDate())
+                .withEnforcesSalesTax(salesTaxTracking.isEnforcesSalesTax())
+                .withEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker())
+                .withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker())
+                .withApproved(salesTaxTracking.isApproved())
+                .withState(salesTaxTracking.getState());
     }
 }

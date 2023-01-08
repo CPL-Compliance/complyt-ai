@@ -152,7 +152,7 @@ public class ExemptionHandlerTest {
 
     @Test
     @WithUserDetails()
-    void update_ExemptionDoesNotExistInDB_Throws404NotFound() {
+    void update_ExemptionDoesNotExist_Throws404NotFound() {
         // Given
         Exemption exemptionWithIdThatDoesNotExist = exemption.withTenantId(null).withId(UUID.randomUUID().toString());
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);

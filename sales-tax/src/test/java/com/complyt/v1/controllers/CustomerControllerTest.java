@@ -1,8 +1,10 @@
 package com.complyt.v1.controllers;
 
+import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.customer.CustomerDto;
@@ -16,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -35,6 +38,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ExtendWith(MockitoExtension.class)
 @WebFluxTest(CustomerController.class)
 @WithMockUser(username = "mock", password = "mock")
+@ContextConfiguration(classes = {CustomerController.class, ApiExceptionConfig.class, GlobalExceptionHandler.class})
 class CustomerControllerTest {
 
     Customer customer;
@@ -156,9 +160,7 @@ class CustomerControllerTest {
         // When + Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + externalId)
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path(CustomerController.BASE_URL + "/" + externalId).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
