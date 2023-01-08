@@ -11,13 +11,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@With
-@ToString
+@Value
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@With
+@AllArgsConstructor
 @Document(collection = "transaction")
 public class Transaction {
     @Id
