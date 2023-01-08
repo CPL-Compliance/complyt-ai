@@ -28,11 +28,11 @@ import java.util.function.Function;
 public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
-     TransactionRepository transactionRepository;
+    TransactionRepository transactionRepository;
 
     @NonNull
     @Qualifier("productClassificationServiceImpl")
-     ProductClassificationService productClassificationService;
+    ProductClassificationService productClassificationService;
 
     @NonNull
     @Qualifier("transactionItemsAmountsCollector")
