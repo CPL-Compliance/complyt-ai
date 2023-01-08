@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionAmountsCollector<Transaction> transactionAmountsCollector;
 
     @NonNull
-    private CountyProvider countyProvider;
+    CountyProvider countyProvider;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -116,7 +116,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .withInternalTimestamps(transaction.getInternalTimestamps())
                 .withExternalTimestamps(transaction.getExternalTimestamps())
                 .withTransactionType(transaction.getTransactionType())
-                .withShippingFee(transaction.getShippingFee());
+                .withShippingFee(transaction.getShippingFee())
+                .withTaxableItemsAmount(transaction.getTaxableItemsAmount())
+                .withTangibleItemsAmount(transaction.getTangibleItemsAmount())
+                .withTotalItemsAmount(transaction.getTotalItemsAmount());
     }
 
 }
