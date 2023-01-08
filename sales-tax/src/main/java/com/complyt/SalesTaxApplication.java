@@ -15,7 +15,7 @@ import reactivefeign.spring.config.EnableReactiveFeignClients;
 @EnableReactiveFeignClients
 @EnableFeignClients
 public class SalesTaxApplication implements CommandLineRunner {
-
+    // test
     public static void main(String[] args) {
         SpringApplication.run(SalesTaxApplication.class, args);
     }
