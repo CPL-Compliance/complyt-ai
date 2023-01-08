@@ -63,19 +63,19 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction newTransactionWithInternalTimestamps = modifiedTransaction
                 .withInternalTimestamps(originalTransaction.getInternalTimestamps());
 
-        return injectCommonDataToNewAndExistingTransaction(newTransactionWithInternalTimestamps)
+        return injectCommonDataToNewAndModifiedTransaction(newTransactionWithInternalTimestamps)
                 .map(ExistingTransactionInternalTimestampsInjector::new)
                 .map(ExistingTransactionInternalTimestampsInjector::inject);
     }
 
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
-        return injectCommonDataToNewAndExistingTransaction(transaction)
+        return injectCommonDataToNewAndModifiedTransaction(transaction)
                 .map(NewTransactionInternalTimestampsInjector::new)
                 .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
-    private Mono<Transaction> injectCommonDataToNewAndExistingTransaction(Transaction transaction) {
+    private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
                 .map(transactionAmountsCollector::collect);
