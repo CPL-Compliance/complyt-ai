@@ -69,7 +69,7 @@ public class ExemptionRepositoryTest {
         ));
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private Exemption createExemption() {

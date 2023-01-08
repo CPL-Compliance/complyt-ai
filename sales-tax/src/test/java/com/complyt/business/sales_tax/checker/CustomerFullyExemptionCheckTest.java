@@ -52,7 +52,7 @@ public class CustomerFullyExemptionCheckTest {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null, null);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, new ObjectId(), customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private Exemption createExemption() {

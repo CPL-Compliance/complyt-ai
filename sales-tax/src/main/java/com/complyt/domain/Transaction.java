@@ -36,8 +36,8 @@ public class Transaction {
     TransactionType transactionType;
     ShippingFee shippingFee;
     String createdFrom;
-    float taxablesAmount;
-    float tangiblesAmount;
+    float taxableItemsAmount;
+    float tangibleItemsAmount;
     float totalItemsAmount;
 
 }

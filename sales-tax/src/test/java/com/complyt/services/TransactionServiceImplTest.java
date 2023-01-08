@@ -1,8 +1,9 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
@@ -50,6 +51,9 @@ class TransactionServiceImplTest {
     @Mock
     CountyProvider countyProvider;
 
+    @Mock
+    TransactionAmountsCollector<Transaction> transactionAmountsCollector;
+
     Transaction transaction;
     Customer customer;
 
@@ -75,7 +79,7 @@ class TransactionServiceImplTest {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
 
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private Customer createCustomer() {
@@ -252,7 +256,7 @@ class TransactionServiceImplTest {
         // Given
         String anotherTransactionId = UUID.randomUUID().toString();
         Transaction anotherTransactionWithSameClientId = transaction.withId(anotherTransactionId);
-        List<Transaction> transactions = new ArrayList<Transaction>() {{
+        List<Transaction> transactions = new ArrayList<>() {{
             add(transaction);
             add(anotherTransactionWithSameClientId);
         }};
@@ -275,7 +279,7 @@ class TransactionServiceImplTest {
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
 
-        List<Transaction> allTransactions = new ArrayList<Transaction>() {{
+        List<Transaction> allTransactions = new ArrayList<>() {{
             add(transactionWithCustomer);
             add(secondTransactionWithCustomer);
         }};
@@ -333,6 +337,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)).thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(transactionAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
 
         // Then
@@ -368,6 +373,7 @@ class TransactionServiceImplTest {
         // When
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(newTransaction)).thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
+        when(transactionAmountsCollector.collect(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithProductClassificationAndCounty);
         Mono<Transaction> transactionMono = transactionService.injectDataToModifiedTransaction(newTransaction, transactionWithCustomer);
 
         // Then

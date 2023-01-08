@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
     @Qualifier("transactionItemsAmountsCollector")
-    TransactionAmountsCollector transactionAmountsCollector;
+    TransactionAmountsCollector<Transaction> transactionAmountsCollector;
 
     @NonNull
     private CountyProvider countyProvider;
@@ -65,18 +65,18 @@ public class TransactionServiceImpl implements TransactionService {
 
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimestamps)
                 .flatMap(countyProvider::provide)
+                .map(transactionAmountsCollector::collect)
                 .map(ExistingTransactionInternalTimestampsInjector::new)
-                .map(ExistingTransactionInternalTimestampsInjector::inject)
-                .map(transactionAmountsCollector::collect);
+                .map(ExistingTransactionInternalTimestampsInjector::inject);
     }
 
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
+                .map(transactionAmountsCollector::collect)
                 .map(NewTransactionInternalTimestampsInjector::new)
-                .map(NewTransactionInternalTimestampsInjector::inject)
-                .map(transactionAmountsCollector::collect);
+                .map(NewTransactionInternalTimestampsInjector::inject);
     }
 
     @Override

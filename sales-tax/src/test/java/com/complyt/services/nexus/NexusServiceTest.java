@@ -123,7 +123,7 @@ class NexusServiceTest {
         };
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {

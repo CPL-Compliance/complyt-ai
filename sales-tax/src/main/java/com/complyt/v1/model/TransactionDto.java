@@ -29,4 +29,7 @@ public class TransactionDto {
     private final TransactionTypeDto transactionType;
     private final ShippingFeeDto shippingFee;
     private final String createdFrom;
+    float taxableItemsAmount;
+    float tangibleItemsAmount;
+    float totalItemsAmount;
 }
