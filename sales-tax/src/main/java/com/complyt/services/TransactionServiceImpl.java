@@ -3,11 +3,14 @@ package com.complyt.services;
 import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,14 +24,19 @@ import java.util.function.Function;
 @Service
 @AllArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
-    private TransactionRepository transactionRepository;
+     TransactionRepository transactionRepository;
 
     @NonNull
     @Qualifier("productClassificationServiceImpl")
-    private ProductClassificationService productClassificationService;
+     ProductClassificationService productClassificationService;
+
+    @NonNull
+    @Qualifier("transactionItemsAmountsCollector")
+    TransactionAmountsCollector transactionAmountsCollector;
 
     @NonNull
     private CountyProvider countyProvider;
@@ -58,7 +66,8 @@ public class TransactionServiceImpl implements TransactionService {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimestamps)
                 .flatMap(countyProvider::provide)
                 .map(ExistingTransactionInternalTimestampsInjector::new)
-                .map(ExistingTransactionInternalTimestampsInjector::inject);
+                .map(ExistingTransactionInternalTimestampsInjector::inject)
+                .map(transactionAmountsCollector::collect);
     }
 
     @Override
@@ -66,7 +75,8 @@ public class TransactionServiceImpl implements TransactionService {
         return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
                 .map(NewTransactionInternalTimestampsInjector::new)
-                .map(NewTransactionInternalTimestampsInjector::inject);
+                .map(NewTransactionInternalTimestampsInjector::inject)
+                .map(transactionAmountsCollector::collect);
     }
 
     @Override
