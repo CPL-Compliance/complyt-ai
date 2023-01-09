@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -31,12 +30,10 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionRepository transactionRepository;
 
     @NonNull
-    @Qualifier("productClassificationServiceImpl")
-    ProductClassificationService productClassificationService;
+    ProductClassificationService productClassificationServiceImpl;
 
     @NonNull
-    @Qualifier("transactionItemsAmountsCollector")
-    TransactionAmountsCollector<Transaction> transactionAmountsCollector;
+    TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
 
     @NonNull
     CountyProvider countyProvider;
@@ -76,9 +73,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
+        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
                 .flatMap(countyProvider::provide)
-                .map(transactionAmountsCollector::collect);
+                .map(transactionItemsAmountsCollector::collect);
     }
 
     @Override
