@@ -9,6 +9,8 @@ import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.customer.CustomerDto;
 import com.complyt.v1.model.customer.CustomerTypeDto;
+import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +62,9 @@ class CustomerControllerTest {
         String externalId = UUID.randomUUID().toString();
         String name = "Existing Customer";
         AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, null, null);
+        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(LocalDateTime.now().toString());
+        TimestampsDto timestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
+        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, timestampsDto, timestampsDto);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
@@ -173,6 +178,9 @@ class CustomerControllerTest {
         List<Customer> customersFoundByName = new ArrayList<>() {{
             add(customer);
         }};
+        List<CustomerDto> allCustomerDtos = new ArrayList<>() {{
+            add(CustomerMapper.INSTANCE.customerToCustomerDto(customer));
+        }};
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
         // When + Then
@@ -184,8 +192,8 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk().
-                expectBodyList(Customer.class)
-                .value(customers -> customers, equalTo(customersFoundByName));
+                expectBodyList(CustomerDto.class)
+                .value(customerDtos -> customerDtos, equalTo(allCustomerDtos));
     }
 
     @Test
@@ -199,6 +207,12 @@ class CustomerControllerTest {
             add(secondCustomer);
         }};
 
+        List<CustomerDto> allCustomerDtos = new ArrayList<>() {{
+            add(CustomerMapper.INSTANCE.customerToCustomerDto(customer));
+            add(CustomerMapper.INSTANCE.customerToCustomerDto(secondCustomer));
+        }};
+
+
         when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(allCustomers));
 
         // When + Then
@@ -210,8 +224,8 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
-                .value(customers -> customers, equalTo(allCustomers));
+                .expectBodyList(CustomerDto.class)
+                .value(customerDtos -> customerDtos, equalTo(allCustomerDtos));
     }
 
     @Test
