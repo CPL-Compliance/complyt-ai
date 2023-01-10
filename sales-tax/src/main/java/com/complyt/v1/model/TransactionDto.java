@@ -9,7 +9,6 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 @AllArgsConstructor
-@ToString
 @With
 @Value
 @Schema(name = "Transaction")
