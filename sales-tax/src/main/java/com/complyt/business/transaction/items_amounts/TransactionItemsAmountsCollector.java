@@ -35,9 +35,15 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
         float tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(items);
         float totalItemsAmount = totalItemsAmountCalculator.calculate(items);
 
-        return transaction
-                .withTaxableItemsAmount(taxableItemsAmount)
-                .withTangibleItemsAmount(tangibleItemsAmount)
-                .withTotalItemsAmount(totalItemsAmount);
+        return new Transaction(
+                transaction.getId(), transaction.getExternalId(),
+                transaction.getItems(), transaction.getBillingAddress(),
+                transaction.getShippingAddress(), transaction.getCustomerId(), transaction.getCustomer(),
+                transaction.getSalesTax(), transaction.getTransactionStatus(),
+                transaction.getTenantId(), transaction.getInternalTimestamps(),
+                transaction.getExternalTimestamps(), transaction.getTransactionType(),
+                transaction.getShippingFee(), transaction.getCreatedFrom(),
+                taxableItemsAmount, tangibleItemsAmount, totalItemsAmount
+        );
     }
 }

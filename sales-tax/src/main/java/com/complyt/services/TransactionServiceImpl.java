@@ -101,22 +101,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Function<Transaction, Transaction> createFunctionUpdateTransaction(final Transaction transaction) {
-        return transactionInfo -> transactionInfo
-                .withExternalId(transaction.getExternalId())
-                .withItems(transaction.getItems())
-                .withBillingAddress(transaction.getBillingAddress())
-                .withShippingAddress(transaction.getShippingAddress())
-                .withCustomerId(transaction.getCustomerId())
-                .withCustomer(transaction.getCustomer())
-                .withSalesTax(transaction.getSalesTax())
-                .withTransactionStatus(transaction.getTransactionStatus())
-                .withInternalTimestamps(transaction.getInternalTimestamps())
-                .withExternalTimestamps(transaction.getExternalTimestamps())
-                .withTransactionType(transaction.getTransactionType())
-                .withShippingFee(transaction.getShippingFee())
-                .withTaxableItemsAmount(transaction.getTaxableItemsAmount())
-                .withTangibleItemsAmount(transaction.getTangibleItemsAmount())
-                .withTotalItemsAmount(transaction.getTotalItemsAmount());
+        return transactionInfo ->
+                new Transaction(
+                        transactionInfo.getId(), transaction.getExternalId(),
+                        transaction.getItems(), transaction.getBillingAddress(), transaction.getShippingAddress(),
+                        transaction.getCustomerId(), transaction.getCustomer(), transaction.getSalesTax(),
+                        transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
+                        transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
+                        transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount()
+                );
     }
 
 }
