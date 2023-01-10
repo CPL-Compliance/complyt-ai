@@ -8,7 +8,7 @@ import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.v1.controllers.routers.SalesTaxTrackingRouter;
-import com.complyt.v1.exceptions.GlobalExceptionHandler;
+import com.complyt.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;

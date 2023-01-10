@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Description;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -21,7 +23,8 @@ import java.time.format.DateTimeFormatter;
 @Schema(name = "ComplytTimestamp")
 public class ComplytTimestampDto {
 
-    @DateTimeFormat
+    @NotEmpty
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     String timestamp;
 
     public ComplytTimestampDto(String timestamp) {

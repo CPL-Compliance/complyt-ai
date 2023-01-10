@@ -11,7 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.TransactionFacade;
-import com.complyt.v1.exceptions.GlobalExceptionHandler;
+import com.complyt.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.model.TransactionDto;
 import org.bson.types.ObjectId;

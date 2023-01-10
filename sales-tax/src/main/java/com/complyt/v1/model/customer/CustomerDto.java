@@ -17,7 +17,7 @@ import javax.validation.constraints.NotEmpty;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Schema(name = "Customer")
 public class CustomerDto {
-    @NonNull
+
     @Max(256)
     String id;
 

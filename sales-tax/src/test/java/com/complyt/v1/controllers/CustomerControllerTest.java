@@ -4,7 +4,7 @@
 //import com.complyt.domain.customer.Customer;
 //import com.complyt.facades.CustomerFacade;
 //import com.complyt.repositories.exceptions.OperationFailedException;
-//import com.complyt.v1.exceptions.GlobalExceptionHandler;
+//import com.complyt.exceptions.GlobalExceptionHandler;
 //import com.complyt.v1.mappers.CustomerMapper;
 //import com.complyt.v1.model.AddressDto;
 //import com.complyt.v1.model.customer.CustomerDto;

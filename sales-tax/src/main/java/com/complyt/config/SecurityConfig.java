@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 
+
         // OAuth2
         http.oauth2ResourceServer().jwt();
 

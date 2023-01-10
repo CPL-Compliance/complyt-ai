@@ -1,4 +1,4 @@
-package com.complyt.v1.exceptions;
+package com.complyt.exceptions;
 
 import com.complyt.annotations.Generated;
 

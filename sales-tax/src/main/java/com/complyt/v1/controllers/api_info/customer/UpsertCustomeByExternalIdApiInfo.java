@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
@@ -22,18 +23,26 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.GET,
+                method = RequestMethod.PUT,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by External ID",
-                        operationId = "getCustomerByExternalId",
+                        description = "Update or Insert Customer by External ID",
+                        operationId = "upsertCustomerByExternalId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Customer External ID")
                         },
                         tags = "customer",
+                        requestBody =
+                                @RequestBody(
+                                        description = "Customer to add",
+                                        required = true,
+                                        content = @Content(
+                                                schema = @Schema(implementation = CustomerDto.class,
+                                                        required = true))
+                                ),
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -56,5 +65,5 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetCustomerByExternalIdApiInfo {
+public @interface UpsertCustomeByExternalIdApiInfo {
 }

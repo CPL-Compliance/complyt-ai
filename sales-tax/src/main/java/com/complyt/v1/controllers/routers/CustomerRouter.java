@@ -1,6 +1,8 @@
 package com.complyt.v1.controllers.routers;
 
+import com.complyt.v1.controllers.api_info.customer.GetAllCustomersApiInfo;
 import com.complyt.v1.controllers.api_info.customer.GetCustomerByExternalIdApiInfo;
+import com.complyt.v1.controllers.api_info.customer.UpsertCustomeByExternalIdApiInfo;
 import com.complyt.v1.controllers.handlers.CustomerHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -14,12 +16,23 @@ public class CustomerRouter {
     public static final String BASE_URL = "/v1/customers";
 
     @Bean
+    @UpsertCustomeByExternalIdApiInfo
     public RouterFunction<ServerResponse> upsertCustomerByExternalIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
         RequestPredicate putCustomerRoute = RequestPredicates
                 .PUT(BASE_URL + "/{externalId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(putCustomerRoute, customerHandler::upsert);
+    }
+
+    @Bean
+    @GetAllCustomersApiInfo
+    public RouterFunction<ServerResponse> getAllCustomersRouterFunction(@NonNull final CustomerHandler customerHandler) {
+        RequestPredicate putCustomerRoute = RequestPredicates
+                .GET(BASE_URL)
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(putCustomerRoute, customerHandler::getAll);
     }
 
     @Bean
