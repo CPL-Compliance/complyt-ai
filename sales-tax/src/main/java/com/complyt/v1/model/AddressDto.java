@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
@@ -15,30 +16,30 @@ import javax.validation.constraints.NotEmpty;
 public class AddressDto {
 
     @NonNull
-    @NotEmpty
-    @Max(100)
+    @NotBlank(message = "City may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     private String city;
 
     @NonNull
-    @NotEmpty
-    @Max(100)
+    @NotBlank(message = "Country may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     private String country;
 
-    @Max(100)
+    @Max(value = 256, message = "256 characters maximum")
     private String county;
 
     @NonNull
-    @NotEmpty
-    @Max(100)
+    @NotBlank(message = "State may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     private String state;
 
     @NonNull
-    @NotEmpty
-    @Max(100)
+    @NotBlank(message = "Street may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     private String street;
 
     @NonNull
-    @NotEmpty
-    @Max(100)
+    @NotBlank(message = "ZIP may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     private String zip;
 }

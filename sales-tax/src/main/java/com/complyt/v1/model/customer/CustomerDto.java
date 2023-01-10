@@ -7,7 +7,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -18,32 +19,32 @@ import javax.validation.constraints.NotEmpty;
 @Schema(name = "Customer")
 public class CustomerDto {
 
-    @Max(256)
+    @Max(value = 256, message = "256 characters maximum")
     String id;
 
-    @NotEmpty
     @NonNull
-    @Max(256)
+    @NotBlank(message = "External ID may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     String externalId;
 
-    @NotEmpty
     @NonNull
-    @Max(256)
+    @NotBlank(message = "Name may not be blank")
+    @Max(value = 256, message = "256 characters maximum")
     String name;
 
-    @NotEmpty
     @NonNull
+    @NotNull(message = "Address may not be null")
     AddressDto address;
 
-    @NotEmpty
     @NonNull
+    @NotNull(message = "Customer type may not be null")
     CustomerTypeDto customerType;
 
-    @NotEmpty
     @NonNull
+    @NotNull(message = "Internal timestamps may not be null")
     TimestampsDto internalTimestamps;
 
-    @NotEmpty
     @NonNull
+    @NotNull(message = "External timestamps may not be null")
     TimestampsDto externalTimestamps;
 }

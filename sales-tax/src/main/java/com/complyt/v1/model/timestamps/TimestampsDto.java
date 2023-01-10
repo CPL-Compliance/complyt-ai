@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @EqualsAndHashCode
 @ToString
 @With
@@ -16,11 +19,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Schema(name = "Timestamps")
 public class TimestampsDto {
-    @CreatedDate
+
     @NonNull
+    @NotNull(message = "Created date may not be null")
     ComplytTimestampDto createdDate;
-    @LastModifiedDate
+
     @NonNull
+    @NotNull(message = "Updated date may not be null")
     ComplytTimestampDto updatedDate;
 
 }

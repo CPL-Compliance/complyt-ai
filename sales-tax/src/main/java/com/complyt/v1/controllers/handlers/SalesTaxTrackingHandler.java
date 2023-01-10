@@ -4,7 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +42,7 @@ public class SalesTaxTrackingHandler {
         return ServerResponse.ok()
                 .body(salesTaxTrackingFacade.findByState(state)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundException("SalesTaxTracking with state " + state + " not found"))), SalesTaxTrackingDto.class);
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())), SalesTaxTrackingDto.class);
     }
 
     @Operation(summary = "This will update the SalesTaxTracking if found by id, otherwise it will throw an error")

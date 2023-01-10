@@ -2,6 +2,8 @@ package com.complyt.v1.controllers.api_info.customer;
 
 import com.complyt.v1.model.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,8 +26,13 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get all Customers",
-                        operationId = "getAllCustomers",
+                        description = "Get all customers by Name",
+                        operationId = "getCustomerByName",
+                        parameters = {
+                                @Parameter(in = ParameterIn.PATH,
+                                        name = "name",
+                                        description = "Customer Name")
+                        },
                         tags = "customer",
                         responses = {
                                 @ApiResponse(
@@ -46,5 +53,5 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetAllCustomersApiInfo {
+public @interface GetCustomerByNameApiInfo {
 }

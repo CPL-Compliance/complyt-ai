@@ -1,7 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.annotations.Generated;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ public class ApiExceptionConfig {
     @Bean
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
-                ObjectNotFoundException.class, HttpStatus.NOT_FOUND
+                ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND
         );
     }
 }

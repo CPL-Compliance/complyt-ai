@@ -1,4 +1,4 @@
-package com.complyt.exceptions;
+package com.complyt.v1.exceptions;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;

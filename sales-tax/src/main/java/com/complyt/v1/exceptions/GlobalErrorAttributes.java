@@ -1,5 +1,6 @@
-package com.complyt.exceptions;
+package com.complyt.v1.exceptions;
 
+import com.complyt.v1.exceptions.types.ComplytApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -42,8 +43,8 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     }
 
     private HttpStatus getHttpStatus(Throwable error) {
-        if (error instanceof ComplytException complytException) {
-            return exceptionToStatusCode.getOrDefault(complytException.getClass(), defaultStatus);
+        if (error instanceof ComplytApiException complytApiException) {
+            return exceptionToStatusCode.getOrDefault(complytApiException.getClass(), defaultStatus);
         } else if (error instanceof ResponseStatusException responseStatusException) {
             return HttpStatus.resolve(responseStatusException.getRawStatusCode());
         } else {

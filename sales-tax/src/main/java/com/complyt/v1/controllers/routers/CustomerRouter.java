@@ -2,6 +2,7 @@ package com.complyt.v1.controllers.routers;
 
 import com.complyt.v1.controllers.api_info.customer.GetAllCustomersApiInfo;
 import com.complyt.v1.controllers.api_info.customer.GetCustomerByExternalIdApiInfo;
+import com.complyt.v1.controllers.api_info.customer.GetCustomerByNameApiInfo;
 import com.complyt.v1.controllers.api_info.customer.UpsertCustomeByExternalIdApiInfo;
 import com.complyt.v1.controllers.handlers.CustomerHandler;
 import lombok.NonNull;
@@ -43,5 +44,15 @@ public class CustomerRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getCustomerRoute, customerHandler::getByExternalId);
+    }
+
+    @Bean
+    @GetCustomerByNameApiInfo
+    public RouterFunction<ServerResponse> getCustomerByNameRouterFunction(@NonNull final CustomerHandler customerHandler) {
+        RequestPredicate getCustomerRoute = RequestPredicates
+                .GET(BASE_URL + "/name/{name}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(getCustomerRoute, customerHandler::getByName);
     }
 }
