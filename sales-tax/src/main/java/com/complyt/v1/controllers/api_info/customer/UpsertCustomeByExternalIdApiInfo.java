@@ -34,7 +34,8 @@ import java.lang.annotation.Target;
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Customer External ID",
-                                        examples = @ExampleObject(value = "999444", name = "999444"))
+                                        examples = @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.externalIdExample,
+                                                name = UpsertCustomeByExternalIdApiInfo.externalIdExample))
                         },
                         tags = "customer",
                         requestBody =
@@ -44,27 +45,7 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = CustomerDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = "{\n" +
-                                                        "    \"externalId\": \"999444\",\n" +
-                                                        "    \"name\": \"Complyt LTD.\",\n" +
-                                                        "    \"address\": {\n" +
-                                                        "        \"city\": \"Sacramento\",\n" +
-                                                        "        \"country\": \"US\",\n" +
-                                                        "        \"county\": null,\n" +
-                                                        "        \"state\": \"CA\",\n" +
-                                                        "        \"street\": \"944 W. Wintergreen St.\",\n" +
-                                                        "        \"zip\": \"95823\"\n" +
-                                                        "    },\n" +
-                                                        "    \"customerType\": \"RETAIL\",\n" +
-                                                        "    \"externalTimestamps\": {\n" +
-                                                        "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
-                                                        "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-                                                        "    },\n" +
-                                                        "    \"internalTimestamps\": {\n" +
-                                                        "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
-                                                        "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-                                                        "    }\n" +
-                                                        "}")
+                                                @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.newCustomerExample)
                                         })
                         ),
                         responses = {
@@ -76,36 +57,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = "{\n" +
-                                                                        "  \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-                                                                        "  \"externalId\": \"999444\",\n" +
-                                                                        "  \"name\": \"Complyt LTD.\",\n" +
-                                                                        "  \"address\": {\n" +
-                                                                        "    \"city\": \"Sacramento\",\n" +
-                                                                        "    \"country\": \"US\",\n" +
-                                                                        "    \"county\": null,\n" +
-                                                                        "    \"state\": \"CA\",\n" +
-                                                                        "    \"street\": \"944 W. Wintergreen St.\",\n" +
-                                                                        "    \"zip\": \"95823\"\n" +
-                                                                        "  },\n" +
-                                                                        "  \"customerType\": \"RETAIL\",\n" +
-                                                                        "  \"internalTimestamps\": {\n" +
-                                                                        "    \"createdDate\": {\n" +
-                                                                        "      \"timestamp\": \"2023-01-10T17:40:44.357271\"\n" +
-                                                                        "    },\n" +
-                                                                        "    \"updatedDate\": {\n" +
-                                                                        "      \"timestamp\": \"2023-01-10T17:40:44.357271\"\n" +
-                                                                        "    }\n" +
-                                                                        "  },\n" +
-                                                                        "  \"externalTimestamps\": {\n" +
-                                                                        "    \"createdDate\": {\n" +
-                                                                        "      \"timestamp\": \"2022-10-19T07:00:00\"\n" +
-                                                                        "    },\n" +
-                                                                        "    \"updatedDate\": {\n" +
-                                                                        "      \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
-                                                                        "    }\n" +
-                                                                        "  }\n" +
-                                                                        "}")
+                                                                @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.returnedCustomerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -122,4 +74,57 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface UpsertCustomeByExternalIdApiInfo {
+    String externalIdExample = "999444";
+    String newCustomerExample = "{\n" +
+            "    \"externalId\":" + externalIdExample + ",\n" +
+            "    \"name\": \"Complyt LTD.\",\n" +
+            "    \"address\": {\n" +
+            "        \"city\": \"Sacramento\",\n" +
+            "        \"country\": \"US\",\n" +
+            "        \"county\": null,\n" +
+            "        \"state\": \"CA\",\n" +
+            "        \"street\": \"944 W. Wintergreen St.\",\n" +
+            "        \"zip\": \"95823\"\n" +
+            "    },\n" +
+            "    \"customerType\": \"RETAIL\",\n" +
+            "    \"externalTimestamps\": {\n" +
+            "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
+            "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
+            "    },\n" +
+            "    \"internalTimestamps\": {\n" +
+            "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
+            "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
+            "    }\n" +
+            "}";
+
+    String returnedCustomerExample = "{\n" +
+            "  \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
+            "  \"externalId\":" + externalIdExample + ",\n" +
+            "  \"name\": \"Complyt LTD.\",\n" +
+            "  \"address\": {\n" +
+            "    \"city\": \"Sacramento\",\n" +
+            "    \"country\": \"US\",\n" +
+            "    \"county\": null,\n" +
+            "    \"state\": \"CA\",\n" +
+            "    \"street\": \"944 W. Wintergreen St.\",\n" +
+            "    \"zip\": \"95823\"\n" +
+            "  },\n" +
+            "  \"customerType\": \"RETAIL\",\n" +
+            "  \"internalTimestamps\": {\n" +
+            "    \"createdDate\": {\n" +
+            "      \"timestamp\": \"2023-01-10T17:40:44.357271\"\n" +
+            "    },\n" +
+            "    \"updatedDate\": {\n" +
+            "      \"timestamp\": \"2023-01-10T17:40:44.357271\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"externalTimestamps\": {\n" +
+            "    \"createdDate\": {\n" +
+            "      \"timestamp\": \"2022-10-19T07:00:00\"\n" +
+            "    },\n" +
+            "    \"updatedDate\": {\n" +
+            "      \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
 }
