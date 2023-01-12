@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetAllCustomersApiInfo.CustomerExample)
+                                                                @ExampleObject(value = GetAllCustomersApiInfo.customerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -51,7 +51,7 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface GetAllCustomersApiInfo {
-    String CustomerExample = "[{\n" +
+    String customerExample = "[{\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": \"999444\",\n" +
             "    \"name\": \"Complyt LTD.\",\n" +
