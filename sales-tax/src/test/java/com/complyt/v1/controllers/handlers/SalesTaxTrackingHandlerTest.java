@@ -11,7 +11,7 @@ import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
-import com.complyt.v1.model.SalesTaxTrackingDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

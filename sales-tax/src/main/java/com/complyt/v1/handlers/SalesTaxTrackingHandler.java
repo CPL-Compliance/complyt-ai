@@ -6,7 +6,7 @@ import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
-import com.complyt.v1.model.SalesTaxTrackingDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

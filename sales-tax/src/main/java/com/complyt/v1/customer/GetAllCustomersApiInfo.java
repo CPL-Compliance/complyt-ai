@@ -1,6 +1,6 @@
 package com.complyt.v1.customer;
 
-import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

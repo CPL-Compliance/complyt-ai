@@ -13,7 +13,7 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
+import com.complyt.v1.models.TransactionDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

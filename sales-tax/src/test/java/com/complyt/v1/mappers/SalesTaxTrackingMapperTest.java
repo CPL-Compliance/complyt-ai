@@ -4,10 +4,10 @@ import com.complyt.domain.State;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.v1.model.EconomicNexusTrackerDto;
-import com.complyt.v1.model.PhysicalNexusTrackerDto;
-import com.complyt.v1.model.SalesTaxTrackingDto;
-import com.complyt.v1.model.StateDto;
+import com.complyt.v1.models.EconomicNexusTrackerDto;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.StateDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

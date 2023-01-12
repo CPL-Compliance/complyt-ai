@@ -1,9 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.customer.exemption.ExemptionDto;
-import com.complyt.v1.model.timestamps.ComplytTimestampDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;

@@ -7,7 +7,7 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.routers.ExemptionRouter;
 import com.complyt.v1.mappers.ExemptionMapper;
-import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;

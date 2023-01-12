@@ -7,7 +7,7 @@ import com.complyt.security.permissions.exemption.ExemptionDeletePermission;
 import com.complyt.security.permissions.exemption.ExemptionReadPermission;
 import com.complyt.security.permissions.exemption.ExemptionUpdatePermission;
 import com.complyt.v1.mappers.ExemptionMapper;
-import com.complyt.v1.model.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
-import com.complyt.v1.model.StateDto;
+import com.complyt.v1.models.StateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
