@@ -1,4 +1,4 @@
-package com.complyt.v1.controllers.handlers;
+package com.complyt.v1.handlers;
 
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;

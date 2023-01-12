@@ -1,6 +1,6 @@
-package com.complyt.v1.controllers.routers;
+package com.complyt.v1.routers;
 
-import com.complyt.v1.controllers.handlers.SalesTaxTrackingHandler;
+import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
