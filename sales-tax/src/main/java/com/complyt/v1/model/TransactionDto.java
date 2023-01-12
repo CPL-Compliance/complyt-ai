@@ -8,25 +8,26 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 
-@Getter
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
+@Value
 @Schema(name = "Transaction")
 public class TransactionDto {
-    private final String id;
-    private final String externalId;
-    private final List<ItemDto> items;
-    private final AddressDto billingAddress;
-    private final AddressDto shippingAddress;
-    private final ObjectId customerId;
-    private final CustomerDto customer;
-    private final SalesTaxDto salesTax;
-    private final TransactionStatusDto transactionStatus;
-    private final TimestampsDto internalTimestamps;
-    private final TimestampsDto externalTimestamps;
-    private final TransactionTypeDto transactionType;
-    private final ShippingFeeDto shippingFee;
-    private final String createdFrom;
+    String id;
+    String externalId;
+    List<ItemDto> items;
+    AddressDto billingAddress;
+    AddressDto shippingAddress;
+    ObjectId customerId;
+    CustomerDto customer;
+    SalesTaxDto salesTax;
+    TransactionStatusDto transactionStatus;
+    TimestampsDto internalTimestamps;
+    TimestampsDto externalTimestamps;
+    TransactionTypeDto transactionType;
+    ShippingFeeDto shippingFee;
+    String createdFrom;
+    float taxableItemsAmount;
+    float tangibleItemsAmount;
+    float totalItemsAmount;
 }

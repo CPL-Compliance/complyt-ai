@@ -8,7 +8,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class CustomerCreation {
+public class CustomerCreator {
     public Customer createCustomer() {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);

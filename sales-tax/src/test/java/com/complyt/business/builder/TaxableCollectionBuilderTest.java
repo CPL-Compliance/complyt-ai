@@ -54,7 +54,7 @@ public class TaxableCollectionBuilderTest {
         items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
         Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId, CustomerType.RETAIL, null, null);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, shippingFee, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {

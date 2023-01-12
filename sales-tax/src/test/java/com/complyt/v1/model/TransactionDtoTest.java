@@ -45,7 +45,7 @@ class TransactionDtoTest {
         ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
         TimestampsDto timeStamps = new TimestampsDto(complytTimestamp, complytTimestamp);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto();
-        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
+        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
     private ShippingFeeDto createShippingFeeDto() {
@@ -74,7 +74,10 @@ class TransactionDtoTest {
                 ", externalTimestamps=" + transactionDto.getExternalTimestamps() +
                 ", transactionType=" + transactionDto.getTransactionType() +
                 ", shippingFee=" + transactionDto.getShippingFee() +
-                ", createdFrom=" + transactionDto.getCreatedFrom() + ")";
+                ", createdFrom=" + transactionDto.getCreatedFrom() +
+                ", taxableItemsAmount=" + transactionDto.getTaxableItemsAmount() +
+                ", tangibleItemsAmount=" + transactionDto.getTangibleItemsAmount() +
+                ", totalItemsAmount=" + transactionDto.getTotalItemsAmount() + ")";
 
         // When
         String actualString = transactionDto.toString();
