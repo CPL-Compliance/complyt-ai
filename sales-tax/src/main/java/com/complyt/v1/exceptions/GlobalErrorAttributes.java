@@ -46,12 +46,11 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     private String extractMessage(HttpStatus httpStatus, Throwable error) {
         if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
             return GENERIC_ERROR_MESSAGE;
+        } else if (error instanceof ServerWebInputException serverWebInputException){
+            return serverWebInputException.getReason();
         } else {
-            return ((ServerWebInputException)error).getReason();
+            return error.getMessage();
         }
-//        } else {
-//            return error.getMessage();
-//        }
     }
 
     private HttpStatus getHttpStatus(Throwable error) {
