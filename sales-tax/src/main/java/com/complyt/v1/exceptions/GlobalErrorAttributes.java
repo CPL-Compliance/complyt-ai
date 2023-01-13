@@ -44,13 +44,14 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     }
 
     private String extractMessage(HttpStatus httpStatus, Throwable error) {
-        if (HttpStatus.valueOf(httpStatus.value()) == HttpStatus.INTERNAL_SERVER_ERROR) {
+        if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
             return GENERIC_ERROR_MESSAGE;
-        } else if (HttpStatus.valueOf(httpStatus.value()) == HttpStatus.BAD_REQUEST) {
-            return ((ServerWebInputException) error).getMostSpecificCause().getMessage();
         } else {
-            return error.getMessage();
+            return ((ServerWebInputException)error).getReason();
         }
+//        } else {
+//            return error.getMessage();
+//        }
     }
 
     private HttpStatus getHttpStatus(Throwable error) {
