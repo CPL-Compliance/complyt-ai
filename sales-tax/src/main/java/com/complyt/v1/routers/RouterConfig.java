@@ -1,7 +1,7 @@
 package com.complyt.v1.routers;
 
-import com.complyt.v1.validators.AnnotatedRequestEntityValidationHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.complyt.v1.validators.CustomerValidationHandler;
+import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RequestPredicates;
@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class RouterConfig {
 
     @Bean
-    public RouterFunction<ServerResponse> validationsRouter(@Autowired AnnotatedRequestEntityValidationHandler annotatedEntityHandler) {
-        return RouterFunctions.route(RequestPredicates.POST("/annotated-functional-validation"), annotatedEntityHandler::handleRequest);
+    public RouterFunction<ServerResponse> customerValidationsRouter(@NonNull final CustomerValidationHandler customerValidationHandler) {
+        return RouterFunctions.route(RequestPredicates.POST("/customerdto-validation/{externalId}"), customerValidationHandler::upsert);
     }
 }

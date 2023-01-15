@@ -3,6 +3,7 @@ package com.complyt.v1.validators;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.NonNull;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -16,7 +17,7 @@ public abstract class AbstractValidationHandler<T, U extends Validator> {
 
     private final U validator;
 
-    protected AbstractValidationHandler(Class<T> clazz, U validator) {
+    public AbstractValidationHandler(Class<T> clazz, U validator) {
         this.validationClass = clazz;
         this.validator = validator;
     }
