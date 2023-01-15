@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
