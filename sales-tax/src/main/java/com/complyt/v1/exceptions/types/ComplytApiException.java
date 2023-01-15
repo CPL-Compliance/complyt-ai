@@ -5,7 +5,7 @@ import org.springframework.web.server.ServerWebInputException;
 
 @Generated
 public class ComplytApiException extends ServerWebInputException {
-    public ComplytApiException(String s) {
-        super(s);
+    public ComplytApiException(String message) {
+        super(message);
     }
 }
