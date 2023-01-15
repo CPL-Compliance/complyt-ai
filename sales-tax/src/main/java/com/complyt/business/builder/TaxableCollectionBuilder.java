@@ -12,7 +12,7 @@ import java.util.Collection;
 
 @Component
 @AllArgsConstructor
-public class TaxableCollectionBuilder {
+public class TaxableCollectionBuilder implements CollectionBuilder<Taxable> {
 
     @NonNull
     private final TaxableItemExistChecker taxableItemExistChecker;
