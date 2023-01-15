@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,44 +47,15 @@ public class ExemptionServiceImplTest {
     Customer customer;
     ObjectId customerId = new ObjectId();
     String tenantId = UUID.randomUUID().toString();
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
-        customer = createCustomer();
-        transaction = createTransaction();
-        exemption = createExemption();
-    }
-
-    private Customer createCustomer() {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null, null);
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-
-        Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-        ));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = domainObjectStub.createCustomer(customerId.toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString());
     }
 
     @Test

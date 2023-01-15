@@ -2,21 +2,19 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.domain.*;
-import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.Nexus;
+import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
-import com.complyt.domain.nexus.*;
-import com.complyt.domain.nexus.enums.Definition;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.NexusCalculationSummary;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,77 +67,22 @@ class NexusServiceTest {
     private NexusChecker nexusChecker;
 
     private Transaction transaction;
-    private NexusStateRule nexusStateRule;
+    DomainObjectStub domainObjectStub;
+
+    String salesTaxTrackingId;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        transaction = createTransaction();
-        nexusStateRule = createNexusStateRule();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTrackingId = UUID.randomUUID().toString();
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
     }
 
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                UUID.randomUUID().toString(), true,
-                new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null),
-                LocalDateTime.now(), true, LocalDateTime.now());
-    }
+    private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished(String id) {
 
-    private NexusStateRule createNexusStateRule() {
-        State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<TaxableCategory>() {{
-            add(TaxableCategory.TAXABLE);
-        }};
-
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
-            add(TangibleCategory.TANGIBLE);
-        }};
-
-        List<CustomerType> customerTypes = new ArrayList<CustomerType>() {{
-            add(CustomerType.RETAIL);
-        }};
-
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
-
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<Item>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
-    }
-
-    private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished() {
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-
-        State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, UUID.randomUUID().toString(),
-                true, physicalNexusTracker, economicNexusTracker,
-                LocalDateTime.now(), true, LocalDateTime.now());
-    }
-
-    private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
-
-        return createSalesTaxTrackingWithoutNexusEstablished()
+        return domainObjectStub.createSalesTaxTracking(id)
                 .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
     }
 
@@ -158,7 +102,7 @@ class NexusServiceTest {
     void calculate_NexusDoesNotPassThreshold_NexusTrackingDoesNotChange() {
         // Given
         Nexus nexusInfo = new Nexus(null);
-        NexusStateRule nexusStateRule = createNexusStateRule();
+        NexusStateRule nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
         Query query = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
@@ -171,7 +115,7 @@ class NexusServiceTest {
                 nexusStateRule.getNexusThreshold().getAmount() - 1);
 
         State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithoutNexusEstablished();
+        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
 
         // When
@@ -193,7 +137,7 @@ class NexusServiceTest {
     void calculate_NexusPassesThreshold_NexusTrackingChanges() {
         // Given
         Nexus nexusInfo = new Nexus(null);
-        NexusStateRule nexusStateRule = createNexusStateRule();
+        NexusStateRule nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
         Query query = Query.query(Criteria.where("externalTimestamps.createdDate")
                         .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now()))
                 .addCriteria(Criteria.where("shippingAddress.state")
@@ -207,8 +151,8 @@ class NexusServiceTest {
                 nexusStateRule.getNexusThreshold().getAmount() + 1);
 
         State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = createSalesTaxTrackingWithoutNexusEstablished();
-        SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished();
+        SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished(salesTaxTrackingId);
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
 
 
@@ -232,7 +176,7 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_StateSent_FindsTracking_ReturnsTracking() {
         // Given
-        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
@@ -245,7 +189,7 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_TransactionSent_FindsTracking_ReturnsTracking() {
         // Given
-        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
@@ -258,7 +202,7 @@ class NexusServiceTest {
     @Test
     void findRuleByState_FindsRule_ReturnsRule() {
         // Given
-        NexusStateRule nexusStateRule = createNexusStateRule();
+        NexusStateRule nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
         String state = nexusStateRule.getState().getAbbreviation();
 
         // When
@@ -272,8 +216,7 @@ class NexusServiceTest {
     @Test
     void hasNexus_HasNexus_ReturnsHasNexus() {
         // Given
-        Transaction transaction = createTransaction();
-        SalesTaxTracking salesTaxTracking = createSalesTaxTracking();
+        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When

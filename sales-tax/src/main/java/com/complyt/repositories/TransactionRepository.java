@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -57,12 +58,30 @@ public class TransactionRepository {
                 });
     }
 
-    public Mono<Transaction> findByExternalId(String externalId) {
+    public Mono<Transaction> findByExternalId(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
+                            .and("source").is(source)
                             .and("tenantId").is(tenantId));
-                    log.debug("Searching for an transaction with external id of : " + externalId);
+                    log.debug("Searching for an transaction with external id of : " + externalId + ", in source : " + source);
+
+                    return reactiveMongoTemplate
+                            .findOne(query, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate
+                                    .findOne(Query.query(Criteria
+                                            .where("complytId").is(transaction.getCustomerId())
+                                            .and("tenantId").is(tenantId)), Customer.class)
+                                    .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
+                });
+    }
+
+    public Mono<Transaction> findByComplytId(UUID complytId) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
+                    log.debug("Searching for an transaction with complyt id of : " + complytId);
 
                     return reactiveMongoTemplate
                             .findOne(query, Transaction.class)
@@ -77,6 +96,18 @@ public class TransactionRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
                     log.debug("Executing find tenant's related transactions");
+                    return reactiveMongoTemplate.find(query, Transaction.class)
+                            .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
+                                    .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
+                });
+    }
+
+    public Flux<Transaction> findAllBySource(String source) {
+        return tenantResolver.resolve()
+                .flatMapMany(tenantId -> {
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)
+                            .and("source").is(source));
+                    log.debug("Executing find tenant's related transactions in source : " + source);
                     return reactiveMongoTemplate.find(query, Transaction.class)
                             .flatMap(transaction -> reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)
                                     .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();

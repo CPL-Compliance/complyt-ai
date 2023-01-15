@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @Component
 public class TransactionFacade {
@@ -48,40 +50,48 @@ public class TransactionFacade {
                         .thenReturn(savedTransaction)) : transactionService.save(transaction);
     }
 
-    public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
+    public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source,  @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
         return originalTransaction.equals(newTransaction) ?
-                Mono.just(newTransaction) : update(externalId, newTransaction, originalTransaction);
+                Mono.just(newTransaction) : update(externalId, source, newTransaction, originalTransaction);
     }
 
-    public Mono<Transaction> update(@NonNull String externalId, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+    public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
         return  transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
                 .flatMap(checkedModifiedTransaction -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
-                                handleSalesTaxCalculationAndUpdate(externalId, setTransaction, salesTaxTrackingWithNexusInfo) :
-                                updateAndHandleNexusTrackingCalculation(externalId, setTransaction))));
+                                handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo) :
+                                updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction))));
     }
 
-    private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
+    private Mono<Transaction> handleSalesTaxCalculationAndUpdate(String externalId, String source, Transaction transaction, SalesTaxTrackingWithNexusInfo salesTaxTrackingWithNexusInfo) {
         return salesTaxService.handleSalesTaxCalculation(transaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking())
-                .flatMap(updatedTransaction -> transactionService.update(externalId, updatedTransaction));
+                .flatMap(updatedTransaction -> transactionService.update(externalId, source, updatedTransaction));
     }
 
-    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, Transaction transaction) {
-        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.update(externalId, transaction)
+    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction) {
+        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
-                        .thenReturn(updatedTransaction)) : transactionService.update(externalId, transaction);
+                        .thenReturn(updatedTransaction)) : transactionService.update(externalId, source, transaction);
     }
 
-    public Mono<Transaction> findByExternalId(String externalId) {
-        return transactionService.findByExternalId(externalId);
+    public Mono<Transaction> findByExternalId(String externalId, String source) {
+        return transactionService.findByExternalId(externalId, source);
+    }
+
+    public Mono<Transaction> findByComplytId(UUID complytId) {
+        return transactionService.findByComplytId(complytId);
     }
 
     public Flux<Transaction> getAll() {
         return transactionService.findAll();
     }
 
-    public Mono<Transaction> markAsCancelled(String transactionId) {
-        return transactionService.markAsCancelled(transactionId);
+    public Flux<Transaction> getAllBySource(String source) {
+        return transactionService.findAllBySource(source);
+    }
+
+    public Mono<Transaction> markAsCancelled(String externalId, String source) {
+        return transactionService.markAsCancelled(externalId , source);
     }
 }

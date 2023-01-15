@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,55 +43,15 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     Transaction transaction;
     private NexusStateRule nexusStateRule;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
-        nexusStateRule = createNexusStateRule();
-    }
-
-    private Transaction createTransaction() {
-        String id = null;
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = createItems();
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
-    }
-
-    private NexusStateRule createNexusStateRule() {
-        State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
-            add(TaxableCategory.TAXABLE);
-        }};
-        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
-            add(TangibleCategory.TANGIBLE);
-        }};
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, null, null, null);
-    }
-
-    private List<Item> createItems() {
-        Item item = new Item(10, 5, 50, "description", "name", "C1S1", null,
-                null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
-        return new ArrayList<>() {{
-            add(item);
-        }};
-    }
-
-    private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
-                new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
-    }
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(null);
+        nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
+}
 
     @Test
     void check_NoItemsThatCountsRegardingToNexusRule_ReturnsFalse() {

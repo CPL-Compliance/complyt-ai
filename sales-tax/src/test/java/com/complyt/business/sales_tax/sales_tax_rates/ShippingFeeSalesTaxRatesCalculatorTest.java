@@ -1,11 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.ShippingFee;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,6 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.DomainObjectStub;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -33,24 +35,15 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
     SalesTaxRate salesTaxRate;
     ShippingFee shippingFee;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        salesTaxRate = createSalesTaxRates();
-        shippingFee = createShippingFee();
-    }
-
-    private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
-    }
-
-    private ShippingFee createShippingFee() {
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
+        salesTaxRate = domainObjectStub.createSalesTaxRates();
+        shippingFee = domainObjectStub.createShippingFee(false,false);
     }
 
     @Test

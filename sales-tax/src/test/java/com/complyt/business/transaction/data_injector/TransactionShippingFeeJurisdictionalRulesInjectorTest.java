@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,38 +26,20 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector;
     Transaction transaction;
 
+    ShippingFee shippingFee;
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        shippingFee = domainObjectStub.createShippingFee( true, false);
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         transactionShippingFeeJurisdictionalRulesInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
     }
 
-    private Transaction createTransaction() {
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
-    }
-
-    private ShippingFee createShippingFee() {
-        return new ShippingFee(false, 0, 1000, null,
-                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
     private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithTaxableRule() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
 
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
@@ -70,7 +53,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithNotTaxableRule() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules().withTaxable(false);
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules().withTaxable(false);
 
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
@@ -83,13 +66,9 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
         }};
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, false,
-                CalculationType.FIXED, "description", 0, null);
-    }
 
     private Transaction createTransactionWithNotTaxableShippingFee() {
-        JurisdictionalSalesTaxRules notTaxableRules = createJurisdictionalSalesTaxRules().withTaxable(false);
+        JurisdictionalSalesTaxRules notTaxableRules = domainObjectStub.createJurisdictionalSalesTaxRules().withTaxable(false);
         ShippingFee notTaxableShippingFee = transaction.getShippingFee()
                 .withJurisdictionalSalesTaxRules(notTaxableRules)
                 .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
@@ -100,7 +79,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     void inject_InjectsDataToTransactionWithShippingFeeWithTaxableCategory_ReturnsModifiedTransaction() {
         // Given
         Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
-        ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(createJurisdictionalSalesTaxRules());
+        ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(domainObjectStub.createJurisdictionalSalesTaxRules());
 
         Transaction transactionWithRules = transaction.withShippingFee(shippingFeeWithRules);
 
@@ -129,7 +108,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     void inject_DoesNotInjectDataToTransactionBecauseShippingFessTaxCodeIsUnrecognized_ReturnsUnModifiedTransaction() {
         // Given
         Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
-        ShippingFee shippingFeeWithUnrecognizedTaxCode = createShippingFee().withTaxCode("C7S1");
+        ShippingFee shippingFeeWithUnrecognizedTaxCode = domainObjectStub.createShippingFee(false,false).withTaxCode("C7S1");
 
         Transaction transactionWithShippingFeeWithUnrecognizedTaxCode = transaction.withShippingFee(shippingFeeWithUnrecognizedTaxCode);
         TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector =

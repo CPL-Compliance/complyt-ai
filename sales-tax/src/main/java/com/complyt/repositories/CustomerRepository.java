@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
 @Slf4j
 @AllArgsConstructor
@@ -56,6 +58,17 @@ public class CustomerRepository {
                 });
     }
 
+    public Flux<Customer> findAllBySource(String source) {
+        return tenantResolver.resolve()
+                .flatMapMany(tenantId -> {
+                    Query query = Query.query(Criteria.where("tenantId").is(tenantId)
+                            .and("source").is(source));
+                    log.debug("Executing findAll customers in source : " + source);
+
+                    return reactiveMongoTemplate.find(query, Customer.class).log();
+                });
+    }
+
     public Mono<Customer> save(@NonNull Customer customer) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> reactiveMongoTemplate.save(customer.withTenantId(tenantId))).log();
@@ -72,12 +85,24 @@ public class CustomerRepository {
                 });
     }
 
-    public Mono<Customer> findByExternalId(String externalId) {
+    public Mono<Customer> findByExternalId(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)
+                            .and("source").is(source)
                             .and("tenantId").is(tenantId));
-                    log.debug("Searching for a customer with externalId of : " + externalId);
+                    log.debug("Searching for a customer with externalId of : " + externalId + " in source : " + source);
+
+                    return reactiveMongoTemplate.findOne(query, Customer.class).log();
+                });
+    }
+
+    public Mono<Customer> findByComplytId(UUID complytId) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
+                    log.debug("Searching for a customer with complytId of : " + complytId);
 
                     return reactiveMongoTemplate.findOne(query, Customer.class).log();
                 });

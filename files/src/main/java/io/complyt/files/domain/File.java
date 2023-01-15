@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @ToString
 @Document(collection = "file")
 public class File {
+
     @Id
     @NonNull
     String id;
-
     @NonNull
     String tenantId;
 

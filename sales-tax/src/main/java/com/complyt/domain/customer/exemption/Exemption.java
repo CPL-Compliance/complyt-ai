@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -17,8 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Exemption {
     @Id
     private final String id;
+    private final UUID complytId;
     private final String tenantId;
-    private final ObjectId customerId;
+    private final UUID customerId;
     private final State state;
     private final Classification classification;
     private final ValidationDates validationDates;

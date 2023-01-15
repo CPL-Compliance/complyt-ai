@@ -17,9 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
 
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Customer", description = "This is the Customer controller")
@@ -33,16 +34,16 @@ public class CustomerController {
     @NonNull
     private final CustomerFacade customerfacade;
 
-    @Operation(summary = "This will update the customer if found by externalId, otherwise it will create the customer")
+    @Operation(summary = "This will update the customer if found by externalId and source, otherwise it will create the customer")
     @CustomerUpdatePermission
-    @PutMapping("{externalId}")
+    @PutMapping("source/{source}/externalId/{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> upsert(@PathVariable @NonNull String externalId,
+    public Mono<ResponseEntity<CustomerDto>> upsert(@PathVariable("externalId") @NonNull String externalId, @PathVariable("source") @NonNull String source,
                                                     @RequestBody @NonNull CustomerDto customerDto) {
         log.debug("Upsert customer - DTO received in request body : " + customerDto);
         Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
-        return customerfacade.findByExternalId(externalId)
+        return customerfacade.findByExternalId(externalId, source)
                 .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer))
                 .map(updatedCustomer -> ResponseEntity.status(HttpStatus.OK).body(CustomerMapper.INSTANCE.customerToCustomerDto(updatedCustomer)))
                 .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer)
@@ -50,16 +51,28 @@ public class CustomerController {
 
     }
 
-    @Operation(summary = "Gets customer by externalId")
+    @Operation(summary = "Gets customer by externalId and source")
     @CustomerReadPermission
-    @GetMapping("{externalId}")
+    @GetMapping("source/{source}/externalId/{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId) {
-        log.debug("Get customer by external id - id received as path variable : " + externalId);
+    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId, @PathVariable("source") @NonNull String source) {
+        log.debug("Get customer by external id and source - id and source received as path variables : " + externalId + ", " + source);
 
-        return customerfacade.findByExternalId(externalId)
+        return customerfacade.findByExternalId(externalId, source)
                 .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Customer with externalId " + externalId)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Customer with externalId " + externalId + ", in source " + source)));
+    }
+
+    @Operation(summary = "Gets customer by complytId")
+    @CustomerReadPermission
+    @GetMapping("complytId/{complytId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<CustomerDto>> getByComplytId(@PathVariable("complytId") @NonNull UUID complytId) {
+        log.debug("Get customer by complyt id - id received as path variable : " + complytId);
+
+        return customerfacade.findByComplytId(complytId)
+                .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Customer with complytId " + complytId)));
     }
 
     @Operation(summary = "Gets all matching customers by name")
@@ -71,7 +84,7 @@ public class CustomerController {
 
         return customerfacade.findByName(name)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
-                .switchIfEmpty(Flux.error(new ObjectNotFoundException("No Customer with externalId " + name)));
+                .switchIfEmpty(Flux.error(new ObjectNotFoundException("No Customer with name " + name)));
     }
 
     @Operation(summary = "Gets all the customers")
@@ -79,6 +92,14 @@ public class CustomerController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public Flux<CustomerDto> getAll() {
-        return customerfacade.getAllCustomers().map(CustomerMapper.INSTANCE::customerToCustomerDto);
+        return customerfacade.getAll().map(CustomerMapper.INSTANCE::customerToCustomerDto);
+    }
+
+    @Operation(summary = "Gets all the customers in source ")
+    @CustomerReadPermission
+    @GetMapping("source/{source}")
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<CustomerDto> getAllBySource(@PathVariable("source") @NonNull String source) {
+        return customerfacade.getAllBySource(source).map(CustomerMapper.INSTANCE::customerToCustomerDto);
     }
 }

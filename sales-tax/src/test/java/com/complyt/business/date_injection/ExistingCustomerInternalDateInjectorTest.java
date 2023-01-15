@@ -7,6 +7,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,27 +20,14 @@ public class ExistingCustomerInternalDateInjectorTest {
 
     Customer customer;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        customer = createCustomer();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
         existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
-    }
-
-    public Customer createCustomer() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(LocalDateTime.now().minusMinutes(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute, complytTimestamp);
-        return new Customer(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                "name",
-                null,
-                UUID.randomUUID().toString(),
-                CustomerType.RETAIL,
-                internalTimeStamps,
-                externalTimestamps
-        );
     }
 
     @Test

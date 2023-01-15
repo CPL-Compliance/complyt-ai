@@ -1,18 +1,17 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.complyt_id.TransactionComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
-import com.complyt.domain.*;
+import com.complyt.business.transaction.CountyProvider;
+import com.complyt.domain.Item;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.TransactionRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,41 +50,26 @@ class TransactionServiceImplTest {
     @Mock
     CountyProvider countyProvider;
 
+    @Mock
+    TransactionComplytIdHandler transactionComplytIdHandler;
+
     Transaction transaction;
     Customer customer;
+    String source;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        transaction = createTransaction();
-        customer = createCustomer();
-    }
-
-    private Transaction createTransaction() {
-        String id = null;
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<Item>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, null, null);
-    }
-
-    private Customer createCustomer() {
-
-        return new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "name", null, UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        customer = domainObjectStub.createCustomer(transaction.getId());
+        source = domainObjectStub.getUnifiedSource();
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = domainObjectStub.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0).withTaxableCategory(TaxableCategory.TAXABLE).withTangibleCategory(TangibleCategory.TANGIBLE).withJurisdictionalSalesTaxRules(rules);
 
@@ -93,10 +78,6 @@ class TransactionServiceImplTest {
         }};
         return transaction.withItems(modifiedItems).withCustomer(customer);
 
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, false, CalculationType.FIXED, "description", 0, null);
     }
 
     @Test
@@ -118,8 +99,8 @@ class TransactionServiceImplTest {
         Transaction transactionToSearchFor = transaction.withExternalId(id);
 
         // When
-        when(transactionRepository.findByExternalId(id)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionService.findByExternalId(id);
+        when(transactionRepository.findByExternalId(id, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionService.findByExternalId(id, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
@@ -132,7 +113,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.findByExternalId(nullExternalId);
+            transactionService.findByExternalId(nullExternalId, source);
         });
 
         // Then
@@ -174,7 +155,7 @@ class TransactionServiceImplTest {
         Transaction transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -186,7 +167,7 @@ class TransactionServiceImplTest {
         String externalID = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(externalID, source, transaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
@@ -199,10 +180,10 @@ class TransactionServiceImplTest {
         String externalId = transaction.getExternalId();
 
         // When
-        when(transactionRepository.findByExternalId(externalId)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.findByExternalId(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
 
-        Mono<Transaction> transactionMono = transactionService.update(externalId, transaction);
+        Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -214,7 +195,7 @@ class TransactionServiceImplTest {
         transaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", transaction));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update("", source, transaction));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -226,10 +207,10 @@ class TransactionServiceImplTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
-        when(transactionRepository.findByExternalId(transaction.getExternalId())).thenReturn(Mono.just(transaction));
+        when(transactionRepository.findByExternalId(transaction.getExternalId(),source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
 
-        Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId());
+        Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(),source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(cancelledTransaction).verifyComplete();
@@ -241,7 +222,7 @@ class TransactionServiceImplTest {
         String nullExternalId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.markAsCancelled(nullExternalId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.markAsCancelled(nullExternalId,source));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
@@ -270,7 +251,9 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
-        Customer customer = new Customer(customerId.toString(), externalId, "customer", transaction.getShippingAddress(), UUID.randomUUID().toString(), CustomerType.RETAIL, null, null);
+        Customer customer = domainObjectStub.createCustomer(customerId.toString())
+                .withExternalId(externalId)
+                .withAddress(transaction.getShippingAddress());
 
         Transaction transactionWithCustomer = transaction.withCustomer(customer);
         Transaction secondTransactionWithCustomer = transaction.withExternalId(externalId).withCustomerId(customerId).withCustomer(customer);
@@ -313,7 +296,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.update(externalId, nullTransaction);
+            transactionService.update(externalId, source, nullTransaction);
         });
 
         // Then
@@ -327,10 +310,13 @@ class TransactionServiceImplTest {
 
         Transaction transactionWithProductClassificationAndCounty = transactionWithProductClassification.withShippingAddress(transactionWithProductClassification.getShippingAddress().withCounty("County"));
 
-        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithProductClassification);
+        Transaction transactionWithAllInjectedData = transactionWithProductClassificationAndCounty.withComplytId(UUID.randomUUID());
+
+        NewTransactionInternalTimestampsInjector injector = new NewTransactionInternalTimestampsInjector(transactionWithAllInjectedData);
         Transaction transactionWithUpdatedDates = injector.inject();
 
         // When
+        when(transactionComplytIdHandler.insertComplytIdToNew(transactionWithProductClassificationAndCounty)).thenReturn(transactionWithAllInjectedData);
         when(productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)).thenReturn(Mono.just(transactionWithProductClassification));
         when(countyProvider.provide(transactionWithProductClassification)).thenReturn(Mono.just(transactionWithProductClassificationAndCounty));
         Mono<Transaction> transactionMono = transactionService.injectDataToNewTransaction(transaction);
@@ -350,7 +336,8 @@ class TransactionServiceImplTest {
                     expectedCreatedDateTime.getYear() == actualCreatedDateTime.getYear() &&
                     expectedCreatedDateTime.getMonthValue() == actualCreatedDateTime.getMonthValue() &&
                     expectedCreatedDateTime.getDayOfYear() == actualCreatedDateTime.getDayOfYear() &&
-                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour();
+                    expectedCreatedDateTime.getHour() == actualCreatedDateTime.getHour() &&
+                    transaction.getComplytId() == transactionWithAllInjectedData.getComplytId();
         }).expectComplete().verify();
     }
 

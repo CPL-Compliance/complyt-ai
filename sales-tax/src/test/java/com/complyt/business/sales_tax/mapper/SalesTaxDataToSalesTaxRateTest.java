@@ -3,11 +3,17 @@ package com.complyt.business.sales_tax.mapper;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import testUtils.DomainObjectStub;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,10 +31,17 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Mock
     SalesTaxData salesTaxData;
 
+    DomainObjectStub domainObjectStub;
+
+    @BeforeEach void setup() {
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+    }
+
     @Test
     void map_MapsIncorporatedAddress_ReturnsSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTaxRate expectedSalesTaxRate = domainObjectStub.createSalesTaxRates();
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
@@ -43,7 +56,7 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
         SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0).withCityDistrictRate(0);
 
         // When

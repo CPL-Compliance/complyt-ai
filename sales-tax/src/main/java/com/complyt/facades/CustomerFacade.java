@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 @AllArgsConstructor
 public class CustomerFacade {
@@ -18,24 +20,33 @@ public class CustomerFacade {
     private CustomerService customerService;
 
     public Mono<Customer> saveCustomer(@NonNull Customer customer) {
-        return customerService.save(customer);
+        return customerService.checkCustomerNotHavingComplytId(customer)
+                .flatMap(customerService::injectDataToNewCustomer)
+                .flatMap(customerService::save);
     }
 
     public Mono<Customer> updateIfModified(@NonNull Customer newCustomer, @NonNull Customer originalCustomer) {
         return originalCustomer.equals(newCustomer) ?
-                Mono.just(newCustomer) : customerService.update(newCustomer);
+                Mono.just(newCustomer) : customerService.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, originalCustomer)
+                .flatMap(customerService::update);
     }
 
     public Flux<Customer> findByName(String name) {
         return customerService.findByName(name);
     }
 
-    public Mono<Customer> findByExternalId(String externalId) {
-        return customerService.findByExternalId(externalId);
+    public Mono<Customer> findByExternalId(String externalId, String source) {
+        return customerService.findByExternalId(externalId, source);
+    }
+    public Mono<Customer> findByComplytId(UUID complytId) {
+        return customerService.findByComplytId(complytId);
     }
 
-    public Flux<Customer> getAllCustomers() {
+    public Flux<Customer> getAll() {
         return customerService.findAll();
+    }
+    public Flux<Customer> getAllBySource(String source) {
+        return customerService.findAllBySource(source);
     }
 
 }

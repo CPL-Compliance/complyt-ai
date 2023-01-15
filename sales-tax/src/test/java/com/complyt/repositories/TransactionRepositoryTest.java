@@ -6,6 +6,7 @@ import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,37 +50,30 @@ class TransactionRepositoryTest {
 
     Customer customer;
 
-    String tenantId;
+    String source;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
-        tenantId = UUID.randomUUID().toString();
-        transaction = createTransaction();
-        customer = new Customer(transaction.getCustomerId().toString(), UUID.randomUUID().toString(), "customer", transaction.getShippingAddress(), tenantId, CustomerType.RETAIL, null, null);
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca88");
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, null, null);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        customer = domainObjectStub.createCustomer(transaction.getId());
+        source = domainObjectStub.getUnifiedSource();
     }
 
     @Test
     void findByExternalId_FindsTransaction_ReturnsTransaction() {
         // Given
-        Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId()).and("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
+                .and("source").is(source)
+                .and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
-        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId());
+        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();
@@ -88,10 +83,10 @@ class TransactionRepositoryTest {
     void findOneById_IdDoesNotExist_ReturnsNull() {
         // Given
         Query query = Query.query(Criteria.where("_id").is(transaction.getId())
-                .and("tenantId").is(tenantId));
+                .and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         Mono<Transaction> transactionMono = transactionRepository.findById(transaction.getId());
@@ -103,14 +98,16 @@ class TransactionRepositoryTest {
     @Test
     void findByExternalId_ExternalIdExists_ReturnsOneTransaction() {
         // Given
-        Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId()).and("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
+                .and("source").is(source)
+                .and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
 
-        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId());
+        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();
@@ -126,7 +123,7 @@ class TransactionRepositoryTest {
         allTransactions.add(secondTransaction);
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.insertAll(allTransactions)).thenReturn(Flux.fromIterable(allTransactions));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         when(reactiveMongoTemplate.findById(secondTransaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
@@ -143,7 +140,7 @@ class TransactionRepositoryTest {
         Transaction newTransaction = transaction.withExternalId(id).withCustomer(customer);
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.save(transaction)).thenReturn(Mono.just(newTransaction));
         when(reactiveMongoTemplate.findById(newTransaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         Mono<Transaction> transactionMono = transactionRepository.save(transaction);
@@ -176,10 +173,10 @@ class TransactionRepositoryTest {
             add(transaction);
             add(secondTransaction);
         }};
-        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()));
 
         //When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.fromIterable(allTransactions));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         when(reactiveMongoTemplate.findById(secondTransaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
@@ -206,7 +203,7 @@ class TransactionRepositoryTest {
                 .gte(start).lte(end));
 
         //When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Transaction.class)).thenReturn(Flux.fromIterable(allTransactions));
         when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
         when(reactiveMongoTemplate.findById(secondTransaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));

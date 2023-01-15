@@ -1,9 +1,8 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,17 +35,13 @@ public class SalesTaxTrackingFacadeTest {
 
     private SalesTaxTracking salesTaxTracking;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        return new SalesTaxTracking(null, state, null,
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = domainObjectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test

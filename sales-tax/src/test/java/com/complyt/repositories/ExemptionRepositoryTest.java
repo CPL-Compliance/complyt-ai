@@ -23,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,54 +48,27 @@ public class ExemptionRepositoryTest {
     TenantResolver tenantResolver;
     Exemption exemption;
     Transaction transaction;
-    private String tenantId;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
-        tenantId = UUID.randomUUID().toString();
-        exemption = createExemption();
-        transaction = createTransaction();
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-
-        Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, exemption.getState().getAbbreviation(), "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-        ));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, exemption.getCustomerId(), null, null, TransactionStatus.ACTIVE, exemption.getTenantId(), null, externalTimestamps, TransactionType.INVOICE, null, null);
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), tenantId, new ObjectId(),
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test
     void findByClientCustomerAndState_FindsExemption_ReturnsExemption() {
         // Given
         Query query = Query.query(Criteria
-                .where("tenantId").is(tenantId)
+                .where("tenantId").is(transaction.getTenantId())
                 .and("customerId").is(transaction.getCustomerId())
                 .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
 
         // Then
@@ -119,12 +93,12 @@ public class ExemptionRepositoryTest {
     void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         Query query = Query.query(Criteria
-                .where("tenantId").is(tenantId)
+                .where("tenantId").is(transaction.getTenantId())
                 .and("customerId").is(transaction.getCustomerId())
                 .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
 
         // Then
@@ -138,7 +112,7 @@ public class ExemptionRepositoryTest {
         Exemption exemptionNoId = exemption.withId(null);
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.save(exemptionNoId)).thenReturn(Mono.just(exemption));
 
         // Then
@@ -152,7 +126,7 @@ public class ExemptionRepositoryTest {
         Exemption exemptionNoId = exemption;
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.save(exemptionNoId)).thenReturn(Mono.empty());
 
         // Then
@@ -178,10 +152,10 @@ public class ExemptionRepositoryTest {
         // Given
         String id = exemption.getId();
         Query query = Query.query(Criteria.where("_id").is(id)
-                .and("tenantId").is(tenantId));
+                .and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
 
         // Then
@@ -194,10 +168,10 @@ public class ExemptionRepositoryTest {
         // Given
         String id = exemption.getId();
         Query query = Query.query(Criteria.where("_id").is(id)
-                .and("tenantId").is(tenantId));
+                .and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
 
         // Then
@@ -214,10 +188,10 @@ public class ExemptionRepositoryTest {
             add(exemption);
             add(secondExemption);
         }};
-        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.fromIterable(exemptions));
 
         // Then
@@ -228,10 +202,10 @@ public class ExemptionRepositoryTest {
     @Test
     void findAll_NoExemptionReturned_EmptyFluxReturned() {
         // Given
-        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.find(query, Exemption.class)).thenReturn(Flux.empty());
 
         // Then
@@ -243,11 +217,11 @@ public class ExemptionRepositoryTest {
     void delete_DeletesExemption_ReturnsDeleteResult() {
         // Given
         String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(transaction.getTenantId()));
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.just(deleteResult));
 
         // Then
@@ -259,10 +233,10 @@ public class ExemptionRepositoryTest {
     void delete_ExemptionDoesNotExistInDB_ReturnsEmptyMono() {
         // Given
         String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(transaction.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.empty());
 
         // Then

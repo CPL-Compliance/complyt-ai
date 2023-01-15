@@ -17,11 +17,11 @@ public class ExemptionRouter {
     public RouterFunction<ServerResponse> exemptionsRoute(@NonNull final ExemptionHandler exemptionHandler) {
         return RouterFunctions.route()
                 .path(BASE_URL, builder -> builder
-                        .GET("/{id}", exemptionHandler::getOne)
+                        .GET("/complytId/{complytId}", exemptionHandler::findByComplytId)
                         .GET("", exemptionHandler::getAll)
                         .POST("", exemptionHandler::create)
-                        .PUT("/{id}", exemptionHandler::update)
-                        .DELETE("/{id}", exemptionHandler::delete))
+                        .PUT("/complytId/{complytId}", exemptionHandler::update)
+                        .DELETE("/complytId/{complytId}", exemptionHandler::delete))
                 .build();
     }
 }

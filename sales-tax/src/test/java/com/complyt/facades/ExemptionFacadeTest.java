@@ -1,9 +1,9 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.domain.customer.exemption.*;
 import com.complyt.services.ExemptionServiceImpl;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.types.ObjectId;
@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,22 +40,13 @@ public class ExemptionFacadeTest {
 
     Exemption exemption;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        exemption = createExemption();
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString());
     }
 
     @Test

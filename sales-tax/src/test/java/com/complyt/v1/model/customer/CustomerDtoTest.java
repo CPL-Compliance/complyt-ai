@@ -1,12 +1,15 @@
 package com.complyt.v1.model.customer;
 
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.model.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.DomainObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,15 +20,15 @@ public class CustomerDtoTest {
 
     private CustomerDto customerDto;
     private CustomerDto anotherCustomerDto;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, null, null);
-        anotherCustomerDto = new CustomerDto(customerDto.getId(), customerDto.getExternalId(), customerDto.getName(), customerDto.getAddress(), customerDto.getCustomerType(), null, null);
+        customerDto = domainObjectStub.createCustomerDto(id);
+        anotherCustomerDto = customerDto.withId(id);
     }
 
     @Test
@@ -41,8 +44,10 @@ public class CustomerDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "CustomerDto(id=" + customerDto.getId() +
+        String expectedString = "CustomerDto(complytId=" + customerDto.getComplytId() +
+                ", id=" + customerDto.getId() +
                 ", externalId=" + customerDto.getExternalId() +
+                ", source=" + customerDto.getSource() +
                 ", name=" + customerDto.getName() +
                 ", address=" + customerDto.getAddress() +
                 ", customerType=" + customerDto.getCustomerType() +

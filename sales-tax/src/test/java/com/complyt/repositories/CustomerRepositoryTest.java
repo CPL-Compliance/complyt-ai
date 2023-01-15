@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,15 +44,20 @@ class CustomerRepositoryTest {
     Customer customer;
     String tenantId;
 
+    String source;
+
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        tenantId = UUID.randomUUID().toString();
         MockitoAnnotations.openMocks(this);
+        tenantId = UUID.randomUUID().toString();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), tenantId);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
+        customer = domainObjectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
+        source = domainObjectStub.getUnifiedSource();
     }
 
     @Test
@@ -248,6 +256,7 @@ class CustomerRepositoryTest {
     void findByExternalId_IdExists_ReturnsCustomer() {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId())
+                .and("source").is(source)
                 .and("tenantId").is(tenantId));
 
         // When
@@ -255,7 +264,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId());
+        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId(),source);
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
@@ -264,6 +273,7 @@ class CustomerRepositoryTest {
         // Given
         String id = UUID.randomUUID().toString();
         Query query = Query.query(Criteria.where("externalId").is(id)
+                .and("source").is(source)
                 .and("tenantId").is(tenantId));
 
         // When
@@ -271,7 +281,7 @@ class CustomerRepositoryTest {
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(id);
+        Mono<Customer> customerMono = customerRepository.findByExternalId(id, source);
 
         StepVerifier.create(customerMono).expectNextCount(0).verifyComplete();
     }

@@ -1,5 +1,6 @@
 package com.complyt.domain.customer.exemption;
 
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ import java.time.LocalDateTime;
 @With
 @ToString
 public class ValidationDates {
-    private final LocalDateTime fromDate;
-    private final LocalDateTime toDate;
+
+    private  final ComplytTimestamp fromDate;
+    private final ComplytTimestamp toDate;
 
 }

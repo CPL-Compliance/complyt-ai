@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,42 +41,19 @@ class TransactionZipTaxCountyFetcherTest {
     private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
     private Transaction transaction;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
-        ObjectId tenantId = new ObjectId();
-        List<Item> items = new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId.toString(), null, externalTimestamps, TransactionType.INVOICE, null, null);
-    }
-
-    private Result createResult() {
-        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
-                0f, 0f, 0f, 0f, "", 0f, 0, "",
-                0f, 0f, "", 0, 0, "", 0,
-                0, "", 0, 0, "", 0, 0, "",
-                0, 0, "");
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
-        Result result = createResult();
+        Result result = domainObjectStub.createResult();
         List<Result> results = new ArrayList<>() {{
             add(result);
         }};

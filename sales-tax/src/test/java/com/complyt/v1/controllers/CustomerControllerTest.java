@@ -2,13 +2,12 @@ package com.complyt.v1.controllers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.customer.CustomerDto;
-import com.complyt.v1.model.customer.CustomerTypeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +22,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.DomainObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,14 +54,17 @@ class CustomerControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
+    String source;
+
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, null, null);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customerDto = domainObjectStub.createCustomerDto(UUID.randomUUID().toString()).withInternalTimestamps(null).withExternalTimestamps(null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        source = domainObjectStub.getUnifiedSource();
     }
 
     @Test
@@ -68,7 +72,7 @@ class CustomerControllerTest {
         // Given
         String externalId = customerDto.getExternalId();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
         // When + Then
@@ -76,7 +80,7 @@ class CustomerControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + externalId)
+                        .path(CustomerController.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -92,7 +96,7 @@ class CustomerControllerTest {
         String externalId = customer.getExternalId();
         Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer originalCustomer = newCustomer.withName("originalCustomer");
-        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.just(originalCustomer));
+        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(originalCustomer));
         when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
         when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
 
@@ -101,7 +105,7 @@ class CustomerControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + externalId)
+                        .path(CustomerController.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -115,13 +119,13 @@ class CustomerControllerTest {
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.just(customer));
+        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(customer));
 
         // When + Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerController.BASE_URL + "/" + externalId)
+                        .path(CustomerController.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -135,7 +139,7 @@ class CustomerControllerTest {
         // Given
 
         String externalId = customer.getExternalId();
-        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
 
         // When + Then
@@ -155,12 +159,12 @@ class CustomerControllerTest {
     void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(CustomerController.BASE_URL + "/" + externalId).build())
+                .uri(uriBuilder -> uriBuilder.path(CustomerController.BASE_URL + "/source/" + source + "/externalId/" + externalId).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
@@ -173,6 +177,10 @@ class CustomerControllerTest {
         List<Customer> customersFoundByName = new ArrayList<>() {{
             add(customer);
         }};
+
+        List<CustomerDto> customerDtosFoundByName = new ArrayList<>() {{
+            add(customerDto);
+        }};
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
         // When + Then
@@ -184,8 +192,8 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk().
-                expectBodyList(Customer.class)
-                .value(customers -> customers, equalTo(customersFoundByName));
+                expectBodyList(CustomerDto.class)
+                .value(customers -> customers, equalTo(customerDtosFoundByName));
     }
 
     @Test
@@ -193,13 +201,19 @@ class CustomerControllerTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);
+        CustomerDto secondCustomerDto = customerDto.withId(id);
 
         List<Customer> allCustomers = new ArrayList<>() {{
             add(customer);
             add(secondCustomer);
         }};
 
-        when(customerFacade.getAllCustomers()).thenReturn(Flux.fromIterable(allCustomers));
+        List<CustomerDto> allCustomerDtos = new ArrayList<>() {{
+            add(customerDto);
+            add(secondCustomerDto);
+        }};
+
+        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(allCustomers));
 
         // When + Then
         webTestClient
@@ -210,8 +224,8 @@ class CustomerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Customer.class)
-                .value(customers -> customers, equalTo(allCustomers));
+                .expectBodyList(CustomerDto.class)
+                .value(customers -> customers, equalTo(allCustomerDtos));
     }
 
     @Test
@@ -222,7 +236,7 @@ class CustomerControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.upsert(nullExternalId, customerDto);
+            customerController.upsert(nullExternalId, source, customerDto);
         });
 
         // Then
@@ -238,7 +252,7 @@ class CustomerControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.upsert(externalId, nullCustomerDto);
+            customerController.upsert(externalId, source, nullCustomerDto);
         });
 
         // Then
@@ -253,7 +267,7 @@ class CustomerControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.getByExternalId(nullExternalId);
+            customerController.getByExternalId(nullExternalId, source);
         });
 
         // Then

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @Component
 public class ExemptionFacade {
@@ -20,22 +22,29 @@ public class ExemptionFacade {
     private ExemptionService exemptionService;
 
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return exemptionService.save(exemption);
+        return exemptionService.checkExemptionNotHavingComplytId(exemption)
+                .flatMap(exemptionService::injectDataToNewExemption)
+                .flatMap(exemptionService::save);
     }
 
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionService.findById(id);
+    }
+    public Mono<Exemption> findByComplytId(@NonNull final UUID complytId) {
+        return exemptionService.findByComplytId(complytId);
     }
 
     public Flux<Exemption> findAll() {
         return exemptionService.findAll();
     }
 
-    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id) {
-        return exemptionService.update(exemption, id);
+    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final UUID complytId) {
+        return exemptionService.findByComplytId(complytId).flatMap(originalExemption ->
+            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption,originalExemption)
+                    .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)));
     }
 
-    public Mono<DeleteResult> delete(@NonNull final String id) {
-        return exemptionService.delete(id);
+    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
+        return exemptionService.delete(complytId);
     }
 }

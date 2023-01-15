@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,39 +25,18 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
     TransactionShippingFeeTangibleCategoryInjector transactionShippingFeeTangibleCategoryInjector;
     Transaction transaction;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
         transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
     }
 
-    private Transaction createTransaction() {
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
-    }
-
-    private ShippingFee createShippingFee() {
-        return new ShippingFee(false, 0, 1000, null,
-                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C7S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> itemJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -74,21 +54,17 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         }};
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
-    }
-
     @Test
     void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
+        Transaction expectedTransaction = transaction.withShippingFee(domainObjectStub.createShippingFee(false,true));
 
         // When
         Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(expectedTransaction).verifyComplete();
     }
 
     @Test
@@ -148,3 +124,6 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
         assertEquals("transaction is marked non-null but is null", exception.getMessage());
     }
 }
+
+// Transaction(complytId=fc64ec07-096f-4b5d-bf62-e9ff5e2131ba, id=ae26370f-db37-4f18-9b79-dca62adfda73, externalId=ae26370f-db37-4f18-9b79-dca62adfda73, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=null, salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=null, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=null, salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=null, taxableCategory=TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc16966a1e2469c8227e63, customer=Customer(complytId=5188c116-658e-48f7-bdac-6fbf73ba1fc2, id=63bc16966a1e2469c8227e63, externalId=63bc16966a1e2469c8227e63, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=954fd34a-ba71-44e9-9816-676f4c4bc3ac, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:27:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091))), salesTax=null, transactionStatus=ACTIVE, tenantId=954fd34a-ba71-44e9-9816-676f4c4bc3ac, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), transactionType=INVOICE, shippingFee=ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=null, salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=TANGIBLE), createdFrom=null))
+// Transaction(complytId=fc64ec07-096f-4b5d-bf62-e9ff5e2131ba, id=ae26370f-db37-4f18-9b79-dca62adfda73, externalId=ae26370f-db37-4f18-9b79-dca62adfda73, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=null, salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=null, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=null, salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=null, taxableCategory=TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc16966a1e2469c8227e63, customer=Customer(complytId=5188c116-658e-48f7-bdac-6fbf73ba1fc2, id=63bc16966a1e2469c8227e63, externalId=63bc16966a1e2469c8227e63, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=954fd34a-ba71-44e9-9816-676f4c4bc3ac, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:27:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091))), salesTax=null, transactionStatus=ACTIVE, tenantId=954fd34a-ba71-44e9-9816-676f4c4bc3ac, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091), updatedDate=ComplytTimestamp(timestamp=2023-01-09T15:28:54.374091)), transactionType=INVOICE, shippingFee=ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=null, salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE), createdFrom=null))
