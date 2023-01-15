@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -100,6 +101,6 @@ public class TransactionRepository {
                 .and("tenantId").is(tenantId));
 
         return reactiveMongoTemplate.findOne(query, Customer.class)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("Transaction's Customer has not been found")));
+                .switchIfEmpty(Mono.error(new NotFoundException("Transaction's Customer has not been found")));
     }
 }
