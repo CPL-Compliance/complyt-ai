@@ -1,4 +1,4 @@
-package com.complyt.v1.customer;
+package com.complyt.v1.api_info.customer;
 
 import com.complyt.v1.models.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;

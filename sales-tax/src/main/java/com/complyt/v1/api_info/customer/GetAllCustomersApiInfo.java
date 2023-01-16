@@ -1,9 +1,7 @@
-package com.complyt.v1.customer;
+package com.complyt.v1.api_info.customer;
 
 import com.complyt.v1.models.customer.CustomerDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,15 +25,8 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by External ID",
-                        operationId = "getCustomerByExternalId",
-                        parameters = {
-                                @Parameter(in = ParameterIn.PATH,
-                                        name = "externalId",
-                                        description = "Customer External ID",
-                                        examples = @ExampleObject(value = GetCustomerByExternalIdApiInfo.externalIdExample,
-                                                name = GetCustomerByExternalIdApiInfo.externalIdExample))
-                        },
+                        description = "Get all Customers",
+                        operationId = "getAllCustomers",
                         tags = "customer",
                         responses = {
                                 @ApiResponse(
@@ -46,7 +37,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetCustomerByExternalIdApiInfo.customerExample)
+                                                                @ExampleObject(value = GetAllCustomersApiInfo.customerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -54,17 +45,13 @@ import java.lang.annotation.Target;
                                         description = "Something is wrong with your request"
                                 ),
                                 @ApiResponse(
-                                        responseCode = "404",
-                                        description = "Customer Not Found"),
-                                @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
                         }))
 })
-public @interface GetCustomerByExternalIdApiInfo {
-    String externalIdExample = "999444";
-    String customerExample = "{\n" +
+public @interface GetAllCustomersApiInfo {
+    String customerExample = "[{\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": \"999444\",\n" +
             "    \"name\": \"Complyt LTD.\",\n" +
@@ -93,5 +80,5 @@ public @interface GetCustomerByExternalIdApiInfo {
             "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
             "        }\n" +
             "    }\n" +
-            "}";
+            "}]";
 }

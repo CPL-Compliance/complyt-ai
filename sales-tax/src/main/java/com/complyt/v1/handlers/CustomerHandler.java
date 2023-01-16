@@ -6,6 +6,7 @@ import com.complyt.security.permissions.customer.CustomerUpdatePermission;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
@@ -27,6 +29,9 @@ public class CustomerHandler {
     @NonNull
     CustomerFacade customerfacade;
 
+    @NonNull
+    ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler;
+
     @CustomerReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         Flux<CustomerDto> customerDtoMono = customerfacade.getAllCustomers()
@@ -39,7 +44,7 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
 
-        Mono<CustomerDto> customerDtoMono = serverRequest.bodyToMono(CustomerDto.class)
+        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest)
                 .map(CustomerMapper.INSTANCE::customerDtoToCustomer).flatMap(receivedCustomer ->
                         customerfacade.findByExternalId(externalId)
                                 .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer))

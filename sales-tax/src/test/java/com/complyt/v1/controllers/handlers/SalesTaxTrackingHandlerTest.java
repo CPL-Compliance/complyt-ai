@@ -7,11 +7,12 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
-import com.complyt.v1.handlers.SalesTaxTrackingHandler;
-import com.complyt.v1.routers.SalesTaxTrackingRouter;
+import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
+import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +41,11 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest(SalesTaxTrackingHandler.class)
 @ExtendWith(MockitoExtension.class)
 @Import(JacksonConfig.class)
-@ContextConfiguration(classes = {SalesTaxTrackingRouter.class, SalesTaxTrackingHandler.class, ApiExceptionConfig.class, GlobalExceptionHandler.class})
+@ContextConfiguration(classes = {SalesTaxTrackingRouter.class,
+        SalesTaxTrackingHandler.class,
+        ApiExceptionConfig.class,
+        GlobalExceptionHandler.class,
+        GlobalErrorAttributes.class})
 public class SalesTaxTrackingHandlerTest {
 
     @Autowired
@@ -94,8 +99,7 @@ public class SalesTaxTrackingHandlerTest {
 
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.empty());
 
-        webTestClient
-                .get()
+        webTestClient.get()
                 .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

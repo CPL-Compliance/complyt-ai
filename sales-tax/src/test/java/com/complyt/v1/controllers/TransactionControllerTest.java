@@ -11,6 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.facades.TransactionFacade;
+import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.TransactionDto;
@@ -47,7 +48,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ExtendWith(MockitoExtension.class)
 @WebFluxTest(TransactionController.class)
 @WithMockUser(username = "mock", password = "mock")
-@ContextConfiguration(classes = {TransactionController.class, ApiExceptionConfig.class, GlobalExceptionHandler.class})
+@ContextConfiguration(classes = {TransactionController.class,
+        ApiExceptionConfig.class,
+        GlobalExceptionHandler.class,
+        GlobalErrorAttributes.class})
 class TransactionControllerTest {
 
     Transaction transactionWithId;

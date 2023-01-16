@@ -1,9 +1,9 @@
 package com.complyt.v1.routers;
 
-import com.complyt.v1.customer.GetAllCustomersApiInfo;
-import com.complyt.v1.customer.GetCustomerByExternalIdApiInfo;
-import com.complyt.v1.customer.GetCustomerByNameApiInfo;
-import com.complyt.v1.customer.UpsertCustomeByExternalIdApiInfo;
+import com.complyt.v1.api_info.customer.GetAllCustomersApiInfo;
+import com.complyt.v1.api_info.customer.GetCustomerByExternalIdApiInfo;
+import com.complyt.v1.api_info.customer.GetCustomerByNameApiInfo;
+import com.complyt.v1.api_info.customer.UpsertCustomeByExternalIdApiInfo;
 import com.complyt.v1.handlers.CustomerHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;

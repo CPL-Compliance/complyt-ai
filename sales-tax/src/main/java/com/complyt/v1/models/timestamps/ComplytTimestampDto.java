@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -24,8 +24,8 @@ import java.time.format.DateTimeFormatter;
 @Schema(name = "ComplytTimestamp")
 public class ComplytTimestampDto {
 
-    @NotBlank
-    @PastOrPresent
+    @NotBlank(message = "Timestamp may not be blank")
+    @Size(max = 256, message = "Timestamp may be 256 characters maximum")
     String timestamp;
 
     public ComplytTimestampDto(String timestamp) {
