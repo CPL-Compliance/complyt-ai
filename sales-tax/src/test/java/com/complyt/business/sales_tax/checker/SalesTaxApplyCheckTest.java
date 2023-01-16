@@ -63,7 +63,7 @@ public class SalesTaxApplyCheckTest {
         };
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
@@ -82,7 +82,7 @@ public class SalesTaxApplyCheckTest {
         };
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     @Test

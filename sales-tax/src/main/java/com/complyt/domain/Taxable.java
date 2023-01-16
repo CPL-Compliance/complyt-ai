@@ -36,4 +36,7 @@ public interface Taxable {
         return getTotalPrice() * getSalesTaxRate().getTaxRate();
     }
 
+    Taxable withTangibleCategory(TangibleCategory intangible);
+
+    Taxable withTaxableCategory(TaxableCategory notTaxable);
 }

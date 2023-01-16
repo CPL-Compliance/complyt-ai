@@ -92,7 +92,7 @@ public class NexusTransactionsAmountCalculatorTest {
             }
         };
         Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
     }
 
     private Transaction createRefundTransaction() {

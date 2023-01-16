@@ -33,7 +33,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(15, fields.length);
+        Assertions.assertEquals(18, fields.length);
     }
 
     @BeforeEach
@@ -59,7 +59,7 @@ public class TransactionTest {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
         Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null,0,0,0);
     }
 
     private ShippingFee createShippingFee() {
@@ -89,7 +89,10 @@ public class TransactionTest {
                 ", externalTimestamps=" + transaction.getExternalTimestamps() +
                 ", transactionType=" + transaction.getTransactionType() +
                 ", shippingFee=" + transaction.getShippingFee() +
-                ", createdFrom=" + transaction.getCreatedFrom() + ")";
+                ", createdFrom=" + transaction.getCreatedFrom() +
+                ", taxableItemsAmount=" + transaction.getTaxableItemsAmount() +
+                ", tangibleItemsAmount=" + transaction.getTangibleItemsAmount() +
+                ", totalItemsAmount=" + transaction.getTotalItemsAmount() + ")";
 
         // When
         String actualString = transaction.toString();

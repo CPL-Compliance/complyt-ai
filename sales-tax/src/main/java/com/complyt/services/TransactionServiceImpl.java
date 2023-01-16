@@ -3,13 +3,15 @@ package com.complyt.services;
 import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.repositories.TransactionRepository;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -21,17 +23,20 @@ import java.util.function.Function;
 @Service
 @AllArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionServiceImpl implements TransactionService {
 
     @NonNull
-    private TransactionRepository transactionRepository;
+    TransactionRepository transactionRepository;
 
     @NonNull
-    @Qualifier("productClassificationServiceImpl")
-    private ProductClassificationService productClassificationService;
+    ProductClassificationService productClassificationServiceImpl;
 
     @NonNull
-    private CountyProvider countyProvider;
+    TransactionAmountsCollector<Transaction> transactionItemsAmountsCollector;
+
+    @NonNull
+    CountyProvider countyProvider;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -55,18 +60,22 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction newTransactionWithInternalTimestamps = modifiedTransaction
                 .withInternalTimestamps(originalTransaction.getInternalTimestamps());
 
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(newTransactionWithInternalTimestamps)
-                .flatMap(countyProvider::provide)
+        return injectCommonDataToNewAndModifiedTransaction(newTransactionWithInternalTimestamps)
                 .map(ExistingTransactionInternalTimestampsInjector::new)
                 .map(ExistingTransactionInternalTimestampsInjector::inject);
     }
 
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
-        return productClassificationService.getTransactionWithRelevantProductClassificationData(transaction)
-                .flatMap(countyProvider::provide)
+        return injectCommonDataToNewAndModifiedTransaction(transaction)
                 .map(NewTransactionInternalTimestampsInjector::new)
                 .map(NewTransactionInternalTimestampsInjector::inject);
+    }
+
+    private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
+        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
+                .map(transactionItemsAmountsCollector::collect)
+                .flatMap(countyProvider::provide);
     }
 
     @Override
@@ -92,19 +101,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Function<Transaction, Transaction> createFunctionUpdateTransaction(final Transaction transaction) {
-        return transactionInfo -> transactionInfo
-                .withExternalId(transaction.getExternalId())
-                .withItems(transaction.getItems())
-                .withBillingAddress(transaction.getBillingAddress())
-                .withShippingAddress(transaction.getShippingAddress())
-                .withCustomerId(transaction.getCustomerId())
-                .withCustomer(transaction.getCustomer())
-                .withSalesTax(transaction.getSalesTax())
-                .withTransactionStatus(transaction.getTransactionStatus())
-                .withInternalTimestamps(transaction.getInternalTimestamps())
-                .withExternalTimestamps(transaction.getExternalTimestamps())
-                .withTransactionType(transaction.getTransactionType())
-                .withShippingFee(transaction.getShippingFee());
+        return transactionInfo ->
+                new Transaction(
+                        transactionInfo.getId(), transaction.getExternalId(),
+                        transaction.getItems(), transaction.getBillingAddress(), transaction.getShippingAddress(),
+                        transaction.getCustomerId(), transaction.getCustomer(), transaction.getSalesTax(),
+                        transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
+                        transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
+                        transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount()
+                );
     }
 
 }

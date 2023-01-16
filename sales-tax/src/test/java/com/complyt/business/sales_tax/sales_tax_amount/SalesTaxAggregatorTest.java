@@ -76,7 +76,7 @@ public class SalesTaxAggregatorTest {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps timestamps = new Timestamps(complytTimestamp, complytTimestamp);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timestamps, timestamps, TransactionType.INVOICE, shippingFee, null);
+        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timestamps, timestamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
     @Test

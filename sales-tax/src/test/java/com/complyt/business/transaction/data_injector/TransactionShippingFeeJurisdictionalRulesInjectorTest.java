@@ -47,7 +47,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
         Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null);
+        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
     private ShippingFee createShippingFee() {

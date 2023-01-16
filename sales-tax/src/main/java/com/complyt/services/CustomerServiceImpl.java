@@ -81,12 +81,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private Function<Customer, Customer> createFunctionUpdateCustomer(final Customer customer) {
-        return customerInfo -> customerInfo
-                .withExternalId(customer.getExternalId())
-                .withAddress(customer.getAddress())
-                .withName(customer.getName())
-                .withCustomerType(customer.getCustomerType())
-                .withInternalTimestamps(customer.getInternalTimestamps())
-                .withExternalTimestamps(customer.getExternalTimestamps());
+        return customerInfo ->
+                new Customer(
+                        customerInfo.getId(), customer.getExternalId(),
+                        customer.getName(), customer.getAddress(),
+                        customerInfo.getTenantId(), customer.getCustomerType(),
+                        customer.getInternalTimestamps(), customer.getExternalTimestamps()
+                );
     }
 }
