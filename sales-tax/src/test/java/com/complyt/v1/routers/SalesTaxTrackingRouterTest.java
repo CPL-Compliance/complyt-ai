@@ -1,4 +1,4 @@
-package com.complyt.v1.controllers.routers;
+package com.complyt.v1.routers;
 
 import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;

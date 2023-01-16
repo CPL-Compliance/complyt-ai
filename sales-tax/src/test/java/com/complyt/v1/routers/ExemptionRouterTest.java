@@ -1,4 +1,4 @@
-package com.complyt.v1.controllers.routers;
+package com.complyt.v1.routers;
 
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;

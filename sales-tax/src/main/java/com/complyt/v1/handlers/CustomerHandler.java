@@ -44,14 +44,28 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
 
-        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest)
+//        return customerDtoValidationHandler.validate(serverRequest).map(CustomerMapper.INSTANCE::customerDtoToCustomer)
+//                .flatMap(newCustomer ->
+//                    customerFacade.findByExternalId(externalId)
+//                            .flatMap(originalCustomer -> customerFacade.updateIfModified(newCustomer, originalCustomer).flatMap(updatedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(CustomerMapper.INSTANCE.customerToCustomerDto(updatedCustomer), CustomerDto.class)))
+//                            .switchIfEmpty(customerFacade.saveCustomer(newCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer), CustomerDto.class))));
+
+//        return customerDtoValidationHandler.validate(serverRequest).map(CustomerMapper.INSTANCE::customerDtoToCustomer)
+//                .flatMap(newCustomer -> customerFacade.findByExternalId(externalId)
+//                        .flatMap(originalCustomer -> customerFacade.updateIfModified(newCustomer, originalCustomer))
+//                        .flatMap(updatedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(CustomerMapper.INSTANCE.customerToCustomerDto(updatedCustomer), CustomerDto.class)))
+//                        .switchIfEmpty(customerFacade.saveCustomer(newCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer), CustomerDto.class));
+
+        return customerDtoValidationHandler.validate(serverRequest)
                 .map(CustomerMapper.INSTANCE::customerDtoToCustomer).flatMap(receivedCustomer ->
                         customerfacade.findByExternalId(externalId)
-                                .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer))
-                                .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer)))
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto);
+                                .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer)
+                                        .flatMap(savedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class)))
+                                .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class))));
+//                .map(CustomerMapper.INSTANCE::customerToCustomerDto);
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
+//        ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
+//        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
     }
 
     @CustomerReadPermission
