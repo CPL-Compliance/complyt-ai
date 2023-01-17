@@ -125,8 +125,9 @@ class CustomerFacadeTest {
     @Test
     void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
-        String id = UUID.randomUUID().toString();
-        Customer secondCustomer = customer.withExternalId(id);
+        Customer secondCustomer = customer
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
         List<Customer> allCustomers = new ArrayList<>();
         allCustomers.add(customer);
         allCustomers.add(secondCustomer);
@@ -137,6 +138,38 @@ class CustomerFacadeTest {
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getAllCustomersInSource_CustomersExistsInSource_ReturnsAllCustomersFound() {
+        // Given
+        String source = customer.getSource();
+        Customer secondCustomer = customer
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
+        List<Customer> allCustomersInSource = new ArrayList<>();
+        allCustomersInSource.add(customer);
+        allCustomersInSource.add(secondCustomer);
+
+        // When
+        when(customerService.findAllBySource(source)).thenReturn(Flux.fromIterable(allCustomersInSource));
+        Flux<Customer> returnedCustomers = customerFacade.getAllBySource(source);
+
+        // Then
+        StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getByComplytId_CustomerExists_ReturnsCustomer() {
+        // Given
+        UUID complytId = customer.getComplytId();
+
+        // When
+        when(customerService.findByComplytId(complytId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test

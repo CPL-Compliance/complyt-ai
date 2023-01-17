@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;
@@ -110,6 +111,19 @@ public class SalesTaxTrackingFacadeTest {
                 .expectNextCount(0)
                 .verifyComplete();
 
+    }
+
+    @Test
+    void getByComplytId_SalesTaxTrackingExists_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = salesTaxTracking.getComplytId();
+
+        // When
+        when(salesTaxTrackingService.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
     @Test

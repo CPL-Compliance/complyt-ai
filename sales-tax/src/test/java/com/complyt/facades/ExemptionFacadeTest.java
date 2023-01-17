@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
@@ -162,6 +163,19 @@ public class ExemptionFacadeTest {
 
         // Then
         StepVerifier.create(exemptionMono).expectError(ObjectNotFoundException.class).verify();
+    }
+
+    @Test
+    void getByComplytId_ExemptionExists_ReturnsExemption() {
+        // Given
+        UUID complytId = exemption.getComplytId();
+
+        // When
+        when(exemptionService.findByComplytId(complytId)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
     @Test

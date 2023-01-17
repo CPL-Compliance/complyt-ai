@@ -408,4 +408,36 @@ public class TransactionFacadeTest {
         // Then
         StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
     }
+
+    @Test
+    void getAllTransactionsInSource_TransactionsExistsInSource_ReturnsAllTransactionsFound() {
+        // Given
+        String source = transaction.getSource();
+        Transaction secondTransaction = transaction
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
+        List<Transaction> allTransactionsInSource = new ArrayList<>();
+        allTransactionsInSource.add(transaction);
+        allTransactionsInSource.add(secondTransaction);
+
+        // When
+        when(transactionService.findAllBySource(source)).thenReturn(Flux.fromIterable(allTransactionsInSource));
+        Flux<Transaction> returnedTransactions = transactionFacade.getAllBySource(source);
+
+        // Then
+        StepVerifier.create(returnedTransactions).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getByComplytId_TransactionExists_ReturnsTransaction() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+
+        // When
+        when(transactionService.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
 }

@@ -69,6 +69,7 @@ class SalesTaxRatesProviderTest {
                 .withTaxRate(calculatedTaxRateValue);
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.FIXED)
+                .withSpecialTreatment(true)
                 .withCalculationValue(fixedStateRateValue);
 
         // When
