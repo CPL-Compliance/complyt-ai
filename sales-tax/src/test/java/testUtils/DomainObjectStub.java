@@ -18,6 +18,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.model.*;
 import com.complyt.v1.model.customer.CustomerDto;
 import com.complyt.v1.model.customer.CustomerTypeDto;
+import com.complyt.v1.model.customer.exemption.*;
 import com.complyt.v1.model.timestamps.ComplytTimestampDto;
 import com.complyt.v1.model.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
@@ -32,7 +33,7 @@ public class DomainObjectStub {
     ComplytTimestampDto complytTimestampDto;
     String tenantId;
 
-    ObjectId customerIdOtherDomains;
+    UUID customerIdOtherDomains;
 
     String certificateId;
 
@@ -42,7 +43,7 @@ public class DomainObjectStub {
         this.complytTimestamp = complytTimestamp;
         this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
         this.tenantId = tenantId;
-        customerIdOtherDomains = new ObjectId();
+        customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
         source = String.valueOf(Math.round(Math.random()*10));
     }
@@ -76,7 +77,6 @@ public class DomainObjectStub {
         return new CustomerDto(
                 UUID.randomUUID(),
                 id,
-                id,
                 source,
                 "name",
                 new AddressDto("City", "Country", "County", "CA", "Street", "Zip"),
@@ -102,7 +102,7 @@ public class DomainObjectStub {
         List<ItemDto> items = createItemDtos(false, false);
         TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(false,false);
-        return new TransactionDto(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
+        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -176,13 +176,27 @@ public class DomainObjectStub {
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(complytTimestamp.getTimestamp().minusYears(1), complytTimestamp.getTimestamp().plusYears(1));
+        ValidationDates validationDates = new ValidationDates( new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
         Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
-        return new Exemption(id, tenantId, customerIdOtherDomains,
+        return new Exemption( UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
                 state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+    }
+
+    public ExemptionDto createExemptionDto(String id) {
+        StateDto state = new StateDto("CA", "02", "California");
+        ClassificationDto classification = new ClassificationDto("code", "description");
+        ValidationDatesDto validationDates = new ValidationDatesDto(
+                new ComplytTimestampDto(complytTimestamp.getTimestamp().minusYears(1).toString()),
+                new ComplytTimestampDto(complytTimestamp.getTimestamp().plusYears(1).toString()));
+        TimestampsDto internalTimestamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+        StatusDto status = new StatusDto("code", "name");
+        CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
+
+        return new ExemptionDto( UUID.randomUUID(), customerIdOtherDomains,
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY);
     }
 
     public NexusStateRule createNexusStateRule(String id) {
@@ -213,10 +227,19 @@ public class DomainObjectStub {
 
     public SalesTaxTracking createSalesTaxTracking(String id) {
         State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(id, state,
+        return new SalesTaxTracking(UUID.randomUUID() , id, state,
                 tenantId, true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null), complytTimestamp.getTimestamp(),
+                true, complytTimestamp.getTimestamp());
+    }
+
+    public SalesTaxTrackingDto createSalesTaxTrackingDto() {
+        StateDto state = new StateDto("CA", "02", "California");
+        return new SalesTaxTrackingDto(UUID.randomUUID(), state,
+                true,
+                new PhysicalNexusTrackerDto(false, null),
+                new EconomicNexusTrackerDto(false, null), complytTimestamp.getTimestamp(),
                 true, complytTimestamp.getTimestamp());
     }
 

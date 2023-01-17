@@ -6,11 +6,13 @@ import com.complyt.domain.State;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.v1.controllers.router.SalesTaxTrackingRouter;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.model.SalesTaxTrackingDto;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,17 +53,13 @@ public class SalesTaxTrackingHandlerTest {
 
     SalesTaxTracking salesTaxTracking;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        return new SalesTaxTracking(null, state, null,
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = domainObjectStub.createSalesTaxTracking( new ObjectId().toString());
     }
 
     @Test
@@ -76,7 +75,7 @@ public class SalesTaxTrackingHandlerTest {
         webTestClient
                 .mutateWith(csrf())
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -95,7 +94,7 @@ public class SalesTaxTrackingHandlerTest {
 
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
@@ -105,22 +104,23 @@ public class SalesTaxTrackingHandlerTest {
     @WithUserDetails
     void upsert_NewSalesTaxTracking_SalesTaxTrackingReturned() {
         // Given
-        String state = salesTaxTracking.getState().getName();
-        SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
+        String state = newSalesTaxTracking.getState().getName();
+        SalesTaxTracking salesTaxTrackingWithId = newSalesTaxTracking.withId(UUID.randomUUID().toString());
         SalesTaxTrackingDto salesTaxTrackingDtoSent =
-                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTrackingWithId);
 
         // When
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.empty());
-        when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
                 .bodyValue(salesTaxTrackingDtoSent)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -170,10 +170,10 @@ public class SalesTaxTrackingHandlerTest {
     @WithUserDetails
     void upsert_SalesTaxTrackingUpdated_SalesTaxTrackingReturned() {
         // Given
-        String state = salesTaxTracking.getState().getName();
-        SalesTaxTracking originalSalesTaxTracking = salesTaxTracking.withId(UUID.randomUUID().toString());
-        SalesTaxTrackingDto salesTaxTrackingDtoSent =
-                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
+        String state = newSalesTaxTracking.getState().getName();
+        SalesTaxTracking originalSalesTaxTracking = newSalesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTrackingDto salesTaxTrackingDtoSent = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
         SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDtoSent);
         SalesTaxTracking receivedSalesTaxTrackingWithId = receivedSalesTaxTracking
                 .withId(UUID.randomUUID().toString());
@@ -183,14 +183,14 @@ public class SalesTaxTrackingHandlerTest {
 
         // When
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
-        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
-        when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.empty());
+        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/" + state).build())
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
                 .bodyValue(salesTaxTrackingDtoSent)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

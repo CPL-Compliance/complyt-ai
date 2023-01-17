@@ -3,6 +3,7 @@ package com.complyt.v1.controllers.router;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.handler.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
@@ -22,6 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -45,23 +47,14 @@ public class ExemptionRouterTest {
     @MockBean
     ExemptionFacade exemptionFacade;
 
-    String exemptionId;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setup() {
-        exemptionId = UUID.randomUUID().toString();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
-    }
 
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(exemptionId, UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, null, status, certificate, ExemptionType.FULLY);
     }
 
     @Test
@@ -81,17 +74,18 @@ public class ExemptionRouterTest {
     @Test
     @WithUserDetails
     void exemptionRoute_ExemptionHandler_RoutingToExemptionHandler() {
-        // Given
-        Exemption expectedExemption = createExemption();
+        //
+        UUID complytId = UUID.randomUUID();
+        Exemption expectedExemption = domainObjectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
         ExemptionDto expectedExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(expectedExemption);
 
         // When
-        when(exemptionFacade.findById(exemptionId)).thenReturn(Mono.just(expectedExemption));
+        when(exemptionFacade.findByComplytId(complytId)).thenReturn(Mono.just(expectedExemption));
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemptionId).build())
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + complytId).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()

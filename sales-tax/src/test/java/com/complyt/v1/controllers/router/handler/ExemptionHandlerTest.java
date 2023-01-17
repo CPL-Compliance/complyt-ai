@@ -3,6 +3,7 @@ package com.complyt.v1.controllers.router.handler;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.ExemptionRouter;
 import com.complyt.v1.mappers.ExemptionMapper;
@@ -25,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,30 +52,23 @@ public class ExemptionHandlerTest {
     @MockBean
     private ExemptionFacade exemptionFacade;
 
+    DomainObjectStub domainObjectStub;
+
     @BeforeEach
     public void setUp() {
-        exemption = createExemption();
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), (new ObjectId()).toString(), new ObjectId(),
-                state, classification, validationDates, null, status, certificate, ExemptionType.FULLY);
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        exemption = domainObjectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
     }
 
     @Test
     @WithUserDetails()
     public void getOne_FindsExemption_ReturnsExemption() {
         // Given
-        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
 
         // When
-        when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.just(exemption));
+        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.just(exemption));
         ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
 
         // Then
@@ -90,10 +85,10 @@ public class ExemptionHandlerTest {
     @WithUserDetails()
     public void getOne_ExemptionDoesNotExistInDB_Throws404NotFound() {
         // Given
-        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
 
         // When
-        when(exemptionFacade.findById(exemption.getId())).thenReturn(Mono.empty());
+        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.empty());
 
         // Then
         webTestClient.get()
@@ -107,7 +102,7 @@ public class ExemptionHandlerTest {
     @Test
     public void create_CreatesExemption_ReturnsExemption() {
         // Given
-        Exemption exemptionNoId = exemption.withId(null).withTenantId(null);
+        Exemption exemptionNoId = exemption.withId(null).withTenantId(null).withComplytId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
 
         // When
@@ -123,31 +118,31 @@ public class ExemptionHandlerTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(ExemptionDto.class)
-                .isEqualTo(exemptionDto.withId(exemption.getId()));
+                .isEqualTo(exemptionDto.withComplytId(exemption.getComplytId()));
     }
 
     @Test
     @WithUserDetails()
     void update_UpdatesExemption_ReturnsExemption() {
         // Given
-        Exemption exemptionNoClientId = exemption.withTenantId(null);
+        Exemption exemptionNoClientId = exemption.withTenantId(null).withId(null);
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoClientId);
 
         // When
-        when(exemptionFacade.update(exemptionNoClientId, exemption.getId())).thenReturn(Mono.just(exemption));
+        when(exemptionFacade.update(exemptionNoClientId, exemption.getComplytId())).thenReturn(Mono.just(exemption));
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemption.getId())
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId())
                         .build())
                 .bodyValue(exemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ExemptionDto.class)
-                .isEqualTo(exemptionDto.withId(exemption.getId()));
+                .isEqualTo(exemptionDto);
     }
 
     @Test
@@ -158,13 +153,13 @@ public class ExemptionHandlerTest {
         ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);
 
         // When
-        when(exemptionFacade.update(exemptionWithIdThatDoesNotExist, exemption.getId())).thenReturn(Mono.empty());
+        when(exemptionFacade.update(exemptionWithIdThatDoesNotExist, exemption.getComplytId())).thenReturn(Mono.empty());
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/" + exemption.getId())
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId" + exemption.getId())
                         .build())
                 .bodyValue(exemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -211,11 +206,11 @@ public class ExemptionHandlerTest {
     @WithUserDetails()
     public void delete_DeletesExemption_Returns204NoContent() {
         // Given
-        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
-        when(exemptionFacade.delete(exemption.getId())).thenReturn(Mono.just(deleteResult));
+        when(exemptionFacade.delete(exemption.getComplytId())).thenReturn(Mono.just(deleteResult));
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -230,10 +225,10 @@ public class ExemptionHandlerTest {
     @WithUserDetails()
     public void delete_ExemptionDoesNoExistInDB_Throws404NotFound() {
         // Given
-        String url = ExemptionRouter.BASE_URL + "/" + exemption.getId();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
 
         // When
-        when(exemptionFacade.delete(exemption.getId())).thenReturn(Mono.empty());
+        when(exemptionFacade.delete(exemption.getComplytId())).thenReturn(Mono.empty());
 
         // Then
         webTestClient.mutateWith(csrf())

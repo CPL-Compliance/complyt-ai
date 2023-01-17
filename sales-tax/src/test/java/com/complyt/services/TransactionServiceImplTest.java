@@ -250,7 +250,7 @@ class TransactionServiceImplTest {
     void getTransactionsByQuery_TwoTransactionsMatch_returnsTwoTransactions() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        UUID customerId = UUID.randomUUID();
         Customer customer = domainObjectStub.createCustomer(customerId.toString())
                 .withExternalId(externalId)
                 .withAddress(transaction.getShippingAddress());

@@ -5,16 +5,18 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
+@With
 @Schema(name = "SalesTaxTracking")
 public class SalesTaxTrackingDto {
 
-    String id;
+    UUID complytId;
     StateDto state;
     boolean enforcesSalesTax;
     PhysicalNexusTrackerDto physicalNexusTracker;

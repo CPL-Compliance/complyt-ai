@@ -15,7 +15,7 @@ import java.util.UUID;
 @With
 @Schema(name = "Exemption")
 public class ExemptionDto {
-    private final String complytId;
+    private final UUID complytId;
     private final UUID customerId;
     private final StateDto state;
     private final ClassificationDto classification;

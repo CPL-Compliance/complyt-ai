@@ -28,7 +28,7 @@ public class CustomerDtoTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         customerDto = domainObjectStub.createCustomerDto(id);
-        anotherCustomerDto = customerDto.withId(id);
+        anotherCustomerDto = customerDto.withComplytId(customerDto.getComplytId());
     }
 
     @Test
@@ -45,7 +45,6 @@ public class CustomerDtoTest {
     void toString_ReturnString() {
         // Given
         String expectedString = "CustomerDto(complytId=" + customerDto.getComplytId() +
-                ", id=" + customerDto.getId() +
                 ", externalId=" + customerDto.getExternalId() +
                 ", source=" + customerDto.getSource() +
                 ", name=" + customerDto.getName() +

@@ -17,9 +17,10 @@ public class SalesTaxTrackingRouter {
     public RouterFunction<ServerResponse> salesTaxTrackingRoute(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         return RouterFunctions.route()
                 .path(BASE_URL, builder -> builder
-                        .GET("/{state}", salesTaxTrackingHandler::getOne)
+                        .GET("/state/{state}", salesTaxTrackingHandler::getOne)
+                        .GET("/complytId/{complytId}", salesTaxTrackingHandler::getByComplytId)
                         .GET("", salesTaxTrackingHandler::getAll)
-                        .PUT("/{state}", salesTaxTrackingHandler::upsert))
+                        .PUT("/state/{state}", salesTaxTrackingHandler::upsert))
                 .build();
     }
 }

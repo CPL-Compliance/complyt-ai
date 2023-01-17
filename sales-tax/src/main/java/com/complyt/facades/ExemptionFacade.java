@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.services.ExemptionService;
+import com.complyt.v1.exceptions.ObjectNotFoundException;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -41,7 +42,8 @@ public class ExemptionFacade {
     public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final UUID complytId) {
         return exemptionService.findByComplytId(complytId).flatMap(originalExemption ->
             exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption,originalExemption)
-                    .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)));
+                    .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundException("Exemption with complyt id " + complytId + " not found")));
     }
 
     public Mono<DeleteResult> delete(@NonNull final UUID complytId) {

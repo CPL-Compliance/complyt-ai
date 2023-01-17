@@ -3,7 +3,6 @@ package com.complyt.v1.mappers;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.model.TransactionDto;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.DomainObjectStub;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TransactionMapperTest {
 
     private Transaction transaction;
-    private Transaction transactionNoTenant;
+    private Transaction transactionNoTenantNorId;
     private TransactionDto transactionDto;
     DomainObjectStub domainObjectStub;
 
@@ -25,7 +24,7 @@ public class TransactionMapperTest {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
-        transactionNoTenant = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null));
+        transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
         transactionDto = domainObjectStub.createTransactionDto(transaction.getId())
                 .withComplytId(transaction.getComplytId())
                 .withCustomer( CustomerMapper.INSTANCE.customerToCustomerDto(transaction.getCustomer()));
@@ -54,7 +53,7 @@ public class TransactionMapperTest {
         Transaction actualTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
 
         // Then
-        assertEquals(transactionNoTenant, actualTransaction);
+        assertEquals(transactionNoTenantNorId, actualTransaction);
     }
 
 }

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CustomerMapperTest {
 
     private Customer customer;
-    private Customer customerNoTenant;
+    private Customer customerNoTenantNorId;
     private CustomerDto customerDto;
     DomainObjectStub domainObjectStub;
 
@@ -24,7 +24,7 @@ public class CustomerMapperTest {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
-        customerNoTenant = domainObjectStub.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId());
+        customerNoTenantNorId = domainObjectStub.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId()).withId(null);
         customerDto = domainObjectStub.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());
     }
 
@@ -52,7 +52,7 @@ public class CustomerMapperTest {
         Customer actualCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
 
         // Then
-        assertEquals(customerNoTenant, actualCustomer);
+        assertEquals(customerNoTenantNorId, actualCustomer);
     }
 
 }

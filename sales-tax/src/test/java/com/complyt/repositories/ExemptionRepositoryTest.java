@@ -216,8 +216,8 @@ public class ExemptionRepositoryTest {
     @Test
     void delete_DeletesExemption_ReturnsDeleteResult() {
         // Given
-        String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(transaction.getTenantId()));
+        UUID id = exemption.getComplytId();
+        Query query = Query.query(Criteria.where("complytId").is(id).and("tenantId").is(transaction.getTenantId()));
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
@@ -232,8 +232,8 @@ public class ExemptionRepositoryTest {
     @Test
     void delete_ExemptionDoesNotExistInDB_ReturnsEmptyMono() {
         // Given
-        String id = exemption.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(transaction.getTenantId()));
+        UUID id = exemption.getComplytId();
+        Query query = Query.query(Criteria.where("complytId").is(id).and("tenantId").is(transaction.getTenantId()));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -261,12 +261,12 @@ public class ExemptionRepositoryTest {
     @Test
     void delete_NullIdPassed_ThrowsException() {
         // Given
-        String nullId = null;
+        UUID nullId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.delete(nullId));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 }

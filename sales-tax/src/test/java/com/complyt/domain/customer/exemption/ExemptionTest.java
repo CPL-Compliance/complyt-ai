@@ -6,6 +6,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,45 +16,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExemptionTest {
     private Exemption exemption;
-
-    private LocalDateTime localDateTime;
-
-    private ObjectId customerId;
-
-    private String exemptionId;
-
-    private String certificateId;
-
-    private String tenantId;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setup() {
-        tenantId = UUID.randomUUID().toString();
-        customerId = new ObjectId();
-        localDateTime = LocalDateTime.now();
-        certificateId = UUID.randomUUID().toString();
-        exemptionId = UUID.randomUUID().toString();
-        exemption = createExemption();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        exemption = domainObjectStub.createExemption(new ObjectId().toString());
     }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(certificateId, "url", "name");
-
-
-        return new Exemption(exemptionId, tenantId, customerId,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
-    }
-
     @Test
     void Equals_sameExemption_ReturnsTrue() {
         // Given
-        Exemption givenExemption = createExemption();
+        Exemption givenExemption = domainObjectStub.createExemption(exemption.getId()).withComplytId(exemption.getComplytId());
 
         // When
         boolean isEquals = exemption.equals(givenExemption);
@@ -65,7 +39,8 @@ class ExemptionTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Exemption(id=" + exemption.getId() +
+        String expectedString = "Exemption(complytId=" + exemption.getComplytId() +
+                ", id=" + exemption.getId() +
                 ", tenantId=" + exemption.getTenantId() +
                 ", customerId=" + exemption.getCustomerId() +
                 ", state=" + exemption.getState() +
@@ -87,6 +62,7 @@ class ExemptionTest {
     void exemptionBuilder_Build_SameExemption() {
         // Given + When
         Exemption actualExemption = Exemption.builder()
+                .complytId(exemption.getComplytId())
                 .id(exemption.getId())
                 .tenantId(exemption.getTenantId())
                 .customerId(exemption.getCustomerId())

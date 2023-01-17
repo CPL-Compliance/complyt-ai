@@ -3,6 +3,7 @@ package com.complyt.business.nexus.checker;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,19 +24,20 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PhysicalNexusCheckTest {
 
     PhysicalNexusChecker physicalNexusChecker;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         physicalNexusChecker = new PhysicalNexusChecker();
     }
 
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(true, LocalDateTime.now());
-        State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(), state, (new ObjectId()).toString(),
-                true, physicalNexusTracker, null, LocalDateTime.now(), true, LocalDateTime.now());
+        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString())
+                .withPhysicalNexusTracker(new PhysicalNexusTracker(true,LocalDateTime.now()));
 
         // When + Then
         boolean hasPhysicalNexus = physicalNexusChecker.check(salesTaxTracking);

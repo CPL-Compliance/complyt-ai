@@ -1,5 +1,6 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.function.Function;
 
 @AllArgsConstructor
@@ -27,6 +29,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     SalesTaxTrackingRepository salesTaxTrackingRepository;
     @NonNull
     ApplicationDateCreator applicationDateCreator;
+
+    @NonNull SalesTaxTrackingComplytIdHandler complytIdHandler;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -41,6 +45,11 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
         return salesTaxTrackingRepository.findByState(state);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
+        return salesTaxTrackingRepository.findByComplytId(complytId);
     }
 
     @Override
@@ -78,5 +87,22 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker())
                 .withApproved(salesTaxTracking.isApproved())
                 .withState(salesTaxTracking.getState());
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking) {
+        return complytIdHandler.isNewDontHaveComplytId(newSalesTaxTracking)
+                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new SalesTaxTracking with complyt id")));
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final SalesTaxTracking modifiedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
+        return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedSalesTaxTracking, originalSalesTaxTracking)
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original SalesTaxTracking's complytIds not equal")));
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking SalesTaxTracking) {
+        return Mono.just(SalesTaxTracking).map(complytIdHandler::insertComplytIdToNew);
     }
 }

@@ -201,7 +201,7 @@ class CustomerControllerTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);
-        CustomerDto secondCustomerDto = customerDto.withId(id);
+        CustomerDto secondCustomerDto = customerDto;
 
         List<Customer> allCustomers = new ArrayList<>() {{
             add(customer);

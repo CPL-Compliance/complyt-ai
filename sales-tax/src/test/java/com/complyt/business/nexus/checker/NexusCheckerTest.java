@@ -3,6 +3,7 @@ package com.complyt.business.nexus.checker;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -44,10 +46,13 @@ public class NexusCheckerTest {
     SalesTaxTracking salesTaxTracking;
     NexusCalculationSummary nexusCalculationSummary;
     NexusStateRule nexusStateRule;
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
         nexusCalculationSummary = createNexusCalculationSummary();
         nexusStateRule = createNexusStateRule();
     }
@@ -61,14 +66,6 @@ public class NexusCheckerTest {
 
     private NexusCalculationSummary createNexusCalculationSummary() {
         return new NexusCalculationSummary(10, 10000);
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, (new ObjectId()).toString(),
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
     }
 
     @Test

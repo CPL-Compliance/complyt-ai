@@ -17,9 +17,10 @@ import java.util.UUID;
 @Builder
 @Document(collection = "exemption")
 public class Exemption {
+
+    private final UUID complytId;
     @Id
     private final String id;
-    private final UUID complytId;
     private final String tenantId;
     private final UUID customerId;
     private final State state;

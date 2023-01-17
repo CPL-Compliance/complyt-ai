@@ -78,7 +78,9 @@ public class CustomerFullyExemptionCheckTest {
     @Test
     void check_TransactionIsBeforeTimeFrame_ReturnsFalse() {
         // Given
-        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().plusYears(2), LocalDateTime.now().plusYears(3)));
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(
+                new ComplytTimestamp(LocalDateTime.now().plusYears(2)),
+                new ComplytTimestamp(LocalDateTime.now().plusYears(3))));
 
         // When
         boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
@@ -90,7 +92,9 @@ public class CustomerFullyExemptionCheckTest {
     @Test
     void check_TransactionIsAfterTimeFrame_ReturnsFalse() {
         // Given
-        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(LocalDateTime.now().minusYears(2), LocalDateTime.now().minusYears(3)));
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(
+                new ComplytTimestamp(LocalDateTime.now().minusYears(2)),
+                new ComplytTimestamp(LocalDateTime.now().minusYears(3))));
 
         // When
         boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);

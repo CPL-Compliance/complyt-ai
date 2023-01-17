@@ -72,7 +72,9 @@ class TransactionRepositoryTest {
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
-        when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findOne(Query.query(Criteria
+                .where("complytId").is(transaction.getCustomerId())
+                .and("tenantId").is(transaction.getTenantId())), Customer.class)).thenReturn(Mono.just(customer));
         Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
 
         // Then
@@ -105,7 +107,9 @@ class TransactionRepositoryTest {
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Transaction.class)).thenReturn(Mono.just(transaction));
-        when(reactiveMongoTemplate.findById(transaction.getCustomerId(), Customer.class)).thenReturn(Mono.just(customer));
+        when(reactiveMongoTemplate.findOne(Query.query(Criteria
+                .where("complytId").is(transaction.getCustomerId())
+                .and("tenantId").is(transaction.getTenantId())), Customer.class)).thenReturn(Mono.just(customer));
 
         Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
 
@@ -167,7 +171,7 @@ class TransactionRepositoryTest {
     void findAll_twoTransactionsMatch_returnsTwoTransactions() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
         List<Transaction> allTransactions = new ArrayList<>() {{
             add(transaction);
@@ -191,7 +195,7 @@ class TransactionRepositoryTest {
     void findAllByQuery_twoTransactionsMatch_returnsTwoTransactions() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId("5399aba6e4b0ae375bfdca89");
+        UUID customerId = UUID.randomUUID();
         Transaction secondTransaction = transaction.withExternalId(externalId).withCustomerId(customerId);
         List<Transaction> allTransactions = new ArrayList<>() {{
             add(transaction);

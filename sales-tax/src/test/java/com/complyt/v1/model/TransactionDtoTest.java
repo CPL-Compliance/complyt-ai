@@ -29,7 +29,6 @@ class TransactionDtoTest {
     void toString_ReturnString() {
         // Given
         String expectedString = "TransactionDto(complytId=" + transactionDto.getComplytId() +
-                ", id=" + transactionDto.getId() +
                 ", externalId=" + transactionDto.getExternalId() +
                 ", source=" + transactionDto.getSource() +
                 ", items=" + transactionDto.getItems() +
@@ -53,17 +52,17 @@ class TransactionDtoTest {
     }
 
     @Test
-    void withId_DifferentId_ReturnTransactionDto() {
+    void withConmplytId_DifferentId_ReturnTransactionDto() {
         // Given
-        String differentId = UUID.randomUUID().toString();
-        TransactionDto expectedTransactionDto = domainObjectStub.createTransactionDto(differentId)
-                .withComplytId(transactionDto.getComplytId())
+        UUID differentId = UUID.randomUUID();
+        TransactionDto expectedTransactionDto = domainObjectStub.createTransactionDto(transactionDto.getExternalId())
+                .withComplytId(differentId)
                 .withExternalId(transactionDto.getExternalId())
                 .withCustomerId(transactionDto.getCustomerId())
                 .withCustomer(transactionDto.getCustomer());
 
         // When
-        TransactionDto actualTransactionDto = transactionDto.withId(differentId);
+        TransactionDto actualTransactionDto = transactionDto.withComplytId(differentId);
 
         // Then
         assertEquals(expectedTransactionDto, actualTransactionDto);

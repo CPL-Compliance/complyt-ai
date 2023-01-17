@@ -1,5 +1,6 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
@@ -8,7 +9,9 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,19 +46,18 @@ public class SalesTaxTrackingServiceImplTest {
     @Mock
     ApplicationDateCreator applicationDateCreator;
 
+    @Mock
+    SalesTaxTrackingComplytIdHandler complytIdHandler;
+
     SalesTaxTracking salesTaxTracking;
 
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, UUID.randomUUID().toString(),
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
-    }
+    DomainObjectStub domainObjectStub;
 
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
+        domainObjectStub = new DomainObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
