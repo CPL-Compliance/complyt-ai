@@ -3,39 +3,43 @@ package com.complyt.domain;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
-import lombok.*;
-import org.bson.types.ObjectId;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@EqualsAndHashCode
-@AllArgsConstructor
-@ToString
+@Value
 @Builder
 @With
+@AllArgsConstructor
 @Document(collection = "transaction")
 public class Transaction {
 
-    private final UUID complytId;
+    UUID complytId;
     @Id
-    private final String id;
-    private final String externalId;
-    private final String source;
-    private final List<Item> items;
-    private final Address billingAddress;
-    private final Address shippingAddress;
-    private final UUID customerId;
-    private final Customer customer;
-    private final SalesTax salesTax;
-    private final TransactionStatus transactionStatus;
-    private final String tenantId;
-    private final Timestamps internalTimestamps;
-    private final Timestamps externalTimestamps;
-    private final TransactionType transactionType;
-    private final ShippingFee shippingFee;
-    private final String createdFrom;
+    String id;
+    String externalId;
+    String source;
+    List<Item> items;
+    Address billingAddress;
+    Address shippingAddress;
+    UUID customerId;
+    Customer customer;
+    SalesTax salesTax;
+    TransactionStatus transactionStatus;
+    String tenantId;
+    Timestamps internalTimestamps;
+    Timestamps externalTimestamps;
+    TransactionType transactionType;
+    ShippingFee shippingFee;
+    String createdFrom;
+    float taxableItemsAmount;
+    float tangibleItemsAmount;
+    float totalItemsAmount;
+
 }

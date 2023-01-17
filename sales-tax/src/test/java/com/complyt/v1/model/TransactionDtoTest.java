@@ -42,7 +42,10 @@ class TransactionDtoTest {
                 ", externalTimestamps=" + transactionDto.getExternalTimestamps() +
                 ", transactionType=" + transactionDto.getTransactionType() +
                 ", shippingFee=" + transactionDto.getShippingFee() +
-                ", createdFrom=" + transactionDto.getCreatedFrom() + ")";
+                ", createdFrom=" + transactionDto.getCreatedFrom() +
+                ", taxableItemsAmount=" + transactionDto.getTaxableItemsAmount() +
+                ", tangibleItemsAmount=" + transactionDto.getTangibleItemsAmount() +
+                ", totalItemsAmount=" + transactionDto.getTotalItemsAmount() + ")";
 
         // When
         String actualString = transactionDto.toString();

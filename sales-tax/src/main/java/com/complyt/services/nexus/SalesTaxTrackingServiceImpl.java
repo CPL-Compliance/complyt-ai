@@ -79,14 +79,14 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     private Function<SalesTaxTracking, SalesTaxTracking> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingInfo -> salesTaxTrackingInfo
-                .withAppliedDate(salesTaxTracking.getAppliedDate())
-                .withApprovalDate(salesTaxTracking.getApprovalDate())
-                .withEnforcesSalesTax(salesTaxTracking.isEnforcesSalesTax())
-                .withEconomicNexusTracker(salesTaxTracking.getEconomicNexusTracker())
-                .withPhysicalNexusTracker(salesTaxTracking.getPhysicalNexusTracker())
-                .withApproved(salesTaxTracking.isApproved())
-                .withState(salesTaxTracking.getState());
+        return salesTaxTrackingInfo ->
+                new SalesTaxTracking(
+                        salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTracking.getState(),
+                        salesTaxTrackingInfo.getTenantId(), salesTaxTracking.isEnforcesSalesTax(),
+                        salesTaxTracking.getPhysicalNexusTracker(), salesTaxTracking.getEconomicNexusTracker(),
+                        salesTaxTracking.getAppliedDate(), salesTaxTracking.isApproved(),
+                        salesTaxTracking.getApprovalDate()
+                );
     }
 
     @Override

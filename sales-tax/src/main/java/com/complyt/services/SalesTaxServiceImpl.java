@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.builder.TaxableCollectionBuilder;
+import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
@@ -44,7 +44,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @NonNull
-    private TaxableCollectionBuilder taxableCollectionBuilder;
+    private CollectionBuilder<Taxable> taxableCollectionBuilder;
 
     @Override
     public Mono<Transaction> handleSalesTaxCalculation(@NonNull Transaction transactionWithOutSalesTax, @NonNull SalesTaxTracking salesTaxTracking) {
