@@ -95,6 +95,38 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Customer> monoCustomer = customerRepository.findByComplytId(complytId);
+        StepVerifier.create(monoCustomer).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdExist_ReturnsCustomer() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer.withComplytId(complytId)));
+
+        // Then
+        Mono<Customer> monoCustomer = customerRepository.findByComplytId(complytId);
+        StepVerifier.create(monoCustomer).expectNext(customer.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
     void findByName_NameDoesntExist_ReturnsEmpty() {
         // Given
         String name = "Existing Customer";
@@ -177,6 +209,24 @@ class CustomerRepositoryTest {
 
         //Then
         Flux<Customer> customerFlux = customerRepository.findAll();
+        StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
+    }
+
+    @Test
+    void getAllCustomersBySource_RetrievingAllCustomersInSource_ExpectingTwoCustomers() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        Customer secondCustomer = customer.withId(id).withExternalId(externalId);
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId)
+                .and("source").is(source));
+
+        //When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
+
+        //Then
+        Flux<Customer> customerFlux = customerRepository.findAllBySource(source);
         StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
     }
 

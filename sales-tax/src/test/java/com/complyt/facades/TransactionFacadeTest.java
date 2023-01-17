@@ -440,4 +440,16 @@ public class TransactionFacadeTest {
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
+
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
 }

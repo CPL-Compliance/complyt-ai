@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;
@@ -174,6 +175,31 @@ public class SalesTaxTrackingFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+        String state = salesTaxTracking.getState().getName();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, nullSalesTaxTracking, state));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
     }
 
 }

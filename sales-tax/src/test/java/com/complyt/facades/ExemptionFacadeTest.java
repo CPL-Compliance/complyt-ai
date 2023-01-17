@@ -244,4 +244,16 @@ public class ExemptionFacadeTest {
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
 }

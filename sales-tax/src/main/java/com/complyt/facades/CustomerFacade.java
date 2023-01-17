@@ -38,7 +38,7 @@ public class CustomerFacade {
     public Mono<Customer> findByExternalId(String externalId, String source) {
         return customerService.findByExternalId(externalId, source);
     }
-    public Mono<Customer> findByComplytId(UUID complytId) {
+    public Mono<Customer> findByComplytId( @NonNull UUID complytId) {
         return customerService.findByComplytId(complytId);
     }
 

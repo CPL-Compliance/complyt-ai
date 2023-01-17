@@ -79,7 +79,7 @@ public class TransactionFacade {
         return transactionService.findByExternalId(externalId, source);
     }
 
-    public Mono<Transaction> findByComplytId(UUID complytId) {
+    public Mono<Transaction> findByComplytId( @NonNull UUID complytId) {
         return transactionService.findByComplytId(complytId);
     }
 

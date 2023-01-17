@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.*;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -242,6 +243,38 @@ public class ExemptionRepositoryTest {
         // Then
         Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
         StepVerifier.create(deleteResultMono).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(exemption.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(exemption.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Exemption> monoExemption = exemptionRepository.findByComplytId(complytId);
+        StepVerifier.create(monoExemption).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdExist_ReturnsExemption() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(exemption.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(exemption.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption.withComplytId(complytId)));
+
+        // Then
+        Mono<Exemption> monoExemption = exemptionRepository.findByComplytId(complytId);
+        StepVerifier.create(monoExemption).expectNext(exemption.withComplytId(complytId)).verifyComplete();
     }
 
     @SuppressWarnings("ConstantConditions")

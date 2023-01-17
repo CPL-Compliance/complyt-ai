@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
@@ -147,5 +148,37 @@ public class SalesTaxTrackingRepositoryTest {
         Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll();
 
         StepVerifier.create(salesTaxTrackingFlux).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(salesTaxTracking.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<SalesTaxTracking> monoSalesTaxTracking = salesTaxTrackingRepository.findByComplytId(complytId);
+        StepVerifier.create(monoSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdExist_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(salesTaxTracking.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking.withComplytId(complytId)));
+
+        // Then
+        Mono<SalesTaxTracking> monoSalesTaxTracking = salesTaxTrackingRepository.findByComplytId(complytId);
+        StepVerifier.create(monoSalesTaxTracking).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
     }
 }
