@@ -38,7 +38,7 @@ public class EurekaConfigTest {
     }
 
     @Test
-    void eurekaInstanceConfig() throws UnknownHostException {
+    void eurekaInstanceConfig_allDataProvidedAndValid_returnsEurekaInstanceConfigBean() throws UnknownHostException {
         // Given
         String expectedIp = "1.1.1.1";
         String expectedPort = "1234";

@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,8 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {FileRouter.class, FileHandler.class})
 @WebFluxTest
 public class FileRouterTest {
@@ -60,9 +59,8 @@ public class FileRouterTest {
     }
 
     @Test
-    @Disabled
-    @WithUserDetails
-    public void exemptionsRoute() {
+    @WithMockUser(authorities = "SCOPE_read:link")
+    public void linkRoute_getFile_fileReturned() {
         // Given
         File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
@@ -79,5 +77,23 @@ public class FileRouterTest {
                 .expectStatus().isOk()
                 .expectBody(FileDto.class)
                 .isEqualTo(fileDto);
+    }
+
+    @Test
+    public void linkRoute_getFile_unauthorized() {
+        // Given
+        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
+        FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
+
+        // When
+        when(fileService.find()).thenReturn(Mono.just(file));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 }
