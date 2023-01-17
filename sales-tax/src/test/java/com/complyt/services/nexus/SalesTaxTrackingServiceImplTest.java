@@ -4,6 +4,7 @@ import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
@@ -211,6 +212,81 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void checkSalesTaxTrackingNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(complytIdHandler.isNewDontHaveComplytId(salesTaxTracking)).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("cannot insert new salesTaxTracking with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
+
+        // When
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("modified and original salesTaxTracking's complytIds not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewSalesTaxTracking() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
+
+        // When
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewSalesTaxTracking() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
+
+        // When
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(salesTaxTrackingRepository.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking.withComplytId(complytId)));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void injectDataToNewSalesTaxTracking_notNullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(complytIdHandler.insertComplytIdToNew(salesTaxTracking)).thenReturn(salesTaxTracking.withComplytId(complytId));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectDataToNewSalesTaxTracking(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
     }
 
     @Test

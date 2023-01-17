@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -260,6 +261,91 @@ class CustomerServiceImplTest {
     }
 
     @Test
+    void findAllBySource_SourceExists_Returns2Customers() {
+        // Given
+        Customer secondsCustomer = domainObjectStub.createCustomer(new ObjectId().toString());
+
+        // When
+        when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer,secondsCustomer));
+        Flux<Customer> customerFlux = customerServiceImpl.findAllBySource(source);
+
+        // Then
+        StepVerifier.create(customerFlux).expectNext(customer, secondsCustomer).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsCustomer() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(customerRepository.findByComplytId(complytId)).thenReturn(Mono.just(customer.withComplytId(complytId)));
+        Mono<Customer> customerMono = customerServiceImpl.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customer.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void checkCustomerNotHavingComplytId_DoesntHaveComplytId_ReturnsCustomer() {
+        // Given When
+        when(customerComplytIdHandler.isNewDontHaveComplytId(customer)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerServiceImpl.checkCustomerNotHavingComplytId(customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
+    }
+
+    @Test
+    void checkCustomerNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(customerComplytIdHandler.isNewDontHaveComplytId(customer)).thenReturn(Mono.empty());
+        Mono<Customer> customerMono = customerServiceImpl.checkCustomerNotHavingComplytId(customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectErrorMessage("cannot insert new transaction with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        Customer newCustomer = customer.withComplytId(UUID.randomUUID());
+
+        // When
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.empty());
+        Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectErrorMessage("modified and original customer's complytIds not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewCustomer() {
+        // Given
+        Customer newCustomer = customer.withComplytId(null);
+
+        // When
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewCustomer() {
+        // Given
+        Customer newCustomer = customer.withComplytId(customer.getComplytId());
+
+        // When
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
+    }
+
+    @Test
     void save_NullGiven_ThrowsNullPointerException() {
         // Given
         Customer nullCustomer = null;
@@ -288,6 +374,8 @@ class CustomerServiceImplTest {
 
         assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
     }
+
+
 
     @Test
     void findOneByName_NullGiven_ThrowsNullPointerException() {

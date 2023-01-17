@@ -73,7 +73,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
         return salesTaxTrackingRepository.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No SalesTaxTracking with state " + state)))
+                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)))
                 .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(salesTaxTrackingRepository::save);
     }
@@ -92,13 +92,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking) {
         return complytIdHandler.isNewDontHaveComplytId(newSalesTaxTracking)
-                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new SalesTaxTracking with complyt id")));
+                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id")));
     }
 
     @Override
     public Mono<SalesTaxTracking> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final SalesTaxTracking modifiedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
         return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedSalesTaxTracking, originalSalesTaxTracking)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original SalesTaxTracking's complytIds not equal")));
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original salesTaxTracking's complytIds not equal")));
     }
 
     @Override

@@ -385,6 +385,90 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void findAllBySource_SourceExists_Returns2Transactions() {
+        // Given
+        Transaction secondsTransaction = domainObjectStub.createTransaction(new ObjectId().toString());
+
+        // Then
+        when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction,secondsTransaction));
+        Flux<Transaction> transactionFlux = transactionService.findAllBySource(source);
+
+        // When
+        StepVerifier.create(transactionFlux).expectNext(transaction, secondsTransaction).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsTransaction() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        // Then
+        when(transactionRepository.findByComplytId(complytId)).thenReturn(Mono.just(transaction.withComplytId(complytId)));
+        Mono<Transaction> transactionMono = transactionService.findByComplytId(complytId);
+
+        // When
+        StepVerifier.create(transactionMono).expectNext(transaction.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void checkTransactionNotHavingComplytId_DoesntHaveComplytId_ReturnsTransaction() {
+        // Given When
+        when(transactionComplytIdHandler.isNewDontHaveComplytId(transaction)).thenReturn(Mono.just(transaction));
+        Mono<Transaction> transactionMono = transactionService.checkTransactionNotHavingComplytId(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void checkTransactionNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(transactionComplytIdHandler.isNewDontHaveComplytId(transaction)).thenReturn(Mono.empty());
+        Mono<Transaction> transactionMono = transactionService.checkTransactionNotHavingComplytId(transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectErrorMessage("cannot insert new transaction with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        Transaction newTransaction = transaction.withComplytId(UUID.randomUUID());
+
+        // When
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.empty());
+        Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectErrorMessage("modified and original transaction's complytIds not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewTransaction() {
+        // Given
+        Transaction newTransaction = transaction.withComplytId(null);
+
+        // When
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewTransaction() {
+        // Given
+        Transaction newTransaction = transaction.withComplytId(transaction.getComplytId());
+
+        // When
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
+    }
+
+    @Test
     void injectDataToModifiedTransaction_NullNewTransactionPassed_ThrowsException() {
         // Given
         Transaction nullNewTransaction = null;

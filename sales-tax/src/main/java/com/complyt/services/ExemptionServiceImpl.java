@@ -82,13 +82,13 @@ public class ExemptionServiceImpl implements ExemptionService {
     @Override
     public Mono<Exemption> checkComplytIdOfModifiedEqualsToOriginal(@NonNull Exemption modifiedExemption, @NonNull Exemption originalExemption) {
         return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedExemption,originalExemption)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original transaction's complytIds not equal")));
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original exemption's complytIds not equal")));
     }
 
     @Override
     public Mono<Exemption> checkExemptionNotHavingComplytId(@NonNull Exemption newExemption) {
         return complytIdHandler.isNewDontHaveComplytId(newExemption)
-                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new transaction with complyt id")));
+                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new exemption with complyt id")));
     }
 
     private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {

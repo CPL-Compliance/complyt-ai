@@ -44,7 +44,7 @@ public class ExemptionServiceImplTest {
     ExemptionRepository exemptionRepository;
 
     @Mock
-    ExemptionComplytIdHandler complytIdHandler;
+    ExemptionComplytIdHandler exemptionComplytIdHandler;
 
     Transaction transaction;
     Exemption exemption;
@@ -232,6 +232,91 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
     }
 
+    @Test
+    void checkExemptionNotHavingComplytId_DoesntHaveComplytId_ReturnsExemption() {
+        // Given When
+        when(exemptionComplytIdHandler.isNewDontHaveComplytId(exemption)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void checkExemptionNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(exemptionComplytIdHandler.isNewDontHaveComplytId(exemption)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectErrorMessage("cannot insert new exemption with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
+
+        // When
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectErrorMessage("modified and original exemption's complytIds not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewExemption() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(null);
+
+        // When
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewExemption() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(exemption.getComplytId());
+
+        // When
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsExemption() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(exemptionRepository.findByComplytId(complytId)).thenReturn(Mono.just(exemption.withComplytId(complytId)));
+        Mono<Exemption> exemptionMono = exemptionService.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void injectDataToNewExemption_notNullExemption_ReturnsExemptionWithData() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemption.withComplytId(complytId));
+        Mono<Exemption> exemptionMono = exemptionService.injectDataToNewExemption(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
+    }
+
 
     @Test
     void delete_NullIdPassed_ThrowsException() {
@@ -304,6 +389,19 @@ public class ExemptionServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullOriginalExemptionPassed_ThrowsException() {
+        // Given
+        Exemption nullExemption = null;
+        UUID id = UUID.randomUUID();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullExemption, id));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalExemption is marked non-null but is null");
     }
 
     @Test
