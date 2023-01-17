@@ -100,6 +100,27 @@ class CustomerRouterTest {
     }
 
     @Test
+    void accessNonExistingPath_NotFound() {
+        // Given
+        String externalId = customerDto.getExternalId();
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        when(customerFacade.findByExternalId(externalId)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
+        when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/non-existing-path/error")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     void upsert_CustomerExists_UpdatesCustomer() {
         // Given
         String externalId = customer.getExternalId();
