@@ -1,4 +1,4 @@
-package io.complyt.files.v1.model;
+package io.complyt.files.v1.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;

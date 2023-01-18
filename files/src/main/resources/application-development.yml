@@ -1,0 +1,23 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${discovery-service-uri}
+    enabled: false
+  instance:
+    prefer-ip-address: true
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/alex
+
+logging:
+  level:
+    root: INFO
+    web: INFO
+    org:
+      springframework:
+        security: INFO
+    reactor:
+      netty:
+        http: INFO

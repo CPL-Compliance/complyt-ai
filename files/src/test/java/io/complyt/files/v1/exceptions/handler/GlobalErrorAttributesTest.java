@@ -1,5 +1,6 @@
-package io.complyt.files.v1.exception.handler;
+package io.complyt.files.v1.exceptions.handler;
 
+import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

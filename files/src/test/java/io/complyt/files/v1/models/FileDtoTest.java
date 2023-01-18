@@ -1,4 +1,4 @@
-package io.complyt.files.v1.model;
+package io.complyt.files.v1.models;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

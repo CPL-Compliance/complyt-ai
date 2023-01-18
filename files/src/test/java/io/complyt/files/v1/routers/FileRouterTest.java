@@ -1,25 +1,20 @@
-package io.complyt.files.v1.router;
+package io.complyt.files.v1.routers;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.services.FileService;
-import io.complyt.files.v1.handler.FileHandler;
+import io.complyt.files.v1.handlers.FileHandler;
 import io.complyt.files.v1.mappers.FileMapper;
-import io.complyt.files.v1.model.FileDto;
+import io.complyt.files.v1.models.FileDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -52,7 +47,7 @@ public class FileRouterTest {
         FileHandler nullFileHandler = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.fileRoute(nullFileHandler));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.getfileLinkRouterFunction(nullFileHandler));
 
         // Then
         assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
