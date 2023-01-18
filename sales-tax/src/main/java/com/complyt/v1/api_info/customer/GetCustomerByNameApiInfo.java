@@ -54,6 +54,14 @@ import java.lang.annotation.Target;
                                         description = "Something is wrong with your request"
                                 ),
                                 @ApiResponse(
+                                        responseCode = "401",
+                                        description = "Unauthorized"
+                                ),
+                                @ApiResponse(
+                                        responseCode = "403",
+                                        description = "Forbidden"
+                                ),
+                                @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
@@ -61,7 +69,7 @@ import java.lang.annotation.Target;
 })
 public @interface GetCustomerByNameApiInfo {
     String nameExample = "Complyt LTD.";
-    String customerExample = "{\n" +
+    String customerExample = "[{\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": \"999444\",\n" +
             "    \"name\": \"Complyt LTD.\",\n" +
@@ -90,5 +98,5 @@ public @interface GetCustomerByNameApiInfo {
             "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
             "        }\n" +
             "    }\n" +
-            "}";
+            "}]";
 }

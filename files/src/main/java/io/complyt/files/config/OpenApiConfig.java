@@ -1,4 +1,4 @@
-package com.complyt.config;
+package io.complyt.files.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -27,8 +27,8 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI openAPIConfiguration() {
         return new OpenAPI()
-                .info(new Info().title("Sales-Tax API")
-                        .description("Sales-Tax API")
+                .info(new Info().title("Files API")
+                        .description("Files API")
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")

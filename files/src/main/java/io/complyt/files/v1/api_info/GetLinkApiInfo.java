@@ -45,17 +45,25 @@ import java.lang.annotation.Target;
                                         description = "Something is wrong with your request"
                                 ),
                                 @ApiResponse(
-                                        responseCode = "500",
-                                        description = "Internal Error"
+                                        responseCode = "401",
+                                        description = "Unauthorized"
+                                ),
+                                @ApiResponse(
+                                        responseCode = "403",
+                                        description = "Forbidden"
                                 ),
                                 @ApiResponse(
                                         responseCode = "404",
                                         description = "File not found"
+                                ),
+                                @ApiResponse(
+                                        responseCode = "500",
+                                        description = "Internal Error"
                                 )
                         }))
 })
 public @interface GetLinkApiInfo {
     String fileExample = "{\n" +
-            "   \"link\": \"https://simplitax1.sharepoint.com/:f:/s/Complete/EsS5dCIRxJpHvnOOpqhrAW8B_eRWd4ltNNVLoXo7I3JOpA\"\n" +
+            "   \"link\": \"https://example.example.com/files/example.csv\"\n" +
             "}";
 }

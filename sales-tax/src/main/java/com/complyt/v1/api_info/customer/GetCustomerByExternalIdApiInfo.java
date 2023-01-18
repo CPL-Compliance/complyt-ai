@@ -54,6 +54,14 @@ import java.lang.annotation.Target;
                                         description = "Something is wrong with your request"
                                 ),
                                 @ApiResponse(
+                                        responseCode = "401",
+                                        description = "Unauthorized"
+                                ),
+                                @ApiResponse(
+                                        responseCode = "403",
+                                        description = "Forbidden"
+                                ),
+                                @ApiResponse(
                                         responseCode = "404",
                                         description = "Customer Not Found"),
                                 @ApiResponse(
