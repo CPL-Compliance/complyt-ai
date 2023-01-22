@@ -103,10 +103,6 @@ public class FileRouterTest {
     @Test
     @WithMockUser(authorities = "SCOPE_read:link")
     public void linkRoute_resourceDoesntExist_returnsNotFound404() {
-        // Given
-        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
-        FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
-
         // When
         when(fileService.find()).thenReturn(Mono.empty());
 
@@ -121,13 +117,6 @@ public class FileRouterTest {
 
     @Test
     public void linkRoute_getFile_unauthorized() {
-        // Given
-        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
-        FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
-
-        // When
-        when(fileService.find()).thenReturn(Mono.just(file));
-
         // Then
         webTestClient
                 .get()
@@ -140,10 +129,6 @@ public class FileRouterTest {
     @Test
     @WithMockUser(authorities = "SCOPE_read:link")
     public void linkRoute_getFile_internalError() {
-        // Given
-        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
-        FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
-
         // When
         when(fileService.find()).thenThrow(RuntimeException.class);
 
