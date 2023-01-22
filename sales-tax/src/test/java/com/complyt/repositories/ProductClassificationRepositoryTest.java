@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.timestamps.ComplytTimestamp;

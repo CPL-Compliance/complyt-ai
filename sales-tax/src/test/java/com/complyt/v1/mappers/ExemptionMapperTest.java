@@ -1,10 +1,8 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
-import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.customer.exemption.*;
+import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.DomainObjectStub;

@@ -342,7 +342,7 @@ public class TransactionFacadeTest {
                 .thenReturn(Mono.just(modifiedTransaction));
         when(nexusService.hasNexus(modifiedTransaction)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(newTransactionWithSalesTax));
-        when(transactionService.update(newTransactionWithSalesTax.getExternalId(), source,  newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
+        when(transactionService.update(newTransactionWithSalesTax.getExternalId(), source, newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
         // Then
@@ -407,8 +407,8 @@ public class TransactionFacadeTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
-        when(transactionService.markAsCancelled(externalId ,source)).thenReturn(Mono.just(cancelledTransaction));
-        Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId ,source);
+        when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
+        Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
 
         // Then
         StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction).verifyComplete();

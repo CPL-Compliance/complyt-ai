@@ -1,8 +1,7 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.timestamps.ComplytTimestamp;
@@ -13,7 +12,9 @@ import reactor.test.StepVerifier;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,15 +1,10 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -17,7 +12,9 @@ import reactor.test.StepVerifier;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,7 +62,7 @@ class TransactionItemsTangibleCategoryInjectorTest {
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withItems(domainObjectStub.createItems(false,true));
+        Transaction expectedTransaction = transaction.withItems(domainObjectStub.createItems(false, true));
 
         // When
         Mono<Transaction> transactionMono = transactionItemsTangibleCategoryInjector.inject(classifications);

@@ -1,12 +1,9 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.complyt_id.CustomerComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
-import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
@@ -20,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -198,8 +194,8 @@ class CustomerServiceImplTest {
         Customer customerToSearchFor = customer.withExternalId(id);
 
         // When
-        when(customerRepository.findByExternalId(id,source)).thenReturn(Mono.just(customerToSearchFor));
-        Mono<Customer> customerMono = customerServiceImpl.findByExternalId(id,source);
+        when(customerRepository.findByExternalId(id, source)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerServiceImpl.findByExternalId(id, source);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
@@ -266,7 +262,7 @@ class CustomerServiceImplTest {
         Customer secondsCustomer = domainObjectStub.createCustomer(new ObjectId().toString());
 
         // When
-        when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer,secondsCustomer));
+        when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer, secondsCustomer));
         Flux<Customer> customerFlux = customerServiceImpl.findAllBySource(source);
 
         // Then
@@ -312,7 +308,7 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(UUID.randomUUID());
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.empty());
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.empty());
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
@@ -325,7 +321,7 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(null);
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
@@ -338,7 +334,7 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(customer.getComplytId());
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
@@ -374,7 +370,6 @@ class CustomerServiceImplTest {
 
         assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
     }
-
 
 
     @Test

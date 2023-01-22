@@ -3,12 +3,9 @@ package com.complyt.business.transaction.items_amount;
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionItemsAmountsCollector;
-import com.complyt.domain.*;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.Taxable;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +47,7 @@ public class TransactionItemsAmountsCollectorTest {
     void setUp() {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction( new ObjectId().toString());
+        transaction = domainObjectStub.createTransaction(new ObjectId().toString());
         items = new ArrayList<>(transaction.getItems());
         transactionItemsAmountsCollector = new TransactionItemsAmountsCollector(
                 taxableItemsAmountCalculator,

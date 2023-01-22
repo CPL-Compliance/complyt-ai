@@ -1,15 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.ShippingFee;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,8 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,7 +68,7 @@ class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_ShippingFeeExist_ReturnsTransaction() {
         // Given
-        ShippingFee givenShippingFee = domainObjectStub.createShippingFee(false,false);
+        ShippingFee givenShippingFee = domainObjectStub.createShippingFee(false, false);
         Transaction expectedTransaction = transaction.withShippingFee(givenShippingFee);
 
         // When

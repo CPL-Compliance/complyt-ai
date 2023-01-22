@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;

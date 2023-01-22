@@ -1,6 +1,5 @@
 package com.complyt.domain.customer;
 
-import com.complyt.domain.Address;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ class CustomerTest {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
-        anotherCustomer = new Customer(customer.getComplytId(),  customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps());
+        anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps());
     }
 
     @Test

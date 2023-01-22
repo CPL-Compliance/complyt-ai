@@ -1,9 +1,7 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +28,7 @@ public class TransactionMapperTest {
         transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
         transactionDto = domainObjectStub.createTransactionDto(transaction.getId())
                 .withComplytId(transaction.getComplytId())
-                .withCustomer( CustomerMapper.INSTANCE.customerToCustomerDto(transaction.getCustomer()));
+                .withCustomer(CustomerMapper.INSTANCE.customerToCustomerDto(transaction.getCustomer()));
     }
 
     @Test

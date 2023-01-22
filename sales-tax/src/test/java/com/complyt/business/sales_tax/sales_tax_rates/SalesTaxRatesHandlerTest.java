@@ -68,7 +68,7 @@ public class SalesTaxRatesHandlerTest {
     @Test
     void setRates_SetsRatesToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(false,false);
+        ShippingFee shippingFee = domainObjectStub.createShippingFee(false, false);
         Transaction transaction = domainObjectStub.createTransaction(null).withShippingFee(shippingFee);
         SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);

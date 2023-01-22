@@ -1,7 +1,10 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.*;
+import com.complyt.domain.nexus.NexusCalculationSummary;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusThreshold;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;

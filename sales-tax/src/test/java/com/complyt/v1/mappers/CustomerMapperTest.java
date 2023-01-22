@@ -1,9 +1,7 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

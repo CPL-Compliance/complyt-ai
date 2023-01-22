@@ -258,7 +258,7 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.empty());
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.empty());
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then
@@ -271,7 +271,7 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(null);
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then
@@ -284,7 +284,7 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(exemption.getComplytId());
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then

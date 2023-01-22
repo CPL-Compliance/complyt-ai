@@ -1,6 +1,5 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.State;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;

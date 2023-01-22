@@ -43,7 +43,7 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRate = domainObjectStub.createSalesTaxRates();
-        shippingFee = domainObjectStub.createShippingFee(false,false);
+        shippingFee = domainObjectStub.createShippingFee(false, false);
     }
 
     @Test

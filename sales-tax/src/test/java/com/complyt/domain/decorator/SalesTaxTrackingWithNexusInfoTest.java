@@ -1,8 +1,5 @@
 package com.complyt.domain.decorator;
 
-import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;

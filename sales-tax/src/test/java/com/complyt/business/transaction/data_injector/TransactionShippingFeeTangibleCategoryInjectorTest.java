@@ -1,15 +1,11 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.*;
+import com.complyt.domain.ShippingFee;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -17,7 +13,9 @@ import reactor.test.StepVerifier;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,7 +56,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withShippingFee(domainObjectStub.createShippingFee(false,true));
+        Transaction expectedTransaction = transaction.withShippingFee(domainObjectStub.createShippingFee(false, true));
 
         // When
         Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);

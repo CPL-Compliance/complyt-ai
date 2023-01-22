@@ -1,14 +1,12 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.ObjectNotFoundException;
 import com.mongodb.client.result.DeleteResult;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

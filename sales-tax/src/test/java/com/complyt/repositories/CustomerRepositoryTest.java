@@ -1,8 +1,6 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
@@ -314,7 +312,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId(),source);
+        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId(), source);
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 

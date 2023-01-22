@@ -1,13 +1,8 @@
 package com.complyt.business.transaction;
 
 import com.complyt.business.transaction.data_fetcher.CountyFetcher;
-import com.complyt.domain.*;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,8 +16,6 @@ import reactor.test.StepVerifier;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -39,7 +32,8 @@ public class CountyProviderTest {
     CountyFetcher countyFetcher;
     DomainObjectStub domainObjectStub;
 
-    @BeforeEach void setup() {
+    @BeforeEach
+    void setup() {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
 

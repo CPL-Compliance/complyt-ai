@@ -1,6 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Item;
+import com.complyt.domain.ShippingFee;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
@@ -66,6 +68,7 @@ public class ProductClassificationServiceTest {
         return new ProductClassification("id", "C1S1", "description",
                 "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
+
     private ProductClassification createItemProductClassification1() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C3S1", "description",
@@ -94,7 +97,7 @@ public class ProductClassificationServiceTest {
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = domainObjectStub.createItems(true,true);
+        List<Item> modifiedItems = domainObjectStub.createItems(true, true);
         return transaction.withItems(modifiedItems);
     }
 
@@ -123,7 +126,7 @@ public class ProductClassificationServiceTest {
     void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
         // Given
         SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(true,true).withSalesTaxRate(salesTaxRate);
+        ShippingFee shippingFee = domainObjectStub.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
         Transaction givenTransaction = transaction.withShippingFee(shippingFee);
         String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
         String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();

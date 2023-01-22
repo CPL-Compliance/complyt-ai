@@ -1,8 +1,6 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;

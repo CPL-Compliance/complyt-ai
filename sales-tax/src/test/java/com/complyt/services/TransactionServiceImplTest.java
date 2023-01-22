@@ -5,13 +5,10 @@ import com.complyt.business.timestamps_injection.ExistingTransactionInternalTime
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
-import com.complyt.domain.*;
-import com.complyt.business.transaction.CountyProvider;
 import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -211,7 +208,7 @@ class TransactionServiceImplTest {
     @Test
     void update_NullSourceGiven_ThrowsException() {
         // Given
-        String nullSource= null;
+        String nullSource = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction));
@@ -226,10 +223,10 @@ class TransactionServiceImplTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
-        when(transactionRepository.findByExternalId(transaction.getExternalId(),source)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.findByExternalId(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
 
-        Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(),source);
+        Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(), source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(cancelledTransaction).verifyComplete();
@@ -242,7 +239,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
-                transactionService.markAsCancelled(nullExternalId,source));
+                transactionService.markAsCancelled(nullExternalId, source));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
@@ -255,7 +252,7 @@ class TransactionServiceImplTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
-                transactionService.markAsCancelled(UUID.randomUUID().toString(),nullSource));
+                transactionService.markAsCancelled(UUID.randomUUID().toString(), nullSource));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
@@ -417,7 +414,7 @@ class TransactionServiceImplTest {
         Transaction secondsTransaction = domainObjectStub.createTransaction(new ObjectId().toString());
 
         // Then
-        when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction,secondsTransaction));
+        when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction, secondsTransaction));
         Flux<Transaction> transactionFlux = transactionService.findAllBySource(source);
 
         // When
@@ -462,7 +459,7 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(UUID.randomUUID());
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.empty());
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.empty());
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then
@@ -475,7 +472,7 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(null);
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then
@@ -488,7 +485,7 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(transaction.getComplytId());
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld( newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then

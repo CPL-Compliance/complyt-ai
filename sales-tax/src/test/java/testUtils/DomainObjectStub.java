@@ -21,7 +21,6 @@ import com.complyt.v1.model.customer.CustomerTypeDto;
 import com.complyt.v1.model.customer.exemption.*;
 import com.complyt.v1.model.timestamps.ComplytTimestampDto;
 import com.complyt.v1.model.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +44,14 @@ public class DomainObjectStub {
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
-        source = String.valueOf(Math.round(Math.random()*10));
+        source = String.valueOf(Math.round(Math.random() * 10));
     }
 
     public String getUnifiedSource() {
         return source;
-    };
+    }
+
+    ;
 
     public Customer createCustomer(String id) {
         Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
@@ -92,7 +93,7 @@ public class DomainObjectStub {
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = createItems(false, false);
         Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee(false,false);
+        ShippingFee shippingFee = createShippingFee(false, false);
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
@@ -101,8 +102,8 @@ public class DomainObjectStub {
         AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(false, false);
         TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
-        ShippingFeeDto shippingFeeDto = createShippingFeeDto(false,false);
-        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0,0, 0);
+        ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
+        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -155,17 +156,17 @@ public class DomainObjectStub {
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules: null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules: null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, 0, 1000, withJurisdictionalRules ? rules: null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE: null);
+        return new ShippingFeeDto(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -176,12 +177,12 @@ public class DomainObjectStub {
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates( new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
+        ValidationDates validationDates = new ValidationDates(new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
         Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
-        return new Exemption( UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
+        return new Exemption(UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
                 state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
@@ -195,7 +196,7 @@ public class DomainObjectStub {
         StatusDto status = new StatusDto("code", "name");
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
-        return new ExemptionDto( UUID.randomUUID(), customerIdOtherDomains,
+        return new ExemptionDto(UUID.randomUUID(), customerIdOtherDomains,
                 state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY);
     }
 
@@ -227,7 +228,7 @@ public class DomainObjectStub {
 
     public SalesTaxTracking createSalesTaxTracking(String id) {
         State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID() , id, state,
+        return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
                 new PhysicalNexusTracker(false, null),
                 new EconomicNexusTracker(false, null), complytTimestamp.getTimestamp(),

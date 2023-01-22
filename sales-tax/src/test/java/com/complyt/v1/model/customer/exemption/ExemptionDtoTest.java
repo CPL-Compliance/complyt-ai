@@ -1,10 +1,6 @@
 package com.complyt.v1.model.customer.exemption;
 
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.timestamps.ComplytTimestampDto;
-import com.complyt.v1.model.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.DomainObjectStub;
@@ -27,7 +23,7 @@ class ExemptionDtoTest {
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        domainObjectStub = new DomainObjectStub( new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+        domainObjectStub = new DomainObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
         exemptionId = UUID.randomUUID().toString();
         exemptionDto = domainObjectStub.createExemptionDto(exemptionId);
     }

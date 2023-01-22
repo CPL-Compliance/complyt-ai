@@ -1,8 +1,6 @@
 package com.complyt.domain.customer.exemption;
 
-import com.complyt.domain.State;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +22,7 @@ class ExemptionTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         exemption = domainObjectStub.createExemption(new ObjectId().toString());
     }
+
     @Test
     void Equals_sameExemption_ReturnsTrue() {
         // Given

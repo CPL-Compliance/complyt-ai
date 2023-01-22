@@ -5,19 +5,15 @@ import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.Item;
+import com.complyt.domain.Taxable;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -183,7 +179,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxTracking tracking =  domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking tracking = domainObjectStub.createSalesTaxTracking(salesTaxTrackingId);
         Transaction nullTransaction = null;
 
         // When + Then

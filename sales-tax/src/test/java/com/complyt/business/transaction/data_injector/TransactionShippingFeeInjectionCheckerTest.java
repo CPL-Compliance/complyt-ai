@@ -38,7 +38,7 @@ class TransactionShippingFeeInjectionCheckerTest {
     void setup() {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(false,false).withTaxCode("C6S1");
+        ShippingFee shippingFee = domainObjectStub.createShippingFee(false, false).withTaxCode("C6S1");
         transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         ReflectionTestUtils.setField(injector, "transaction", transaction, Transaction.class);
     }

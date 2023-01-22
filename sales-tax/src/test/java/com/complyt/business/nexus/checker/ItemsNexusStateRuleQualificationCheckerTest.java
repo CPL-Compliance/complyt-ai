@@ -1,16 +1,14 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
-import com.complyt.domain.*;
+import com.complyt.domain.Item;
+import com.complyt.domain.ShippingFee;
+import com.complyt.domain.Taxable;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.DomainObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +48,7 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transaction = domainObjectStub.createTransaction(null);
         nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
-}
+    }
 
     @Test
     void check_NoItemsThatCountsRegardingToNexusRule_ReturnsFalse() {

@@ -33,7 +33,8 @@ public class SalesTaxDataToSalesTaxRateTest {
 
     DomainObjectStub domainObjectStub;
 
-    @BeforeEach void setup() {
+    @BeforeEach
+    void setup() {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }

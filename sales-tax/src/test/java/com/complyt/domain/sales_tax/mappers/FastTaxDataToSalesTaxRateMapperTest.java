@@ -64,7 +64,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_nullTaxInfoItem_ReturnNull() {
         // Given + When
-        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem)null);
+        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
 
         // Then
         assertNull(actualSalesTaxRate);

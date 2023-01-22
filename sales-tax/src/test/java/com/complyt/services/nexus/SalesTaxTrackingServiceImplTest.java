@@ -4,8 +4,10 @@ import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.nexus.*;
+import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusThreshold;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -19,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -230,7 +231,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.empty());
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.empty());
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then
@@ -243,7 +244,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then
@@ -256,7 +257,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld( newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then

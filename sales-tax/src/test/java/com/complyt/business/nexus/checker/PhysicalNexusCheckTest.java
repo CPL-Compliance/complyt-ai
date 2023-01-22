@@ -1,6 +1,5 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.State;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
@@ -37,7 +36,7 @@ public class PhysicalNexusCheckTest {
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
         SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString())
-                .withPhysicalNexusTracker(new PhysicalNexusTracker(true,LocalDateTime.now()));
+                .withPhysicalNexusTracker(new PhysicalNexusTracker(true, LocalDateTime.now()));
 
         // When + Then
         boolean hasPhysicalNexus = physicalNexusChecker.check(salesTaxTracking);

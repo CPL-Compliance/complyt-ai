@@ -3,8 +3,6 @@ package com.complyt.v1.controllers.router.handler;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.SalesTaxTrackingFacade;
@@ -59,7 +57,7 @@ public class SalesTaxTrackingHandlerTest {
     void setUp() {
         domainObjectStub = new DomainObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking( new ObjectId().toString());
+        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     @Test

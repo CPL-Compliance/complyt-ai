@@ -1,7 +1,6 @@
 package com.complyt.v1.model.customer;
 
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

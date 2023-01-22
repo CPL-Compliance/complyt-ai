@@ -1,18 +1,8 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapper;
-import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.EconomicNexusTrackerDto;
-import com.complyt.v1.model.PhysicalNexusTrackerDto;
 import com.complyt.v1.model.SalesTaxTrackingDto;
-import com.complyt.v1.model.StateDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.DomainObjectStub;

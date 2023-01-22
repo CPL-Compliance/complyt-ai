@@ -1,8 +1,7 @@
 package com.complyt.v1.controllers.router;
 
 import com.complyt.config.JacksonConfig;
-import com.complyt.domain.State;
-import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.controllers.router.handler.ExemptionHandler;

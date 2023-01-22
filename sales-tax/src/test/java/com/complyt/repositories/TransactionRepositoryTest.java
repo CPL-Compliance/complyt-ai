@@ -1,14 +1,9 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -240,7 +235,7 @@ class TransactionRepositoryTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         Transaction secondTransaction = transaction.withId(id).withExternalId(externalId);
-        Query query = Query.query(Criteria.where("tenantId").is( transaction.getTenantId())
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
                 .and("source").is(source));
 
         //When
