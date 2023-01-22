@@ -4,6 +4,10 @@ import com.complyt.domain.State;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.sales_tax.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.model.EconomicNexusTrackerDto;
 import com.complyt.v1.model.PhysicalNexusTrackerDto;
@@ -17,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SalesTaxTrackingMapperTest {
 
@@ -51,6 +56,17 @@ public class SalesTaxTrackingMapperTest {
 
         // Then
         assertEquals(salesTaxTrackingNoTenantNorId, salesTaxTrackingResult);
+    }
+
+    @Test
+    void mapping_nullSalesTaxTracking_ReturnNull() {
+        // Given + When
+        SalesTaxTracking givenSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(null);
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(null);
+
+        // Then
+        assertNull(givenSalesTaxTracking);
+        assertNull(givenSalesTaxTrackingDto);
     }
 
 }

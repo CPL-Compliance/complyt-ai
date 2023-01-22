@@ -262,7 +262,7 @@ public class ExemptionServiceImplTest {
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then
-        StepVerifier.create(exemptionMono).expectErrorMessage("modified and original exemption's complytIds not equal").verify();
+        StepVerifier.create(exemptionMono).expectErrorMessage("modified and original exemptions complytIds not equal").verify();
     }
 
     @Test

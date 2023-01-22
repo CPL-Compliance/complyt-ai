@@ -21,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import testUtils.ObjectStub;
 
 import java.util.UUID;
 
@@ -40,6 +41,8 @@ public class FileRouterTest {
     FileService fileService;
 
     private WebTestClient webTestClient;
+
+    private ObjectStub objectStub = new ObjectStub();
 
     @BeforeEach
     void setUp() {
@@ -64,7 +67,7 @@ public class FileRouterTest {
     @WithUserDetails
     public void exemptionsRoute() {
         // Given
-        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
+        File file = objectStub.createFile();
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
 
         // When

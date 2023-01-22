@@ -75,7 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
         return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedTransaction, originalTransaction)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original transaction's complytIds not equal")));
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original transactions complytIds not equal")));
     }
 
     @Override

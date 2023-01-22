@@ -316,7 +316,7 @@ class CustomerServiceImplTest {
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
-        StepVerifier.create(customerMono).expectErrorMessage("modified and original customer's complytIds not equal").verify();
+        StepVerifier.create(customerMono).expectErrorMessage("modified and original customers complytIds not equal").verify();
     }
 
     @Test

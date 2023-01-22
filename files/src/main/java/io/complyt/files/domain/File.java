@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 @Document(collection = "file")
 public class File {
 
+    @NonNull
+    UUID complytId;
     @Id
     @NonNull
     String id;

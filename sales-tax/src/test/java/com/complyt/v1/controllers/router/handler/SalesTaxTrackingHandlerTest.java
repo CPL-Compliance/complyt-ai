@@ -86,6 +86,28 @@ public class SalesTaxTrackingHandlerTest {
 
     @Test
     @WithUserDetails
+    void getByComplytId_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
+
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        UUID complytId = expectedSalesTaxTrackingDto.getComplytId();
+
+        when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .isEqualTo(expectedSalesTaxTrackingDto);
+
+    }
+
+    @Test
+    @WithUserDetails
     void getOne_SalesTaxTrackingDoesNotExist_Throws404NotFound() {
 
         String state = salesTaxTracking.getState().getName();
@@ -98,6 +120,26 @@ public class SalesTaxTrackingHandlerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    @WithUserDetails
+    void getByComplytId_SalesTaxTrackingDoesNotExist_Throws404NotFound() {
+
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
+        UUID complytId = expectedSalesTaxTrackingDto.getComplytId();
+
+        when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+
     }
 
     @Test

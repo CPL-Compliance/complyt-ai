@@ -439,7 +439,7 @@ class TransactionServiceImplTest {
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("modified and original transaction's complytIds not equal").verify();
+        StepVerifier.create(transactionMono).expectErrorMessage("modified and original transactions complytIds not equal").verify();
     }
 
     @Test

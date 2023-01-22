@@ -1,7 +1,9 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CustomerMapperTest {
 
@@ -53,6 +56,17 @@ public class CustomerMapperTest {
 
         // Then
         assertEquals(customerNoTenantNorId, actualCustomer);
+    }
+
+    @Test
+    void mapping_NullState_ReturnNull() {
+        // Given + When
+        Customer givenCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(null);
+        CustomerDto givenCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(null);
+
+        // Then
+        assertNull(givenCustomer);
+        assertNull(givenCustomerDto);
     }
 
 }

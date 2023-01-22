@@ -64,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Mono<Customer> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Customer modifiedCustomer, @NonNull final Customer originalCustomer) {
         return customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original customer's complytIds not equal")));
+                .switchIfEmpty(Mono.error(new NotFoundException("modified and original customers complytIds not equal")));
     }
 
     @Override

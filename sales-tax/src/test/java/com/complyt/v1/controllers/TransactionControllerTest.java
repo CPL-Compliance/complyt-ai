@@ -147,7 +147,7 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getOne_FindsTransaction_ReturnsTransaction() {
+    void getByExternalId_FindsTransaction_ReturnsTransaction() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(transactionFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(transactionWithId));
@@ -166,7 +166,43 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getOne_FacadeReturnsMonoEmpty_Returns4xxNotFound() {
+    void getByComplytId_FindsTransaction_ReturnsTransaction() {
+        // Given
+        UUID complytId = transactionWithId.getComplytId();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.just(transactionWithId));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionController.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionItem -> transactionItem, equalTo(transactionDto));
+    }
+
+    @Test
+    void getByComplytId_DoNotFindTransaction_Returns4xxNotFound() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionController.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void getByExternalId_FacadeReturnsMonoEmpty_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
         when(transactionFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
@@ -211,6 +247,36 @@ class TransactionControllerTest {
     }
 
     @Test
+    void getAllBySource_ExpectTwoTransactions_ReturnsTwoTransactions() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transactionWithId.withExternalId(firstId);
+        Transaction secondTransaction = transactionWithId.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionController.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
+
+    @Test
     void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
         // Given
         Transaction cancelledTransaction = transactionWithId.withTransactionStatus(TransactionStatus.CANCELLED);
@@ -229,7 +295,7 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getOne_NullExternalId_ThrowsNullPointerException() {
+    void getByExternalId_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
         TransactionController transactionController = new TransactionController(transactionFacade);

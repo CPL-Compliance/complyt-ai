@@ -1,6 +1,7 @@
 package com.complyt.domain.sales_tax.mappers;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -61,5 +63,14 @@ class ZipTaxDataToSalesTaxRateMapperTest {
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void map_nullResult_ReturnNull() {
+        // Given + When
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map((Result) null);
+
+        // Then
+        assertNull(actualSalesTaxRate);
     }
 }

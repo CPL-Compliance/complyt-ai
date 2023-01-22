@@ -1,7 +1,9 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.v1.model.StateDto;
 import com.complyt.v1.model.customer.exemption.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ExemptionMapperTest {
 
@@ -52,5 +55,14 @@ public class ExemptionMapperTest {
         assertEquals(exemptionNoTenantNorId, actualExemption);
     }
 
+    @Test
+    void mapping_NullState_ReturnNull() {
+        // Given + When
+        Exemption givenExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(null);
+        ExemptionDto givenExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(null);
 
+        // Then
+        assertNull(givenExemption);
+        assertNull(givenExemptionDto);
+    }
 }

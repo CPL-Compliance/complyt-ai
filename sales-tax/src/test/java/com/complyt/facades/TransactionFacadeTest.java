@@ -234,6 +234,17 @@ public class TransactionFacadeTest {
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
     }
 
+    @Test
+    void updateIfModified_NullSourcePassed_ThrowsException() {
+        // Given
+        String nullSource = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.updateIfModified(transaction.getExternalId(), nullSource, transaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
+    }
 
     @Test
     void updateIfModified_NullNewTransactionPassed_ThrowsException() {
@@ -271,6 +282,18 @@ public class TransactionFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullSourcePassed_ThrowsException() {
+        // Given
+        String nullSource = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionFacade.update(transaction.getExternalId(), nullSource, transaction, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
     }
 
     @Test

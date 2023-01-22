@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
+import java.util.UUID;
 
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -13,6 +15,10 @@ import javax.validation.constraints.Max;
 @With
 @Schema(name = "File")
 public class FileDto {
+
+    //@Pattern(regexp="^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
+    @NonNull
+    UUID complytId;
     @NonNull
     @Max(2048)
     String link;
