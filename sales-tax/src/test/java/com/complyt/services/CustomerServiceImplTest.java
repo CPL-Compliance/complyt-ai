@@ -434,4 +434,43 @@ class CustomerServiceImplTest {
 
         assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
     }
+
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.checkCustomerNotHavingComplytId(nullCustomer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newCustomer is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedCustomer_ThrowsNullPointerException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(nullCustomer, customer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedCustomer is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalCustomer_ThrowsNullPointerException() {
+        // Given
+        Customer nullCustomer = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(customer, nullCustomer);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalCustomer is marked non-null but is null");
+    }
 }

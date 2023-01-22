@@ -11,6 +11,7 @@ import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -208,6 +209,18 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void update_NullSourceGiven_ThrowsException() {
+        // Given
+        String nullSource= null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.update(transaction.getExternalId(), nullSource, transaction));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
+    }
+
+    @Test
     void markAsCancelled_ChangesTransactionsStatus_ReturnsUpdatedTransaction() throws InterruptedException {
         // Given
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
@@ -223,15 +236,29 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void markAsCancelled_NullExternalIdPassed_ThrowsException() throws InterruptedException {
+    void markAsCancelled_NullExternalIdPassed_ThrowsException() {
         // Given
         String nullExternalId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionService.markAsCancelled(nullExternalId,source));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionService.markAsCancelled(nullExternalId,source));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "externalId is marked non-null but is null");
+    }
+
+    @Test
+    void markAsCancelled_NullSourcePassed_ThrowsException() {
+        // Given
+        String nullSource = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->
+                transactionService.markAsCancelled(UUID.randomUUID().toString(),nullSource));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
     }
 
     @Test
@@ -510,4 +537,68 @@ class TransactionServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
 
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.checkTransactionNotHavingComplytId(nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.checkComplytIdOfModifiedEqualsToOriginal(nullTransaction, transaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalTransaction_ThrowsNullPointerException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.checkComplytIdOfModifiedEqualsToOriginal(transaction, nullTransaction);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalTransaction is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullTransaction_ThrowsNullPointerException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.findByComplytId(nullComplytId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void findAllBySource_NullSource_ThrowsNullPointerException() {
+        // Given
+        String source = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.findAllBySource(source);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
+    }
 }

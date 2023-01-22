@@ -1,7 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.State;
-import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
@@ -180,5 +178,17 @@ public class SalesTaxTrackingRepositoryTest {
         // Then
         Mono<SalesTaxTracking> monoSalesTaxTracking = salesTaxTrackingRepository.findByComplytId(complytId);
         StepVerifier.create(monoSalesTaxTracking).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_NullComplytIdPassed_ThrowsException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByComplytId(nullComplytId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 }

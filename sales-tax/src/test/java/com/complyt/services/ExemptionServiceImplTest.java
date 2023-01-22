@@ -428,4 +428,68 @@ public class ExemptionServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkExemptionNotHavingComplytId(nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newExemption is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(nullExemption, exemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedExemption is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption, nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalExemption is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewExemption_NullExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.injectDataToNewExemption(nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullExemption_ThrowsNullPointerException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.findByComplytId(nullComplytId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
 }

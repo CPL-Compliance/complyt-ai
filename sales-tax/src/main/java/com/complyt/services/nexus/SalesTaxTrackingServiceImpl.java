@@ -102,7 +102,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking SalesTaxTracking) {
-        return Mono.just(SalesTaxTracking).map(complytIdHandler::insertComplytIdToNew);
+    public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.just(salesTaxTracking).map(complytIdHandler::insertComplytIdToNew);
     }
 }

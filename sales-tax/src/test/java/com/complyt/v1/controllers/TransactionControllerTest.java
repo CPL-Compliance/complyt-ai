@@ -2,13 +2,8 @@ package com.complyt.v1.controllers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.timestamps.ComplytTimestamp;
@@ -16,7 +11,6 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.model.TransactionDto;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -310,6 +304,21 @@ class TransactionControllerTest {
     }
 
     @Test
+    void getByExternalId_NullSource_ThrowsNullPointerException() {
+        //Given
+        String nullSource = null;
+        TransactionController transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.getByExternalId(transactionDto.getExternalId(), nullSource);
+        });
+
+        // Then
+        assertEquals("source is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
     void upsert_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
@@ -322,6 +331,21 @@ class TransactionControllerTest {
 
         // Then
         assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsert_NullSource_ThrowsNullPointerException() {
+        //Given
+        String nullSource = null;
+        TransactionController transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.upsert(transactionDto.getExternalId(), nullSource, transactionDto);
+        });
+
+        // Then
+        assertEquals("source is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -339,7 +363,7 @@ class TransactionControllerTest {
     }
 
     @Test
-    void delete_NullExternalId_ThrowsNullPointerException() {
+    void delete_NullExternalIdPassed_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
         transactionController = new TransactionController(transactionFacade);
@@ -351,5 +375,50 @@ class TransactionControllerTest {
 
         // Then
         assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void delete_NullSourcePassed_ThrowsNullPointerException() {
+        //Given
+        String nullSource = null;
+        transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.delete(transactionDto.getExternalId(), nullSource);
+        });
+
+        // Then
+        assertEquals("source is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getAllBySource_NullSourcePassed_ThrowsNullPointerException() {
+        //Given
+        String nullSource = null;
+        transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.getAllBySource(nullSource);
+        });
+
+        // Then
+        assertEquals("source is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getByComplytId_NullComplytIdPassed_ThrowsNullPointerException() {
+        //Given
+        UUID complytId = null;
+        transactionController = new TransactionController(transactionFacade);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionController.getByComplytId(complytId);
+        });
+
+        // Then
+        assertEquals("complytId is marked non-null but is null", nullPointerException.getMessage());
     }
 }

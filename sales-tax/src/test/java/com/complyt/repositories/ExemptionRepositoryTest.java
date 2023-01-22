@@ -1,15 +1,11 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.exemption.*;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -298,6 +294,18 @@ public class ExemptionRepositoryTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.delete(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullComplytIdPassed_ThrowsException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByComplytId(nullComplytId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");

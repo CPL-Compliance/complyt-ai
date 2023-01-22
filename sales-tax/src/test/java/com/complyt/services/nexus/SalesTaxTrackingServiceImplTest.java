@@ -377,4 +377,69 @@ public class SalesTaxTrackingServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
     }
 
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(nullSalesTaxTracking, salesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewSalesTaxTracking_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.injectDataToNewSalesTaxTracking(nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.findByComplytId(nullComplytId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
 }
