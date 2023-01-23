@@ -1,11 +1,10 @@
 package io.complyt.files.v1.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.NonNull;
 import lombok.With;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @With
 @Schema(name = "File")

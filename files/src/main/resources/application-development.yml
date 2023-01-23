@@ -1,8 +1,8 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${discovery-service-uri}
-    enabled: false
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
   instance:
     prefer-ip-address: true
 

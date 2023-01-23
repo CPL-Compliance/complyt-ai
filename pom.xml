@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.6</version>
+        <version>3.0.0</version>
     </parent>
 
     <!-- Maven Coordinates -->
@@ -43,8 +43,8 @@
         <spring-security-test.version>5.6.3</spring-security-test.version>
         <mockito-junit-jupiter.version>4.6.1</mockito-junit-jupiter.version>
         <feign-reactor.version>3.2.0</feign-reactor.version>
-        <spring-cloud-starter-vault-config.version>3.1.1</spring-cloud-starter-vault-config.version>
-        <spring-cloud-vault-config-databases.version>3.1.1</spring-cloud-vault-config-databases.version>
+        <spring-cloud-starter-vault-config.version>4.0.0</spring-cloud-starter-vault-config.version>
+        <spring-cloud-vault-config-databases.version>4.0.0</spring-cloud-vault-config-databases.version>
         <spring-cloud.version>2021.0.5</spring-cloud.version>
         <feign-slf4j.version>11.2</feign-slf4j.version>
         <!-- Dependencies -->
@@ -69,23 +69,28 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
+                <version>2022.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-starter-gateway</artifactId>-->
+<!--                <version>4.0.0</version>-->
+<!--            </dependency>-->
             <!-- Spring Cloud Dependencies -->
 
             <!-- Spring Cloud Vault Dependencies -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-vault-config</artifactId>
-                <version>${spring-cloud-starter-vault-config.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-vault-config-databases</artifactId>
-                <version>${spring-cloud-vault-config-databases.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-starter-vault-config</artifactId>-->
+<!--                <version>${spring-cloud-starter-vault-config.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-vault-config-databases</artifactId>-->
+<!--                <version>${spring-cloud-vault-config-databases.version}</version>-->
+<!--            </dependency>-->
             <!-- Spring Cloud Vault Dependencies -->
 
             <!-- Spring Cloud Feign Dependencies -->
@@ -104,24 +109,24 @@
                 <artifactId>feign-reactor-spring-configuration</artifactId>
                 <version>${feign-reactor.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.github.openfeign</groupId>
-                <artifactId>feign-slf4j</artifactId>
-                <version>${feign-slf4j.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>io.github.openfeign</groupId>-->
+<!--                <artifactId>feign-slf4j</artifactId>-->
+<!--                <version>${feign-slf4j.version}</version>-->
+<!--            </dependency>-->
             <!-- Spring Cloud Feign Dependencies -->
 
             <!-- Spring Cloud Eureka Dependencies -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-                <version>${spring-cloud-starter-netflix-eureka-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-                <version>${spring-cloud-starter-netflix-eureka-server.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--                <version>4.0.0</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.cloud</groupId>-->
+<!--                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>-->
+<!--                <version>4.0.0</version>-->
+<!--            </dependency>-->
             <!-- Spring Cloud Eureka Dependencies -->
 
             <!-- Test Dependencies -->
@@ -176,8 +181,8 @@
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-webflux-ui</artifactId>
-                <version>${springdoc-openapi-webflux-ui.version}</version>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>

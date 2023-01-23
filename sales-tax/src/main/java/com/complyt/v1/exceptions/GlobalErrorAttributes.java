@@ -57,7 +57,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
         if (error instanceof ComplytApiException complytApiException) {
             return exceptionToStatusCode.getOrDefault(complytApiException.getClass(), defaultStatus);
         } else if (error instanceof ResponseStatusException responseStatusException) {
-            return HttpStatus.resolve(responseStatusException.getRawStatusCode());
+            return HttpStatus.resolve(responseStatusException.getStatusCode().value());
         } else {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
