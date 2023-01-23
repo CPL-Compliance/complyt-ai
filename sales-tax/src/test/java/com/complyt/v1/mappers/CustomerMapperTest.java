@@ -86,4 +86,28 @@ public class CustomerMapperTest {
         assertEquals(customerNoTenant, actualCustomer);
     }
 
+    @Test
+    void customerDtoToCustomer_CustomerDtoIsNull_returnNull() {
+
+        // Given
+        CustomerDto givenCustomerDto = null;
+
+        // When
+        Customer actualCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+
+        // Then
+        assertEquals(null, actualCustomer);
+    }
+
+    @Test
+    void customerToCustomerDto_customerIsNull_returnNull() {
+        // Given
+        Customer givenCustomer = null;
+
+        // When
+        CustomerDto actualCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(givenCustomer);
+
+        // Then
+        assertEquals(givenCustomer, actualCustomerDto);
+    }
 }

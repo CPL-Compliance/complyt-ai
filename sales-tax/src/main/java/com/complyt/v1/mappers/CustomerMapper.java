@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
+@Mapper(nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface CustomerMapper {
     CustomerMapper INSTANCE = Mappers.getMapper(CustomerMapper.class);
 
