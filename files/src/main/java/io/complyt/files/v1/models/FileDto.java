@@ -8,5 +8,5 @@ import lombok.With;
 
 @With
 @Schema(name = "File")
-public record FileDto(@NonNull @Size(max = 2048, message = "Link should be 2048 characters maximum") @NotBlank String link) {
+public record FileDto(@NonNull @Size(max = 2048, message = "Link should be 2048 characters maximum") @NotBlank(message = "Link shouldn't be blank") String link) {
 }
