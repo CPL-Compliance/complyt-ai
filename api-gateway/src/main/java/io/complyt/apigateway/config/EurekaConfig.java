@@ -18,7 +18,7 @@ public class EurekaConfig {
     @NonNull
     Environment environment;
 
-    @Profile({"production", "demo"})
+    @Profile({"production", "demo", "test"})
     @Bean
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
         EurekaInstanceConfigBean config = new EurekaInstanceConfigBean(inetUtils);
