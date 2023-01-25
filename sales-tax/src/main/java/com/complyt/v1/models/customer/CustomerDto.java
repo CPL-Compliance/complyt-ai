@@ -21,17 +21,17 @@ import lombok.experimental.FieldDefaults;
 @Schema(name = "Customer")
 public class CustomerDto {
 
-    @Size(max = 256, message = "ID may be 256 characters maximum")
+    @Size(min = 1, max = 256, message = "ID length should be 1-256 characters maximum")
     String id;
 
     @NonNull
     @NotBlank(message = "External ID may not be blank")
-    @Size(max = 256, message = "External ID may be 256 characters maximum")
+    @Size(min = 1, max = 256, message = "External ID length should be 1-256 characters maximum")
     String externalId;
 
     @NonNull
     @NotBlank(message = "Name may not be blank")
-    @Size(max = 256, message = "Name may be 256 characters maximum")
+    @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum")
     String name;
 
     @NonNull

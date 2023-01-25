@@ -38,7 +38,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
         errorMap.put("error", httpStatus.getReasonPhrase());
         errorMap.put("requestId", request.exchange().getRequest().getId());
         errorMap.put("message", message);
-        errorMap.put("endpoint url", request.path());
+        errorMap.put("url", request.path());
 
         return errorMap;
     }

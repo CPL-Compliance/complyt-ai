@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class ComplytTimestampDto {
 
     @NotBlank(message = "Timestamp may not be blank")
-    @Size(max = 256, message = "Timestamp may be 256 characters maximum")
+    @Size(min = 1, max = 256, message = "Timestamp should be 1-256 characters maximum")
     String timestamp;
 
     public ComplytTimestampDto(String timestamp) {
