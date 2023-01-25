@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,13 +53,13 @@ public class NexusTransactionCountCalculatorTest {
     Customer customer;
     ObjectId customerId;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactions();
         nexusStateRule = createNexusStateRule();
     }
@@ -86,7 +86,7 @@ public class NexusTransactionCountCalculatorTest {
 
     private List<Transaction> createTransactions() {
 
-        Transaction transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         return new ArrayList<>() {{
             add(transaction);
         }};

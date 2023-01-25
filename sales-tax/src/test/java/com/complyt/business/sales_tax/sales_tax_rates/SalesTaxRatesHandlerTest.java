@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,19 +38,19 @@ public class SalesTaxRatesHandlerTest {
     @Mock
     private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
     @Test
     void setRates_SetsRatesToTransactionWithNoShippingFee_ReturnsModifiedTransaction() {
         // Given
-        Transaction transaction = domainObjectStub.createTransaction(null).withShippingFee(null);
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
+        Transaction transaction = objectStub.createTransaction(null).withShippingFee(null);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -68,9 +68,9 @@ public class SalesTaxRatesHandlerTest {
     @Test
     void setRates_SetsRatesToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(false, false);
-        Transaction transaction = domainObjectStub.createTransaction(null).withShippingFee(shippingFee);
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
+        ShippingFee shippingFee = objectStub.createShippingFee(false, false);
+        Transaction transaction = objectStub.createTransaction(null).withShippingFee(shippingFee);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -90,7 +90,7 @@ public class SalesTaxRatesHandlerTest {
     @Test
     void setRates_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Transaction nullTransaction = null;
 
         // When
@@ -104,7 +104,7 @@ public class SalesTaxRatesHandlerTest {
     void setRates_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
         SalesTaxRate nullSalesTaxRate = null;
-        Transaction transaction = domainObjectStub.createTransaction(null);
+        Transaction transaction = objectStub.createTransaction(null);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));

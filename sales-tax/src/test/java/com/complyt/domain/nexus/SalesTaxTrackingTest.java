@@ -4,7 +4,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,16 +19,16 @@ class SalesTaxTrackingTest {
     private ObjectId tenantId;
     private LocalDateTime localDateTime;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         id = UUID.randomUUID().toString();
         tenantId = new ObjectId();
         localDateTime = LocalDateTime.now();
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     @Test
@@ -55,7 +55,7 @@ class SalesTaxTrackingTest {
     @Test
     void Equals_SameSalesTaxTracking_ReturnsTrue() {
         // Given
-        SalesTaxTracking givenSalesTaxTracking = domainObjectStub.createSalesTaxTracking(salesTaxTracking.getId())
+        SalesTaxTracking givenSalesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTracking.getId())
                 .withComplytId(salesTaxTracking.getComplytId());
 
         // When

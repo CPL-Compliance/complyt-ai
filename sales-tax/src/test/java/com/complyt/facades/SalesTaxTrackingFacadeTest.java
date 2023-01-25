@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,13 +35,13 @@ public class SalesTaxTrackingFacadeTest {
 
     private SalesTaxTracking salesTaxTracking;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test

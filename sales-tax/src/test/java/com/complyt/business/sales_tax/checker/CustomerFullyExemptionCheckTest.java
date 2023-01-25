@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,15 +26,15 @@ public class CustomerFullyExemptionCheckTest {
 
     Exemption exemption;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
-        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString());
+        exemption = objectStub.createExemption(UUID.randomUUID().toString());
     }
 
 

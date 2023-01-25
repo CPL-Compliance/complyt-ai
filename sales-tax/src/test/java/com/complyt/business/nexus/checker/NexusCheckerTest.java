@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -49,13 +49,13 @@ public class NexusCheckerTest {
     SalesTaxTracking salesTaxTracking;
     NexusCalculationSummary nexusCalculationSummary;
     NexusStateRule nexusStateRule;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
         nexusCalculationSummary = createNexusCalculationSummary();
         nexusStateRule = createNexusStateRule();
     }

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,20 +34,20 @@ public class TransactionsFilterByNexusRulesTest {
     Transaction invoiceTransaction;
     Transaction salesOrderTransaction;
     Customer customer;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionsFilterByNexusRules = new TransactionsFilterByNexusRules();
-        customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactionList();
-        nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
+        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     private List<Transaction> createTransactionList() {
-        invoiceTransaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        invoiceTransaction = objectStub.createTransaction(UUID.randomUUID().toString());
         salesOrderTransaction = invoiceTransaction
                 .withId(UUID.randomUUID().toString())
                 .withExternalId(UUID.randomUUID().toString())

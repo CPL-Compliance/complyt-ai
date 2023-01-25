@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,13 +22,13 @@ class SalesTaxTrackingComplytIdHandlerTest {
     @InjectMocks
     SalesTaxTrackingComplytIdHandler complytIdHandler;
     SalesTaxTracking salesTaxTracking;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     @Test
@@ -37,7 +37,7 @@ class SalesTaxTrackingComplytIdHandlerTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
 
         // When
-        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
@@ -49,7 +49,7 @@ class SalesTaxTrackingComplytIdHandlerTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
 
         // When
-        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
@@ -61,10 +61,10 @@ class SalesTaxTrackingComplytIdHandlerTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("complyt ids of modified and original salesTaxTrackings are not equal").verify();
     }
 
     @Test
@@ -73,7 +73,7 @@ class SalesTaxTrackingComplytIdHandlerTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
 
         // When
-        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.isNewDontHaveComplytId(newSalesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
@@ -85,10 +85,10 @@ class SalesTaxTrackingComplytIdHandlerTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.isNewDontHaveComplytId(newSalesTaxTracking);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("cannot insert new salesTaxTracking with complyt id").verify();
     }
 
     @Test

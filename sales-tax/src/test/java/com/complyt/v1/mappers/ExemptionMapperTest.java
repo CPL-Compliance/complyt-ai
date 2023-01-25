@@ -5,7 +5,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.model.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,17 +20,17 @@ public class ExemptionMapperTest {
     private ExemptionDto exemptionDto;
     private String tenantId;
 
-    private DomainObjectStub domainObjectStub;
+    private ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         tenantId = UUID.randomUUID().toString();
 
-        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
-        exemptionDto = domainObjectStub.createExemptionDto(exemption.getId()).withComplytId(exemption.getComplytId());
-        exemptionNoTenantNorId = domainObjectStub.createExemption(null).withTenantId(null).withComplytId(exemption.getComplytId());
+        exemption = objectStub.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
+        exemptionDto = objectStub.createExemptionDto(exemption.getId()).withComplytId(exemption.getComplytId());
+        exemptionNoTenantNorId = objectStub.createExemption(null).withTenantId(null).withComplytId(exemption.getComplytId());
     }
 
     @Test

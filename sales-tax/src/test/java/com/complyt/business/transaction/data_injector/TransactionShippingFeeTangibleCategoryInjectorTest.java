@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,18 +23,18 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
 
     TransactionShippingFeeTangibleCategoryInjector transactionShippingFeeTangibleCategoryInjector;
     Transaction transaction;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> itemJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -56,7 +56,7 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void inject_ClassificationsMapDoesNotContainShippingFeeTaxCode_TransactionNotModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withShippingFee(domainObjectStub.createShippingFee(false, true));
+        Transaction expectedTransaction = transaction.withShippingFee(objectStub.createShippingFee(false, true));
 
         // When
         Mono<Transaction> transactionMono = transactionShippingFeeTangibleCategoryInjector.inject(classifications);

@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,24 +59,24 @@ public class TransactionFacadeTest {
     Transaction transaction;
     Customer customer;
     Transaction transactionNoId;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     String source;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
 
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(UUID.randomUUID().toString());
-        transactionNoId = domainObjectStub.createTransaction(null).withComplytId(null).withExternalId(transaction.getExternalId());
-        source = domainObjectStub.getUnifiedSource();
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        transactionNoId = objectStub.createTransaction(null).withComplytId(null).withExternalId(transaction.getExternalId());
+        source = objectStub.getUnifiedSource();
     }
 
     private Transaction createTransactionWithProductClassificationAndComplytId() {
-        JurisdictionalSalesTaxRules rules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0)
                 .withTaxableCategory(TaxableCategory.TAXABLE)
@@ -93,7 +93,7 @@ public class TransactionFacadeTest {
     private SalesTaxTracking createSalesTaxTrackingWithoutNexusEstablished(String id) {
         PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
         EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-        return domainObjectStub.createSalesTaxTracking(id)
+        return objectStub.createSalesTaxTracking(id)
                 .withEconomicNexusTracker(economicNexusTracker)
                 .withPhysicalNexusTracker(physicalNexusTracker);
     }
@@ -106,7 +106,7 @@ public class TransactionFacadeTest {
     }
 
     private SalesTax createSalesTax() {
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         return new SalesTax(1000, salesTaxRate);
     }
 
@@ -187,8 +187,8 @@ public class TransactionFacadeTest {
         Transaction transactionToSearchFor = transaction.withExternalId(externalId);
 
         // When
-        when(transactionService.findByExternalId(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionFacade.findByExternalId(externalId, source);
+        when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();

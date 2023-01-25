@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DomainObjectStub {
+public class ObjectStub {
 
     ComplytTimestamp complytTimestamp;
     ComplytTimestampDto complytTimestampDto;
@@ -38,7 +38,7 @@ public class DomainObjectStub {
 
     String source;
 
-    public DomainObjectStub(ComplytTimestamp complytTimestamp, String tenantId) {
+    public ObjectStub(ComplytTimestamp complytTimestamp, String tenantId) {
         this.complytTimestamp = complytTimestamp;
         this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
         this.tenantId = tenantId;

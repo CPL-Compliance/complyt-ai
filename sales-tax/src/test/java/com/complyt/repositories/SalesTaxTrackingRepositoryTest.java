@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,14 +43,14 @@ public class SalesTaxTrackingRepositoryTest {
 
     SalesTaxTracking salesTaxTracking;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test

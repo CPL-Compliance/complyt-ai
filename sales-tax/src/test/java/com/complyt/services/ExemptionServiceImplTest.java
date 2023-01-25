@@ -19,10 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,15 +51,15 @@ public class ExemptionServiceImplTest {
     Exemption exemption;
     Customer customer;
     ObjectId customerId = new ObjectId();
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(customerId.toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
-        exemption = domainObjectStub.createExemption(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(customerId.toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        exemption = objectStub.createExemption(UUID.randomUUID().toString());
     }
 
     @Test
@@ -235,7 +236,7 @@ public class ExemptionServiceImplTest {
     @Test
     void checkExemptionNotHavingComplytId_DoesntHaveComplytId_ReturnsExemption() {
         // Given When
-        when(exemptionComplytIdHandler.isNewDontHaveComplytId(exemption)).thenReturn(Mono.just(exemption));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemption)).thenReturn(Mono.just(exemption));
         Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
 
         // Then
@@ -245,7 +246,7 @@ public class ExemptionServiceImplTest {
     @Test
     void checkExemptionNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
         // Given When
-        when(exemptionComplytIdHandler.isNewDontHaveComplytId(exemption)).thenReturn(Mono.empty());
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemption)).thenReturn(Mono.error(new NotFoundException("cannot insert new exemption with complyt id")));
         Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
 
         // Then
@@ -258,11 +259,11 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.empty());
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original exemptions are not equal")));
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then
-        StepVerifier.create(exemptionMono).expectErrorMessage("modified and original exemptions complytIds not equal").verify();
+        StepVerifier.create(exemptionMono).expectErrorMessage("complyt ids of modified and original exemptions are not equal").verify();
     }
 
     @Test
@@ -271,7 +272,7 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(null);
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then
@@ -284,7 +285,7 @@ public class ExemptionServiceImplTest {
         Exemption newExemption = exemption.withComplytId(exemption.getComplytId());
 
         // When
-        when(exemptionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
 
         // Then

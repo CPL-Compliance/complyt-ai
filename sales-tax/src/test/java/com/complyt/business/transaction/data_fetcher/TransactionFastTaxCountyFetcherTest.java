@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,13 +36,13 @@ class TransactionFastTaxCountyFetcherTest {
     private TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher;
     private Transaction transaction;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
     }
 
     private TaxInfoItem createTaxInfoItem() {

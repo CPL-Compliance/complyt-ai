@@ -26,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,13 +52,13 @@ public class ExemptionHandlerTest {
     @MockBean
     private ExemptionFacade exemptionFacade;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     public void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        exemption = domainObjectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
+        exemption = objectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
     }
 
     @Test

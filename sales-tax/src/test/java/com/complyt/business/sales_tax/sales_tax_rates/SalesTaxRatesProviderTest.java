@@ -7,7 +7,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,14 +23,14 @@ class SalesTaxRatesProviderTest {
 
     private SalesTaxRate salesTaxRate;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
-        salesTaxRate = domainObjectStub.createSalesTaxRates();
+        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        salesTaxRate = objectStub.createSalesTaxRates();
         salesTaxRatesProvider = new SalesTaxRatesProvider();
     }
 

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,18 +23,18 @@ class TransactionItemsTangibleCategoryInjectorTest {
 
     TransactionItemsTangibleCategoryInjector transactionItemsTangibleCategoryInjector;
     Transaction transaction;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         transactionItemsTangibleCategoryInjector = new TransactionItemsTangibleCategoryInjector(transaction);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -62,7 +62,7 @@ class TransactionItemsTangibleCategoryInjectorTest {
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withItems(domainObjectStub.createItems(false, true));
+        Transaction expectedTransaction = transaction.withItems(objectStub.createItems(false, true));
 
         // When
         Mono<Transaction> transactionMono = transactionItemsTangibleCategoryInjector.inject(classifications);

@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,13 +23,13 @@ class CustomerComplytIdHandlerTest {
     @InjectMocks
     CustomerComplytIdHandler complytIdHandler;
     Customer customer;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(new ObjectId().toString());
+        customer = objectStub.createCustomer(new ObjectId().toString());
     }
 
     @Test
@@ -38,7 +38,7 @@ class CustomerComplytIdHandlerTest {
         Customer newCustomer = customer.withComplytId(null);
 
         // When
-        Mono<Customer> customerMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
+        Mono<Customer> customerMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
@@ -50,7 +50,7 @@ class CustomerComplytIdHandlerTest {
         Customer newCustomer = customer.withComplytId(customer.getComplytId());
 
         // When
-        Mono<Customer> customerMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
+        Mono<Customer> customerMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
@@ -62,10 +62,10 @@ class CustomerComplytIdHandlerTest {
         Customer newCustomer = customer.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Customer> customerMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
+        Mono<Customer> customerMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
 
         // Then
-        StepVerifier.create(customerMono).verifyComplete();
+        StepVerifier.create(customerMono).expectErrorMessage("complyt ids of modified and original customers are not equal").verify();
     }
 
     @Test
@@ -74,7 +74,7 @@ class CustomerComplytIdHandlerTest {
         Customer newCustomer = customer.withComplytId(null);
 
         // When
-        Mono<Customer> customerMono = complytIdHandler.isNewDontHaveComplytId(newCustomer);
+        Mono<Customer> customerMono = complytIdHandler.checkNewDontHaveComplytId(newCustomer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(newCustomer).verifyComplete();
@@ -86,10 +86,10 @@ class CustomerComplytIdHandlerTest {
         Customer newCustomer = customer.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Customer> customerMono = complytIdHandler.isNewDontHaveComplytId(newCustomer);
+        Mono<Customer> customerMono = complytIdHandler.checkNewDontHaveComplytId(newCustomer);
 
         // Then
-        StepVerifier.create(customerMono).verifyComplete();
+        StepVerifier.create(customerMono).expectErrorMessage("cannot insert new customer with complyt id").verify();
     }
 
     @Test

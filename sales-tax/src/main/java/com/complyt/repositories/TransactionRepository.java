@@ -63,7 +63,7 @@ public class TransactionRepository {
                 });
     }
 
-    public Mono<Transaction> findByExternalId(String externalId, String source) {
+    public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("externalId").is(externalId)

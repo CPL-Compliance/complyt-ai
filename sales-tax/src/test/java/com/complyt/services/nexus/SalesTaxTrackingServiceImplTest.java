@@ -21,10 +21,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,13 +54,13 @@ public class SalesTaxTrackingServiceImplTest {
 
     SalesTaxTracking salesTaxTracking;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
@@ -218,7 +219,7 @@ public class SalesTaxTrackingServiceImplTest {
     @Test
     void checkSalesTaxTrackingNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
         // Given When
-        when(complytIdHandler.isNewDontHaveComplytId(salesTaxTracking)).thenReturn(Mono.empty());
+        when(complytIdHandler.checkNewDontHaveComplytId(salesTaxTracking)).thenReturn(Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id")));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking);
 
         // Then
@@ -231,11 +232,11 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.empty());
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original salesTaxTrackings are not equal")));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("modified and original salesTaxTracking's complytIds not equal").verify();
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("complyt ids of modified and original salesTaxTrackings are not equal").verify();
     }
 
     @Test
@@ -244,7 +245,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then
@@ -257,7 +258,7 @@ public class SalesTaxTrackingServiceImplTest {
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
 
         // When
-        when(complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
 
         // Then

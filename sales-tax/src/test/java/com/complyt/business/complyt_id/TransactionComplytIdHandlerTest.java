@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,13 +23,13 @@ class TransactionComplytIdHandlerTest {
     @InjectMocks
     TransactionComplytIdHandler complytIdHandler;
     Transaction transaction;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(new ObjectId().toString());
+        transaction = objectStub.createTransaction(new ObjectId().toString());
     }
 
     @Test
@@ -38,7 +38,7 @@ class TransactionComplytIdHandlerTest {
         Transaction newTransaction = transaction.withComplytId(null);
 
         // When
-        Mono<Transaction> transactionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
+        Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
@@ -50,7 +50,7 @@ class TransactionComplytIdHandlerTest {
         Transaction newTransaction = transaction.withComplytId(transaction.getComplytId());
 
         // When
-        Mono<Transaction> transactionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
+        Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
@@ -62,10 +62,10 @@ class TransactionComplytIdHandlerTest {
         Transaction newTransaction = transaction.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Transaction> transactionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
+        Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
 
         // Then
-        StepVerifier.create(transactionMono).verifyComplete();
+        StepVerifier.create(transactionMono).expectErrorMessage("complyt ids of modified and original transactions are not equal").verify();
     }
 
     @Test
@@ -74,7 +74,7 @@ class TransactionComplytIdHandlerTest {
         Transaction newTransaction = transaction.withComplytId(null);
 
         // When
-        Mono<Transaction> transactionMono = complytIdHandler.isNewDontHaveComplytId(newTransaction);
+        Mono<Transaction> transactionMono = complytIdHandler.checkNewDontHaveComplytId(newTransaction);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(newTransaction).verifyComplete();
@@ -86,10 +86,10 @@ class TransactionComplytIdHandlerTest {
         Transaction newTransaction = transaction.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Transaction> transactionMono = complytIdHandler.isNewDontHaveComplytId(newTransaction);
+        Mono<Transaction> transactionMono = complytIdHandler.checkNewDontHaveComplytId(newTransaction);
 
         // Then
-        StepVerifier.create(transactionMono).verifyComplete();
+        StepVerifier.create(transactionMono).expectErrorMessage("cannot insert new transaction with complyt id").verify();
     }
 
     @Test

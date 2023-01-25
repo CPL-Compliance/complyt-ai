@@ -3,7 +3,7 @@ package com.complyt.v1.model;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,14 +15,14 @@ class TransactionDtoTest {
     private TransactionDto transactionDto;
     private String transactionId;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
-        transactionDto = domainObjectStub.createTransactionDto(transactionId);
+        transactionDto = objectStub.createTransactionDto(transactionId);
     }
 
     @Test
@@ -58,7 +58,7 @@ class TransactionDtoTest {
     void withConmplytId_DifferentId_ReturnTransactionDto() {
         // Given
         UUID differentId = UUID.randomUUID();
-        TransactionDto expectedTransactionDto = domainObjectStub.createTransactionDto(transactionDto.getExternalId())
+        TransactionDto expectedTransactionDto = objectStub.createTransactionDto(transactionDto.getExternalId())
                 .withComplytId(differentId)
                 .withExternalId(transactionDto.getExternalId())
                 .withCustomerId(transactionDto.getCustomerId())

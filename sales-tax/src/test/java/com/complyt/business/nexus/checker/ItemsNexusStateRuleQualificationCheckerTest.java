@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,14 +40,14 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     Transaction transaction;
     private NexusStateRule nexusStateRule;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(null);
-        nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(null);
+        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     @Test

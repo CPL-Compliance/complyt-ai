@@ -4,7 +4,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,19 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExemptionTest {
     private Exemption exemption;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        exemption = domainObjectStub.createExemption(new ObjectId().toString());
+        exemption = objectStub.createExemption(new ObjectId().toString());
     }
 
     @Test
     void Equals_sameExemption_ReturnsTrue() {
         // Given
-        Exemption givenExemption = domainObjectStub.createExemption(exemption.getId()).withComplytId(exemption.getComplytId());
+        Exemption givenExemption = objectStub.createExemption(exemption.getId()).withComplytId(exemption.getComplytId());
 
         // When
         boolean isEquals = exemption.equals(givenExemption);

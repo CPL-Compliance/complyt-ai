@@ -3,7 +3,7 @@ package com.complyt.v1.model.customer.exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,20 +18,20 @@ class ExemptionDtoTest {
 
     private String exemptionId;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        domainObjectStub = new DomainObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+        objectStub = new ObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
         exemptionId = UUID.randomUUID().toString();
-        exemptionDto = domainObjectStub.createExemptionDto(exemptionId);
+        exemptionDto = objectStub.createExemptionDto(exemptionId);
     }
 
     @Test
     void Equals_sameExemptionDto_ReturnsTrue() {
         // Given
-        ExemptionDto givenExemptionDto = domainObjectStub.createExemptionDto(exemptionId).withComplytId(exemptionDto.getComplytId());
+        ExemptionDto givenExemptionDto = objectStub.createExemptionDto(exemptionId).withComplytId(exemptionDto.getComplytId());
 
         // When
         boolean isEquals = exemptionDto.equals(givenExemptionDto);

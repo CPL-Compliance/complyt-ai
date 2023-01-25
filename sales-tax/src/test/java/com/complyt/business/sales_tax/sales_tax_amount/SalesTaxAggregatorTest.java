@@ -10,7 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,17 +28,17 @@ public class SalesTaxAggregatorTest {
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     Transaction transaction;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
-        transaction = domainObjectStub.createTransaction(null)
-                .withItems(domainObjectStub.createItemsWithSalesTaxRate(true, true))
-                .withShippingFee(domainObjectStub.createShippingFeeWithSalesTaxRates(true, true));
+        transaction = objectStub.createTransaction(null)
+                .withItems(objectStub.createItemsWithSalesTaxRate(true, true))
+                .withShippingFee(objectStub.createShippingFeeWithSalesTaxRates(true, true));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class SalesTaxAggregatorTest {
         float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
         float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRate().getTaxRate() * transaction.getShippingFee().getTotalPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
-        List<Taxable> taxAbles = domainObjectStub.createTaxables(transaction);
+        List<Taxable> taxAbles = objectStub.createTaxables(transaction);
 
         // When
         float actualAmount = salesTaxAggregator.aggregate(taxAbles);

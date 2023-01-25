@@ -34,13 +34,13 @@ public class TransactionController {
     @NonNull
     private TransactionFacade transactionFacade;
 
-    @Operation(summary = "Gets transaction by externalId & source")
+    @Operation(summary = "Gets transaction by externalId and source")
     @TransactionReadPermission
     @GetMapping("source/{source}/externalId/{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<TransactionDto>> getByExternalId(@PathVariable("externalId") @NonNull String externalId, @PathVariable("source") @NonNull String source) {
+    public Mono<ResponseEntity<TransactionDto>> getByExternalIdAndSource(@PathVariable("externalId") @NonNull String externalId, @PathVariable("source") @NonNull String source) {
         log.debug("Get customer by external id and source - id and source received as path variables : " + externalId + ", " + source);
-        return transactionFacade.findByExternalId(externalId, source)
+        return transactionFacade.findByExternalIdAndSource(externalId, source)
                 .map(transactionItem -> new ResponseEntity<>(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem), HttpStatus.OK))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)));
     }
@@ -80,7 +80,7 @@ public class TransactionController {
         log.debug("Upsert transaction - DTO received in request body : " + transactionDto);
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
 
-        return transactionFacade.findByExternalId(externalId, source)
+        return transactionFacade.findByExternalIdAndSource(externalId, source)
                 .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, source, receivedTransaction, originalTransaction))
                 .map(updatedTransaction -> ResponseEntity.status(HttpStatus.OK).body(TransactionMapper.INSTANCE.transactionToTransactionDto(updatedTransaction)))
                 .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)

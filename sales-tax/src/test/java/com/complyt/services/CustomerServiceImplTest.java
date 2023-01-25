@@ -17,10 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -48,15 +49,15 @@ class CustomerServiceImplTest {
 
     String source;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeAll
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String name = "Existing Customer";
-        customer = domainObjectStub.createCustomer(UUID.randomUUID().toString()).withName(name);
-        source = domainObjectStub.getUnifiedSource();
+        customer = objectStub.createCustomer(UUID.randomUUID().toString()).withName(name);
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -153,7 +154,7 @@ class CustomerServiceImplTest {
         // Given
 
         // When
-        when(customerRepository.findByExternalId(customer.getExternalId(), source)).thenReturn(Mono.just(customer));
+        when(customerRepository.findByExternalIdAndSource(customer.getExternalId(), source)).thenReturn(Mono.just(customer));
         when(customerRepository.save(any())).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
@@ -166,7 +167,7 @@ class CustomerServiceImplTest {
         // Given
 
         // When
-        when(customerRepository.findByExternalId(customer.getExternalId(), source)).thenReturn(Mono.empty());
+        when(customerRepository.findByExternalIdAndSource(customer.getExternalId(), source)).thenReturn(Mono.empty());
         Mono<Customer> customerMono = customerServiceImpl.update(customer);
 
         // Then
@@ -188,14 +189,14 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void findByExternalId_CustomerFound_ReturnsCustomer() {
+    void findByExternalIdAndSource_CustomerFound_ReturnsCustomer() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer customerToSearchFor = customer.withExternalId(id);
 
         // When
-        when(customerRepository.findByExternalId(id, source)).thenReturn(Mono.just(customerToSearchFor));
-        Mono<Customer> customerMono = customerServiceImpl.findByExternalId(id, source);
+        when(customerRepository.findByExternalIdAndSource(id, source)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerServiceImpl.findByExternalIdAndSource(id, source);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
@@ -259,7 +260,7 @@ class CustomerServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Customers() {
         // Given
-        Customer secondsCustomer = domainObjectStub.createCustomer(new ObjectId().toString());
+        Customer secondsCustomer = objectStub.createCustomer(new ObjectId().toString());
 
         // When
         when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer, secondsCustomer));
@@ -285,7 +286,7 @@ class CustomerServiceImplTest {
     @Test
     void checkCustomerNotHavingComplytId_DoesntHaveComplytId_ReturnsCustomer() {
         // Given When
-        when(customerComplytIdHandler.isNewDontHaveComplytId(customer)).thenReturn(Mono.just(customer));
+        when(customerComplytIdHandler.checkNewDontHaveComplytId(customer)).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerServiceImpl.checkCustomerNotHavingComplytId(customer);
 
         // Then
@@ -295,11 +296,11 @@ class CustomerServiceImplTest {
     @Test
     void checkCustomerNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
         // Given When
-        when(customerComplytIdHandler.isNewDontHaveComplytId(customer)).thenReturn(Mono.empty());
+        when(customerComplytIdHandler.checkNewDontHaveComplytId(customer)).thenReturn(Mono.error(new NotFoundException("cannot insert new customer with complyt id")));
         Mono<Customer> customerMono = customerServiceImpl.checkCustomerNotHavingComplytId(customer);
 
         // Then
-        StepVerifier.create(customerMono).expectErrorMessage("cannot insert new transaction with complyt id").verify();
+        StepVerifier.create(customerMono).expectErrorMessage("cannot insert new customer with complyt id").verify();
     }
 
     @Test
@@ -308,11 +309,11 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(UUID.randomUUID());
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.empty());
+        when(customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original customers are not equal")));
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
-        StepVerifier.create(customerMono).expectErrorMessage("modified and original customers complytIds not equal").verify();
+        StepVerifier.create(customerMono).expectErrorMessage("complyt ids of modified and original customers are not equal").verify();
     }
 
     @Test
@@ -321,7 +322,7 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(null);
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        when(customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then
@@ -334,7 +335,7 @@ class CustomerServiceImplTest {
         Customer newCustomer = customer.withComplytId(customer.getComplytId());
 
         // When
-        when(customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
+        when(customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer)).thenReturn(Mono.just(newCustomer));
         Mono<Customer> customerMono = customerServiceImpl.checkComplytIdOfModifiedEqualsToOriginal(newCustomer, customer);
 
         // Then

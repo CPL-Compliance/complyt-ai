@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,13 +49,13 @@ public class ProductClassificationServiceTest {
     String tenantId;
 
     Transaction transaction;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         itemProductClassification0 = createItemProductClassification0();
         itemProductClassification1 = createItemProductClassification1();
         shippingFeeProductClassification = createShippingFeeProductClassification();
@@ -82,7 +82,7 @@ public class ProductClassificationServiceTest {
     }
 
     private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
 
         return new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
@@ -90,14 +90,14 @@ public class ProductClassificationServiceTest {
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0)
                 .withTaxableCategory(TaxableCategory.TAXABLE)
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = domainObjectStub.createItems(true, true);
+        List<Item> modifiedItems = objectStub.createItems(true, true);
         return transaction.withItems(modifiedItems);
     }
 
@@ -125,8 +125,8 @@ public class ProductClassificationServiceTest {
     @Test
     void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
         // Given
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        ShippingFee shippingFee = objectStub.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
         Transaction givenTransaction = transaction.withShippingFee(shippingFee);
         String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
         String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();
@@ -260,6 +260,3 @@ public class ProductClassificationServiceTest {
     }
 
 }
-
-// Transaction(complytId=3e4b6a0d-d656-4c30-9adc-a0ec34cd4398, id=5144226a-17e8-4f14-b6ef-f3b6f733566f, externalId=5144226a-17e8-4f14-b6ef-f3b6f733566f, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C3S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc302a91fc5e3d78fb9e7e, customer=Customer(complytId=f106bf13-5c29-4068-97ba-af791f0d410c, id=63bc302a91fc5e3d78fb9e7e, externalId=63bc302a91fc5e3d78fb9e7e, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=c97de989-888a-4e3c-af2f-82c74c441e6b, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826), updatedDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T17:17:02.779826), updatedDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826))), salesTax=null, transactionStatus=ACTIVE, tenantId=c97de989-888a-4e3c-af2f-82c74c441e6b, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826), updatedDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826), updatedDate=ComplytTimestamp(timestamp=2023-01-09T17:18:02.779826)), transactionType=INVOICE, shippingFee=null, createdFrom=null))
-// Transaction(complytId=6e5be361-e471-4a8d-992d-7f5475b90d8a, id=50e4f104-61eb-4e2b-97e6-96cb05cb3b91, externalId=50e4f104-61eb-4e2b-97e6-96cb05cb3b91, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=TANGIBLE, taxableCategory=TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc2505aaf5026f61b6c2f7, customer=Customer(complytId=c6842a2a-15da-42e8-ae29-79e9eafa0cbf, id=63bc2505aaf5026f61b6c2f7, externalId=63bc2505aaf5026f61b6c2f7, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=13b5773d-6472-405e-ab58-ce485edc1646, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896), updatedDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T16:29:29.239896), updatedDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896))), salesTax=null, transactionStatus=ACTIVE, tenantId=13b5773d-6472-405e-ab58-ce485edc1646, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896), updatedDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896), updatedDate=ComplytTimestamp(timestamp=2023-01-09T16:30:29.239896)), transactionType=INVOICE, shippingFee=null, createdFrom=null))

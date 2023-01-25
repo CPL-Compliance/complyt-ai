@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,15 +56,15 @@ class CustomerControllerTest {
 
     String source;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customerDto = domainObjectStub.createCustomerDto(UUID.randomUUID().toString()).withInternalTimestamps(null).withExternalTimestamps(null);
+        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString()).withInternalTimestamps(null).withExternalTimestamps(null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        source = domainObjectStub.getUnifiedSource();
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -72,7 +72,7 @@ class CustomerControllerTest {
         // Given
         String externalId = customerDto.getExternalId();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
         // When + Then
@@ -96,7 +96,7 @@ class CustomerControllerTest {
         String externalId = customer.getExternalId();
         Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer originalCustomer = newCustomer.withName("originalCustomer");
-        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(originalCustomer));
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
         when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
         when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
 
@@ -116,10 +116,10 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getByExternalId_FindsCustomer_ReturnsCustomer() {
+    void getByExternalIdAndSource_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
 
         // When + Then
         webTestClient
@@ -139,7 +139,7 @@ class CustomerControllerTest {
         // Given
 
         String externalId = customer.getExternalId();
-        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
 
         // When + Then
@@ -156,10 +156,10 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getByExternalId_OperationFails_Returns4xxNotFound() {
+    void getByExternalIdAndSource_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(customerFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
@@ -260,14 +260,14 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getByExternalId_NullExternalId_ThrowsNullPointerException() {
+    void getByExternalIdAndSource_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
         customerController = new CustomerController(customerFacade);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            customerController.getByExternalId(nullExternalId, source);
+            customerController.getByExternalIdAndSource(nullExternalId, source);
         });
 
         // Then

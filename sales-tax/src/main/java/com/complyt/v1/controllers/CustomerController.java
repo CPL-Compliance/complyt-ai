@@ -45,7 +45,7 @@ public class CustomerController {
         log.debug("Upsert customer - DTO received in request body : " + customerDto);
         Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
-        return customerfacade.findByExternalId(externalId, source)
+        return customerfacade.findByExternalIdAndSource(externalId, source)
                 .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer))
                 .map(updatedCustomer -> ResponseEntity.status(HttpStatus.OK).body(CustomerMapper.INSTANCE.customerToCustomerDto(updatedCustomer)))
                 .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer)
@@ -57,10 +57,10 @@ public class CustomerController {
     @CustomerReadPermission
     @GetMapping("source/{source}/externalId/{externalId}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<CustomerDto>> getByExternalId(@NonNull @PathVariable("externalId") String externalId, @PathVariable("source") @NonNull String source) {
+    public Mono<ResponseEntity<CustomerDto>> getByExternalIdAndSource(@NonNull @PathVariable("externalId") String externalId, @PathVariable("source") @NonNull String source) {
         log.debug("Get customer by external id and source - id and source received as path variables : " + externalId + ", " + source);
 
-        return customerfacade.findByExternalId(externalId, source)
+        return customerfacade.findByExternalIdAndSource(externalId, source)
                 .map(customerItem -> ResponseEntity.ok().body(CustomerMapper.INSTANCE.customerToCustomerDto(customerItem)))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Customer with externalId " + externalId + ", in source " + source)));
     }

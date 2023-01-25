@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,14 +42,14 @@ public class NexusTransactionsAmountCalculatorTest {
     List<Transaction> transactions;
     NexusStateRule nexusStateRule;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactions = createTransactions();
-        nexusStateRule = domainObjectStub.createNexusStateRule(UUID.randomUUID().toString());
+        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     private Transaction createRefundTransaction() {
@@ -61,7 +61,7 @@ public class NexusTransactionsAmountCalculatorTest {
     }
 
     private List<Transaction> createTransactions() {
-        Transaction transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         List<Item> secondTransactionItems = new ArrayList<>() {{
             add(transaction.getItems().get(0).withUnitPrice(1000).withTotalPrice(4000));
         }};

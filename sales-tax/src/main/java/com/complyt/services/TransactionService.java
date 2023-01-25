@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface TransactionService extends CrudService<Transaction, String> {
-    Mono<Transaction> findByExternalId(@NonNull final String externalId, @NonNull final String source);
+    Mono<Transaction> findByExternalIdAndSource(@NonNull final String externalId, @NonNull final String source);
 
     Mono<Transaction> findByComplytId(@NonNull final UUID complytId);
 

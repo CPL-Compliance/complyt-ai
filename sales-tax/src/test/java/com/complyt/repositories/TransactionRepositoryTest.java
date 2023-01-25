@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,19 +46,19 @@ class TransactionRepositoryTest {
     Customer customer;
 
     String source;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(transaction.getId());
-        source = domainObjectStub.getUnifiedSource();
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(transaction.getId());
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
-    void findByExternalId_FindsTransaction_ReturnsTransaction() {
+    void findByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
                 .and("source").is(source)
@@ -70,7 +70,7 @@ class TransactionRepositoryTest {
         when(reactiveMongoTemplate.findOne(Query.query(Criteria
                 .where("complytId").is(transaction.getCustomerId())
                 .and("tenantId").is(transaction.getTenantId())), Customer.class)).thenReturn(Mono.just(customer));
-        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
+        Mono<Transaction> transactionMono = transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();
@@ -95,7 +95,7 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    void findByExternalId_ExternalIdExists_ReturnsOneTransaction() {
+    void findByExternalIdAndSource_ExternalIdExists_ReturnsOneTransaction() {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(transaction.getExternalId())
                 .and("source").is(source)
@@ -108,7 +108,7 @@ class TransactionRepositoryTest {
                 .where("complytId").is(transaction.getCustomerId())
                 .and("tenantId").is(transaction.getTenantId())), Customer.class)).thenReturn(Mono.just(customer));
 
-        Mono<Transaction> transactionMono = transactionRepository.findByExternalId(transaction.getExternalId(), source);
+        Mono<Transaction> transactionMono = transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();

@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.complyt_id.TransactionComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
@@ -51,13 +50,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction) {
-        return complytIdHandler.isNewDontHaveComplytId(newTransaction)
-                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new transaction with complyt id")));
+        return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
     }
 
     @Override
-    public Mono<Transaction> findByExternalId(@NonNull String externalId, String source) {
-        return transactionRepository.findByExternalId(externalId, source);
+    public Mono<Transaction> findByExternalIdAndSource(@NonNull String externalId, String source) {
+        return transactionRepository.findByExternalIdAndSource(externalId, source);
     }
 
     @Override
@@ -66,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction) {
-        return transactionRepository.findByExternalId(externalId, source)
+        return transactionRepository.findByExternalIdAndSource(externalId, source)
                 .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)))
                 .map(createFunctionUpdateTransaction(transaction))
                 .flatMap(transactionRepository::save);
@@ -74,8 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
-        return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedTransaction, originalTransaction)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original transactions complytIds not equal")));
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedTransaction, originalTransaction);
     }
 
     @Override
@@ -110,7 +107,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> markAsCancelled(@NonNull String externalId, @NonNull String source) {
         return transactionRepository
-                .findByExternalId(externalId, source)
+                .findByExternalIdAndSource(externalId, source)
                 .map(transaction -> transaction.withTransactionStatus(TransactionStatus.CANCELLED))
                 .flatMap(transactionRepository::save);
     }

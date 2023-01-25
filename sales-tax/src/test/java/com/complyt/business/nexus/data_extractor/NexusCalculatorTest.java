@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,11 +45,11 @@ public class NexusCalculatorTest {
     TransactionsFilterByNexusRules transactionNexusFilter;
 
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
@@ -74,7 +74,7 @@ public class NexusCalculatorTest {
     }
 
     private List<Transaction> createTransactionsList() {
-        Transaction transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         Transaction secondTransaction = transaction.withId(UUID.randomUUID().toString()).withExternalId(UUID.randomUUID().toString());
         return new ArrayList<>() {{
             add(transaction);

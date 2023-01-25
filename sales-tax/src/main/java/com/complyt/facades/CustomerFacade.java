@@ -35,8 +35,8 @@ public class CustomerFacade {
         return customerService.findByName(name);
     }
 
-    public Mono<Customer> findByExternalId(String externalId, String source) {
-        return customerService.findByExternalId(externalId, source);
+    public Mono<Customer> findByExternalIdAndSource(String externalId, String source) {
+        return customerService.findByExternalIdAndSource(externalId, source);
     }
     public Mono<Customer> findByComplytId( @NonNull UUID complytId) {
         return customerService.findByComplytId(complytId);

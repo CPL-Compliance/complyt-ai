@@ -4,6 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -13,15 +14,15 @@ import java.util.UUID;
 @Slf4j
 public class SalesTaxTrackingComplytIdHandler implements ComplytIdHandler<SalesTaxTracking> {
     @Override
-    public Mono<SalesTaxTracking> isComplytIdOfUpdatedEqualsToOld(SalesTaxTracking newSalesTaxTracking, SalesTaxTracking oldSalesTaxTracking) {
+    public Mono<SalesTaxTracking> checkComplytIdOfUpdatedEqualsToOld(SalesTaxTracking newSalesTaxTracking, SalesTaxTracking oldSalesTaxTracking) {
         return newSalesTaxTracking.getComplytId() == null || newSalesTaxTracking.getComplytId().equals(oldSalesTaxTracking.getComplytId()) ?
-                Mono.just(newSalesTaxTracking) : Mono.empty();
+                Mono.just(newSalesTaxTracking) : Mono.error(new NotFoundException("complyt ids of modified and original salesTaxTrackings are not equal"));
     }
 
     @Override
-    public Mono<SalesTaxTracking> isNewDontHaveComplytId(SalesTaxTracking newSalesTaxTracking) {
+    public Mono<SalesTaxTracking> checkNewDontHaveComplytId(SalesTaxTracking newSalesTaxTracking) {
         return newSalesTaxTracking.getComplytId() == null ?
-                Mono.just(newSalesTaxTracking) : Mono.empty();
+                Mono.just(newSalesTaxTracking) : Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id"));
     }
 
     @Override

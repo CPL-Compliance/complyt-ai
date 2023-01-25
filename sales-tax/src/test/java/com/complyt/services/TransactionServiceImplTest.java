@@ -22,10 +22,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,20 +61,20 @@ class TransactionServiceImplTest {
     Transaction transaction;
     Customer customer;
     String source;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
-        customer = domainObjectStub.createCustomer(transaction.getId());
-        source = domainObjectStub.getUnifiedSource();
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(transaction.getId());
+        source = objectStub.getUnifiedSource();
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0).withTaxableCategory(TaxableCategory.TAXABLE).withTangibleCategory(TangibleCategory.TANGIBLE).withJurisdictionalSalesTaxRules(rules);
 
@@ -97,27 +98,27 @@ class TransactionServiceImplTest {
     }
 
     @Test
-    void findByExternalId_TransactionFound_ReturnsTransaction() {
+    void findByExternalIdAndSource_TransactionFound_ReturnsTransaction() {
         // Given
         String id = UUID.randomUUID().toString();
         Transaction transactionToSearchFor = transaction.withExternalId(id);
 
         // When
-        when(transactionRepository.findByExternalId(id, source)).thenReturn(Mono.just(transactionToSearchFor));
-        Mono<Transaction> transactionMono = transactionService.findByExternalId(id, source);
+        when(transactionRepository.findByExternalIdAndSource(id, source)).thenReturn(Mono.just(transactionToSearchFor));
+        Mono<Transaction> transactionMono = transactionService.findByExternalIdAndSource(id, source);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
     }
 
     @Test
-    void findByExternalId_NullExternalIdGiven_ThrowsException() {
+    void findByExternalIdAndSource_NullExternalIdGiven_ThrowsException() {
         // Given
         String nullExternalId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionService.findByExternalId(nullExternalId, source);
+            transactionService.findByExternalIdAndSource(nullExternalId, source);
         });
 
         // Then
@@ -184,7 +185,7 @@ class TransactionServiceImplTest {
         String externalId = transaction.getExternalId();
 
         // When
-        when(transactionRepository.findByExternalId(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
 
         Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
@@ -223,7 +224,7 @@ class TransactionServiceImplTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
-        when(transactionRepository.findByExternalId(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
         when(transactionRepository.save(cancelledTransaction)).thenReturn(Mono.just(cancelledTransaction));
 
         Mono<Transaction> transactionMono = transactionService.markAsCancelled(transaction.getExternalId(), source);
@@ -281,7 +282,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
-        Customer customer = domainObjectStub.createCustomer(customerId.toString())
+        Customer customer = objectStub.createCustomer(customerId.toString())
                 .withExternalId(externalId)
                 .withAddress(transaction.getShippingAddress());
 
@@ -411,7 +412,7 @@ class TransactionServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Transactions() {
         // Given
-        Transaction secondsTransaction = domainObjectStub.createTransaction(new ObjectId().toString());
+        Transaction secondsTransaction = objectStub.createTransaction(new ObjectId().toString());
 
         // Then
         when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction, secondsTransaction));
@@ -436,7 +437,7 @@ class TransactionServiceImplTest {
     @Test
     void checkTransactionNotHavingComplytId_DoesntHaveComplytId_ReturnsTransaction() {
         // Given When
-        when(transactionComplytIdHandler.isNewDontHaveComplytId(transaction)).thenReturn(Mono.just(transaction));
+        when(transactionComplytIdHandler.checkNewDontHaveComplytId(transaction)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = transactionService.checkTransactionNotHavingComplytId(transaction);
 
         // Then
@@ -446,7 +447,7 @@ class TransactionServiceImplTest {
     @Test
     void checkTransactionNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
         // Given When
-        when(transactionComplytIdHandler.isNewDontHaveComplytId(transaction)).thenReturn(Mono.empty());
+        when(transactionComplytIdHandler.checkNewDontHaveComplytId(transaction)).thenReturn(Mono.error(new NotFoundException("cannot insert new transaction with complyt id")));
         Mono<Transaction> transactionMono = transactionService.checkTransactionNotHavingComplytId(transaction);
 
         // Then
@@ -459,11 +460,11 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(UUID.randomUUID());
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.empty());
+        when(transactionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original transactions are not equal")));
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("modified and original transactions complytIds not equal").verify();
+        StepVerifier.create(transactionMono).expectErrorMessage("complyt ids of modified and original transactions are not equal").verify();
     }
 
     @Test
@@ -472,7 +473,7 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(null);
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        when(transactionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then
@@ -485,7 +486,7 @@ class TransactionServiceImplTest {
         Transaction newTransaction = transaction.withComplytId(transaction.getComplytId());
 
         // When
-        when(transactionComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
+        when(transactionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction)).thenReturn(Mono.just(newTransaction));
         Mono<Transaction> transactionMono = transactionService.checkComplytIdOfModifiedEqualsToOriginal(newTransaction, transaction);
 
         // Then

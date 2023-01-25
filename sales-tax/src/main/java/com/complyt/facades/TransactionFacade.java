@@ -75,8 +75,8 @@ public class TransactionFacade {
                         .thenReturn(updatedTransaction)) : transactionService.update(externalId, source, transaction);
     }
 
-    public Mono<Transaction> findByExternalId(String externalId, String source) {
-        return transactionService.findByExternalId(externalId, source);
+    public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
+        return transactionService.findByExternalIdAndSource(externalId, source);
     }
 
     public Mono<Transaction> findByComplytId( @NonNull UUID complytId) {

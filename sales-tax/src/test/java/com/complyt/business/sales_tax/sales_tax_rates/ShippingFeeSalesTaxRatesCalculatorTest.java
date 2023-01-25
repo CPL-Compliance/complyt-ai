@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,15 +35,15 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
     SalesTaxRate salesTaxRate;
     ShippingFee shippingFee;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
-        salesTaxRate = domainObjectStub.createSalesTaxRates();
-        shippingFee = domainObjectStub.createShippingFee(false, false);
+        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
+        salesTaxRate = objectStub.createSalesTaxRates();
+        shippingFee = objectStub.createShippingFee(false, false);
     }
 
     @Test

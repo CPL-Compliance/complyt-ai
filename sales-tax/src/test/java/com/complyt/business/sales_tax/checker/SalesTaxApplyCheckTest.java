@@ -11,7 +11,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,26 +26,26 @@ public class SalesTaxApplyCheckTest {
     private SalesTaxApplyCheck salesTaxApplyCheck;
     private SalesTaxTracking salesTaxTracking;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = domainObjectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
 
     private Transaction createTransactionWithAppliedReferenceDate() {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return domainObjectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
         Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return domainObjectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     @Test

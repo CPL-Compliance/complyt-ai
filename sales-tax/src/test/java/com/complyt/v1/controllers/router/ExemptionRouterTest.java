@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -46,11 +46,11 @@ public class ExemptionRouterTest {
     @MockBean
     ExemptionFacade exemptionFacade;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
 
@@ -75,7 +75,7 @@ public class ExemptionRouterTest {
     void exemptionRoute_ExemptionHandler_RoutingToExemptionHandler() {
         //
         UUID complytId = UUID.randomUUID();
-        Exemption expectedExemption = domainObjectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
+        Exemption expectedExemption = objectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
         ExemptionDto expectedExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(expectedExemption);
 
         // When

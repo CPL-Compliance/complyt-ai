@@ -27,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,20 +62,20 @@ class TransactionControllerTest {
 
     String source;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void cleanUp() {
         MockitoAnnotations.openMocks(this);
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        Transaction transactionWithCustomerWithTimestamps = domainObjectStub.createTransaction(UUID.randomUUID().toString())
+        Transaction transactionWithCustomerWithTimestamps = objectStub.createTransaction(UUID.randomUUID().toString())
                 .withInternalTimestamps(null).withExternalTimestamps(null);
         transactionWithId = transactionWithCustomerWithTimestamps
                 .withCustomer(transactionWithCustomerWithTimestamps.getCustomer()
                         .withInternalTimestamps(null).withExternalTimestamps(null));
         transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithId);
-        source = domainObjectStub.getUnifiedSource();
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -95,7 +95,7 @@ class TransactionControllerTest {
         Transaction transactionWithSalesTax = transactionWithId.withSalesTax(new SalesTax(0, new SalesTaxRate(0, 0, 0, 0, 0, 0)));
 
         // When + Then
-        when(transactionFacade.findByExternalId(transactionDto.getExternalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalIdAndSource(transactionDto.getExternalId(), source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transactionWithSalesTax));
 
         TransactionDto expectedTransactionDtoWithSalesTax = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithSalesTax);
@@ -122,7 +122,7 @@ class TransactionControllerTest {
         Transaction updatedTransaction = mappedTransaction.withId(transactionWithId.getId());
 
         // When + Then
-        when(transactionFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(transactionWithId));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionWithId));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.updateIfModified(externalId, source, mappedTransaction, transactionWithId)).thenReturn(Mono.just(updatedTransaction));
 
@@ -141,10 +141,10 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getByExternalId_FindsTransaction_ReturnsTransaction() {
+    void getByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(transactionFacade.findByExternalId(externalId, source)).thenReturn(Mono.just(transactionWithId));
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionWithId));
 
         // When + Then
         webTestClient
@@ -196,10 +196,10 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getByExternalId_FacadeReturnsMonoEmpty_Returns4xxNotFound() {
+    void getByExternalIdAndSource_FacadeReturnsMonoEmpty_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        when(transactionFacade.findByExternalId(externalId, source)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
         webTestClient
@@ -289,14 +289,14 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getByExternalId_NullExternalId_ThrowsNullPointerException() {
+    void getByExternalIdAndSource_NullExternalId_ThrowsNullPointerException() {
         //Given
         String nullExternalId = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.getByExternalId(nullExternalId, transactionDto.getSource());
+            transactionController.getByExternalIdAndSource(nullExternalId, transactionDto.getSource());
         });
 
         // Then
@@ -304,14 +304,14 @@ class TransactionControllerTest {
     }
 
     @Test
-    void getByExternalId_NullSource_ThrowsNullPointerException() {
+    void getByExternalIdAndSource_NullSource_ThrowsNullPointerException() {
         //Given
         String nullSource = null;
         TransactionController transactionController = new TransactionController(transactionFacade);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.getByExternalId(transactionDto.getExternalId(), nullSource);
+            transactionController.getByExternalIdAndSource(transactionDto.getExternalId(), nullSource);
         });
 
         // Then

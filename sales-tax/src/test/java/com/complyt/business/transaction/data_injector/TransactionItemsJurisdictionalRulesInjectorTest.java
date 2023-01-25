@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -23,18 +23,18 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
 
     TransactionItemsJurisdictionalRulesInjector transactionItemsJurisdictionalRulesInjector;
     Transaction transaction;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         transactionItemsJurisdictionalRulesInjector = new TransactionItemsJurisdictionalRulesInjector(transaction);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -62,7 +62,7 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withItems(domainObjectStub.createItems(true, false));
+        Transaction expectedTransaction = transaction.withItems(objectStub.createItems(true, false));
 
         // When
         Mono<Transaction> transactionMono = transactionItemsJurisdictionalRulesInjector.inject(classifications);
@@ -93,6 +93,3 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
         assertTrue(isEquals);
     }
 }
-
-// Transaction(complytId=0af54c64-6b93-487b-83d8-afc7ee2141fe, id=919dac0b-bc68-44c1-9ab0-7a79dced40e5, externalId=919dac0b-bc68-44c1-9ab0-7a79dced40e5, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=NOT_TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=NOT_TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc0ea3fc7e861c6b32769d, customer=Customer(complytId=1f14a2fa-4f06-4477-8713-4730578d1d46, id=63bc0ea3fc7e861c6b32769d, externalId=63bc0ea3fc7e861c6b32769d, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=377242ef-f2e0-497d-b3cd-0ba502d43746, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:53:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792))), salesTax=null, transactionStatus=ACTIVE, tenantId=377242ef-f2e0-497d-b3cd-0ba502d43746, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), transactionType=INVOICE, shippingFee=ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE), createdFrom=null)
-// Transaction(complytId=0af54c64-6b93-487b-83d8-afc7ee2141fe, id=919dac0b-bc68-44c1-9ab0-7a79dced40e5, externalId=919dac0b-bc68-44c1-9ab0-7a79dced40e5, source=co.com, items=[Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=TAXABLE), Item(unitPrice=2000.0, quantity=4, totalPrice=8000.0, description=description, name=name, taxCode=C1S1, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, manualSalesTax=false, manualSalesTaxRate=0.0, tangibleCategory=INTANGIBLE, taxableCategory=TAXABLE)], billingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), shippingAddress=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), customerId=63bc0ea3fc7e861c6b32769d, customer=Customer(complytId=1f14a2fa-4f06-4477-8713-4730578d1d46, id=63bc0ea3fc7e861c6b32769d, externalId=63bc0ea3fc7e861c6b32769d, source=1, name=name, address=Address(city=City, country=Country, county=County, state=CA, street=Street, zip=Zip), tenantId=377242ef-f2e0-497d-b3cd-0ba502d43746, customerType=RETAIL, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:53:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792))), salesTax=null, transactionStatus=ACTIVE, tenantId=377242ef-f2e0-497d-b3cd-0ba502d43746, internalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), externalTimestamps=Timestamps(createdDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792), updatedDate=ComplytTimestamp(timestamp=2023-01-09T14:54:58.995792)), transactionType=INVOICE, shippingFee=ShippingFee(manualSalesTax=false, manualSalesTaxRate=0.0, totalPrice=1000.0, jurisdictionalSalesTaxRules=JurisdictionalSalesTaxRules(name=California, abbreviation=CA, taxable=true, specialTreatment=false, calculationType=FIXED, description=description, calculationValue=0.5, cities=null), salesTaxRate=null, taxCode=C6S1, taxableCategory=TAXABLE, tangibleCategory=INTANGIBLE), createdFrom=null)

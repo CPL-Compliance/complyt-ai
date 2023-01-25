@@ -9,7 +9,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SalesTaxEnforcementCheckTest {
 
     SalesTaxEnforcementChecker salesTaxEnforcementChecker;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         salesTaxEnforcementChecker = new SalesTaxEnforcementChecker();
     }
@@ -34,7 +34,7 @@ public class SalesTaxEnforcementCheckTest {
     @Test
     void check_CheckingSalesTaxTracking_ReturnsIsEnforcesSalesTax() {
         // Given
-        SalesTaxTracking salesTaxTracking = domainObjectStub.createSalesTaxTracking(new ObjectId().toString());
+        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
 
         // When + Then
         boolean isEnforcesSalesTax = salesTaxEnforcementChecker.check(salesTaxTracking);

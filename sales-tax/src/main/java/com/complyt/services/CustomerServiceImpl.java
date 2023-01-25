@@ -34,18 +34,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Mono<Customer> update(@NonNull Customer newCustomer) {
-        return customerRepository.findByExternalId(newCustomer.getExternalId(), newCustomer.getSource())
+        return customerRepository.findByExternalIdAndSource(newCustomer.getExternalId(), newCustomer.getSource())
                 .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
                 .flatMap(originalCustomer ->
                         injectDataToExistingCustomer(newCustomer, originalCustomer)
                                 .map(customerWithInjectedData -> createFunctionUpdateCustomer(customerWithInjectedData)
                                         .apply(originalCustomer)
-                                ))
-                /*.map(originalCustomer -> {
-                    Customer customerWithInjectedData = injectDataToExistingCustomer(newCustomer, originalCustomer);
-                    return createFunctionUpdateCustomer(customerWithInjectedData).apply(originalCustomer);
-                })*/
-                .flatMap(customerRepository::save);
+                                )).flatMap(customerRepository::save);
     }
 
     @Override
@@ -58,13 +53,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> checkCustomerNotHavingComplytId(@NonNull Customer newCustomer) {
-        return customerComplytIdHandler.isNewDontHaveComplytId(newCustomer)
-                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new transaction with complyt id")));
+        return customerComplytIdHandler.checkNewDontHaveComplytId(newCustomer);
     }
 
     public Mono<Customer> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Customer modifiedCustomer, @NonNull final Customer originalCustomer) {
-        return customerComplytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original customers complytIds not equal")));
+        return customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer);
     }
 
     @Override
@@ -76,8 +69,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Mono<Customer> findByExternalId(String externalId, String source) {
-        return customerRepository.findByExternalId(externalId, source);
+    public Mono<Customer> findByExternalIdAndSource(String externalId, String source) {
+        return customerRepository.findByExternalIdAndSource(externalId, source);
     }
 
     @Override

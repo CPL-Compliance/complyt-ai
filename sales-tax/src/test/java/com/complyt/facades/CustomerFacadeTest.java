@@ -14,7 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,16 +38,16 @@ class CustomerFacadeTest {
 
     Customer customer;
     String source;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeAll
     void setUp() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        customer = domainObjectStub.createCustomer(id).withExternalId(externalId);
-        source = domainObjectStub.getUnifiedSource();
+        customer = objectStub.createCustomer(id).withExternalId(externalId);
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -115,8 +115,8 @@ class CustomerFacadeTest {
 
 
         // When
-        when(customerService.findByExternalId(id, source)).thenReturn(Mono.just(customerToSearchFor));
-        Mono<Customer> customerMono = customerFacade.findByExternalId(id, source);
+        when(customerService.findByExternalIdAndSource(id, source)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerFacade.findByExternalIdAndSource(id, source);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();

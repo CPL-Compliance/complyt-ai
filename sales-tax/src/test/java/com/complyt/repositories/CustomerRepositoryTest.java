@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -44,18 +44,18 @@ class CustomerRepositoryTest {
 
     String source;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), tenantId);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        customer = domainObjectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
-        source = domainObjectStub.getUnifiedSource();
+        customer = objectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -301,7 +301,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void findByExternalId_IdExists_ReturnsCustomer() {
+    void findByExternalIdAndSource_IdExists_ReturnsCustomer() {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId())
                 .and("source").is(source)
@@ -312,12 +312,12 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId(), source);
+        Mono<Customer> customerMono = customerRepository.findByExternalIdAndSource(customer.getExternalId(), source);
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
-    void findByExternalId_IdNotExists_ReturnsEmpty() {
+    void findByExternalIdAndSource_IdNotExists_ReturnsEmpty() {
         // Given
         String id = UUID.randomUUID().toString();
         Query query = Query.query(Criteria.where("externalId").is(id)
@@ -329,7 +329,7 @@ class CustomerRepositoryTest {
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(id, source);
+        Mono<Customer> customerMono = customerRepository.findByExternalIdAndSource(id, source);
 
         StepVerifier.create(customerMono).expectNextCount(0).verifyComplete();
     }

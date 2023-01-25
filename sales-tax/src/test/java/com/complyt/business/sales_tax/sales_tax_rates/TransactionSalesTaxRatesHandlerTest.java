@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,13 +37,13 @@ class TransactionSalesTaxRatesHandlerTest {
 
     SalesTaxRate salesTaxRate;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         salesTaxRate = createSalesTaxRates();
     }
 
@@ -68,7 +68,7 @@ class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_ShippingFeeExist_ReturnsTransaction() {
         // Given
-        ShippingFee givenShippingFee = domainObjectStub.createShippingFee(false, false);
+        ShippingFee givenShippingFee = objectStub.createShippingFee(false, false);
         Transaction expectedTransaction = transaction.withShippingFee(givenShippingFee);
 
         // When

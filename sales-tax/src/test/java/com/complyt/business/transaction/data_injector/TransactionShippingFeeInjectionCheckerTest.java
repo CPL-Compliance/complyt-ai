@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Mono;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -32,19 +32,19 @@ class TransactionShippingFeeInjectionCheckerTest {
 
     private Transaction transaction;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        ShippingFee shippingFee = domainObjectStub.createShippingFee(false, false).withTaxCode("C6S1");
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
+        ShippingFee shippingFee = objectStub.createShippingFee(false, false).withTaxCode("C6S1");
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         ReflectionTestUtils.setField(injector, "transaction", transaction, Transaction.class);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithTaxableRule(String taxCode) {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = domainObjectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
 
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);

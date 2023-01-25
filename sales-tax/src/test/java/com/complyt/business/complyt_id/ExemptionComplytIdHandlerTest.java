@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,13 +22,13 @@ class ExemptionComplytIdHandlerTest {
     @InjectMocks
     ExemptionComplytIdHandler complytIdHandler;
     Exemption exemption;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        exemption = domainObjectStub.createExemption(new ObjectId().toString());
+        exemption = objectStub.createExemption(new ObjectId().toString());
     }
 
     @Test
@@ -37,7 +37,7 @@ class ExemptionComplytIdHandlerTest {
         Exemption newExemption = exemption.withComplytId(null);
 
         // When
-        Mono<Exemption> exemptionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
+        Mono<Exemption> exemptionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
@@ -49,7 +49,7 @@ class ExemptionComplytIdHandlerTest {
         Exemption newExemption = exemption.withComplytId(exemption.getComplytId());
 
         // When
-        Mono<Exemption> exemptionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
+        Mono<Exemption> exemptionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
@@ -61,10 +61,10 @@ class ExemptionComplytIdHandlerTest {
         Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Exemption> exemptionMono = complytIdHandler.isComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
+        Mono<Exemption> exemptionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
 
         // Then
-        StepVerifier.create(exemptionMono).verifyComplete();
+        StepVerifier.create(exemptionMono).expectErrorMessage("complyt ids of modified and original exemptions are not equal").verify();
     }
 
     @Test
@@ -73,7 +73,7 @@ class ExemptionComplytIdHandlerTest {
         Exemption newExemption = exemption.withComplytId(null);
 
         // When
-        Mono<Exemption> exemptionMono = complytIdHandler.isNewDontHaveComplytId(newExemption);
+        Mono<Exemption> exemptionMono = complytIdHandler.checkNewDontHaveComplytId(newExemption);
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
@@ -85,10 +85,10 @@ class ExemptionComplytIdHandlerTest {
         Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
 
         // When
-        Mono<Exemption> exemptionMono = complytIdHandler.isNewDontHaveComplytId(newExemption);
+        Mono<Exemption> exemptionMono = complytIdHandler.checkNewDontHaveComplytId(newExemption);
 
         // Then
-        StepVerifier.create(exemptionMono).verifyComplete();
+        StepVerifier.create(exemptionMono).expectErrorMessage("cannot insert new exemption with complyt id").verify();
     }
 
     @Test

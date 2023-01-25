@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,18 +31,18 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Mock
     SalesTaxData salesTaxData;
 
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
     @Test
     void map_MapsIncorporatedAddress_ReturnsSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = domainObjectStub.createSalesTaxRates();
+        SalesTaxRate expectedSalesTaxRate = objectStub.createSalesTaxRates();
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
@@ -57,7 +57,7 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        SalesTaxRate salesTaxRate = domainObjectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0).withCityDistrictRate(0);
 
         // When

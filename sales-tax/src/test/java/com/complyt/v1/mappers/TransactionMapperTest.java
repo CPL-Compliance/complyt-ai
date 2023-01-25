@@ -5,7 +5,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.model.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,15 +18,15 @@ public class TransactionMapperTest {
     private Transaction transaction;
     private Transaction transactionNoTenantNorId;
     private TransactionDto transactionDto;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
-        transactionDto = domainObjectStub.createTransactionDto(transaction.getId())
+        transactionDto = objectStub.createTransactionDto(transaction.getId())
                 .withComplytId(transaction.getComplytId())
                 .withCustomer(CustomerMapper.INSTANCE.customerToCustomerDto(transaction.getCustomer()));
     }

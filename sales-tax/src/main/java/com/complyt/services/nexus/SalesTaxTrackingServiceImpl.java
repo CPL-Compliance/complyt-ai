@@ -91,14 +91,12 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking) {
-        return complytIdHandler.isNewDontHaveComplytId(newSalesTaxTracking)
-                .switchIfEmpty(Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id")));
+        return complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
     }
 
     @Override
     public Mono<SalesTaxTracking> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final SalesTaxTracking modifiedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
-        return complytIdHandler.isComplytIdOfUpdatedEqualsToOld(modifiedSalesTaxTracking, originalSalesTaxTracking)
-                .switchIfEmpty(Mono.error(new NotFoundException("modified and original salesTaxTracking's complytIds not equal")));
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedSalesTaxTracking, originalSalesTaxTracking);
     }
 
     @Override

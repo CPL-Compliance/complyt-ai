@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.DomainObjectStub;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,11 +30,11 @@ public class CountyProviderTest {
 
     @Mock
     CountyFetcher countyFetcher;
-    DomainObjectStub domainObjectStub;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        domainObjectStub = new DomainObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
 
     }
@@ -42,7 +42,7 @@ public class CountyProviderTest {
     @Test
     void provide_GetsCountyAndInjectsIt_ReturnsTransaction() {
         // Given
-        Transaction transaction = domainObjectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         String injectedCounty = "InjectedCounty";
         Transaction transactionWithCounty = transaction.withShippingAddress(transaction.getShippingAddress().withCounty(injectedCounty));
 
