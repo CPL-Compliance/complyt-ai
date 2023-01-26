@@ -1,14 +1,14 @@
-spring:
-  data:
-    mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@demo.dt2c3mf.mongodb.net/sales_tax
-
 eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
   instance:
     prefer-ip-address: true
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@test.bzk8n3u.mongodb.net/files
 
 logging:
   level:
@@ -20,9 +20,3 @@ logging:
     reactor:
       netty:
         http: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
