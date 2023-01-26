@@ -10,7 +10,7 @@ spring:
     mongodb:
       uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/files
 
-logging:
+  logging:
   level:
     root: INFO
     web: INFO
