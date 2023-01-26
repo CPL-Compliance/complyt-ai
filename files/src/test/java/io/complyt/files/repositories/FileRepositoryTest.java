@@ -38,7 +38,7 @@ class FileRepositoryTest {
     String tenantId;
 
     @BeforeEach
-    private void setUp(){
+    void setUp(){
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
         file = createLink();

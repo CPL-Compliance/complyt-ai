@@ -1,7 +1,5 @@
 package com.complyt.config;
 
-import com.complyt.v1.model.timestamps.TimestampsDto;
-import com.fasterxml.jackson.databind.ser.std.ClassSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;

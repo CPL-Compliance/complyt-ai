@@ -5,9 +5,9 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
+import com.complyt.v1.models.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +39,7 @@ public class TransactionController {
     public Mono<ResponseEntity<TransactionDto>> getOne(@PathVariable("externalId") @NonNull String externalId) {
         return transactionFacade.findByExternalId(externalId)
                 .map(transactionItem -> new ResponseEntity<>(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem), HttpStatus.OK))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with externalId " + externalId)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @Operation(summary = "Gets all transactions")

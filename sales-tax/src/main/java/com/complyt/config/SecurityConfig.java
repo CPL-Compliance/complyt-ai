@@ -3,9 +3,13 @@ package com.complyt.config;
 import com.complyt.annotations.Generated;
 import com.complyt.security.AudienceValidator;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -16,6 +20,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
+@Configuration
 @Generated
 public class SecurityConfig {
 

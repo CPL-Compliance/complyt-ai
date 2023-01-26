@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.v1.model.SalesTaxTrackingDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
