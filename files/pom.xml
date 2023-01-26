@@ -24,7 +24,7 @@
         <java.version>17</java.version>
         <!-- Docker Coordinates -->
         <docker.image.prefix>complyt</docker.image.prefix>
-        <docker.image.name>documents</docker.image.name>
+        <docker.image.name>files</docker.image.name>
         <!-- Docker Coordinates -->
     </properties>
 
