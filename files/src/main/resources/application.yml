@@ -4,7 +4,6 @@ server.port: ${PORT:9880}
 spring.profiles.active:
   - @activeEnv@
 
-
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
 # https://cloud.spring.io/spring-cloud-vault/reference/html/

@@ -42,6 +42,26 @@ spring:
           lower-case-service-id: true
       metrics.enabled: true
       routes:
+        # ==== Open API ====
+        - id: files-service
+          uri: lb://files-service
+          predicates:
+            - Path=/files/**
+          filters:
+            - RewritePath=/files/(?<path>.*), /$\{path}
+        - id: sales-tax-service
+          uri: lb://sales-tax-service
+          predicates:
+            - Path=/sales-tax/**
+          filters:
+            - RewritePath=/sales-tax/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+        # ==== Open API ====
         # ==== Sales Tax Service ====
         # ---- Transaction ----
         - id: sales-tax-get-transactions
@@ -146,8 +166,8 @@ spring:
             - Path=/v1/exemptions/{id}
           filters:
             - SetPath=/v1/exemptions/{id}
-      # ---- Exemption ----
-      # ---- Nexus ----
+        # ---- Exemption ----
+        # ---- Nexus ----
         - id: sales-tax-get-nexuses
           uri: lb://sales-tax
           predicates:
@@ -169,9 +189,10 @@ spring:
             - Path=/v1/nexus/{state}
           filters:
             - SetPath=/v1/nexus/{state}
-      # ---- Nexus ----
-      # ==== Sales Tax Service ====
-      # ==== Files Service ====
+        # ---- Nexus ----
+        # ==== Sales Tax Service ====
+        # ==== Files Service ====
+        # ---- Files ----
         - id: files-get-link
           uri: lb://files
           predicates:
@@ -179,4 +200,5 @@ spring:
             - Path=/v1/files
           filters:
             - SetPath=/v1/files
-      # ==== Files Service ====
+        # ---- Files ----
+        # ==== Files Service ====

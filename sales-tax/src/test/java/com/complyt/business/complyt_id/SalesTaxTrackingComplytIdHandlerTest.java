@@ -64,7 +64,7 @@ class SalesTaxTrackingComplytIdHandlerTest {
         Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("complyt ids of modified and original salesTaxTrackings are not equal").verify();
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test
@@ -88,7 +88,7 @@ class SalesTaxTrackingComplytIdHandlerTest {
         Mono<SalesTaxTracking> salesTaxTrackingMono = complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("cannot insert new salesTaxTracking with complyt id").verify();
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test

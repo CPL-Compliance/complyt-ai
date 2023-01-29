@@ -24,12 +24,16 @@
         <java.version>17</java.version>
         <!-- Docker Coordinates -->
         <docker.image.prefix>complyt</docker.image.prefix>
-        <docker.image.name>documents</docker.image.name>
+        <docker.image.name>files</docker.image.name>
         <!-- Docker Coordinates -->
     </properties>
 
     <dependencies>
         <!-- Spring Boot Starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -135,7 +139,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -149,6 +153,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
+                <version>2.1.0</version>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>

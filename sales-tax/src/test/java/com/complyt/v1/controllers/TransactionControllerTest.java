@@ -8,9 +8,12 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.TransactionFacade;
+import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
+import com.complyt.v1.models.TransactionDto;
+import org.bson.types.ObjectId;
+import com.complyt.v1.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +48,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ExtendWith(MockitoExtension.class)
 @WebFluxTest(TransactionController.class)
 @WithMockUser(username = "mock", password = "mock")
-@ContextConfiguration(classes = {TransactionController.class, ApiExceptionConfig.class, GlobalExceptionHandler.class})
+@ContextConfiguration(classes = {TransactionController.class,
+        ApiExceptionConfig.class,
+        GlobalExceptionHandler.class,
+        GlobalErrorAttributes.class})
 class TransactionControllerTest {
 
     Transaction transactionWithId;
@@ -72,8 +78,7 @@ class TransactionControllerTest {
         Transaction transactionWithCustomerWithTimestamps = objectStub.createTransaction(UUID.randomUUID().toString())
                 .withInternalTimestamps(null).withExternalTimestamps(null);
         transactionWithId = transactionWithCustomerWithTimestamps
-                .withCustomer(transactionWithCustomerWithTimestamps.getCustomer()
-                        .withInternalTimestamps(null).withExternalTimestamps(null));
+                .withCustomer(null);
         transactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithId);
         source = objectStub.getUnifiedSource();
     }
@@ -358,6 +363,7 @@ class TransactionControllerTest {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             transactionController.upsert(transactionDto.getExternalId(), transactionDto.getSource(), nullTransactionDto);
         });
+
         // Then
         assertEquals("transactionDto is marked non-null but is null", nullPointerException.getMessage());
     }

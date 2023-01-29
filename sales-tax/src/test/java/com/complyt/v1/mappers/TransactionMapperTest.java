@@ -2,7 +2,12 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.TransactionDto;
+import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.v1.models.*;
+import com.complyt.v1.models.timestamps.ComplytTimestampDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
+import org.bson.types.ObjectId;
+import com.complyt.v1.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.ObjectStub;

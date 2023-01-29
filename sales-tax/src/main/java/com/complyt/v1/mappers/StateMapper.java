@@ -1,11 +1,12 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.State;
-import com.complyt.v1.model.StateDto;
+import com.complyt.v1.models.StateDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface StateMapper {
 
     StateMapper INSTANCE = Mappers.getMapper(StateMapper.class);

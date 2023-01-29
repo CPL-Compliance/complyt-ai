@@ -1,7 +1,7 @@
 package testUtils;
 
 import io.complyt.files.domain.File;
-import io.complyt.files.v1.model.FileDto;
+import io.complyt.files.v1.models.FileDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

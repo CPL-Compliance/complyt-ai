@@ -1,7 +1,8 @@
 package io.complyt.files.config;
 
 import io.complyt.files.annotations.Generated;
-import io.complyt.files.v1.exception.ObjectNotFoundException;
+import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
+import io.complyt.files.v1.exceptions.types.ObjectNotValidApiException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,8 @@ public class ApiExceptionConfig {
     @Bean
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
-                ObjectNotFoundException.class, HttpStatus.NOT_FOUND
+                ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
+                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

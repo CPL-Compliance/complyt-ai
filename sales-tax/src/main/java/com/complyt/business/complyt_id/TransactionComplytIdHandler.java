@@ -1,6 +1,9 @@
 package com.complyt.business.complyt_id;
 
 import com.complyt.domain.Transaction;
+import com.complyt.v1.exceptions.types.ComplytApiException;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,13 +19,13 @@ public class TransactionComplytIdHandler implements ComplytIdHandler<Transaction
     @Override
     public Mono<Transaction> checkComplytIdOfUpdatedEqualsToOld(Transaction newTransaction, Transaction oldTransaction) {
         return newTransaction.getComplytId() == null || newTransaction.getComplytId().equals(oldTransaction.getComplytId()) ?
-                Mono.just(newTransaction) : Mono.error(new NotFoundException("complyt ids of modified and original transactions are not equal"));
+                Mono.just(newTransaction) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override
     public Mono<Transaction> checkNewDontHaveComplytId(Transaction newTransaction) {
         return newTransaction.getComplytId() == null ?
-                Mono.just(newTransaction) : Mono.error(new NotFoundException("cannot insert new transaction with complyt id"));
+                Mono.just(newTransaction) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override

@@ -65,7 +65,7 @@ class CustomerComplytIdHandlerTest {
         Mono<Customer> customerMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newCustomer, customer);
 
         // Then
-        StepVerifier.create(customerMono).expectErrorMessage("complyt ids of modified and original customers are not equal").verify();
+        StepVerifier.create(customerMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test
@@ -89,7 +89,7 @@ class CustomerComplytIdHandlerTest {
         Mono<Customer> customerMono = complytIdHandler.checkNewDontHaveComplytId(newCustomer);
 
         // Then
-        StepVerifier.create(customerMono).expectErrorMessage("cannot insert new customer with complyt id").verify();
+        StepVerifier.create(customerMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test

@@ -41,7 +41,7 @@ class FileRepositoryTest {
     String tenantId;
 
     @BeforeEach
-    private void setUp(){
+    void setUp(){
         tenantId = objectStub.getTenantId();
         MockitoAnnotations.openMocks(this);
         file = objectStub.createFile();

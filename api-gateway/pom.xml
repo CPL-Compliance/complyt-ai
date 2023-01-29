@@ -35,6 +35,11 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+        </dependency>
+
         <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -112,6 +117,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
+                <version>2.1.0</version>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>

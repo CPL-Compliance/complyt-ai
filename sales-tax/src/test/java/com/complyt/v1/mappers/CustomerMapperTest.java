@@ -2,7 +2,7 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.v1.model.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.ObjectStub;
@@ -29,10 +29,8 @@ public class CustomerMapperTest {
         customerDto = objectStub.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());
     }
 
-
     @Test
     void customerToCustomerDto_Customer_returnCustomerDto() {
-
         // Given
         Customer givenCustomer = customer;
 
@@ -67,4 +65,28 @@ public class CustomerMapperTest {
         assertNull(givenCustomerDto);
     }
 
+    @Test
+    void customerDtoToCustomer_CustomerDtoIsNull_returnNull() {
+
+        // Given
+        CustomerDto givenCustomerDto = null;
+
+        // When
+        Customer actualCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+
+        // Then
+        assertEquals(null, actualCustomer);
+    }
+
+    @Test
+    void customerToCustomerDto_customerIsNull_returnNull() {
+        // Given
+        Customer givenCustomer = null;
+
+        // When
+        CustomerDto actualCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(givenCustomer);
+
+        // Then
+        assertEquals(givenCustomer, actualCustomerDto);
+    }
 }

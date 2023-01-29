@@ -64,7 +64,7 @@ class ExemptionComplytIdHandlerTest {
         Mono<Exemption> exemptionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption);
 
         // Then
-        StepVerifier.create(exemptionMono).expectErrorMessage("complyt ids of modified and original exemptions are not equal").verify();
+        StepVerifier.create(exemptionMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test
@@ -88,7 +88,7 @@ class ExemptionComplytIdHandlerTest {
         Mono<Exemption> exemptionMono = complytIdHandler.checkNewDontHaveComplytId(newExemption);
 
         // Then
-        StepVerifier.create(exemptionMono).expectErrorMessage("cannot insert new exemption with complyt id").verify();
+        StepVerifier.create(exemptionMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test

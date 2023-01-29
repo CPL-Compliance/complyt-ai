@@ -1,6 +1,9 @@
 package com.complyt.business.complyt_id;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.v1.exceptions.types.ComplytApiException;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,13 +19,13 @@ public class SalesTaxTrackingComplytIdHandler implements ComplytIdHandler<SalesT
     @Override
     public Mono<SalesTaxTracking> checkComplytIdOfUpdatedEqualsToOld(SalesTaxTracking newSalesTaxTracking, SalesTaxTracking oldSalesTaxTracking) {
         return newSalesTaxTracking.getComplytId() == null || newSalesTaxTracking.getComplytId().equals(oldSalesTaxTracking.getComplytId()) ?
-                Mono.just(newSalesTaxTracking) : Mono.error(new NotFoundException("complyt ids of modified and original salesTaxTrackings are not equal"));
+                Mono.just(newSalesTaxTracking) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override
     public Mono<SalesTaxTracking> checkNewDontHaveComplytId(SalesTaxTracking newSalesTaxTracking) {
         return newSalesTaxTracking.getComplytId() == null ?
-                Mono.just(newSalesTaxTracking) : Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id"));
+                Mono.just(newSalesTaxTracking) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override

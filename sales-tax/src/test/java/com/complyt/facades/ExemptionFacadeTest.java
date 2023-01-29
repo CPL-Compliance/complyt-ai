@@ -5,7 +5,7 @@ import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.ExemptionServiceImpl;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,7 +160,7 @@ public class ExemptionFacadeTest {
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, idThatDoesNotExist);
 
         // Then
-        StepVerifier.create(exemptionMono).expectError(ObjectNotFoundException.class).verify();
+        StepVerifier.create(exemptionMono).expectError(ObjectNotFoundApiException.class).verify();
     }
 
     @Test

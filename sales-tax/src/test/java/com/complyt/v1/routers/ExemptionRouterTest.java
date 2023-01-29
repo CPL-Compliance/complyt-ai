@@ -1,0 +1,96 @@
+package com.complyt.v1.routers;
+
+import com.complyt.config.JacksonConfig;
+import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.facades.ExemptionFacade;
+import com.complyt.v1.handlers.ExemptionHandler;
+import com.complyt.v1.mappers.ExemptionMapper;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.routers.ExemptionRouter;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+import testUtils.ObjectStub;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(SpringExtension.class)
+@WebFluxTest(ExemptionHandler.class)
+@ExtendWith(MockitoExtension.class)
+@Import(JacksonConfig.class)
+@ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class})
+public class ExemptionRouterTest {
+
+    ExemptionRouter exemptionRouter;
+
+    @Autowired
+    WebTestClient webTestClient;
+
+    @MockBean
+    ExemptionFacade exemptionFacade;
+
+    ObjectStub objectStub;
+
+    @BeforeEach
+    void setup() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        exemptionRouter = new ExemptionRouter();
+
+    }
+
+    @Test
+    void exemptionRoute_nullExemptionHandler_ThrowsNullPointerException() {
+        // Given
+        ExemptionHandler nullExemptionHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionRouter.exemptionsRoute(nullExemptionHandler);
+        });
+
+        // Then
+        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    @WithUserDetails
+    void exemptionRoute_ExemptionHandler_RoutingToExemptionHandler() {
+        //
+        UUID complytId = UUID.randomUUID();
+        Exemption expectedExemption = objectStub.createExemption(new ObjectId().toString()).withValidationDates(null).withInternalTimestamps(null);
+        ExemptionDto expectedExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(expectedExemption);
+
+        // When
+        when(exemptionFacade.findByComplytId(complytId)).thenReturn(Mono.just(expectedExemption));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemptionDto);
+    }
+
+}

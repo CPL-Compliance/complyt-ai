@@ -2,11 +2,10 @@ package com.complyt.facades;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.services.ExemptionService;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -31,6 +30,7 @@ public class ExemptionFacade {
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionService.findById(id);
     }
+
     public Mono<Exemption> findByComplytId(@NonNull final UUID complytId) {
         return exemptionService.findByComplytId(complytId);
     }
@@ -41,9 +41,9 @@ public class ExemptionFacade {
 
     public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final UUID complytId) {
         return exemptionService.findByComplytId(complytId).flatMap(originalExemption ->
-            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption,originalExemption)
-                    .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("Exemption with complyt id " + complytId + " not found")));
+                        exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption, originalExemption)
+                                .flatMap(checkedExemption -> exemptionService.update(checkedExemption, originalExemption, complytId)))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     public Mono<DeleteResult> delete(@NonNull final UUID complytId) {

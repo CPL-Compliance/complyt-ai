@@ -5,9 +5,9 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
-import com.complyt.v1.exceptions.ObjectNotFoundException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.model.TransactionDto;
+import com.complyt.v1.models.TransactionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +42,7 @@ public class TransactionController {
         log.debug("Get customer by external id and source - id and source received as path variables : " + externalId + ", " + source);
         return transactionFacade.findByExternalIdAndSource(externalId, source)
                 .map(transactionItem -> new ResponseEntity<>(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem), HttpStatus.OK))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @Operation(summary = "Gets all transactions")
@@ -68,7 +68,7 @@ public class TransactionController {
     public Mono<ResponseEntity<TransactionDto>> getByComplytId(@PathVariable("complytId") @NonNull UUID complytId) {
         return transactionFacade.findByComplytId(complytId)
                 .map(transactionItem -> new ResponseEntity<>(TransactionMapper.INSTANCE.transactionToTransactionDto(transactionItem), HttpStatus.OK))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundException("No Transaction with complytId: " + complytId)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @Operation(summary = "This will update the transaction if found by externalId & source, otherwise it will create it")

@@ -15,12 +15,12 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.model.*;
-import com.complyt.v1.model.customer.CustomerDto;
-import com.complyt.v1.model.customer.CustomerTypeDto;
-import com.complyt.v1.model.customer.exemption.*;
-import com.complyt.v1.model.timestamps.ComplytTimestampDto;
-import com.complyt.v1.model.timestamps.TimestampsDto;
+import com.complyt.v1.models.*;
+import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.timestamps.ComplytTimestampDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.util.ArrayList;
 import java.util.List;

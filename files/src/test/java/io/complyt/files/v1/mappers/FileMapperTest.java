@@ -1,7 +1,7 @@
 package io.complyt.files.v1.mappers;
 
 import io.complyt.files.domain.File;
-import io.complyt.files.v1.model.FileDto;
+import io.complyt.files.v1.models.FileDto;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

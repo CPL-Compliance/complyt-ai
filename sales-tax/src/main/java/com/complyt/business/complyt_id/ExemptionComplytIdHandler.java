@@ -1,6 +1,10 @@
 package com.complyt.business.complyt_id;
 
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.v1.exceptions.types.ComplytApiException;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,13 +20,13 @@ public class ExemptionComplytIdHandler implements ComplytIdHandler<Exemption> {
     @Override
     public Mono<Exemption> checkComplytIdOfUpdatedEqualsToOld(Exemption newExemption, Exemption oldExemption) {
         return newExemption.getComplytId() == null || newExemption.getComplytId().equals(oldExemption.getComplytId()) ?
-                Mono.just(newExemption) : Mono.error(new NotFoundException("complyt ids of modified and original exemptions are not equal"));
+                Mono.just(newExemption) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override
     public Mono<Exemption> checkNewDontHaveComplytId(Exemption newExemption) {
         return newExemption.getComplytId() == null ?
-                Mono.just(newExemption) : Mono.error(new NotFoundException("cannot insert new exemption with complyt id"));
+                Mono.just(newExemption) : Mono.error(new ConflictedDataApiException());
     }
 
     @Override

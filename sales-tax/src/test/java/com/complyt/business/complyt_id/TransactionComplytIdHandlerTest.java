@@ -65,7 +65,7 @@ class TransactionComplytIdHandlerTest {
         Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("complyt ids of modified and original transactions are not equal").verify();
+        StepVerifier.create(transactionMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test
@@ -89,7 +89,7 @@ class TransactionComplytIdHandlerTest {
         Mono<Transaction> transactionMono = complytIdHandler.checkNewDontHaveComplytId(newTransaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectErrorMessage("cannot insert new transaction with complyt id").verify();
+        StepVerifier.create(transactionMono).expectErrorMessage("400 BAD_REQUEST \"The requested operation failed because there was an unresolvable conflict between two or more inputs.\"").verify();
     }
 
     @Test
