@@ -1,6 +1,5 @@
 package com.complyt.business.builder;
 
-import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import lombok.NonNull;
 

@@ -28,8 +28,8 @@ public class SalesTaxTrackingFacade {
     }
 
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking, @NonNull String state) {
-        return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking,originalSalesTaxTracking)
-                .flatMap(checkedSalesTaxTracking -> salesTaxTrackingService.update(checkedSalesTaxTracking,state));
+        return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
+                .flatMap(checkedSalesTaxTracking -> salesTaxTrackingService.update(checkedSalesTaxTracking, state));
     }
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {

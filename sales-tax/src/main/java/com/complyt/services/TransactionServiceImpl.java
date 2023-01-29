@@ -121,7 +121,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll();
     }
 
-    public Flux<Transaction> findAllBySource(@NonNull final  String source) {
+    public Flux<Transaction> findAllBySource(@NonNull final String source) {
         return transactionRepository.findAllBySource(source);
     }
 

@@ -2,7 +2,6 @@ package io.complyt.files.services;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.repositories.FileRepository;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
-
-import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 
@@ -29,6 +26,7 @@ class FileServiceTest {
     FileRepository fileRepository;
 
     ObjectStub objectStub = new ObjectStub();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);

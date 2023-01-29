@@ -9,7 +9,6 @@ import io.complyt.files.v1.handlers.FileHandler;
 import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.models.FileDto;
 import io.complyt.files.v1.validators.ValidatorConfig;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

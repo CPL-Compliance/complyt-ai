@@ -3,7 +3,6 @@ package com.complyt.domain.customer.exemption;
 import com.complyt.domain.State;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

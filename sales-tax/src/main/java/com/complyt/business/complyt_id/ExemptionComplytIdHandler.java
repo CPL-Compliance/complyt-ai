@@ -1,14 +1,10 @@
 package com.complyt.business.complyt_id;
 
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.v1.exceptions.types.ComplytApiException;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

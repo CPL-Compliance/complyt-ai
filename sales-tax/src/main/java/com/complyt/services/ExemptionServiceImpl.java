@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -81,7 +80,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> checkComplytIdOfModifiedEqualsToOriginal(@NonNull Exemption modifiedExemption, @NonNull Exemption originalExemption) {
-        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedExemption,originalExemption);
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedExemption, originalExemption);
     }
 
     @Override

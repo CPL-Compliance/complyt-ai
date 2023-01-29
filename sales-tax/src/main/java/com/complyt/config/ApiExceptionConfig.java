@@ -30,7 +30,7 @@ public class ApiExceptionConfig {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
                 ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
-                ConflictedDataApiException. class, HttpStatus.BAD_REQUEST
+                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

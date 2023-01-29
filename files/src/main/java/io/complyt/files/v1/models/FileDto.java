@@ -10,5 +10,6 @@ import java.util.UUID;
 
 @With
 @Schema(name = "File")
-public record FileDto(UUID complytId, @NonNull @Size(max = 2048, message = "Link should be 2048 characters maximum") @NotBlank(message = "Link shouldn't be blank") String link) {
+public record FileDto(UUID complytId,
+                      @NonNull @Size(max = 2048, message = "Link should be 2048 characters maximum") @NotBlank(message = "Link shouldn't be blank") String link) {
 }

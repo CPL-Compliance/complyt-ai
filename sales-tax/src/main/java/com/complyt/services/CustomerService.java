@@ -1,6 +1,5 @@
 package com.complyt.services;
 
-import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.services.crud.CrudService;
 import com.complyt.services.crud.FindByName;
@@ -23,7 +22,9 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
     Mono<Customer> findByExternalIdAndSource(String externalId, String source);
 
     Flux<Customer> findAll();
+
     Flux<Customer> findAllBySource(String source);
+
     Mono<Customer> findByComplytId(UUID complytId);
 
     Mono<Customer> findById(@NonNull ObjectId id);
@@ -33,5 +34,6 @@ public interface CustomerService extends CrudService<Customer, String>, FindByNa
     Mono<Customer> injectDataToNewCustomer(Customer customer);
 
     Mono<Customer> checkCustomerNotHavingComplytId(@NonNull final Customer newCustomer);
+
     Mono<Customer> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Customer modifiedCustomer, @NonNull final Customer originalCustomer);
 }

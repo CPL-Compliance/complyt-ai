@@ -14,7 +14,7 @@ public interface TransactionService extends CrudService<Transaction, String> {
 
     Mono<Transaction> findByComplytId(@NonNull final UUID complytId);
 
-    Flux<Transaction> findAllBySource(@NonNull final  String source);
+    Flux<Transaction> findAllBySource(@NonNull final String source);
 
     Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction);
 

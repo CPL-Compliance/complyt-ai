@@ -38,13 +38,15 @@ public class CustomerFacade {
     public Mono<Customer> findByExternalIdAndSource(String externalId, String source) {
         return customerService.findByExternalIdAndSource(externalId, source);
     }
-    public Mono<Customer> findByComplytId( @NonNull UUID complytId) {
+
+    public Mono<Customer> findByComplytId(@NonNull UUID complytId) {
         return customerService.findByComplytId(complytId);
     }
 
     public Flux<Customer> getAll() {
         return customerService.findAll();
     }
+
     public Flux<Customer> getAllBySource(String source) {
         return customerService.findAllBySource(source);
     }

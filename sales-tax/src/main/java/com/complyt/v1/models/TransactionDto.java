@@ -3,7 +3,9 @@ package com.complyt.v1.models;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
 import java.util.UUID;

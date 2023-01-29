@@ -3,8 +3,6 @@ package com.complyt.domain.customer.exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -12,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString
 public class ValidationDates {
 
-    private  final ComplytTimestamp fromDate;
+    private final ComplytTimestamp fromDate;
     private final ComplytTimestamp toDate;
 
 }

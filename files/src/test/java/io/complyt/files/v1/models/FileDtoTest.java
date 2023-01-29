@@ -17,6 +17,7 @@ class FileDtoTest {
     private String linkStr = "http://localhost";
 
     private ObjectStub objectStub = new ObjectStub();
+
     @BeforeEach
     public void setUp() {
 

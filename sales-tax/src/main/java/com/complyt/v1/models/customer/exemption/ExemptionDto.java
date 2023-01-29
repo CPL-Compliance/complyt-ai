@@ -4,7 +4,6 @@ import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.bson.types.ObjectId;
 
 import java.util.UUID;
 

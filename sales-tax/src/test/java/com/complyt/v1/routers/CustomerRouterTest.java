@@ -9,6 +9,7 @@ import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.CustomerHandler;
+import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidationHandler;
@@ -85,7 +86,7 @@ class CustomerRouterTest {
         String externalId = customerDto.getExternalId();
         String source = customerDto.getSource();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
-        when(customerFacade.findByExternalIdAndSource(externalId,source)).thenReturn(Mono.empty());
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
         when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
 

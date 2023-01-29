@@ -17,18 +17,18 @@ public class ObjectStub {
     private String tenantId = UUID.randomUUID().toString();
 
     public File createFile() {
-        return new File(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr );
+        return new File(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr);
     }
 
     public File createFile(UUID complytId, String id) {
-        return new File(complytId, id, tenantId, linkStr );
+        return new File(complytId, id, tenantId, linkStr);
     }
 
     public FileDto createFileDto() {
-        return  new FileDto(UUID.randomUUID(), linkStr);
+        return new FileDto(UUID.randomUUID(), linkStr);
     }
 
     public FileDto createFileDto(UUID complytId) {
-        return  new FileDto(complytId, linkStr);
+        return new FileDto(complytId, linkStr);
     }
 }
