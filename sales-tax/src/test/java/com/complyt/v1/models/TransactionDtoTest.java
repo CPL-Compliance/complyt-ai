@@ -21,14 +21,13 @@ class TransactionDtoTest {
     private String externalId;
     private LocalDateTime localDateTime;
     private ObjectId customerId;
-    private String transactionId;
 
     @BeforeEach
     void setup() {
         externalId = UUID.randomUUID().toString();
         localDateTime = LocalDateTime.now();
         customerId = new ObjectId();
-        transactionId = UUID.randomUUID().toString();
+        String transactionId = UUID.randomUUID().toString();
         transactionDto = createTransactionDto(transactionId);
     }
 
