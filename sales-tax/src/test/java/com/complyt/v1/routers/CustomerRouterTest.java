@@ -3,6 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
@@ -44,10 +45,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
+
 @WebFluxTest
-@Import(JacksonConfig.class)
 @WithMockUser(username = "mock", password = "mock")
 @ContextConfiguration(classes = {CustomerRouter.class, CustomerHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
@@ -315,20 +314,93 @@ class CustomerRouterTest {
                 .equals(allCustomers);
     }
 
-//    @Test
-//        // These @NonNull in CustomerRouter can't be tested but still checked by codecov.
-//    void routerFunctions_NullHandler() {
-//        // Given
-//        CustomerHandler nullCustomerHandler = null;
-//
-//        // When
-//        RouterFunction getAllRouterFunction = customerRouter.getAllCustomersRouterFunction(nullCustomerHandler);
-//        RouterFunction getAllBySourceRouterFunction = customerRouter.getAllCustomersBySourceRouterFunction(nullCustomerHandler);
-//        RouterFunction getByNameRouterFunction = customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
-//        RouterFunction getByComplytIdRouterFunction = customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
-//        RouterFunction upsertRouterFunction = customerRouter.upsertCustomerByExternalIdRouterFunction(nullCustomerHandler);
-//        RouterFunction getByExternalIdRouterFunction = customerRouter.getCustomerByExternalIdRouterFunction(nullCustomerHandler);
-//
-//
-//    }
+    @Test
+    void getAllCustomersRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.getAllCustomersRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getCustomerByExternalIdRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.getCustomerByExternalIdRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAllCustomersBySourceRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.getAllCustomersBySourceRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getCustomerByComplytIdRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getCustomerByNameRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void upsertCustomerByExternalIdRouterFunctions_NullHandler_ThrowsException() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+        CustomerRouter customerRouter = new CustomerRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            customerRouter.upsertCustomerByExternalIdRouterFunction(nullCustomerHandler);
+        });
+
+        // Then
+        assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
 }
