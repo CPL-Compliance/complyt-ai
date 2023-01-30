@@ -18,12 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @Schema(name = "Timestamps")
 public class TimestampsDto {
 
-    @NonNull
     @Valid
     @NotNull(message = "Created date may not be null")
     ComplytTimestampDto createdDate;
 
-    @NonNull
     @Valid
     @NotNull(message = "Updated date may not be null")
     ComplytTimestampDto updatedDate;

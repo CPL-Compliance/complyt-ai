@@ -26,34 +26,28 @@ public class CustomerDto {
 
     UUID complytId;
 
-    @NonNull
     @NotBlank(message = "External ID may not be blank")
     @Size(min = 1, max = 256, message = "External ID length should be 1-256 characters maximum")
     String externalId;
 
-    @NonNull
     @NotBlank(message = "External ID may not be blank")
-    @Pattern(regexp = "[0-9]", message = "source should be a single digit")
+    @Pattern(regexp = "[1-9]", message = "source should be a single digit")
     String source;
 
-    @NonNull
     @NotBlank(message = "Name may not be blank")
     @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum")
     String name;
 
-    @NonNull
     @Valid
     @NotNull(message = "Address may not be null")
     AddressDto address;
 
-    @NonNull
     @NotNull(message = "Customer type may not be null")
     CustomerTypeDto customerType;
 
     @Valid
     TimestampsDto internalTimestamps;
 
-    @NonNull
     @Valid
     @NotNull(message = "External timestamps may not be null")
     TimestampsDto externalTimestamps;
