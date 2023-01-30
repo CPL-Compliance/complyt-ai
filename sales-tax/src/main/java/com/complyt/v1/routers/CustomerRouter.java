@@ -15,7 +15,7 @@ public class CustomerRouter {
 
     @Bean
     @UpsertCustomerByExternalIdAndSourceApiInfo
-    public RouterFunction<ServerResponse> upsertCustomerByExternalIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    public RouterFunction<ServerResponse> upsertCustomerByExternalIdRouterFunction( final CustomerHandler customerHandler) {
         RequestPredicate putCustomerRoute = RequestPredicates
                 .PUT(BASE_URL + "/source/{source}/externalId/{externalId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
@@ -25,7 +25,7 @@ public class CustomerRouter {
 
     @Bean
     @GetAllCustomersApiInfo
-    public RouterFunction<ServerResponse> getAllCustomersRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    public RouterFunction<ServerResponse> getAllCustomersRouterFunction( final CustomerHandler customerHandler) {
         RequestPredicate putCustomerRoute = RequestPredicates
                 .GET(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
@@ -35,7 +35,7 @@ public class CustomerRouter {
 
     @Bean
     @GetAllCustomersBySourceApiInfo
-    public RouterFunction<ServerResponse> getAllCustomersBySourceRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    public RouterFunction<ServerResponse> getAllCustomersBySourceRouterFunction( final CustomerHandler customerHandler) {
         RequestPredicate putCustomerRoute = RequestPredicates
                 .GET(BASE_URL + "/source/{source}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
@@ -45,7 +45,7 @@ public class CustomerRouter {
 
     @Bean
     @GetCustomerByExternalIdAndSourceApiInfo
-    public RouterFunction<ServerResponse> getCustomerByExternalIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    public RouterFunction<ServerResponse> getCustomerByExternalIdRouterFunction( final CustomerHandler customerHandler) {
         RequestPredicate getCustomerRoute = RequestPredicates
                 .GET(BASE_URL + "/source/{source}/externalId/{externalId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
@@ -55,7 +55,7 @@ public class CustomerRouter {
 
     @Bean
     @GetCustomerByComplytIdApiInfo
-    public RouterFunction<ServerResponse> getCustomerByComplytIdRouterFunction(@NonNull final CustomerHandler customerHandler) {
+    public RouterFunction<ServerResponse> getCustomerByComplytIdRouterFunction( final CustomerHandler customerHandler) {
         RequestPredicate getCustomerRoute = RequestPredicates
                 .GET(BASE_URL + "/complytId/{complytId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));

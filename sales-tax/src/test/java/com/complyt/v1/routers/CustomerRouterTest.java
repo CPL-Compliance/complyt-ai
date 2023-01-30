@@ -315,20 +315,20 @@ class CustomerRouterTest {
                 .equals(allCustomers);
     }
 
-    @Test
-        // These @NonNull in CustomerRouter can't be tested but still checked by codecov.
-    void routerFunctions_NullHandler() {
-        // Given
-        CustomerHandler nullCustomerHandler = null;
-
-        // When
-        RouterFunction getAllRouterFunction = customerRouter.getAllCustomersRouterFunction(nullCustomerHandler);
-        RouterFunction getAllBySourceRouterFunction = customerRouter.getAllCustomersBySourceRouterFunction(nullCustomerHandler);
-        RouterFunction getByNameRouterFunction = customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
-        RouterFunction getByComplytIdRouterFunction = customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
-        RouterFunction upsertRouterFunction = customerRouter.upsertCustomerByExternalIdRouterFunction(nullCustomerHandler);
-        RouterFunction getByExternalIdRouterFunction = customerRouter.getCustomerByExternalIdRouterFunction(nullCustomerHandler);
-
-
-    }
+//    @Test
+//        // These @NonNull in CustomerRouter can't be tested but still checked by codecov.
+//    void routerFunctions_NullHandler() {
+//        // Given
+//        CustomerHandler nullCustomerHandler = null;
+//
+//        // When
+//        RouterFunction getAllRouterFunction = customerRouter.getAllCustomersRouterFunction(nullCustomerHandler);
+//        RouterFunction getAllBySourceRouterFunction = customerRouter.getAllCustomersBySourceRouterFunction(nullCustomerHandler);
+//        RouterFunction getByNameRouterFunction = customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
+//        RouterFunction getByComplytIdRouterFunction = customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
+//        RouterFunction upsertRouterFunction = customerRouter.upsertCustomerByExternalIdRouterFunction(nullCustomerHandler);
+//        RouterFunction getByExternalIdRouterFunction = customerRouter.getCustomerByExternalIdRouterFunction(nullCustomerHandler);
+//
+//
+//    }
 }
