@@ -44,7 +44,7 @@ public class ObjectStub {
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
-        source = String.valueOf(Math.round(Math.random() * 10));
+        source = "1";
     }
 
     public String getUnifiedSource() {
