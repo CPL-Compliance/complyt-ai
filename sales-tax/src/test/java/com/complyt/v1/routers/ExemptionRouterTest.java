@@ -7,7 +7,6 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.routers.ExemptionRouter;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

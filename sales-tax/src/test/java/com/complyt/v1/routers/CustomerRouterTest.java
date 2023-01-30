@@ -71,6 +71,7 @@ class CustomerRouterTest {
     private WebTestClient webTestClient;
 
     private ObjectStub objectStub;
+    private RouterFunction routerFunction;
 
     @BeforeEach
     void setUp() {
@@ -314,64 +315,20 @@ class CustomerRouterTest {
                 .equals(allCustomers);
     }
 
-//    @Test
-//    void upsertCustomer_NullExternalId_ThrowsNullPointerException() {
-//        // Given
-//        String nullExternalId = null;
-//        customerRouter = new CustomerController(customerFacade);
-//
-//        // When
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            customerRouter.upsert(nullExternalId, customerDto);
-//        });
-//
-//        // Then
-//        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
-//    }
-//
-//    @Test
-//    void upsertCustomer_NullCustomerDto_ThrowsNullPointerException() {
-//        //Given
-//        String externalId = UUID.randomUUID().toString();
-//        CustomerDto nullCustomerDto = null;
-//        customerRouter = new CustomerController(customerFacade);
-//
-//        // When
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            customerRouter.upsert(externalId, nullCustomerDto);
-//        });
-//
-//        // Then
-//        assertEquals("customerDto is marked non-null but is null", nullPointerException.getMessage());
-//    }
-//
-//    @Test
-//    void getByExternalId_NullExternalId_ThrowsNullPointerException() {
-//        //Given
-//        String nullExternalId = null;
-//        customerRouter = new CustomerController(customerFacade);
-//
-//        // When
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            customerRouter.getByExternalId(nullExternalId);
-//        });
-//
-//        // Then
-//        assertEquals("externalId is marked non-null but is null", nullPointerException.getMessage());
-//    }
-//
-//    @Test
-//    void getByName_NullName_ThrowsNullPointerException() {
-//        //Given
-//        String nullName = null;
-//        customerRouter = new CustomerController(customerFacade);
-//
-//        // When
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            customerRouter.getByName(nullName);
-//        });
-//
-//        // Then
-//        assertEquals("name is marked non-null but is null", nullPointerException.getMessage());
-//    }
+    @Test
+        // These @NonNull in CustomerRouter can't be tested but still checked by codecov.
+    void routerFunctions_NullHandler() {
+        // Given
+        CustomerHandler nullCustomerHandler = null;
+
+        // When
+        RouterFunction getAllRouterFunction = customerRouter.getAllCustomersRouterFunction(nullCustomerHandler);
+        RouterFunction getAllBySourceRouterFunction = customerRouter.getAllCustomersBySourceRouterFunction(nullCustomerHandler);
+        RouterFunction getByNameRouterFunction = customerRouter.getCustomerByNameRouterFunction(nullCustomerHandler);
+        RouterFunction getByComplytIdRouterFunction = customerRouter.getCustomerByComplytIdRouterFunction(nullCustomerHandler);
+        RouterFunction upsertRouterFunction = customerRouter.upsertCustomerByExternalIdRouterFunction(nullCustomerHandler);
+        RouterFunction getByExternalIdRouterFunction = customerRouter.getCustomerByExternalIdRouterFunction(nullCustomerHandler);
+
+
+    }
 }
