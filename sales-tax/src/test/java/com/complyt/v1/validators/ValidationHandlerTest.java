@@ -39,7 +39,6 @@ class ValidationHandlerTest {
 
     @Test
     void validate_validCustomer_returnsCustomerDto() {
-        objectStub = new ObjectStub(new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
         when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
         Mono<CustomerDto> validationMono = customerDtoValidationHandler.validate(serverRequest);
