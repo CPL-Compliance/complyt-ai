@@ -18,73 +18,60 @@ public class TransactionDto {
     @Size(min = 1, max = 256, message = "ID length should be 1-256 characters maximum")
     String id;
 
-    @NonNull
     @NotBlank(message = "External ID may not be blank")
     @Size(min = 1, max = 256, message = "External ID length should be 1-256 characters maximum")
     String externalId;
 
     @NotEmpty(message = "Items list cannot be empty")
-    @NonNull
+    @NotNull(message = "Items may not be null")
     List<@Valid ItemDto> items;
 
-    @NonNull
     @Valid
     @NotNull(message = "Billing address may not be null")
     AddressDto billingAddress;
 
-    @NonNull
     @Valid
     @NotNull(message = "Shipping address may not be null")
     AddressDto shippingAddress;
 
-    @NonNull
     @NotNull(message = "Customer Id may not be null")
     ObjectId customerId;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Customer may not be null")
     CustomerDto customer;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Sales Tax may not be null")
     SalesTaxDto salesTax;
 
-    @NonNull
     @NotNull(message = "Transaction Status type may not be null")
     TransactionStatusDto transactionStatus;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Internal timestamps may not be null")
     TimestampsDto internalTimestamps;
 
-    @NonNull
     @Valid
     @NotNull(message = "External timestamps may not be null")
     TimestampsDto externalTimestamps;
 
-    @NonNull
-    @NotNull(message = "Transaction Type type may not be null")
+    @NotNull(message = "Transaction Type may not be null")
     TransactionTypeDto transactionType;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Shipping Fee may not be null")
     ShippingFeeDto shippingFee;
 
-    @NonNull
     @NotBlank(message = "Created From may not be blank")
     @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum")
     String createdFrom;
 
-    @Min(value = 0, message = "Taxable items amount's minimum value is 0")
+    @NotNull(message = "Taxable items amount may not be null")
+    @PositiveOrZero(message = "Taxable items amount can not be a negative number")
     float taxableItemsAmount;
 
-    @Min(value = 0, message = "Tangible items amount's minimum value is 0")
+    @NotNull(message = "Tangible items amount may not be null")
+    @PositiveOrZero(message = "Tangible items amount can not be a negative number")
     float tangibleItemsAmount;
 
-    @Min(value = 0, message = "Total items amount's minimum value is 0")
+    @NotNull(message = "Total items amount may not be null")
+    @PositiveOrZero(message = "Total items amount can not be a negative number")
     float totalItemsAmount;
 }

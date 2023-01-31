@@ -2,14 +2,13 @@ package com.complyt.v1.controllers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.config.JacksonConfig;
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.*;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
@@ -33,6 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -83,6 +83,9 @@ class TransactionControllerTest {
             }
         };
 
+        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+
         transactionWithId = Transaction.builder()
                 .id(id)
                 .externalId(externalId)
@@ -90,7 +93,9 @@ class TransactionControllerTest {
                 .billingAddress(billingAddress)
                 .shippingAddress(shippingAddress)
                 .customerId(customerId)
+                .externalTimestamps(externalTimestamps)
                 .transactionStatus(TransactionStatus.ACTIVE)
+                .transactionType(TransactionType.INVOICE)
                 .tenantId(tenantId.toString())
                 .build();
 

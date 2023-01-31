@@ -11,38 +11,31 @@ import lombok.*;
 @ToString
 @Schema(name = "Item")
 public class ItemDto {
-    @Min(value = 0, message = "Unit Price's minimum value is 0")
+    @PositiveOrZero(message = "Unit Price can not be a negative number")
     private float unitPrice;
 
-    @Min(value = 0, message = "Quantity's minimum value is 0")
+    @PositiveOrZero(message = "Quantity can not be a negative number")
     private int quantity;
 
-    @Min(value = 0, message = "Total Price's minimum value is 0")
+    @PositiveOrZero(message = "Total Price can not be a negative number")
     private float totalPrice;
 
-    @NonNull
     @NotBlank(message = "Description may not be blank")
     @Size(min = 1, max = 256, message = "Description should be 1-256 characters maximum")
     private String description;
 
-    @NonNull
     @NotBlank(message = "Name may not be blank")
     @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum")
     private String name;
 
-    @NonNull
     @NotBlank(message = "Tax Code may not be blank")
     @Size(min = 1, max = 256, message = "Tax Code should be 1-256 characters maximum")
     private String taxCode;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Jurisdictional Sales Tax Rules may not be null")
     private JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Jurisdictional Sales Tax Rules may not be null")
     private SalesTaxRateDto salesTaxRate;
 
     @NotNull(message = "Manual Sales Tax may not be null")
@@ -53,11 +46,9 @@ public class ItemDto {
     @DecimalMax(value = "0.2", message = "manualSalesTaxRate's maximum value is 0.2")
     private float manualSalesTaxRate;
 
-    @NonNull
     @NotNull(message = "Tangible Category type may not be null")
     private TangibleCategoryDto tangibleCategory;
 
-    @NonNull
     @NotNull(message = "Taxable Category type may not be null")
     private TaxableCategoryDto taxableCategory;
 }

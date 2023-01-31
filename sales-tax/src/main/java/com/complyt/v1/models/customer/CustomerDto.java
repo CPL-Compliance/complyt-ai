@@ -41,9 +41,7 @@ public class CustomerDto {
     @NotNull(message = "Customer type may not be null")
     CustomerTypeDto customerType;
 
-    @NonNull
     @Valid
-    @NotNull(message = "Internal timestamps may not be null")
     TimestampsDto internalTimestamps;
 
     @NonNull
