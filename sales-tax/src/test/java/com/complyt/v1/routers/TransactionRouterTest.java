@@ -4,7 +4,6 @@ import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.TransactionFacade;
-import com.complyt.v1.controllers.TransactionController;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.TransactionHandler;
@@ -22,14 +21,19 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @WebFluxTest
 @WithMockUser(username = "mock", password = "mock")
@@ -55,19 +59,25 @@ public class TransactionRouterTest {
     @Autowired
     private WebTestClient webTestClient;
 
+    String source;
+
     @BeforeEach
     void setUp() {
         ObjectStub objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
+                .withInternalTimestamps(null)
+                .withExternalTimestamps(null)
+                .withCustomer(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
     void getByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
         // Given
-        String externalId = transactionDto.getExternalId();
-        String source = transactionDto.getSource();
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
 
         // When + Then
@@ -83,8 +93,135 @@ public class TransactionRouterTest {
                 .value(transactionItem -> transactionItem, equalTo(transactionDto));
     }
 
+    @Test
+    void getAll_ExpectTwoTransactions_ReturnsTwoTransactions() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
 
+        // When
+        when(transactionFacade.getAll()).thenReturn(Flux.just(firstTransaction, secondTransaction));
 
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
 
+    @Test
+    void getAllBySource_ExpectTwoTransactions_ReturnsTwoTransactions() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
+        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
+            add(transactionNoId);
+            add(secondTransactionNoId);
+        }};
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
+
+    @Test
+    void getByComplytId_FindsTransaction_ReturnsTransaction() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionItem -> transactionItem, equalTo(transactionDto));
+    }
+
+    @Test
+    void upsert_NewTransactionCreated_ReturnsStatus201Created() {
+        // Given
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(transactionDto.externalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transaction));
+        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
+
+        TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDto.externalId())
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransactionDto));
+    }
+
+    @Test
+    void update_TransactionExists_ReturnsStatus200() {
+        // Given
+        String externalId = transactionDto.externalId();
+        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
+        Transaction updatedTransaction = mappedTransaction.withId(transaction.getId());
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
+        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
+    }
 
 }
