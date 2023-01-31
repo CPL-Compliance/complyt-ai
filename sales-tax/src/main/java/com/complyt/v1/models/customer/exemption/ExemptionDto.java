@@ -4,7 +4,8 @@ import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.bson.types.ObjectId;
+
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
@@ -13,8 +14,8 @@ import org.bson.types.ObjectId;
 @With
 @Schema(name = "Exemption")
 public class ExemptionDto {
-    private final String id;
-    private final ObjectId customerId;
+    private final UUID complytId;
+    private final UUID customerId;
     private final StateDto state;
     private final ClassificationDto classification;
     private final ValidationDatesDto validationDates;

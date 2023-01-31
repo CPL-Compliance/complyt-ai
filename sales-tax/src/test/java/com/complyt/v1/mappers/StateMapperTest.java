@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class StateMapperTest {
     private State state;
@@ -41,5 +42,16 @@ public class StateMapperTest {
 
         // Then
         assertEquals(state, actualState);
+    }
+
+    @Test
+    void mapping_NullState_ReturnNull() {
+        // Given + When
+        State givenState = StateMapper.INSTANCE.stateDtoToState(null);
+        StateDto givenStateDto = StateMapper.INSTANCE.stateToStateDto(null);
+
+        // Then
+        assertNull(givenState);
+        assertNull(givenStateDto);
     }
 }

@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.complyt_id.CustomerComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
@@ -13,6 +14,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -23,36 +25,52 @@ public class CustomerServiceImpl implements CustomerService {
     @NonNull
     private CustomerRepository customerRepository;
 
+    @NonNull
+    private CustomerComplytIdHandler customerComplytIdHandler;
+
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {
-        Customer customerWithInjectedData = injectDataToNewCustomer(customer);
-        return customerRepository.save(customerWithInjectedData);
+        return customerRepository.save(customer);
     }
 
     public Mono<Customer> update(@NonNull Customer newCustomer) {
-        return customerRepository.findByExternalId(newCustomer.getExternalId())
+        return customerRepository.findByExternalIdAndSource(newCustomer.getExternalId(), newCustomer.getSource())
                 .switchIfEmpty(Mono.error(new NotFoundException("No customer with externalId " + newCustomer.getExternalId())))
-                .map(originalCustomer -> {
-                    Customer customerWithInjectedData = injectDataToExistingCustomer(newCustomer, originalCustomer);
-                    return createFunctionUpdateCustomer(customerWithInjectedData).apply(originalCustomer);
-                })
-                .flatMap(customerRepository::save);
-    }
-
-    public Customer injectDataToNewCustomer(Customer customer) {
-        return new NewCustomerInternalTimestampsInjector(customer).inject();
-    }
-
-    public Customer injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
-        Customer existingCustomerWithInternalTimeStamps = newCustomer
-                .withInternalTimestamps(originalCustomer.getInternalTimestamps());
-
-        return new ExistingCustomerInternalTimestampsInjector(existingCustomerWithInternalTimeStamps).inject();
+                .flatMap(originalCustomer ->
+                        injectDataToExistingCustomer(newCustomer, originalCustomer)
+                                .map(customerWithInjectedData -> createFunctionUpdateCustomer(customerWithInjectedData)
+                                        .apply(originalCustomer)
+                                )).flatMap(customerRepository::save);
     }
 
     @Override
-    public Mono<Customer> findByExternalId(String externalId) {
-        return customerRepository.findByExternalId(externalId);
+    public Mono<Customer> injectDataToNewCustomer(Customer customer) {
+        return Mono.just(customer)
+                .map(customerComplytIdHandler::insertComplytIdToNew)
+                .map(NewCustomerInternalTimestampsInjector::new)
+                .map(NewCustomerInternalTimestampsInjector::inject);
+    }
+
+    @Override
+    public Mono<Customer> checkCustomerNotHavingComplytId(@NonNull Customer newCustomer) {
+        return customerComplytIdHandler.checkNewDontHaveComplytId(newCustomer);
+    }
+
+    public Mono<Customer> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Customer modifiedCustomer, @NonNull final Customer originalCustomer) {
+        return customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer);
+    }
+
+    @Override
+    public Mono<Customer> injectDataToExistingCustomer(Customer newCustomer, Customer originalCustomer) {
+        return Mono.just(newCustomer).map(customer -> customer
+                        .withInternalTimestamps(originalCustomer.getInternalTimestamps()))
+                .map(ExistingCustomerInternalTimestampsInjector::new)
+                .map(ExistingCustomerInternalTimestampsInjector::inject);
+    }
+
+    @Override
+    public Mono<Customer> findByExternalIdAndSource(String externalId, String source) {
+        return customerRepository.findByExternalIdAndSource(externalId, source);
     }
 
     @Override
@@ -76,6 +94,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Flux<Customer> findAllBySource(String source) {
+        return customerRepository.findAllBySource(source);
+    }
+
+    @Override
+    public Mono<Customer> findByComplytId(UUID complytId) {
+        return customerRepository.findByComplytId(complytId);
+    }
+
+    @Override
     public Mono<Customer> findById(@NonNull ObjectId id) {
         return customerRepository.findById(id);
     }
@@ -83,8 +111,8 @@ public class CustomerServiceImpl implements CustomerService {
     private Function<Customer, Customer> createFunctionUpdateCustomer(final Customer customer) {
         return customerInfo ->
                 new Customer(
-                        customerInfo.getId(), customer.getExternalId(),
-                        customer.getName(), customer.getAddress(),
+                        customerInfo.getComplytId(), customerInfo.getId(), customer.getExternalId(),
+                        customer.getSource(), customer.getName(), customer.getAddress(),
                         customerInfo.getTenantId(), customer.getCustomerType(),
                         customer.getInternalTimestamps(), customer.getExternalTimestamps()
                 );

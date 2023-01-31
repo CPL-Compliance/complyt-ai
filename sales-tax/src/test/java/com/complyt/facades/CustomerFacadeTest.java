@@ -1,8 +1,7 @@
 package com.complyt.facades;
 
-import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.CustomerService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,25 +37,30 @@ class CustomerFacadeTest {
     CustomerService customerService;
 
     Customer customer;
+    String source;
+    ObjectStub objectStub;
 
     @BeforeAll
     void setUp() {
-        String tenantId = UUID.randomUUID().toString();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
+        customer = objectStub.createCustomer(id).withExternalId(externalId);
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
     void saveCustomer_CustomerSaved_CustomerReturned() {
         // Given
-        Customer customerNoId = customer.withId(null);
+        Customer newCustomer = customer.withId(null).withComplytId(null);
+        Customer newCustomerWithComplytId = newCustomer.withComplytId(customer.getComplytId());
         // When
 
-        when(customerService.save(customerNoId)).thenReturn(Mono.just(customer));
-        Mono<Customer> customerMono = customerFacade.saveCustomer(customerNoId);
+        when(customerService.checkCustomerNotHavingComplytId(newCustomer)).thenReturn(Mono.just(newCustomer));
+        when(customerService.injectDataToNewCustomer(newCustomer)).thenReturn(Mono.just(newCustomerWithComplytId));
+        when(customerService.save(newCustomerWithComplytId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.saveCustomer(newCustomer);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
@@ -67,6 +73,7 @@ class CustomerFacadeTest {
         Customer customerNoId = customer.withId(null);
 
         // When
+        when(customerService.checkComplytIdOfModifiedEqualsToOriginal(customerNoId, originalCustomer)).thenReturn(Mono.just(customerNoId));
         when(customerService.update(customerNoId)).thenReturn(Mono.just(customer));
         Mono<Customer> customerMono = customerFacade.updateIfModified(customerNoId, originalCustomer);
 
@@ -108,8 +115,8 @@ class CustomerFacadeTest {
 
 
         // When
-        when(customerService.findByExternalId(id)).thenReturn(Mono.just(customerToSearchFor));
-        Mono<Customer> customerMono = customerFacade.findByExternalId(id);
+        when(customerService.findByExternalIdAndSource(id, source)).thenReturn(Mono.just(customerToSearchFor));
+        Mono<Customer> customerMono = customerFacade.findByExternalIdAndSource(id, source);
 
         // Then
         StepVerifier.create(customerMono).expectNext(customerToSearchFor).verifyComplete();
@@ -118,18 +125,51 @@ class CustomerFacadeTest {
     @Test
     void getAllCustomers_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
-        String id = UUID.randomUUID().toString();
-        Customer secondCustomer = customer.withExternalId(id);
+        Customer secondCustomer = customer
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
         List<Customer> allCustomers = new ArrayList<>();
         allCustomers.add(customer);
         allCustomers.add(secondCustomer);
 
         // When
         when(customerService.findAll()).thenReturn(Flux.fromIterable(allCustomers));
-        Flux<Customer> returnedCustomers = customerFacade.getAllCustomers();
+        Flux<Customer> returnedCustomers = customerFacade.getAll();
 
         // Then
         StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getAllCustomersInSource_CustomersExistsInSource_ReturnsAllCustomersFound() {
+        // Given
+        String source = customer.getSource();
+        Customer secondCustomer = customer
+                .withComplytId(UUID.randomUUID())
+                .withExternalId(UUID.randomUUID().toString());
+        List<Customer> allCustomersInSource = new ArrayList<>();
+        allCustomersInSource.add(customer);
+        allCustomersInSource.add(secondCustomer);
+
+        // When
+        when(customerService.findAllBySource(source)).thenReturn(Flux.fromIterable(allCustomersInSource));
+        Flux<Customer> returnedCustomers = customerFacade.getAllBySource(source);
+
+        // Then
+        StepVerifier.create(returnedCustomers).expectNextCount(2).verifyComplete();
+    }
+
+    @Test
+    void getByComplytId_CustomerExists_ReturnsCustomer() {
+        // Given
+        UUID complytId = customer.getComplytId();
+
+        // When
+        when(customerService.findByComplytId(complytId)).thenReturn(Mono.just(customer));
+        Mono<Customer> customerMono = customerFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
@@ -166,6 +206,18 @@ class CustomerFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "originalCustomer is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> customerFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
 }

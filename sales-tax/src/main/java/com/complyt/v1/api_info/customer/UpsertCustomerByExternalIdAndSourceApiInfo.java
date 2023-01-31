@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
@@ -23,20 +24,35 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.GET,
+                method = RequestMethod.PUT,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by External ID",
-                        operationId = "getCustomerByExternalId",
+                        description = "Update or Insert Customer by External ID and source",
+                        operationId = "upsertCustomerByExternalId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Customer External ID",
-                                        examples = @ExampleObject(value = GetCustomerByExternalIdApiInfo.externalIdExample,
-                                                name = GetCustomerByExternalIdApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample)),
+                                @Parameter(in = ParameterIn.PATH,
+                                        name = "source",
+                                        description = "Customer Source",
+                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample))
                         },
                         tags = "customer",
+                        requestBody =
+                        @RequestBody(
+                                description = "Customer to add",
+                                required = true,
+                                content = @Content(
+                                        schema = @Schema(implementation = CustomerDto.class, required = true),
+                                        examples = {
+                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.newCustomerExample)
+                                        })
+                        ),
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -46,7 +62,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetCustomerByExternalIdApiInfo.customerExample)
+                                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -70,11 +86,36 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetCustomerByExternalIdApiInfo {
+public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
-    String customerExample = "{\n" +
+    String newCustomerExample = "{\n" +
+            "    \"externalId\":" + externalIdExample + ",\n" +
+            "    \"source\": \"1\",\n" +
+            "    \"name\": \"Complyt LTD.\",\n" +
+            "    \"address\": {\n" +
+            "        \"city\": \"Sacramento\",\n" +
+            "        \"country\": \"US\",\n" +
+            "        \"county\": null,\n" +
+            "        \"state\": \"CA\",\n" +
+            "        \"street\": \"944 W. Wintergreen St.\",\n" +
+            "        \"zip\": \"95823\"\n" +
+            "    },\n" +
+            "    \"customerType\": \"RETAIL\",\n" +
+            "    \"externalTimestamps\": {\n" +
+            "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
+            "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
+            "    },\n" +
+            "    \"internalTimestamps\": {\n" +
+            "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
+            "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
+            "    }\n" +
+            "}";
+
+    String returnedCustomerExample = "[{\n" +
+            "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-            "    \"externalId\": \"999444\",\n" +
+            "    \"externalId\": " + externalIdExample + ",\n" +
+            "    \"source\": \"1\",\n" +
             "    \"name\": \"Complyt LTD.\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
@@ -101,5 +142,5 @@ public @interface GetCustomerByExternalIdApiInfo {
             "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
             "        }\n" +
             "    }\n" +
-            "}";
+            "}]";
 }

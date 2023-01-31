@@ -20,6 +20,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 @Slf4j
 @AllArgsConstructor
@@ -34,29 +36,53 @@ public class CustomerHandler {
 
     @CustomerReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
-        Flux<CustomerDto> customerDtoMono = customerfacade.getAllCustomers()
+        Flux<CustomerDto> customerDtoFlux = customerfacade.getAll()
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto);
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
+    }
+
+    @CustomerReadPermission
+    public Mono<ServerResponse> getAllBySource(ServerRequest serverRequest) {
+        String source = serverRequest.pathVariable("source");
+        Flux<CustomerDto> customerDtoFlux = customerfacade.getAllBySource(source)
+                .map(CustomerMapper.INSTANCE::customerToCustomerDto);
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
 
     @CustomerUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
+        String source = serverRequest.pathVariable("source");
 
         return customerDtoValidationHandler.validate(serverRequest)
-                .map(CustomerMapper.INSTANCE::customerDtoToCustomer).flatMap(receivedCustomer ->
-                        customerfacade.findByExternalId(externalId)
+                .map(customerDto ->
+                        CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
+                .flatMap(receivedCustomer ->
+                        customerfacade.findByExternalIdAndSource(externalId, source)
                                 .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer)
                                         .flatMap(savedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class)))
                                 .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class))));
     }
 
     @CustomerReadPermission
-    public Mono<ServerResponse> getByExternalId(ServerRequest serverRequest) {
+    public Mono<ServerResponse> getByExternalIdAndSource(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
+        String source = serverRequest.pathVariable("source");
 
-        Mono<CustomerDto> customerDtoMono = customerfacade.findByExternalId(externalId)
+        Mono<CustomerDto> customerDtoMono = customerfacade.findByExternalIdAndSource(externalId, source)
+                .map(CustomerMapper.INSTANCE::customerToCustomerDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoMono, CustomerDto.class);
+    }
+
+    @CustomerReadPermission
+    public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
+        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+
+        Mono<CustomerDto> customerDtoMono = customerfacade.findByComplytId(complytId)
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 

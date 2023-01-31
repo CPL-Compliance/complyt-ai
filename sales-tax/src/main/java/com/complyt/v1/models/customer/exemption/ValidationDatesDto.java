@@ -1,17 +1,19 @@
 package com.complyt.v1.models.customer.exemption;
 
+import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Getter
-@AllArgsConstructor
 @EqualsAndHashCode
-@With
 @ToString
-@Schema(name = "Validation")
+@With
+@Getter
+@RequiredArgsConstructor
+@Schema(name = "validationDates")
 public class ValidationDatesDto {
-    private final LocalDateTime fromDate;
-    private final LocalDateTime toDate;
+
+    @NonNull
+    private final ComplytTimestampDto fromDate;
+    @NonNull
+    private final ComplytTimestampDto toDate;
 }

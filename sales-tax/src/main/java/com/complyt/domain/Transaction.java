@@ -7,11 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.UUID;
 
 @Value
 @Builder
@@ -19,13 +19,16 @@ import java.util.List;
 @AllArgsConstructor
 @Document(collection = "transaction")
 public class Transaction {
+
+    UUID complytId;
     @Id
     String id;
     String externalId;
+    String source;
     List<Item> items;
     Address billingAddress;
     Address shippingAddress;
-    ObjectId customerId;
+    UUID customerId;
     Customer customer;
     SalesTax salesTax;
     TransactionStatus transactionStatus;

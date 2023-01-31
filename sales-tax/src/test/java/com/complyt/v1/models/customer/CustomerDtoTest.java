@@ -1,15 +1,12 @@
 package com.complyt.v1.models.customer;
 
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.AddressDto;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,24 +19,15 @@ public class CustomerDtoTest {
 
     private CustomerDto customerDto;
     private CustomerDto anotherCustomerDto;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        AddressDto address = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-
-        Timestamps timestamps = createTimestamps();
-        TimestampsDto timestampsDto = new TimestampsDto(new ComplytTimestampDto(timestamps.getCreatedDate().getTimestamp().toString()), new ComplytTimestampDto(timestamps.getUpdatedDate().getTimestamp().toString()));
-        customerDto = new CustomerDto(id, externalId, name, address, CustomerTypeDto.RETAIL, timestampsDto, timestampsDto);
-        anotherCustomerDto = new CustomerDto(customerDto.getId(), customerDto.getExternalId(), customerDto.getName(), customerDto.getAddress(), customerDto.getCustomerType(), timestampsDto, timestampsDto);
-    }
-
-    private Timestamps createTimestamps() {
-        ComplytTimestamp createdDateTimestamp = new ComplytTimestamp(LocalDateTime.of(2002, 2, 2, 2, 2, 2));
-        ComplytTimestamp updatedDateTimestamp = new ComplytTimestamp(LocalDateTime.of(2003, 3, 3, 3, 3, 3));
-        return new Timestamps(createdDateTimestamp, updatedDateTimestamp);
+        customerDto = objectStub.createCustomerDto(id);
+        anotherCustomerDto = customerDto.withComplytId(customerDto.getComplytId());
     }
 
     @Test
@@ -55,8 +43,9 @@ public class CustomerDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "CustomerDto(id=" + customerDto.getId() +
+        String expectedString = "CustomerDto(complytId=" + customerDto.getComplytId() +
                 ", externalId=" + customerDto.getExternalId() +
+                ", source=" + customerDto.getSource() +
                 ", name=" + customerDto.getName() +
                 ", address=" + customerDto.getAddress() +
                 ", customerType=" + customerDto.getCustomerType() +

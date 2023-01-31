@@ -3,22 +3,25 @@ package com.complyt.v1.models;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import org.bson.types.ObjectId;
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @With
 @Value
 @Schema(name = "Transaction")
 public class TransactionDto {
-    String id;
+    UUID complytId;
     String externalId;
+    String source;
     List<ItemDto> items;
     AddressDto billingAddress;
     AddressDto shippingAddress;
-    ObjectId customerId;
+    UUID customerId;
     CustomerDto customer;
     SalesTaxDto salesTax;
     TransactionStatusDto transactionStatus;

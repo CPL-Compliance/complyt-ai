@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
 @Slf4j
 @AllArgsConstructor
@@ -54,6 +56,17 @@ public class ExemptionRepository {
                 });
     }
 
+    public Mono<Exemption> findByComplytId(@NonNull final UUID complytId) {
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
+                    log.debug("Searching for an exemption with complyt id of : " + complytId);
+
+                    return reactiveMongoTemplate.findOne(query, Exemption.class).log();
+                });
+    }
+
     public Flux<Exemption> findAll() {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
@@ -64,11 +77,12 @@ public class ExemptionRepository {
                 });
     }
 
-    public Mono<DeleteResult> delete(@NonNull final String id) {
+    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
-                    log.debug("Deleting exemption with id : " + id);
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
+                    log.debug("Deleting exemption with complyt id : " + complytId);
 
                     return reactiveMongoTemplate.remove(query, Exemption.class).log();
                 });

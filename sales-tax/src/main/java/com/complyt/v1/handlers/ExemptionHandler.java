@@ -22,6 +22,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @RestController
 @Slf4j
 @AllArgsConstructor
@@ -35,13 +37,13 @@ public class ExemptionHandler {
     @Operation(summary = "Gets exemption by id")
     @ResponseStatus(HttpStatus.OK)
     @ExemptionReadPermission
-    public Mono<ServerResponse> getOne(ServerRequest request) {
-        String id = request.pathVariable("id");
+    public Mono<ServerResponse> findByComplytId(ServerRequest request) {
+        UUID complytId = UUID.fromString(request.pathVariable("complytId"));
 
         return ServerResponse.ok()
-                .body(exemptionFacade.findById(id)
+                .body(exemptionFacade.findByComplytId(complytId)
                         .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + " not found"))), ExemptionDto.class);
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with complyt id " + complytId + " not found"))), ExemptionDto.class);
     }
 
     @Operation(summary = "This will update the exemption if found by id, otherwise it will create it")
@@ -59,15 +61,15 @@ public class ExemptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest request) {
-        String id = request.pathVariable("id");
+        UUID complytId = UUID.fromString(request.pathVariable("complytId"));
 
         return request.bodyToMono(ExemptionDto.class)
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
-                    return exemptionFacade.update(receivedExemption, id);
+                    return exemptionFacade.update(receivedExemption, complytId);
                 })
                 .flatMap(updatedExemption -> ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption not found")));
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption not found by complytId " + complytId)));
     }
 
     @Operation(summary = "Gets all exemptions")
@@ -83,10 +85,10 @@ public class ExemptionHandler {
     @ResponseStatus(HttpStatus.OK)
     @ExemptionDeletePermission
     public Mono<ServerResponse> delete(ServerRequest request) {
-        String id = request.pathVariable("id");
+        UUID complytId = UUID.fromString(request.pathVariable("complytId"));
 
-        return exemptionFacade.delete(id)
+        return exemptionFacade.delete(complytId)
                 .flatMap(deleteResult -> ServerResponse.noContent().build())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with id " + id + " was not found")));
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Exemption with complyt id " + complytId + " was not found")));
     }
 }

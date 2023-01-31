@@ -4,8 +4,10 @@ import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,39 +20,22 @@ class ExemptionDtoTest {
 
     private LocalDateTime localDateTime;
 
-    private ObjectId customerId;
-
     private String exemptionId;
 
-    private String certificateId;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        customerId = new ObjectId();
         localDateTime = LocalDateTime.now();
-        certificateId = UUID.randomUUID().toString();
+        objectStub = new ObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
         exemptionId = UUID.randomUUID().toString();
-        exemptionDto = createExemptionDto();
-    }
-
-    private ExemptionDto createExemptionDto() {
-        StateDto stateDto = new StateDto("CA", "02", "California");
-        ClassificationDto classificationDto = new ClassificationDto("code", "description");
-        ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
-        TimestampsDto internalTimestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
-        StatusDto statusDto = new StatusDto("code", "name");
-        CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
-
-
-        return new ExemptionDto(exemptionId, customerId,
-                stateDto, classificationDto, validationDatesDto, internalTimestampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
+        exemptionDto = objectStub.createExemptionDto(exemptionId);
     }
 
     @Test
     void Equals_sameExemptionDto_ReturnsTrue() {
         // Given
-        ExemptionDto givenExemptionDto = createExemptionDto();
+        ExemptionDto givenExemptionDto = objectStub.createExemptionDto(exemptionId).withComplytId(exemptionDto.getComplytId());
 
         // When
         boolean isEquals = exemptionDto.equals(givenExemptionDto);
@@ -62,7 +47,7 @@ class ExemptionDtoTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ExemptionDto(id=" + exemptionDto.getId() +
+        String expectedString = "ExemptionDto(complytId=" + exemptionDto.getComplytId() +
                 ", customerId=" + exemptionDto.getCustomerId() +
                 ", state=" + exemptionDto.getState() +
                 ", classification=" + exemptionDto.getClassification() +

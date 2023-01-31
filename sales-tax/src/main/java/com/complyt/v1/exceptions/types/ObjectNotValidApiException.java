@@ -5,8 +5,6 @@ import lombok.NonNull;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.Errors;
 
-import java.util.List;
-
 @Generated
 public class ObjectNotValidApiException extends ComplytApiException {
     public ObjectNotValidApiException(@NonNull Errors errors) {

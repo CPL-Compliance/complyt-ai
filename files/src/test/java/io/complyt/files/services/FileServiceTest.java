@@ -2,7 +2,6 @@ package io.complyt.files.services;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.repositories.FileRepository;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.UUID;
+import testUtils.ObjectStub;
 
 import static org.mockito.Mockito.when;
 
@@ -27,6 +25,8 @@ class FileServiceTest {
     @Mock
     FileRepository fileRepository;
 
+    ObjectStub objectStub = new ObjectStub();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -35,7 +35,7 @@ class FileServiceTest {
     @Test
     void find_tenantIdExistsInCollection_ReturnsLink() {
         // Given
-        File file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
+        File file = objectStub.createFile();
 
         // When
         when(fileRepository.find()).thenReturn(Mono.just(file));

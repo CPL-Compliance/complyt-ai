@@ -1,8 +1,7 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Address;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,15 +42,20 @@ class CustomerRepositoryTest {
     Customer customer;
     String tenantId;
 
+    String source;
+
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        tenantId = UUID.randomUUID().toString();
         MockitoAnnotations.openMocks(this);
+        tenantId = UUID.randomUUID().toString();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), tenantId);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
+        customer = objectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
+        source = objectStub.getUnifiedSource();
     }
 
     @Test
@@ -84,6 +90,38 @@ class CustomerRepositoryTest {
         // Then
         Mono<Customer> monoCustomer = customerRepository.findById(id);
         StepVerifier.create(monoCustomer).expectNext(customer.withId(id)).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Customer> monoCustomer = customerRepository.findByComplytId(complytId);
+        StepVerifier.create(monoCustomer).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdExist_ReturnsCustomer() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer.withComplytId(complytId)));
+
+        // Then
+        Mono<Customer> monoCustomer = customerRepository.findByComplytId(complytId);
+        StepVerifier.create(monoCustomer).expectNext(customer.withComplytId(complytId)).verifyComplete();
     }
 
     @Test
@@ -173,6 +211,24 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void getAllCustomersBySource_RetrievingAllCustomersInSource_ExpectingTwoCustomers() {
+        // Given
+        String id = UUID.randomUUID().toString();
+        String externalId = UUID.randomUUID().toString();
+        Customer secondCustomer = customer.withId(id).withExternalId(externalId);
+        Query query = Query.query(Criteria.where("tenantId").is(tenantId)
+                .and("source").is(source));
+
+        //When
+        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(reactiveMongoTemplate.find(query, Customer.class)).thenReturn(Flux.just(customer, secondCustomer));
+
+        //Then
+        Flux<Customer> customerFlux = customerRepository.findAllBySource(source);
+        StepVerifier.create(customerFlux).expectNext(customer, secondCustomer).verifyComplete();
+    }
+
+    @Test
     void save_NexCustomer_CustomerSaved() {
         // Given
         String mongoId = UUID.randomUUID().toString();
@@ -245,9 +301,10 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void findByExternalId_IdExists_ReturnsCustomer() {
+    void findByExternalIdAndSource_IdExists_ReturnsCustomer() {
         // Given
         Query query = Query.query(Criteria.where("externalId").is(customer.getExternalId())
+                .and("source").is(source)
                 .and("tenantId").is(tenantId));
 
         // When
@@ -255,15 +312,16 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Customer.class)).thenReturn(Mono.just(customer));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(customer.getExternalId());
+        Mono<Customer> customerMono = customerRepository.findByExternalIdAndSource(customer.getExternalId(), source);
         StepVerifier.create(customerMono).expectNext(customer).verifyComplete();
     }
 
     @Test
-    void findByExternalId_IdNotExists_ReturnsEmpty() {
+    void findByExternalIdAndSource_IdNotExists_ReturnsEmpty() {
         // Given
         String id = UUID.randomUUID().toString();
         Query query = Query.query(Criteria.where("externalId").is(id)
+                .and("source").is(source)
                 .and("tenantId").is(tenantId));
 
         // When
@@ -271,7 +329,7 @@ class CustomerRepositoryTest {
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
 
         // Then
-        Mono<Customer> customerMono = customerRepository.findByExternalId(id);
+        Mono<Customer> customerMono = customerRepository.findByExternalIdAndSource(id, source);
 
         StepVerifier.create(customerMono).expectNextCount(0).verifyComplete();
     }

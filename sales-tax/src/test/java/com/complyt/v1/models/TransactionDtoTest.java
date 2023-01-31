@@ -5,12 +5,12 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,51 +18,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TransactionDtoTest {
 
     private TransactionDto transactionDto;
-    private String externalId;
-    private LocalDateTime localDateTime;
-    private ObjectId customerId;
     private String transactionId;
+
+    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        externalId = UUID.randomUUID().toString();
-        localDateTime = LocalDateTime.now();
-        customerId = new ObjectId();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
-        transactionDto = createTransactionDto(transactionId);
-    }
-
-    private TransactionDto createTransactionDto(String id) {
-        AddressDto billingAddress = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        AddressDto shippingAddress = new AddressDto("City", "Country", "County", "State", "Street", "Zip");
-        List<ItemDto> items = new ArrayList<ItemDto>() {
-            {
-                add(new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
-                ));
-            }
-        };
-        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
-        TimestampsDto timeStamps = new TimestampsDto(complytTimestamp, complytTimestamp);
-        ShippingFeeDto shippingFeeDto = createShippingFeeDto();
-        return new TransactionDto(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
-    }
-
-    private ShippingFeeDto createShippingFeeDto() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, 0, 1000, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+        transactionDto = objectStub.createTransactionDto(transactionId);
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TransactionDto(id=" + transactionDto.getId() +
+        String expectedString = "TransactionDto(complytId=" + transactionDto.getComplytId() +
                 ", externalId=" + transactionDto.getExternalId() +
+                ", source=" + transactionDto.getSource() +
                 ", items=" + transactionDto.getItems() +
                 ", billingAddress=" + transactionDto.getBillingAddress() +
                 ", shippingAddress=" + transactionDto.getShippingAddress() +
@@ -87,13 +60,17 @@ class TransactionDtoTest {
     }
 
     @Test
-    void withId_DifferentId_ReturnTransactionDto() {
+    void withConmplytId_DifferentId_ReturnTransactionDto() {
         // Given
-        String differentId = UUID.randomUUID().toString();
-        TransactionDto expectedTransactionDto = createTransactionDto(differentId);
+        UUID differentId = UUID.randomUUID();
+        TransactionDto expectedTransactionDto = objectStub.createTransactionDto(transactionDto.getExternalId())
+                .withComplytId(differentId)
+                .withExternalId(transactionDto.getExternalId())
+                .withCustomerId(transactionDto.getCustomerId())
+                .withCustomer(transactionDto.getCustomer());
 
         // When
-        TransactionDto actualTransactionDto = transactionDto.withId(differentId);
+        TransactionDto actualTransactionDto = transactionDto.withComplytId(differentId);
 
         // Then
         assertEquals(expectedTransactionDto, actualTransactionDto);

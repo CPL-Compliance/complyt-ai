@@ -36,7 +36,7 @@ public class ValidationHandler<T, U extends Validator> {
         });
     }
 
-    private Mono<T> onValidationErrors(@NonNull Errors errors) {
+    private Mono<T> onValidationErrors(Errors errors) {
         return Mono.error(new ObjectNotValidApiException(errors));
     }
 }

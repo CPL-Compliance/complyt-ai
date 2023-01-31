@@ -1,13 +1,9 @@
 package com.complyt.business.transaction;
 
 import com.complyt.business.transaction.data_fetcher.CountyFetcher;
-import com.complyt.domain.*;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -35,30 +30,19 @@ public class CountyProviderTest {
 
     @Mock
     CountyFetcher countyFetcher;
+    ObjectStub objectStub;
 
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
-        ObjectId tenantId = new ObjectId();
-        List<Item> items = new ArrayList<Item>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId.toString(), null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
+    @BeforeEach
+    void setup() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+
     }
 
     @Test
     void provide_GetsCountyAndInjectsIt_ReturnsTransaction() {
         // Given
-        Transaction transaction = createTransaction();
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         String injectedCounty = "InjectedCounty";
         Transaction transactionWithCounty = transaction.withShippingAddress(transaction.getShippingAddress().withCounty(injectedCounty));
 
