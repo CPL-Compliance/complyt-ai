@@ -34,8 +34,8 @@ import java.lang.annotation.Target;
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Customer External ID",
-                                        examples = @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.externalIdExample,
-                                                name = UpsertCustomeByExternalIdApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdApiInfo.externalIdExample,
+                                                name = UpsertCustomerByExternalIdApiInfo.externalIdExample))
                         },
                         tags = "customer",
                         requestBody =
@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = CustomerDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.newCustomerExample)
+                                                @ExampleObject(value = UpsertCustomerByExternalIdApiInfo.newCustomerExample)
                                         })
                         ),
                         responses = {
@@ -57,7 +57,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = UpsertCustomeByExternalIdApiInfo.returnedCustomerExample)
+                                                                @ExampleObject(value = UpsertCustomerByExternalIdApiInfo.returnedCustomerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -81,7 +81,7 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface UpsertCustomeByExternalIdApiInfo {
+public @interface UpsertCustomerByExternalIdApiInfo {
     String externalIdExample = "999444";
     String newCustomerExample = "{\n" +
             "    \"externalId\":" + externalIdExample + ",\n" +
