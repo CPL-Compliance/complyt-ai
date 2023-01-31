@@ -1,35 +1,27 @@
 package com.complyt.v1.routers;
 
 import com.complyt.config.ApiExceptionConfig;
-import com.complyt.config.JacksonConfig;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.CustomerHandler;
-import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import org.springframework.web.reactive.function.server.RouterFunction;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
@@ -69,12 +61,9 @@ class CustomerRouterTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private ObjectStub objectStub;
-    private RouterFunction routerFunction;
-
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        ObjectStub objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);

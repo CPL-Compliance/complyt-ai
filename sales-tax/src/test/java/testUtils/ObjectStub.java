@@ -51,8 +51,6 @@ public class ObjectStub {
         return source;
     }
 
-    ;
-
     public Customer createCustomer(String id) {
         Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(complytTimestamp.getTimestamp().minusMinutes(1));
