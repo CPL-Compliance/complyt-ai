@@ -19,6 +19,6 @@ public class ProductClassification {
     private final String taxCode;
     private final String description;
     private final String title;
-    private final Map<String,JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
+    private final Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRules;
     private TangibleCategory tangibleCategory;
 }

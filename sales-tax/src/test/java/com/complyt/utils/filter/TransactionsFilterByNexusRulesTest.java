@@ -1,23 +1,21 @@
 package com.complyt.utils.filter;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.TransactionType;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.nexus.NexusThreshold;
-import com.complyt.domain.nexus.enums.Definition;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import org.bson.types.ObjectId;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.ObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,26 +34,20 @@ public class TransactionsFilterByNexusRulesTest {
     Transaction invoiceTransaction;
     Transaction salesOrderTransaction;
     Customer customer;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionsFilterByNexusRules = new TransactionsFilterByNexusRules();
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactionList();
-        nexusStateRule = createNexusStateRule();
+        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     private List<Transaction> createTransactionList() {
-        String id = UUID.randomUUID().toString();
-        ObjectId tenantId = new ObjectId();
-        ObjectId customerId = new ObjectId();
-        String externalId = UUID.randomUUID().toString();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        customer = createCustomer(customerId, tenantId, shippingAddress);
-        invoiceTransaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId.toString(), null, null, TransactionType.INVOICE, null, null, 0, 0, 0);
+        invoiceTransaction = objectStub.createTransaction(UUID.randomUUID().toString());
         salesOrderTransaction = invoiceTransaction
                 .withId(UUID.randomUUID().toString())
                 .withExternalId(UUID.randomUUID().toString())
@@ -68,35 +60,11 @@ public class TransactionsFilterByNexusRulesTest {
         }};
     }
 
-    private Customer createCustomer(ObjectId customerId, ObjectId tenantId, Address shippingAddress) {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId.toString(), CustomerType.RETAIL, null, null);
-    }
-
-    private NexusStateRule createNexusStateRule() {
-        State state = new State("CA", "02", "California");
-        List<TaxableCategory> taxableCategories = new ArrayList<>() {{
-            add(TaxableCategory.TAXABLE);
-        }};
-
-        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
-            add(TangibleCategory.TANGIBLE);
-        }};
-
-        List<CustomerType> customerTypes = new ArrayList<>() {{
-            add(CustomerType.RETAIL);
-        }};
-
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
-
-        return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
-    }
-
     @Test
     void filter_FiltersBecauseCustomerTypeDoesNotExist_ReturnsOneTransaction() {
         // Given
         transactions.remove(salesOrderTransaction);
-        Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
+        Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE).withComplytId(customer.getComplytId());
         Transaction transactionWithCustomerThatDoesNotExist = invoiceTransaction.withCustomer(marketPlaceCustomer);
         transactions.add(transactionWithCustomerThatDoesNotExist);
 

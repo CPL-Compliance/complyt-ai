@@ -1,13 +1,11 @@
 package io.complyt.files.domain;
 
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.UUID;
+import testUtils.ObjectStub;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,16 +13,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class FileTest {
     private File file;
+    ObjectStub objectStub = new ObjectStub();
 
     @BeforeEach
-    public void setUp(){
-        file = new File(ObjectId.get().toString(), UUID.randomUUID().toString(), "http://localhost");
+    public void setUp() {
+        file = objectStub.createFile();
     }
 
     @Test
-    public void equals_IdenticalLinks_Equal(){
-        File referenceFile = new File(file.getId(), file.getTenantId(), file.getLink());
+    public void equals_IdenticalLinks_Equal() {
+        // Given + When
+        File referenceFile = objectStub.createFile(file.getComplytId(), file.getId());
 
+        // Then
         assertEquals(file, referenceFile);
     }
 }

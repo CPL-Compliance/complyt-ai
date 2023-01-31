@@ -1,12 +1,12 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
+import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.domain.customer.exemption.*;
 import com.complyt.services.ExemptionServiceImpl;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,31 +40,25 @@ public class ExemptionFacadeTest {
 
     Exemption exemption;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        exemption = createExemption();
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        exemption = objectStub.createExemption(UUID.randomUUID().toString());
     }
 
     @Test
     void save_ExemptionSaved_ExemptionReturned() {
         // Given
-        Exemption exemptionNoId = exemption.withId(null);
+        Exemption exemptionNoId = exemption.withId(null).withComplytId(null);
+        Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
 
         // When
-        when(exemptionService.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionService.checkExemptionNotHavingComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionService.injectDataToNewExemption(exemption)).thenReturn(Mono.just(exemptionWithNewComplytId));
+        when(exemptionService.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemption));
         Mono<Exemption> exemptionMono = exemptionFacade.save(exemptionNoId);
 
         // Then
@@ -142,10 +137,12 @@ public class ExemptionFacadeTest {
     void update_UpdatesExemption_ReturnsUpdatedExemption() {
         // Given
         Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
-        String id = exemption.getId();
+        UUID id = exemption.getComplytId();
 
         // When
-        when(exemptionService.update(newExemption, id)).thenReturn(Mono.just(newExemption));
+        when(exemptionService.update(newExemption, exemption, id)).thenReturn(Mono.just(newExemption));
+        when(exemptionService.findByComplytId(id)).thenReturn(Mono.just(exemption));
+        when(exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption)).thenReturn(Mono.just(newExemption));
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, id);
 
         // Then
@@ -156,20 +153,33 @@ public class ExemptionFacadeTest {
     void update_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
-        String idThatDoesNotExist = UUID.randomUUID().toString();
+        UUID idThatDoesNotExist = UUID.randomUUID();
 
         // When
-        when(exemptionService.update(newExemption, idThatDoesNotExist)).thenReturn(Mono.empty());
+        when(exemptionService.findByComplytId(idThatDoesNotExist)).thenReturn(Mono.empty());
         Mono<Exemption> exemptionMono = exemptionFacade.update(newExemption, idThatDoesNotExist);
 
         // Then
-        StepVerifier.create(exemptionMono).verifyComplete();
+        StepVerifier.create(exemptionMono).expectError(ObjectNotFoundApiException.class).verify();
+    }
+
+    @Test
+    void getByComplytId_ExemptionExists_ReturnsExemption() {
+        // Given
+        UUID complytId = exemption.getComplytId();
+
+        // When
+        when(exemptionService.findByComplytId(complytId)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
     @Test
     void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
         // Given
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
@@ -183,7 +193,7 @@ public class ExemptionFacadeTest {
     @Test
     void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
         // Given
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
         DeleteResult deleteResult = DeleteResult.acknowledged(0);
 
         // When
@@ -198,20 +208,20 @@ public class ExemptionFacadeTest {
     @Test
     void delete_NullIdPassed_ThrowsException() {
         // Given
-        String nullId = null;
+        UUID nullId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.delete(nullId));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
     @Test
     void update_NullExemptionPassed_ThrowsException() {
         // Given
         Exemption nullExemption = null;
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(nullExemption, id));
@@ -223,13 +233,25 @@ public class ExemptionFacadeTest {
     @Test
     void update_NullIdPassed_ThrowsException() {
         // Given
-        String nullId = null;
+        UUID nullId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.update(exemption, nullId));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
 }

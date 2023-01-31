@@ -27,14 +27,19 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by External ID",
-                        operationId = "getCustomerByExternalId",
+                        description = "Get Customer by External ID and Source",
+                        operationId = "getCustomerByExternalIdAndSource",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Customer External ID",
-                                        examples = @ExampleObject(value = GetCustomerByExternalIdApiInfo.externalIdExample,
-                                                name = GetCustomerByExternalIdApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = GetCustomerByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = GetCustomerByExternalIdAndSourceApiInfo.externalIdExample)),
+                                @Parameter(in = ParameterIn.PATH,
+                                        name = "source",
+                                        description = "Customer Source",
+                                        examples = @ExampleObject(value = GetCustomerByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = GetCustomerByExternalIdAndSourceApiInfo.externalIdExample))
                         },
                         tags = "customer",
                         responses = {
@@ -46,7 +51,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetCustomerByExternalIdApiInfo.customerExample)
+                                                                @ExampleObject(value = GetCustomerByExternalIdAndSourceApiInfo.customerExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -70,11 +75,13 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetCustomerByExternalIdApiInfo {
+public @interface GetCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
-    String customerExample = "{\n" +
+    String customerExample = "[{\n" +
+            "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": \"999444\",\n" +
+            "    \"source\": \"1\",\n" +
             "    \"name\": \"Complyt LTD.\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
@@ -101,5 +108,5 @@ public @interface GetCustomerByExternalIdApiInfo {
             "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
             "        }\n" +
             "    }\n" +
-            "}";
+            "}]";
 }

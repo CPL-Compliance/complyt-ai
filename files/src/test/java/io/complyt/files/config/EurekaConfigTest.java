@@ -15,9 +15,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +42,7 @@ public class EurekaConfigTest {
         String expectedIp = "1.1.1.1";
         String expectedPort = "1234";
 
-        try (MockedStatic<InetAddress> mocked = mockStatic(InetAddress.class)){
+        try (MockedStatic<InetAddress> mocked = mockStatic(InetAddress.class)) {
             // When
             InetAddress mockInetAddress = mock(InetAddress.class);
             mocked.when(InetAddress::getLocalHost).thenReturn(mockInetAddress);

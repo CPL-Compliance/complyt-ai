@@ -5,22 +5,25 @@ import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import jakarta.validation.Valid;
-import lombok.*;
-import org.bson.types.ObjectId;
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @With
 @Value
 @Schema(name = "Transaction")
 public class TransactionDto {
-    @Size(min = 1, max = 256, message = "ID length should be 1-256 characters maximum")
-    String id;
+
+    UUID complytId;
 
     @NotBlank(message = "External ID may not be blank")
     @Size(min = 1, max = 256, message = "External ID length should be 1-256 characters maximum")
     String externalId;
+    String source;
 
     @NotEmpty(message = "Items list cannot be empty")
     @NotNull(message = "Items may not be null")
@@ -34,8 +37,9 @@ public class TransactionDto {
     @NotNull(message = "Shipping address may not be null")
     AddressDto shippingAddress;
 
+
     @NotNull(message = "Customer Id may not be null")
-    ObjectId customerId;
+    UUID customerId;
 
     @Valid
     CustomerDto customer;

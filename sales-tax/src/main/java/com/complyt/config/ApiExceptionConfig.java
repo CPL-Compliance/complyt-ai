@@ -1,6 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.annotations.Generated;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -28,7 +29,8 @@ public class ApiExceptionConfig {
     public Map<Class<? extends Exception>, HttpStatus> exceptionToStatusCode() {
         return Map.of(
                 ObjectNotFoundApiException.class, HttpStatus.NOT_FOUND,
-                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST
+                ObjectNotValidApiException.class, HttpStatus.BAD_REQUEST,
+                ConflictedDataApiException.class, HttpStatus.BAD_REQUEST
         );
     }
 }

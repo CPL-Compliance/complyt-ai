@@ -36,7 +36,8 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
         float totalItemsAmount = totalItemsAmountCalculator.calculate(items);
 
         return new Transaction(
-                transaction.getId(), transaction.getExternalId(),
+                transaction.getComplytId(), transaction.getId(),
+                transaction.getExternalId(), transaction.getSource(),
                 transaction.getItems(), transaction.getBillingAddress(),
                 transaction.getShippingAddress(), transaction.getCustomerId(), transaction.getCustomer(),
                 transaction.getSalesTax(), transaction.getTransactionStatus(),

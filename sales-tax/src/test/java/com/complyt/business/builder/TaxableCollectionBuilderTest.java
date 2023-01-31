@@ -1,15 +1,9 @@
 package com.complyt.business.builder;
 
 import com.complyt.business.sales_tax.checker.TaxableItemExistChecker;
-import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import org.bson.types.ObjectId;
+import com.complyt.domain.Taxable;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import testUtils.ObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,34 +33,13 @@ public class TaxableCollectionBuilderTest {
 
     Transaction transaction;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String tenantId = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
-        items.add(new Item(2000, 4, 8000, "description", "name", "taxCode", null, salesTaxRate, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
-        Customer customer = new Customer(customerId.toString(), UUID.randomUUID().toString(), "customer", shippingAddress, tenantId, CustomerType.RETAIL, null, null);
-        ShippingFee shippingFee = createShippingFee();
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, null, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
-    }
-
-    private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, rules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test

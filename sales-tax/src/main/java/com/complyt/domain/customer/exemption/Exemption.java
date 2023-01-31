@@ -3,9 +3,10 @@ package com.complyt.domain.customer.exemption;
 import com.complyt.domain.State;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
@@ -15,10 +16,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 @Document(collection = "exemption")
 public class Exemption {
+
+    private final UUID complytId;
     @Id
     private final String id;
     private final String tenantId;
-    private final ObjectId customerId;
+    private final UUID customerId;
     private final State state;
     private final Classification classification;
     private final ValidationDates validationDates;

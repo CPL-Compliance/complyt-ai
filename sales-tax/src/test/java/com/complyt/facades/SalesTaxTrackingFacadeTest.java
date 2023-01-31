@@ -1,9 +1,8 @@
 package com.complyt.facades;
 
 import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,30 +35,29 @@ public class SalesTaxTrackingFacadeTest {
 
     private SalesTaxTracking salesTaxTracking;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        return new SalesTaxTracking(null, state, null,
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test
     void save_SavesSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
+        SalesTaxTracking salesTaxTrackingWithId = newSalesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
 
         // When
-        when(salesTaxTrackingService.save(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.save(salesTaxTracking);
+        when(salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        when(salesTaxTrackingService.injectDataToNewSalesTaxTracking(newSalesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
+        when(salesTaxTrackingService.save(salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.save(newSalesTaxTracking);
 
         // Then
-        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
     }
 
     @Test
@@ -68,8 +67,9 @@ public class SalesTaxTrackingFacadeTest {
         SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
 
         // When
+        when(salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.update(salesTaxTracking, state)).thenReturn(Mono.just(salesTaxTrackingWithId));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.update(salesTaxTracking, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTrackingWithId, state);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
@@ -113,12 +113,25 @@ public class SalesTaxTrackingFacadeTest {
     }
 
     @Test
+    void getByComplytId_SalesTaxTrackingExists_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = salesTaxTracking.getComplytId();
+
+        // When
+        when(salesTaxTrackingService.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
     void update_NullStatePassed_ThrowsException() {
         // Given
         String nullState = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, nullState));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTracking, nullState));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
@@ -132,7 +145,7 @@ public class SalesTaxTrackingFacadeTest {
         String state = salesTaxTracking.getState().getName();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(nullSalesTaxTracking, state));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(nullSalesTaxTracking, salesTaxTracking, state));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
@@ -160,6 +173,31 @@ public class SalesTaxTrackingFacadeTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.findByComplytId(nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+        String state = salesTaxTracking.getState().getName();
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, nullSalesTaxTracking, state));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
     }
 
 }

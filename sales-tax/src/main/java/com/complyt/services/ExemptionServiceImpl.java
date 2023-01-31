@@ -1,5 +1,6 @@
 package com.complyt.services;
 
+import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -22,9 +24,17 @@ public class ExemptionServiceImpl implements ExemptionService {
     @NonNull
     private ExemptionRepository exemptionRepository;
 
+    @NonNull
+    private ExemptionComplytIdHandler complytIdHandler;
+
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
         return exemptionRepository.findByClientCustomerAndState(transaction);
+    }
+
+    @Override
+    public Mono<Exemption> findByComplytId(@NonNull UUID complytId) {
+        return exemptionRepository.findByComplytId(complytId);
     }
 
     @Override
@@ -52,15 +62,30 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final String id) {
-        return exemptionRepository.findById(id)
+    public Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final Exemption originalExemption, @NonNull final UUID complytId) {
+        return Mono.just(originalExemption)
                 .map(createFunctionUpdateExemption(exemption))
                 .flatMap(exemptionRepository::save);
     }
 
     @Override
-    public Mono<DeleteResult> delete(@NonNull final String id) {
-        return exemptionRepository.delete(id);
+    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
+        return exemptionRepository.delete(complytId);
+    }
+
+    @Override
+    public Mono<Exemption> injectDataToNewExemption(@NonNull Exemption exemption) {
+        return Mono.just(exemption).map(complytIdHandler::insertComplytIdToNew);
+    }
+
+    @Override
+    public Mono<Exemption> checkComplytIdOfModifiedEqualsToOriginal(@NonNull Exemption modifiedExemption, @NonNull Exemption originalExemption) {
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedExemption, originalExemption);
+    }
+
+    @Override
+    public Mono<Exemption> checkExemptionNotHavingComplytId(@NonNull Exemption newExemption) {
+        return complytIdHandler.checkNewDontHaveComplytId(newExemption);
     }
 
     private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {

@@ -1,7 +1,10 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.ItemsNexusStateRuleQualificationChecker;
-import com.complyt.domain.*;
+import com.complyt.domain.Item;
+import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionType;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -10,9 +13,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,20 +53,15 @@ public class NexusTransactionCountCalculatorTest {
     Customer customer;
     ObjectId customerId;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        customer = createCustomer();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactions();
         nexusStateRule = createNexusStateRule();
-    }
-
-    private Customer createCustomer() {
-        customerId = new ObjectId();
-        String tenantId = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -88,23 +85,8 @@ public class NexusTransactionCountCalculatorTest {
     }
 
     private List<Transaction> createTransactions() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        List<Item> items = new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
 
-        Transaction transaction = new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
+        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         return new ArrayList<>() {{
             add(transaction);
         }};

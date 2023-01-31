@@ -22,6 +22,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 @Slf4j
 @AllArgsConstructor
@@ -33,7 +35,7 @@ public class SalesTaxTrackingHandler {
     @NonNull
     SalesTaxTrackingFacade salesTaxTrackingFacade;
 
-    @Operation(summary = "Gets SalesTaxTracking by id")
+    @Operation(summary = "Gets SalesTaxTracking by state")
     @ResponseStatus(HttpStatus.OK)
     @NexusReadPermission
     public Mono<ServerResponse> getOne(ServerRequest request) {
@@ -45,7 +47,19 @@ public class SalesTaxTrackingHandler {
                         .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())), SalesTaxTrackingDto.class);
     }
 
-    @Operation(summary = "This will update the SalesTaxTracking if found by id, otherwise it will throw an error")
+    @Operation(summary = "Gets SalesTaxTracking by complyt id")
+    @ResponseStatus(HttpStatus.OK)
+    @NexusReadPermission
+    public Mono<ServerResponse> getByComplytId(ServerRequest request) {
+        UUID complytId = UUID.fromString(request.pathVariable("complytId"));
+
+        return ServerResponse.ok()
+                .body(salesTaxTrackingFacade.findByComplytId(complytId)
+                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())), SalesTaxTrackingDto.class);
+    }
+
+    @Operation(summary = "This will update the SalesTaxTracking if found by state, otherwise it will throw an error")
     @ResponseStatus(HttpStatus.OK)
     @NexusUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest request) {
@@ -55,7 +69,7 @@ public class SalesTaxTrackingHandler {
                 .flatMap(salesTaxTrackingDto -> {
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
                     return salesTaxTrackingFacade.findByState(state)
-                            .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, state))
+                            .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state))
                             .flatMap(updatedSalesTaxTracking ->
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
                             .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)

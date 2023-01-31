@@ -1,7 +1,7 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,20 +43,14 @@ public class SalesTaxTrackingRepositoryTest {
 
     SalesTaxTracking salesTaxTracking;
 
-    String tenantId;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
-        tenantId = UUID.randomUUID().toString();
-        salesTaxTracking = createSalesTaxTracking();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state,
-                tenantId, true, null,
-                null, null, true, LocalDateTime.now());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test
@@ -66,10 +61,10 @@ public class SalesTaxTrackingRepositoryTest {
                 .orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state));
 
-        Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
+        Query query = Query.query(stateSearchCriteria.and("tenantId").is(salesTaxTracking.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
@@ -96,7 +91,7 @@ public class SalesTaxTrackingRepositoryTest {
         SalesTaxTracking salesTaxTrackingNoId = salesTaxTracking.withId(null);
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(reactiveMongoTemplate.save(salesTaxTrackingNoId)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
@@ -121,10 +116,10 @@ public class SalesTaxTrackingRepositoryTest {
     void findById_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
         // given
         String id = salesTaxTracking.getId();
-        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(salesTaxTracking.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking));
 
         // Then
@@ -141,15 +136,59 @@ public class SalesTaxTrackingRepositoryTest {
 
         }};
 
-        Query query = Query.query(Criteria.where("tenantId").is(tenantId));
+        Query query = Query.query(Criteria.where("tenantId").is(salesTaxTracking.getTenantId()));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
         when(reactiveMongoTemplate.find(query, SalesTaxTracking.class)).thenReturn(Flux.fromIterable(salesTaxTrackingList));
 
         // Then
         Flux<SalesTaxTracking> salesTaxTrackingFlux = salesTaxTrackingRepository.findAll();
 
         StepVerifier.create(salesTaxTrackingFlux).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(salesTaxTracking.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.empty());
+
+        // Then
+        Mono<SalesTaxTracking> monoSalesTaxTracking = salesTaxTrackingRepository.findByComplytId(complytId);
+        StepVerifier.create(monoSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_IdExist_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        Query query = Query.query(Criteria.where("complytId").is(complytId)
+                .and("tenantId").is(salesTaxTracking.getTenantId()));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(salesTaxTracking.getTenantId()));
+        when(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class)).thenReturn(Mono.just(salesTaxTracking.withComplytId(complytId)));
+
+        // Then
+        Mono<SalesTaxTracking> monoSalesTaxTracking = salesTaxTrackingRepository.findByComplytId(complytId);
+        StepVerifier.create(monoSalesTaxTracking).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_NullComplytIdPassed_ThrowsException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingRepository.findByComplytId(nullComplytId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 }

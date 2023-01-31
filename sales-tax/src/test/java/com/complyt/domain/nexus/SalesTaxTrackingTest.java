@@ -1,9 +1,10 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.State;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,24 +19,23 @@ class SalesTaxTrackingTest {
     private ObjectId tenantId;
     private LocalDateTime localDateTime;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setup() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         id = UUID.randomUUID().toString();
         tenantId = new ObjectId();
         localDateTime = LocalDateTime.now();
-        salesTaxTracking = createSalesTaxTracking();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        return new SalesTaxTracking(id,
-                new State("CA", "code", "California"), tenantId.toString(), true, null, null, null,
-                true, localDateTime);
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTaxTracking(id=" + salesTaxTracking.getId() +
+        String expectedString = "SalesTaxTracking(complytId=" + salesTaxTracking.getComplytId() +
+                ", id=" + salesTaxTracking.getId() +
                 ", state=" + salesTaxTracking.getState() +
                 ", tenantId=" + salesTaxTracking.getTenantId() +
                 ", enforcesSalesTax=" + salesTaxTracking.isEnforcesSalesTax() +
@@ -55,7 +55,8 @@ class SalesTaxTrackingTest {
     @Test
     void Equals_SameSalesTaxTracking_ReturnsTrue() {
         // Given
-        SalesTaxTracking givenSalesTaxTracking = createSalesTaxTracking();
+        SalesTaxTracking givenSalesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTracking.getId())
+                .withComplytId(salesTaxTracking.getComplytId());
 
         // When
         boolean isEquals = salesTaxTracking.equals(givenSalesTaxTracking);

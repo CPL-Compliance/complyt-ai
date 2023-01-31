@@ -1,22 +1,20 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.*;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,39 +23,18 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
 
     TransactionItemsJurisdictionalRulesInjector transactionItemsJurisdictionalRulesInjector;
     Transaction transaction;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        transaction = createTransaction();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         transactionItemsJurisdictionalRulesInjector = new TransactionItemsJurisdictionalRulesInjector(transaction);
     }
 
-    private Transaction createTransaction() {
-        String externalId = UUID.randomUUID().toString();
-        ObjectId customerId = new ObjectId();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        String tenantId = UUID.randomUUID().toString();
-        List<Item> items = new ArrayList<>() {
-            {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null, new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE
-                ));
-            }
-        };
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee();
-        return new Transaction(UUID.randomUUID().toString(), externalId, items, billingAddress, shippingAddress, customerId, null, null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
-    }
-
-    private ShippingFee createShippingFee() {
-        return new ShippingFee(false, 0, 1000, null,
-                new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f), "C7S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -67,30 +44,25 @@ class TransactionItemsJurisdictionalRulesInjectorTest {
             put("CA", jurisdictionalSalesTaxRules);
         }};
         ProductClassification item2ProductClassification = new ProductClassification(UUID.randomUUID().toString()
-                , "C2S1", "item", "title", item2JurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
+                , "C6S1", "item", "title", item2JurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
+        Map<String, JurisdictionalSalesTaxRules> item3JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
+            put("CA", jurisdictionalSalesTaxRules);
+        }};
+        ProductClassification item3ProductClassification = new ProductClassification(UUID.randomUUID().toString()
+                , "C3S1", "item", "title", item1JurisdictionalSalesTaxRulesMap, TangibleCategory.TANGIBLE);
 
         return new HashMap<>() {{
             put("C1S1", item1ProductClassification);
             put("C6S1", item2ProductClassification);
+            put("C3S1", item3ProductClassification);
         }};
-    }
-
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
     }
 
     @Test
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Item itemWithJurisdictionRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                createJurisdictionalSalesTaxRules(), new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE);
-        Transaction expectedTransaction = transaction.withItems(new ArrayList<>() {
-            {
-                add(itemWithJurisdictionRule);
-            }
-        });
+        Transaction expectedTransaction = transaction.withItems(objectStub.createItems(true, false));
 
         // When
         Mono<Transaction> transactionMono = transactionItemsJurisdictionalRulesInjector.inject(classifications);

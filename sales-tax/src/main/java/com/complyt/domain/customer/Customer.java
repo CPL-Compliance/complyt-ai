@@ -6,16 +6,20 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Getter
-@AllArgsConstructor
 @EqualsAndHashCode
-@With
+@AllArgsConstructor
 @ToString
 @Document(collection = "customer")
+@With
 public class Customer {
+    private final UUID complytId;
     @Id
     private final String id;
     private final String externalId;
+    private final String source;
     private final String name;
     private final Address address;
     private final String tenantId;
