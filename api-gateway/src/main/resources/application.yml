@@ -140,9 +140,9 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/customers/complytId/{complytId}
+            - Path=/v1/customers/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/customers/complytId/{complytId}
+            - SetPath=/v1/customers/complytId/{complyt-id}
         - id: sales-tax-put-customer-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
@@ -150,13 +150,6 @@ spring:
             - Path=/v1/customers/source/{source}/externalId/{external_id}
           filters:
             - SetPath=/v1/customers/source/{source}/externalId/{external_id}
-        - id: sales-tax-post-customer
-          uri: lb://sales-tax
-          predicates:
-            - Method=POST
-            - Path=/v1/customers
-          filters:
-            - SetPath=/v1/customers
         # ---- Customer ----
         # ---- Exemption ----
         - id: sales-tax-get-exemptions
@@ -170,9 +163,9 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/exemptions/complytId/{complytId}
+            - Path=/v1/exemptions/complytId/{complyt-id}
           filters:
-            - SetPath=/v1/exemptions/complytId{complytId}
+            - SetPath=/v1/exemptions/complytId{complyt_id}
         - id: sales-tax-post-exemption
           uri: lb://sales-tax
           predicates:
@@ -184,16 +177,16 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/exemptions/complytId/{complytId}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/complytId/{complytId}
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         - id: sales-tax-delete-exemption-by-complyt-id
           uri: lb://sales-tax
           predicates:
             - Method=DELETE
-            - Path=/v1/exemptions/complytId/{complytId}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/complytId/{complytId}
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         # ---- Exemption ----
         # ---- Nexus ----
         - id: sales-tax-get-nexuses
