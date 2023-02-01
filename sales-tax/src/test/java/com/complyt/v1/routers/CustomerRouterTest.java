@@ -209,6 +209,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -225,6 +226,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByComplytId_OperationFails_Returns4xxNotFound() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -240,6 +242,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
@@ -261,6 +264,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAll_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -286,6 +290,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAllBySource_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
