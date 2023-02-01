@@ -72,8 +72,8 @@ class CustomerRouterTest {
     @Test
     void upsert_NewCustomerCreated_SavesCustomer() {
         // Given®
-        String externalId = customerDto.getExternalId();
-        String source = customerDto.getSource();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
@@ -96,8 +96,8 @@ class CustomerRouterTest {
     @Test
     void accessNonExistingPath_NotFound() {
         // Given
-        String externalId = customerDto.getExternalId();
-        String source = customerDto.getSource();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
@@ -119,7 +119,7 @@ class CustomerRouterTest {
     void upsert_CustomerExists_UpdatesCustomer() {
         // Given
         String externalId = customer.getExternalId();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer originalCustomer = newCustomer.withName("originalCustomer");
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
@@ -145,7 +145,7 @@ class CustomerRouterTest {
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
 
         // When + Then
@@ -183,7 +183,7 @@ class CustomerRouterTest {
         // Given
 
         String externalId = customer.getExternalId();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
 
@@ -204,7 +204,7 @@ class CustomerRouterTest {
     void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then

@@ -50,12 +50,21 @@ public class TransactionRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> upsertRouterFunction(@NonNull final TransactionHandler transactionHandler) {
+    public RouterFunction<ServerResponse> upsertTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate putTransactionRoute = RequestPredicates
                 .PUT(BASE_URL + "/source/{source}/externalId/{externalId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(putTransactionRoute, transactionHandler::upsert);
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> deleteTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
+        RequestPredicate deleteTransactionRoute = RequestPredicates
+                .DELETE(BASE_URL + "/source/{source}/externalId/{externalId}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(deleteTransactionRoute, transactionHandler::delete);
     }
 
 }

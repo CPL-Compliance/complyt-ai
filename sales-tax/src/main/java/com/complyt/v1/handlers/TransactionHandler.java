@@ -2,6 +2,7 @@ package com.complyt.v1.handlers;
 
 import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
+import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.TransactionDto;
@@ -85,7 +86,17 @@ public class TransactionHandler {
                         transactionFacade.findByExternalIdAndSource(externalId, source)
                                 .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, source, receivedTransaction, originalTransaction)
                                         .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
-                                .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction).flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))));
+                                .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction).flatMap(savedTransaction ->
+                                        ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))));
     }
 
+    @TransactionDeletePermission
+    public Mono<ServerResponse> delete(ServerRequest serverRequest) {
+        String externalId = serverRequest.pathVariable("externalId");
+        String source = serverRequest.pathVariable("source");
+        log.debug("Delete transaction - external id and source received as path variable : " + externalId + ", " + source);
+
+        return transactionFacade.markAsCancelled(externalId, source)
+                .flatMap(transaction -> ServerResponse.noContent().build());
+    }
 }

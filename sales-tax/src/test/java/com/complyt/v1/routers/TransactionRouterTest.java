@@ -2,6 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
@@ -222,6 +223,25 @@ public class TransactionRouterTest {
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
                 .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
+    }
+
+    @Test
+    void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
+        // Given
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        when(transactionFacade.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
     }
 
 }
