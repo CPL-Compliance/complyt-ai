@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
@@ -39,7 +40,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 
 @WebFluxTest
-@WithMockUser(username = "mock", password = "mock")
 @ContextConfiguration(classes = {CustomerRouter.class, CustomerHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
@@ -61,6 +61,8 @@ class CustomerRouterTest {
     @Autowired
     private WebTestClient webTestClient;
 
+    private ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
         ObjectStub objectStub = new ObjectStub(
@@ -70,6 +72,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void upsert_NewCustomerCreated_SavesCustomer() {
         // Given®
         String externalId = customerDto.externalId();
@@ -94,6 +97,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void accessNonExistingPath_NotFound() {
         // Given
         String externalId = customerDto.externalId();
@@ -116,6 +120,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void upsert_CustomerExists_UpdatesCustomer() {
         // Given
         String externalId = customer.getExternalId();
@@ -142,6 +147,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -161,6 +167,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser
     void getByComplytId_FindsCustomer_ReturnsCustomer() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -179,6 +186,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void update_UpdateFails_Returns5xxServerError() {
         // Given
 
@@ -201,6 +209,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
@@ -217,6 +226,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByComplytId_OperationFails_Returns4xxNotFound() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -232,6 +242,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
@@ -253,6 +264,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAll_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -278,6 +290,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAllBySource_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
