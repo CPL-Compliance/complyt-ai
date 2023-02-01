@@ -1,35 +1,28 @@
 package com.complyt.v1.routers;
 
 import com.complyt.config.ApiExceptionConfig;
-import com.complyt.config.JacksonConfig;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.CustomerHandler;
-import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import org.springframework.web.reactive.function.server.RouterFunction;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
@@ -47,7 +40,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 
 @WebFluxTest
-@WithMockUser(username = "mock", password = "mock")
 @ContextConfiguration(classes = {CustomerRouter.class, CustomerHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
@@ -70,7 +62,6 @@ class CustomerRouterTest {
     private WebTestClient webTestClient;
 
     private ObjectStub objectStub;
-    private RouterFunction routerFunction;
 
     @BeforeEach
     void setUp() {
@@ -81,10 +72,11 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void upsert_NewCustomerCreated_SavesCustomer() {
         // Given®
-        String externalId = customerDto.getExternalId();
-        String source = customerDto.getSource();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
@@ -105,10 +97,11 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void accessNonExistingPath_NotFound() {
         // Given
-        String externalId = customerDto.getExternalId();
-        String source = customerDto.getSource();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
@@ -127,10 +120,11 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser()
     void upsert_CustomerExists_UpdatesCustomer() {
         // Given
         String externalId = customer.getExternalId();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         Customer newCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer originalCustomer = newCustomer.withName("originalCustomer");
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
@@ -153,10 +147,11 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser
     void getByExternalId_FindsCustomer_ReturnsCustomer() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
 
         // When + Then
@@ -172,6 +167,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithMockUser
     void getByComplytId_FindsCustomer_ReturnsCustomer() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -190,11 +186,12 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void update_UpdateFails_Returns5xxServerError() {
         // Given
 
         String externalId = customer.getExternalId();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
 
@@ -212,10 +209,11 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByExternalId_OperationFails_Returns4xxNotFound() {
         // Given
         String externalId = UUID.randomUUID().toString();
-        String source = customerDto.getSource();
+        String source = customerDto.source();
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
 
         // When + Then
@@ -228,6 +226,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByComplytId_OperationFails_Returns4xxNotFound() {
         // Given
         UUID complytId = UUID.randomUUID();
@@ -243,6 +242,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getByName_FindsCustomer_ReturnsCustomer() {
         // Given
         String name = "name";
@@ -264,6 +264,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAll_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
@@ -289,6 +290,7 @@ class CustomerRouterTest {
     }
 
     @Test
+    @WithUserDetails
     void getAllBySource_AllCustomersRetrieved_ReturnsAllCustomersFound() {
         // Given
         String id = UUID.randomUUID().toString();
