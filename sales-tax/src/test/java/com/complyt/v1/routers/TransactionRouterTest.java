@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -242,6 +244,96 @@ public class TransactionRouterTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    void getTransactionByExternalIdAndSourceRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.getTransactionByExternalIdAndSourceRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAllTransactionsRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.getAllTransactionsRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getAllTransactionsBySourceRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.getAllTransactionsBySourceRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void getTransactionByComplytIdRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.getTransactionByComplytIdRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void upsertTransactionRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.upsertTransactionRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    void deleteTransactionRouterFunction_NullHandler_ThrowsException() {
+        // Given
+        TransactionHandler nullTransactionHandler = null;
+        transactionRouter = new TransactionRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            transactionRouter.upsertTransactionRouterFunction(nullTransactionHandler);
+        });
+
+        // Then
+        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
 }

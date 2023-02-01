@@ -5,7 +5,6 @@ import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.reactive.function.server.*;
 
 @Configuration
@@ -14,7 +13,7 @@ public class TransactionRouter {
     public static final String BASE_URL = "/v1/transactions";
 
     @Bean
-    public RouterFunction<ServerResponse> getTransactionByExternalIdRouterFunction(@NonNull final TransactionHandler transactionHandler) {
+    public RouterFunction<ServerResponse> getTransactionByExternalIdAndSourceRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL + "/source/{source}/externalId/{externalId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
@@ -41,7 +40,7 @@ public class TransactionRouter {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> getTransactionsByComplytIdRouterFunction(@NonNull final TransactionHandler transactionHandler) {
+    public RouterFunction<ServerResponse> getTransactionByComplytIdRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL + "/complytId/{complytId}")
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
