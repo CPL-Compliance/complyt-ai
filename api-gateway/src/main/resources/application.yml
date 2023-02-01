@@ -142,7 +142,7 @@ spring:
             - Method=GET
             - Path=/v1/customers/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/customers/complytId/{complyt-id}
+            - SetPath=/v1/customers/complytId/{complyt_id}
         - id: sales-tax-put-customer-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
@@ -163,7 +163,7 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/exemptions/complytId/{complyt-id}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
             - SetPath=/v1/exemptions/complytId{complyt_id}
         - id: sales-tax-post-exemption
