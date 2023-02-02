@@ -2,6 +2,7 @@ package com.complyt.v1.validators;
 
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,5 +18,10 @@ public class ValidatorConfig {
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter);
+    }
+
+    @Bean
+    ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter);
     }
 }

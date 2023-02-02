@@ -35,6 +35,6 @@ public class AddressDto {
     private String street;
 
     @NotBlank(message = "ZIP may not be blank")
-    @Size(min = 1, max = 10, message = "ZIP should be 1-256 characters maximum")
+    @Size(min = 1, max = 256, message = "ZIP should be 1-256 characters maximum")
     private String zip;
 }
