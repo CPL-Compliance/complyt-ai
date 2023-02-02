@@ -329,7 +329,7 @@ public class TransactionRouterTest {
 
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.upsertTransactionRouterFunction(nullTransactionHandler);
+            transactionRouter.deleteTransactionRouterFunction(nullTransactionHandler);
         });
 
         // Then
