@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
@@ -23,25 +24,35 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.GET,
+                method = RequestMethod.PUT,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Transaction by External ID and Source",
-                        operationId = "getTransactionByExternalIdAndSource",
+                        description = "Update or Insert Transaction by External ID and source",
+                        operationId = "upsertTransactionByExternalId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "externalId",
                                         description = "Transaction External ID",
-                                        examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample)),
+                                        examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.externalIdExample)),
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
                                         description = "Transaction Source",
-                                        examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.externalIdExample,
+                                                name = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.externalIdExample))
                         },
                         tags = "transaction",
+                        requestBody =
+                        @RequestBody(
+                                description = "Transaction to add",
+                                required = true,
+                                content = @Content(
+                                        schema = @Schema(implementation = TransactionDto.class, required = true),
+                                        examples = {
+                                                @ExampleObject(value = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.newTransactionExample)
+                                        })
+                        ),
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -51,7 +62,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = TransactionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetTransactionByExternalIdAndSourceApiInfo.newTransactionExample)
+                                                                @ExampleObject(value = UpsertTransactionByExternalIdAndSourceApiInfo.returnedTransactionExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -75,11 +86,12 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetTransactionByExternalIdAndSourceApiInfo {
+
+public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String newTransactionExample = """
             {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "externalId":"string",
+            "externalId":"999444",
             "source":"string",
             "items":[
             {"unitPrice":0,
@@ -108,7 +120,6 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
             "zip": "string"
             },
             "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              
               "externalTimestamps": {
                 "createdDate": {
                   "timestamp": "2023-02-05T12:24:43.193Z"
@@ -122,8 +133,6 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                 "manualSalesTaxRate": 0,
                 "totalPrice": 0,
                 "taxCode": "string"
-                "taxableCategory": "TAXABLE",
-                "tangibleCategory": "TANGIBLE"
             },
             "transactionStatus": "ACTIVE",
             "transactionType": "SALES_ORDER",
@@ -133,7 +142,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
 
     String returnedTransactionExample = """
             {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "externalId":"string",
+            "externalId":"999444",
             "source":"string",
             "items":[
             {"unitPrice":0,
@@ -326,203 +335,5 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
             "totalItemsAmount": 0
             }
             """;
+
 }
-
-
-
-
-
-
-//    String jsonInString = "{\"complytId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
-//            "\"externalId\":\"string\",\n" +
-//            "\"source\":\"string\",\n" +
-//            "\"items\":[\n" +
-//            "{\"unitPrice\":0,\n" +
-//            "\"quantity\":0,\n" +
-//            "\"totalPrice\":0,\n" +
-//            "\"description\":\"string\",\n" +
-//            "\"name\":\"string\",\n" +
-//            "\"taxCode\":\"string\",\n" +
-//            "\"jurisdictionalSalesTaxRules\":\n" +
-//            "{\"name\":\"string\",\n" +
-//            "\"abbreviation\":\"string\",\n" +
-//            "\"taxable\":true,\n" +
-//            "\"specialTreatment\":true,\n" +
-//            "\"calculationType\":\"FIXED\",\n" +
-//            "\"description\":\"string\",\n" +
-//            "\"calculationValue\":0,\n" +
-//            "\"cities\":\n" +
-//            "{\"additionalProp1\":\n" +
-//            "{\"name\":\"string\",\n" +
-//            "\"abbreviation\":\"string\",\n" +
-//            "\"taxable\":true,\n" +
-//            "\"specialTreatment\":true,\n" +
-//            "\"calculationType\":\"FIXED\",\n" +
-//            "\"description\":\"string\",\n" +
-//            "\"calculationValue\":0\n" +
-//            "},\n" +
-//            "\"additionalProp2\":\n" +
-//            "{\"name\":\"string\",\n" +
-//            "\"abbreviation\":\"string\",\n" +
-//            "\"taxable\":true,\n" +
-//            "\"specialTreatment\":true,\n" +
-//            "\"calculationType\":\"FIXED\",\n" +
-//            "\"description\":\"string\",\n" +
-//            "\"calculationValue\":0\n" +
-//            "},\n" +
-//            "\"additionalProp3\":\n" +
-//            "{\"name\":\"string\",\n" +
-//            "\"abbreviation\":\"string\",\n" +
-//            "\"taxable\":true,\n" +
-//            "\"specialTreatment\":true,\n" +
-//            "\"calculationType\":\"FIXED\",\n" +
-//            "\"description\":\"string\",\n" +
-//            "\"calculationValue\":0\n" +
-//            "}\n" +
-//            "}\n" +
-//            "}\n," +
-//            "\"salesTaxRate\":\n" +
-//            "{\"cityDistrictRate\":0,\n" +
-//            "\"cityRate\":0,\n" +
-//            "\"countyDistrictRate\":0,\n" +
-//            "\"countyRate\":0,\n" +
-//            "\"stateRate\":0,\n" +
-//            "\"taxRate\":0\n" +
-//            "\"manualSalesTax\": true,\n" +
-//            "\"manualSalesTaxRate\": 0,\n" +
-//            "\"tangibleCategory\": \"TANGIBLE\",\n" +
-//            "\"taxableCategory\": \"TAXABLE\"\n" +
-//            "],\n" +
-//            "\"billingAddress\": {\n" +
-//            "\"city\": \"string\",\n" +
-//            "\"country\": \"string\",\n" +
-//            "\"county\": \"string\",\n" +
-//            "\"state\": \"string\",\n" +
-//            "\"street\": \"string\",\n" +
-//            "\"zip\": \"string\"\n" +
-//            "},\n" +
-//            "\"shippingAddress\": {\n" +
-//            "\"city\": \"string\",\n" +
-//            "\"country\": \"string\",\n" +
-//            "\"county\": \"string\",\n" +
-//            "\"state\": \"string\"," +
-//            "\"street\": \"string\",\n" +
-//            "\"zip\": \"string\"\n" +
-//            "},\n" +
-//            "\"customerId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
-//            "\"customer\": {\n" +
-//            "\"complytId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\n" +
-//            "\"externalId\": \"string\",\n" +
-//            "\"source\": \"7\",\n" +
-//            "\"name\": \"string\",\n" +
-//            "\"address\": {\n" +
-//            "\"city\": \"string\",\n" +
-//            "\"country\": \"string\",\n" +
-//            "\"county\": \"string\",\n" +
-//            "\"state\": \"string\",\n" +
-//            "\"street\": \"string\",\n" +
-//            "\"zip\": \"string\"\n" +
-//            "},\n" +
-//            "\"customerType\": \"RETAIL\",\n" +
-//            "\"internalTimestamps\": {\n" +
-//            "\"createdDate\": {\n" +
-//            "\"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "},\n" +
-//            "\"updatedDate\": {\n" +
-//            "\"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "}\n" +
-//            "},\n" +
-//            "\"externalTimestamps\": {\n" +
-//            "\"createdDate\": {\n" +
-//            "\"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "},\n" +
-//            "\"updatedDate\": {\n" +
-//            "\"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "}\n" +
-//            "}\n" +
-//            "},\n" +
-//            "\"salesTax\": {\n" +
-//            "\"amount\": 0,\n" +
-//            "\"salesTaxRate\": {\n" +
-//            "\"cityDistrictRate\": 0,\n" +
-//            "\"cityRate\": 0,\n" +
-//            "\"countyDistrictRate\": 0,\n" +
-//            "\"countyRate\": 0,\n" +
-//            "\"stateRate\": 0,\n" +
-//            "\"taxRate\": 0\n" +
-//            "    }\n" +
-//            "  },\n" +
-//            "  \"transactionStatus\": \"ACTIVE\",\n" +
-//            "  \"internalTimestamps\": {\n" +
-//            "    \"createdDate\": {\n" +
-//            "      \"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "    },\n" +
-//            "    \"updatedDate\": {\n" +
-//            "      \"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "    }\n" +
-//            "  },\n" +
-//            "  \"externalTimestamps\": {\n" +
-//            "    \"createdDate\": {\n" +
-//            "      \"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "    },\n" +
-//            "    \"updatedDate\": {\n" +
-//            "      \"timestamp\": \"2023-02-05T12:24:43.193Z\"\n" +
-//            "    }\n" +
-//            "  },\n" +
-//            "  \"transactionType\": \"SALES_ORDER\",\n" +
-//            "  \"shippingFee\": {\n" +
-//            "    \"manualSalesTax\": true,\n" +
-//            "    \"manualSalesTaxRate\": 0,\n" +
-//            "    \"totalPrice\": 0,\n" +
-//            "    \"jurisdictionalSalesTaxRules\": {\n" +
-//            "      \"name\": \"string\",\n" +
-//            "      \"abbreviation\": \"string\",\n" +
-//            "      \"taxable\": true,\n" +
-//            "      \"specialTreatment\": true,\n" +
-//            "      \"calculationType\": \"FIXED\",\n" +
-//            "      \"description\": \"string\",\n" +
-//            "      \"calculationValue\": 0,\n" +
-//            "      \"cities\": {\n" +
-//            "        \"additionalProp1\": {\n" +
-//            "          \"name\": \"string\",\n" +
-//            "          \"abbreviation\": \"string\",\n" +
-//            "          \"taxable\": true,\n" +
-//            "          \"specialTreatment\":true\n" +
-//            "          \"calculationType\": \"FIXED\",\n" +
-//            "           \"description\": \"string\",\n" +
-//            "           \"calculationValue\": 0,\n" +
-//            "          \"additionalProp2\": {\n" +
-//            "            \"name\": \"string\",\n" +
-//            "            \"abbreviation\": \"string\",\n" +
-//            "        \"taxable\": true,\n" +
-//            "        \"specialTreatment\": true,\n" +
-//                    "\"calculationType\": \"FIXED\",\n" +
-//                    "\"description\": \"string\",\n" +
-//                    "\"calculationValue\": 0\n" +
-//                    "},\n" +
-//                    "\"additionalProp3\": {\n" +
-//                    "\"name\": \"string\",\n" +
-//                    "\"abbreviation\": \"string\",\n" +
-//                    "\"taxable\": true,\n" +
-//                    "\"specialTreatment\": true,\n" +
-//                    "\"calculationType\": \"FIXED\",\n" +
-//                    "\"description\": \"string\",\n" +
-//                    "\"calculationValue\": 0\n" +
-//                    "}\n" +
-//                    "},\n" +
-//                    "\"salesTaxRate\": {\n" +
-//                    "\"cityDistrictRate\": 0,\n" +
-//                    "\"cityRate\": 0,\n" +
-//                    "\"countyDistrictRate\": 0,\n" +
-//                    "\"countyRate\": 0,\n" +
-//                    "\"stateRate\": 0,\n" +
-//                    "\"taxRate\": 0\n" +
-//                    "},\n" +
-//                    "\"taxCode\": \"string\",\n" +
-//                    "\"taxableCategory\": \"TAXABLE\",\n" +
-//                    "\"tangibleCategory\": \"TANGIBLE\",\n" +
-//                    "\"createdFrom\": \"string\",\n" +
-//                    "\"taxableItemsAmount\": 0,\n" +
-//                    "\"tangibleItemsAmount\": 0,\n" +
-//                    "\"totalItemsAmount\": 0\n" +
-//                    "}\n";

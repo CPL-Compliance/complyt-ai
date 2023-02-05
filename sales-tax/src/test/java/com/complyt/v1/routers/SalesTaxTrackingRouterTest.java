@@ -105,7 +105,6 @@ public class SalesTaxTrackingRouterTest {
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .isEqualTo(expectedSalesTaxTrackingDto);
-
     }
 
     @Test
