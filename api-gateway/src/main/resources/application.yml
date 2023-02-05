@@ -89,9 +89,9 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/transactions/complytId/{complytId}
+            - Path=/v1/transactions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+            - SetPath=/v1/transactions/complytId/{complyt_id}
         - id: sales-tax-put-transaction-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
