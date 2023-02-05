@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -56,6 +58,7 @@ public class SalesTaxTrackingRouterTest {
 
     @BeforeEach
     void setUp() {
+        salesTaxTrackingRouter = new SalesTaxTrackingRouter();
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
@@ -240,18 +243,60 @@ public class SalesTaxTrackingRouterTest {
                 .isEqualTo(expectedSalesTaxTrackingDto);
     }
 
+    @Test
+    void getSalesTaxTrackingByStateRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
-//    @Test
-//    void exemptionRoute_nullExemptionHandler_ThrowsNullPointerException() {
-//        // Given
-//        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
-//
-//        // When
-//        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-//            salesTaxTrackingRouter.salesTaxTrackingRoute(nullSalesTaxTrackingHandler);
-//        });
-//
-//        // Then
-//        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
-//    }
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingRouter.getSalesTaxTrackingByStateRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getSalesTaxTrackingByComplytIdRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingRouter.getSalesTaxTrackingByComplytIdRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getAllSalesTaxTrackingRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingRouter.getAllSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsertSalesTaxTrackingRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingRouter.upsertSalesTaxTrackingRouterFunction(nullSalesTaxTrackingHandler);
+        });
+
+        // Then
+        assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
+    }
+
 }
