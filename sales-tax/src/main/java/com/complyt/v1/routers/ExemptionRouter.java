@@ -1,5 +1,6 @@
 package com.complyt.v1.routers;
 
+import com.complyt.v1.api_info.exemption.*;
 import com.complyt.v1.handlers.ExemptionHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ public class ExemptionRouter {
     public static final String BASE_URL = "/v1/exemptions";
 
     @Bean
+    @GetExemptionByComplytIdApiInfo
     public RouterFunction<ServerResponse> GetExemptionByComplytIdRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate getExemptionRoute = RequestPredicates
                 .GET(BASE_URL + "/complytId/{complytId}")
@@ -22,6 +24,7 @@ public class ExemptionRouter {
     }
 
     @Bean
+    @GetAllExemptionsApiInfo
     public RouterFunction<ServerResponse> GetAllExemptionsRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate getAllExemptiosRoute = RequestPredicates
                 .GET(BASE_URL)
@@ -31,6 +34,7 @@ public class ExemptionRouter {
     }
 
     @Bean
+    @PostExemptionApiInfo
     public RouterFunction<ServerResponse> postExemptionRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate postExemptionRoute = RequestPredicates
                 .POST(BASE_URL)
@@ -40,6 +44,7 @@ public class ExemptionRouter {
     }
 
     @Bean
+    @PutExemptionApiInfo
     public RouterFunction<ServerResponse> updateExemptionByComplytIdRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate putExemptionRoute = RequestPredicates
                 .PUT(BASE_URL + "/complytId/{complytId}")
@@ -49,6 +54,7 @@ public class ExemptionRouter {
     }
 
     @Bean
+    @DeleteExemptionByComplytIdApiInfo
     public RouterFunction<ServerResponse> deleteExemptionByComplytIdRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate deleteExemptionRoute = RequestPredicates
                 .DELETE(BASE_URL + "/complytId/{complytId}")

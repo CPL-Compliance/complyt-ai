@@ -1,5 +1,6 @@
 package com.complyt.v1.routers;
 
+import com.complyt.v1.api_info.transaction.*;
 import com.complyt.v1.handlers.TransactionHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ public class TransactionRouter {
     public static final String BASE_URL = "/v1/transactions";
 
     @Bean
+    @GetTransactionByExternalIdAndSourceApiInfo
     public RouterFunction<ServerResponse> getTransactionByExternalIdAndSourceRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL + "/source/{source}/externalId/{externalId}")
@@ -22,6 +24,7 @@ public class TransactionRouter {
     }
 
     @Bean
+    @GetAllTransactionsApiInfo
     public RouterFunction<ServerResponse> getAllTransactionsRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL)
@@ -31,6 +34,7 @@ public class TransactionRouter {
     }
 
     @Bean
+    @GetAllTransactionsBySourceApiInfo
     public RouterFunction<ServerResponse> getAllTransactionsBySourceRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL + "/source/{source}")
@@ -40,6 +44,7 @@ public class TransactionRouter {
     }
 
     @Bean
+    @GetTransactionByComplytIdApiInfo
     public RouterFunction<ServerResponse> getTransactionByComplytIdRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate getTransactionRoute = RequestPredicates
                 .GET(BASE_URL + "/complytId/{complytId}")
@@ -49,6 +54,7 @@ public class TransactionRouter {
     }
 
     @Bean
+    @UpsertTransactionByExternalIdAndSourceApiInfo
     public RouterFunction<ServerResponse> upsertTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate putTransactionRoute = RequestPredicates
                 .PUT(BASE_URL + "/source/{source}/externalId/{externalId}")
@@ -58,6 +64,7 @@ public class TransactionRouter {
     }
 
     @Bean
+    @DeleteTransactionByExternalIdAndSourceApiInfo
     public RouterFunction<ServerResponse> deleteTransactionRouterFunction(@NonNull final TransactionHandler transactionHandler) {
         RequestPredicate deleteTransactionRoute = RequestPredicates
                 .DELETE(BASE_URL + "/source/{source}/externalId/{externalId}")
