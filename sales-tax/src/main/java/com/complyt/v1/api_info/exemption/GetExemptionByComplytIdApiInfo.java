@@ -1,6 +1,6 @@
-package com.complyt.v1.api_info.customer;
+package com.complyt.v1.api_info.exemption;
 
-import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -27,16 +27,16 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by Complyt ID",
-                        operationId = "getCustomerByComplytId",
+                        description = "Get Exemption by Complyt ID",
+                        operationId = "getExemptionByComplytId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "complytId",
-                                        description = "Customer complyt ID",
-                                        examples = @ExampleObject(value = GetCustomerByComplytIdApiInfo.complytIdExample,
-                                                name = GetCustomerByComplytIdApiInfo.complytIdExample))
+                                        description = "Exemption complyt ID",
+                                        examples = @ExampleObject(value = GetExemptionByComplytIdApiInfo.complytIdExample,
+                                                name = GetExemptionByComplytIdApiInfo.complytIdExample))
                         },
-                        tags = "customer",
+                        tags = "exemption",
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -44,9 +44,9 @@ import java.lang.annotation.Target;
                                         content = {
                                                 @Content(
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                        schema = @Schema(implementation = CustomerDto.class),
+                                                        schema = @Schema(implementation = ExemptionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetCustomerByComplytIdApiInfo.customerExample)
+                                                                @ExampleObject(value = GetExemptionByComplytIdApiInfo.exemptionExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -63,45 +63,55 @@ import java.lang.annotation.Target;
                                 ),
                                 @ApiResponse(
                                         responseCode = "404",
-                                        description = "Customer Not Found"),
+                                        description = "Exemption Not Found"),
                                 @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
                         }))
 })
-public @interface GetCustomerByComplytIdApiInfo {
+public @interface GetExemptionByComplytIdApiInfo {
+
     String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
-    String customerExample = "[{\n" +
-            "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-            "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-            "    \"externalId\": \"999444\",\n" +
-            "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt LTD.\",\n" +
-            "    \"address\": {\n" +
-            "        \"city\": \"Sacramento\",\n" +
-            "        \"country\": \"US\",\n" +
-            "        \"county\": null,\n" +
-            "        \"state\": \"CA\",\n" +
-            "        \"street\": \"944 W. Wintergreen St.\",\n" +
-            "        \"zip\": \"95823\"\n" +
-            "    },\n" +
-            "    \"customerType\": \"RETAIL\",\n" +
-            "    \"internalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2023-01-10T17:40:44.357\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2023-01-11T17:10:21.275\"\n" +
-            "        }\n" +
-            "    },\n" +
-            "    \"externalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T07:00:00\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
-            "        }\n" +
-            "    }\n" +
-            "}]";
+    String exemptionExample = """
+            {
+                     "complytId": "f2cfcad9-d4e2-4ade-96b4-e83b7d402933",
+                     "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
+                     "state": {
+                         "abbreviation": "AZ",
+                         "code": "04",
+                         "name": "Arizona"
+                     },
+                     "classification": {
+                         "code": "code",
+                         "description": "description"
+                     },
+                     "validationDates": {
+                         "fromDate": {
+                             "timestamp": "2022-11-01T02:00:00"
+                         },
+                         "toDate": {
+                             "timestamp": "2023-02-28T02:00:00"
+                         }
+                     },
+                     "internalTimestamps": {
+                         "createdDate": {
+                             "timestamp": "2022-12-29T10:24:54.577"
+                         },
+                         "updatedDate": {
+                             "timestamp": "2022-12-29T10:24:54.577"
+                         }
+                     },
+                     "status": {
+                         "code": "code",
+                         "name": "name"
+                     },
+                     "certificate": {
+                         "certificateId": "id",
+                         "url": "url",
+                         "name": "name"
+                     },
+                     "exemptionType": "FULLY"
+                 }
+            """;
 }

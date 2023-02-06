@@ -66,6 +66,17 @@ import java.lang.annotation.Target;
                                                         })
                                         }),
                                 @ApiResponse(
+                                        responseCode = "201",
+                                        description = "Successful operation",
+                                        content = {
+                                                @Content(
+                                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                                        schema = @Schema(implementation = CustomerDto.class),
+                                                        examples = {
+                                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
+                                                        })
+                                        }),
+                                @ApiResponse(
                                         responseCode = "400",
                                         description = "Something is wrong with your request"
                                 ),

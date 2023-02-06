@@ -1,6 +1,6 @@
-package com.complyt.v1.api_info.customer;
+package com.complyt.v1.api_info.sales_tax_tracking;
 
-import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -27,16 +27,16 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Customer by Complyt ID",
-                        operationId = "getCustomerByComplytId",
+                        description = "Get Sales tax tracking By Source",
+                        operationId = "getAllSalesTaxTrackingByState",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
-                                        name = "complytId",
-                                        description = "Customer complyt ID",
-                                        examples = @ExampleObject(value = GetCustomerByComplytIdApiInfo.complytIdExample,
-                                                name = GetCustomerByComplytIdApiInfo.complytIdExample))
+                                        name = "state",
+                                        description = "Sales tax tracking State",
+                                        examples = @ExampleObject(value = GetSalesTaxTrackingByStateApiInfo.stateExample,
+                                                name = GetSalesTaxTrackingByStateApiInfo.stateExample))
                         },
-                        tags = "customer",
+                        tags = "salesTaxTracking",
                         responses = {
                                 @ApiResponse(
                                         responseCode = "200",
@@ -44,9 +44,9 @@ import java.lang.annotation.Target;
                                         content = {
                                                 @Content(
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                        schema = @Schema(implementation = CustomerDto.class),
+                                                        schema = @Schema(implementation = SalesTaxTrackingDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetCustomerByComplytIdApiInfo.customerExample)
+                                                                @ExampleObject(value = GetSalesTaxTrackingByStateApiInfo.salesTaxTrackingExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -63,45 +63,38 @@ import java.lang.annotation.Target;
                                 ),
                                 @ApiResponse(
                                         responseCode = "404",
-                                        description = "Customer Not Found"),
+                                        description = "salesTaxTracking Not Found"
+                                ),
                                 @ApiResponse(
                                         responseCode = "500",
                                         description = "Internal Error"
                                 )
                         }))
 })
-public @interface GetCustomerByComplytIdApiInfo {
-    String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
-    String customerExample = "[{\n" +
-            "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-            "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-            "    \"externalId\": \"999444\",\n" +
-            "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt LTD.\",\n" +
-            "    \"address\": {\n" +
-            "        \"city\": \"Sacramento\",\n" +
-            "        \"country\": \"US\",\n" +
-            "        \"county\": null,\n" +
-            "        \"state\": \"CA\",\n" +
-            "        \"street\": \"944 W. Wintergreen St.\",\n" +
-            "        \"zip\": \"95823\"\n" +
-            "    },\n" +
-            "    \"customerType\": \"RETAIL\",\n" +
-            "    \"internalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2023-01-10T17:40:44.357\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2023-01-11T17:10:21.275\"\n" +
-            "        }\n" +
-            "    },\n" +
-            "    \"externalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T07:00:00\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
-            "        }\n" +
-            "    }\n" +
-            "}]";
+public @interface GetSalesTaxTrackingByStateApiInfo {
+
+    String stateExample = "California";
+    String salesTaxTrackingExample = """
+            {
+                {
+                    "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",
+                    "state": {
+                        "abbreviation": "CA",
+                        "code": "06",
+                        "name": "California"
+                    },
+                    "enforcesSalesTax": true,
+                    "physicalNexusTracker": {
+                        "established": false,
+                        "establishedDate": "2000-12-31T22:00:00"
+                    },
+                    "economicNexusTracker": {
+                        "established": true,
+                        "establishedDate": "2022-08-02T16:12:00"
+                    },
+                    "appliedDate": "2015-08-02T16:12:00",
+                    "approved": true,
+                    "approvalDate": "2015-06-22T13:57:00"
+                }
+            }""";
 }
