@@ -45,7 +45,7 @@ class ItemDtoTest {
                 ", manualSalesTax=" + itemDto.manualSalesTax() +
                 ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
                 ", tangibleCategory=" + itemDto.tangibleCategory() +
-                ", taxableCategory=" + itemDto.taxableCategory() + ")";
+                ", taxableCategory=" + itemDto.taxableCategory() + "]";
 
         // When
         String actualString = itemDto.toString();
