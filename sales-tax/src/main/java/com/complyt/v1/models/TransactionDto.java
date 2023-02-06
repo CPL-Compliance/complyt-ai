@@ -26,8 +26,6 @@ public record TransactionDto(UUID complytId,
                              @NotNull(message = "Transaction Type may not be null") TransactionTypeDto transactionType,
                              @Valid ShippingFeeDto shippingFee,
                              @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
-                             @NotNull(message = "Taxable items amount may not be null") @PositiveOrZero(message = "Taxable items amount can not be a negative number") float taxableItemsAmount,
-                             @NotNull(message = "Tangible items amount may not be null") @PositiveOrZero(message = "Tangible items amount can not be a negative number") float tangibleItemsAmount,
-                             @NotNull(message = "Total items amount may not be null") @PositiveOrZero(message = "Total items amount can not be a negative number") float totalItemsAmount) {
+                             float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount) {
 
 }

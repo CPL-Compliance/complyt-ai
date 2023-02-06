@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @RouterOperations({
         @RouterOperation(
-                method = RequestMethod.GET,
+                method = RequestMethod.PUT,
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),

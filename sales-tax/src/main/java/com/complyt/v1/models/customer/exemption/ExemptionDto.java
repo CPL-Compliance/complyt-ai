@@ -9,41 +9,14 @@ import lombok.*;
 
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
 @Schema(name = "Exemption")
-public class ExemptionDto {
-    private final UUID complytId;
-
-    @NotNull(message = "Customer Id may not be null")
-    private final UUID customerId;
-
-    @Valid
-    @NotNull(message = "State may not be null")
-    private final StateDto state;
-
-    @Valid
-    @NotNull(message = "Classification may not be null")
-    private final ClassificationDto classification;
-
-    @Valid
-//    @NotNull(message = "Validation Dates may not be null")
-    private final ValidationDatesDto validationDates;
-
-    @Valid
-    private final TimestampsDto internalTimestamps;
-
-    @Valid
-    @NotNull(message = "Status Dates may not be null")
-    private final StatusDto status;
-
-    @Valid
-    @NotNull(message = "Certificate Dates may not be null")
-    private final CertificateDto certificate;
-
-    @NotNull(message = "Exemption Type Dates may not be null")
-    private final ExemptionTypeDto exemptionType;
+public record ExemptionDto(UUID complytId, @NotNull(message = "Customer Id may not be null") UUID customerId,
+                           @Valid @NotNull(message = "State may not be null") StateDto state,
+                           @Valid @NotNull(message = "Classification may not be null") ClassificationDto classification,
+                           @Valid @NotNull(message = "Validation Dates may not be null") ValidationDatesDto validationDates,
+                           @Valid TimestampsDto internalTimestamps,
+                           @Valid @NotNull(message = "Status Dates may not be null") StatusDto status,
+                           @Valid @NotNull(message = "Certificate Dates may not be null") CertificateDto certificate,
+                           @NotNull(message = "Exemption Type Dates may not be null") ExemptionTypeDto exemptionType) {
 }

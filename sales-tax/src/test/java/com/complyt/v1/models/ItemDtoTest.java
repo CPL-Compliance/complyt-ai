@@ -34,18 +34,18 @@ class ItemDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ItemDto(unitPrice=" + itemDto.getUnitPrice() +
-                ", quantity=" + itemDto.getQuantity() +
-                ", totalPrice=" + itemDto.getTotalPrice() +
-                ", description=" + itemDto.getDescription() +
-                ", name=" + itemDto.getName() +
-                ", taxCode=" + itemDto.getTaxCode() +
-                ", jurisdictionalSalesTaxRules=" + itemDto.getJurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + itemDto.getSalesTaxRate() +
-                ", manualSalesTax=" + itemDto.isManualSalesTax() +
-                ", manualSalesTaxRate=" + itemDto.getManualSalesTaxRate() +
-                ", tangibleCategory=" + itemDto.getTangibleCategory() +
-                ", taxableCategory=" + itemDto.getTaxableCategory() + ")";
+        String expectedString = "ItemDto[unitPrice=" + itemDto.unitPrice() +
+                ", quantity=" + itemDto.quantity() +
+                ", totalPrice=" + itemDto.totalPrice() +
+                ", description=" + itemDto.description() +
+                ", name=" + itemDto.name() +
+                ", taxCode=" + itemDto.taxCode() +
+                ", jurisdictionalSalesTaxRules=" + itemDto.jurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + itemDto.salesTaxRate() +
+                ", manualSalesTax=" + itemDto.manualSalesTax() +
+                ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
+                ", tangibleCategory=" + itemDto.tangibleCategory() +
+                ", taxableCategory=" + itemDto.taxableCategory() + ")";
 
         // When
         String actualString = itemDto.toString();

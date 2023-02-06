@@ -162,7 +162,7 @@ public class ObjectStub {
     }
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
         return new ShippingFeeDto(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 

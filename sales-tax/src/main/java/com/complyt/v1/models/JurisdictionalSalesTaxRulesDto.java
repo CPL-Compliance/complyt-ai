@@ -10,19 +10,10 @@ import lombok.ToString;
 
 import java.util.Map;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Schema(name = "JurisdictionalSalesTaxRules")
-public class JurisdictionalSalesTaxRulesDto {
+public record JurisdictionalSalesTaxRulesDto(String name, String abbreviation, boolean taxable,
+                                             boolean specialTreatment, CalculationType calculationType,
+                                             String description, float calculationValue,
+                                             Map<String, CitySalesTaxRules> cities) {
 
-    private final String name;
-    private final String abbreviation;
-    private final boolean taxable;
-    private final boolean specialTreatment;
-    private final CalculationType calculationType;
-    private final String description;
-    private final float calculationValue;
-    private final Map<String, CitySalesTaxRules> cities;
 }

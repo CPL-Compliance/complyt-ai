@@ -70,7 +70,7 @@ public class SalesTaxTrackingRouterTest {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
-        String state = expectedSalesTaxTrackingDto.getState().getName();
+        String state = expectedSalesTaxTrackingDto.state().name();
 
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
 
@@ -92,7 +92,7 @@ public class SalesTaxTrackingRouterTest {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
-        UUID complytId = expectedSalesTaxTrackingDto.getComplytId();
+        UUID complytId = expectedSalesTaxTrackingDto.complytId();
 
         when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking));
 
@@ -129,7 +129,7 @@ public class SalesTaxTrackingRouterTest {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
-        UUID complytId = expectedSalesTaxTrackingDto.getComplytId();
+        UUID complytId = expectedSalesTaxTrackingDto.complytId();
 
         when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
 

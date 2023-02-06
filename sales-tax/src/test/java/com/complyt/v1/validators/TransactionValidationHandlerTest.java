@@ -38,7 +38,7 @@ class TransactionValidationHandlerTest {
     }
 
     @Test
-    void validate_validCustomer_returnsTransactionDto() {
+    void validate_validTransaction_returnsTransactionDto() {
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);

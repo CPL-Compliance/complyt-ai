@@ -5,23 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
 @With
-@ToString
 @Schema(name = "Certificate")
-public class CertificateDto {
+public record CertificateDto(
+        @NotBlank(message = "Certificate Id may not be blank") @Size(min = 1, max = 256, message = "Certificate Id should be 1-256 characters maximum") String certificateId,
+        @NotBlank(message = "Url may not be blank") @Size(min = 1, max = 256, message = "Url should be 1-256 characters maximum") String url,
+        @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name) {
 
-    @NotBlank(message = "Certificate Id may not be blank")
-    @Size(min = 1, max = 256, message = "Certificate Id should be 1-256 characters maximum")
-    private final String certificateId;
-
-    @NotBlank(message = "Url may not be blank")
-    @Size(min = 1, max = 256, message = "Url should be 1-256 characters maximum")
-    private final String url;
-
-    @NotBlank(message = "Name may not be blank")
-    @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum")
-    private final String name;
 }
