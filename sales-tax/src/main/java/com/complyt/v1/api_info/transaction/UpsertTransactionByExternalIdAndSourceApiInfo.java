@@ -90,7 +90,8 @@ import java.lang.annotation.Target;
 public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String newTransactionExample = """
-            {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            {
+            "complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
             "externalId":"999444",
             "source":"string",
             "items":[
@@ -135,13 +136,14 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 "taxCode": "string"
             },
             "transactionStatus": "ACTIVE",
-            "transactionType": "SALES_ORDER",
+            "transactionType": "INVOICE",
             "createdFrom": "string"
             }
             """;
 
     String returnedTransactionExample = """
-            {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            {
+            "complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
             "externalId":"999444",
             "source":"string",
             "items":[
@@ -276,7 +278,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                   "timestamp": "2023-02-05T12:24:43.193Z"
                 }
               },
-              "transactionType": "SALES_ORDER",
+              "transactionType": "INVOICE",
               "shippingFee": {
                 "manualSalesTax": true,
                 "manualSalesTaxRate": 0,
@@ -335,5 +337,4 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
             "totalItemsAmount": 0
             }
             """;
-
 }

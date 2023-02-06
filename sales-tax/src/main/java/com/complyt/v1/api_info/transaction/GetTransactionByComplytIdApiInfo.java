@@ -27,19 +27,14 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get Transaction by External ID and Source",
-                        operationId = "getTransactionByExternalIdAndSource",
+                        description = "Get Transaction by Complyt ID",
+                        operationId = "getTransactionByComplytId",
                         parameters = {
                                 @Parameter(in = ParameterIn.PATH,
-                                        name = "externalId",
-                                        description = "Transaction External ID",
-                                        examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = com.complyt.v1.api_info.transaction.GetTransactionByExternalIdAndSourceApiInfo.externalIdExample)),
-                                @Parameter(in = ParameterIn.PATH,
-                                        name = "source",
-                                        description = "Transaction Source",
-                                        examples = @ExampleObject(value = GetTransactionByExternalIdAndSourceApiInfo.sourceExample,
-                                                name = GetTransactionByExternalIdAndSourceApiInfo.sourceExample))
+                                        name = "complytId",
+                                        description = "Transaction complyt ID",
+                                        examples = @ExampleObject(value = GetTransactionByComplytIdApiInfo.complytIdExample,
+                                                name = GetTransactionByComplytIdApiInfo.complytIdExample))
                         },
                         tags = "transaction",
                         responses = {
@@ -51,7 +46,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = TransactionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetTransactionByExternalIdAndSourceApiInfo.returnedTransactionExample)
+                                                                @ExampleObject(value = GetTransactionByComplytIdApiInfo.returnedTransactionExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -75,9 +70,9 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetTransactionByExternalIdAndSourceApiInfo {
-    String externalIdExample = "999444";
-    String sourceExample = "1";
+
+public @interface GetTransactionByComplytIdApiInfo {
+    String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
     String returnedTransactionExample = """
             {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
             "externalId":"999444",
@@ -274,4 +269,3 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
             }
             """;
 }
-
