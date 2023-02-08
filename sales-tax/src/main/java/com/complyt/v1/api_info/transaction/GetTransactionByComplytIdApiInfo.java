@@ -73,199 +73,149 @@ import java.lang.annotation.Target;
 
 public @interface GetTransactionByComplytIdApiInfo {
     String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
+
     String returnedTransactionExample = """
-            {"complytId":"3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "externalId":"999444",
-            "source":"1",
-            "items":[
-            {"unitPrice":0,
-            "quantity":0,
-            "totalPrice":0,
-            "description":"string",
-            "name":"string",
-            "taxCode":"string",
-            "jurisdictionalSalesTaxRules":
-            {"name":"string",
-            "abbreviation":"string",
-            "taxable":true,
-            "specialTreatment":true,
-            "calculationType":"FIXED",
-            "description":"string",
-            "calculationValue":0,
-            "cities":
-            {"additionalProp1":
-            {"name":"string",
-            "abbreviation":"string",
-            "taxable":true,
-            "specialTreatment":true,
-            "calculationType":"FIXED",
-            "description":"string",
-            "calculationValue":0
-            },
-            "additionalProp2":
-            {"name":"string",
-            "abbreviation":"string",
-            "taxable":true,
-            "specialTreatment":true,
-            "calculationType":"FIXED",
-            "description":"string",
-            "calculationValue":0
-            },
-            "additionalProp3":
-            {"name":"string",
-            "abbreviation":"string",
-            "taxable":true,
-            "specialTreatment":true,
-            "calculationType":"FIXED",
-            "description":"string",
-            "calculationValue":0
-            }
-            }
-            }
-            ,"salesTaxRate":
-            {"cityDistrictRate":0,
-            "cityRate":0,
-            "countyDistrictRate":0,
-            "countyRate":0,
-            "stateRate":0,
-            "taxRate":0
-            "manualSalesTax": true,
-            "manualSalesTaxRate": 0,
-            "tangibleCategory": "TANGIBLE",
-            "taxableCategory": "TAXABLE"
-            ],
-            "billingAddress": {
-            "city": "string",
-            "country": "string",
-            "county": "string",
-            "state": "string",
-            "street": "string",
-            "zip": "string"
-            },
-            "shippingAddress": {
-            "city": "string",
-            "country": "string",
-            "county": "string",
-            "state": "string","street": "string",
-            "zip": "string"
-            },
-            "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "customer": {
-            "complytId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "externalId": "string",
-            "source": "7",
-            "name": "string",
-            "address": {
-            "city": "string",
-            "country": "string",
-            "county": "string",
-            "state": "string",
-            "street": "string",
-            "zip": "string"
-            },
-            "customerType": "RETAIL",
-            "internalTimestamps": {
-            "createdDate": {
-            "timestamp": "2023-02-05T12:24:43.193Z"
-            },
-            "updatedDate": {
-            "timestamp": "2023-02-05T12:24:43.193Z"
-            }
-            },
-            "externalTimestamps": {
-            "createdDate": {
-            "timestamp": "2023-02-05T12:24:43.193Z"
-            },
-            "updatedDate": {
-            "timestamp": "2023-02-05T12:24:43.193Z"
-            }
-            }
-            },
-            "salesTax": {
-            "amount": 0,
-            "salesTaxRate": {
-            "cityDistrictRate": 0,
-            "cityRate": 0,
-            "countyDistrictRate": 0,
-            "countyRate": 0,
-            "stateRate": 0,
-            "taxRate": 0
-                }
-              },
-              "transactionStatus": "ACTIVE",
-              "internalTimestamps": {
-                "createdDate": {
-                  "timestamp": "2023-02-05T12:24:43.193Z"
+            {
+                "complytId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "externalId": "999444",
+                "source": "1",
+                "items": [
+                    {
+                        "unitPrice": 0,
+                        "quantity": 0,
+                        "totalPrice": 0,
+                        "description": "string",
+                        "name": "string",
+                        "taxCode": "string",
+                        "jurisdictionalSalesTaxRules": {
+                            "name": "string",
+                            "abbreviation": "string",
+                            "taxable": true,
+                            "specialTreatment": true,
+                            "calculationType": "FIXED",
+                            "description": "string",
+                            "calculationValue": 0
+                        },
+                        "salesTaxRate": {
+                            "cityDistrictRate": 0,
+                            "cityRate": 0,
+                            "countyDistrictRate": 0,
+                            "countyRate": 0,
+                            "stateRate": 0,
+                            "taxRate": 0
+                        },
+                        "manualSalesTax": true,
+                        "manualSalesTaxRate": 0,
+                        "tangibleCategory": "TANGIBLE",
+                        "taxableCategory": "TAXABLE"
+                    }
+                ],
+                "billingAddress": {
+                    "city": "string",
+                    "country": "string",
+                    "county": "string",
+                    "state": "string",
+                    "street": "string",
+                    "zip": "string"
                 },
-                "updatedDate": {
-                  "timestamp": "2023-02-05T12:24:43.193Z"
-                }
-              },
-              "externalTimestamps": {
-                "createdDate": {
-                  "timestamp": "2023-02-05T12:24:43.193Z"
+                "shippingAddress": {
+                    "city": "string",
+                    "country": "string",
+                    "county": "string",
+                    "state": "string",
+                    "street": "string",
+                    "zip": "string"
                 },
-                "updatedDate": {
-                  "timestamp": "2023-02-05T12:24:43.193Z"
-                }
-              },
-              "transactionType": "SALES_ORDER",
-              "shippingFee": {
-                "manualSalesTax": true,
-                "manualSalesTaxRate": 0,
-                "totalPrice": 0,
-                "jurisdictionalSalesTaxRules": {
-                  "name": "string",
-                  "abbreviation": "string",
-                  "taxable": true,
-                  "specialTreatment": true,
-                  "calculationType": "FIXED",
-                  "description": "string",
-                  "calculationValue": 0,
-                  "cities": {
-                    "additionalProp1": {
-                      "name": "string",
-                      "abbreviation": "string",
-                      "taxable": true,
-                      "specialTreatment":true
-                      "calculationType": "FIXED",
-                       "description": "string",
-                       "calculationValue": 0,
-                      "additionalProp2": {
+                "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "customer": {
+                    "complytId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "externalId": "string",
+                    "source": "7",
+                    "name": "string",
+                    "address": {
+                        "city": "string",
+                        "country": "string",
+                        "county": "string",
+                        "state": "string",
+                        "street": "string",
+                        "zip": "string"
+                    },
+                    "customerType": "RETAIL",
+                    "internalTimestamps": {
+                        "createdDate": {
+                            "timestamp": "2023-02-05T12:24:43.193Z"
+                        },
+                        "updatedDate": {
+                            "timestamp": "2023-02-05T12:24:43.193Z"
+                        }
+                    },
+                    "externalTimestamps": {
+                        "createdDate": {
+                            "timestamp": "2023-02-05T12:24:43.193Z"
+                        },
+                        "updatedDate": {
+                            "timestamp": "2023-02-05T12:24:43.193Z"
+                        }
+                    }
+                },
+                "salesTax": {
+                    "amount": 0,
+                    "salesTaxRate": {
+                        "cityDistrictRate": 0,
+                        "cityRate": 0,
+                        "countyDistrictRate": 0,
+                        "countyRate": 0,
+                        "stateRate": 0,
+                        "taxRate": 0
+                    }
+                },
+                "transactionStatus": "ACTIVE",
+                "internalTimestamps": {
+                    "createdDate": {
+                        "timestamp": "2023-02-05T12:24:43.193Z"
+                    },
+                    "updatedDate": {
+                        "timestamp": "2023-02-05T12:24:43.193Z"
+                    }
+                },
+                "externalTimestamps": {
+                    "createdDate": {
+                        "timestamp": "2023-02-05T12:24:43.193Z"
+                    },
+                    "updatedDate": {
+                        "timestamp": "2023-02-05T12:24:43.193Z"
+                    }
+                },
+                "transactionType": "SALES_ORDER",
+                "shippingFee": {
+                    "manualSalesTax": true,
+                    "manualSalesTaxRate": 0,
+                    "totalPrice": 0,
+                    "taxCode": "string",
+                    "taxableCategory": "TAXABLE",
+                    "tangibleCategory": "TANGIBLE",
+                    "jurisdictionalSalesTaxRules": {
                         "name": "string",
                         "abbreviation": "string",
-                    "taxable": true,
-                    "specialTreatment": true,
-            "calculationType": "FIXED",
-            "description": "string",
-            "calculationValue": 0
-            },
-            "additionalProp3": {
-            "name": "string",
-            "abbreviation": "string",
-            "taxable": true,
-            "specialTreatment": true,
-            "calculationType": "FIXED",
-            "description": "string",
-            "calculationValue": 0
-            }
-            },
-            "salesTaxRate": {
-            "cityDistrictRate": 0,
-            "cityRate": 0,
-            "countyDistrictRate": 0,
-            "countyRate": 0,
-            "stateRate": 0,
-            "taxRate": 0
-            },
-            "taxCode": "string",
-            "taxableCategory": "TAXABLE",
-            "tangibleCategory": "TANGIBLE"
-            }
-            "createdFrom": "string",
-            "taxableItemsAmount": 0,
-            "tangibleItemsAmount": 0,
-            "totalItemsAmount": 0
+                        "taxable": true,
+                        "specialTreatment": true,
+                        "calculationType": "FIXED",
+                        "description": "string",
+                        "calculationValue": 0
+                    },
+                    "salesTaxRate": {
+                        "cityDistrictRate": 0,
+                        "cityRate": 0,
+                        "countyDistrictRate": 0,
+                        "countyRate": 0,
+                        "stateRate": 0,
+                        "taxRate": 0
+                    }
+                },
+                "createdFrom": "string",
+                "taxableItemsAmount": 0,
+                "tangibleItemsAmount": 0,
+                "totalItemsAmount": 0
             }
             """;
 }

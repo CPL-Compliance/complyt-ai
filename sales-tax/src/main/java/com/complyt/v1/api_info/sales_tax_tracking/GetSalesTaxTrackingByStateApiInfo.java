@@ -76,25 +76,24 @@ public @interface GetSalesTaxTrackingByStateApiInfo {
     String stateExample = "California";
     String salesTaxTrackingExample = """
             {
-                {
-                    "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",
-                    "state": {
-                        "abbreviation": "CA",
-                        "code": "06",
-                        "name": "California"
-                    },
-                    "enforcesSalesTax": true,
-                    "physicalNexusTracker": {
-                        "established": false,
-                        "establishedDate": "2000-12-31T22:00:00"
-                    },
-                    "economicNexusTracker": {
-                        "established": true,
-                        "establishedDate": "2022-08-02T16:12:00"
-                    },
-                    "appliedDate": "2015-08-02T16:12:00",
-                    "approved": true,
-                    "approvalDate": "2015-06-22T13:57:00"
-                }
-            }""";
+                 "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",
+                 "state": {
+                     "abbreviation": "CA",
+                     "code": "06",
+                     "name": "California"
+                 },
+                 "enforcesSalesTax": true,
+                 "physicalNexusTracker": {
+                     "established": false,
+                     "establishedDate": "2000-12-31T22:00:00"
+                 },
+                 "economicNexusTracker": {
+                     "established": true,
+                     "establishedDate": "2022-08-02T16:12:00"
+                 },
+                 "appliedDate": "2015-08-02T16:12:00",
+                 "approved": true,
+                 "approvalDate": "2015-06-22T13:57:00"
+             }
+             """;
 }
