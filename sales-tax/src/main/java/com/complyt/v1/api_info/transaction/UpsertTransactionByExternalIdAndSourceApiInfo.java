@@ -102,55 +102,44 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String newTransactionExample = """
             {
-                "complytId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                "externalId": "999444",
-                "source": "string",
-                "items": [
-                    {
-                        "unitPrice": 0,
-                        "quantity": 0,
-                        "totalPrice": 0,
-                        "description": "string",
-                        "name": "string",
-                        "taxCode": "string",
-                        "manualSalesTax": true,
-                        "manualSalesTaxRate": 0
-                    }
-                ],
-                "billingAddress": {
-                    "city": "string",
-                    "country": "string",
-                    "county": "string",
-                    "state": "string",
-                    "street": "string",
-                    "zip": "string"
-                },
-                "shippingAddress": {
-                    "city": "string",
-                    "country": "string",
-                    "county": "string",
-                    "state": "string",
-                    "street": "string",
-                    "zip": "string"
-                },
-                "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                "externalTimestamps": {
-                    "createdDate": {
-                        "timestamp": "2023-02-05T12:24:43.193Z"
-                    },
-                    "updatedDate": {
-                        "timestamp": "2023-02-05T12:24:43.193Z"
-                    }
-                },
-                "shippingFee": {
-                    "manualSalesTax": true,
-                    "manualSalesTaxRate": 0,
-                    "totalPrice": 0,
-                    "taxCode": "string"
-                },
-                "transactionStatus": "ACTIVE",
-                "transactionType": "INVOICE",
-                "createdFrom": "string"
+               "externalId": "465813",
+               "source": "1",
+               "items": [
+                   {
+                       "unitPrice": 0,
+                       "quantity": 0,
+                       "totalPrice": 0,
+                       "description": "string",
+                       "name": "string",
+                       "taxCode": "C1S1",
+                       "manualSalesTax": true,
+                       "manualSalesTaxRate": 0
+                   }
+               ],
+               "billingAddress": {
+                   "city":"",
+                   "country": "US",
+                   "county": null,
+                   "state": "CA",
+                   "street": "3098 N Remington Ave",
+                   "zip": "93711-5508"
+               },
+               "shippingAddress": {
+                   "city":"fresno",
+                   "country": "US",
+                   "county": null,
+                   "state": "CA",
+                   "street": "3098 N Remington Ave",
+                   "zip": "93711-5508"
+               },
+               "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
+               "externalTimestamps": {
+                   "createdDate":  "2023-02-05T12:24:43.193Z",
+                   "updatedDate":  "2023-02-05T12:24:43.193Z"
+               },
+               "transactionStatus": "ACTIVE",
+               "transactionType": "INVOICE",
+               "createdFrom": "string"
             }
             """;
 
