@@ -3,7 +3,7 @@ spring.application.name: sales-tax
 server.port: ${PORT:9898}
 
 spring.profiles.active:
-  - @activeEnv@
+  - demo
   - @activeTaxClient@
 
 # Spring Cloud Vault configuration

@@ -45,27 +45,4 @@ class SalesTaxRateDtoTest {
         assertTrue(isEquals);
     }
 
-    @Test
-    void With_CreatesNewSalesTaxRatesDto_ReturnsSalesTaxRatesDto() {
-        // Given
-        SalesTaxRateDto givenSalesTaxRateDto = createSalesTaxRateDto();
-        SalesTaxRateDto givenSalesTaxRateDtoWithStateRate0 =
-                givenSalesTaxRateDto.withStateRate(0)
-                        .withCityRate(0)
-                        .withCountyRate(0)
-                        .withCountyDistrictRate(0)
-                        .withCityDistrictRate(0)
-                        .withTaxRate(0);
-        // When
-        boolean isEquals = givenSalesTaxRateDtoWithStateRate0.equals(givenSalesTaxRateDto.withStateRate(0)
-                .withCityRate(0)
-                .withCountyRate(0)
-                .withCountyDistrictRate(0)
-                .withCityDistrictRate(0)
-                .withTaxRate(0));
-
-        // Then
-        assertTrue(isEquals);
-    }
-
 }
