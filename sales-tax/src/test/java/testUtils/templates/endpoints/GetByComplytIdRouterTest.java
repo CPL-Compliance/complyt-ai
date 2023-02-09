@@ -16,9 +16,6 @@ public interface GetByComplytIdRouterTest {
     void getByComplytId_UserWithoutAuthorities_Returns403();
 
     @Test
-    void getByComplytId_UserWithoutCSRFToken_Returns403();
-
-    @Test
     void getByComplytId_InternalServerError_Returns500();
 
     @Test

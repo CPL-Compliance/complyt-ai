@@ -16,9 +16,6 @@ public interface GetAllRouterTest {
     void getAll_UserWithoutAuthorities_Returns403();
 
     @Test
-    void getAll_UserWithoutCSRFToken_Returns403();
-
-    @Test
     void getAll_InternalServerError_Returns500();
 
     @Test

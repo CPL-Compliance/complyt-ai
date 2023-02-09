@@ -25,6 +25,6 @@ public record CustomerDto(UUID complytId,
                           @Valid @NotNull(message = "Address may not be null") AddressDto address,
                           @NotNull(message = "Customer type may not be null") CustomerTypeDto customerType,
                           @Valid TimestampsDto internalTimestamps,
-        /*@Valid @NotNull(message = "External timestamps may not be null")*/ TimestampsDto externalTimestamps
+        @Valid /*@NotNull(message = "External timestamps may not be null")*/ TimestampsDto externalTimestamps
 ) implements ComplytIdFieldModel, ExternalIdAndSourceFieldsModel, NameFieldModel {
 }

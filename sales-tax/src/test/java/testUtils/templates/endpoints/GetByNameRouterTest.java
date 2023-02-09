@@ -16,9 +16,6 @@ public interface GetByNameRouterTest {
     void getByName_UserWithoutAuthorities_Returns403();
 
     @Test
-    void getByName_UserWithoutCSRFToken_Returns403();
-
-    @Test
     void getByName_InternalServerError_Returns500();
 
     @Test

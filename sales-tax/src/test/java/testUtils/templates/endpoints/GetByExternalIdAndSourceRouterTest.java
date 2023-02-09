@@ -16,9 +16,6 @@ public interface GetByExternalIdAndSourceRouterTest {
     void getByExternalIdAndSource_UserWithoutAuthorities_Returns403();
 
     @Test
-    void getByExternalIdAndSource_UserWithoutCSRFToken_Returns403();
-
-    @Test
     void getByExternalIdAndSource_InternalServerError_Returns500();
 
     @Test

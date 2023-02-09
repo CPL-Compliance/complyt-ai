@@ -16,9 +16,6 @@ public interface GetAllBySourceRouterTest {
     void getAllBySource_UserWithoutAuthorities_Returns403();
 
     @Test
-    void getAllBySource_UserWithoutCSRFToken_Returns403();
-
-    @Test
     void getAllBySource_InternalServerError_Returns500();
 
     @Test

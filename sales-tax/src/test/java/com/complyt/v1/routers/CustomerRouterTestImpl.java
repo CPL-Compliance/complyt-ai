@@ -1232,11 +1232,38 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void upsert_NullCustomerType_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Customer type may not be null]", message);
+                });
     }
 
     @Test
@@ -1354,50 +1381,48 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
 
     @Override
     @Test
-    @WithMockUser
     public void getByExternalIdAndSource_UnauthenticatedUser_Returns401() {
         // Given
+        String externalId = customerDto.toString();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Override
     @Test
     @WithMockUser
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
+        // ???
     }
 
     @Override
     @Test
     @WithMockUser
     public void getByExternalIdAndSource_InternalServerError_Returns500() {
-        // Given
+        /// Given
+        CustomerDto requestCustomerDto = customerDto.withInternalTimestamps(null).withExternalTimestamps(null);
+        String externalId = requestCustomerDto.externalId();
+        String source = requestCustomerDto.source();
 
         // When
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -1418,50 +1443,47 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
 
     @Override
     @Test
-    @WithMockUser
     public void getByComplytId_UnauthenticatedUser_Returns401() {
         // Given
+        UUID complytId = UUID.randomUUID();
+        when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.just(customer));
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(CustomerRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Override
     @Test
     @WithMockUser
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByComplytId_UserWithoutCSRFToken_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
+        // ???
     }
 
     @Override
     @Test
     @WithMockUser
     public void getByComplytId_InternalServerError_Returns500() {
-        // Given
+        /// Given
+        CustomerDto requestCustomerDto = customerDto.withInternalTimestamps(null).withExternalTimestamps(null);
+        UUID complytId = requestCustomerDto.complytId();
 
         // When
+        when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -1473,9 +1495,11 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
         List<Customer> customersFoundByName = new ArrayList<>() {{
             add(customer);
         }};
+
+        // WHen
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
-        // When + Then
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -1492,47 +1516,52 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void getByName_EmptyCollection_Returns200WithEmptyList() {
         // Given
+        String name = "name";
+        List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.empty());
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
     }
 
     @Override
     @Test
-    @WithMockUser
     public void getByName_UnauthenticatedUser_Returns401() {
         // Given
+        String name = "name";
+        List<Customer> customersFoundByName = new ArrayList<>() {{
+            add(customer);
+        }};
 
         // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Override
     @Test
     @WithMockUser
     public void getByName_UserWithoutAuthorities_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getByName_UserWithoutCSRFToken_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
+        // ???
     }
 
     @Override
@@ -1540,11 +1569,20 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void getByName_InternalServerError_Returns500() {
         // Given
+        String name = "name";
 
         // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -1554,15 +1592,15 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);
-
         List<Customer> allCustomers = new ArrayList<>() {{
             add(customer);
             add(secondCustomer);
         }};
 
+        // When
         when(customerFacade.getAll()).thenReturn(Flux.fromIterable(allCustomers));
 
-        // When + Then
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -1578,60 +1616,67 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Test
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
-        // Given
+        /// Given
+        List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
+        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
     }
 
     @Override
     @Test
-    @WithMockUser
     public void getAll_UnauthenticatedUser_Returns401() {
-        // Given
+        /// Given
+        List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
+        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Override
     @Test
     @WithMockUser
     public void getAll_UserWithoutAuthorities_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getAll_UserWithoutCSRFToken_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
+        // ???
     }
 
     @Override
     @Test
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
-        // Given
-
-        // When
+        // Given + When
+        when(customerFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -1666,60 +1711,72 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Test
     @WithMockUser
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
-        // Given
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
     }
 
     @Override
     @Test
-    @WithMockUser
     public void getAllBySource_UnauthenticatedUser_Returns401() {
-        // Given
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
 
         // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Override
     @Test
     @WithMockUser
     public void getAllBySource_UserWithoutAuthorities_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void getAllBySource_UserWithoutCSRFToken_Returns403() {
-        // Given
-
-        // When
-
-        // Then
-
+        // ???
     }
 
     @Override
     @Test
     @WithMockUser
     public void getAllBySource_InternalServerError_Returns500() {
-        // Given
+        /// Given
+        String source = customer.getSource();
 
         // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.error(new OperationFailedException()));
 
         // Then
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -1816,11 +1873,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Test
     @WithMockUser
     public void upsert_NullExternalTimestamp_Returns400ValidationError() {
-        // Given
-
-        // When
-
-        // Then
+        // Currently externalTimestamp can be null
 
     }
 
@@ -1829,11 +1882,38 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Created date may not be null]", message);
+                });
     }
 
     @Override
@@ -1841,47 +1921,120 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void upsert_NullUpdatedDateInExternalTimestamp_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Updated date may not be null]", message);
+                });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
-        // Given
+    public void upsert_InvalidTimestampInUpdatedDateInExternalTimestamp_Returns400ValidationError() {
+// Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String timestampWithLengthOf257 = "not a timestamp";
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullTimestampInUpdatedDateInExternalTimestamp_Returns400ValidationError() {
+    public void upsert_InvalidTimestampInCreatedDateInExternalTimestamp_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
 
-        // When
-
-        // Then
-
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullInternalTimestamp_Returns400ValidationError() {
-        // Given
-
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
     }
 
     @Override
@@ -1889,11 +2042,38 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Created date may not be null]", message);
+                });
     }
 
     @Override
@@ -1901,34 +2081,119 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @WithMockUser
     public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Updated date may not be null]", message);
+                });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullTimestampInCreatedDateInInternalTimestamps_Returns400ValidationError() {
+    public void upsert_InvalidTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_InvalidTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
 
-        // When
-
-        // Then
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
     }
 }
