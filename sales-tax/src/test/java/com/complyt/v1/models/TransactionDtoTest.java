@@ -28,7 +28,7 @@ class TransactionDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TransactionDto(complytId=" + transactionDto.complytId() +
+        String expectedString = "TransactionDto[complytId=" + transactionDto.complytId() +
                 ", externalId=" + transactionDto.externalId() +
                 ", source=" + transactionDto.source() +
                 ", items=" + transactionDto.items() +
@@ -45,7 +45,7 @@ class TransactionDtoTest {
                 ", createdFrom=" + transactionDto.createdFrom() +
                 ", taxableItemsAmount=" + transactionDto.taxableItemsAmount() +
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
-                ", totalItemsAmount=" + transactionDto.totalItemsAmount() + ")";
+                ", totalItemsAmount=" + transactionDto.totalItemsAmount() + "]";
 
         // When
         String actualString = transactionDto.toString();
