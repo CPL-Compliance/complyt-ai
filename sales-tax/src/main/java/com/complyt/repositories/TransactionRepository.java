@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @AllArgsConstructor
 public class TransactionRepository {
+
     @NonNull
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
@@ -29,20 +31,17 @@ public class TransactionRepository {
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
-                .flatMap(tenantId -> reactiveMongoTemplate.save(transaction.withTenantId(tenantId))
-                        .flatMap(savedTransaction -> reactiveMongoTemplate.findOne(Query.query(Criteria
-                                        .where("complytId").is(transaction.getCustomerId())
-                                        .and("tenantId").is(tenantId)), Customer.class)
-                                .map(savedTransaction::withCustomer)));
+                .flatMap(tenantId -> getCustomerByTransaction(transaction, tenantId)
+                        .flatMap(customer -> reactiveMongoTemplate.save(transaction.withTenantId(tenantId))
+                                .map(savedTransaction -> savedTransaction.withCustomer(customer))));
     }
 
-    public Flux<Transaction> saveAll(List<Transaction> transactions) {
+    public Flux<Transaction> saveAll(@NonNull List<Transaction> transactions) {
         return tenantResolver.resolve()
                 .map(tenantId -> transactions.stream().map(transaction -> transaction.withTenantId(tenantId)).collect(Collectors.toList()))
                 .flatMapMany(transactionsWithClientId -> reactiveMongoTemplate.insertAll(transactionsWithClientId)
-                        .flatMap(transaction -> reactiveMongoTemplate.findOne(Query.query(Criteria
-                                        .where("complytId").is(transaction.getCustomerId())), Customer.class)
-                                .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction)))).log();
+                        .flatMap(transaction -> getCustomerByTransaction(transaction, transaction.getTenantId())
+                                .map(transaction::withCustomer))).log();
     }
 
     public Mono<Transaction> findById(@NonNull String transactionId) {
@@ -55,10 +54,7 @@ public class TransactionRepository {
 
                     return reactiveMongoTemplate
                             .findOne(query, Transaction.class)
-                            .flatMap(transaction -> reactiveMongoTemplate
-                                    .findOne(Query.query(Criteria
-                                            .where("complytId").is(transaction.getCustomerId())
-                                            .and("tenantId").is(tenantId)), Customer.class)
+                            .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                     .map(transaction::withCustomer)).log();
                 });
     }
@@ -73,11 +69,8 @@ public class TransactionRepository {
 
                     return reactiveMongoTemplate
                             .findOne(query, Transaction.class)
-                            .flatMap(transaction -> reactiveMongoTemplate
-                                    .findOne(Query.query(Criteria
-                                            .where("complytId").is(transaction.getCustomerId())
-                                            .and("tenantId").is(tenantId)), Customer.class)
-                                    .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
+                            .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
+                                    .map(transaction::withCustomer)).log();
                 });
     }
 
@@ -104,10 +97,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
                     log.debug("Executing find tenant's related transactions");
                     return reactiveMongoTemplate.find(query, Transaction.class)
-                            .flatMap(transaction -> reactiveMongoTemplate
-                                    .findOne(Query.query(Criteria
-                                            .where("complytId").is(transaction.getCustomerId())
-                                            .and("tenantId").is(tenantId)), Customer.class)
+                            .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                     .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
                 });
     }
@@ -119,10 +109,7 @@ public class TransactionRepository {
                             .and("source").is(source));
                     log.debug("Executing find tenant's related transactions in source : " + source);
                     return reactiveMongoTemplate.find(query, Transaction.class)
-                            .flatMap(transaction -> reactiveMongoTemplate
-                                    .findOne(Query.query(Criteria
-                                            .where("complytId").is(transaction.getCustomerId())
-                                            .and("tenantId").is(tenantId)), Customer.class)
+                            .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                     .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))).log();
                 });
     }
@@ -134,11 +121,17 @@ public class TransactionRepository {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
 
                     return reactiveMongoTemplate.find(updatedQuery, Transaction.class)
-                            .flatMap(transaction -> reactiveMongoTemplate
-                                    .findOne(Query.query(Criteria
-                                            .where("complytId").is(transaction.getCustomerId())
-                                            .and("tenantId").is(tenantId)), Customer.class)
+                            .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                     .map(transaction::withCustomer)).log();
                 });
+    }
+
+    private Mono<Customer> getCustomerByTransaction(Transaction transaction, String tenantId) {
+        Query query = Query.query(Criteria
+                .where("complytId").is(transaction.getCustomerId())
+                .and("tenantId").is(tenantId));
+
+        return reactiveMongoTemplate.findOne(query, Customer.class)
+                .switchIfEmpty(Mono.error(new NotFoundException("Transaction's Customer has not been found")));
     }
 }
