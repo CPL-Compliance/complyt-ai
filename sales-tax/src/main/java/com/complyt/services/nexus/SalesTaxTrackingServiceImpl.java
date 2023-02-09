@@ -1,6 +1,6 @@
 package com.complyt.services.nexus;
 
-import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -30,7 +30,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     ApplicationDateCreator applicationDateCreator;
 
-    @NonNull SalesTaxTrackingComplytIdHandler complytIdHandler;
+    @NonNull ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {

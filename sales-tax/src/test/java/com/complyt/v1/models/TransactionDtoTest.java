@@ -1,10 +1,5 @@
 package com.complyt.v1.models;
 
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,24 +28,24 @@ class TransactionDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TransactionDto(complytId=" + transactionDto.getComplytId() +
-                ", externalId=" + transactionDto.getExternalId() +
-                ", source=" + transactionDto.getSource() +
-                ", items=" + transactionDto.getItems() +
-                ", billingAddress=" + transactionDto.getBillingAddress() +
-                ", shippingAddress=" + transactionDto.getShippingAddress() +
-                ", customerId=" + transactionDto.getCustomerId() +
-                ", customer=" + transactionDto.getCustomer() +
-                ", salesTax=" + transactionDto.getSalesTax() +
-                ", transactionStatus=" + transactionDto.getTransactionStatus() +
-                ", internalTimestamps=" + transactionDto.getInternalTimestamps() +
-                ", externalTimestamps=" + transactionDto.getExternalTimestamps() +
-                ", transactionType=" + transactionDto.getTransactionType() +
-                ", shippingFee=" + transactionDto.getShippingFee() +
-                ", createdFrom=" + transactionDto.getCreatedFrom() +
-                ", taxableItemsAmount=" + transactionDto.getTaxableItemsAmount() +
-                ", tangibleItemsAmount=" + transactionDto.getTangibleItemsAmount() +
-                ", totalItemsAmount=" + transactionDto.getTotalItemsAmount() + ")";
+        String expectedString = "TransactionDto(complytId=" + transactionDto.complytId() +
+                ", externalId=" + transactionDto.externalId() +
+                ", source=" + transactionDto.source() +
+                ", items=" + transactionDto.items() +
+                ", billingAddress=" + transactionDto.billingAddress() +
+                ", shippingAddress=" + transactionDto.shippingAddress() +
+                ", customerId=" + transactionDto.customerId() +
+                ", customer=" + transactionDto.customer() +
+                ", salesTax=" + transactionDto.salesTax() +
+                ", transactionStatus=" + transactionDto.transactionStatus() +
+                ", internalTimestamps=" + transactionDto.internalTimestamps() +
+                ", externalTimestamps=" + transactionDto.externalTimestamps() +
+                ", transactionType=" + transactionDto.transactionType() +
+                ", shippingFee=" + transactionDto.shippingFee() +
+                ", createdFrom=" + transactionDto.createdFrom() +
+                ", taxableItemsAmount=" + transactionDto.taxableItemsAmount() +
+                ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
+                ", totalItemsAmount=" + transactionDto.totalItemsAmount() + ")";
 
         // When
         String actualString = transactionDto.toString();
@@ -63,11 +58,11 @@ class TransactionDtoTest {
     void withConmplytId_DifferentId_ReturnTransactionDto() {
         // Given
         UUID differentId = UUID.randomUUID();
-        TransactionDto expectedTransactionDto = objectStub.createTransactionDto(transactionDto.getExternalId())
+        TransactionDto expectedTransactionDto = objectStub.createTransactionDto(transactionDto.externalId())
                 .withComplytId(differentId)
-                .withExternalId(transactionDto.getExternalId())
-                .withCustomerId(transactionDto.getCustomerId())
-                .withCustomer(transactionDto.getCustomer());
+                .withExternalId(transactionDto.externalId())
+                .withCustomerId(transactionDto.customerId())
+                .withCustomer(transactionDto.customer());
 
         // When
         TransactionDto actualTransactionDto = transactionDto.withComplytId(differentId);

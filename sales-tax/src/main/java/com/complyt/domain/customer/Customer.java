@@ -1,6 +1,9 @@
 package com.complyt.domain.customer;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.fields.ComplytIdFieldDomain;
+import com.complyt.domain.fields.ExternalIdAndSourceFieldsDomain;
+import com.complyt.domain.fields.NameFieldDomain;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -14,7 +17,7 @@ import java.util.UUID;
 @ToString
 @Document(collection = "customer")
 @With
-public class Customer {
+public class Customer implements ComplytIdFieldDomain, ExternalIdAndSourceFieldsDomain, NameFieldDomain {
     private final UUID complytId;
     @Id
     private final String id;
