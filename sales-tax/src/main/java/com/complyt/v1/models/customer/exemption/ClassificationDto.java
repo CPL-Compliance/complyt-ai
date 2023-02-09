@@ -3,7 +3,6 @@ package com.complyt.v1.models.customer.exemption;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
 
 @Schema(name = "Classification")
 public record ClassificationDto(
