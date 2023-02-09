@@ -88,6 +88,7 @@ public class FileRouterTest {
     }
 
     @Test
+    @WithMockUser
     public void linkRoute_pathDoesntExist_returnsNotFound404() {
         // Given
         File file = objectStub.createFile();
