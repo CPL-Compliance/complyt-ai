@@ -17,12 +17,12 @@ class ShippingFeeDtoTest {
     }
 
     private ShippingFeeDto createShippingFeeDto() {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRules();
         return new ShippingFeeDto(false, 0, 1000, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
+    private JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRules() {
+        return new JurisdictionalSalesTaxRulesDto("California", "CA", true,
                 false, CalculationType.FIXED, "description", 0, null);
     }
 
@@ -41,14 +41,14 @@ class ShippingFeeDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "ShippingFeeDto(manualSalesTax=" + shippingFeeDto.isManualSalesTax()
-                + ", manualSalesTaxRate=" + shippingFeeDto.getManualSalesTaxRate() +
-                ", totalPrice=" + shippingFeeDto.getTotalPrice() +
-                ", jurisdictionalSalesTaxRules=" + shippingFeeDto.getJurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + shippingFeeDto.getSalesTaxRate() +
-                ", taxCode=" + shippingFeeDto.getTaxCode() +
-                ", taxableCategory=" + shippingFeeDto.getTaxableCategory() +
-                ", tangibleCategory=" + shippingFeeDto.getTangibleCategory() + ")";
+        String expectedString = "ShippingFeeDto[manualSalesTax=" + shippingFeeDto.manualSalesTax()
+                + ", manualSalesTaxRate=" + shippingFeeDto.manualSalesTaxRate() +
+                ", totalPrice=" + shippingFeeDto.totalPrice() +
+                ", jurisdictionalSalesTaxRules=" + shippingFeeDto.jurisdictionalSalesTaxRules() +
+                ", salesTaxRate=" + shippingFeeDto.salesTaxRate() +
+                ", taxCode=" + shippingFeeDto.taxCode() +
+                ", taxableCategory=" + shippingFeeDto.taxableCategory() +
+                ", tangibleCategory=" + shippingFeeDto.tangibleCategory() + "]";
 
         // When
         String actualString = shippingFeeDto.toString();

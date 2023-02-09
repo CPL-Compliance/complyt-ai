@@ -28,8 +28,6 @@ import java.util.UUID;
 @Slf4j
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@SecurityRequirement(name = "bearerAuth")
-@Tag(name = "Nexus", description = "This is the Nexus controller")
 public class SalesTaxTrackingHandler {
 
     @NonNull

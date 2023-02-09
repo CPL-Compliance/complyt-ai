@@ -1,9 +1,5 @@
 package com.complyt.v1.models.customer.exemption;
 
-import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,13 +25,13 @@ class ExemptionDtoTest {
         localDateTime = LocalDateTime.now();
         objectStub = new ObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
         exemptionId = UUID.randomUUID().toString();
-        exemptionDto = objectStub.createExemptionDto(exemptionId);
+        exemptionDto = objectStub.createExemptionDto();
     }
 
     @Test
     void Equals_sameExemptionDto_ReturnsTrue() {
         // Given
-        ExemptionDto givenExemptionDto = objectStub.createExemptionDto(exemptionId).withComplytId(exemptionDto.getComplytId());
+        ExemptionDto givenExemptionDto = objectStub.createExemptionDto().withComplytId(exemptionDto.complytId());
 
         // When
         boolean isEquals = exemptionDto.equals(givenExemptionDto);
@@ -47,15 +43,15 @@ class ExemptionDtoTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "ExemptionDto(complytId=" + exemptionDto.getComplytId() +
-                ", customerId=" + exemptionDto.getCustomerId() +
-                ", state=" + exemptionDto.getState() +
-                ", classification=" + exemptionDto.getClassification() +
-                ", validationDates=" + exemptionDto.getValidationDates() +
-                ", internalTimestamps=" + exemptionDto.getInternalTimestamps() +
-                ", status=" + exemptionDto.getStatus() +
-                ", certificate=" + exemptionDto.getCertificate() +
-                ", exemptionType=" + exemptionDto.getExemptionType() + ")";
+        String expectedString = "ExemptionDto[complytId=" + exemptionDto.complytId() +
+                ", customerId=" + exemptionDto.customerId() +
+                ", state=" + exemptionDto.state() +
+                ", classification=" + exemptionDto.classification() +
+                ", validationDates=" + exemptionDto.validationDates() +
+                ", internalTimestamps=" + exemptionDto.internalTimestamps() +
+                ", status=" + exemptionDto.status() +
+                ", certificate=" + exemptionDto.certificate() +
+                ", exemptionType=" + exemptionDto.exemptionType() + "]";
 
         // When
         String actualString = exemptionDto.toString();

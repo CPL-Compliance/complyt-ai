@@ -23,12 +23,12 @@ class AddressDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "AddressDto(city=" + city +
+        String expectedString = "AddressDto[city=" + city +
                 ", country=" + country +
                 ", county=" + county +
                 ", state=" + state +
                 ", street=" + street +
-                ", zip=" + zip + ")";
+                ", zip=" + zip + "]";
 
         // When
         String actualString = addressDto.toString();

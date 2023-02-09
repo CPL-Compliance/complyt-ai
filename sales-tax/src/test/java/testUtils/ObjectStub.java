@@ -51,8 +51,6 @@ public class ObjectStub {
         return source;
     }
 
-    ;
-
     public Customer createCustomer(String id) {
         Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
         ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(complytTimestamp.getTimestamp().minusMinutes(1));
@@ -128,19 +126,18 @@ public class ObjectStub {
 
     public List<ItemDto> createItemDtosWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     createSalesTaxRatesDto(), false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     createSalesTaxRatesDto(), false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-
         }};
     }
 
     public List<ItemDto> createItemDtos(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     null, false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
                     null, false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
@@ -165,12 +162,17 @@ public class ObjectStub {
     }
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
-        JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
         return new ShippingFeeDto(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0.5f, null);
+    }
+
+    public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDto() {
+        return new JurisdictionalSalesTaxRulesDto("California", "CA", true,
                 false, CalculationType.FIXED, "description", 0.5f, null);
     }
 
@@ -186,7 +188,7 @@ public class ObjectStub {
                 state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
     }
 
-    public ExemptionDto createExemptionDto(String id) {
+    public ExemptionDto createExemptionDto() {
         StateDto state = new StateDto("CA", "02", "California");
         ClassificationDto classification = new ClassificationDto("code", "description");
         ValidationDatesDto validationDates = new ValidationDatesDto(

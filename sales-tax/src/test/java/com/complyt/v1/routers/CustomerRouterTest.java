@@ -65,7 +65,7 @@ class CustomerRouterTest {
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        ObjectStub objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
