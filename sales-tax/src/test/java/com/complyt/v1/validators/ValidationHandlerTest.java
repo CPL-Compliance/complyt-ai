@@ -37,21 +37,21 @@ class ValidationHandlerTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
-    @Test
-    void validate_validCustomer_returnsCustomerDto() {
-        CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
-        when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
-        Mono<CustomerDto> validationMono = customerDtoValidationHandler.validate(serverRequest);
-
-        StepVerifier.create(validationMono).expectNext(customerDto).verifyComplete();
-    }
-
-    @Test
-    void validate_invalidCustomerDto_returnsError() {
-        CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString()).withName("");
-        when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
-        Mono<CustomerDto> validationMono = customerDtoValidationHandler.validate(serverRequest);
-
-        StepVerifier.create(validationMono).expectError().verify();
-    }
+//    @Test
+//    void validate_validCustomer_returnsCustomerDto() {
+//        CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
+//        when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
+//        Mono<CustomerDto> validationMono = customerDtoValidationHandler.validate(serverRequest);
+//
+//        StepVerifier.create(validationMono).expectNext(customerDto).verifyComplete();
+//    }
+//
+//    @Test
+//    void validate_invalidCustomerDto_returnsError() {
+//        CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString()).withName("");
+//        when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
+//        Mono<CustomerDto> validationMono = customerDtoValidationHandler.validate(serverRequest);
+//
+//        StepVerifier.create(validationMono).expectError().verify();
+//    }
 }

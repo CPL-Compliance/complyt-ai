@@ -57,13 +57,13 @@ public class CustomerHandler {
         String source = serverRequest.pathVariable("source");
 
         return customerDtoValidationHandler.validate(serverRequest)
-                .map(customerDto ->
-                        CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
-                .flatMap(receivedCustomer ->
-                        customerfacade.findByExternalIdAndSource(externalId, source)
-                                .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer)
-                                        .flatMap(savedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class)))
-                                .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class))));
+                .flatMap(customerDto -> customerDtoValidationHandler.checkExternalIdAndSourceConflict(customerDto, externalId, source)
+                .map(CustomerMapper.INSTANCE::customerDtoToCustomer))
+                .flatMap(receivedCustomer -> customerfacade.findByExternalIdAndSource(externalId, source)
+                        .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer)
+                                .flatMap(savedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class)))
+                        .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer)
+                                .flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer)), CustomerDto.class))));
     }
 
     @CustomerReadPermission

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.CustomerComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
@@ -26,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @NonNull
-    private CustomerComplytIdHandler customerComplytIdHandler;
+    private ComplytIdHandler<Customer> customerComplytIdHandler;
 
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {

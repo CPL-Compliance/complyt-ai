@@ -12,8 +12,6 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.TransactionDto;
-import org.bson.types.ObjectId;
-import com.complyt.v1.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,7 +98,7 @@ class TransactionControllerTest {
         Transaction transactionWithSalesTax = transactionWithId.withSalesTax(new SalesTax(0, new SalesTaxRate(0, 0, 0, 0, 0, 0)));
 
         // When + Then
-        when(transactionFacade.findByExternalIdAndSource(transactionDto.getExternalId(), source)).thenReturn(Mono.empty());
+        when(transactionFacade.findByExternalIdAndSource(transactionDto.externalId(), source)).thenReturn(Mono.empty());
         when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transactionWithSalesTax));
 
         TransactionDto expectedTransactionDtoWithSalesTax = TransactionMapper.INSTANCE.transactionToTransactionDto(transactionWithSalesTax);
@@ -109,7 +107,7 @@ class TransactionControllerTest {
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionController.BASE_URL + "/source/" + source + "/externalId/" + transactionDto.getExternalId())
+                        .path(TransactionController.BASE_URL + "/source/" + source + "/externalId/" + transactionDto.externalId())
                         .build())
                 .bodyValue(transactionDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -122,7 +120,7 @@ class TransactionControllerTest {
     @Test
     void update_TransactionExists_ReturnsStatus200() {
         // Given
-        String externalId = transactionDto.getExternalId();
+        String externalId = transactionDto.externalId();
         Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         Transaction updatedTransaction = mappedTransaction.withId(transactionWithId.getId());
 
@@ -301,7 +299,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.getByExternalIdAndSource(nullExternalId, transactionDto.getSource());
+            transactionController.getByExternalIdAndSource(nullExternalId, transactionDto.source());
         });
 
         // Then
@@ -316,7 +314,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.getByExternalIdAndSource(transactionDto.getExternalId(), nullSource);
+            transactionController.getByExternalIdAndSource(transactionDto.externalId(), nullSource);
         });
 
         // Then
@@ -331,7 +329,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.upsert(nullExternalId, transactionDto.getSource(), transactionDto);
+            transactionController.upsert(nullExternalId, transactionDto.source(), transactionDto);
         });
 
         // Then
@@ -346,7 +344,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.upsert(transactionDto.getExternalId(), nullSource, transactionDto);
+            transactionController.upsert(transactionDto.externalId(), nullSource, transactionDto);
         });
 
         // Then
@@ -361,7 +359,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.upsert(transactionDto.getExternalId(), transactionDto.getSource(), nullTransactionDto);
+            transactionController.upsert(transactionDto.externalId(), transactionDto.source(), nullTransactionDto);
         });
 
         // Then
@@ -376,7 +374,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.delete(nullExternalId, transactionDto.getSource());
+            transactionController.delete(nullExternalId, transactionDto.source());
         });
 
         // Then
@@ -391,7 +389,7 @@ class TransactionControllerTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            transactionController.delete(transactionDto.getExternalId(), nullSource);
+            transactionController.delete(transactionDto.externalId(), nullSource);
         });
 
         // Then

@@ -1,6 +1,8 @@
 package com.complyt.domain;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.fields.ComplytIdFieldDomain;
+import com.complyt.domain.fields.ExternalIdAndSourceFieldsDomain;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.AllArgsConstructor;
@@ -18,7 +20,7 @@ import java.util.UUID;
 @With
 @AllArgsConstructor
 @Document(collection = "transaction")
-public class Transaction {
+public class Transaction implements ComplytIdFieldDomain, ExternalIdAndSourceFieldsDomain {
 
     UUID complytId;
     @Id

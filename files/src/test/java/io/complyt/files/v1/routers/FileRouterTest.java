@@ -1,7 +1,9 @@
 package io.complyt.files.v1.routers;
 
 import io.complyt.files.config.ApiExceptionConfig;
+import io.complyt.files.config.SecurityConfig;
 import io.complyt.files.domain.File;
+import io.complyt.files.security.AudienceValidator;
 import io.complyt.files.services.FileService;
 import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.files.v1.exceptions.GlobalExceptionHandler;
@@ -18,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.reactive.server.MockServerConfigurer;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
@@ -29,7 +32,8 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {FileRouter.class, FileHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+SecurityConfig.class})
 @WebFluxTest
 public class FileRouterTest {
     @Autowired
@@ -44,6 +48,7 @@ public class FileRouterTest {
 
     @BeforeEach
     void setUp() {
+        webTestClient = WebTestClient.bindToApplicationContext(context).build();
         objectStub = new ObjectStub();
         webTestClient = WebTestClient.bindToApplicationContext(context).build();
     }
@@ -62,7 +67,7 @@ public class FileRouterTest {
     }
 
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
+    @WithMockUser()
     public void linkRoute_getFile_fileReturned() {
         // Given
         File file = objectStub.createFile();
@@ -83,7 +88,7 @@ public class FileRouterTest {
     }
 
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
+    @WithMockUser
     public void linkRoute_pathDoesntExist_returnsNotFound404() {
         // Given
         File file = objectStub.createFile();
