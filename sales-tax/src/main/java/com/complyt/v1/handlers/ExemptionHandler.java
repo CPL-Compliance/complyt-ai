@@ -67,7 +67,7 @@ public class ExemptionHandler {
                     return exemptionFacade.update(receivedExemption, complytId);
                 })
                 .flatMap(updatedExemption -> ServerResponse.status(HttpStatus.OK).bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(updatedExemption)))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException("Exemption not found by complytId " + complytId)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @ExemptionReadPermission
@@ -83,6 +83,6 @@ public class ExemptionHandler {
 
         return exemptionFacade.delete(complytId)
                 .flatMap(deleteResult -> ServerResponse.noContent().build())
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException("Exemption with complyt id " + complytId + " was not found")));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 }
