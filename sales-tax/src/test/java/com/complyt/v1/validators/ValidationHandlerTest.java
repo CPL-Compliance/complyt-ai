@@ -3,20 +3,15 @@ package com.complyt.v1.validators;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static org.mockito.Mockito.when;
 
 @SpringBootTest()
 class ValidationHandlerTest {

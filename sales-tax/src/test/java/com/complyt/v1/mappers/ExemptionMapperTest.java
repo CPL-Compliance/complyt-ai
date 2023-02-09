@@ -2,12 +2,6 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

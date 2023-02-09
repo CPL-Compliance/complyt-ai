@@ -1,9 +1,5 @@
 package com.complyt.v1.models.customer.exemption;
 
-import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
