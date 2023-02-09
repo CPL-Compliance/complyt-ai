@@ -43,3 +43,8 @@ auth0.audience: ${audience}
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
+
+spring:
+  data:
+    mongodb:
+      uuid-representation: standard

@@ -4,7 +4,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -13,10 +14,12 @@ import org.springframework.stereotype.Component;
 @ToString
 @Document(collection = "file")
 public class File {
+
+    @NonNull
+    UUID complytId;
     @Id
     @NonNull
     String id;
-
     @NonNull
     String tenantId;
 

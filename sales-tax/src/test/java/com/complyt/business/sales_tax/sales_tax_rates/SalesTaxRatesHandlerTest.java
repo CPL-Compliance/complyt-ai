@@ -1,16 +1,11 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.*;
-import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.Item;
+import com.complyt.domain.ShippingFee;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,44 +38,19 @@ public class SalesTaxRatesHandlerTest {
     @Mock
     private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
 
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                "CA", true, false, CalculationType.FIXED, "description", 0, null);
-        List<Item> items = new ArrayList<>() {{
-            add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                    jurisdictionalSalesTaxRules, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-            ));
-        }};
-        ObjectId customerId = new ObjectId();
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Customer customer = createCustomer(customerId);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, customer.getTenantId(), null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
-    }
+    ObjectStub objectStub;
 
-    private ShippingFee createShippingFee() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("California",
-                "CA", true, false, CalculationType.FIXED, "description", 0, null);
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, null, "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
-    }
-
-    private Customer createCustomer(ObjectId customerId) {
-        String tenantId = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        return new Customer(customerId.toString(), externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
+    @BeforeEach
+    void setup() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
     @Test
     void setRates_SetsRatesToTransactionWithNoShippingFee_ReturnsModifiedTransaction() {
         // Given
-        Transaction transaction = createTransaction();
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        Transaction transaction = objectStub.createTransaction(null).withShippingFee(null);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -97,9 +68,9 @@ public class SalesTaxRatesHandlerTest {
     @Test
     void setRates_SetsRatesToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-        ShippingFee shippingFee = createShippingFee();
-        Transaction transaction = createTransaction().withShippingFee(shippingFee);
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        ShippingFee shippingFee = objectStub.createShippingFee(false, false);
+        Transaction transaction = objectStub.createTransaction(null).withShippingFee(shippingFee);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -119,7 +90,7 @@ public class SalesTaxRatesHandlerTest {
     @Test
     void setRates_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
         Transaction nullTransaction = null;
 
         // When
@@ -133,7 +104,7 @@ public class SalesTaxRatesHandlerTest {
     void setRates_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
         SalesTaxRate nullSalesTaxRate = null;
-        Transaction transaction = createTransaction();
+        Transaction transaction = objectStub.createTransaction(null);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));

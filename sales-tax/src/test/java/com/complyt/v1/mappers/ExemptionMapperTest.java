@@ -1,71 +1,42 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
-import com.complyt.domain.customer.exemption.*;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.model.StateDto;
-import com.complyt.v1.model.customer.exemption.*;
-import com.complyt.v1.model.timestamps.ComplytTimestampDto;
-import com.complyt.v1.model.timestamps.TimestampsDto;
+import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.timestamps.ComplytTimestampDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.bson.types.ObjectId;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ExemptionMapperTest {
 
-    String certificateId;
-    String exemptionId;
     private Exemption exemption;
-    private Exemption exemptionNoTenant;
+    private Exemption exemptionNoTenantNorId;
     private ExemptionDto exemptionDto;
     private String tenantId;
-    private LocalDateTime localDateTime;
-    private ObjectId customerId;
+
+    private ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         tenantId = UUID.randomUUID().toString();
-        customerId = new ObjectId();
-        localDateTime = LocalDateTime.now();
-        certificateId = UUID.randomUUID().toString();
-        exemptionId = UUID.randomUUID().toString();
 
-        exemption = createExemption(tenantId);
-        exemptionDto = createExemptionDto();
-        exemptionNoTenant = createExemption(null);
-    }
-
-    private Exemption createExemption(String tenantId) {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(localDateTime);
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(certificateId, "url", "name");
-
-        return new Exemption(exemptionId, tenantId, customerId,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
-    }
-
-    private ExemptionDto createExemptionDto() {
-        StateDto stateDto = new StateDto("CA", "02", "California");
-        ClassificationDto classificationDto = new ClassificationDto("code", "description");
-        ValidationDatesDto validationDatesDto = new ValidationDatesDto(localDateTime.minusYears(1), localDateTime.plusYears(1));
-        ComplytTimestampDto complytTimestamp = new ComplytTimestampDto(localDateTime.toString());
-        TimestampsDto internalTimestampsDto = new TimestampsDto(complytTimestamp, complytTimestamp);
-        StatusDto statusDto = new StatusDto("code", "name");
-        CertificateDto certificateDto = new CertificateDto(certificateId, "url", "name");
-
-
-        return new ExemptionDto(exemptionId, customerId,
-                stateDto, classificationDto, validationDatesDto, internalTimestampsDto, statusDto, certificateDto, ExemptionTypeDto.FULLY);
+        exemption = objectStub.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
+        exemptionDto = objectStub.createExemptionDto(exemption.getId()).withComplytId(exemption.getComplytId());
+        exemptionNoTenantNorId = objectStub.createExemption(null).withTenantId(null).withComplytId(exemption.getComplytId());
     }
 
     @Test
@@ -85,8 +56,17 @@ public class ExemptionMapperTest {
         Exemption actualExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
 
         // Then
-        assertEquals(exemptionNoTenant, actualExemption);
+        assertEquals(exemptionNoTenantNorId, actualExemption);
     }
 
+    @Test
+    void mapping_NullState_ReturnNull() {
+        // Given + When
+        Exemption givenExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(null);
+        ExemptionDto givenExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(null);
 
+        // Then
+        assertNull(givenExemption);
+        assertNull(givenExemptionDto);
+    }
 }

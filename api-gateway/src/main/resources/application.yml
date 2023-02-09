@@ -42,6 +42,26 @@ spring:
           lower-case-service-id: true
       metrics.enabled: true
       routes:
+        # ==== Open API ====
+        - id: files-service
+          uri: lb://files-service
+          predicates:
+            - Path=/files/**
+          filters:
+            - RewritePath=/files/(?<path>.*), /$\{path}
+        - id: sales-tax-service
+          uri: lb://sales-tax-service
+          predicates:
+            - Path=/sales-tax/**
+          filters:
+            - RewritePath=/sales-tax/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+        # ==== Open API ====
         # ==== Sales Tax Service ====
         # ---- Transaction ----
         - id: sales-tax-get-transactions
@@ -51,27 +71,41 @@ spring:
             - Path=/v1/transactions
           filters:
             - SetPath=/v1/transactions
-        - id: sales-tax-get-transaction-by-external-id
+        - id: sales-tax-get-transactions-by-source
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/transactions/{external_id}
+            - Path=/v1/transactions/source/{source}
           filters:
-            - SetPath=/v1/transactions/{external_id}
-        - id: sales-tax-put-transaction-by-external-id
+            - SetPath=/v1/transactions/source/{source}
+        - id: sales-tax-get-transaction-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+        - id: sales-tax-get-transaction-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/transactions/complytId/{complyt_id}
+        - id: sales-tax-put-transaction-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/transactions/{external_id}
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
           filters:
-            - SetPath=/v1/transactions/{external_id}
-        - id: sales-tax-delete-transaction-by-external-id
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+        - id: sales-tax-delete-transaction-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
             - Method=DELETE
-            - Path=/v1/transactions/{external_id}
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
           filters:
-            - SetPath=/v1/transactions/{external_id}
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
         # ---- Transaction ----
         # ---- Customer ----
         - id: sales-tax-get-customers
@@ -81,6 +115,13 @@ spring:
             - Path=/v1/customers
           filters:
             - SetPath=/v1/customers
+        - id: sales-tax-get-customers-by-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/source/{source}
+          filters:
+            - SetPath=/v1/customers/source/{source}
         - id: sales-tax-get-customer-by-name
           uri: lb://sales-tax
           predicates:
@@ -88,27 +129,27 @@ spring:
             - Path=/v1/customers/name/{name}
           filters:
             - SetPath=/v1/customers/name/{name}
-        - id: sales-tax-get-customer-by-external-id
+        - id: sales-tax-get-customer-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/customers/{external_id}
+            - Path=/v1/customers/source/{source}/externalId/{external_id}
           filters:
-            - SetPath=/v1/customers/{external_id}
-        - id: sales-tax-put-customer-by-external-id
+            - SetPath=/v1/customers/source/{source}/externalId/{external_id}
+        - id: sales-tax-get-customer-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/customers/complytId/{complyt_id}
+        - id: sales-tax-put-customer-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/customers/{external_id}
+            - Path=/v1/customers/source/{source}/externalId/{external_id}
           filters:
-            - SetPath=/v1/customers/{external_id}
-        - id: sales-tax-post-customer
-          uri: lb://sales-tax
-          predicates:
-            - Method=POST
-            - Path=/v1/customers
-          filters:
-            - SetPath=/v1/customers
+            - SetPath=/v1/customers/source/{source}/externalId/{external_id}
         # ---- Customer ----
         # ---- Exemption ----
         - id: sales-tax-get-exemptions
@@ -118,13 +159,13 @@ spring:
             - Path=/v1/exemptions
           filters:
             - SetPath=/v1/exemptions
-        - id: sales-tax-get-exemption-by-id
+        - id: sales-tax-get-exemption-by-complyt-id
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/exemptions/{id}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/{id}
+            - SetPath=/v1/exemptions/complytId{complyt_id}
         - id: sales-tax-post-exemption
           uri: lb://sales-tax
           predicates:
@@ -132,22 +173,22 @@ spring:
             - Path=/v1/exemptions
           filters:
             - SetPath=/v1/exemptions
-        - id: sales-tax-put-exemption-by-id
+        - id: sales-tax-put-exemption-by-complyt-id
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/exemptions/{id}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/{id}
-        - id: sales-tax-delete-exemption-by-id
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
+        - id: sales-tax-delete-exemption-by-complyt-id
           uri: lb://sales-tax
           predicates:
             - Method=DELETE
-            - Path=/v1/exemptions/{id}
+            - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/{id}
-      # ---- Exemption ----
-      # ---- Nexus ----
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
+        # ---- Exemption ----
+        # ---- Nexus ----
         - id: sales-tax-get-nexuses
           uri: lb://sales-tax
           predicates:
@@ -159,19 +200,20 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
+            - SetPath=/v1/nexus/state/{state}
         - id: sales-tax-put-nexus
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
-      # ---- Nexus ----
-      # ==== Sales Tax Service ====
-      # ==== Files Service ====
+            - SetPath=/v1/nexus/state/{state}
+        # ---- Nexus ----
+        # ==== Sales Tax Service ====
+        # ==== Files Service ====
+        # ---- Files ----
         - id: files-get-link
           uri: lb://files
           predicates:
@@ -179,4 +221,5 @@ spring:
             - Path=/v1/files
           filters:
             - SetPath=/v1/files
-      # ==== Files Service ====
+        # ---- Files ----
+        # ==== Files Service ====

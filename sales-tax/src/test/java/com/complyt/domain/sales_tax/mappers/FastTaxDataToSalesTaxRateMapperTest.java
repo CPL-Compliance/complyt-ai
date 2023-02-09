@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -58,5 +59,14 @@ class FastTaxDataToSalesTaxRateMapperTest {
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void map_nullTaxInfoItem_ReturnNull() {
+        // Given + When
+        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
+
+        // Then
+        assertNull(actualSalesTaxRate);
     }
 }

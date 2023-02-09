@@ -2,11 +2,10 @@ package com.complyt.business.date_injection;
 
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,27 +18,14 @@ public class ExistingCustomerInternalDateInjectorTest {
 
     Customer customer;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        customer = createCustomer();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
         existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
-    }
-
-    public Customer createCustomer() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(LocalDateTime.now().minusMinutes(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute, complytTimestamp);
-        return new Customer(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                "name",
-                null,
-                UUID.randomUUID().toString(),
-                CustomerType.RETAIL,
-                internalTimeStamps,
-                externalTimestamps
-        );
     }
 
     @Test

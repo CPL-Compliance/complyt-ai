@@ -1,11 +1,10 @@
 package io.complyt.apigateway.config;
 
-import io.complyt.apigateway.security.AudienceValidator;
 import io.complyt.apigateway.annotations.Generated;
+import io.complyt.apigateway.security.AudienceValidator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -16,12 +15,10 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @Generated
+@Configuration
 public class SecurityConfig {
 
     @Value("${auth0.audience}")
@@ -78,6 +75,8 @@ public class SecurityConfig {
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/actuator/health",
+                        "/files/v3/api-docs",
+                        "/sales-tax/v3/api-docs",
                         "/v3/api-docs/**",
                         "/webjars/**",
                         "/swagger-ui*/**"

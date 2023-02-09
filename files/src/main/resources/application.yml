@@ -4,7 +4,6 @@ server.port: ${PORT:9880}
 spring.profiles.active:
   - @activeEnv@
 
-
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
@@ -35,6 +34,7 @@ spring.cloud.vault:
     role: ${VAULT_DB_ROLE}
     backend: database
 
+
 spring.config.import: vault://
 
 auth0.audience: ${audience}
@@ -42,3 +42,8 @@ auth0.audience: ${audience}
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
+
+spring:
+  data:
+    mongodb:
+      uuid-representation: standard

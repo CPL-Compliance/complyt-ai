@@ -1,11 +1,12 @@
 package com.complyt.business.nexus.checker;
 
-import com.complyt.domain.State;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,19 +16,20 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EconomicNexusCheckTest {
 
     EconomicNexusChecker economicNexusChecker;
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         economicNexusChecker = new EconomicNexusChecker();
     }
 
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, LocalDateTime.now());
-        State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTracking = new SalesTaxTracking(UUID.randomUUID().toString(), state, (new ObjectId()).toString(),
-                true, null, economicNexusTracker, LocalDateTime.now(), true, LocalDateTime.now());
+        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString())
+                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
 
         // When + Then
         boolean hasEconomicNexus = economicNexusChecker.check(salesTaxTracking);

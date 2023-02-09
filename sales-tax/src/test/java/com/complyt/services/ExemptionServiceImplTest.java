@@ -1,11 +1,12 @@
 package com.complyt.services;
 
-import com.complyt.domain.*;
+import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
+import com.complyt.domain.State;
+import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.customer.exemption.*;
-import com.complyt.domain.nexus.enums.TangibleCategory;
-import com.complyt.domain.nexus.enums.TaxableCategory;
+import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionType;
+import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
@@ -18,9 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,49 +44,22 @@ public class ExemptionServiceImplTest {
     @Mock
     ExemptionRepository exemptionRepository;
 
+    @Mock
+    ExemptionComplytIdHandler exemptionComplytIdHandler;
+
     Transaction transaction;
     Exemption exemption;
     Customer customer;
     ObjectId customerId = new ObjectId();
-    String tenantId = UUID.randomUUID().toString();
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        customer = createCustomer();
-        transaction = createTransaction();
-        exemption = createExemption();
-    }
-
-    private Customer createCustomer() {
-        return new Customer(customerId.toString(), UUID.randomUUID().toString(), "name", null, tenantId, CustomerType.RETAIL, null, null);
-    }
-
-    private Exemption createExemption() {
-        State state = new State("CA", "02", "California");
-        Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(LocalDateTime.now().minusYears(1), LocalDateTime.now().plusYears(1));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        Status status = new Status("code", "name");
-        Certificate certificate = new Certificate(UUID.randomUUID().toString(), "url", "name");
-
-        return new Exemption(UUID.randomUUID().toString(), UUID.randomUUID().toString(), new ObjectId(),
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
-    }
-
-    private Transaction createTransaction() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-
-        Address billingAddress = new Address("City", "Country", null, "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", null, "CA", "Street", "Zip");
-        List<Item> items = new ArrayList<>();
-        items.add(new Item(1000, 3, 3000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
-        ));
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return new Transaction(id, externalId, items, billingAddress, shippingAddress, customerId, customer, null, TransactionStatus.ACTIVE, tenantId, null, externalTimestamps, TransactionType.INVOICE, null, null, 0, 0, 0);
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(customerId.toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        exemption = objectStub.createExemption(UUID.randomUUID().toString());
     }
 
     @Test
@@ -147,28 +123,14 @@ public class ExemptionServiceImplTest {
     void update_UpdatesExemption_ReturnsUpdatedExemption() {
         // Given
         Exemption newExemption = exemption.withStatus(new Status("new code", "new name"));
-        String id = exemption.getId();
+        UUID id = exemption.getComplytId();
 
         // When
-        when(exemptionRepository.findById(id)).thenReturn(Mono.just(exemption));
         when(exemptionRepository.save(newExemption)).thenReturn(Mono.just(newExemption));
-        Mono<Exemption> exemptionMono = exemptionService.update(newExemption, id);
+        Mono<Exemption> exemptionMono = exemptionService.update(newExemption, exemption, id);
 
         // Then
         StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
-    }
-
-    @Test
-    void update_IdDoesNotExist_ReturnsEmptyMono() {
-        // Given
-        String id = exemption.getId();
-
-        // When
-        when(exemptionRepository.findById(id)).thenReturn(Mono.empty());
-        Mono<Exemption> exemptionMono = exemptionService.update(exemption, id);
-
-        // Then
-        StepVerifier.create(exemptionMono).verifyComplete();
     }
 
     @Test
@@ -199,7 +161,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().plusYears(1));
+        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().getTimestamp().plusYears(1));
         ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
@@ -216,7 +178,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().minusYears(1));
+        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1));
         ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
@@ -246,7 +208,7 @@ public class ExemptionServiceImplTest {
     @Test
     void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
         // Given
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
@@ -260,7 +222,7 @@ public class ExemptionServiceImplTest {
     @Test
     void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
         // Given
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
         DeleteResult deleteResult = DeleteResult.acknowledged(0);
 
         // When
@@ -271,17 +233,102 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
     }
 
+    @Test
+    void checkExemptionNotHavingComplytId_DoesntHaveComplytId_ReturnsExemption() {
+        // Given When
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemption)).thenReturn(Mono.just(exemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
+    }
+
+    @Test
+    void checkExemptionNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemption)).thenReturn(Mono.error(new NotFoundException("cannot insert new exemption with complyt id")));
+        Mono<Exemption> exemptionMono = exemptionService.checkExemptionNotHavingComplytId(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectErrorMessage("cannot insert new exemption with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(UUID.randomUUID());
+
+        // When
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original exemptions are not equal")));
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectErrorMessage("complyt ids of modified and original exemptions are not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewExemption() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(null);
+
+        // When
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewExemption() {
+        // Given
+        Exemption newExemption = exemption.withComplytId(exemption.getComplytId());
+
+        // When
+        when(exemptionComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newExemption, exemption)).thenReturn(Mono.just(newExemption));
+        Mono<Exemption> exemptionMono = exemptionService.checkComplytIdOfModifiedEqualsToOriginal(newExemption, exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(newExemption).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsExemption() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(exemptionRepository.findByComplytId(complytId)).thenReturn(Mono.just(exemption.withComplytId(complytId)));
+        Mono<Exemption> exemptionMono = exemptionService.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void injectDataToNewExemption_notNullExemption_ReturnsExemptionWithData() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemption.withComplytId(complytId));
+        Mono<Exemption> exemptionMono = exemptionService.injectDataToNewExemption(exemption);
+
+        // Then
+        StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
+    }
+
 
     @Test
     void delete_NullIdPassed_ThrowsException() {
         // Given
-        String nullId = null;
+        UUID nullId = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.delete(nullId));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
     @Test
@@ -336,25 +383,38 @@ public class ExemptionServiceImplTest {
     void update_NullExemptionPassed_ThrowsException() {
         // Given
         Exemption nullExemption = null;
-        String id = UUID.randomUUID().toString();
+        UUID id = UUID.randomUUID();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption, id));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(nullExemption, exemption, id));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
     @Test
-    void update_NullIdPassed_ThrowsException() {
+    void update_NullOriginalExemptionPassed_ThrowsException() {
         // Given
-        String nullId = null;
+        Exemption nullExemption = null;
+        UUID id = UUID.randomUUID();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, nullExemption, id));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "originalExemption is marked non-null but is null");
+    }
+
+    @Test
+    void update_NullIdPassed_ThrowsException() {
+        // Given
+        UUID nullId = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.update(exemption, exemption, nullId));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
     @Test
@@ -369,4 +429,68 @@ public class ExemptionServiceImplTest {
         assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkExemptionNotHavingComplytId(nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newExemption is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(nullExemption, exemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedExemption is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.checkComplytIdOfModifiedEqualsToOriginal(exemption, nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalExemption is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewExemption_NullExemption_ThrowsNullPointerException() {
+        // Given
+        Exemption nullExemption = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.injectDataToNewExemption(nullExemption);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullExemption_ThrowsNullPointerException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            exemptionService.findByComplytId(nullComplytId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
 }

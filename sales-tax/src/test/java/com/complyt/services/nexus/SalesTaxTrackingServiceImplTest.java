@@ -1,23 +1,31 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
-import com.complyt.domain.nexus.*;
+import com.complyt.domain.nexus.EconomicNexusTracker;
+import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.domain.nexus.NexusThreshold;
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,19 +49,18 @@ public class SalesTaxTrackingServiceImplTest {
     @Mock
     ApplicationDateCreator applicationDateCreator;
 
+    @Mock
+    SalesTaxTrackingComplytIdHandler complytIdHandler;
+
     SalesTaxTracking salesTaxTracking;
 
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(false, null);
-        return new SalesTaxTracking(UUID.randomUUID().toString(), state, UUID.randomUUID().toString(),
-                true, physicalNexusTracker, economicNexusTracker, null, true, LocalDateTime.now());
-    }
+    ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {
@@ -223,6 +230,81 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
+    void checkSalesTaxTrackingNotHavingComplytId_DoesHaveComplytId_ThrowsException() {
+        // Given When
+        when(complytIdHandler.checkNewDontHaveComplytId(salesTaxTracking)).thenReturn(Mono.error(new NotFoundException("cannot insert new salesTaxTracking with complyt id")));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("cannot insert new salesTaxTracking with complyt id").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdMotEquals_ThrowsExceptions() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(UUID.randomUUID());
+
+        // When
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.error(new NotFoundException("complyt ids of modified and original salesTaxTrackings are not equal")));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("complyt ids of modified and original salesTaxTrackings are not equal").verify();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_DoesNotHaveComplytId_ReturnsNewSalesTaxTracking() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null);
+
+        // When
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_ComplytIdAreEquals_ReturnsNewSalesTaxTracking() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(salesTaxTracking.getComplytId());
+
+        // When
+        when(complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newSalesTaxTracking, salesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(newSalesTaxTracking, salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytIdExists_ReturnsSalesTaxTracking() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(salesTaxTrackingRepository.findByComplytId(complytId)).thenReturn(Mono.just(salesTaxTracking.withComplytId(complytId)));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.findByComplytId(complytId);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
+    void injectDataToNewSalesTaxTracking_notNullSalesTaxTracking_ReturnsSalesTaxTrackingWithData() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // When
+        when(complytIdHandler.insertComplytIdToNew(salesTaxTracking)).thenReturn(salesTaxTracking.withComplytId(complytId));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.injectDataToNewSalesTaxTracking(salesTaxTracking);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking.withComplytId(complytId)).verifyComplete();
+    }
+
+    @Test
     void update_SalesTaxTrackingNotFoundByState_ThrowsNotFoundException() {
         // Given
         String state = salesTaxTracking.getState().getName();
@@ -308,6 +390,71 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void checkCustomerNotHavingComplytId_NullGiven_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "newSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullModifiedSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(nullSalesTaxTracking, salesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "modifiedSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void checkComplytIdOfModifiedEqualsToOriginal_NullOriginalSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void injectDataToNewSalesTaxTracking_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.injectDataToNewSalesTaxTracking(nullSalesTaxTracking);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_NullSalesTaxTracking_ThrowsNullPointerException() {
+        // Given
+        UUID nullComplytId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.findByComplytId(nullComplytId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
     }
 
 }

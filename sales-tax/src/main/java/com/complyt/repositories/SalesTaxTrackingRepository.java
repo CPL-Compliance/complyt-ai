@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Slf4j
 @AllArgsConstructor
 @Repository
@@ -35,6 +37,17 @@ public class SalesTaxTrackingRepository {
                                     Criteria.where("state.name").is(state));
 
                     Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
+
+                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
+                });
+    }
+
+    public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
+
+        return tenantResolver.resolve()
+                .flatMap(tenantId -> {
+                    Query query = Query.query(Criteria.where("complytId").is(complytId)
+                            .and("tenantId").is(tenantId));
 
                     return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
                 });

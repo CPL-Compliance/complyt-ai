@@ -1,8 +1,9 @@
 package com.complyt.services;
 
-import com.complyt.business.transaction.CountyProvider;
+import com.complyt.business.complyt_id.TransactionComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
+import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
@@ -18,6 +19,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -38,21 +40,39 @@ public class TransactionServiceImpl implements TransactionService {
     @NonNull
     CountyProvider countyProvider;
 
+    @NonNull
+    private TransactionComplytIdHandler complytIdHandler;
+
     @Override
     public Mono<Transaction> save(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
 
     @Override
-    public Mono<Transaction> findByExternalId(@NonNull String externalId) {
-        return transactionRepository.findByExternalId(externalId);
+    public Mono<Transaction> checkTransactionNotHavingComplytId(@NonNull final Transaction newTransaction) {
+        return complytIdHandler.checkNewDontHaveComplytId(newTransaction);
     }
 
-    public Mono<Transaction> update(@NonNull final String externalId, @NonNull final Transaction transaction) {
-        return transactionRepository.findByExternalId(externalId)
-                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId " + externalId)))
+    @Override
+    public Mono<Transaction> findByExternalIdAndSource(@NonNull String externalId, String source) {
+        return transactionRepository.findByExternalIdAndSource(externalId, source);
+    }
+
+    @Override
+    public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
+        return transactionRepository.findByComplytId(complytId);
+    }
+
+    public Mono<Transaction> update(@NonNull final String externalId, @NonNull String source, @NonNull final Transaction transaction) {
+        return transactionRepository.findByExternalIdAndSource(externalId, source)
+                .switchIfEmpty(Mono.error(new NotFoundException("No Transaction with externalId: " + externalId + ", in source: " + source)))
                 .map(createFunctionUpdateTransaction(transaction))
                 .flatMap(transactionRepository::save);
+    }
+
+    @Override
+    public Mono<Transaction> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Transaction modifiedTransaction, @NonNull final Transaction originalTransaction) {
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedTransaction, originalTransaction);
     }
 
     @Override
@@ -68,6 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToNewAndModifiedTransaction(transaction)
+                .map(complytIdHandler::insertComplytIdToNew)
                 .map(NewTransactionInternalTimestampsInjector::new)
                 .map(NewTransactionInternalTimestampsInjector::inject);
     }
@@ -84,9 +105,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Mono<Transaction> markAsCancelled(@NonNull String externalId) {
+    public Mono<Transaction> markAsCancelled(@NonNull String externalId, @NonNull String source) {
         return transactionRepository
-                .findByExternalId(externalId)
+                .findByExternalIdAndSource(externalId, source)
                 .map(transaction -> transaction.withTransactionStatus(TransactionStatus.CANCELLED))
                 .flatMap(transactionRepository::save);
     }
@@ -100,10 +121,15 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAll();
     }
 
+    public Flux<Transaction> findAllBySource(@NonNull final String source) {
+        return transactionRepository.findAllBySource(source);
+    }
+
     private Function<Transaction, Transaction> createFunctionUpdateTransaction(final Transaction transaction) {
         return transactionInfo ->
                 new Transaction(
-                        transactionInfo.getId(), transaction.getExternalId(),
+                        transactionInfo.getComplytId(), transactionInfo.getId(),
+                        transaction.getExternalId(), transaction.getSource(),
                         transaction.getItems(), transaction.getBillingAddress(), transaction.getShippingAddress(),
                         transaction.getCustomerId(), transaction.getCustomer(), transaction.getSalesTax(),
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),

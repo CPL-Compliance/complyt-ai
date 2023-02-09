@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -61,5 +62,14 @@ class ZipTaxDataToSalesTaxRateMapperTest {
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void map_nullResult_ReturnNull() {
+        // Given + When
+        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map((Result) null);
+
+        // Then
+        assertNull(actualSalesTaxRate);
     }
 }

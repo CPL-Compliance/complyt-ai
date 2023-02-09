@@ -1,50 +1,37 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.State;
-import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.PhysicalNexusTracker;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.v1.model.EconomicNexusTrackerDto;
-import com.complyt.v1.model.PhysicalNexusTrackerDto;
-import com.complyt.v1.model.SalesTaxTrackingDto;
-import com.complyt.v1.model.StateDto;
+import com.complyt.v1.models.EconomicNexusTrackerDto;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
+import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.StateDto;
+import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SalesTaxTrackingMapperTest {
 
     private SalesTaxTracking salesTaxTracking;
+    private SalesTaxTracking salesTaxTrackingNoTenantNorId;
     private SalesTaxTrackingDto salesTaxTrackingDto;
     private LocalDateTime localDateTime;
-
-    String salesTaxTrackingId;
+    private ObjectStub objectStub;
 
     @BeforeEach
     void setUp() {
-        salesTaxTracking = createSalesTaxTracking();
-        salesTaxTrackingDto = createSalesTaxTrackingDto();
         localDateTime = LocalDateTime.now();
-        salesTaxTrackingId = UUID.randomUUID().toString();
-    }
-
-    private SalesTaxTracking createSalesTaxTracking() {
-        State state = new State("CA", "02", "California");
-        PhysicalNexusTracker physicalNexusTracker = new PhysicalNexusTracker(false, null);
-        EconomicNexusTracker economicNexusTracker = new EconomicNexusTracker(true, localDateTime);
-        return new SalesTaxTracking(salesTaxTrackingId, state, null,
-                true, physicalNexusTracker, economicNexusTracker, null, true, localDateTime);
-    }
-
-    private SalesTaxTrackingDto createSalesTaxTrackingDto() {
-        StateDto state = new StateDto("CA", "02", "California");
-        PhysicalNexusTrackerDto physicalNexusTracker = new PhysicalNexusTrackerDto(false, null);
-        EconomicNexusTrackerDto economicNexusTracker = new EconomicNexusTrackerDto(true, localDateTime);
-        return new SalesTaxTrackingDto(salesTaxTrackingId, state, true, physicalNexusTracker, economicNexusTracker, null, true, localDateTime);
+        objectStub = new ObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        salesTaxTrackingNoTenantNorId = salesTaxTracking.withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId());
+        salesTaxTrackingDto = objectStub.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId());
     }
 
     @Test
@@ -62,7 +49,18 @@ public class SalesTaxTrackingMapperTest {
         SalesTaxTracking salesTaxTrackingResult = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
 
         // Then
-        assertEquals(salesTaxTracking, salesTaxTrackingResult);
+        assertEquals(salesTaxTrackingNoTenantNorId, salesTaxTrackingResult);
+    }
+
+    @Test
+    void mapping_nullSalesTaxTracking_ReturnNull() {
+        // Given + When
+        SalesTaxTracking givenSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(null);
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(null);
+
+        // Then
+        assertNull(givenSalesTaxTracking);
+        assertNull(givenSalesTaxTrackingDto);
     }
 
 }

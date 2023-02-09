@@ -1,9 +1,11 @@
 package com.complyt.domain.customer;
 
-import com.complyt.domain.Address;
+import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.ObjectStub;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,15 +15,14 @@ class CustomerTest {
     private Customer customer;
     private Customer anotherCustomer;
 
+    ObjectStub objectStub;
+
     @BeforeEach
     void setUp() {
-        String id = UUID.randomUUID().toString();
-        String externalId = UUID.randomUUID().toString();
-        String tenantId = UUID.randomUUID().toString();
-        String name = "Existing Customer";
-        Address address = new Address("City", "Country", "County", "State", "Street", "Zip");
-        customer = new Customer(id, externalId, name, address, tenantId, CustomerType.RETAIL, null, null);
-        anotherCustomer = new Customer(customer.getId(), customer.getExternalId(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), null, null);
+        objectStub = new ObjectStub(
+                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps());
     }
 
     @Test
@@ -37,8 +38,10 @@ class CustomerTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "Customer(id=" + customer.getId() +
+        String expectedString = "Customer(complytId=" + customer.getComplytId() +
+                ", id=" + customer.getId() +
                 ", externalId=" + customer.getExternalId() +
+                ", source=" + customer.getSource() +
                 ", name=" + customer.getName() +
                 ", address=" + customer.getAddress() +
                 ", tenantId=" + customer.getTenantId() +
