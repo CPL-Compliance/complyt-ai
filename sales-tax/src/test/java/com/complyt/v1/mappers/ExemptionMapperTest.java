@@ -2,12 +2,6 @@ package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,18 +18,15 @@ public class ExemptionMapperTest {
     private Exemption exemption;
     private Exemption exemptionNoTenantNorId;
     private ExemptionDto exemptionDto;
-    private String tenantId;
-
-    private ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
+        ObjectStub objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        tenantId = UUID.randomUUID().toString();
+        String tenantId = UUID.randomUUID().toString();
 
         exemption = objectStub.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
-        exemptionDto = objectStub.createExemptionDto(exemption.getId()).withComplytId(exemption.getComplytId());
+        exemptionDto = objectStub.createExemptionDto().withComplytId(exemption.getComplytId());
         exemptionNoTenantNorId = objectStub.createExemption(null).withTenantId(null).withComplytId(exemption.getComplytId());
     }
 

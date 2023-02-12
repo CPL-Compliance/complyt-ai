@@ -26,6 +26,7 @@ import java.util.function.Function;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
+
     @NonNull
     SalesTaxTrackingRepository salesTaxTrackingRepository;
     @NonNull

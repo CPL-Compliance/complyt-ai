@@ -24,7 +24,7 @@ public class SalesTaxDtoTest {
         salesTaxDto = new SalesTaxDto(5000, null);
 
         // Then
-        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.getAmount(), null);
+        anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.amount(), null);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class SalesTaxDtoTest {
     @Test
     void equals_NotIdenticalCustomers_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.getAmount() - 1;
+        float newAmount = salesTaxDto.amount() - 1;
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then
@@ -50,7 +50,7 @@ public class SalesTaxDtoTest {
     @Test
     void hashCode_NotIdenticalSalesTax_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.getAmount() - 1;
+        float newAmount = salesTaxDto.amount() - 1;
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then
@@ -59,8 +59,8 @@ public class SalesTaxDtoTest {
 
     @Test
     void toString_StringMatches_Equal() {
-        String salesTaxDtoToString = "SalesTaxDto(amount=" + salesTaxDto.getAmount() +
-                ", salesTaxRate=" + salesTaxDto.getSalesTaxRate() + ")";
+        String salesTaxDtoToString = "SalesTaxDto[amount=" + salesTaxDto.amount() +
+                ", salesTaxRate=" + salesTaxDto.salesTaxRate() + "]";
         assertEquals(salesTaxDto.toString(), salesTaxDtoToString);
     }
 

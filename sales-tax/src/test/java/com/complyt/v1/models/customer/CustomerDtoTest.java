@@ -57,6 +57,5 @@ public class CustomerDtoTest {
 
         // Then
         assertEquals(expectedString, actualString);
-
     }
 }

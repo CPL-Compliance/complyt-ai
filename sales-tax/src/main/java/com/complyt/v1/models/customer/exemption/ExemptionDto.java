@@ -3,24 +3,20 @@ package com.complyt.v1.models.customer.exemption;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
 @Schema(name = "Exemption")
-public class ExemptionDto {
-    private final UUID complytId;
-    private final UUID customerId;
-    private final StateDto state;
-    private final ClassificationDto classification;
-    private final ValidationDatesDto validationDates;
-    private final TimestampsDto internalTimestamps;
-    private final StatusDto status;
-    private final CertificateDto certificate;
-    private final ExemptionTypeDto exemptionType;
+public record ExemptionDto(UUID complytId, @NotNull(message = "Customer Id may not be null") UUID customerId,
+                           @Valid @NotNull(message = "State may not be null") StateDto state,
+                           @Valid @NotNull(message = "Classification may not be null") ClassificationDto classification,
+                           @Valid @NotNull(message = "Validation Dates may not be null") ValidationDatesDto validationDates,
+                           @Valid TimestampsDto internalTimestamps,
+                           @Valid @NotNull(message = "Status Dates may not be null") StatusDto status,
+                           @Valid @NotNull(message = "Certificate Dates may not be null") CertificateDto certificate,
+                           @NotNull(message = "Exemption Type Dates may not be null") ExemptionTypeDto exemptionType) {
 }

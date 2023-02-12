@@ -89,9 +89,9 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/transactions/complytId/{complytId}
+            - Path=/v1/transactions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+            - SetPath=/v1/transactions/complytId/{complyt_id}
         - id: sales-tax-put-transaction-by-external-id-and-source
           uri: lb://sales-tax
           predicates:
@@ -200,16 +200,16 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
+            - SetPath=/v1/nexus/state/{state}
         - id: sales-tax-put-nexus
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
+            - SetPath=/v1/nexus/state/{state}
         # ---- Nexus ----
         # ==== Sales Tax Service ====
         # ==== Files Service ====

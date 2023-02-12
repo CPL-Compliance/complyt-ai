@@ -74,7 +74,7 @@ public class SalesTaxTrackingServiceImplTest {
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
