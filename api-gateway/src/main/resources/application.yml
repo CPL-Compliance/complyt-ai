@@ -200,16 +200,16 @@ spring:
           uri: lb://sales-tax
           predicates:
             - Method=GET
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
+            - SetPath=/v1/nexus/state/{state}
         - id: sales-tax-put-nexus
           uri: lb://sales-tax
           predicates:
             - Method=PUT
-            - Path=/v1/nexus/{state}
+            - Path=/v1/nexus/state/{state}
           filters:
-            - SetPath=/v1/nexus/{state}
+            - SetPath=/v1/nexus/state/{state}
         # ---- Nexus ----
         # ==== Sales Tax Service ====
         # ==== Files Service ====

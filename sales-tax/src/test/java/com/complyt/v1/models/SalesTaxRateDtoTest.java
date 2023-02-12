@@ -22,9 +22,9 @@ class SalesTaxRateDtoTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRateDto(cityDistrictRate=" + rate +
+        String expectedString = "SalesTaxRateDto[cityDistrictRate=" + rate +
                 ", cityRate=" + rate + ", countyDistrictRate=" + rate +
-                ", countyRate=" + rate + ", stateRate=" + rate + ", taxRate=" + rate + ")";
+                ", countyRate=" + rate + ", stateRate=" + rate + ", taxRate=" + rate + "]";
 
         // When
         String actualString = salesTaxRateDto.toString();

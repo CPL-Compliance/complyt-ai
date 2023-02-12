@@ -66,6 +66,17 @@ import java.lang.annotation.Target;
                                                         })
                                         }),
                                 @ApiResponse(
+                                        responseCode = "201",
+                                        description = "Successful operation",
+                                        content = {
+                                                @Content(
+                                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                                        schema = @Schema(implementation = CustomerDto.class),
+                                                        examples = {
+                                                                @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.returnedCustomerExample)
+                                                        })
+                                        }),
+                                @ApiResponse(
                                         responseCode = "400",
                                         description = "Something is wrong with your request"
                                 ),
@@ -86,6 +97,7 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
+
 public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String newCustomerExample = "{\n" +
@@ -105,10 +117,6 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
             "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
             "    },\n" +
-            "    \"internalTimestamps\": {\n" +
-            "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
-            "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-            "    }\n" +
             "}";
 
     String returnedCustomerExample = "[{\n" +

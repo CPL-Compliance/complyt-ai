@@ -1,5 +1,6 @@
 package com.complyt.v1.validators;
 
+import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,5 +32,13 @@ class ValidatorConfigTest {
         ValidationHandler<CustomerDto, SpringValidatorAdapter> expectedCustomerDtoValidationHandler = validatorConfig.customerDtoValidationHandler(springValidatorAdapter);
 
         assertEquals(expectedCustomerDtoValidationHandler, actualCustomerDtoValidationHandler);
+    }
+
+    @Test
+    void transactionDtoValidationHandler() {
+        ValidationHandler<TransactionDto, SpringValidatorAdapter> actualTransactionDtoValidationHandler = new ValidationHandler<>(TransactionDto.class, springValidatorAdapter);
+        ValidationHandler<TransactionDto, SpringValidatorAdapter> expectedTransactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
+
+        assertEquals(expectedTransactionDtoValidationHandler, actualTransactionDtoValidationHandler);
     }
 }

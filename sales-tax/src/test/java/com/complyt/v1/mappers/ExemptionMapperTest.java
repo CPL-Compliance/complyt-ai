@@ -18,18 +18,15 @@ public class ExemptionMapperTest {
     private Exemption exemption;
     private Exemption exemptionNoTenantNorId;
     private ExemptionDto exemptionDto;
-    private String tenantId;
-
-    private ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
+        ObjectStub objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        tenantId = UUID.randomUUID().toString();
+        String tenantId = UUID.randomUUID().toString();
 
         exemption = objectStub.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
-        exemptionDto = objectStub.createExemptionDto(exemption.getId()).withComplytId(exemption.getComplytId());
+        exemptionDto = objectStub.createExemptionDto().withComplytId(exemption.getComplytId());
         exemptionNoTenantNorId = objectStub.createExemption(null).withTenantId(null).withComplytId(exemption.getComplytId());
     }
 

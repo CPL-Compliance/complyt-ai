@@ -74,7 +74,7 @@ public class SalesTaxTrackingServiceImplTest {
             add(TaxableCategory.TAXABLE);
         }};
 
-        List<TangibleCategory> tangibleCategories = new ArrayList<TangibleCategory>() {{
+        List<TangibleCategory> tangibleCategories = new ArrayList<>() {{
             add(TangibleCategory.TANGIBLE);
         }};
 
@@ -153,6 +153,19 @@ public class SalesTaxTrackingServiceImplTest {
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
+    }
+
+    @Test
+    void findByState_RepositoryReturnsMonoEmpty_ThrowsException() {
+        // Given
+        String nonExistingState = "Non existing state";
+
+        // When
+        when(salesTaxTrackingRepository.findByState(nonExistingState)).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByState(nonExistingState);
+
+        // Then
+        StepVerifier.create(actualSalesTaxTracking).expectError().verify();
     }
 
     @Test

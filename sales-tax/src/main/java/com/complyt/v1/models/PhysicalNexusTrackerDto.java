@@ -1,17 +1,14 @@
 package com.complyt.v1.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
 @With
-@ToString
-@EqualsAndHashCode
 @Schema(name = "PhysicalNexusTracker")
-public class PhysicalNexusTrackerDto {
-    private boolean established;
-    private LocalDateTime establishedDate;
+public record PhysicalNexusTrackerDto(@NotNull(message = "Established may not be null") boolean established,
+                                      @NotNull(message = "EstablishedDate may not be null") LocalDateTime establishedDate) {
+
 }

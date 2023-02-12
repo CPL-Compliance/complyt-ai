@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @SpringBootTest()
-class ValidationHandlerTest {
+class CustomerValidationHandlerTest {
 
     @Autowired
     SpringValidatorAdapter springValidatorAdapter;

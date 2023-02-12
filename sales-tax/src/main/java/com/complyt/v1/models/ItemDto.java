@@ -1,28 +1,18 @@
 package com.complyt.v1.models;
 
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Schema(name = "Item")
-public class ItemDto {
-    private float unitPrice;
-    private int quantity;
-    private float totalPrice;
-    private String description;
-    private String name;
-    private String taxCode;
-    private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    private SalesTaxRateDto salesTaxRate;
-    private boolean manualSalesTax;
-    private float manualSalesTaxRate;
-    private TangibleCategoryDto tangibleCategory;
-    private TaxableCategoryDto taxableCategory;
+public record ItemDto(@PositiveOrZero(message = "Unit Price can not be a negative number") float unitPrice,
+                      @PositiveOrZero(message = "Quantity can not be a negative number") int quantity,
+                      @PositiveOrZero(message = "Total Price can not be a negative number") float totalPrice,
+                      @NotBlank(message = "Description may not be blank") @Size(min = 1, max = 256, message = "Description should be 1-256 characters maximum") String description,
+                      @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name,
+                      @NotBlank(message = "Tax Code may not be blank") @Size(min = 1, max = 256, message = "Tax Code should be 1-256 characters maximum") String taxCode,
+                      JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules, SalesTaxRateDto salesTaxRate,
+                      @NotNull(message = "Manual Sales Tax may not be null") boolean manualSalesTax,
+                      @NotNull(message = "Manual Sales Tax Rate may not be null") @Min(value = 0, message = "manualSalesTaxRate's minimum value is 0") @DecimalMax(value = "0.2", message = "manualSalesTaxRate's maximum value is 0.2") float manualSalesTaxRate,
+                      TangibleCategoryDto tangibleCategory, TaxableCategoryDto taxableCategory) {
 }

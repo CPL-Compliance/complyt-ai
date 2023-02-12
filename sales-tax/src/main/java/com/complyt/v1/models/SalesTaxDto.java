@@ -1,15 +1,14 @@
 package com.complyt.v1.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
 @Schema(name = "SalesTax")
-public class SalesTaxDto {
-    private float amount;
-    private SalesTaxRateDto salesTaxRate;
+public record SalesTaxDto(
+        @NotNull(message = "Amount may not be null") @PositiveOrZero(message = "Amount can not be a negative number") float amount,
+        @Valid @NotNull(message = "Amount may not be null")SalesTaxRateDto salesTaxRate) {
 }

@@ -1,15 +1,12 @@
 package com.complyt.v1.models.customer.exemption;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@With
-@ToString
 @Schema(name = "Classification")
-public class ClassificationDto {
-    private final String code;
-    private final String description;
+public record ClassificationDto(
+        @NotBlank(message = "code may not be blank") @Size(min = 1, max = 256, message = "code should be 1-256 characters maximum") String code,
+        @NotBlank(message = "description may not be blank") @Size(min = 1, max = 256, message = "description should be 1-256 characters maximum") String description) {
+
 }

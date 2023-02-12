@@ -9,4 +9,5 @@ public class ObjectNotFoundApiException extends ComplytApiException {
     public ObjectNotFoundApiException() {
         super(message);
     }
+
 }

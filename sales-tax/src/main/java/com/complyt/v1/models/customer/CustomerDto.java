@@ -15,7 +15,6 @@ import lombok.With;
 
 import java.util.UUID;
 
-
 @With
 @Schema(name = "Customer")
 public record CustomerDto(UUID complytId,
