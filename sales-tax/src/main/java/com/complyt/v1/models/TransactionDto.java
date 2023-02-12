@@ -1,8 +1,8 @@
 package com.complyt.v1.models;
 
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.fields.ComplytIdFieldModel;
-import com.complyt.v1.models.fields.ExternalIdAndSourceFieldsModel;
+import com.complyt.v1.models.properties.ComplytIdPropertyDto;
+import com.complyt.v1.models.properties.ExternalIdAndSourcePropertyDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.With;
@@ -19,5 +19,5 @@ public record TransactionDto(UUID complytId, String externalId, String source, L
                              TimestampsDto internalTimestamps, TimestampsDto externalTimestamps,
                              TransactionTypeDto transactionType, ShippingFeeDto shippingFee, String createdFrom,
                              float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount
-) implements ComplytIdFieldModel, ExternalIdAndSourceFieldsModel {
+) implements ComplytIdPropertyDto, ExternalIdAndSourcePropertyDto {
 }

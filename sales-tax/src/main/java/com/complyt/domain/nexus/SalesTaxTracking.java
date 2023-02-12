@@ -1,8 +1,8 @@
 package com.complyt.domain.nexus;
 
 import com.complyt.domain.State;
-import com.complyt.domain.fields.ComplytIdFieldDomain;
-import com.complyt.domain.fields.StateFieldDomain;
+import com.complyt.domain.properties.ComplytIdProperty;
+import com.complyt.domain.properties.StateProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Document(collection = "sales_tax_tracking")
-public class SalesTaxTracking implements StateFieldDomain, ComplytIdFieldDomain {
+public class SalesTaxTracking implements StateProperty, ComplytIdProperty {
 
     UUID complytId;
     @Id

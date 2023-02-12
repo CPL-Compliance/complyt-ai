@@ -3,10 +3,10 @@ package com.complyt.v1.validators;
 import com.complyt.domain.State;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.models.fields.ComplytIdFieldModel;
-import com.complyt.v1.models.fields.ExternalIdAndSourceFieldsModel;
-import com.complyt.v1.models.fields.NameFieldModel;
-import com.complyt.v1.models.fields.StateFieldModel;
+import com.complyt.v1.models.properties.ComplytIdPropertyDto;
+import com.complyt.v1.models.properties.ExternalIdAndSourcePropertyDto;
+import com.complyt.v1.models.properties.NamePropertyDto;
+import com.complyt.v1.models.properties.StateFieldPropertyDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -49,22 +49,22 @@ public class ValidationHandler<T, U extends Validator> {
                 });
     }
 
-    public <M extends ExternalIdAndSourceFieldsModel> Mono<M> checkExternalIdAndSourceConflict(M resource, String externalId, String source) {
+    public <M extends ExternalIdAndSourcePropertyDto> Mono<M> checkExternalIdAndSourceConflict(M resource, String externalId, String source) {
         return externalId.equals(resource.externalId()) && source.equals(resource.source()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }
 
-    public <M extends ComplytIdFieldModel> Mono<M> checkComplytIdConflict(M resource, UUID complytId) {
+    public <M extends ComplytIdPropertyDto> Mono<M> checkComplytIdConflict(M resource, UUID complytId) {
         return complytId.equals(resource.complytId()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }
 
-    public <M extends StateFieldModel> Mono<M> checkStateConflict(M resource, State state) {
+    public <M extends StateFieldPropertyDto> Mono<M> checkStateConflict(M resource, State state) {
         return state.equals(resource.state()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }
 
-    public <M extends NameFieldModel> Mono<M> checkNameConflict(M resource, String name) {
+    public <M extends NamePropertyDto> Mono<M> checkNameConflict(M resource, String name) {
         return name.equals(resource.name()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }

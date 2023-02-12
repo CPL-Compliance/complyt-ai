@@ -5,10 +5,9 @@ import testUtils.templates.endpoints.*;
 import testUtils.templates.validations.ExternalTimestampsValidationRouterTest;
 import testUtils.templates.validations.InternalTimestampsValidationRouterTest;
 
-public interface CustomerRouterTest extends
+public interface TransactionRouterTestInterface extends
         GetByExternalIdAndSourceRouterTest,
         GetByComplytIdRouterTest,
-        GetByNameRouterTest,
         GetAllRouterTest,
         GetAllBySourceRouterTest,
         // Validation::ExternalId, Source, ComplytId
@@ -23,14 +22,7 @@ public interface CustomerRouterTest extends
     @Test
     void putAny_InvalidUrl_Returns404();
 
-    // Validation::Name
-    @Test
-    void upsert_BlankName_Returns400ValidationError();
-
-    @Test
-    void upsert_LengthGreaterThen256Name_Returns400ValidationError();
-
-    // Validation::Address
+    // Validation::ShippingAddress
     @Test
     void upsert_NullAddress_Returns400ValidationError();
 
@@ -67,8 +59,8 @@ public interface CustomerRouterTest extends
     @Test
     void upsert_LengthGreaterThen256StreetInAddress_Returns400ValidationError();
 
-    // Validation::CustomerType
+    // Validation::TransactionType
     @Test
-    void upsert_NullCustomerType_Returns400ValidationError();
+    void upsert_NullTransactionType_Returns400ValidationError();
 
 }
