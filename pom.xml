@@ -60,7 +60,7 @@
     <!-- To use the dependency in the module you just need to declare it in the module but don't include the version. -->
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Cloud Dependencies -->
+            <!-- Spring Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -68,9 +68,9 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- Spring Cloud Dependencies -->
+            <!-- Spring Cloud -->
 
-            <!-- Spring Cloud Feign Dependencies -->
+            <!-- Spring Cloud Feign -->
             <dependency>
                 <groupId>com.playtika.reactivefeign</groupId>
                 <artifactId>feign-reactor-webclient</artifactId>
@@ -86,9 +86,33 @@
                 <artifactId>feign-reactor-spring-configuration</artifactId>
                 <version>${feign-reactor.version}</version>
             </dependency>
-            <!-- Spring Cloud Feign Dependencies -->
+            <!-- Spring Cloud Feign -->
 
-            <!-- Test Dependencies -->
+            <!-- Observability -->
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core-micrometer</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>context-propagation</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>io.micrometer</groupId>-->
+<!--                <artifactId>micrometer-tracing-bridge-brave</artifactId>-->
+<!--                <version>1.0.1</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>io.micrometer</groupId>-->
+<!--                <artifactId>micrometer-registry-prometheus</artifactId>-->
+<!--                <scope>runtime</scope>-->
+<!--                <version>1.10.3</version>-->
+<!--            </dependency>-->
+            <!-- Observability -->
+
+            <!-- Test -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -119,9 +143,9 @@
                 <version>${mockito-inline.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- Test Dependencies -->
+            <!-- Test -->
 
-            <!-- Other Dependencies -->
+            <!-- Other -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
@@ -150,7 +174,7 @@
                 <classifier>osx-aarch_64</classifier>
             </dependency>
         </dependencies>
-        <!-- Other Dependencies -->
+        <!-- Other -->
     </dependencyManagement>
 
     <build>

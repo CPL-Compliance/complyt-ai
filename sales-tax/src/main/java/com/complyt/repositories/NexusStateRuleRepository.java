@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +39,7 @@ public class NexusStateRuleRepository {
     }
 
     public Flux<NexusStateRule> findAll() {
-        log.debug("Executing findAll nexus state rule");
-
-        return reactiveMongoTemplate.findAll(NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Executing findAll nexus state rule", log::debug)
+                .thenMany(reactiveMongoTemplate.findAll(NexusStateRule.class).log());
     }
 }

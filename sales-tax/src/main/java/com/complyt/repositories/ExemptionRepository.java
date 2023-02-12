@@ -3,6 +3,7 @@ package com.complyt.repositories;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
+import com.complyt.utils.observability.ContextLogger;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -34,9 +35,8 @@ public class ExemptionRepository {
                             .and("customerId").is(transaction.getCustomerId())
                             .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
-                    log.debug("Searching for an exemption by query : " + query);
-
-                    return reactiveMongoTemplate.findOne(query, Exemption.class).log();
+                    return ContextLogger.observeCtx("Searching for an exemption by query : " + query, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, Exemption.class).log());
                 });
     }
 
@@ -50,9 +50,9 @@ public class ExemptionRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("tenantId").is(tenantId));
-                    log.debug("Searching for an exemption with id of : " + id);
 
-                    return reactiveMongoTemplate.findOne(query, Exemption.class).log();
+                    return ContextLogger.observeCtx("Searching for an exemption with id of : " + id, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, Exemption.class).log());
                 });
     }
 
@@ -61,9 +61,9 @@ public class ExemptionRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
-                    log.debug("Searching for an exemption with complyt id of : " + complytId);
 
-                    return reactiveMongoTemplate.findOne(query, Exemption.class).log();
+                    return ContextLogger.observeCtx("Searching for an exemption with complyt id of : " + complytId, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, Exemption.class).log());
                 });
     }
 
@@ -71,9 +71,9 @@ public class ExemptionRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-                    log.debug("Executing findAll exemptions");
 
-                    return reactiveMongoTemplate.find(query, Exemption.class).log();
+                    return ContextLogger.observeCtx("Executing findAll exemptions", log::debug)
+                            .thenMany(reactiveMongoTemplate.find(query, Exemption.class).log());
                 });
     }
 
@@ -82,9 +82,9 @@ public class ExemptionRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
-                    log.debug("Deleting exemption with complyt id : " + complytId);
 
-                    return reactiveMongoTemplate.remove(query, Exemption.class).log();
+                    return ContextLogger.observeCtx("Deleting exemption with complyt id : " + complytId, log::debug)
+                            .then(reactiveMongoTemplate.remove(query, Exemption.class).log());
                 });
     }
 }

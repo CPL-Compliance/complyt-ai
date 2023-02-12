@@ -3,6 +3,7 @@ package com.complyt.v1.handlers;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.security.permissions.customer.CustomerReadPermission;
 import com.complyt.security.permissions.customer.CustomerUpdatePermission;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.customer.CustomerDto;
@@ -36,8 +37,10 @@ public class CustomerHandler {
 
     @CustomerReadPermission
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
-        Flux<CustomerDto> customerDtoFlux = customerfacade.getAll()
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto);
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAll()
+                .map(CustomerMapper.INSTANCE::customerToCustomerDto));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -45,8 +48,10 @@ public class CustomerHandler {
     @CustomerReadPermission
     public Mono<ServerResponse> getAllBySource(ServerRequest serverRequest) {
         String source = serverRequest.pathVariable("source");
-        Flux<CustomerDto> customerDtoFlux = customerfacade.getAllBySource(source)
-                .map(CustomerMapper.INSTANCE::customerToCustomerDto);
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.getAllBySource(source)
+                .map(CustomerMapper.INSTANCE::customerToCustomerDto));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);
     }
@@ -55,8 +60,10 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return customerDtoValidationHandler.validate(serverRequest)
+        return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validate(serverRequest))
+                .flatMap(customerDto -> ContextLogger.observeCtx(customerDto.toString(), log::info).thenReturn(customerDto))
                 .map(customerDto ->
                         CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
                 .flatMap(receivedCustomer ->
@@ -70,8 +77,9 @@ public class CustomerHandler {
     public Mono<ServerResponse> getByExternalIdAndSource(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<CustomerDto> customerDtoMono = customerfacade.findByExternalIdAndSource(externalId, source)
+        Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByExternalIdAndSource(externalId, source))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
@@ -81,8 +89,9 @@ public class CustomerHandler {
     @CustomerReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<CustomerDto> customerDtoMono = customerfacade.findByComplytId(complytId)
+        Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByComplytId(complytId))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
@@ -92,8 +101,9 @@ public class CustomerHandler {
     @CustomerReadPermission
     public Mono<ServerResponse> getByName(ServerRequest serverRequest) {
         String name = serverRequest.pathVariable("name");
+        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<CustomerDto> customerDtoFlux = customerfacade.findByName(name)
+        Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.findByName(name))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(customerDtoFlux, CustomerDto.class);

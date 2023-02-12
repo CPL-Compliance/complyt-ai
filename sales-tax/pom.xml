@@ -75,6 +75,23 @@
         </dependency>
         <!-- Spring Cloud Vault -->
 
+        <!-- Observability -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <!-- Observability -->
+
         <!-- Spring Cloud Feign -->
         <dependency>
             <groupId>com.playtika.reactivefeign</groupId>
@@ -101,7 +118,7 @@
         </dependency>
         <!-- Spring Cloud Eureka -->
 
-        <!-- Test Dependencies -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

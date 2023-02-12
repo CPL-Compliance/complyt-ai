@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.ClientTracking;
 import com.complyt.security.TenantResolver;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +29,8 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    log.debug("Searching for a Client with tenant ID of : " + tenantId);
-                    return reactiveMongoTemplate.findOne(query, ClientTracking.class).log();
+                    return ContextLogger.observeCtx("Searching for a Client with tenant ID of : " + tenantId, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, ClientTracking.class).log());
                 });
     }
 
@@ -41,11 +42,10 @@ public class ClientTrackingRepository {
     public Mono<ClientTracking> findById(String id) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("_id").is(id)
-                            .and("tenantId").is(tenantId));
-                    log.debug("Executing findById with search criteria of Client Tracking id : " + id);
+                    Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return reactiveMongoTemplate.findOne(query, ClientTracking.class).log();
+                    return ContextLogger.observeCtx("Executing findById with search criteria of Client Tracking id : " + id, log::debug)
+                            .then(reactiveMongoTemplate.findOne(query, ClientTracking.class).log());
                 });
     }
 
@@ -53,9 +53,9 @@ public class ClientTrackingRepository {
         return tenantResolver.resolve()
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-                    log.debug("Executing findAll Client Tracking");
 
-                    return reactiveMongoTemplate.find(query, ClientTracking.class).log();
+                    return ContextLogger.observeCtx("Executing findAll Client Tracking", log::debug)
+                            .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class).log());
                 });
     }
 }
