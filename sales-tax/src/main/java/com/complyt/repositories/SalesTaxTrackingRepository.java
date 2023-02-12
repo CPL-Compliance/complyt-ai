@@ -30,7 +30,6 @@ public class SalesTaxTrackingRepository {
     TenantResolver tenantResolver;
 
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
-
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Criteria stateSearchCriteria = new Criteria()
@@ -39,24 +38,25 @@ public class SalesTaxTrackingRepository {
 
                     Query query = Query.query(stateSearchCriteria.and("tenantId").is(tenantId));
 
-                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
+                    return ContextLogger.observeCtx("Finding SalesTaxTracking by State: " + state, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
                 });
     }
 
     public Mono<SalesTaxTracking> findByComplytId(@NonNull UUID complytId) {
-
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("complytId").is(complytId).and("tenantId").is(tenantId));
 
-                    return reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log();
+                    return ContextLogger.observeCtx("Finding SalesTaxTracking by ComplytId: " + complytId, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
                 });
     }
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return tenantResolver.resolve()
-                .flatMap(tenantId -> ContextLogger.observeCtx("Saving modified sales tax tracking : " + salesTaxTracking, log::debug)
-                        .then(reactiveMongoTemplate.save(salesTaxTracking.withTenantId(tenantId)).log()));
+                .flatMap(tenantId -> ContextLogger.observeCtx("Saving SalesTaxTracking: " + salesTaxTracking, log::info)
+                        .then(reactiveMongoTemplate.save(salesTaxTracking.withTenantId(tenantId))));
     }
 
     public Mono<SalesTaxTracking> findById(String id) {
@@ -64,8 +64,8 @@ public class SalesTaxTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a sales tax tracking with id of : " + id, log::debug)
-                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class).log());
+                    return ContextLogger.observeCtx("Searching for a SalesTaxTracking with ID of: " + id, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, SalesTaxTracking.class));
                 });
     }
 
@@ -74,8 +74,8 @@ public class SalesTaxTrackingRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing findAll sales tax tracking", log::debug)
-                            .thenMany(reactiveMongoTemplate.find(query, SalesTaxTracking.class).log());
+                    return ContextLogger.observeCtx("Executing findAll SalesTaxTracking", log::info)
+                            .thenMany(reactiveMongoTemplate.find(query, SalesTaxTracking.class));
                 });
     }
 }

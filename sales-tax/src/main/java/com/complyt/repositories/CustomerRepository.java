@@ -15,7 +15,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
-import java.util.logging.Level;
 
 @Repository
 @Slf4j
@@ -34,7 +33,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("name").regex("^" + name, "i")
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for customers with name : " + name, log::debug)
+                    return ContextLogger.observeCtx("Searching for customers with name: " + name, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
@@ -45,7 +44,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("name").is("^" + name)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with name : " + name, log::debug)
+                    return ContextLogger.observeCtx("Searching for a customer with name: " + name, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -66,14 +65,18 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
 
-                    return ContextLogger.observeCtx("Executing findAll customers in source : " + source, log::debug)
+                    return ContextLogger.observeCtx("Executing findAll customers in source: " + source, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
 
     public Mono<Customer> save(@NonNull Customer customer) {
         return tenantResolver.resolve()
-                .flatMap(tenantId -> reactiveMongoTemplate.save(customer.withTenantId(tenantId)));
+                .flatMap(tenantId -> {
+                    Customer customerWithTenantId = customer.withTenantId(tenantId);
+                    return ContextLogger.observeCtx("Saving Customer: " + customerWithTenantId.toString(), log::info)
+                            .then(reactiveMongoTemplate.save(customerWithTenantId));
+                });
     }
 
     public Mono<Customer> findById(String id) {
@@ -81,7 +84,7 @@ public class CustomerRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with id of : " + id, log::debug)
+                    return ContextLogger.observeCtx("Searching for a customer with id of: " + id, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -94,7 +97,7 @@ public class CustomerRepository {
                             .and("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for a customer with externalId of : "
-                                    + externalId + " in source : " + source, log::debug)
+                                    + externalId + " in source : " + source, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -105,7 +108,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with complytId of : " + complytId, log::debug)
+                    return ContextLogger.observeCtx("Searching for a customer with complytId of: " + complytId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }
@@ -116,7 +119,7 @@ public class CustomerRepository {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing findById with search criteria of customer id : " + id.toString(), log::debug)
+                    return ContextLogger.observeCtx("Executing findById with search criteria of customer id : " + id.toString(), log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

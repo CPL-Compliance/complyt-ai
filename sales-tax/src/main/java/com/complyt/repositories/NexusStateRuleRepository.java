@@ -21,7 +21,8 @@ public class NexusStateRuleRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return reactiveMongoTemplate.findById(id, NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Finding NexusStateRule by ID: " + id, log::info)
+                .then(reactiveMongoTemplate.findById(id, NexusStateRule.class));
     }
 
     public Mono<NexusStateRule> findByState(@NonNull String state) {
@@ -31,15 +32,17 @@ public class NexusStateRuleRepository {
 
         Query query = Query.query(stateSearchCriteria);
 
-        return reactiveMongoTemplate.findOne(query, NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Finding NexusStateRule by state: " + state, log::info)
+                .then(reactiveMongoTemplate.findOne(query, NexusStateRule.class));
     }
 
     public Mono<NexusStateRule> save(@NonNull NexusStateRule nexusStateRule) {
-        return reactiveMongoTemplate.save(nexusStateRule).log();
+        return ContextLogger.observeCtx("Saving NexusStateRule: " + nexusStateRule, log::info)
+                .then(reactiveMongoTemplate.save(nexusStateRule));
     }
 
     public Flux<NexusStateRule> findAll() {
-        return ContextLogger.observeCtx("Executing findAll nexus state rule", log::debug)
-                .thenMany(reactiveMongoTemplate.findAll(NexusStateRule.class).log());
+        return ContextLogger.observeCtx("Returning all NexusStateRule documents", log::info)
+                .thenMany(reactiveMongoTemplate.findAll(NexusStateRule.class));
     }
 }

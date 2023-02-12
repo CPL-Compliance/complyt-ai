@@ -23,8 +23,8 @@ public class ProductClassificationRepository {
     public Mono<ProductClassification> findOneByTaxCode(String taxCode) {
         Query query = Query.query(Criteria.where("taxCode").is(taxCode));
 
-        return ContextLogger.observeCtx("Searching for product classification for tax code : " + taxCode, log::debug)
-                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class).log());
+        return ContextLogger.observeCtx("Searching for product classification with tax code: " + taxCode, log::info)
+                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
     }
 
     public Flux<ProductClassification> findAll() {
@@ -34,11 +34,12 @@ public class ProductClassificationRepository {
     public Mono<ProductClassification> findById(@NonNull String id) {
         Query query = Query.query(Criteria.where("_id").is(id));
 
-        return ContextLogger.observeCtx("Searching for a productClassification with id of : " + id, log::debug)
-                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class).log());
+        return ContextLogger.observeCtx("Searching for a productClassification with id of: " + id, log::info)
+                .then(reactiveMongoTemplate.findOne(query, ProductClassification.class));
     }
 
     public Mono<ProductClassification> save(@NonNull ProductClassification productClassification) {
-        return reactiveMongoTemplate.save(productClassification).log();
+        return ContextLogger.observeCtx("Saving ProductClassification: " + productClassification, log::info)
+                .then(reactiveMongoTemplate.save(productClassification));
     }
 }
