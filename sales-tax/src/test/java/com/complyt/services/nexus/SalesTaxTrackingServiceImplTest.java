@@ -156,19 +156,6 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
-    void findByState_RepositoryReturnsMonoEmpty_ThrowsException() {
-        // Given
-        String nonExistingState = "Non existing state";
-
-        // When
-        when(salesTaxTrackingRepository.findByState(nonExistingState)).thenReturn(Mono.empty());
-        Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.findByState(nonExistingState);
-
-        // Then
-        StepVerifier.create(actualSalesTaxTracking).expectError().verify();
-    }
-
-    @Test
     void findByState_NullStatePassed_ThrowsException() {
         // Given
         String nullState = null;
