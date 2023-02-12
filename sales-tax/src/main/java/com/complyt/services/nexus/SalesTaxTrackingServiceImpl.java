@@ -25,7 +25,7 @@ import java.util.function.Function;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
-    
+
     @NonNull
     SalesTaxTrackingRepository salesTaxTrackingRepository;
     @NonNull
@@ -45,8 +45,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
-        return salesTaxTrackingRepository.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No SalesTaxTracking with state " + state)));
+        return salesTaxTrackingRepository.findByState(state);
     }
 
     @Override

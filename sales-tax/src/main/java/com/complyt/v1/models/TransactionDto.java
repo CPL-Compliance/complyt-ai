@@ -15,7 +15,7 @@ import java.util.UUID;
 public record TransactionDto(UUID complytId,
                              @NotBlank(message = "External ID may not be blank") @Size(min = 1, max = 256, message = "External ID length should be 1-256 characters maximum") String externalId,
                              String source,
-                             @NotEmpty(message = "Items list cannot be empty") @NotNull(message = "Items may not be null") List<ItemDto> items,
+                             @NotEmpty(message = "Items list cannot be empty") @NotNull(message = "Items may not be null") List<@Valid ItemDto> items,
                              @Valid @NotNull(message = "Billing address may not be null") AddressDto billingAddress,
                              @Valid @NotNull(message = "Shipping address may not be null") AddressDto shippingAddress,
                              @NotNull(message = "Customer Id may not be null") UUID customerId,
