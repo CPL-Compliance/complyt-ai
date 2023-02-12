@@ -85,7 +85,7 @@ public class ProductClassificationServiceTest {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
 
         return new HashMap<>() {{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
+            put(jurisdictionalSalesTaxRules.abbreviation(), jurisdictionalSalesTaxRules);
         }};
     }
 

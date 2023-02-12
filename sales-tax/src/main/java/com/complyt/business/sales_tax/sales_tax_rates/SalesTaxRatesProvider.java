@@ -2,7 +2,7 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.SalesTaxRules;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,29 +22,29 @@ public class SalesTaxRatesProvider {
      * @param originalSalesTaxRate        - Sales tax rate given by external resource regarding the current transaction's address
      * @return
      */
-    public SalesTaxRate calculateSalesTaxRate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
-        if (!jurisdictionalSalesTaxRules.isTaxable()) {
+    public SalesTaxRate calculateSalesTaxRate(@NonNull SalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
+        if (!jurisdictionalSalesTaxRules.taxable()) {
             log.info("None taxable rule - returning sales tax rate that is set to 0");
             SalesTaxRate zeroSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
             return zeroSalesTaxRate;
         }
 
-        if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
+        if (!jurisdictionalSalesTaxRules.specialTreatment()) {
             log.info("None special treatment for rule - returning original sales tax rate");
 
             return originalSalesTaxRate;
         }
 
-        if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
-            log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.getCalculationValue());
-            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+        if (jurisdictionalSalesTaxRules.calculationType() == CalculationType.FIXED) {
+            log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.calculationValue());
+            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
 
             return modifiedRateByFixedTreatment;
         }
 
-        log.info("Returning sales tax rate by percentage cut of : " + jurisdictionalSalesTaxRules.getCalculationValue());
-        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+        log.info("Returning sales tax rate by percentage cut of : " + jurisdictionalSalesTaxRules.calculationValue());
+        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
 
         return modifiedRateByPercentageTreatment;
     }

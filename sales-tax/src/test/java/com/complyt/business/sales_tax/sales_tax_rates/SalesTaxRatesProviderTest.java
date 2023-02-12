@@ -85,7 +85,7 @@ class SalesTaxRatesProviderTest {
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.PERCENTAGE)
                 .withSpecialTreatment(true);
-        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRate.getTaxRate();
+        float calculatedRate = percentageCalculationTypeRule.calculationValue() * salesTaxRate.getTaxRate();
         SalesTaxRate expectedSalesTaxRate = salesTaxRate.withTaxRate(calculatedRate);
 
         // When + Then

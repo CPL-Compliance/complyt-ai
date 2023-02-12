@@ -35,7 +35,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjector extends Transacti
 
             ShippingFee modifiedShippingFee = transaction.getShippingFee().withJurisdictionalSalesTaxRules(rules);
 
-            TaxableCategory category = modifiedShippingFee.getJurisdictionalSalesTaxRules().isTaxable() ?
+            TaxableCategory category = modifiedShippingFee.getJurisdictionalSalesTaxRules().taxable() ?
                     TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
             ShippingFee shippingFeeWithTaxableCategory = modifiedShippingFee.withTaxableCategory(category);
 

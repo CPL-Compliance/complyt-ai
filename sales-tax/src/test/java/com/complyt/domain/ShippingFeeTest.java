@@ -46,7 +46,7 @@ public class ShippingFeeTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = shippingFee.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = shippingFee.getSalesTaxRate().getTaxRate() * rulesByPercentage.getCalculationValue();
+        float rateAfterPercentageCut = shippingFee.getSalesTaxRate().getTaxRate() * rulesByPercentage.calculationValue();
         SalesTaxRate salesTaxRate = shippingFee.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage)
                 .withSalesTaxRate(salesTaxRate);

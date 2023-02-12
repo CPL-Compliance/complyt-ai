@@ -86,10 +86,10 @@ public class TransactionProductClassificationDataInjectionManagerTest {
 
     private Map<String, ProductClassification> createClassificationsMap(JurisdictionalSalesTaxRules firstRule, JurisdictionalSalesTaxRules secondRule) {
         Map<String, JurisdictionalSalesTaxRules> firstRulesMap = new HashMap<>() {{
-            put(firstRule.getAbbreviation(), firstRule);
+            put(firstRule.abbreviation(), firstRule);
         }};
         Map<String, JurisdictionalSalesTaxRules> secondRulesMap = new HashMap<>() {{
-            put(secondRule.getAbbreviation(), secondRule);
+            put(secondRule.abbreviation(), secondRule);
         }};
         ProductClassification productClassification1 = new ProductClassification("id", "C1S1", "description", "title", firstRulesMap, TangibleCategory.TANGIBLE);
         ProductClassification productClassification2 = new ProductClassification("id", "C2S2", "description", "title", secondRulesMap, TangibleCategory.TANGIBLE);

@@ -44,7 +44,7 @@ public class ProductClassificationRepositoryTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
-            put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
+            put(jurisdictionalSalesTaxRules.abbreviation(), jurisdictionalSalesTaxRules);
         }};
 
         productClassification = new ProductClassification(UUID.randomUUID().toString(), "C1S1", "description",

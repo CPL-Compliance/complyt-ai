@@ -54,7 +54,7 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
             JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
             Item itemWithRules = item.withJurisdictionalSalesTaxRules(rules);
 
-            TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().isTaxable() ?
+            TaxableCategory category = itemWithRules.getJurisdictionalSalesTaxRules().taxable() ?
                     TaxableCategory.TAXABLE : TaxableCategory.NOT_TAXABLE;
             Item itemWithCategory = itemWithRules.withTaxableCategory(category);
 

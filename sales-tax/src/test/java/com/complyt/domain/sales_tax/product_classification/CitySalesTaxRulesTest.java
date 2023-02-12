@@ -22,13 +22,13 @@ class CitySalesTaxRulesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "CitySalesTaxRules(name=" + citySalesTaxRules.getName() +
-                ", abbreviation=" + citySalesTaxRules.getAbbreviation() +
-                ", taxable=" + citySalesTaxRules.isTaxable() +
-                ", specialTreatment=" + citySalesTaxRules.isSpecialTreatment() +
-                ", calculationType=" + citySalesTaxRules.getCalculationType() +
-                ", description=" + citySalesTaxRules.getDescription() +
-                ", calculationValue=" + citySalesTaxRules.getCalculationValue() + ")";
+        String expectedString = "CitySalesTaxRules[name=" + citySalesTaxRules.name() +
+                ", abbreviation=" + citySalesTaxRules.abbreviation() +
+                ", taxable=" + citySalesTaxRules.taxable() +
+                ", specialTreatment=" + citySalesTaxRules.specialTreatment() +
+                ", calculationType=" + citySalesTaxRules.calculationType() +
+                ", description=" + citySalesTaxRules.description() +
+                ", calculationValue=" + citySalesTaxRules.calculationValue() + "]";
 
         // When
         String actualString = citySalesTaxRules.toString();
