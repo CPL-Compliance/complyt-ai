@@ -6,7 +6,7 @@ spring:
     name: api-gateway
   profiles:
     active:
-      - @activeEnv@
+      - test
   security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
   config.import: vault://
   cloud:

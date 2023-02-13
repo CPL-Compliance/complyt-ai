@@ -521,6 +521,12 @@
             </properties>
         </profile>
         <profile>
+            <id>test</id>
+            <properties>
+                <activeEnv>test</activeEnv>
+            </properties>
+        </profile>
+        <profile>
             <id>penetration-test</id>
             <properties>
                 <activeEnv>penetration-test</activeEnv>
