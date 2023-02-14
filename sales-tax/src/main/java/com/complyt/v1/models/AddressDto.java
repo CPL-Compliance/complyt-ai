@@ -12,6 +12,6 @@ public record AddressDto(
         @Size(max = 256, message = "County should be 1-256 characters maximum") String county,
         @Size(max = 256, message = "State should be 1-256 characters maximum") String state,
         @Size(max = 256, message = "Street should be 1-256 characters maximum") String street,
-        @Size(max = 256, message = "ZIP should be 1-256 characters maximum") String zip) {
+        @Size(max = 20, message = "ZIP should be 1-256 characters maximum") String zip) {
 
 }

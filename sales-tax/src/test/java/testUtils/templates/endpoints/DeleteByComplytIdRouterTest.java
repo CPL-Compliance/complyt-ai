@@ -1,0 +1,18 @@
+package testUtils.templates.endpoints;
+
+public interface DeleteByComplytIdRouterTest {
+    void deleteByComplytId_Exists_Returns204();
+
+    void deleteByComplytId_DoesntExists_Returns404();
+
+    void deleteByComplytId_UnauthenticatedUser_Returns401();
+
+    void deleteByComplytId_UserWithoutAuthorities_Returns403();
+
+    void deleteByComplytId_UserWithoutCSRFToken_Returns403();
+
+    void deleteByComplytId_InternalServerError_Returns500();
+
+    void deleteByComplytId_NullHandler_ThrowsNullPointerException();
+}
+

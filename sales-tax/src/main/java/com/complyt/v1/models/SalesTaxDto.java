@@ -10,5 +10,5 @@ import lombok.*;
 @Schema(name = "SalesTax")
 public record SalesTaxDto(
         @NotNull(message = "Amount may not be null") @PositiveOrZero(message = "Amount can not be a negative number") float amount,
-        @Valid @NotNull(message = "Amount may not be null")SalesTaxRateDto salesTaxRate) {
+        @Valid @NotNull(message = "SalesTaxRate may not be null")SalesTaxRateDto salesTaxRate) {
 }

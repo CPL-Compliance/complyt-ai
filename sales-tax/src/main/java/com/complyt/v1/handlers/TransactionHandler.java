@@ -4,6 +4,7 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.validators.ValidationHandler;
@@ -41,7 +42,8 @@ public class TransactionHandler {
 
         log.debug("Get Transaction by external id and source - id and source received as path variables : " + externalId + ", " + source);
         Mono<TransactionDto> transactionDtoMono = transactionFacade.findByExternalIdAndSource(externalId, source)
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto);
+                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -70,7 +72,8 @@ public class TransactionHandler {
         UUID complytId = UUID.fromString(complytIdAsString);
 
         Mono<TransactionDto> transactionDtoMono = transactionFacade.findByComplytId(complytId)
-                .map(TransactionMapper.INSTANCE::transactionToTransactionDto);
+                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -81,6 +84,7 @@ public class TransactionHandler {
         String source = serverRequest.pathVariable("source");
 
         return transactionDtoValidationHandler.validate(serverRequest)
+                .flatMap(transactionDto -> transactionDtoValidationHandler.checkExternalIdAndSourceConflict(transactionDto, externalId, source))
                 .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                 .flatMap(receivedTransaction ->
                         transactionFacade.findByExternalIdAndSource(externalId, source)
@@ -97,6 +101,7 @@ public class TransactionHandler {
         log.debug("Delete transaction - external id and source received as path variable : " + externalId + ", " + source);
 
         return transactionFacade.markAsCancelled(externalId, source)
-                .flatMap(transaction -> ServerResponse.noContent().build());
+                .flatMap(transaction -> ServerResponse.noContent().build())
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 }

@@ -1,334 +1,82 @@
 package com.complyt.v1.routers;
 
-import com.complyt.config.ApiExceptionConfig;
-import com.complyt.config.JacksonConfig;
-import com.complyt.domain.State;
-import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.facades.ExemptionFacade;
-import com.complyt.v1.exceptions.GlobalErrorAttributes;
-import com.complyt.v1.exceptions.GlobalExceptionHandler;
-import com.complyt.v1.handlers.ExemptionHandler;
-import com.complyt.v1.mappers.ExemptionMapper;
-import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.ValidatorConfig;
-import com.mongodb.client.result.DeleteResult;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.templates.endpoints.*;
+import testUtils.templates.validations.InternalTimestampsValidationRouterTest;
+import testUtils.templates.validations.StateValidationRouterTest;
+import testUtils.templates.validations.ValidationDatesValidationRouterTest;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+public interface ExemptionRouterTest extends
+        GetByComplytIdRouterTest,
+        GetAllRouterTest,
+        DeleteByComplytIdRouterTest,
+        CreateRouterTest,
+        // Validations::ComplytId
+        UpsertByComplytIdRouterTest,
+        // Validations::InternalTimestamps
+        InternalTimestampsValidationRouterTest,
+        // Validations:ValidationDates
+        ValidationDatesValidationRouterTest,
+        // Validations::State
+        StateValidationRouterTest {
+    void getAny_InvalidUrl_Returns404();
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+    void putAny_InvalidUrl_Returns404();
 
-@ExtendWith(SpringExtension.class)
-@WebFluxTest(ExemptionHandler.class)
-@ExtendWith(MockitoExtension.class)
-@Import(JacksonConfig.class)
-@ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class, ApiExceptionConfig.class,
-        ValidatorConfig.class,
-        GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
-public class ExemptionRouterTest {
+    void deleteAny_InvalidUrl_Returns404();
 
-    ExemptionRouter exemptionRouter;
+    void postAny_InvalidUrl_Returns404();
 
-    @MockBean
-    private ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler;
+    // Validations::Classification
+    void upsert_NullClassification_Returns400ValidationError();
 
-    @Autowired
-    WebTestClient webTestClient;
+    void upsert_BlankCodeInClassification_Returns400ValidationError();
 
-    @MockBean
-    ExemptionFacade exemptionFacade;
+    void upsert_BlankDescriptionInClassification_Returns400ValidationError();
 
-    Exemption exemption;
+    void upsert_NullCodeInClassification_Returns400ValidationError();
 
-    ObjectStub objectStub;
+    void upsert_NullDescriptionInClassification_Returns400ValidationError();
 
-    @BeforeEach
-    void setup() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        exemptionRouter = new ExemptionRouter();
-        exemption = objectStub.createExemption(UUID.randomUUID().toString())
-                .withInternalTimestamps(null)
-                .withValidationDates(null);
-    }
+    void upsert_LengthOf257CodeInClassification_Returns400ValidationError();
 
-    @Test
-    @WithUserDetails()
-    public void getOne_FindsExemption_ReturnsExemption() {
-        // Given
-        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
+    void upsert_LengthOf257DescriptionInClassification_Returns400ValidationError();
 
-        // When
-        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.just(exemption));
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
+    // Validations::Status
+    void upsert_NullStatus_Returns400validationError();
 
-        // Then
-        webTestClient.get()
-                .uri(uriBuilder -> uriBuilder.path(url).build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(ExemptionDto.class)
-                .isEqualTo(expectedExemption);
-    }
+    void upsert_NullCodeInStatus_Returns400validationError();
 
-    @Test
-    @WithUserDetails()
-    public void getOne_ExemptionDoesNotExistInDB_Throws404NotFound() {
-        // Given
-        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
+    void upsert_NullNameInStatus_Returns400validationError();
 
-        // When
-        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.empty());
+    void upsert_blankCodeInStatus_Returns400validationError();
 
-        // Then
-        webTestClient.get()
-                .uri(uriBuilder -> uriBuilder.path(url).build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNotFound();
-    }
+    void upsert_blankNameInStatus_Returns400validationError();
 
-    @WithUserDetails()
-    @Test
-    public void create_CreatesExemption_ReturnsExemption() {
-        // Given
-        Exemption exemptionNoId = exemption.withId(null).withTenantId(null).withComplytId(null);
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
+    void upsert_LengthOf257NameInStatus_Returns400validationError();
 
-        // When
-        when(exemptionDtoValidationHandler.validate(any())).thenReturn(Mono.just(exemptionDto));
-        when(exemptionFacade.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+    void upsert_LengthOf257CodeInStatus_Returns400validationError();
 
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .post()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
-                .bodyValue(exemptionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(ExemptionDto.class)
-                .isEqualTo(exemptionDto.withComplytId(exemption.getComplytId()));
-    }
+    //Validations::Certificate
+    void upsert_NullCertificate_Returns400ValidationError();
 
-    @Test
-    @WithUserDetails()
-    void update_UpdatesExemption_ReturnsExemption() {
-        // Given
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
-        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+    void upsert_NullCertificateIdInCertificate_Returns400ValidationError();
 
-        // When
-        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(exemption));
-        when(exemptionDtoValidationHandler.validate(any())).thenReturn(Mono.just(exemptionDto));
+    void upsert_NullUrlInCertificate_Returns400ValidationError();
 
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId().toString())
-                        .build())
-                .bodyValue(exemptionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(ExemptionDto.class)
-                .isEqualTo(exemptionDto);
-    }
+    void upsert_NullNameInCertificate_Returns400ValidationError();
 
-    @Test
-    @WithUserDetails()
-    void update_ExemptionDoesNotExist_Throws404NotFound() {
-        // Given
-        Exemption exemptionWithIdThatDoesNotExist = exemption.withTenantId(null).withId(UUID.randomUUID().toString());
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);
+    void upsert_BlankCertificateIdInCertificate_Returns400ValidationError();
 
-        // When
-        when(exemptionFacade.update(exemptionWithIdThatDoesNotExist, exemption.getComplytId())).thenReturn(Mono.empty());
+    void upsert_BlankUrlInCertificate_Returns400ValidationError();
 
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId" + exemption.getId())
-                        .build())
-                .bodyValue(exemptionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNotFound();
-    }
+    void upsert_BlankNameInCertificate_Returns400ValidationError();
 
-    @Test
-    @WithUserDetails()
-    void getAll_FindsTwoExemptions_ReturnsTwoExemptions() {
-        // Given
-        Exemption secondExemption = exemption.withId(UUID.randomUUID().toString())
-                .withState(new State("NY", "05", "New York"));
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption);
-        ExemptionDto secondExemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(secondExemption);
+    void upsert_LengthOf257CertificateIdInCertificate_Returns400ValidationError();
 
-        List<Exemption> exemptions = new ArrayList<>() {{
-            add(exemption);
-            add(secondExemption);
-        }};
+    void upsert_LengthOf257UrlInCertificate_Returns400ValidationError();
 
-        List<ExemptionDto> exemptionDtos = new ArrayList<>() {{
-            add(exemptionDto);
-            add(secondExemptionDto);
-        }};
+    void upsert_LengthOf257NameInCertificate_Returns400ValidationError();
 
-        // When
-        when(exemptionFacade.findAll()).thenReturn(Flux.fromIterable(exemptions));
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .get()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(ExemptionDto.class)
-                .isEqualTo(exemptionDtos);
-    }
-
-    @Test
-    @WithUserDetails()
-    public void delete_DeletesExemption_Returns204NoContent() {
-        // Given
-        UUID complytId = UUID.randomUUID();
-        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
-        DeleteResult deleteResult = DeleteResult.acknowledged(1);
-
-        // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.just(deleteResult));
-
-        // Then
-        webTestClient.mutateWith(csrf())
-                .delete()
-                .uri(uriBuilder -> uriBuilder.path(url).build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNoContent();
-    }
-
-    @Test
-    @WithUserDetails()
-    public void delete_ExemptionDoesNoExistInDB_Throws404NotFound() {
-        // Given
-        UUID complytId = UUID.randomUUID();
-        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
-
-        // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
-
-        // Then
-        webTestClient.mutateWith(csrf())
-                .delete()
-                .uri(uriBuilder -> uriBuilder.path(url).build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNotFound();
-    }
-
-    @Test
-    void GetExemptionByComplytIdRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.GetExemptionByComplytIdRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-    @Test
-    void GetAllExemptionsRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.GetAllExemptionsRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-    @Test
-    void postExemptionRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.postExemptionRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-    @Test
-    void updateExemptionByComplytIdRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.updateExemptionByComplytIdRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-    @Test
-    void deleteExemptionByComplytIdRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
-        // Given
-        ExemptionHandler nullExemptionHandler = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.deleteExemptionByComplytIdRouterFunction(nullExemptionHandler);
-        });
-
-        // Then
-        assertEquals("exemptionHandler is marked non-null but is null", nullPointerException.getMessage());
-    }
-
-
+    // Validations::ExemptionType
+    void upsert_NullExemptionType_Returns400ValidationError();
 }

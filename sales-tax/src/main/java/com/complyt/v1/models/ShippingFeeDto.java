@@ -7,10 +7,10 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 @Schema(name = "ShippingFee")
-public record ShippingFeeDto(@NotNull(message = "manualSalesTax may not be null") boolean manualSalesTax,
-                             @NotNull(message = "manualSalesTaxRate may not be null") @PositiveOrZero(message = "manualSalesTaxRate items amount can not be a negative number") float manualSalesTaxRate,
-                             @NotNull(message = "totalPrice may not be null") @PositiveOrZero(message = "totalPrice items amount can not be a negative number") float totalPrice,
+public record ShippingFeeDto(boolean manualSalesTax,
+                             @PositiveOrZero(message = "Manual Sales Tax Rate items amount can not be a negative number") float manualSalesTaxRate,
+                             @PositiveOrZero(message = "Total Price items amount can not be a negative number") float totalPrice,
                              JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules, SalesTaxRateDto salesTaxRate,
-                             @NotBlank(message = "taxCode may not be blank") @Size(min = 1, max = 256, message = "taxCode should be 1-256 characters maximum") String taxCode,
+                             @NotBlank(message = "Tax Code may not be blank") @Size(min = 1, max = 256, message = "Tax Code should be 1-256 characters maximum") String taxCode,
                              TaxableCategoryDto taxableCategory, TangibleCategoryDto tangibleCategory) {
 }

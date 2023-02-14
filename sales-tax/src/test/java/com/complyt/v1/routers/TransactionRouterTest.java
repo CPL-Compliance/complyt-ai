@@ -1,339 +1,86 @@
 package com.complyt.v1.routers;
 
-import com.complyt.config.ApiExceptionConfig;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.facades.TransactionFacade;
-import com.complyt.v1.exceptions.GlobalErrorAttributes;
-import com.complyt.v1.exceptions.GlobalExceptionHandler;
-import com.complyt.v1.handlers.TransactionHandler;
-import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.models.TransactionDto;
-import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.ValidatorConfig;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.templates.endpoints.*;
+import testUtils.templates.validations.ExternalTimestampsValidationRouterTest;
+import testUtils.templates.validations.InternalTimestampsValidationRouterTest;
+import testUtils.templates.validations.ItemValidationRouterTest;
+import testUtils.templates.validations.ShippingFeeValidationRouterTest;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+public interface TransactionRouterTest extends
+        GetByExternalIdAndSourceRouterTest,
+        GetByComplytIdRouterTest,
+        GetAllRouterTest,
+        GetAllBySourceRouterTest,
+        DeleteByExternalIdAndSourceRouterTest,
+        // Validation::ExternalId, Source, ComplytId
+        UpsertByExternalIdAndSourceRouterTest,
+        // Validation::InternalTimestamps
+        InternalTimestampsValidationRouterTest,
+        // Validation::ExternalTimestamps
+        ExternalTimestampsValidationRouterTest,
+        // Validation::Item in Items
+        ItemValidationRouterTest,
+        // Validation::ShippingFee
+        ShippingFeeValidationRouterTest {
+    void getAny_InvalidUrl_Returns404();
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+    void putAny_InvalidUrl_Returns404();
 
-@WebFluxTest
-@WithMockUser(username = "mock", password = "mock")
-@ContextConfiguration(classes = {TransactionRouter.class, TransactionHandler.class, ApiExceptionConfig.class,
-        ValidatorConfig.class,
-        GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
-public class TransactionRouterTest {
+    void deleteAny_InvalidUrl_Returns404();
 
-    Transaction transaction;
+    // Validation::ShippingAddress
+    void upsert_NullShippingAddress_Returns400ValidationError();
 
-    TransactionDto transactionDto;
+    void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError();
 
-    @Autowired
-    TransactionRouter transactionRouter;
+    void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError();
 
-    @MockBean
-    private ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler;
+    void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError();
 
-    @MockBean
-    private TransactionFacade transactionFacade;
+    void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError();
 
-    @Autowired
-    private WebTestClient webTestClient;
+    void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError();
 
-    String source;
+    void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError();
 
-    @BeforeEach
-    void setUp() {
-        ObjectStub objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
-                .withInternalTimestamps(null)
-                .withExternalTimestamps(null)
-                .withCustomer(null);
-        transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
-        source = objectStub.getUnifiedSource();
-    }
+    // Validation::BillingAddress
+    void upsert_NullBillingAddress_Returns400ValidationError();
 
-    @Test
-    void getByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
-        // Given
-        String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+    void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError();
 
-        // When + Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(TransactionDto.class)
-                .value(transactionItem -> transactionItem, equalTo(transactionDto));
-    }
+    void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError();
 
-    @Test
-    void getAll_ExpectTwoTransactions_ReturnsTwoTransactions() {
-        // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
-        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
-        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
-        Transaction firstTransaction = transaction.withExternalId(firstId);
-        Transaction secondTransaction = transaction.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
-            add(transactionNoId);
-            add(secondTransactionNoId);
-        }};
+    void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError();
 
-        // When
-        when(transactionFacade.getAll()).thenReturn(Flux.just(firstTransaction, secondTransaction));
+    void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError();
 
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
-    }
+    void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError();
 
-    @Test
-    void getAllBySource_ExpectTwoTransactions_ReturnsTwoTransactions() {
-        // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
-        TransactionDto transactionNoId = transactionDto.withExternalId(firstId);
-        TransactionDto secondTransactionNoId = transactionDto.withExternalId(secondId);
-        Transaction firstTransaction = transaction.withExternalId(firstId);
-        Transaction secondTransaction = transaction.withExternalId(secondId);
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>() {{
-            add(transactionNoId);
-            add(secondTransactionNoId);
-        }};
+    void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError();
 
-        // When
-        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+    // Validation::TransactionType
+    void upsert_NullTransactionType_Returns400ValidationError();
 
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
-    }
+    // Validation::Items
+    void upsert_NullItemsList_Returns400ValidationError();
 
-    @Test
-    void getByComplytId_FindsTransaction_ReturnsTransaction() {
-        // Given
-        UUID complytId = transaction.getComplytId();
-        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
+    void upsert_EmptyItemsList_Returns400ValidationError();
 
-        // When + Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(TransactionDto.class)
-                .value(transactionItem -> transactionItem, equalTo(transactionDto));
-    }
+    // Validation::SalesTax
+    void upsert_NegativeAmountInSalesTax_Returns400validationError();
 
-    @Test
-    void upsert_NewTransactionCreated_ReturnsStatus201Created() {
-        // Given
+    void upsert_NullSalesTaxRatesInSalesTax_Returns400validationError();
 
-        // When + Then
-        when(transactionFacade.findByExternalIdAndSource(transactionDto.externalId(), source)).thenReturn(Mono.empty());
-        when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transaction));
-        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
+    // Validation::CreatedFrom
+    void upsert_LengthGreaterThan256CreatedFrom_Returns400validationError();
 
-        TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
+    void upsert_BlankCreatedFrom_Returns400validationError();
 
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDto.externalId())
-                        .build())
-                .bodyValue(transactionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDtoItem -> transactionDtoItem, equalTo(expectedTransactionDto));
-    }
+    //Validation::CustomerId
+    void upsert_CustomerIdFailedToParse_Returns400();
 
-    @Test
-    void update_TransactionExists_ReturnsStatus200() {
-        // Given
-        String externalId = transactionDto.externalId();
-        Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
-        Transaction updatedTransaction = mappedTransaction.withId(transaction.getId());
+    void upsert_NullCustomerId_Returns400();
 
-        // When + Then
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
-        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
-
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(transactionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(TransactionDto.class)
-                .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
-    }
-
-    @Test
-    void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
-        // Given
-        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
-        String externalId = transactionDto.externalId();
-
-        // When + Then
-        when(transactionFacade.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
-        webTestClient
-                .mutateWith(csrf())
-                .delete()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isNoContent();
-    }
-
-    @Test
-    void getTransactionByExternalIdAndSourceRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.getTransactionByExternalIdAndSourceRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void getAllTransactionsRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.getAllTransactionsRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void getAllTransactionsBySourceRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.getAllTransactionsBySourceRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void getTransactionByComplytIdRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.getTransactionByComplytIdRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void upsertTransactionRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.upsertTransactionRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
-    @Test
-    void deleteTransactionRouterFunction_NullHandler_ThrowsException() {
-        // Given
-        TransactionHandler nullTransactionHandler = null;
-        transactionRouter = new TransactionRouter();
-
-        // When
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            transactionRouter.deleteTransactionRouterFunction(nullTransactionHandler);
-        });
-
-        // Then
-        assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
-    }
-
+    // Validation::Customer
+    void upsert_InvalidCustomer_Returns400();
 }

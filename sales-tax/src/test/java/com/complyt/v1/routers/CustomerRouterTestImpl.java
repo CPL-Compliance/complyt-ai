@@ -100,11 +100,10 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<String>();
         expectedErrors.addAll(List.of(
-                "City may not be blank",
-                "City should be 1-256 characters maximum",
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum",
                 "Source should be a single digit",
-                "Street may not be blank",
-                "Street should be 1-256 characters maximum"));
+                "Customer type may not be null"));
 
         // When + Then
         webTestClient
@@ -115,19 +114,18 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
                         "    \"source\": \"" + "source" + "\",\n" +
-                        "    \"name\": \"name\",\n" +
+                        "    \"name\": \"\",\n" +
                         "    \"address\": {\n" +
-                        "        \"city\": \"\",\n" +
+                        "        \"city\": \"City\",\n" +
                         "        \"country\": \"Country\",\n" +
                         "        \"county\": \"County\",\n" +
                         "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"\",\n" +
+                        "        \"street\": \"Street\",\n" +
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -292,8 +290,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -337,8 +335,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -378,8 +376,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -401,7 +399,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
         HashSet<String> expectedErrors = new HashSet<String>();
         expectedErrors.addAll(List.of(
                 "External ID may not be blank",
-                "External ID length should be 1-256 characters maximum"));
+                "External ID should be 1-256 characters maximum"));
 
         // When + Then
         webTestClient
@@ -423,8 +421,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -468,15 +466,15 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[External ID length should be 1-256 characters maximum]", message);
+                    assertEquals("[External ID should be 1-256 characters maximum]", message);
                 });
     }
 
@@ -510,8 +508,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -625,7 +623,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
         HashSet<String> expectedErrors = new HashSet<String>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
-                "Name length should be 1-256 characters maximum"));
+                "Name should be 1-256 characters maximum"));
 
         // When + Then
         webTestClient
@@ -647,8 +645,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -692,15 +690,15 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Name length should be 1-256 characters maximum]", message);
+                    assertEquals("[Name should be 1-256 characters maximum]", message);
                 });
     }
 
@@ -724,8 +722,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    \"name\": \"name\",\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -733,251 +731,6 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                 .value(map -> {
                     String message = (String) map.get("message");
                     assertEquals("[Address may not be null]", message);
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullZipInAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidZip = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "ZIP may not be blank",
-                "ZIP should be 1-256 characters maximum"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"" + invalidZip + "\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
-                        "}}")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullCountryInAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidCountry = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "Country may not be blank",
-                "Country should be 1-256 characters maximum"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"" + invalidCountry + "\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
-                        "}}")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullCityInAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidCity = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "City may not be blank",
-                "City should be 1-256 characters maximum"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"" + invalidCity + "\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
-                        "}}")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullStateInAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidState = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "State may not be blank",
-                "State should be 1-256 characters maximum"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"" + invalidState + "\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
-                        "}}")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullStreetInAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        String invalidStreet = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "Street may not be blank",
-                "Street should be 1-256 characters maximum"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"State\",\n" +
-                        "        \"street\": \"" + invalidStreet + "\",\n" +
-                        "        \"zip\": \"zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
-                        "}}")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
                 });
     }
 
@@ -1010,8 +763,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1051,8 +804,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1092,8 +845,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1133,8 +886,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1174,8 +927,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1215,8 +968,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1254,8 +1007,8 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1872,7 +1625,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullExternalTimestamp_Returns400ValidationError() {
+    public void upsert_NullExternalTimestamps_Returns400ValidationError() {
         // Currently externalTimestamp can be null
 
     }
@@ -1905,7 +1658,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1919,7 +1672,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullUpdatedDateInExternalTimestamp_Returns400ValidationError() {
+    public void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -1944,7 +1697,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1958,7 +1711,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInExternalTimestamp_Returns400ValidationError() {
+    public void upsert_InvalidTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
 // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -1984,7 +1737,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
                         "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
@@ -1999,7 +1752,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInExternalTimestamp_Returns400ValidationError() {
+    public void upsert_InvalidTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -2026,7 +1779,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -2065,7 +1818,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -2104,7 +1857,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -2144,7 +1897,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"," +
+                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
                         "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
@@ -2186,7 +1939,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().getCreatedDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
                         "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
