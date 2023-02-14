@@ -1711,7 +1711,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
 // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -1752,7 +1752,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -1871,7 +1871,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
@@ -1912,7 +1912,7 @@ class CustomerRouterTestImpl implements CustomerRouterTest {
     @Override
     @Test
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();

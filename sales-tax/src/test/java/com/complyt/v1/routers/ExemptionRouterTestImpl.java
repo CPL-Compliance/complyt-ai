@@ -1,53 +1,40 @@
 package com.complyt.v1.routers;
 
 import com.complyt.config.ApiExceptionConfig;
-import com.complyt.config.JacksonConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.ExemptionFacade;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.ValidatorConfig;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@ExtendWith(SpringExtension.class)
-@WebFluxTest(ExemptionHandler.class)
-@ExtendWith(MockitoExtension.class)
-@Import(JacksonConfig.class)
+@WebFluxTest
 @ContextConfiguration(classes = {ExemptionRouter.class, ExemptionHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
@@ -60,18 +47,18 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @MockBean
     ExemptionFacade exemptionFacade;
     Exemption exemption;
+    ExemptionDto exemptionDto;
     ObjectStub objectStub;
-    @MockBean
-    private ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler;
 
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
-        exemption = objectStub.createExemption(UUID.randomUUID().toString())
+        exemptionDto = objectStub.createExemptionDto()
                 .withInternalTimestamps(null)
                 .withValidationDates(null);
+        exemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
     }
 
     @Test
@@ -115,35 +102,52 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
 
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_UnauthenticatedUser_Returns401() {
+        // Given
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
 
+        // When + Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     @Override
     @WithMockUser
     public void getByComplytId_UserWithoutAuthorities_Returns403() {
-
+        // ???
     }
 
     @Test
     @Override
     @WithMockUser
     public void getByComplytId_InternalServerError_Returns500() {
+        // Given
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId();
 
+        // When
+        when(exemptionFacade.findByComplytId(exemption.getComplytId())).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @WithUserDetails()
     @Override
     @Test
-    public void createByComplytId_Exists_Returns201() {
+    public void createByComplytId_Valid_Returns201() {
         // Given
         Exemption exemptionNoId = exemption.withId(null).withTenantId(null).withComplytId(null);
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionNoId);
+        ExemptionDto requestExemptionDto = exemptionDto.withComplytId(null);
 
         // When
-        when(exemptionDtoValidationHandler.validate(any())).thenReturn(Mono.just(exemptionDto));
         when(exemptionFacade.save(exemptionNoId)).thenReturn(Mono.just(exemption));
 
         // Then
@@ -151,47 +155,125 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
-                .bodyValue(exemptionDto)
+                .bodyValue(requestExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(ExemptionDto.class)
-                .isEqualTo(exemptionDto.withComplytId(exemption.getComplytId()));
+                .isEqualTo(requestExemptionDto.withComplytId(exemption.getComplytId()));
     }
 
     @Test
     @Override
     @WithMockUser
     public void createByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
+        // Given
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum",
+                "Url may not be blank",
+                "Status may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"MA\",\n" +
+                        "        \"code\": \"09\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
-    @WithMockUser
     public void createByComplytId_UnauthenticatedUser_Returns401() {
+        // Given
+        ExemptionDto requestExemptionDto = exemptionDto.withComplytId(null);
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
+                .bodyValue(requestExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     @Override
     @WithMockUser
     public void createByComplytId_UserWithoutAuthorities_Returns403() {
-
+        // ???
     }
 
     @Test
     @Override
     @WithMockUser
     public void createByComplytId_UserWithoutCSRFToken_Returns403() {
+        // Given
+        ExemptionDto requestExemptionDto = exemptionDto.withComplytId(null);
 
+        // When + Then
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
+                .bodyValue(requestExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
     }
 
     @Test
     @Override
     @WithMockUser
     public void createByComplytId_InternalServerError_Returns500() {
+        // Given
+        Exemption exemptionNoId = exemption.withId(null).withTenantId(null).withComplytId(null);
+        ExemptionDto requestExemptionDto = exemptionDto.withComplytId(null);
 
+        // When
+        when(exemptionFacade.save(exemptionNoId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL).build())
+                .bodyValue(requestExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -204,7 +286,6 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
 
         // When
         when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(exemption));
-        when(exemptionDtoValidationHandler.validate(any())).thenReturn(Mono.just(exemptionDto));
 
         // Then
         webTestClient
@@ -224,18 +305,14 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @Override
     @WithUserDetails()
     public void upsertByComplytId_DoesntExists_Returns404() {
-        // Given
-        Exemption exemptionWithIdThatDoesNotExist = exemption.withTenantId(null).withId(UUID.randomUUID().toString());
-        ExemptionDto exemptionDto = ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemptionWithIdThatDoesNotExist);
-
-        // When
-        when(exemptionFacade.update(exemptionWithIdThatDoesNotExist, exemption.getComplytId())).thenReturn(Mono.empty());
+        // Given + When
+        when(exemptionFacade.update(exemption, exemption.getComplytId())).thenReturn(Mono.empty());
 
         // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
-                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId" + exemption.getId())
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId())
                         .build())
                 .bodyValue(exemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -247,63 +324,295 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @Override
     @WithMockUser
     public void upsertByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum",
+                "Url may not be blank",
+                "Status may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"MA\",\n" +
+                        "        \"code\": \"09\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_DifferentComplytIdInBody_Returns400ConflictedData() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        UUID differentComplytId = UUID.randomUUID();
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + differentComplytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_NullComplytId_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_BlankComplytId_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_ComplytIdFailedToParse_Returns400() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"24105509-ff95-4408-b058-3eead7ae6fd7Q\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("Failed to read HTTP message", map.get("message"));
+                });
     }
 
     @Test
     @Override
-    @WithMockUser
     public void upsertByComplytId_UnauthenticatedUser_Returns401() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId().toString())
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_UserWithoutAuthorities_Returns403() {
-
+        // ???
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_UserWithoutCSRFToken_Returns403() {
-
+        // Given + When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + exemption.getComplytId().toString())
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsertByComplytId_InternalServerError_Returns500() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
 
+        // When
+        when(exemptionFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .bodyValue(exemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -346,28 +655,62 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @Override
     @WithMockUser
     public void getAll_EmptyCollection_Returns200WithEmptyList() {
+        // Given
+        List<ExemptionDto> exemptionDtos = new ArrayList<>();
 
+        // When
+        when(exemptionFacade.findAll()).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(ExemptionDto.class)
+                .isEqualTo(exemptionDtos);
     }
 
     @Test
     @Override
-    @WithMockUser
     public void getAll_UnauthenticatedUser_Returns401() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     @Override
     @WithMockUser
     public void getAll_UserWithoutAuthorities_Returns403() {
-
+        // ??
     }
 
     @Test
     @Override
     @WithMockUser
     public void getAll_InternalServerError_Returns500() {
+        // Given + When
+        when(exemptionFacade.findAll()).thenReturn(Flux.error(new OperationFailedException()));
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -395,35 +738,81 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @Override
     @WithMockUser
     public void deleteByComplytId_DoesntExists_Returns404() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
+        // When
+        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient.mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
     @Override
-    @WithMockUser
     public void deleteByComplytId_UnauthenticatedUser_Returns401() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
+        // When + Then
+        webTestClient.mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
     @Override
     @WithMockUser
     public void deleteByComplytId_UserWithoutAuthorities_Returns403() {
-
+        // ???
     }
 
     @Test
     @Override
     @WithMockUser
     public void deleteByComplytId_UserWithoutCSRFToken_Returns403() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
+        // When + Then
+        webTestClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
     }
 
     @Test
     @Override
     @WithMockUser
     public void deleteByComplytId_InternalServerError_Returns500() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
+        // When
+        when(exemptionFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(url).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -530,335 +919,2388 @@ public class ExemptionRouterTestImpl implements ExemptionRouterTest {
     @Override
     @WithMockUser
     public void getAny_InvalidUrl_Returns404() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "wrong/url").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
     @Override
     @WithMockUser
     public void putAny_InvalidUrl_Returns404() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "wrong/url").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
     @Override
     @WithMockUser
     public void deleteAny_InvalidUrl_Returns404() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "wrong/url").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
     @Override
     @WithMockUser
     public void postAny_InvalidUrl_Returns404() {
-
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "wrong/url").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Classification may not be null]", map.get("message"));
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankCodeInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank",
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankDescriptionInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Description may not be blank",
+                "Description should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCodeInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullDescriptionInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Description may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257CodeInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257DescriptionInClassification_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Description = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Description should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"description\": \"" + lengthOf257Description + "\",\n" +
+                        "        \"code\": \"code\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Status may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCodeInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullNameInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_blankCodeInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank",
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_blankNameInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257NameInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"" + lengthOf257Name + "\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257CodeInStatus_Returns400validationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Certificate may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCertificateIdInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Certificate Id may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullUrlInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Url may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullNameInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankCertificateIdInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Certificate Id may not be blank",
+                "Certificate Id should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankUrlInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Url may not be blank",
+                "Url should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankNameInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257CertificateIdInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257CertificateId = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Certificate Id should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"" + lengthOf257CertificateId + "\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257UrlInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Url = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Url should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"" + lengthOf257Url + "\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257NameInCertificate_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"" + lengthOf257Name + "\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullExemptionType_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Exemption Type may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Created date may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Updated date may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Timestamp may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Timestamp may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"createdDate\": \"\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Abbreviation may not be blank",
+                "Abbreviation should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankCodeInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank",
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_BlankNameInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Abbreviation = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Abbreviation should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"" + lengthOf257Abbreviation + "\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_LengthOf257NameInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name should be 1-256 characters maximum"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \""+lengthOf257Name+"\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullAbbreviationInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Abbreviation may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullCodeInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_NullNameInState_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullValidationDates_Returns400ValidationError() {
+    public void upsert_NullFromDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "From Date may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullCreatedDateInValidationDates_Returns400ValidationError() {
+    public void upsert_NullToDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "To Date may not be null"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"fromDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullUpdatedDateInValidationDates_Returns400ValidationError() {
+    public void upsert_BlankTimestampInToDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Timestamp may not be blank"));
 
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"fromDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"toDate\": \"\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInValidationDates_Returns400ValidationError() {
+    public void upsert_BlankTimestampInFromDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Timestamp may not be blank"));
 
-    }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInValidationDates_Returns400ValidationError() {
-
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"fromDate\": \"\",\n" +
+                        "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 }

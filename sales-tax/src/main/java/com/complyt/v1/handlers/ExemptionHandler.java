@@ -16,6 +16,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -53,8 +54,8 @@ public class ExemptionHandler {
         return exemptionDtoValidationHandler.validate(request)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
                 .flatMap(exemptionFacade::save).log()
-                .flatMap(exemption -> ServerResponse.status(HttpStatus.CREATED)
-                        .bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
+                .flatMap(exemption -> ServerResponse.created(request.uri()).contentType(MediaType.APPLICATION_JSON)
+                        .body(Mono.just(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)), ExemptionDto.class));
     }
 
     @ExemptionUpdatePermission
@@ -62,6 +63,7 @@ public class ExemptionHandler {
         UUID complytId = UUID.fromString(request.pathVariable("complytId"));
 
         return exemptionDtoValidationHandler.validate(request)
+                .flatMap(exemptionDto -> exemptionDtoValidationHandler.checkComplytIdConflict(exemptionDto, complytId))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
                     return exemptionFacade.update(receivedExemption, complytId);

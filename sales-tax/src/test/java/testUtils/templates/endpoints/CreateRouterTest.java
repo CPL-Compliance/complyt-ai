@@ -1,7 +1,7 @@
 package testUtils.templates.endpoints;
 
 public interface CreateRouterTest {
-    void createByComplytId_Exists_Returns201();
+    void createByComplytId_Valid_Returns201();
 
     void createByComplytId_CoupleValidationsFailure_Returns400WithErrorList();
 

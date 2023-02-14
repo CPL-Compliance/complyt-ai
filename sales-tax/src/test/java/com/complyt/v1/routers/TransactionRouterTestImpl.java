@@ -489,7 +489,8 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                .bodyValue("{\n" +
+                        "   \"externalId\": \"" + externalId + "\",\n" +
                         "   \"source\": \"" + source + "\",\n" +
                         "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
                         "   \"items\": [\n" +
@@ -516,7 +517,8 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
                         "    \"externalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                        "   }\n" +
+                        "}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3197,7 +3199,7 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -3257,7 +3259,7 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -3435,7 +3437,7 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -3495,7 +3497,7 @@ public class TransactionRouterTestImpl implements TransactionRouterTest {
     @Test
     @Override
     @WithMockUser
-    public void upsert_InvalidTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();

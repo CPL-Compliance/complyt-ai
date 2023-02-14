@@ -63,9 +63,4 @@ public class ValidationHandler<T, U extends Validator> {
         return state.equals(resource.state()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }
-
-    public <M extends NamePropertyDto> Mono<M> checkNameConflict(M resource, String name) {
-        return name.equals(resource.name()) ?
-                Mono.just(resource) : Mono.error(new ConflictedDataApiException());
-    }
 }

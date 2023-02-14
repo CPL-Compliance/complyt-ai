@@ -7,8 +7,8 @@ public interface ExternalTimestampsValidationRouterTest {
 
     void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError();
 
-    void upsert_InvalidTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError();
+    void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError();
 
-    void upsert_InvalidTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError();
+    void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError();
 
 }
