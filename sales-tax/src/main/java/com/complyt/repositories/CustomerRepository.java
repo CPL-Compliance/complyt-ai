@@ -96,8 +96,8 @@ public class CustomerRepository {
                             .and("source").is(source)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a customer with externalId of : "
-                                    + externalId + " in source : " + source, log::info)
+                    return ContextLogger.observeCtx("Searching for a customer with externalId "
+                                    + externalId + " and source " + source, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Customer.class));
                 });
     }

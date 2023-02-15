@@ -15,13 +15,8 @@ public class LoggingFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String logStr = String.format("Request received:\nMethod -> {}\nPath -> {}\nBody - > {}",
-                exchange.getRequest().getMethod(),
-                exchange.getRequest().getPath(),
-                exchange.getRequest().getBody());
+        String logStr = String.format("Request received:\nMethod -> " + exchange.getRequest().getMethod() + "\nPath -> "+ exchange.getRequest().getPath() + "\nBody - > " + exchange.getRequest().getBody());
 
-        ContextLogger.observeCtx(logStr, log::info).then(chain.filter(exchange));
-
-        return chain.filter(exchange);
+        return ContextLogger.observeCtx(logStr, log::info).then(chain.filter(exchange));
     }
 }

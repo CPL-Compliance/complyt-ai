@@ -1,7 +1,7 @@
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka
 
 springdoc:
   swagger-ui:
@@ -18,4 +18,4 @@ springdoc:
 management.endpoints.web.exposure.include: "*"
 logging:
   level:
-    web: debug
+    web: info

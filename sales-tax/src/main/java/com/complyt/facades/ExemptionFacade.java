@@ -27,6 +27,7 @@ public class ExemptionFacade {
                 .flatMap(exemptionService::save);
     }
 
+    @Deprecated
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionService.findById(id);
     }
