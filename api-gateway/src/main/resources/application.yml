@@ -165,7 +165,7 @@ spring:
             - Method=GET
             - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/complytId{complyt_id}
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         - id: sales-tax-post-exemption
           uri: lb://sales-tax
           predicates:
