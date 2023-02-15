@@ -25,10 +25,10 @@ class TransactionSalesTaxRatesHandlerTest {
 
 
     @Mock
-    ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
     @Mock
-    ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+    ItemsSalesTaxRatesProvider itemsSalesTaxRatesProvider;
 
     @InjectMocks
     TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
@@ -57,7 +57,7 @@ class TransactionSalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withShippingFee(null);
 
         // When
-        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
 
         // Then
         Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction, salesTaxRate);
@@ -72,8 +72,8 @@ class TransactionSalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withShippingFee(givenShippingFee);
 
         // When
-        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
-        when(shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(expectedTransaction.getShippingFee(), salesTaxRate)).thenReturn(expectedTransaction.getShippingFee());
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(expectedTransaction.getItems(), salesTaxRate)).thenReturn(expectedTransaction.getItems());
+        when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(expectedTransaction.getShippingFee(), salesTaxRate)).thenReturn(expectedTransaction.getShippingFee());
 
         // Then
         Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(expectedTransaction, salesTaxRate);

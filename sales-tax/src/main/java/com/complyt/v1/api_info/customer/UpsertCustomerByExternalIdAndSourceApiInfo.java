@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
                                         description = "Customer Source",
-                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample,
+                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample))
                         },
                         tags = "customer",
                         requestBody =
@@ -100,6 +100,7 @@ import java.lang.annotation.Target;
 
 public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
+    String sourceExample = "1";
     String newCustomerExample = "{\n" +
             "    \"externalId\":" + externalIdExample + ",\n" +
             "    \"source\": \"1\",\n" +

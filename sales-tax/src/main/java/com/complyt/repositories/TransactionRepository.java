@@ -131,7 +131,6 @@ public class TransactionRepository {
                 .where("complytId").is(transaction.getCustomerId())
                 .and("tenantId").is(tenantId));
 
-        return reactiveMongoTemplate.findOne(query, Customer.class)
-                .switchIfEmpty(Mono.error(new NotFoundException("Transaction's Customer has not been found")));
+        return reactiveMongoTemplate.findOne(query, Customer.class);
     }
 }

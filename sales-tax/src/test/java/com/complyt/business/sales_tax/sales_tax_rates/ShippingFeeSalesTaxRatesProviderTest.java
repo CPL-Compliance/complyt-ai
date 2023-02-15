@@ -23,10 +23,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ShippingFeeSalesTaxRatesCalculatorTest {
+public class ShippingFeeSalesTaxRatesProviderTest {
 
     @InjectMocks
-    ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
     @Mock
     SalesTaxRatesProvider salesTaxRatesCalculator;
@@ -52,8 +52,8 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
         ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRate(salesTaxRate);
 
         // When
-        when(salesTaxRatesCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(shippingFee, salesTaxRate);
+        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
+        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate);
 
         // Then
         assertEquals(shippingFeeWithRates, actualShippingFee);

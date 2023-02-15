@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ItemsSalesTaxRatesCalculatorTest {
+public class ItemsSalesTaxRatesProviderTest {
 
     @InjectMocks
-    ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+    ItemsSalesTaxRatesProvider itemsSalesTaxRatesProvider;
 
     @Mock
     SalesTaxRatesProvider salesTaxRateCalculator;
@@ -66,8 +66,8 @@ public class ItemsSalesTaxRatesCalculatorTest {
         List<Item> itemsWithRates = setRatesToItems(items);
 
         // When
-        when(salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate);
-        List<Item> actualItems = itemsSalesTaxRatesCalculator.setSalesTaxRates(items, salesTaxRate);
+        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate);
+        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(items, salesTaxRate);
 
         // Then
         assertEquals(itemsWithRates, actualItems);

@@ -33,10 +33,10 @@ public class SalesTaxRatesHandlerTest {
     private TransactionSalesTaxRatesHandler transactionSalesTaxRatesHandler;
 
     @Mock
-    private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+    private ItemsSalesTaxRatesProvider itemsSalesTaxRatesProvider;
 
     @Mock
-    private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    private ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
     ObjectStub objectStub;
 
@@ -58,7 +58,7 @@ public class SalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
         Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
@@ -79,8 +79,8 @@ public class SalesTaxRatesHandlerTest {
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
-        when(itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
-        when(shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(shippingFee, salesTaxRate)).thenReturn(shippingFeeWithRates);
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate)).thenReturn(modifiedItems);
+        when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate)).thenReturn(shippingFeeWithRates);
         Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
