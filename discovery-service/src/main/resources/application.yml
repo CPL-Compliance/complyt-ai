@@ -1,22 +1,17 @@
 spring.application.name: discovery-service
-server.port: ${PORT:8761}
+server.port: 8761
 
-# We set these two parameters to prevent from the Discovery Service to look for a discovery service
-# (because this is who he is) and fetch its registry
 eureka:
-  instance:
-    hostname: localhost
   client:
+    # We set these two parameters to prevent from the Discovery Service to look for a discovery service
+    # (because this is who he is) and fetch its registry
     register-with-eureka: false
     fetch-registry: false
-  service-url:
-    defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
   server:
-    enable-self-preservation: false
-
-logging:
-  level:
-    com:
-      netflix:
-        eureka: off
-        discovery: off
+    expected-client-renewal-interval-seconds: 30
+    eviction-interval-timer-in-ms: 60000
+    renewal-percent-threshold: 0.85
+    renewal-threshold-update-interval-ms: 900000
+    enable-self-preservation: true
+  instance:
+    lease-expiration-duration-in-seconds: 90

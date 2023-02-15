@@ -1,11 +1,11 @@
 eureka:
   client:
-    healthcheck:
-      enabled: true
-    service-url:
+    serviceUrl:
       defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 spring:
   data:
