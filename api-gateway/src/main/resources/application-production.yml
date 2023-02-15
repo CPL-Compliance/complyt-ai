@@ -2,5 +2,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
