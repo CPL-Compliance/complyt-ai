@@ -62,7 +62,7 @@ public class CustomerHandler {
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
-        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validate(serverRequest))
                 .flatMap(customerDto -> ContextLogger.observeCtx(customerDto.toString(), log::info).thenReturn(customerDto))
@@ -83,7 +83,7 @@ public class CustomerHandler {
     public Mono<ServerResponse> getByExternalIdAndSource(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
-        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByExternalIdAndSource(externalId, source))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
@@ -96,7 +96,7 @@ public class CustomerHandler {
     @CustomerReadPermission
     public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
-        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<CustomerDto> customerDtoMono = ContextLogger.observeCtx(logStr, log::info).then(customerfacade.findByComplytId(complytId))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
@@ -109,7 +109,7 @@ public class CustomerHandler {
     @CustomerReadPermission
     public Mono<ServerResponse> getByName(ServerRequest serverRequest) {
         String name = serverRequest.pathVariable("name");
-        String logStr = String.format("Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Flux<CustomerDto> customerDtoFlux = ContextLogger.observeCtx(logStr, log::info).thenMany(customerfacade.findByName(name))
                 .map(CustomerMapper.INSTANCE::customerToCustomerDto)
