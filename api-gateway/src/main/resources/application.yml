@@ -203,6 +203,13 @@ spring:
             - Path=/v1/nexus/state/{state}
           filters:
             - SetPath=/v1/nexus/state/{state}
+        - id: sales-tax-get-nexus-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/nexus/complytId/{complytId}
+          filters:
+            - SetPath=/v1/nexus/complytId/{complytId}
         - id: sales-tax-put-nexus
           uri: lb://sales-tax
           predicates:
