@@ -1,5 +1,6 @@
 package com.complyt.v1.validators;
 
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
@@ -23,5 +24,10 @@ public class ValidatorConfig {
     @Bean
     ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter);
+    }
+
+    @Bean
+    ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter);
     }
 }

@@ -5,13 +5,13 @@ import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.SalesTaxTrackingFacade;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.validators.ValidatorConfig;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
@@ -27,22 +26,19 @@ import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @WebFluxTest
-@WithMockUser(username = "mock", password = "mock")
 @ContextConfiguration(classes = {SalesTaxTrackingRouter.class, SalesTaxTrackingHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class})
-public class SalesTaxTrackingRouterTestImpl {
+public class SalesTaxTrackingRouterTestImpl implements SalesTaxTrackingRouterTest {
 
     SalesTaxTrackingRouter salesTaxTrackingRouter;
 
@@ -54,6 +50,8 @@ public class SalesTaxTrackingRouterTestImpl {
 
     SalesTaxTracking salesTaxTracking;
 
+    SalesTaxTrackingDto salesTaxTrackingDto;
+
     ObjectStub objectStub;
 
     @BeforeEach
@@ -61,12 +59,14 @@ public class SalesTaxTrackingRouterTestImpl {
         salesTaxTrackingRouter = new SalesTaxTrackingRouter();
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTrackingDto = objectStub.createSalesTaxTrackingDto();
+        salesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
     }
 
     @Test
-    @WithUserDetails
-    void getOne_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
+    @Override
+    @WithMockUser
+    public void getByState_Exists_Returns200WithList() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
@@ -87,8 +87,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    @WithUserDetails
-    void getByComplytId_FindsSalesTaxTracking_ReturnsSalesTaxTracking() {
+    @Override
+    @WithMockUser
+    public void getByComplytId_Exists_Returns200() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
@@ -108,8 +109,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    @WithUserDetails
-    void getOne_SalesTaxTrackingDoesNotExist_Throws404NotFound() {
+    @Override
+    @WithMockUser
+    public void getByState_DoesntExists_Returns404() {
 
         String state = salesTaxTracking.getState().getName();
 
@@ -124,8 +126,47 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    @WithUserDetails
-    void getByComplytId_SalesTaxTrackingDoesNotExist_Throws404NotFound() {
+    @Override
+    public void getByState_UnauthenticatedUser_Returns401() {
+        String state = salesTaxTrackingDto.state().name();
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByState_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByState_InternalServerError_Returns500() {
+        String state = salesTaxTrackingDto.state().name();
+
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.error(new OperationFailedException()));
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_DoesntExists_Returns404() {
 
         SalesTaxTrackingDto expectedSalesTaxTrackingDto =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking);
@@ -144,8 +185,47 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    @WithUserDetails
-    void upsert_NewSalesTaxTracking_SalesTaxTrackingReturned() {
+    @Override
+    public void getByComplytId_UnauthenticatedUser_Returns401() {
+        UUID complytId = salesTaxTrackingDto.complytId();
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_InternalServerError_Returns500() {
+        UUID complytId = salesTaxTrackingDto.complytId();
+
+        when(salesTaxTrackingFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
         String state = newSalesTaxTracking.getState().getName();
@@ -173,8 +253,193 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    @WithUserDetails
-    void getAll_GetsAllSalesTaxTracking_ReturnsAllSalesTaxTracking() {
+    @Override
+    @WithMockUser
+    public void upsertByState_CoupleValidationsFailure_Returns400WithErrorList() {
+        // Given
+        String stateName = salesTaxTrackingDto.state().name();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Code may not be blank",
+                "Code should be 1-256 characters maximum",
+                "Established Date may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"approved\": \"true\",\n" +
+                        "    \"enforcesSalesTax\": \"true\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"\",\n" +
+                        "        \"name\": \"" + stateName + "\"\n" +
+                        "    },\n" +
+                        "    \"physicalNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"economicNexusTracker\": {\n" +
+                        "        \"established\": \"true\"\n" +
+                        "    },\n" +
+                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
+                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_DifferentStateInBody_Returns400ConflictedData() {
+        // Given
+        String stateName = salesTaxTrackingDto.state().name();
+        String differentStateName = salesTaxTrackingDto.state().name() + "boo";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"approved\": \"true\",\n" +
+                        "    \"enforcesSalesTax\": \"true\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"" + differentStateName + "\"\n" +
+                        "    },\n" +
+                        "    \"physicalNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"economicNexusTracker\": {\n" +
+                        "        \"established\": \"true\",\n" +
+                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
+                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.",map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_ExistWithDifferentComplytId_Returns400ConflictedData() {
+        // Given
+        String stateName = salesTaxTrackingDto.state().name();
+        UUID differentComplytId = UUID.randomUUID();
+        SalesTaxTracking differentSalesTaxTracking = salesTaxTracking.withComplytId(differentComplytId);
+
+        // When
+        when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.just(differentSalesTaxTracking));
+        when(salesTaxTrackingFacade.save(any())).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.",map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_DoesntExistAndHasComplytId_Returns400ConflictedData() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_BlankStateName_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_NullStateName_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_LengthGreaterThan256StateName_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_ComplytIdFailedToParse_Returns400() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_UnauthenticatedUser_Returns401() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_UserWithoutAuthorities_Returns403() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_UserWithoutCSRFToken_Returns403() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_InternalServerError_Returns500() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_Exists_Returns200WithList() {
         // Given
         SalesTaxTracking secondSalesTaxTracking = salesTaxTracking
                 .withState(new State("NY", "05", "New York"));
@@ -208,10 +473,39 @@ public class SalesTaxTrackingRouterTestImpl {
                 .isEqualTo(salesTaxTrackingDtoList);
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_EmptyCollection_Returns200WithEmptyList() {
+
+    }
 
     @Test
-    @WithUserDetails
-    void upsert_SalesTaxTrackingUpdated_SalesTaxTrackingReturned() {
+    @Override
+    @WithMockUser
+    public void getAll_UnauthenticatedUser_Returns401() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_UserWithoutAuthorities_Returns403() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_InternalServerError_Returns500() {
+
+    }
+
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_Exists_Returns200() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
         String state = newSalesTaxTracking.getState().getName();
@@ -243,7 +537,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    void getSalesTaxTrackingByStateRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+    @Override
+    @WithMockUser
+    public void getByState_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
@@ -257,7 +553,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    void getSalesTaxTrackingByComplytIdRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+    @Override
+    @WithMockUser
+    public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
@@ -271,7 +569,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    void getAllSalesTaxTrackingRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+    @Override
+    @WithMockUser
+    public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
@@ -285,7 +585,9 @@ public class SalesTaxTrackingRouterTestImpl {
     }
 
     @Test
-    void upsertSalesTaxTrackingRouterFunction_nullExemptionHandler_ThrowsNullPointerException() {
+    @Override
+    @WithMockUser
+    public void upsertByState_NullHandler_ThrowsNullPointerException() {
         // Given
         SalesTaxTrackingHandler nullSalesTaxTrackingHandler = null;
 
@@ -298,4 +600,114 @@ public class SalesTaxTrackingRouterTestImpl {
         assertEquals("salesTaxTrackingHandler is marked non-null but is null", nullPointerException.getMessage());
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void getAny_InvalidUrl_Returns404() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void putAny_InvalidUrl_Returns404() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullPhysicalNexusTrackerDto_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullEstablishedDatePhysicalNexusTrackerDto_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullEconomicNexusTrackerDto_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullEstablishedDateEconomicNexusTrackerDto_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    public void upsert_NullState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCodeInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankNameInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthOf257NameInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullAbbreviationInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCodeInState_Returns400ValidationError() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullNameInState_Returns400ValidationError() {
+
+    }
 }

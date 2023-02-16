@@ -1,5 +1,6 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.models.properties.StateFieldPropertyDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -12,9 +13,9 @@ import java.util.UUID;
 @Schema(name = "SalesTaxTracking")
 public record SalesTaxTrackingDto(UUID complytId,
                                   @Valid @NotNull(message = "State address may not be null") StateDto state,
-                                  @NotNull(message = "enforcesSalesTax address may not be null") boolean enforcesSalesTax,
+                                  boolean enforcesSalesTax,
                                   @Valid @NotNull(message = "PhysicalNexusTracker address may not be null") PhysicalNexusTrackerDto physicalNexusTracker,
                                   @Valid @NotNull(message = "PhysicalNexusTracker address may not be null") EconomicNexusTrackerDto economicNexusTracker,
-                                  LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate) {
-
+                                  LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
+        implements StateFieldPropertyDto {
 }

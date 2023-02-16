@@ -1,8 +1,9 @@
 package com.complyt.v1.models.properties;
 
-import com.complyt.domain.State;
+import com.complyt.v1.models.StateDto;
 
 public interface StateFieldPropertyDto {
-    State state();
-    StateFieldPropertyDto withState(State state);
+    StateDto state();
+
+    StateFieldPropertyDto withState(StateDto state);
 }
