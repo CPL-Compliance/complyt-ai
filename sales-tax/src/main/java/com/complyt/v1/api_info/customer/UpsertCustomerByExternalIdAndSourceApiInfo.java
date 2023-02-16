@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
                                         description = "Customer Source",
-                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample,
-                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.externalIdExample))
+                                        examples = @ExampleObject(value = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample,
+                                                name = UpsertCustomerByExternalIdAndSourceApiInfo.sourceExample))
                         },
                         tags = "customer",
                         requestBody =
@@ -100,10 +100,11 @@ import java.lang.annotation.Target;
 
 public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
+    String sourceExample = "1";
     String newCustomerExample = "{\n" +
             "    \"externalId\":" + externalIdExample + ",\n" +
-            "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt LTD.\",\n" +
+            "    \"source\": " + sourceExample + ",\n" +
+            "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
             "        \"country\": \"US\",\n" +
@@ -116,15 +117,15 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             "    \"externalTimestamps\": {\n" +
             "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
             "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-            "    },\n" +
+            "    }\n" +
             "}";
 
     String returnedCustomerExample = "[{\n" +
             "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": " + externalIdExample + ",\n" +
-            "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt LTD.\",\n" +
+            "    \"source\": " + sourceExample + ",\n" +
+            "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
             "        \"country\": \"US\",\n" +

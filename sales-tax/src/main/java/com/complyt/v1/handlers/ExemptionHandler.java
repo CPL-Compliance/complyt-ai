@@ -49,10 +49,9 @@ public class ExemptionHandler {
 
     @ExemptionCreatePermission
     public Mono<ServerResponse> create(ServerRequest request) {
-
         return exemptionDtoValidationHandler.validate(request)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
-                .flatMap(exemptionFacade::save).log()
+                .flatMap(exemptionFacade::save)
                 .flatMap(exemption -> ServerResponse.status(HttpStatus.CREATED)
                         .bodyValue(ExemptionMapper.INSTANCE.exemptionToExemptionDto(exemption)));
     }

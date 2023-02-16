@@ -2,6 +2,7 @@ package io.complyt.files.v1.handlers;
 
 import io.complyt.files.security.permissions.LinkReadPermission;
 import io.complyt.files.services.FileService;
+import io.complyt.files.utils.observability.ContextLogger;
 import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.files.v1.mappers.FileMapper;
 import io.complyt.files.v1.models.FileDto;
@@ -25,8 +26,11 @@ public class FileHandler {
 
     @LinkReadPermission
     public Mono<ServerResponse> get(ServerRequest serverRequest) {
-        Mono<FileDto> value = fileService.find()
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        Mono<FileDto> value = ContextLogger.observeCtx(logStr, log::info).then(fileService.find())
                 .map(FileMapper.INSTANCE::fileToFileDto)
+                .flatMap(fileDto -> ContextLogger.observeCtx("<-- Returned Body: " + fileDto.toString(), log::info).thenReturn(fileDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().body(value, FileDto.class);
