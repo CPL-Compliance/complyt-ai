@@ -29,7 +29,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a Client with tenant ID of : " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for a client tracking with tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
                 });
     }
@@ -39,7 +39,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     ClientTracking clientTrackingWithTenantId = clientTracking.withTenantId(tenantId);
 
-                    return ContextLogger.observeCtx("Saving ClientTracking: " + clientTrackingWithTenantId.toString(), log::info)
+                    return ContextLogger.observeCtx("Saving client tracking " + clientTrackingWithTenantId.toString(), log::info)
                             .then(reactiveMongoTemplate.save(clientTrackingWithTenantId));
                 });
     }
@@ -49,7 +49,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("_id").is(id).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing findById with search criteria of Client Tracking id : " + id, log::info)
+                    return ContextLogger.observeCtx("Searching for client tracking with ID " + id + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
                 });
     }
@@ -59,7 +59,7 @@ public class ClientTrackingRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing findAll ClientTracking", log::info)
+                    return ContextLogger.observeCtx("Searching for all client tracking with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, ClientTracking.class));
                 });
     }

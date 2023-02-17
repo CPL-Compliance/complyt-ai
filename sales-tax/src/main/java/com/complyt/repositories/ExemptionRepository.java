@@ -50,6 +50,7 @@ public class ExemptionRepository {
                 });
     }
 
+    @Deprecated
     public Mono<Exemption> findById(@NonNull final String id) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
