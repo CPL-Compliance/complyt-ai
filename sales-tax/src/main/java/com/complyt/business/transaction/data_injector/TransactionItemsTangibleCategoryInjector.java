@@ -29,7 +29,7 @@ public class TransactionItemsTangibleCategoryInjector implements TransactionData
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
         return ContextLogger.observeCtx("Setting tangible categories to Transaction's items", log::info)
                 .then(Mono.just(transaction.withItems(createItemsWithTangibleCategories(mapTaxCodesToClassifications))))
-                .flatMap(modifiedTransaction -> ContextLogger.observeCtx("Transaction with items with tangible categories injected : " + modifiedTransaction, log::debug)
+                .flatMap(modifiedTransaction -> ContextLogger.observeCtx("Transaction with items with tangible categories injected : " + modifiedTransaction, log::info)
                         .thenReturn(modifiedTransaction));
     }
 
