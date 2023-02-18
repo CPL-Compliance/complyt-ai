@@ -54,7 +54,7 @@ public class CustomerRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for all customers with tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for customers with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Customer.class));
                 });
     }
