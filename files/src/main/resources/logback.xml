@@ -11,7 +11,6 @@
         <file>${LOGS_FOLDER}/${LOGS_FILENAME}.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>[appName=sales-tax, host=${HOSTNAME}, traceId=%X{traceId:-NONE}, spanId=%X{spanId:-NONE}, level=%level, threadId=%thread] %logger{0}: %msg%n</pattern>
-<!--            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>-->
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
