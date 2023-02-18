@@ -29,7 +29,7 @@ public class ClientTrackingRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for a client tracking with tenant ID " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for client tracking with tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, ClientTracking.class));
                 });
     }
