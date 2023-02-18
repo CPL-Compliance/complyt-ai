@@ -35,7 +35,7 @@ public class ExemptionRepository {
                             .and("customerId").is(transaction.getCustomerId())
                             .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
 
-                    return ContextLogger.observeCtx("Searching for an exemption by query: " + query, log::info)
+                    return ContextLogger.observeCtx("Searching for exemption by query: " + query, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));
                 });
     }
@@ -45,7 +45,7 @@ public class ExemptionRepository {
                 .flatMap(tenantId -> {
                     Exemption exemptionWithTenantId = exemption.withTenantId(tenantId);
 
-                    return ContextLogger.observeCtx("Saving Exemption:" + exemptionWithTenantId, log::info)
+                    return ContextLogger.observeCtx("Saving exemption: " + exemptionWithTenantId, log::info)
                             .then(reactiveMongoTemplate.save(exemptionWithTenantId));
                 });
     }
@@ -57,7 +57,7 @@ public class ExemptionRepository {
                     Query query = Query.query(Criteria.where("_id").is(id)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for an exemption with id of: " + id, log::info)
+                    return ContextLogger.observeCtx("Searching for exemption with ID " + id + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));
                 });
     }
@@ -68,7 +68,7 @@ public class ExemptionRepository {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for an exemption with complyt id of: " + complytId, log::info)
+                    return ContextLogger.observeCtx("Searching for exemption with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));
                 });
     }
