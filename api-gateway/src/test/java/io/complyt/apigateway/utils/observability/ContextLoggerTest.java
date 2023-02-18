@@ -13,7 +13,7 @@ class ContextLoggerTest {
     @Test
     void observeCtx_PrintsLogInContext_ReturnsMonoEmpty() {
         Logger logger = Logger.getLogger("Test");
-        ContextLogger contextLogger = new ContextLogger();§
+        ContextLogger contextLogger = new ContextLogger();
         Mono<Object> actualMono = contextLogger.observeCtx("Test String", logger::info);
 
         StepVerifier.create(actualMono).verifyComplete();
