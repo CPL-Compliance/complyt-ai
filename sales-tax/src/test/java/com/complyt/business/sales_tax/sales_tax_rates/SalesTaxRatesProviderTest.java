@@ -73,7 +73,6 @@ class SalesTaxRatesProviderTest {
                     put(address.getCity(), citySalesTaxRules);
                 }}
         );
-        
         SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0);
 
         // When

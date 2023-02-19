@@ -10,7 +10,4 @@ public interface SalesTaxRules {
 
     float calculationValue();
 
-    default boolean calculatedByPercentageCheck() {
-        return taxable() && specialTreatment() && calculationType() == CalculationType.PERCENTAGE;
-    }
 }

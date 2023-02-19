@@ -11,4 +11,5 @@ public record JurisdictionalSalesTaxRules(String name, String abbreviation, bool
     public boolean calculatedByPercentageCheck() {
         return taxable && specialTreatment && calculationType == CalculationType.PERCENTAGE;
     }
+
 }
