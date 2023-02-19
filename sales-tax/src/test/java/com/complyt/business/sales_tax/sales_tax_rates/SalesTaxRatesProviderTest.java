@@ -28,10 +28,10 @@ class SalesTaxRatesProviderTest {
     SalesTaxRatesProvider salesTaxRatesProvider;
 
     @Mock
-    SalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
+    SalesTaxRatesCalculator<JurisdictionalSalesTaxRules> stateLevelSalesTaxRatesCalculator;
 
     @Mock
-    SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
+    SalesTaxRatesCalculator<CitySalesTaxRules> cityLevelSalesTaxRatesCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
