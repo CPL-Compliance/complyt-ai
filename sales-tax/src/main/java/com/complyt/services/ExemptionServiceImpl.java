@@ -51,6 +51,7 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.save(exemption);
     }
 
+    @Deprecated
     @Override
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionRepository.findById(id);

@@ -22,4 +22,4 @@ springdoc:
 management.endpoints.web.exposure.include: "*"
 logging:
   level:
-    web: debug
+    web: info

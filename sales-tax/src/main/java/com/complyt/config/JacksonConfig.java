@@ -12,5 +12,4 @@ public class JacksonConfig {
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
         return builder -> builder.serializerByType(ObjectId.class, new ToStringSerializer());
     }
-
 }

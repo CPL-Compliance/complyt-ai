@@ -1,5 +1,7 @@
 package com.complyt.v1.exceptions;
 
+import com.complyt.utils.observability.ContextLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Component
+@Slf4j
 @Order(-2)
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     public GlobalExceptionHandler(ErrorAttributes errorAttributes, WebProperties.Resources resources,
@@ -37,7 +40,9 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         Map<String, Object> errorAttributes = getErrorAttributes(request, ErrorAttributeOptions.defaults());
         HttpStatus httpStatus = HttpStatus.valueOf(Integer.parseInt(errorAttributes.get("code").toString()));
 
-        return ServerResponse.status(httpStatus).contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(errorAttributes));
+        return ContextLogger.observeCtx("<-- !!! Error occurred with attributes: " + errorAttributes + " and HTTP status " + httpStatus, log::error)
+                .then(ServerResponse.status(httpStatus)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(errorAttributes)));
     }
 }

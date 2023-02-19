@@ -4,6 +4,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +28,12 @@ public class NexusCalculator {
     private TransactionsFilterByNexusRules transactionsFilterByNexusRules;
 
     public Mono<NexusCalculationSummary> calculate(List<Transaction> transactions, NexusStateRule nexusStateRule) {
-        log.debug("Calculating amount and count for all transactions on timeframe : " + nexusStateRule.getTimeFrame());
-
         List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, nexusStateRule);
 
-        return nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule)
-                .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule)
-                        .map(amount -> {
-                            log.debug("Calculated total amount of : " + amount + ", and count : " + count);
-                            return new NexusCalculationSummary(count, amount);
-                        }));
+        return ContextLogger.observeCtx("Calculating amount and count for all transactions on timeframe : " + nexusStateRule.getTimeFrame(), log::debug)
+                .then(nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule)
+                        .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule)
+                                .flatMap(amount -> ContextLogger.observeCtx("Calculated total amount of : " + amount + ", and count : " + count, log::debug)
+                                        .thenReturn(new NexusCalculationSummary(count, amount)))));
     }
 }
