@@ -58,7 +58,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("_id").is(transactionId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with ID: " + transactionId, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with ID " + transactionId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class)
                                     .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
@@ -73,7 +73,7 @@ public class TransactionRepository {
                             .and("source").is(source)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + " and source" + source, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class)
                                     .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
@@ -87,7 +87,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("complytId").is(complytId)
                             .and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for transaction with complytId: " + complytId, log::info)
+                    return ContextLogger.observeCtx("Searching for transaction with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
                                     .findOne(query, Transaction.class)
                                     .flatMap(transaction -> reactiveMongoTemplate
@@ -103,7 +103,7 @@ public class TransactionRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing find transactions by tenantId: " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class)
                                     .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                             .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))));
@@ -116,7 +116,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("source").is(source));
 
-                    return ContextLogger.observeCtx("Executing find transactions by tenantId " + tenantId + " and source " + source, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " and source " + source, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Transaction.class)
                                     .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                             .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))));
@@ -128,7 +128,7 @@ public class TransactionRepository {
                 .flatMapMany(tenantId -> {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing find all transactions by query: " + updatedQuery, log::info)
+                    return ContextLogger.observeCtx("Searching for transactions by query: " + updatedQuery, log::info)
                             .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class)
                                     .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
                                             .map(transaction::withCustomer)));
@@ -139,7 +139,8 @@ public class TransactionRepository {
         Query query = Query.query(Criteria.where("complytId").is(transaction.getCustomerId())
                 .and("tenantId").is(tenantId));
 
-        return reactiveMongoTemplate.findOne(query, Customer.class)
+        return ContextLogger.observeCtx("Searching for customer by query: " + query, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Customer.class))
                 .switchIfEmpty(Mono.error(new NotFoundException("Transaction's Customer wasn't found")));
     }
 }

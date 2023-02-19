@@ -68,7 +68,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .withEconomicNexusTracker(newTracker)
                 .withAppliedDate(appliedDate);
 
-        return ContextLogger.observeCtx("Saving modified sales tax tracking :  " + modifiedTracking, log::debug)
+        return ContextLogger.observeCtx("Saving modified sales tax tracking:  " + modifiedTracking, log::debug)
                 .then(save(modifiedTracking));
     }
 

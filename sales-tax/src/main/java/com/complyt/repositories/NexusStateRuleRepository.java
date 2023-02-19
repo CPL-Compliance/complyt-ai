@@ -21,7 +21,7 @@ public class NexusStateRuleRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return ContextLogger.observeCtx("Searching for Nexus State Rule with ID " + id, log::info)
+        return ContextLogger.observeCtx("Searching for nexus state rule with ID " + id, log::info)
                 .then(reactiveMongoTemplate.findById(id, NexusStateRule.class));
     }
 
@@ -37,7 +37,7 @@ public class NexusStateRuleRepository {
     }
 
     public Mono<NexusStateRule> save(@NonNull NexusStateRule nexusStateRule) {
-        return ContextLogger.observeCtx("Saving nexus state rule " + nexusStateRule, log::info)
+        return ContextLogger.observeCtx("Saving nexus state rule: " + nexusStateRule, log::info)
                 .then(reactiveMongoTemplate.save(nexusStateRule));
     }
 

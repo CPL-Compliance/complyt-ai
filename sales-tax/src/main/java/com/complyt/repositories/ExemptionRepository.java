@@ -78,7 +78,7 @@ public class ExemptionRepository {
                 .flatMapMany(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Executing findAll exemptions", log::info)
+                    return ContextLogger.observeCtx("Searching for exemptions with tenant ID " + tenantId, log::info)
                             .thenMany(reactiveMongoTemplate.find(query, Exemption.class));
                 });
     }
@@ -86,10 +86,9 @@ public class ExemptionRepository {
     public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("complytId").is(complytId)
-                            .and("tenantId").is(tenantId));
+                    Query query = Query.query(Criteria.where("complytId").is(complytId).and("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Deleting exemption with complyt id: " + complytId, log::info)
+                    return ContextLogger.observeCtx("Deleting exemption with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.remove(query, Exemption.class));
                 });
     }
