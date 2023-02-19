@@ -1,29 +1,46 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class SalesTaxRatesProviderTest {
 
-    private SalesTaxRatesProvider salesTaxRatesProvider;
+    @InjectMocks
+    SalesTaxRatesProvider salesTaxRatesProvider;
+
+    @Mock
+    SalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
+
+    @Mock
+    SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
     private SalesTaxRate salesTaxRate;
 
     ObjectStub objectStub;
+    Address address;
 
     @BeforeEach
     void setup() {
@@ -31,103 +48,41 @@ class SalesTaxRatesProviderTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         salesTaxRate = objectStub.createSalesTaxRates();
-        salesTaxRatesProvider = new SalesTaxRatesProvider();
+        salesTaxRatesProvider = new SalesTaxRatesProvider(stateLevelSalesTaxRatesCalculator, cityLevelSalesTaxRatesCalculator);
+        address = objectStub.createAddress();
     }
 
     @Test
-    void calculateSalesTaxRate_NotTaxable_ReturnsZeroTaxRate() {
+    void provide_CalculatesSalesTaxRatesOnlyForStateLevel_ReturnsSalesTaxRates() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
-        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(givenJurisdictionalSalesTaxRules, salesTaxRate);
+        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate);
+        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRate, address);
+
+        // Then
+        assertEquals(actualSalesTaxRate, salesTaxRate);
+    }
+
+    @Test
+    void provide_CalculatesSalesTaxRatesForStateAndCityLevels_ReturnsSalesTaxRates() {
+        // Given
+        CitySalesTaxRules citySalesTaxRules = objectStub.createCitySalesTaxRules().withTaxable(false);
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
+                new HashMap<>() {{
+                    put(address.getCity(), citySalesTaxRules);
+                }}
+        );
+        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0);
+
+        // When
+        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRate)).thenReturn(salesTaxRate);
+        when(cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate.withCityRate(0));
+
+        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRate, address);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
-    }
-
-    @Test
-    void calculateSalesTaxRate_NoSpecialTreatment_ReturnsSameTaxRate() {
-        // Given
-        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
-
-        // When
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(givenJurisdictionalSalesTaxRules, salesTaxRate);
-
-        // Then
-        assertEquals(salesTaxRate, actualSalesTaxRate);
-    }
-
-    @Test
-    void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
-        // Given
-        float fixedStateRateValue = 0.1f;
-        float calculatedTaxRateValue = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + fixedStateRateValue;
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate
-                .withStateRate(fixedStateRateValue)
-                .withTaxRate(calculatedTaxRateValue);
-        JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules
-                .withCalculationType(CalculationType.FIXED)
-                .withSpecialTreatment(true)
-                .withCalculationValue(fixedStateRateValue);
-
-        // When
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(givenJurisdictionalSalesTaxRules, salesTaxRate);
-
-        // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
-    }
-
-    @Test
-    void getRateByRules_CalculationTypeSetToPercentage_OverridesStateRate() {
-        // Given
-        JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
-                .withCalculationType(CalculationType.PERCENTAGE)
-                .withSpecialTreatment(true);
-        float calculatedRate = percentageCalculationTypeRule.calculationValue() * salesTaxRate.getTaxRate();
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withTaxRate(calculatedRate);
-
-        // When + Then
-        SalesTaxRate returnedRate = salesTaxRatesProvider.provide(percentageCalculationTypeRule, salesTaxRate);
-        Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
-    }
-
-    @Test
-    void getRateByRules_NotTaxable_ReturnsZeroRate() {
-        // Given
-        SalesTaxRate zeroSalesTaxRate = new SalesTaxRate(0, 0, 0, 0, 0, 0);
-        JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
-
-        // When + Then
-        SalesTaxRate returnedRate = salesTaxRatesProvider.provide(notTaxableRule, salesTaxRate);
-        Assertions.assertEquals(returnedRate, zeroSalesTaxRate);
-    }
-
-    @Test
-    void calculateSalesTaxRate_NullJurisdictionalSalesTaxRulesPassed_ThrowsException() {
-        // Given
-        JurisdictionalSalesTaxRules nullJurisdictionalSalesTaxRules = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRatesProvider.provide(nullJurisdictionalSalesTaxRules, salesTaxRate);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
-    }
-
-    @Test
-    void calculateSalesTaxRate_NullSalesTaxRatesPassed_ThrowsException() {
-        // Given
-        SalesTaxRate nullSalesTaxRate = null;
-
-        // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, nullSalesTaxRate);
-        });
-
-        assertEquals(nullPointerException.getMessage(), "originalSalesTaxRate is marked non-null but is null");
     }
 
 }

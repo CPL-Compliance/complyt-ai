@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -37,6 +38,8 @@ public class ShippingFeeSalesTaxRatesProviderTest {
 
     ObjectStub objectStub;
 
+    Address address;
+
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
@@ -44,6 +47,7 @@ public class ShippingFeeSalesTaxRatesProviderTest {
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRate = objectStub.createSalesTaxRates();
         shippingFee = objectStub.createShippingFee(false, false);
+        address = objectStub.createAddress();
     }
 
     @Test
@@ -52,8 +56,8 @@ public class ShippingFeeSalesTaxRatesProviderTest {
         ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRate(salesTaxRate);
 
         // When
-        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate);
+        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate, address)).thenReturn(salesTaxRate);
+        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate, address);
 
         // Then
         assertEquals(shippingFeeWithRates, actualShippingFee);

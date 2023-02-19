@@ -21,19 +21,15 @@ public class SalesTaxRatesProvider {
     SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
 
     public SalesTaxRate provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate, @NonNull Address address) {
-        SalesTaxRate ratesAfterStateCalculation = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
+        SalesTaxRate calculatedRates = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
 
         if (jurisdictionalSalesTaxRules.cities() != null && jurisdictionalSalesTaxRules.cities().containsKey(address.getCity())) {
-
             SalesTaxRules citySalesTaxRules = jurisdictionalSalesTaxRules.cities().get(address.getCity());
-            SalesTaxRate ratesAfterCityCalculation = cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, ratesAfterStateCalculation.withCityRate(originalSalesTaxRate.getCityRate()));
-            log.debug("Rates returned after calculation for city and state: " + ratesAfterCityCalculation);
-
-            return ratesAfterCityCalculation;
+            calculatedRates = cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, calculatedRates.withCityRate(originalSalesTaxRate.getCityRate()));
         }
-        log.debug("Rates returned after calculation for state: " + ratesAfterStateCalculation);
+        log.debug("Rates returned after calculation: " + calculatedRates);
 
-        return ratesAfterStateCalculation;
+        return calculatedRates;
     }
 
 }

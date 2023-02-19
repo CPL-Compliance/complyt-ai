@@ -2,7 +2,6 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
-import com.complyt.domain.sales_tax.product_classification.SalesTaxRules;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,7 +32,10 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
 
         log.info("None special treatment for city rule - returning original sales tax rate");
 
-        return originalSalesTaxRate;
+        return originalSalesTaxRate.withTaxRate(
+                originalSalesTaxRate.getCityRate() + originalSalesTaxRate.getCityDistrictRate() + originalSalesTaxRate.getCountyDistrictRate()
+                        + originalSalesTaxRate.getCountyRate() + originalSalesTaxRate.getStateRate()
+        );
     }
 
 }
