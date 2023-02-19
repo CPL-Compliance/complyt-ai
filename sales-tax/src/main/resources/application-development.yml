@@ -1,13 +1,16 @@
 eureka:
   client:
-    enabled: false
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@tomer.39drrff.mongodb.net/sales_tax
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@alex.gc1cupx.mongodb.net/sales_tax
 
 logging:
   level:

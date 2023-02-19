@@ -1,6 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.nexus.NexusStateRule;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,8 @@ public class NexusStateRuleRepository {
     private ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Mono<NexusStateRule> findById(@NonNull String id) {
-        return reactiveMongoTemplate.findById(id, NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Searching for nexus state rule with ID " + id, log::info)
+                .then(reactiveMongoTemplate.findById(id, NexusStateRule.class));
     }
 
     public Mono<NexusStateRule> findByState(@NonNull String state) {
@@ -30,16 +32,17 @@ public class NexusStateRuleRepository {
 
         Query query = Query.query(stateSearchCriteria);
 
-        return reactiveMongoTemplate.findOne(query, NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Searching for nexus state rule with state " + state, log::info)
+                .then(reactiveMongoTemplate.findOne(query, NexusStateRule.class));
     }
 
     public Mono<NexusStateRule> save(@NonNull NexusStateRule nexusStateRule) {
-        return reactiveMongoTemplate.save(nexusStateRule).log();
+        return ContextLogger.observeCtx("Saving nexus state rule: " + nexusStateRule, log::info)
+                .then(reactiveMongoTemplate.save(nexusStateRule));
     }
 
     public Flux<NexusStateRule> findAll() {
-        log.debug("Executing findAll nexus state rule");
-
-        return reactiveMongoTemplate.findAll(NexusStateRule.class).log();
+        return ContextLogger.observeCtx("Searching for all nexus state rule documents", log::info)
+                .thenMany(reactiveMongoTemplate.findAll(NexusStateRule.class));
     }
 }

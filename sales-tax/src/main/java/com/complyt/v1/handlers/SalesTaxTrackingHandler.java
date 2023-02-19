@@ -64,11 +64,11 @@ public class SalesTaxTrackingHandler {
                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingDtoToSalesTaxTracking)
                 .flatMap(receivedSalesTaxTracking ->
                         salesTaxTrackingFacade.findByState(state)
-                        .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)
-                        .flatMap(updatedSalesTaxTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)), SalesTaxTrackingDto.class )))
-                        .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
-                                .flatMap(salesTaxTracking ->
-                                        ServerResponse.status(HttpStatus.CREATED).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking)))));
+                                .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)
+                                        .flatMap(updatedSalesTaxTracking -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)), SalesTaxTrackingDto.class)))
+                                .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
+                                        .flatMap(salesTaxTracking ->
+                                                ServerResponse.status(HttpStatus.CREATED).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking)))));
     }
 
 

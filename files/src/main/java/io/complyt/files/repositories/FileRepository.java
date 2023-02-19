@@ -2,6 +2,7 @@ package io.complyt.files.repositories;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.security.TenantResolver;
+import io.complyt.files.utils.observability.ContextLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,9 @@ public class FileRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-                    log.debug("Executing find Link");
 
-                    return reactiveMongoTemplate.findOne(query, File.class).log();
+                    return ContextLogger.observeCtx("Searching for files with tenant ID " + tenantId, log::info)
+                            .then(reactiveMongoTemplate.findOne(query, File.class));
                 });
     }
 }

@@ -5,6 +5,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,15 +34,10 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
      */
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        return Mono.fromCallable(() -> {
-            log.info("Setting jurisdictional sales tax rules and taxable categories to transaction's items");
-            List<Item> modifiedItems = createItemsWithRules(mapTaxCodesToClassifications);
-            Transaction modifiedTransaction = transaction.withItems(modifiedItems);
-
-            log.debug("Transaction with rules and taxable categories injected : " + modifiedTransaction);
-
-            return modifiedTransaction;
-        });
+        return ContextLogger.observeCtx("Setting jurisdictional sales tax rules and taxable categories to transaction's items", log::info)
+                .then(Mono.just(transaction.withItems(createItemsWithRules(mapTaxCodesToClassifications))))
+                .flatMap(modifiedTransaction -> ContextLogger.observeCtx("Transaction with rules and taxable categories injected : " + modifiedTransaction, log::info)
+                        .thenReturn(modifiedTransaction));
     }
 
     private List<Item> createItemsWithRules(Map<String, ProductClassification> mapTaxCodesToClassifications) {

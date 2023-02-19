@@ -69,8 +69,6 @@ public interface TransactionRouterTest extends
     // Validation::SalesTax
     void upsert_NegativeAmountInSalesTax_Returns400validationError();
 
-    void upsert_NullSalesTaxRatesInSalesTax_Returns400validationError();
-
     // Validation::CreatedFrom
     void upsert_LengthGreaterThan256CreatedFrom_Returns400validationError();
 

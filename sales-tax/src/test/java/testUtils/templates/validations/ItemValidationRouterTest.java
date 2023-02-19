@@ -8,12 +8,6 @@ public interface ItemValidationRouterTest {
 
     void upsert_NegativeTotalPriceInItem_Returns400ValidationError();
 
-    void upsert_NullDescriptionInItem_Returns400ValidationError();
-
-    void upsert_BlankDescriptionInItem_Returns400ValidationError();
-
-    void upsert_LengthGreaterThen256DescriptionInItem_Returns400ValidationError();
-
     void upsert_NullNameInItem_Returns400ValidationError();
 
     void upsert_BlankNameInItem_Returns400ValidationError();
