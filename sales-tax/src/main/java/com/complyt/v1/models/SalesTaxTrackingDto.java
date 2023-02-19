@@ -12,10 +12,10 @@ import java.util.UUID;
 @With
 @Schema(name = "SalesTaxTracking")
 public record SalesTaxTrackingDto(UUID complytId,
-                                  @Valid @NotNull(message = "State address may not be null") StateDto state,
+                                  @Valid @NotNull(message = "State may not be null") StateDto state,
                                   boolean enforcesSalesTax,
-                                  @Valid @NotNull(message = "PhysicalNexusTracker address may not be null") PhysicalNexusTrackerDto physicalNexusTracker,
-                                  @Valid @NotNull(message = "PhysicalNexusTracker address may not be null") EconomicNexusTrackerDto economicNexusTracker,
+                                  @Valid @NotNull(message = "Physical Nexus Tracker may not be null") PhysicalNexusTrackerDto physicalNexusTracker,
+                                  @Valid @NotNull(message = "Economic Nexus Tracker may not be null") EconomicNexusTrackerDto economicNexusTracker,
                                   LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
         implements StateFieldPropertyDto {
 }

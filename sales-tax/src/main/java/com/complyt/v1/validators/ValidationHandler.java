@@ -1,11 +1,9 @@
 package com.complyt.v1.validators;
 
-import com.complyt.domain.State;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.models.properties.ComplytIdPropertyDto;
 import com.complyt.v1.models.properties.ExternalIdAndSourcePropertyDto;
-import com.complyt.v1.models.properties.NamePropertyDto;
 import com.complyt.v1.models.properties.StateFieldPropertyDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,7 +33,7 @@ public class ValidationHandler<T, U extends Validator> {
         return Mono.error(new ObjectNotValidApiException(errors));
     }
 
-    public final Mono<T> validate(final ServerRequest request) {
+    public final Mono<T> validateRequestBody(final ServerRequest request) {
         return request.bodyToMono(validationClass)
                 .flatMap(body -> {
                     Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
@@ -60,7 +58,7 @@ public class ValidationHandler<T, U extends Validator> {
     }
 
     public <M extends StateFieldPropertyDto> Mono<M> checkStateConflict(M resource, String state) {
-        return state.equals(resource.state().name()) ?
+        return state.equals(resource.state().name()) || state.equals(resource.state().abbreviation()) ?
                 Mono.just(resource) : Mono.error(new ConflictedDataApiException());
     }
 }

@@ -56,7 +56,7 @@ public class CustomerHandler {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
 
-        return customerDtoValidationHandler.validate(serverRequest)
+        return customerDtoValidationHandler.validateRequestBody(serverRequest)
                 .flatMap(customerDto -> customerDtoValidationHandler.checkExternalIdAndSourceConflict(customerDto, externalId, source)
                 .map(CustomerMapper.INSTANCE::customerDtoToCustomer))
                 .flatMap(receivedCustomer -> customerfacade.findByExternalIdAndSource(externalId, source)

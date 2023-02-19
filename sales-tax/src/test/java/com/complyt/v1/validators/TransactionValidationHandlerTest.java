@@ -41,7 +41,7 @@ class TransactionValidationHandlerTest {
     void validate_validTransaction_returnsTransactionDto() {
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
-        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validateRequestBody(serverRequest);
 
         StepVerifier.create(validationMono).expectNext(transactionDto).verifyComplete();
     }
@@ -50,7 +50,7 @@ class TransactionValidationHandlerTest {
     void validate_invalidTransactionDto_returnsError() {
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString()).withShippingAddress(null);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
-        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validateRequestBody(serverRequest);
 
         StepVerifier.create(validationMono).expectError().verify();
     }

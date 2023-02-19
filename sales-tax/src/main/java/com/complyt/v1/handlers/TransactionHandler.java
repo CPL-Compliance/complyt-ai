@@ -83,7 +83,7 @@ public class TransactionHandler {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");
 
-        return transactionDtoValidationHandler.validate(serverRequest)
+        return transactionDtoValidationHandler.validateRequestBody(serverRequest)
                 .flatMap(transactionDto -> transactionDtoValidationHandler.checkExternalIdAndSourceConflict(transactionDto, externalId, source))
                 .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                 .flatMap(receivedTransaction ->

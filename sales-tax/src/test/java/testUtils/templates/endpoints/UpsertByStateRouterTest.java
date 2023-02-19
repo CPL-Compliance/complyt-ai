@@ -13,12 +13,6 @@ public interface UpsertByStateRouterTest {
 
     void upsertByState_DoesntExistAndHasComplytId_Returns400ConflictedData();
 
-    void upsertByState_BlankStateName_Returns400ValidationError();
-
-    void upsertByState_NullStateName_Returns400ValidationError();
-
-    void upsertByState_LengthGreaterThan256StateName_Returns400ValidationError();
-
     void upsertByState_ComplytIdFailedToParse_Returns400();
 
     void upsertByState_UnauthenticatedUser_Returns401();

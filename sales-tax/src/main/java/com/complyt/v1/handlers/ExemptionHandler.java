@@ -51,7 +51,7 @@ public class ExemptionHandler {
     @ExemptionCreatePermission
     public Mono<ServerResponse> create(ServerRequest request) {
 
-        return exemptionDtoValidationHandler.validate(request)
+        return exemptionDtoValidationHandler.validateRequestBody(request)
                 .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
                 .flatMap(exemptionFacade::save).log()
                 .flatMap(exemption -> ServerResponse.created(request.uri()).contentType(MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ public class ExemptionHandler {
     public Mono<ServerResponse> update(ServerRequest request) {
         UUID complytId = UUID.fromString(request.pathVariable("complytId"));
 
-        return exemptionDtoValidationHandler.validate(request)
+        return exemptionDtoValidationHandler.validateRequestBody(request)
                 .flatMap(exemptionDto -> exemptionDtoValidationHandler.checkComplytIdConflict(exemptionDto, complytId))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
