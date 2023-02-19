@@ -24,26 +24,26 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
      */
     public SalesTaxRate calculate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
         if (!jurisdictionalSalesTaxRules.taxable()) {
-            log.info("None taxable rule - returning sales tax rate that is set to 0");
+            log.debug("None taxable rule - returning sales tax rate that is set to 0");
             SalesTaxRate zeroSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
             return zeroSalesTaxRate;
         }
 
         if (!jurisdictionalSalesTaxRules.specialTreatment()) {
-            log.info("None special treatment for rule - returning original sales tax rate");
+            log.debug("None special treatment for rule - returning original sales tax rate");
 
             return originalSalesTaxRate;
         }
 
         if (jurisdictionalSalesTaxRules.calculationType() == CalculationType.FIXED) {
-            log.info("Returning fixed sales tax rate of: " + jurisdictionalSalesTaxRules.calculationValue());
+            log.debug("Returning fixed sales tax rate of: " + jurisdictionalSalesTaxRules.calculationValue());
             SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
 
             return modifiedRateByFixedTreatment;
         }
 
-        log.info("Returning sales tax rate by percentage cut of: " + jurisdictionalSalesTaxRules.calculationValue());
+        log.debug("Returning sales tax rate by percentage cut of: " + jurisdictionalSalesTaxRules.calculationValue());
         SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
 
         return modifiedRateByPercentageTreatment;
@@ -52,7 +52,7 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
     private SalesTaxRate modifyRateByFixedTreatment(float jurisdictionalRuleStateRate, SalesTaxRate salesTaxRate) {
         float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + jurisdictionalRuleStateRate;
         SalesTaxRate calculatedRate = salesTaxRate.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
-        log.info("State sales tax rate after fixed modification: " + calculatedRate);
+        log.debug("State sales tax rate after fixed modification: " + calculatedRate);
 
         return calculatedRate;
     }
@@ -60,7 +60,7 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
     private SalesTaxRate modifyRateByPercentageTreatment(float percentageToCut, SalesTaxRate salesTaxRate) {
         float newTaxRate = salesTaxRate.getTaxRate() * percentageToCut;
         SalesTaxRate calculatedRate = salesTaxRate.withTaxRate(newTaxRate);
-        log.info("State Sales tax rate after percentage modification: " + calculatedRate);
+        log.debug("State Sales tax rate after percentage modification: " + calculatedRate);
 
         return calculatedRate;
     }

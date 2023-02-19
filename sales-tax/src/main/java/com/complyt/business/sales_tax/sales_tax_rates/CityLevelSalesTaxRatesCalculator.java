@@ -24,18 +24,16 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
      */
     public SalesTaxRate calculate(@NonNull CitySalesTaxRules citySalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
         if (!citySalesTaxRules.taxable()) {
-            log.info("None taxable rule for city - returning 0 City rate");
+            log.debug("None taxable rule for city - returning 0 City rate");
             SalesTaxRate zeroCitySalesTaxRate = originalSalesTaxRate.withCityRate(0);
 
             return zeroCitySalesTaxRate;
         }
+        float taxRate = originalSalesTaxRate.getCityRate() + originalSalesTaxRate.getCityDistrictRate() + originalSalesTaxRate.getCountyDistrictRate()
+                + originalSalesTaxRate.getCountyRate() + originalSalesTaxRate.getStateRate();
+        log.debug("None special treatment for city rule - returning original sales tax rate");
 
-        log.info("None special treatment for city rule - returning original sales tax rate");
-
-        return originalSalesTaxRate.withTaxRate(
-                originalSalesTaxRate.getCityRate() + originalSalesTaxRate.getCityDistrictRate() + originalSalesTaxRate.getCountyDistrictRate()
-                        + originalSalesTaxRate.getCountyRate() + originalSalesTaxRate.getStateRate()
-        );
+        return originalSalesTaxRate.withTaxRate(taxRate);
     }
 
 }
