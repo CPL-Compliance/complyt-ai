@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator<CitySalesTaxRules> {
-
     /**
      * Calculating sales tax rate regarding the rules of the given item
-     * 4 patterns are available :
+     * 2 patterns are available :
      * - not taxable
      * - taxable with no special treatment - taking the original sales tax rate
-     * - calculated by fixed value to override the original sales tax rate
-     * - calculated by certain percentage of the original sales tax rate
      *
      * @param citySalesTaxRules    - Rules to declare how sales tax rate should be calculated
      * @param originalSalesTaxRate - Sales tax rate given by external resource regarding the current transaction's address
