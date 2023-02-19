@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CityLevelSalesTaxRatesCalculatorTest {
 
@@ -79,6 +80,32 @@ public class CityLevelSalesTaxRatesCalculatorTest {
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void calculate_NullCitySalesTaxRulesPassed_ThrowsException() {
+        // Given
+        CitySalesTaxRules nullCitySalesTaxRules = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            cityLevelSalesTaxRatesCalculator.calculate(nullCitySalesTaxRules, salesTaxRate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "citySalesTaxRules is marked non-null but is null");
+    }
+
+    @Test
+    void calculate_NullSalesTaxRatePassed_ThrowsException() {
+        // Given
+        SalesTaxRate nullSalesTaxRate = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, nullSalesTaxRate);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxRate is marked non-null but is null");
     }
 
 }

@@ -102,7 +102,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     }
 
     @Test
-    void calculateSalesTaxRate_NullJurisdictionalSalesTaxRulesPassed_ThrowsException() {
+    void calculate_NullJurisdictionalSalesTaxRulesPassed_ThrowsException() {
         // Given
         JurisdictionalSalesTaxRules nullJurisdictionalSalesTaxRules = null;
 
@@ -115,7 +115,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     }
 
     @Test
-    void calculateSalesTaxRate_NullSalesTaxRatesPassed_ThrowsException() {
+    void calculate_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
         SalesTaxRate nullSalesTaxRate = null;
 
