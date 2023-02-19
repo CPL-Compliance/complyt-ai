@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface GetByNameRouterTest {
+public interface GetByNameRouterTestTemplate {
     void getByName_Exists_Returns200WithList();
 
     void getByName_EmptyCollection_Returns200WithEmptyList();

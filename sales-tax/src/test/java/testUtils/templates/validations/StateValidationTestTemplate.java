@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface StateValidationRouterTest {
+public interface StateValidationTestTemplate {
     void upsert_NullState_Returns400ValidationError();
 
     void upsert_BlankAbbreviationInState_Returns400ValidationError();

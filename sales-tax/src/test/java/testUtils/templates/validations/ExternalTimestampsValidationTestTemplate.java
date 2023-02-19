@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface ExternalTimestampsValidationRouterTest {
+public interface ExternalTimestampsValidationTestTemplate {
     void upsert_NullExternalTimestamps_Returns400ValidationError();
 
     void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError();

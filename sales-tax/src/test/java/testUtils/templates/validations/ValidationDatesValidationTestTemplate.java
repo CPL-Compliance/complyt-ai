@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface ValidationDatesValidationRouterTest {
+public interface ValidationDatesValidationTestTemplate {
 
     void upsert_NullFromDateInValidationDates_Returns400ValidationError();
 

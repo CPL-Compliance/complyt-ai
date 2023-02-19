@@ -1,6 +1,6 @@
 package testUtils.templates.endpoints;
 
-public interface GetByStateRouterTest {
+public interface GetByStateRouterTestTemplate {
     void getByState_Exists_Returns200WithList();
 
     void getByState_DoesntExists_Returns404();

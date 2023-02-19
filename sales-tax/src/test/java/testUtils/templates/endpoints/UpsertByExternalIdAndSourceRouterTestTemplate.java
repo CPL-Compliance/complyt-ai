@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface UpsertByExternalIdAndSourceRouterTest {
+public interface UpsertByExternalIdAndSourceRouterTestTemplate {
     void upsertByExternalIdAndSource_Exists_Returns200();
 
     void upsertByExternalIdAndSource_DoesntExists_Returns201();

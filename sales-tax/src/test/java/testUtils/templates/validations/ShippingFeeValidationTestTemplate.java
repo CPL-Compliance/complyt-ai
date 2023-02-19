@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface ShippingFeeValidationRouterTest {
+public interface ShippingFeeValidationTestTemplate {
 
     void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError();
 

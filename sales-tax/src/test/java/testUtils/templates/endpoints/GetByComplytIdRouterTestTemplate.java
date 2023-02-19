@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface GetByComplytIdRouterTest {
+public interface GetByComplytIdRouterTestTemplate {
     void getByComplytId_Exists_Returns200();
 
     void getByComplytId_DoesntExists_Returns404();

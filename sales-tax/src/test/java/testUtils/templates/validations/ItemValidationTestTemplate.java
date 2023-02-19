@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface ItemValidationRouterTest {
+public interface ItemValidationTestTemplate {
 
     void upsert_NegativeUnitPriceInItem_Returns400ValidationError();
 

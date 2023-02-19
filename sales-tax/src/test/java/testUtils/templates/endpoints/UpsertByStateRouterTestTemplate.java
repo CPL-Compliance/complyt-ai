@@ -1,6 +1,6 @@
 package testUtils.templates.endpoints;
 
-public interface UpsertByStateRouterTest {
+public interface UpsertByStateRouterTestTemplate {
     void upsertByState_Exists_Returns200();
 
     void upsertByState_DoesntExists_Returns201();

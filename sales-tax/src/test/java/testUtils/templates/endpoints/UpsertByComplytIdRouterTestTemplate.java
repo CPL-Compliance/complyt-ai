@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface UpsertByComplytIdRouterTest {
+public interface UpsertByComplytIdRouterTestTemplate {
     void upsertByComplytId_Exists_Returns200();
 
     void upsertByComplytId_DoesntExists_Returns404();

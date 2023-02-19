@@ -1,6 +1,6 @@
 package testUtils.templates.validations;
 
-public interface InternalTimestampsValidationRouterTest {
+public interface InternalTimestampsValidationTestTemplate {
 
     void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError();
 

@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface GetAllBySourceRouterTest {
+public interface GetAllBySourceRouterTestTemplate {
     void getAllBySource_Exists_Returns200WithList();
 
     void getAllBySource_EmptyCollection_Returns200WithEmptyList();

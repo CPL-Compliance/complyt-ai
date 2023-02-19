@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface DeleteByExternalIdAndSourceRouterTest {
+public interface DeleteByExternalIdAndSourceRouterTestTemplate {
     void deleteByExternalIdAndSource_Exists_Returns204();
 
     void deleteByExternalIdAndSource_DoesntExists_Returns404();

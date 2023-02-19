@@ -1,6 +1,6 @@
 package testUtils.templates.endpoints;
 
-public interface DeleteByComplytIdRouterTest {
+public interface DeleteByComplytIdRouterTestTemplate {
     void deleteByComplytId_Exists_Returns204();
 
     void deleteByComplytId_DoesntExists_Returns404();

@@ -1,8 +1,6 @@
 package testUtils.templates.endpoints;
 
-import org.junit.jupiter.api.Test;
-
-public interface GetByExternalIdAndSourceRouterTest {
+public interface GetByExternalIdAndSourceRouterTestTemplate {
     void getByExternalIdAndSource_Exists_Returns200();
 
     void getByExternalIdAndSource_DoesntExists_Returns404();
