@@ -5,16 +5,10 @@ spring:
 
 eureka:
   client:
-#    enabled: false
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
-
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: ${discovery-service-uri}
-#  instance:
-#    prefer-ip-address: true
+      defaultZone: ${discovery-service-uri}
+  instance:
+    prefer-ip-address: true
 
 logging:
   level:
