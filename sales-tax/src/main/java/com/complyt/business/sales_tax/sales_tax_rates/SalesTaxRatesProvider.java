@@ -20,6 +20,12 @@ public class SalesTaxRatesProvider {
     @NonNull
     SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
 
+
+    /**
+     * Calculating sales tax rates for state and city level if exists.
+     * We must make sure that State rates are always being calculated before city's rate
+     * so there won't be a tax rate override
+     */
     public SalesTaxRate provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate, @NonNull Address address) {
         SalesTaxRate calculatedRates = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
 
