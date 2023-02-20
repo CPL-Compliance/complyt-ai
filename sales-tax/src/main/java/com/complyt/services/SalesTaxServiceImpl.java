@@ -59,11 +59,11 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
-                .map(createFunctionInjectSalesTaxToTransaction(transaction));
+                .flatMap(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxData -> {
+    private Function<SalesTaxData, Mono<Transaction>> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxData -> Mono.fromCallable(() -> {
             SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
             Transaction transactionWithRates = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
@@ -72,7 +72,6 @@ public class SalesTaxServiceImpl implements SalesTaxService {
             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
             return transactionWithRates.withSalesTax(salesTax);
-        };
+        });
     }
-
 }
