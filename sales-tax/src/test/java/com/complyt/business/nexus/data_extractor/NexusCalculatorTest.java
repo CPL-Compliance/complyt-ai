@@ -124,5 +124,4 @@ public class NexusCalculatorTest {
         // Then
         StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
     }
-
 }

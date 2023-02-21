@@ -99,6 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(countyProvider::provide);
     }
 
+    @Deprecated
     @Override
     public Mono<Transaction> findById(String id) {
         return transactionRepository.findById(id);

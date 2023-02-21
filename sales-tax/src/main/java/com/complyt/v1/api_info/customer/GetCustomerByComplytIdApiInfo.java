@@ -74,10 +74,9 @@ public @interface GetCustomerByComplytIdApiInfo {
     String complytIdExample = "9f8ee193-1a71-42b4-801d-ee1d8a161fbe";
     String customerExample = "[{\n" +
             "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-            "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
             "    \"externalId\": \"999444\",\n" +
             "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt LTD.\",\n" +
+            "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
             "        \"country\": \"US\",\n" +

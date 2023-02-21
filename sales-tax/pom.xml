@@ -8,12 +8,12 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.11.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>sales-tax</name>
@@ -75,6 +75,21 @@
         </dependency>
         <!-- Spring Cloud Vault -->
 
+        <!-- Observability -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <!-- Observability -->
+
         <!-- Spring Cloud Feign -->
         <dependency>
             <groupId>com.playtika.reactivefeign</groupId>
@@ -101,7 +116,7 @@
         </dependency>
         <!-- Spring Cloud Eureka -->
 
-        <!-- Test Dependencies -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

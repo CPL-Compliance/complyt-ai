@@ -8,12 +8,12 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.11.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
 
@@ -91,7 +91,20 @@
             <artifactId>feign-slf4j</artifactId>
         </dependency>
         <!-- Spring Cloud Feign -->
-
+        <!-- Observability -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <!-- Observability -->
         <!-- Spring Cloud Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
