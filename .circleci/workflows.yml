@@ -32,6 +32,9 @@ parameters:
   run-discovery-service-workflow:
     type: boolean
     default: false
+  run-rates-workflow:
+    type: boolean
+    default: false
 
 jobs:
   verify:
@@ -239,3 +242,31 @@ workflows:
           requires:
             - deploy
           service_name: "discovery-service"
+
+    rates-workflow:
+      when: << pipeline.parameters.run-rates-workflow >>
+      jobs:
+        - verify:
+            filters:
+              branches:
+                only:
+                  - /^(main.+|(?!main).*)$/
+            service_directory: "rates"
+
+        - deploy:
+            filters:
+              branches:
+                only:
+                  - main
+            service_directory: "rates"
+
+        - send-test-coverage-reports:
+            requires:
+              - verify
+              - deploy
+            service_directory: "rates"
+
+        - update-ecs-service:
+            requires:
+              - deploy
+            service_name: "rates"

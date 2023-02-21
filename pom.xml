@@ -23,6 +23,7 @@
         <module>discovery-service</module>
         <module>api-gateway</module>
         <module>files</module>
+        <module>rates</module>
     </modules>
 
     <name>Complyt</name>
