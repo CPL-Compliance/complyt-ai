@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ItemsSalesTaxRatesProvider {
+public class ItemsSalesTaxRatesProvider implements TaxableSalesTaxRatesProvider<List<Item>> {
 
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;

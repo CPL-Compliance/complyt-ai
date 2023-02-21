@@ -17,10 +17,10 @@ import java.util.List;
 public class TransactionSalesTaxRatesHandler {
 
     @NonNull
-    private ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
+    private TaxableSalesTaxRatesProvider<ShippingFee> shippingFeeSalesTaxRatesProvider;
 
     @NonNull
-    private ItemsSalesTaxRatesProvider itemsSalesTaxRatesProvider;
+    private TaxableSalesTaxRatesProvider<List<Item>> itemsSalesTaxRatesProvider;
 
     public Transaction setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
         log.info("Setting sales tax rates for transaction");

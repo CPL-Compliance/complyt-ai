@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ShippingFeeSalesTaxRatesProvider {
+public class ShippingFeeSalesTaxRatesProvider implements TaxableSalesTaxRatesProvider<ShippingFee> {
 
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;
