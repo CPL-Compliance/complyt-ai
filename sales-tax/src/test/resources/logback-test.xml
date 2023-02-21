@@ -4,7 +4,7 @@
     <property name="LOGS_FILENAME" value="sales-tax-test"/>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>[%magenta(appName=api-gateway), %green(host=${HOSTNAME}), ip=${IP}, %highlight(level=%-5level), %blue(traceId=%X{traceId:-NONE}), %yellow(spanId=%X{spanId:-NONE}), %cyan(threadId=%thread)] %logger{0}: %msg%n</pattern>
+            <pattern>[%magenta(appName=sales-tax), %green(host=${HOSTNAME}), ip=${IP}, %highlight(level=%-5level), %blue(traceId=%X{traceId:-NONE}), %yellow(spanId=%X{spanId:-NONE}), %cyan(threadId=%thread)] %logger{0}: %msg%n</pattern>
         </layout>
     </appender>
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">

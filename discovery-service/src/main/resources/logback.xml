@@ -4,13 +4,13 @@
     <property name="LOGS_FILENAME" value="discovery-service"/>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>[%magenta(appName=api-gateway), %green(host=${HOSTNAME}), ip=${IP}, %highlight(level=%-5level), %blue(traceId=%X{traceId:-NONE}), %yellow(spanId=%X{spanId:-NONE}), %cyan(threadId=%thread)] %logger{0}: %msg%n</pattern>
+            <pattern>{"level": "%level", "message": "%msg", "logger": "%logger{0}", "line": "%line", "traceId": "%X{traceId:-NONE}", "spanId": "%X{spanId:-NONE}", "threadId": "%thread", "appName": "sales-tax", "host": "${HOSTNAME}"}\n</pattern>
         </layout>
     </appender>
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_FOLDER}/${LOGS_FILENAME}.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[appName=sales-tax, host=${HOSTNAME}, ip=${IP}, traceId=%X{traceId:-NONE}, spanId=%X{spanId:-NONE}, level=%level, threadId=%thread] %logger{0}: %msg%n</pattern>
+            <pattern>{"level": "%level", "message": "%msg", "logger": "%logger{0}", "line": "%line", "traceId": "%X{traceId:-NONE}", "spanId": "%X{spanId:-NONE}", "threadId": "%thread", "appName": "sales-tax", "host": "${HOSTNAME}"}\n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
