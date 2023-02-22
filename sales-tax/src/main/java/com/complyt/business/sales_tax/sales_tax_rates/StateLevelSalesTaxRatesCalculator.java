@@ -23,28 +23,28 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
      * @return
      */
     public SalesTaxRate calculate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
-        if (!jurisdictionalSalesTaxRules.taxable()) {
+        if (!jurisdictionalSalesTaxRules.isTaxable()) {
             log.debug("None taxable rule - returning sales tax rate that is set to 0");
             SalesTaxRate zeroSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
 
             return zeroSalesTaxRate;
         }
 
-        if (!jurisdictionalSalesTaxRules.specialTreatment()) {
+        if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
             log.debug("None special treatment for rule - returning original sales tax rate");
 
             return originalSalesTaxRate;
         }
 
-        if (jurisdictionalSalesTaxRules.calculationType() == CalculationType.FIXED) {
-            log.debug("Returning fixed sales tax rate of: " + jurisdictionalSalesTaxRules.calculationValue());
-            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
+        if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
+            log.debug("Returning fixed sales tax rate of: " + jurisdictionalSalesTaxRules.getCalculationValue());
+            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
 
             return modifiedRateByFixedTreatment;
         }
 
-        log.debug("Returning sales tax rate by percentage cut of: " + jurisdictionalSalesTaxRules.calculationValue());
-        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.calculationValue(), originalSalesTaxRate);
+        log.debug("Returning sales tax rate by percentage cut of: " + jurisdictionalSalesTaxRules.getCalculationValue());
+        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
 
         return modifiedRateByPercentageTreatment;
     }

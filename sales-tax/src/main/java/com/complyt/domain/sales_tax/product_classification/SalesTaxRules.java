@@ -2,12 +2,12 @@ package com.complyt.domain.sales_tax.product_classification;
 
 public interface SalesTaxRules {
 
-    boolean taxable();
+    boolean isTaxable();
 
-    boolean specialTreatment();
+    boolean isSpecialTreatment();
 
-    CalculationType calculationType();
+    CalculationType getCalculationType();
 
-    float calculationValue();
+    float getCalculationValue();
 
 }

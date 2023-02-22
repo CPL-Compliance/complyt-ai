@@ -40,7 +40,7 @@ class ItemTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = rulesByPercentage.calculationValue() * item.getSalesTaxRate().getTaxRate();
+        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRate().getTaxRate();
         SalesTaxRate salesTaxRate = item.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
 
         Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)

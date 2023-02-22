@@ -20,7 +20,7 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
      * @return
      */
     public SalesTaxRate calculate(@NonNull CitySalesTaxRules citySalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
-        if (!citySalesTaxRules.taxable()) {
+        if (!citySalesTaxRules.isTaxable()) {
             log.debug("None taxable rule for city - returning 0 City rate");
             SalesTaxRate zeroCitySalesTaxRate = originalSalesTaxRate.withCityRate(0);
 

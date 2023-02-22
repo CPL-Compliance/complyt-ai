@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
                                                 name = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.externalIdExample)),
                                 @Parameter(in = ParameterIn.PATH,
                                         name = "source",
-                                        description = "Transaction Source",
+                                        description = "Source",
                                         examples = @ExampleObject(value = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.sourceExample,
                                                 name = com.complyt.v1.api_info.transaction.UpsertTransactionByExternalIdAndSourceApiInfo.sourceExample))
                         },
