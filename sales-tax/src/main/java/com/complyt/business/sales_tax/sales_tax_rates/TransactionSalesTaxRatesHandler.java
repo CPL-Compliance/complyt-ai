@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class TransactionSalesTaxRatesHandler {
     @NonNull
     private TaxableSalesTaxRatesProvider<List<Item>> itemsSalesTaxRatesProvider;
 
-    public Transaction setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
+    public Mono<Transaction> setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
         log.info("Setting sales tax rates for transaction");
 
         List<Item> itemsWithRates = itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, transaction.getShippingAddress());
@@ -32,6 +33,7 @@ public class TransactionSalesTaxRatesHandler {
             transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 
-        return transaction.withItems(itemsWithRates);
+        return Mono.just(transaction.withItems(itemsWithRates));
     }
+
 }

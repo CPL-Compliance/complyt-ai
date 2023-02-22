@@ -20,7 +20,6 @@ public class SalesTaxRatesProvider {
     @NonNull
     SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
 
-
     /**
      * Calculating sales tax rates for state and city level if exists.
      * We must make sure that State rates are always being calculated before city's rate

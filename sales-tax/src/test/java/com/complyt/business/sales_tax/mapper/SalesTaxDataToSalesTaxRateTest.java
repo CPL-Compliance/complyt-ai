@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
@@ -48,10 +50,10 @@ public class SalesTaxDataToSalesTaxRateTest {
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
         when(salesTaxData.isUnincorporated()).thenReturn(false);
 
-        SalesTaxRate actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+        StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
     }
 
     @Test
@@ -64,10 +66,10 @@ public class SalesTaxDataToSalesTaxRateTest {
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRate);
         when(salesTaxData.isUnincorporated()).thenReturn(true);
 
-        SalesTaxRate actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+        StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
     }
 
     @Test

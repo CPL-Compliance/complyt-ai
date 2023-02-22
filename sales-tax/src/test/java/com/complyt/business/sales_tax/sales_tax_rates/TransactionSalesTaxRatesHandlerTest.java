@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
@@ -62,10 +64,10 @@ public class TransactionSalesTaxRatesHandlerTest {
 
         // When
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, address)).thenReturn(modifiedItems);
-        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
-        assertEquals(actualTransaction, expectedTransaction);
+        StepVerifier.create(actualTransaction).expectNext(expectedTransaction).verifyComplete();
     }
 
     @Test
@@ -84,10 +86,10 @@ public class TransactionSalesTaxRatesHandlerTest {
         // When
         when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, transaction.getShippingAddress())).thenReturn(modifiedItems);
         when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate, transaction.getShippingAddress())).thenReturn(shippingFeeWithRates);
-        Transaction actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
 
         // Then
-        assertEquals(actualTransaction, expectedTransaction);
+        StepVerifier.create(actualTransaction).expectNext(expectedTransaction).verifyComplete();
     }
 
     @Test
