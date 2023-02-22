@@ -1,10 +1,6 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.models.properties.ComplytIdPropertyDto;
-import com.complyt.v1.models.properties.ExternalIdAndSourcePropertyDto;
-import com.complyt.v1.models.properties.StateFieldPropertyDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -16,12 +12,10 @@ import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
-import java.util.UUID;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ValidationHandler<T, U extends Validator> {
+public abstract class ValidationHandler<T, U extends Validator> {
 
     @NonNull
     Class<T> validationClass;
@@ -47,18 +41,5 @@ public class ValidationHandler<T, U extends Validator> {
                 });
     }
 
-    public <M extends ExternalIdAndSourcePropertyDto> Mono<M> checkExternalIdAndSourceConflict(M resource, String externalId, String source) {
-        return externalId.equals(resource.externalId()) && source.equals(resource.source()) ?
-                Mono.just(resource) : Mono.error(new ConflictedDataApiException());
-    }
-
-    public <M extends ComplytIdPropertyDto> Mono<M> checkComplytIdConflict(M resource, UUID complytId) {
-        return complytId.equals(resource.complytId()) ?
-                Mono.just(resource) : Mono.error(new ConflictedDataApiException());
-    }
-
-    public <M extends StateFieldPropertyDto> Mono<M> checkStateConflict(M resource, String state) {
-        return state.equals(resource.state().name()) || state.equals(resource.state().abbreviation()) ?
-                Mono.just(resource) : Mono.error(new ConflictedDataApiException());
-    }
+    abstract public Mono<T> validate(final ServerRequest serverRequest);
 }

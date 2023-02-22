@@ -13,21 +13,21 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 public class ValidatorConfig {
     @Bean
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter);
+        return new ExternalIdAndSourcePropertyValidationHandler<>(CustomerDto.class, springValidatorAdapter);
     }
 
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter);
+        return new ExternalIdAndSourcePropertyValidationHandler<>(TransactionDto.class, springValidatorAdapter);
     }
 
     @Bean
     ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter);
+        return new ComplytIdPropertyValidationHandler<>(ExemptionDto.class, springValidatorAdapter);
     }
 
     @Bean
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter);
+        return new StatePropertyValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter);
     }
 }

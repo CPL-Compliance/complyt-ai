@@ -1,8 +1,8 @@
 package com.complyt.v1.models;
 
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.properties.ComplytIdPropertyDto;
-import com.complyt.v1.models.properties.ExternalIdAndSourcePropertyDto;
+import com.complyt.v1.models.properties.ExternalIdPropertyDto;
+import com.complyt.v1.models.properties.SourcePropertyDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -29,6 +29,6 @@ public record TransactionDto(UUID complytId,
                              @Valid ShippingFeeDto shippingFee,
                              @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
                              float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount
-) implements ComplytIdPropertyDto, ExternalIdAndSourcePropertyDto {
+) implements SourcePropertyDto, ExternalIdPropertyDto {
 
 }

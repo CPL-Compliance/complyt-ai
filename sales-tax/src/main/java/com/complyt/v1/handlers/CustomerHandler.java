@@ -64,8 +64,7 @@ public class CustomerHandler {
         String source = serverRequest.pathVariable("source");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validateRequestBody(serverRequest))
-                .flatMap(customerDto -> customerDtoValidationHandler.checkExternalIdAndSourceConflict(customerDto, externalId, source))
+        return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validate(serverRequest))
                 .flatMap(customerDto -> ContextLogger.observeCtx(customerDto.toString(), log::info).thenReturn(customerDto))
                 .map(customerDto -> CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
                 .flatMap(receivedCustomer ->
@@ -74,9 +73,9 @@ public class CustomerHandler {
                                         .flatMap(savedCustomer -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer))
                                                 .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
                                                         .thenReturn(customerDto)), CustomerDto.class)))
-                                        .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer))
-                                                .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
-                                                        .thenReturn(customerDto)), CustomerDto.class))));
+                                .switchIfEmpty(customerfacade.saveCustomer(receivedCustomer).flatMap(savedCustomer -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(CustomerMapper.INSTANCE.customerToCustomerDto(savedCustomer))
+                                        .flatMap(customerDto -> ContextLogger.observeCtx("<-- Returned Body: " + customerDto, log::info)
+                                                .thenReturn(customerDto)), CustomerDto.class))));
     }
 
     @CustomerReadPermission

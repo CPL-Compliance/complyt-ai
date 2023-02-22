@@ -28,7 +28,7 @@ class ValidatorConfigTest {
 
     @Test
     void customerDtoValidationHandler() {
-        ValidationHandler<CustomerDto, SpringValidatorAdapter> actualCustomerDtoValidationHandler = new ValidationHandler<>(CustomerDto.class, springValidatorAdapter);
+        ValidationHandler<CustomerDto, SpringValidatorAdapter> actualCustomerDtoValidationHandler = new ExternalIdAndSourcePropertyValidationHandler<>(CustomerDto.class, springValidatorAdapter);
         ValidationHandler<CustomerDto, SpringValidatorAdapter> expectedCustomerDtoValidationHandler = validatorConfig.customerDtoValidationHandler(springValidatorAdapter);
 
         assertEquals(expectedCustomerDtoValidationHandler, actualCustomerDtoValidationHandler);
@@ -36,7 +36,7 @@ class ValidatorConfigTest {
 
     @Test
     void transactionDtoValidationHandler() {
-        ValidationHandler<TransactionDto, SpringValidatorAdapter> actualTransactionDtoValidationHandler = new ValidationHandler<>(TransactionDto.class, springValidatorAdapter);
+        ValidationHandler<TransactionDto, SpringValidatorAdapter> actualTransactionDtoValidationHandler = new ExternalIdAndSourcePropertyValidationHandler<>(TransactionDto.class, springValidatorAdapter);
         ValidationHandler<TransactionDto, SpringValidatorAdapter> expectedTransactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
 
         assertEquals(expectedTransactionDtoValidationHandler, actualTransactionDtoValidationHandler);
