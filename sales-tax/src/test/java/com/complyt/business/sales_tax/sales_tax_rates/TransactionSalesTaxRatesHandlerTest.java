@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransactionSalesTaxRatesHandlerTest {
 
     @InjectMocks
