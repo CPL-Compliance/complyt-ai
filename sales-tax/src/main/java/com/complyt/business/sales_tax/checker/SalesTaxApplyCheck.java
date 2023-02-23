@@ -29,5 +29,4 @@ public class SalesTaxApplyCheck implements SalesTaxApplyChecker<SalesTaxTracking
         log.debug("Is sales tax applied for transaction returned : " + isApplied);
         return isApplied;
     }
-
 }

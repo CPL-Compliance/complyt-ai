@@ -32,7 +32,7 @@ public class ComplytTimestampDto {
         this.timestamp = parseTimestamp(timestamp);
     }
 
-    private String parseTimestamp(String dateAsString) {
+        private String parseTimestamp(String dateAsString) {
         try {
             String parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0).toString();
             log.debug("Input received as a LocalDate: " + parsedLocalDate);
