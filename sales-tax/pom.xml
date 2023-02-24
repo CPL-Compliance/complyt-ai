@@ -63,7 +63,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!-- Spring Boot Starter -->
-
         <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -74,7 +73,6 @@
             <artifactId>spring-cloud-vault-config-databases</artifactId>
         </dependency>
         <!-- Spring Cloud Vault -->
-
         <!-- Observability -->
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -91,24 +89,20 @@
         <!-- Observability -->
         <!-- Logging -->
         <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.2</version>
-            <!-- Use runtime scope if the project does not have any compile-time usage of logstash-logback-encoder,
-                 such as usage of StructuredArguments/Markers or implementations such as
-                 JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
-            <scope>runtime</scope>
-            -->
-        </dependency>
-        <!-- Your project must also directly depend on either logback-classic or logback-access. For example: -->
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.3.0</version>
-            <!-- Use runtime scope if the project does not have any compile-time usage of logback,
-                 such as implementations of Appender, Encoder, Layout, TurboFilter, etc
-            <scope>runtime</scope>
-            -->
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-json-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <!-- Logging -->
         <!-- Spring Cloud Feign -->

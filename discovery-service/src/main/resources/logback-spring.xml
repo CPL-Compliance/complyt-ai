@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <property name="LOGS_FOLDER" value="./logs"/>
-    <property name="LOGS_FILENAME" value="api-gateway"/>
+    <property name="LOGS_FILENAME" value="discovery-service"/>
+    <springProperty scope="context" name="discovery-service" source="spring.application.name"/>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>{"level": "%level", "message": "%msg", "logger": "%logger{0}", "line": "%line", "traceId": "%X{traceId:-NONE}", "spanId": "%X{spanId:-NONE}", "threadId": "%thread", "appName": "sales-tax", "host": "${HOSTNAME}"}\n</pattern>
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>false</prettyPrint>
+            </jsonFormatter>
+            <appendLineSeparator>true</appendLineSeparator>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
         </layout>
     </appender>
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_FOLDER}/${LOGS_FILENAME}.log</file>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>{"level": "%level", "message": "%msg", "logger": "%logger{0}", "line": "%line", "traceId": "%X{traceId:-NONE}", "spanId": "%X{spanId:-NONE}", "threadId": "%thread", "appName": "sales-tax", "host": "${HOSTNAME}"}\n</pattern>
-        </encoder>
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>false</prettyPrint>
+            </jsonFormatter>
+            <appendLineSeparator>true</appendLineSeparator>
+            <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+        </layout>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
             <fileNamePattern>${LOGS_FOLDER}/archived/${LOGS_FILENAME}-%d{yyyy-MM-dd}.%i.log
@@ -21,14 +30,8 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
-    <!-- LOG everything at INFO level -->
     <root level="info">
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
     </root>
-    <!-- LOG "io.complyt*" at TRACE level -->
-    <logger name="io.complyt" level="trace" additivity="false">
-        <appender-ref ref="RollingFile"/>
-        <appender-ref ref="Console"/>
-    </logger>
 </configuration>
