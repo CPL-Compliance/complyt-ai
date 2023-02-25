@@ -4,6 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -14,6 +15,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -34,34 +36,40 @@ public class SalesTaxTrackingHandler {
     @Operation(summary = "Gets SalesTaxTracking by state")
     @ResponseStatus(HttpStatus.OK)
     @NexusReadPermission
-    public Mono<ServerResponse> getOne(ServerRequest request) {
-        String state = request.pathVariable("state");
+    public Mono<ServerResponse> getOne(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ServerResponse.ok()
-                .body(salesTaxTrackingFacade.findByState(state)
-                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())), SalesTaxTrackingDto.class);
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingFacade.findByState(state))
+                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
+
     }
 
     @Operation(summary = "Gets SalesTaxTracking by complyt id")
     @ResponseStatus(HttpStatus.OK)
     @NexusReadPermission
-    public Mono<ServerResponse> getByComplytId(ServerRequest request) {
-        UUID complytId = UUID.fromString(request.pathVariable("complytId"));
+    public Mono<ServerResponse> getByComplytId(ServerRequest serverRequest) {
+        UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ServerResponse.ok()
-                .body(salesTaxTrackingFacade.findByComplytId(complytId)
-                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())), SalesTaxTrackingDto.class);
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingFacade.findByComplytId(complytId))
+                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
 
     @Operation(summary = "This will update the SalesTaxTracking if found by state, otherwise it will throw an error")
     @ResponseStatus(HttpStatus.OK)
     @NexusUpdatePermission
-    public Mono<ServerResponse> upsert(ServerRequest request) {
-        String state = request.pathVariable("state");
+    public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return request.bodyToMono(SalesTaxTrackingDto.class)
+        return ContextLogger.observeCtx(logStr, log::info).then(serverRequest.bodyToMono(SalesTaxTrackingDto.class))
                 .flatMap(salesTaxTrackingDto -> {
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
                     return salesTaxTrackingFacade.findByState(state)
@@ -77,9 +85,11 @@ public class SalesTaxTrackingHandler {
     @Operation(summary = "Gets all sales tax tracking")
     @ResponseStatus(HttpStatus.OK)
     @NexusReadPermission
-    public Mono<ServerResponse> getAll(ServerRequest request) {
-        return ServerResponse
-                .ok()
-                .body(salesTaxTrackingFacade.findAll().map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class);
+    public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        return ContextLogger.observeCtx(logStr, log::info).then(
+                ServerResponse.ok()
+                        .body(salesTaxTrackingFacade.findAll().map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
     }
 }
