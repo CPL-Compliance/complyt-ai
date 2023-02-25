@@ -32,7 +32,7 @@ public class TransactionSalesTaxRatesHandler {
             transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 
-        return ContextLogger.observeCtx("Sales tax rates had being set for transaction", log::info)
+        return ContextLogger.observeCtx("Set Sales tax rates to Transaction", log::info)
                 .then(Mono.just(transaction.withItems(itemsWithRates)));
     }
 
