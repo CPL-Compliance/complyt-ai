@@ -63,7 +63,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <!-- Spring Boot Starter -->
-
         <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -74,7 +73,6 @@
             <artifactId>spring-cloud-vault-config-databases</artifactId>
         </dependency>
         <!-- Spring Cloud Vault -->
-
         <!-- Observability -->
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -89,7 +87,24 @@
             <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
         <!-- Observability -->
-
+        <!-- Logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-json-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- Logging -->
         <!-- Spring Cloud Feign -->
         <dependency>
             <groupId>com.playtika.reactivefeign</groupId>
