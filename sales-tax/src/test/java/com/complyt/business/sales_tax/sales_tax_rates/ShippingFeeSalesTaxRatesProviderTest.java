@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -20,13 +21,11 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ShippingFeeSalesTaxRatesCalculatorTest {
+public class ShippingFeeSalesTaxRatesProviderTest {
 
     @InjectMocks
-    ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
     @Mock
     SalesTaxRatesProvider salesTaxRatesCalculator;
@@ -37,6 +36,8 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
 
     ObjectStub objectStub;
 
+    Address address;
+
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
@@ -44,6 +45,7 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRate = objectStub.createSalesTaxRates();
         shippingFee = objectStub.createShippingFee(false, false);
+        address = objectStub.createAddress();
     }
 
     @Test
@@ -52,8 +54,8 @@ public class ShippingFeeSalesTaxRatesCalculatorTest {
         ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRate(salesTaxRate);
 
         // When
-        when(salesTaxRatesCalculator.calculateSalesTaxRate(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate)).thenReturn(salesTaxRate);
-        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(shippingFee, salesTaxRate);
+        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate, address)).thenReturn(salesTaxRate);
+        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate, address);
 
         // Then
         assertEquals(shippingFeeWithRates, actualShippingFee);

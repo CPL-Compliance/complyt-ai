@@ -144,23 +144,6 @@ public class ProductClassificationServiceTest {
         StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
     }
 
-//    @Test
-//    void getShippingFeeClassification_FindsClassification_ReturnsClassification() {
-//        // Given
-//        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-//        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1");
-//        ProductClassification shippingClassification = createShippingFeeProductClassification();
-//        Transaction transaction = createTransaction().withShippingFee(shippingFee);
-//
-//        // When
-//        when(productClassificationRepository.findOneByTaxCode(transaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
-//        Mono<ProductClassification> productClassificationMono = productClassificationService.g
-//
-//        // Then
-//    }
-
-
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne() {
         // Given

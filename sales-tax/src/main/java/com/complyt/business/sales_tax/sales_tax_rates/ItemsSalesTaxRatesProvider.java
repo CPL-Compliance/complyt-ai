@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import lombok.AllArgsConstructor;
@@ -13,14 +14,14 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class ItemsSalesTaxRatesCalculator {
+public class ItemsSalesTaxRatesProvider implements TaxableSalesTaxRatesProvider<List<Item>> {
 
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;
 
-    public List<Item> setSalesTaxRates(List<Item> items, SalesTaxRate salesTaxRate) {
+    public List<Item> setSalesTaxRates(List<Item> items, SalesTaxRate salesTaxRate, Address address) {
         return items.stream()
-                .map(item -> item.withSalesTaxRate(salesTaxRatesProvider.calculateSalesTaxRate(item.getJurisdictionalSalesTaxRules(), salesTaxRate)))
+                .map(item -> item.withSalesTaxRate(salesTaxRatesProvider.provide(item.getJurisdictionalSalesTaxRules(), salesTaxRate, address)))
                 .collect(Collectors.toList());
     }
 }
