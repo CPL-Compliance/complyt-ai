@@ -68,6 +68,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
                             float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
                             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+
                             return transactionWithRates.withSalesTax(salesTax);
                         }));
     }

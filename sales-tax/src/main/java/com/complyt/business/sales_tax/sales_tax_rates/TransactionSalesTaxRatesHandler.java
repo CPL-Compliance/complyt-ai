@@ -4,6 +4,7 @@ import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,6 @@ public class TransactionSalesTaxRatesHandler {
     private TaxableSalesTaxRatesProvider<List<Item>> itemsSalesTaxRatesProvider;
 
     public Mono<Transaction> setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
-        log.info("Setting sales tax rates for transaction");
-
         List<Item> itemsWithRates = itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, transaction.getShippingAddress());
 
         if (transaction.getShippingFee() != null) {
@@ -33,7 +32,8 @@ public class TransactionSalesTaxRatesHandler {
             transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 
-        return Mono.just(transaction.withItems(itemsWithRates));
+        return ContextLogger.observeCtx("Sales tax rates had being set for transaction", log::info)
+                .then(Mono.just(transaction.withItems(itemsWithRates)));
     }
 
 }
