@@ -116,9 +116,9 @@ public class SalesTaxServiceImplTest {
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRate));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transactionWithRates);
+                .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
@@ -152,9 +152,9 @@ public class SalesTaxServiceImplTest {
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRate));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transactionWithRates);
+                .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);

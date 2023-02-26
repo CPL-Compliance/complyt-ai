@@ -4,10 +4,12 @@ import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -17,21 +19,21 @@ import java.util.List;
 public class TransactionSalesTaxRatesHandler {
 
     @NonNull
-    private ShippingFeeSalesTaxRatesCalculator shippingFeeSalesTaxRatesCalculator;
+    private TaxableSalesTaxRatesProvider<ShippingFee> shippingFeeSalesTaxRatesProvider;
 
     @NonNull
-    private ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
+    private TaxableSalesTaxRatesProvider<List<Item>> itemsSalesTaxRatesProvider;
 
-    public Transaction setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
-        log.info("Setting sales tax rates for transaction");
-
-        List<Item> itemsWithRates = itemsSalesTaxRatesCalculator.setSalesTaxRates(transaction.getItems(), salesTaxRate);
+    public Mono<Transaction> setRates(@NonNull Transaction transaction, @NonNull SalesTaxRate salesTaxRate) {
+        List<Item> itemsWithRates = itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, transaction.getShippingAddress());
 
         if (transaction.getShippingFee() != null) {
-            ShippingFee shippingFeeWithRates = shippingFeeSalesTaxRatesCalculator.setSalesTaxRates(transaction.getShippingFee(), salesTaxRate);
+            ShippingFee shippingFeeWithRates = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(transaction.getShippingFee(), salesTaxRate, transaction.getShippingAddress());
             transaction = transaction.withShippingFee(shippingFeeWithRates);
         }
 
-        return transaction.withItems(itemsWithRates);
+        return ContextLogger.observeCtx("Set Sales tax rates to Transaction", log::info)
+                .then(Mono.just(transaction.withItems(itemsWithRates)));
     }
+
 }

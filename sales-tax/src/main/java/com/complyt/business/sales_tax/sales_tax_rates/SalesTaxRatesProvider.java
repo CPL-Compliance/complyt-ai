@@ -1,68 +1,43 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.domain.sales_tax.product_classification.SalesTaxRules;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SalesTaxRatesProvider {
+
+    @NonNull
+    SalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
+
+    @NonNull
+    SalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
+
     /**
-     * Calculating sales tax rate regarding the rules of the given item
-     * 4 patterns are available :
-     * - not taxable
-     * - taxable with no special treatment - taking the original sales tax rate
-     * - calculated by fixed value to override the original sales tax rate
-     * - calculated by certain percentage of the original sales tax rate
-     *
-     * @param jurisdictionalSalesTaxRules - Rules to declare how sales tax rate should be calculated
-     * @param originalSalesTaxRate        - Sales tax rate given by external resource regarding the current transaction's address
-     * @return
+     * Calculating sales tax rates for state and city level if exists.
+     * We must make sure that State rates are always being calculated before city's rate
+     * so there won't be a tax rate override
      */
-    public SalesTaxRate calculateSalesTaxRate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {
-        if (!jurisdictionalSalesTaxRules.isTaxable()) {
-            log.info("None taxable rule - returning sales tax rate that is set to 0");
-            SalesTaxRate zeroSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+    public SalesTaxRate provide(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate, @NonNull Address address) {
+        SalesTaxRate calculatedRates = stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, originalSalesTaxRate);
 
-            return zeroSalesTaxRate;
+        if (jurisdictionalSalesTaxRules.getCities() != null && jurisdictionalSalesTaxRules.getCities().containsKey(address.getCity())) {
+            SalesTaxRules citySalesTaxRules = jurisdictionalSalesTaxRules.getCities().get(address.getCity());
+            calculatedRates = cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, calculatedRates.withCityRate(originalSalesTaxRate.getCityRate()));
         }
+        log.debug("Rates returned after calculation: " + calculatedRates);
 
-        if (!jurisdictionalSalesTaxRules.isSpecialTreatment()) {
-            log.info("None special treatment for rule - returning original sales tax rate");
-
-            return originalSalesTaxRate;
-        }
-
-        if (jurisdictionalSalesTaxRules.getCalculationType() == CalculationType.FIXED) {
-            log.info("Returning fixed sales tax rate of : " + jurisdictionalSalesTaxRules.getCalculationValue());
-            SalesTaxRate modifiedRateByFixedTreatment = modifyRateByFixedTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
-
-            return modifiedRateByFixedTreatment;
-        }
-
-        log.info("Returning sales tax rate by percentage cut of : " + jurisdictionalSalesTaxRules.getCalculationValue());
-        SalesTaxRate modifiedRateByPercentageTreatment = modifyRateByPercentageTreatment(jurisdictionalSalesTaxRules.getCalculationValue(), originalSalesTaxRate);
-
-        return modifiedRateByPercentageTreatment;
-    }
-
-    private SalesTaxRate modifyRateByFixedTreatment(float jurisdictionalRuleStateRate, SalesTaxRate salesTaxRate) {
-        float newTaxRate = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + jurisdictionalRuleStateRate;
-        SalesTaxRate calculatedRate = salesTaxRate.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
-        log.info("Sales tax rate after fixed modification : " + calculatedRate);
-
-        return calculatedRate;
-    }
-
-    private SalesTaxRate modifyRateByPercentageTreatment(float percentageToCut, SalesTaxRate salesTaxRate) {
-        float newTaxRate = salesTaxRate.getTaxRate() * percentageToCut;
-        SalesTaxRate calculatedRate = salesTaxRate.withTaxRate(newTaxRate);
-        log.info("Sales tax rate after percentage modification : " + calculatedRate);
-
-        return calculatedRate;
+        return calculatedRates;
     }
 
 }

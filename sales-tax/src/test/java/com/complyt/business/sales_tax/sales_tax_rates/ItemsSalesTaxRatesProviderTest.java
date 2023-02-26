@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
@@ -27,18 +28,17 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ItemsSalesTaxRatesCalculatorTest {
+public class ItemsSalesTaxRatesProviderTest {
 
     @InjectMocks
-    ItemsSalesTaxRatesCalculator itemsSalesTaxRatesCalculator;
-
+    ItemsSalesTaxRatesProvider itemsSalesTaxRatesProvider;
     @Mock
     SalesTaxRatesProvider salesTaxRateCalculator;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     ObjectStub objectStub;
+    Address address;
 
     @BeforeEach
     void setUp() {
@@ -46,6 +46,7 @@ public class ItemsSalesTaxRatesCalculatorTest {
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         salesTaxRate = objectStub.createSalesTaxRates();
+        address = objectStub.createAddress();
     }
 
     private List<Item> createItems() {
@@ -66,8 +67,8 @@ public class ItemsSalesTaxRatesCalculatorTest {
         List<Item> itemsWithRates = setRatesToItems(items);
 
         // When
-        when(salesTaxRateCalculator.calculateSalesTaxRate(jurisdictionalSalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate);
-        List<Item> actualItems = itemsSalesTaxRatesCalculator.setSalesTaxRates(items, salesTaxRate);
+        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRate, address)).thenReturn(salesTaxRate);
+        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(items, salesTaxRate, address);
 
         // Then
         assertEquals(itemsWithRates, actualItems);

@@ -47,6 +47,10 @@
         <reactor-core-micrometer.version>1.0.2</reactor-core-micrometer.version>
         <context-propagation.version>1.0.0</context-propagation.version>
         <micrometer-tracing-bridge-brave.version>1.0.1</micrometer-tracing-bridge-brave.version>
+        <logback-classic.version>1.4.5</logback-classic.version>
+        <logback-json-classic.version>0.1.5</logback-json-classic.version>
+        <jackson-databind.version>2.14.1</jackson-databind.version>
+        <spring-cloud-dependencies.version>2022.0.0</spring-cloud-dependencies.version>
         <!-- Dependencies -->
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -66,12 +70,11 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>2022.0.0</version>
+                <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <!-- Spring Cloud -->
-
             <!-- Spring Cloud Feign -->
             <dependency>
                 <groupId>com.playtika.reactivefeign</groupId>
@@ -89,7 +92,6 @@
                 <version>${feign-reactor.version}</version>
             </dependency>
             <!-- Spring Cloud Feign -->
-
             <!-- Observability -->
             <dependency>
                 <groupId>io.projectreactor</groupId>
@@ -107,7 +109,28 @@
                 <version>${micrometer-tracing-bridge-brave.version}</version>
             </dependency>
             <!-- Observability -->
-
+            <!-- Logging -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback.contrib</groupId>
+                <artifactId>logback-json-classic</artifactId>
+                <version>${logback-json-classic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback.contrib</groupId>
+                <artifactId>logback-jackson</artifactId>
+                <version>${logback-json-classic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <!-- Logging -->
             <!-- Test -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -140,7 +163,6 @@
                 <scope>test</scope>
             </dependency>
             <!-- Test -->
-
             <!-- Other -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
@@ -172,7 +194,6 @@
         </dependencies>
         <!-- Other -->
     </dependencyManagement>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -538,6 +559,12 @@
             <id>demo</id>
             <properties>
                 <activeEnv>demo</activeEnv>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <activeEnv>test</activeEnv>
             </properties>
         </profile>
         <profile>
