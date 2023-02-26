@@ -4,10 +4,10 @@ import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.models.properties.ComplytIdCheckable;
-import com.complyt.v1.models.properties.ExternalIdCheckable;
-import com.complyt.v1.models.properties.SourceCheckable;
-import com.complyt.v1.models.properties.StateCheckable;
+import com.complyt.v1.models.checkables.ComplytIdCheckable;
+import com.complyt.v1.models.checkables.ExternalIdCheckable;
+import com.complyt.v1.models.checkables.SourceCheckable;
+import com.complyt.v1.models.checkables.StateCheckable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +49,7 @@ public class ValidatorConfig {
         map.put("source", SourceCheckable.SOURCE_CONFLICT_CHECK);
         map.put("externalId", ExternalIdCheckable.EXTERNAL_ID_CONFLICT_CHECK);
         map.put("complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK);
+
         return new DataConflictChecksProvider(map);
     }
 }

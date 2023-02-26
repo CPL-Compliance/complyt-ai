@@ -48,8 +48,8 @@ class ValidationHandlerTest {
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
 
         // When
-        when(dataConflictChecksProvider.getCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
-        when(dataConflictChecksProvider.getCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
+        when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
+        when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
 
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("externalId")).thenReturn(transactionDto.externalId());
@@ -68,8 +68,8 @@ class ValidationHandlerTest {
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
 
         // When
-        when(dataConflictChecksProvider.getCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
-        when(dataConflictChecksProvider.getCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
+        when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
+        when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
 
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("externalId")).thenReturn(differentExternalId);

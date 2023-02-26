@@ -1,6 +1,6 @@
 package com.complyt.v1.models;
 
-import com.complyt.v1.models.properties.StateCheckable;
+import com.complyt.v1.models.checkables.StateCheckable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

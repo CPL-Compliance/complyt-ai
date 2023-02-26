@@ -1,4 +1,4 @@
-package com.complyt.v1.models.properties;
+package com.complyt.v1.models.checkables;
 
 import com.complyt.v1.models.StateDto;
 import org.springframework.web.reactive.function.server.ServerRequest;

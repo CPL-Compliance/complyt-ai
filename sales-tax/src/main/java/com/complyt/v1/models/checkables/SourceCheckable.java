@@ -1,4 +1,4 @@
-package com.complyt.v1.models.properties;
+package com.complyt.v1.models.checkables;
 
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
@@ -8,9 +8,9 @@ import java.util.function.BiFunction;
 public interface SourceCheckable {
 
     BiFunction<SourceCheckable, ServerRequest, Mono<Boolean>> SOURCE_CONFLICT_CHECK =
-            (sourcePropertyDto, serverRequest) ->
+            (sourceCheckable, serverRequest) ->
                     Mono.just(serverRequest.pathVariable("source"))
-                            .map(source -> source.equals(sourcePropertyDto.source()));
+                            .map(source -> source.equals(sourceCheckable.source()));
 
     String source();
 }

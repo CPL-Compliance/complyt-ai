@@ -1,4 +1,4 @@
-package com.complyt.v1.models.properties;
+package com.complyt.v1.models.checkables;
 
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;

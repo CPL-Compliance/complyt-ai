@@ -47,13 +47,13 @@ public class ValidationHandler<T, U extends Validator> {
                 });
     }
 
-    public Mono<T> validate(final ServerRequest serverRequest, String... pathVariables) {
+    public final Mono<T> validate(final ServerRequest serverRequest, String... pathVariables) {
         return this.validateRequestBody(serverRequest)
-                .flatMap(resource -> Flux.fromArray(pathVariables)
-                        .flatMap(variable -> dataConflictChecksProvider.getCheck(variable)
-                                .flatMap(check -> check.apply(resource, serverRequest)))
+                .flatMap(body -> Flux.fromArray(pathVariables)
+                        .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
+                                .flatMap(check -> check.apply(body, serverRequest)))
                         .all(valid -> valid)
-                        .flatMap(allValid -> allValid ? Mono.just(resource) :
+                        .flatMap(allValid -> allValid ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException())));
     }
 }

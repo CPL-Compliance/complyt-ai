@@ -1,8 +1,8 @@
 package com.complyt.v1.models.customer;
 
 import com.complyt.v1.models.AddressDto;
-import com.complyt.v1.models.properties.ExternalIdCheckable;
-import com.complyt.v1.models.properties.SourceCheckable;
+import com.complyt.v1.models.checkables.ExternalIdCheckable;
+import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
