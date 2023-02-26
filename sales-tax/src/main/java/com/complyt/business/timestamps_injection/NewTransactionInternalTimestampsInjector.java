@@ -19,8 +19,8 @@ public class NewTransactionInternalTimestampsInjector implements TimestampsInjec
     @Override
     public Transaction inject() {
         LocalDateTime timestamp = LocalDateTime.now();
-        ComplytTimestamp createdDate = new ComplytTimestamp(timestamp);
-        ComplytTimestamp updatedDate = new ComplytTimestamp(timestamp);
+        LocalDateTime createdDate = timestamp;
+        LocalDateTime updatedDate = timestamp;
         Timestamps timeStamps = new Timestamps(createdDate, updatedDate);
 
         return transaction.withInternalTimestamps(timeStamps);

@@ -70,9 +70,9 @@ public class ObjectStub {
     }
 
     public CustomerDto createCustomerDto(String id) {
-        TimestampsDto internalTimeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+        TimestampsDto internalTimeStamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
         ComplytTimestampDto complytTimestampMinusOneMinute = new ComplytTimestampDto(complytTimestampDto.getTimestamp().minusMinutes(1).toString());
-        TimestampsDto externalTimestamps = new TimestampsDto(complytTimestampMinusOneMinute, complytTimestampDto);
+        TimestampsDto externalTimestamps = new TimestampsDto(complytTimestampMinusOneMinute.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
         return new CustomerDto(
                 UUID.randomUUID(),
                 id,
@@ -99,7 +99,7 @@ public class ObjectStub {
         AddressDto billingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(false, false);
-        TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+        TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
         return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
@@ -194,7 +194,7 @@ public class ObjectStub {
         ValidationDatesDto validationDates = new ValidationDatesDto(
                 new ComplytTimestampDto(complytTimestamp.getTimestamp().minusYears(1).toString()),
                 new ComplytTimestampDto(complytTimestamp.getTimestamp().plusYears(1).toString()));
-        TimestampsDto internalTimestamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+        TimestampsDto internalTimestamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
         StatusDto status = new StatusDto("code", "name");
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 

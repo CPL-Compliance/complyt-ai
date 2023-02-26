@@ -16,8 +16,8 @@ public class ExistingCustomerInternalTimestampsInjector implements TimestampsInj
 
     @Override
     public Customer inject() {
-        ComplytTimestamp createdDate = new ComplytTimestamp(customer.getInternalTimestamps().getCreatedDate().getTimestamp());
-        ComplytTimestamp modifiedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = customer.getInternalTimestamps().getCreatedDate();
+        LocalDateTime modifiedDate = LocalDateTime.now();
         Timestamps modifiedTimeStamps = new Timestamps(createdDate, modifiedDate);
 
         return customer.withInternalTimestamps(modifiedTimeStamps);
