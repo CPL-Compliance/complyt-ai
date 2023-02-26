@@ -38,13 +38,13 @@ public class SalesTaxApplyCheckTest {
 
     private Transaction createTransactionWithAppliedReferenceDate() {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
         return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
         ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps externalTimestamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
         return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
@@ -93,7 +93,7 @@ public class SalesTaxApplyCheckTest {
 
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
                 .withApproved(false)
-                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
+                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTrackingWithNoSalesTax);

@@ -52,9 +52,9 @@ public class ObjectStub {
     }
 
     public Customer createCustomer(String id) {
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps internalTimeStamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
         ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(complytTimestamp.getTimestamp().minusMinutes(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute, complytTimestamp);
+        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute.getTimestamp(), complytTimestamp.getTimestamp());
         return new Customer(
                 UUID.randomUUID(),
                 id,
@@ -90,7 +90,7 @@ public class ObjectStub {
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = createItems(false, false);
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps timeStamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
         ShippingFee shippingFee = createShippingFee(false, false);
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
@@ -180,7 +180,7 @@ public class ObjectStub {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps internalTimestamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 

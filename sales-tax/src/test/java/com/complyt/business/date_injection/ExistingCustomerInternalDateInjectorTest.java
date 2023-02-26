@@ -38,8 +38,8 @@ public class ExistingCustomerInternalDateInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp().isAfter(beforeActionTime));
-        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp().isBefore(afterActionTime));
-        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp().isBefore(beforeActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().isBefore(beforeActionTime));
     }
 }

@@ -161,8 +161,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().getTimestamp().plusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getToDate().getTimestamp().plusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
@@ -178,8 +178,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));

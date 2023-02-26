@@ -355,11 +355,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
@@ -392,11 +392,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&

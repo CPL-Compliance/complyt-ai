@@ -116,7 +116,7 @@ class NexusServiceTest {
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
@@ -153,7 +153,7 @@ class NexusServiceTest {
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = objectStub.createSalesTaxTracking(salesTaxTrackingId);
         SalesTaxTracking salesTaxTrackingWithNexusEstablished = createSalesTaxTrackingWithNexusEstablished(salesTaxTrackingId);
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
 
         // When

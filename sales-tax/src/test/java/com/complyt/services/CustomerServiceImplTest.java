@@ -70,11 +70,11 @@ class CustomerServiceImplTest {
         Customer actualCustomer = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer).block();
 
         // Then
-        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp();
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
         Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
         Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
@@ -98,11 +98,11 @@ class CustomerServiceImplTest {
 
         // Then
         StepVerifier.create(actualCustomerMono).assertNext(actualCustomer -> {
-            LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
             Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
             Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());

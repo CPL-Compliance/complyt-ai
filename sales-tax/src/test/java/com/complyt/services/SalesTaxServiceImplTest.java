@@ -89,7 +89,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
         SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId)
-                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
+                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
