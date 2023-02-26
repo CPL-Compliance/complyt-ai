@@ -59,7 +59,7 @@ public class SalesTaxTrackingHandler {
     public Mono<ServerResponse> upsert(ServerRequest request) {
         String state = request.pathVariable("state");
 
-        return salesTaxTrackingDtoValidationHandler.validate(request)
+        return salesTaxTrackingDtoValidationHandler.validate(request, "state")
                 .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingDtoToSalesTaxTracking)
                 .flatMap(receivedSalesTaxTracking ->
                         salesTaxTrackingFacade.findByState(state)

@@ -1,8 +1,8 @@
 package com.complyt.v1.models.customer;
 
 import com.complyt.v1.models.AddressDto;
-import com.complyt.v1.models.properties.ExternalIdPropertyDto;
-import com.complyt.v1.models.properties.SourcePropertyDto;
+import com.complyt.v1.models.properties.ExternalIdCheckable;
+import com.complyt.v1.models.properties.SourceCheckable;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -23,6 +23,5 @@ public record CustomerDto(UUID complytId,
                           @Valid @NotNull(message = "Address may not be null") AddressDto address,
                           @NotNull(message = "Customer type may not be null") CustomerTypeDto customerType,
                           @Valid TimestampsDto internalTimestamps,
-                          @Valid /*@NotNull(message = "External timestamps may not be null")*/ TimestampsDto externalTimestamps
-) implements ExternalIdPropertyDto, SourcePropertyDto {
+                          @Valid TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
 }

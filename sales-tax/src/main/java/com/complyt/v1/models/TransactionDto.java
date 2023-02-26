@@ -1,8 +1,8 @@
 package com.complyt.v1.models;
 
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.models.properties.ExternalIdPropertyDto;
-import com.complyt.v1.models.properties.SourcePropertyDto;
+import com.complyt.v1.models.properties.ExternalIdCheckable;
+import com.complyt.v1.models.properties.SourceCheckable;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -24,11 +24,10 @@ public record TransactionDto(UUID complytId,
                              @Valid CustomerDto customer, @Valid SalesTaxDto salesTax,
                              @NotNull(message = "Transaction Status type may not be null") TransactionStatusDto transactionStatus,
                              @Valid TimestampsDto internalTimestamps,
-                             @Valid /*@NotNull(message = "External timestamps may not be null")*/ TimestampsDto externalTimestamps,
+                             @Valid TimestampsDto externalTimestamps,
                              @NotNull(message = "Transaction Type may not be null") TransactionTypeDto transactionType,
                              @Valid ShippingFeeDto shippingFee,
                              @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
-                             float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount
-) implements SourcePropertyDto, ExternalIdPropertyDto {
+                             float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount) implements SourceCheckable, ExternalIdCheckable {
 
 }
