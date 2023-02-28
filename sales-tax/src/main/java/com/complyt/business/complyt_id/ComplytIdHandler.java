@@ -10,17 +10,17 @@ import java.util.UUID;
 
 @Component
 public class ComplytIdHandler<T extends ComplytIdProperty> {
-    public Mono<T> checkComplytIdOfUpdatedEqualsToOld(@NonNull T newT, @NonNull T oldT) {
-        return newT.getComplytId() == null || newT.getComplytId().equals(oldT.getComplytId()) ?
-                Mono.just(newT) : Mono.error(new ConflictedDataApiException());
+    public Mono<T> checkComplytIdOfUpdatedEqualsToOld(@NonNull T newEntity, @NonNull T oldEntity) {
+        return newEntity.getComplytId() == null || newEntity.getComplytId().equals(oldEntity.getComplytId()) ?
+                Mono.just(newEntity) : Mono.error(new ConflictedDataApiException());
     }
 
-    public Mono<T> checkNewDontHaveComplytId(@NonNull T newT) {
-        return newT.getComplytId() == null ?
-                Mono.just(newT) : Mono.error(new ConflictedDataApiException());
+    public Mono<T> checkNewDontHaveComplytId(@NonNull T newEntity) {
+        return newEntity.getComplytId() == null ?
+                Mono.just(newEntity) : Mono.error(new ConflictedDataApiException());
     }
 
-    public T insertComplytIdToNew(@NonNull T newT) {
-        return (T)newT.withComplytId(UUID.randomUUID());
+    public T insertComplytIdToNew(@NonNull T newEntity) {
+        return (T)newEntity.withComplytId(UUID.randomUUID());
     }
 }
