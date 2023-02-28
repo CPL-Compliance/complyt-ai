@@ -10,7 +10,7 @@ eureka:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@alex.gc1cupx.mongodb.net/files
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@eyal.5gproyc.mongodb.net/rates
 
 
 logging:

@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @Generated
-public class FilesApplication {
+public class RatesApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FilesApplication.class, args);
+        SpringApplication.run(RatesApplication.class, args);
     }
 }

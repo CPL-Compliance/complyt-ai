@@ -1,5 +1,6 @@
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
     should-unregister-on-shutdown: true
@@ -10,7 +11,7 @@ eureka:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@alex.gc1cupx.mongodb.net/sales_tax
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@eyal.5gproyc.mongodb.net/sales_tax
 
 logging:
   level:

@@ -1,5 +1,5 @@
 spring.application.name: files
-server.port: ${PORT:9880}
+server.port: ${PORT:9780}
 
 spring.profiles.active:
   - @activeEnv@
@@ -9,7 +9,7 @@ spring.profiles.active:
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
-  application-name: files-service
+  application-name: rates-service
   host: ${VAULT_HOST}
   port: 8200
   scheme: https
