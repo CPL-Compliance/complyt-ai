@@ -16,6 +16,8 @@ import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -46,16 +48,21 @@ class ValidationHandlerTest {
     void validate_ValidAndUnconflictedDto_ReturnsDto() {
         // Given
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
 
         // When
+
         when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
 
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("externalId")).thenReturn(transactionDto.externalId());
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
 
-        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest, "source", "externalId");
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(validationMono).expectNext(transactionDto).verifyComplete();
@@ -66,16 +73,20 @@ class ValidationHandlerTest {
         // Given
         String differentExternalId = UUID.randomUUID().toString();
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
 
         // When
         when(dataConflictChecksProvider.getPathVariableCheck("externalId")).thenReturn(Mono.just(TransactionDto.EXTERNAL_ID_CONFLICT_CHECK));
         when(dataConflictChecksProvider.getPathVariableCheck("source")).thenReturn(Mono.just(TransactionDto.SOURCE_CONFLICT_CHECK));
 
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("externalId")).thenReturn(differentExternalId);
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
 
-        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest, "source", "externalId");
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(validationMono).expectError(ConflictedDataApiException.class).verify();
@@ -85,21 +96,27 @@ class ValidationHandlerTest {
     void validate_InvalidDtoBodyWithPathVariables_ReturnsValidationError() {
         // Given
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
-        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest, "source", "externalId");
+        Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(validationMono).expectError(ObjectNotValidApiException.class).verify();
     }
 
     @Test
-    void validate_NoPathVariablesValidTransaction_ReturnsTransactionDto() {
+    void validate_NoPathVariablesButValidTransaction_ReturnsTransactionDto() {
         // Given
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        Map<String,String> pathVariables = new HashMap<>();
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
 
@@ -111,8 +128,12 @@ class ValidationHandlerTest {
     void validate_NoPathVariablesInvalidTransaction_ReturnsValidationError() {
         // Given
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         Mono<TransactionDto> validationMono = transactionDtoValidationHandler.validate(serverRequest);
 

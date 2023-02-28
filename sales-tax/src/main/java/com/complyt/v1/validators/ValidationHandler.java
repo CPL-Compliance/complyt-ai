@@ -14,8 +14,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
-
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -49,12 +47,12 @@ public class ValidationHandler<T, U extends Validator> {
                 });
     }
 
-    public final Mono<T> validate(final ServerRequest serverRequest, String... pathVariables) {
+    public final Mono<T> validate(final ServerRequest serverRequest) {
         return this.validateRequestBody(serverRequest)
-                .flatMap(body -> Flux.fromArray(pathVariables)
+                .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
-                        .concatWith(dataConflictChecksProvider.getBodyCheck(Set.of(pathVariables))
+                        .concatWith(dataConflictChecksProvider.getBodyCheck(serverRequest.pathVariables().keySet())
                                 .flatMap(check -> check.apply(body)))
                         .all(valid -> valid)
                         .flatMap(allValid -> allValid ? Mono.just(body) :

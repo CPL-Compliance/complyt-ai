@@ -99,7 +99,7 @@ public class TransactionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         return ContextLogger.observeCtx(logStr, log::info)
-                .then(transactionDtoValidationHandler.validate(serverRequest, "externalId", "source")
+                .then(transactionDtoValidationHandler.validate(serverRequest)
                 .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info).thenReturn(transactionDto))
                 .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                 .flatMap(receivedTransaction ->

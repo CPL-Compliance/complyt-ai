@@ -13,6 +13,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class DataConflictChecksProviderTest {
 
     DataConflictChecksProvider<SourceCheckable> dataConflictChecksProvider;
@@ -35,11 +38,22 @@ class DataConflictChecksProviderTest {
     }
 
     @Test
-    void getCheck_NullVariable_ReturnsDefaultCheck() {
-        // given + When
+    void getCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+        // Given + When
         Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("externalId").flatMap(check -> check.apply(null, null));
 
         // Then
         StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+    }
+
+    @Test
+    void getCheck_Null_Variable_ReturnsNullPointerException() {
+        // When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () -> {
+            dataConflictChecksProvider.getPathVariableCheck(null);
+        });
+
+        // Then
+        assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
     }
 }

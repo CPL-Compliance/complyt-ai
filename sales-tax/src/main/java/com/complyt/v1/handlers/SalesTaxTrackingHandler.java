@@ -67,7 +67,7 @@ public class SalesTaxTrackingHandler {
         String state = serverRequest.pathVariable("state");
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingDtoValidationHandler.validate(serverRequest, "state"))
+        return ContextLogger.observeCtx(logStr, log::info).then(salesTaxTrackingDtoValidationHandler.validate(serverRequest))
                 .flatMap(salesTaxTrackingDto -> {
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
                     return salesTaxTrackingFacade.findByState(state)

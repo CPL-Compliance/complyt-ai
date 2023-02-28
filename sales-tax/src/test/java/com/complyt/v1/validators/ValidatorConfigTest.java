@@ -18,6 +18,8 @@ import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -51,13 +53,17 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler = validatorConfig.customerDtoValidationHandler(springValidatorAdapter);
         CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", customerDto.externalId());
+        pathVariables.put("source", customerDto.source());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(CustomerDto.class)).thenReturn(Mono.just(customerDto));
         when(serverRequest.pathVariable("source")).thenReturn(customerDto.source());
         when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
 
-        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest, "source", "externalId");
+        Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(customerDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
@@ -68,13 +74,17 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
         TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("externalId", transactionDto.externalId());
+        pathVariables.put("source", transactionDto.source());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(TransactionDto.class)).thenReturn(Mono.just(transactionDto));
         when(serverRequest.pathVariable("source")).thenReturn(transactionDto.source());
         when(serverRequest.pathVariable("externalId")).thenReturn("not same external id");
 
-        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest, "source", "externalId");
+        Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(transactionDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
@@ -85,12 +95,15 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler = validatorConfig.exemptionDtoValidationHandler(springValidatorAdapter);
         ExemptionDto exemptionDto = objectStub.createExemptionDto();
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("complytId", exemptionDto.complytId().toString());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(ExemptionDto.class)).thenReturn(Mono.just(exemptionDto));
         when(serverRequest.pathVariable("complytId")).thenReturn("not same external id");
 
-        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest, "complytId");
+        Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(exemptionDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
@@ -101,12 +114,15 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler = validatorConfig.salesTaxTrackingDtoValidationHandler(springValidatorAdapter);
         SalesTaxTrackingDto salesTaxTrackingDto = objectStub.createSalesTaxTrackingDto();
+        Map<String,String> pathVariables = new HashMap<>();
+        pathVariables.put("state", salesTaxTrackingDto.state().name());
 
         // When
+        when(serverRequest.pathVariables()).thenReturn(pathVariables);
         when(serverRequest.bodyToMono(SalesTaxTrackingDto.class)).thenReturn(Mono.just(salesTaxTrackingDto));
         when(serverRequest.pathVariable("state")).thenReturn("not same external id");
 
-        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest, "state");
+        Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest);
 
         // Then
         StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");

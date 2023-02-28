@@ -70,7 +70,7 @@ public class ExemptionHandler {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.validate(serverRequest, "complytId"))
+        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.validate(serverRequest))
                 .flatMap(exemptionDto -> {
                     Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
                     return exemptionFacade.update(receivedExemption, complytId);
