@@ -15,14 +15,7 @@ import java.time.format.DateTimeFormatter;
 
 @With
 @Schema(name = "Timestamps")
-public record TimestampsDto(@Valid @NotBlank(message = "Created date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "Created date is in illegal format") @NotNull(message = "Created date may not be null") String createdDate,
-                            @Valid @NotBlank(message = "Created date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "Updated date is in illegal format") @NotNull(message = "Updated date may not be null") String updatedDate) {
+public record TimestampsDto(@Valid @NotBlank(message = "Created date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "Created date is in illegal format - For date/time fields, please provide a valid ISO format. Supported formats are 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ssZ', and 'YYYY-MM-DDTHH:mm:ss±hh:mm' (with a valid time zone offset).") @NotNull(message = "Created date may not be null") String createdDate,
+                            @Valid @NotBlank(message = "Created date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "Updated date is in illegal format - For date/time fields, please provide a valid ISO format. Supported formats are 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ssZ', and 'YYYY-MM-DDTHH:mm:ss±hh:mm' (with a valid time zone offset).") @NotNull(message = "Updated date may not be null") String updatedDate) {
 
-//    public LocalDateTime getCreatedDate() {
-//        return LocalDateTime.parse(this.createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//    }
-//
-//    public LocalDateTime getUpdatedDate() {
-//        return LocalDateTime.parse(this.updatedDate);
-//    }
 }

@@ -22,6 +22,7 @@ import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class ObjectStub {
 
     String source;
 
-    public ObjectStub(ComplytTimestamp complytTimestamp, String tenantId) {
+    public ObjectStub(LocalDateTime localDateTime, String tenantId) {
         this.complytTimestamp = complytTimestamp;
         this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
         this.tenantId = tenantId;
