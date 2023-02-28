@@ -13,13 +13,11 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.time.LocalDateTime;
@@ -29,8 +27,7 @@ import java.util.UUID;
 
 public class ObjectStub {
 
-    ComplytTimestamp complytTimestamp;
-    ComplytTimestampDto complytTimestampDto;
+    LocalDateTime localDateTime;
     String tenantId;
 
     UUID customerIdOtherDomains;
@@ -40,8 +37,7 @@ public class ObjectStub {
     String source;
 
     public ObjectStub(LocalDateTime localDateTime, String tenantId) {
-        this.complytTimestamp = complytTimestamp;
-        this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
+        this.localDateTime = localDateTime;
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
@@ -53,9 +49,9 @@ public class ObjectStub {
     }
 
     public Customer createCustomer(String id) {
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
-        ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(complytTimestamp.getTimestamp().minusMinutes(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute.getTimestamp(), complytTimestamp.getTimestamp());
+        Timestamps internalTimeStamps = new Timestamps(localDateTime, localDateTime);
+        LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTimeMinusOneMinute, localDateTime);
         return new Customer(
                 UUID.randomUUID(),
                 id,
@@ -71,9 +67,9 @@ public class ObjectStub {
     }
 
     public CustomerDto createCustomerDto(String id) {
-        TimestampsDto internalTimeStamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
-        ComplytTimestampDto complytTimestampMinusOneMinute = new ComplytTimestampDto(complytTimestampDto.getTimestamp().minusMinutes(1).toString());
-        TimestampsDto externalTimestamps = new TimestampsDto(complytTimestampMinusOneMinute.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
+        TimestampsDto internalTimeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
+        TimestampsDto externalTimestamps = new TimestampsDto(localDateTimeMinusOneMinute.toString(), localDateTime.toString());
         return new CustomerDto(
                 UUID.randomUUID(),
                 id,
@@ -91,7 +87,7 @@ public class ObjectStub {
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = createItems(false, false);
-        Timestamps timeStamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(false, false);
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
@@ -100,7 +96,7 @@ public class ObjectStub {
         AddressDto billingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(false, false);
-        TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
+        TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
         return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
@@ -180,8 +176,8 @@ public class ObjectStub {
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp.getTimestamp(), complytTimestamp.getTimestamp());
+        ValidationDates validationDates = new ValidationDates(localDateTime, localDateTime.plusYears(1));
+        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
@@ -193,9 +189,9 @@ public class ObjectStub {
         StateDto state = new StateDto("CA", "02", "California");
         ClassificationDto classification = new ClassificationDto("code", "description");
         ValidationDatesDto validationDates = new ValidationDatesDto(
-                new ComplytTimestampDto(complytTimestamp.getTimestamp().minusYears(1).toString()),
-                new ComplytTimestampDto(complytTimestamp.getTimestamp().plusYears(1).toString()));
-        TimestampsDto internalTimestamps = new TimestampsDto(complytTimestampDto.getTimestamp().toString(), complytTimestampDto.getTimestamp().toString());
+                localDateTime.minusYears(1).toString(),
+                localDateTime.plusYears(1).toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         StatusDto status = new StatusDto("code", "name");
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
@@ -234,8 +230,8 @@ public class ObjectStub {
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
                 new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null), complytTimestamp.getTimestamp(),
-                true, complytTimestamp.getTimestamp());
+                new EconomicNexusTracker(false, null), localDateTime,
+                true, localDateTime);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -243,8 +239,8 @@ public class ObjectStub {
         return new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 true,
                 new PhysicalNexusTrackerDto(false, null),
-                new EconomicNexusTrackerDto(false, null), complytTimestamp.getTimestamp(),
-                true, complytTimestamp.getTimestamp());
+                new EconomicNexusTrackerDto(false, null), localDateTime,
+                true, localDateTime);
     }
 
     public Result createResult() {

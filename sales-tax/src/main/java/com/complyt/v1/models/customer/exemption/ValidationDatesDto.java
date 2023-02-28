@@ -1,7 +1,6 @@
 package com.complyt.v1.models.customer.exemption;
 
 import com.complyt.utils.regex.ISO8601Regex;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

@@ -1,6 +1,5 @@
 package com.complyt.v1.models;
 
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,31 +25,29 @@ class TimestampsDtoTest {
         timestampsDto = new TimestampsDto(createdDate, updatedDate);
     }
 
-//    @Test
-    //Todo
-//    void init_DatesReceivedWithOffset_ReturnsDate() {
-//        // Given
-//        String createdDate = "2015-05-25T13:05:45-05:00";
-//        String updatedDate = "2015-05-25T13:05:45-05:00";
-//        ZonedDateTime createdDateBeforeRemovingOffSet = ZonedDateTime.parse(createdDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-//        ZonedDateTime updatedDateBeforeRemovingOffSet = ZonedDateTime.parse(updatedDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-//        LocalDateTime expectedCreatedDate = LocalDateTime.ofInstant(createdDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
-//        LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
-//
-//        // When
-//        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-//        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-//        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
-//
-//        // Then
-//        Assertions.assertNotNull(actualCreatedDate);
-//        Assertions.assertNotNull(actualUpdatedDate);
-//        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
-//        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
-//    }
+    @Test
+    void init_DatesReceivedWithOffset_ReturnsDate() {
+        // Given
+        String createdDate = "2015-05-25T13:05:45-05:00";
+        String updatedDate = "2015-05-25T13:05:45-05:00";
+        ZonedDateTime createdDateBeforeRemovingOffSet = ZonedDateTime.parse(createdDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime updatedDateBeforeRemovingOffSet = ZonedDateTime.parse(updatedDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        LocalDateTime expectedCreatedDate = LocalDateTime.ofInstant(createdDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
+        LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
+
+        // When
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
+        LocalDateTime actualCreatedDate = LocalDateTime.parse(createdDate);
+        LocalDateTime actualUpdatedDate = LocalDateTime.parse(updatedDate);
+
+        // Then
+        Assertions.assertNotNull(actualCreatedDate);
+        Assertions.assertNotNull(actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
+    }
 
 //    @Test
-    //Todo
 //    void init_InvalidFormatOfCreatedDate_CreatedDateIsSetToNull() {
 //        // Given
 //        String createdDate = "2015-05-25asd";
@@ -78,45 +75,45 @@ class TimestampsDtoTest {
 //        assertNull(expectedUpdatedDate);
 //    }
 
-//    @Test
-//    void init_DatesReceivedWithHour_ReturnsDate() {
-//        // Given
-//        String createdDate = "2015-05-25T13:05:45";
-//        String updatedDate = "2015-05-25T13:05:45";
-//        LocalDateTime expectedCreatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//        LocalDateTime expectedUpdatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//
-//        // When
-//        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-//        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-//        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
-//
-//        // Then
-//        Assertions.assertNotNull(actualCreatedDate);
-//        Assertions.assertNotNull(actualUpdatedDate);
-//        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
-//        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
-//    }
+    @Test
+    void init_DatesReceivedWithHour_ReturnsDate() {
+        // Given
+        String createdDate = "2015-05-25T13:05:45";
+        String updatedDate = "2015-05-25T13:05:45";
+        LocalDateTime expectedCreatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        LocalDateTime expectedUpdatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-//    @Test
-//    void init_DatesReceivedWithNoHour_ReturnsBeginningOfDay() {
-//        // Given
-//        String createdDate = "2015-05-25";
-//        String updatedDate = "2015-05-25";
-//        LocalDateTime expectedCreatedDate = LocalDate.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
-//        LocalDateTime expectedUpdatedDate = LocalDate.parse(updatedDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
-//
-//        // When
-//        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-//        LocalDateTime actualCreatedDate = timeStampsDto.getCreatedDate();
-//        LocalDateTime actualUpdatedDate = timeStampsDto.getUpdatedDate();
-//
-//        // Then
-//        Assertions.assertNotNull(actualCreatedDate);
-//        Assertions.assertNotNull(actualUpdatedDate);
-//        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
-//        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
-//    }
+        // When
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
+        LocalDateTime actualCreatedDate = LocalDateTime.parse(timeStampsDto.createdDate());
+        LocalDateTime actualUpdatedDate = LocalDateTime.parse(timeStampsDto.updatedDate());
+
+        // Then
+        Assertions.assertNotNull(actualCreatedDate);
+        Assertions.assertNotNull(actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
+    }
+
+    @Test
+    void init_DatesReceivedWithNoHour_ReturnsBeginningOfDay() {
+        // Given
+        String createdDate = "2015-05-25";
+        String updatedDate = "2015-05-25";
+        LocalDateTime expectedCreatedDate = LocalDate.parse(createdDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
+        LocalDateTime expectedUpdatedDate = LocalDate.parse(updatedDate, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
+
+        // When
+        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
+        LocalDateTime actualCreatedDate = LocalDateTime.parse(timeStampsDto.createdDate());
+        LocalDateTime actualUpdatedDate = LocalDateTime.parse(timeStampsDto.updatedDate());
+
+        // Then
+        Assertions.assertNotNull(actualCreatedDate);
+        Assertions.assertNotNull(actualUpdatedDate);
+        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
+        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
+    }
 
     @Test
     void withUpdateDate_DifferentDate_ReturnTimestampsDto() {
