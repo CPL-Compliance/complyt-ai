@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -52,6 +54,8 @@ public class ValidationHandler<T, U extends Validator> {
                 .flatMap(body -> Flux.fromArray(pathVariables)
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
+                        .concatWith(dataConflictChecksProvider.getBodyCheck(Set.of(pathVariables))
+                                .flatMap(check -> check.apply(body)))
                         .all(valid -> valid)
                         .flatMap(allValid -> allValid ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException())));

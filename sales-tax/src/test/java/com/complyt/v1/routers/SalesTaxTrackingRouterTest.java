@@ -11,7 +11,10 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.SalesTaxTrackingHandler;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
+import com.complyt.v1.models.EconomicNexusTrackerDto;
+import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.StateDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -258,6 +261,9 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsertByState_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA","","name"))
+                .withEconomicNexusTracker(new EconomicNexusTrackerDto(true,null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank",
@@ -271,24 +277,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"\",\n" +
-                        "        \"name\": \"" + stateName + "\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -307,9 +296,9 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void upsertByState_DifferentStateInBody_Returns400ConflictedData() {
         // Given
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA","code",salesTaxTrackingDto.state().name() + "boo"));
         String stateName = salesTaxTrackingDto.state().name();
-        String differentStateName = salesTaxTrackingDto.state().name() + "boo";
-
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -317,25 +306,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"" + differentStateName + "\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -380,7 +351,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsertByState_DoesntExistAndHasComplytId_Returns400ConflictedData() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        UUID differentComplytId = UUID.randomUUID();
 
         // When
         when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.empty());
@@ -751,21 +721,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(salesTaxTrackingDto.withPhysicalNexusTracker(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -785,6 +741,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullEstablishedDatePhysicalNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withPhysicalNexusTracker(new PhysicalNexusTrackerDto(false, null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Established Date may not be null"));
@@ -796,24 +754,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -844,21 +785,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(salesTaxTrackingDto.withEconomicNexusTracker(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -878,6 +805,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullEstablishedDateEconomicNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withEconomicNexusTracker(new EconomicNexusTrackerDto(false, null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Established Date may not be null"));
@@ -889,24 +818,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -926,6 +838,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(null);
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "State may not be null"));
@@ -937,20 +851,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -970,6 +871,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation may not be blank",
@@ -982,25 +885,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1020,6 +905,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_BlankCodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank",
@@ -1032,25 +919,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1070,6 +939,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_BlankNameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", "code", ""));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum",
@@ -1082,25 +953,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1120,7 +973,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        String lengthOf257Abbreviation = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation should be 1-256 characters maximum"));
@@ -1132,25 +986,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"" + lengthOf257Abbreviation + "\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1170,7 +1006,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code should be 1-256 characters maximum"));
@@ -1182,25 +1019,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1220,7 +1039,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_LengthOf257NameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", "code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));
@@ -1232,25 +1052,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"" + lengthOf257Name + "\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1270,6 +1072,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullAbbreviationInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto(null, "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation may not be blank"));
@@ -1281,24 +1085,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1318,6 +1105,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullCodeInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank"));
@@ -1329,24 +1118,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1366,6 +1138,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullNameInState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
+                .withState(new StateDto("CA", "code", null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank"));
@@ -1377,24 +1151,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                .bodyValue(givenSalesTaxTrackingDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)

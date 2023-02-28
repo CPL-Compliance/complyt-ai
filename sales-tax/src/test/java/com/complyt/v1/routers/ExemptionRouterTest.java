@@ -10,7 +10,11 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
+import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.customer.exemption.CertificateDto;
+import com.complyt.v1.models.customer.exemption.ClassificationDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.customer.exemption.StatusDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,6 +172,10 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void createByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
+        ExemptionDto givenExemptionDto = exemptionDto
+                .withStatus(null)
+                .withState(new StateDto("Ma", "09", ""))
+                .withCertificate(new CertificateDto("id", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
@@ -182,24 +190,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"MA\",\n" +
-                        "        \"code\": \"09\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -325,6 +316,10 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @WithMockUser
     public void upsertByComplytId_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
+        ExemptionDto givenExemptionDto = exemptionDto
+                .withStatus(null)
+                .withState(new StateDto("Ma", "09", ""))
+                .withCertificate(new CertificateDto("id", null, "name"));
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
@@ -340,25 +335,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"MA\",\n" +
-                        "        \"code\": \"09\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -387,29 +364,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + differentComplytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
+                .bodyValue(exemptionDto.withComplytId(differentComplytId)
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -433,29 +388,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(exemptionDto.withComplytId(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -985,25 +918,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
+                .bodyValue(exemptionDto.withClassification(null)
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1019,6 +934,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankCodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("", "desc"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank",
@@ -1031,29 +947,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
+                .bodyValue(givenExemptionDto
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1074,6 +968,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankDescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", ""));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Description may not be blank",
@@ -1086,29 +981,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
+                .bodyValue(givenExemptionDto
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1129,6 +1002,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullCodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto(null, "desc"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank"));
@@ -1140,28 +1014,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
+                .bodyValue(givenExemptionDto
                 )
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1182,6 +1035,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullDescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Description may not be blank"));
@@ -1193,29 +1047,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1235,7 +1067,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257CodeInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "desc"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code should be 1-256 characters maximum"));
@@ -1247,30 +1079,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1290,7 +1099,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257DescriptionInClassification_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Description = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Description should be 1-256 characters maximum"));
@@ -1302,30 +1111,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"description\": \"" + lengthOf257Description + "\",\n" +
-                        "        \"code\": \"code\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1345,6 +1131,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(null);
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Status may not be null"));
@@ -1356,26 +1143,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1395,6 +1163,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullCodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto(null, "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank"));
@@ -1406,29 +1175,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1448,6 +1195,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullNameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank"));
@@ -1459,29 +1207,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1501,6 +1227,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_blankCodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank",
@@ -1513,30 +1240,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1556,6 +1260,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_blankNameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", ""));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
@@ -1568,30 +1273,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1611,7 +1293,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257NameInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));
@@ -1623,30 +1305,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"" + lengthOf257Name + "\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1666,7 +1325,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257CodeInStatus_Returns400validationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code should be 1-256 characters maximum"));
@@ -1678,30 +1337,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1721,6 +1357,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(null);
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Certificate may not be null"));
@@ -1732,25 +1369,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1770,6 +1389,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullCertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto(null, "url", "name"));
+
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Certificate Id may not be blank"));
@@ -1781,29 +1402,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1823,6 +1422,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullUrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Url may not be blank"));
@@ -1834,29 +1434,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1876,6 +1454,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullNameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank"));
@@ -1887,29 +1466,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1929,6 +1486,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankCertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("", "url", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Certificate Id may not be blank",
@@ -1941,30 +1499,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1984,6 +1519,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankUrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Url may not be blank",
@@ -1996,30 +1532,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2039,6 +1552,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankNameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", ""));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
@@ -2051,30 +1565,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2094,7 +1585,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257CertificateIdInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257CertificateId = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "url", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Certificate Id should be 1-256 characters maximum"));
@@ -2106,30 +1597,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"" + lengthOf257CertificateId + "\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2149,7 +1617,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257UrlInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Url = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Url should be 1-256 characters maximum"));
@@ -2161,30 +1629,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"" + lengthOf257Url + "\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2204,7 +1649,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257NameInCertificate_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));
@@ -2216,30 +1661,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"" + lengthOf257Name + "\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2270,29 +1692,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    }\n" +
-                        "}"
-                )
+                .bodyValue(exemptionDto.withExemptionType(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2553,25 +1953,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(exemptionDto.withState(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2591,6 +1973,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankAbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation may not be blank",
@@ -2603,30 +1986,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2646,6 +2006,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankCodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank",
@@ -2658,30 +2019,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2701,6 +2039,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_BlankNameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", ""));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
@@ -2713,30 +2052,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2756,7 +2072,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257AbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Abbreviation = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation should be 1-256 characters maximum"));
@@ -2768,30 +2084,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"" + lengthOf257Abbreviation + "\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2811,7 +2104,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257CodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Code = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code should be 1-256 characters maximum"));
@@ -2823,30 +2116,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"" + lengthOf257Code + "\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2866,7 +2136,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_LengthOf257NameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));
@@ -2878,30 +2148,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \""+lengthOf257Name+"\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2921,6 +2168,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullAbbreviationInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto(null, "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation may not be blank"));
@@ -2932,29 +2180,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2974,6 +2200,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullCodeInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code may not be blank"));
@@ -2985,29 +2212,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3027,6 +2232,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullNameInState_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
+        ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", null));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank"));
@@ -3038,29 +2244,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
-                        "}"
-                )
+                .bodyValue(givenExemptionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)

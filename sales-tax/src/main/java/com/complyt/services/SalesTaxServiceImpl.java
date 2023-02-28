@@ -11,7 +11,6 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -59,20 +58,18 @@ public class SalesTaxServiceImpl implements SalesTaxService {
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
         return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
-                .map(createFunctionInjectSalesTaxToTransaction(transaction));
+                .flatMap(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxData, Transaction> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxData -> {
-            SalesTaxRate salesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+    private Function<SalesTaxData, Mono<Transaction>> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxData -> salesTaxDataToSalesTaxRate.map(salesTaxData)
+                .flatMap(salesTaxRate -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate)
+                        .map(transactionWithRates -> {
+                            List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
+                            float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
+                            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
 
-            Transaction transactionWithRates = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
-            List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
-            float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
-            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
-
-            return transactionWithRates.withSalesTax(salesTax);
-        };
+                            return transactionWithRates.withSalesTax(salesTax);
+                        }));
     }
-
 }

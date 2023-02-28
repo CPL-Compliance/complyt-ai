@@ -10,6 +10,7 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
+import com.complyt.v1.models.AddressDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +60,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     void setUp() {
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
+        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
+                .withExternalTimestamps(null)
+                .withInternalTimestamps(null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
@@ -68,12 +71,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String externalId = requestCustomerDto.externalId();
-        String source = requestCustomerDto.source();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
         // When
-        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(requestCustomerDto);
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
@@ -84,11 +86,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isCreated()
-                .equals(requestCustomerDto);
+                .equals(customerDto);
     }
 
     @Override
@@ -96,6 +98,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
+        CustomerDto givenCustomerDto = customerDto
+                .withName("")
+                .withSource("d")
+                .withCustomerType(null);
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<String>();
@@ -112,21 +118,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + "source" + "\",\n" +
-                        "    \"name\": \"\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(givenCustomerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -145,11 +137,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_DifferentSourceInBody_Returns400ConflictedData() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String externalId = requestCustomerDto.externalId();
+        String externalId = customerDto.externalId();
         String differentSource = "9";
         // When
-        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(requestCustomerDto);
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, differentSource)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
 
@@ -160,7 +151,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -174,8 +165,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_DifferentExternalIdInBody_Returns400ConflictedData() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String source = requestCustomerDto.source();
+        String source = customerDto.source();
         String differentExternalId = UUID.randomUUID().toString();
 
         // When + Then
@@ -185,7 +175,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -199,13 +189,12 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_ExistWithDifferentComplytId_Returns400ConflictedData() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String source = requestCustomerDto.source();
-        String externalId = requestCustomerDto.externalId();
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
         UUID differentComplytId = UUID.randomUUID();
 
         // When
-        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(requestCustomerDto);
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         Customer differentCustomer = mappedCustomer.withComplytId(differentComplytId);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(differentCustomer));
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.empty());
@@ -218,7 +207,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -232,12 +221,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistAndHasComplytId_Returns400ConflictedData() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String source = requestCustomerDto.source();
-        String externalId = requestCustomerDto.externalId();
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
 
         // When
-        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(requestCustomerDto);
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.error(new ConflictedDataApiException()));
 
@@ -248,7 +236,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -277,22 +265,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + invalidSource + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withSource(invalidSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -322,22 +295,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + invalidSource + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withSource(invalidSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -363,22 +321,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + invalidSource + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withSource(invalidSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -408,22 +351,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + nullExternalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withExternalId(nullExternalId))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -453,22 +381,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalIdWithLengthOf257 + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withExternalId(externalIdWithLengthOf257))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -508,8 +421,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -524,9 +437,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     public void upsertByExternalIdAndSource_UnauthenticatedUser_Returns401() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String source = requestCustomerDto.source();
-        String externalId = requestCustomerDto.externalId();
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
 
         // When + Then
         webTestClient
@@ -535,7 +447,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isUnauthorized();
@@ -553,9 +465,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         /// Given
-        CustomerDto requestCustomerDto = customerDto.withExternalTimestamps(null).withInternalTimestamps(null);
-        String source = requestCustomerDto.source();
-        String externalId = requestCustomerDto.externalId();
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
 
         // When + Then
         webTestClient
@@ -563,7 +474,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isForbidden();
@@ -632,22 +543,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"" + invalidName + "\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withName(invalidName))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -677,22 +573,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"" + nameWithLengthOf257 + "\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withName(nameWithLengthOf257))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -717,14 +598,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -741,8 +615,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String countyWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
-
+        AddressDto givenAddress = new AddressDto("city", "country", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "state", "street", "zip");
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -750,22 +623,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"" + countyWithLengthOf257 + "\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -778,11 +636,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen10ZipInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen20ZipInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String zipWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "street", "bacabbacabbacabbacab$");
 
         // When + Then
         webTestClient
@@ -791,28 +649,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"" + zipWithLengthOf257 + "\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[ZIP should be 1-256 characters maximum]", message);
+                    assertEquals("[ZIP should be 1-20 characters maximum]", message);
                 });
     }
 
@@ -823,7 +666,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String countryWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        AddressDto givenAddress = new AddressDto("city", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -832,22 +675,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"" + countryWithLengthOf257 + "\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -864,7 +692,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String cityWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        AddressDto givenAddress = new AddressDto("baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "country", "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -873,22 +701,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"" + cityWithLengthOf257 + "\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -905,7 +718,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String stateWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "street", "zip");
 
         // When + Then
         webTestClient
@@ -914,22 +727,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"" + stateWithLengthOf257 + "\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -946,7 +744,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String streetWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "zip");
 
         // When + Then
         webTestClient
@@ -955,22 +753,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"" + streetWithLengthOf257 + "\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"customerType\": \"RETAIL\",\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withAddress(givenAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -995,21 +778,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
-                        "    \"source\": \"" + source + "\",\n" +
-                        "    \"name\": \"name\",\n" +
-                        "    \"address\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
-                        "}}")
+                .bodyValue(customerDto.withCustomerType(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1031,7 +800,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
         when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
         when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
-        //when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
 
         // When + Then
         webTestClient
@@ -1092,10 +860,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithUserDetails
     public void upsertByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
-        CustomerDto requestCustomerDto = customerDto.withInternalTimestamps(null).withExternalTimestamps(null);
-        String externalId = requestCustomerDto.externalId();
-        String source = requestCustomerDto.source();
-        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(requestCustomerDto);
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
         // When
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
@@ -1108,7 +875,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
-                .bodyValue(requestCustomerDto)
+                .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -1160,9 +927,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getByExternalIdAndSource_InternalServerError_Returns500() {
         /// Given
-        CustomerDto requestCustomerDto = customerDto.withInternalTimestamps(null).withExternalTimestamps(null);
-        String externalId = requestCustomerDto.externalId();
-        String source = requestCustomerDto.source();
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
         // When
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
@@ -1222,8 +988,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @WithMockUser
     public void getByComplytId_InternalServerError_Returns500() {
         /// Given
-        CustomerDto requestCustomerDto = customerDto.withInternalTimestamps(null).withExternalTimestamps(null);
-        UUID complytId = requestCustomerDto.complytId();
+        UUID complytId = customerDto.complytId();
 
         // When
         when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
@@ -1658,7 +1423,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1697,7 +1462,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1737,7 +1502,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
                         "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
@@ -1779,7 +1544,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"externalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1818,7 +1583,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1857,7 +1622,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -1897,7 +1662,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
-                        "\"createdDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"," +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
                         "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
                         "}}")
                 .accept(MediaType.APPLICATION_JSON)
@@ -1939,7 +1704,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "    \"customerType\": \"RETAIL\",\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
-                        "\"updatedDate\":  \"" + customerDto.externalTimestamps().createdDate().getTimestamp() + "\"" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

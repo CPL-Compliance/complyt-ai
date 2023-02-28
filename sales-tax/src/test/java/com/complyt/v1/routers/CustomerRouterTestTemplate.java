@@ -30,7 +30,7 @@ public interface CustomerRouterTestTemplate extends
 
     void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen10ZipInAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen20ZipInAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen256CountryInAddress_Returns400ValidationError();
 

@@ -11,7 +11,8 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.*;
+import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Autowired
     TransactionRouter transactionRouter;
     String source;
+    ObjectStub objectStub;
     @MockBean
     private TransactionFacade transactionFacade;
     @Autowired
@@ -61,7 +63,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @BeforeEach
     void setUp() {
-        ObjectStub objectStub = new ObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
                 .withCustomer(null)
@@ -479,13 +481,19 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
+        ItemDto givenItemDto = new ItemDto(-25, 4, 8000, "description", "name", "C1S1", null, null, false, 0, null, TaxableCategoryDto.TAXABLE);
+        List<ItemDto> itemDtoList = objectStub.createItemDtos(false, false);
+        itemDtoList.add(givenItemDto);
+
+        TransactionDto givenTransaction = transactionDto.withShippingAddress(null).withItems(itemDtoList);
+
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Shipping address may not be null",
-                "Unit Price can not be a negative number",
-                "Created date may not be null"));
+                "Unit Price can not be a negative number"));
 
         // When + Then
         webTestClient
@@ -493,37 +501,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": -25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n" +
-                        "}")
+                        .build())
+                .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -552,44 +531,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + differentSource + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                        .build())
+                .bodyValue(transactionDto.withSource(differentSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -605,7 +548,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String differentexternalId = UUID.randomUUID().toString();
+        String differentExternalId = UUID.randomUUID().toString();
 
         // When + Then
         webTestClient
@@ -614,43 +557,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + differentexternalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withExternalId(differentExternalId))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -696,7 +603,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        UUID differentComplytId = UUID.randomUUID();
 
         // When
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
@@ -725,7 +631,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String invalidSource = "";
+        String blankSource = "";
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Source should be a single digit",
@@ -738,43 +644,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + invalidSource + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withSource(blankSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -804,43 +674,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + invalidSource + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withSource(invalidSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -866,43 +700,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + invalidSource + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withSource(invalidSource))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -932,43 +730,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + blankExternalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withExternalId(blankExternalId))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -998,43 +760,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalIdWithLengthOf257 + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withExternalId(externalIdWithLengthOf257))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1226,7 +952,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
-        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
         String externalId = transactionDto.externalId();
 
         // When + Then
@@ -1473,35 +1198,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1519,12 +1216,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String countyWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "County should be 1-256 characters maximum"));
 
@@ -1535,43 +1232,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"" + countyWithLengthOf257 + "\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1588,14 +1249,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String zipWithLengthOf21 = "baaabbaaabbaaabbaaab1";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "ZIP should be 1-256 characters maximum"));
+                "ZIP should be 1-20 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1604,43 +1265,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"" + zipWithLengthOf21 + "\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1657,11 +1282,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String countryWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Country should be 1-256 characters maximum"));
@@ -1673,43 +1298,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"country\": \"" + countryWithLengthOf257 + "\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1726,11 +1315,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String cityWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "City should be 1-256 characters maximum"));
@@ -1742,43 +1331,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"" + cityWithLengthOf257 + "\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1795,11 +1348,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String stateWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "State should be 1-256 characters maximum"));
@@ -1811,43 +1364,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"" + stateWithLengthOf257 + "\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1864,11 +1381,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String streetWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Street should be 1-256 characters maximum"));
@@ -1880,43 +1397,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"" + streetWithLengthOf257 + "\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1948,35 +1429,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withBillingAddress(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1993,12 +1446,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String countyWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "County should be 1-256 characters maximum"));
 
@@ -2009,43 +1462,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"" + countyWithLengthOf257 + "\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2062,14 +1479,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String zipWithLengthOf21 = "baaabbaaabbaaabbaaab1";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "ZIP should be 1-256 characters maximum"));
+                "ZIP should be 1-20 characters maximum"));
 
         // When + Then
         webTestClient
@@ -2078,43 +1495,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"" + zipWithLengthOf21 + "\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2131,11 +1512,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String countryWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Country should be 1-256 characters maximum"));
@@ -2147,43 +1528,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"country\": \"" + countryWithLengthOf257 + "\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2200,11 +1545,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String cityWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "City should be 1-256 characters maximum"));
@@ -2216,43 +1561,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"" + cityWithLengthOf257 + "\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2269,11 +1578,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String stateWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "State should be 1-256 characters maximum"));
@@ -2285,43 +1594,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"" + stateWithLengthOf257 + "\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2338,11 +1611,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String streetWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Street should be 1-256 characters maximum"));
@@ -2354,43 +1627,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"" + streetWithLengthOf257 + "\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2422,42 +1659,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withTransactionType(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2490,31 +1692,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2546,33 +1724,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(new ArrayList<>()))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2593,6 +1745,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        SalesTaxDto salesTax = new SalesTaxDto(-0.1f, objectStub.createSalesTaxRatesDto());
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Amount can not be a negative number"));
@@ -2604,54 +1757,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"salesTax\": {\n" +
-                        "      \"amount\": -0.1,\n" +
-                        "      \"salesTaxRate\": {\n" +
-                        "        \"cityRate\": 0.1,\n" +
-                        "        \"cityDistrictRate\": 0.1,\n" +
-                        "        \"countyRate\": 0.1,\n" +
-                        "        \"stateRate\": 0.1,\n" +
-                        "        \"countyDistrictRate\": 0.1,\n" +
-                        "        \"taxRate\": 0.5\n" +
-                        "       }\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withSalesTax(salesTax))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2672,8 +1778,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String LengthOf257CreatedFrom = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        String lengthOf257CreatedFrom = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Created From should be 1-256 characters maximum"));
 
@@ -2684,44 +1790,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"createdFrom\": \"" + LengthOf257CreatedFrom + "\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withCreatedFrom(lengthOf257CreatedFrom))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2754,44 +1823,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"createdFrom\": \"" + blankCreatedFrom + "\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withCreatedFrom(blankCreatedFrom))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2812,7 +1844,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String invalidCustomerIdd = "0d3e260d-3555-4fb6-bcdd-926beb4bad51$";
+        String invalidCustomerId = "0d3e260d-3555-4fb6-bcdd-926beb4bad51$";
 
         // When + Then
         webTestClient
@@ -2823,7 +1855,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
                         "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"" + invalidCustomerIdd + "\",\n" +
+                        "   \"customerId\": \"" + invalidCustomerId + "\",\n" +
                         "   \"items\": [\n" +
                         "        {\n" +
                         "            \"unitPrice\": 25,\n" +
@@ -2881,42 +1913,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withCustomerId(null))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2930,15 +1927,19 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_InvalidCustomer_Returns400() {
         // Given
+        String lengthOf257City = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab$";
+        CustomerDto invalidCustomerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
+                .withExternalTimestamps(null)
+                .withInternalTimestamps(null)
+                .withSource("")
+                .withAddress(new AddressDto(lengthOf257City, "country", null, "state", "street", "zip"));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Source should be a single digit",
-                "Transaction Status type may not be null",
-                "Created date may not be null",
-                "Source may not be blank",
-                "Billing address may not be null"));
+                "City should be 1-256 characters maximum",
+                "Source may not be blank"));
 
         // When + Then
         webTestClient
@@ -2947,51 +1948,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "   \"customer\": {\n" +
-                        "       \"externalId\": \"" + externalId + "\",\n" +
-                        "       \"source\": \"\",\n" +
-                        "       \"name\": \"name\",\n" +
-                        "       \"address\": {\n" +
-                        "           \"city\": \"City\",\n" +
-                        "           \"country\": \"Country\",\n" +
-                        "           \"county\": \"County\",\n" +
-                        "           \"state\": \"CA\",\n" +
-                        "           \"street\": \"Street\",\n" +
-                        "           \"zip\": \"Zip\"\n" +
-                        "       },\n" +
-                        "       \"customerType\": \"RETAIL\",\n" +
-                        "       \"externalTimestamps\":  {" +
-                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
-                        "       }" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withCustomer(invalidCustomerDto))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3493,6 +2450,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeUnitPriceInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(-25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
 
@@ -3503,43 +2462,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": -25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3553,6 +2476,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeQuantityInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, -200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
 
@@ -3563,43 +2488,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": -200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3613,6 +2502,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, -5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
 
@@ -3623,43 +2514,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": -5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3673,6 +2528,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullNameInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", null, "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -3687,42 +2544,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3741,6 +2563,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void upsert_BlankNameInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -3756,43 +2580,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3811,9 +2599,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String lengthOf257Name = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));
@@ -3826,43 +2615,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"" + lengthOf257Name + "\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3881,6 +2634,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullTaxCodeInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", null, null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -3895,42 +2650,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"name of item\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3949,6 +2669,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     public void upsert_BlankTaxCodeInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -3964,43 +2686,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"name of item\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4019,9 +2705,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String lengthOf257TaxCode = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Tax Code should be 1-256 characters maximum"));
@@ -4034,43 +2721,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"" + lengthOf257TaxCode + "\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4089,6 +2740,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, -0.5f, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -4103,43 +2756,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": -0.5\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4158,6 +2775,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LargerThanMaxManualSalesTaxRateInItem_Returns400ValidationError() {
         // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0.5f, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -4172,43 +2791,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 42\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withItems(itemList))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4227,11 +2810,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
         // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, -0.5f, 5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Manual Sales Tax Rate's minimum value is 0"));
+                "Manual Sales Tax Rate can not be a negative number"));
 
 
         // When + Then
@@ -4241,51 +2825,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": -0.5\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingFee\": {\n" +
-                        "        \"unitPrice\": 25,\n" +
-                        "        \"totalPrice\": 5000,\n" +
-                        "        \"quantity\": 200,\n" +
-                        "        \"taxCode\": \"C1S1\",\n" +
-                        "        \"manualSalesTax\": false,\n" +
-                        "        \"-manualSalesTaxRate\": 0\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4304,11 +2844,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
         // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, -5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Total Price items amount can not be a negative number"));
+                "Total Price can not be a negative number"));
 
 
         // When + Then
@@ -4318,51 +2859,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingFee\": {\n" +
-                        "        \"unitPrice\": 25,\n" +
-                        "        \"totalPrice\": -5000,\n" +
-                        "        \"quantity\": 200,\n" +
-                        "        \"taxCode\": \"C1S1\",\n" +
-                        "        \"manualSalesTax\": false,\n" +
-                        "        \"manualSalesTaxRate\": 0\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4381,11 +2878,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), null, null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Tax Code should be 1-256 characters maximum",
                 "Tax Code may not be blank"));
 
 
@@ -4396,51 +2893,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S6\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingFee\": {\n" +
-                        "        \"unitPrice\": 25,\n" +
-                        "        \"totalPrice\": 5000,\n" +
-                        "        \"quantity\": 200,\n" +
-                        "        \"taxCode\": \"\",\n" +
-                        "        \"manualSalesTax\": false,\n" +
-                        "        \"manualSalesTaxRate\": 0\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4456,7 +2909,35 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @Override
     public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "", null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code may not be blank",
+                "Tax Code should be 1-256 characters maximum"));
 
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
@@ -4464,9 +2945,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String lengthOf257TaxCode = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Tax Code should be 1-256 characters maximum"));
@@ -4479,51 +2960,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"name\": \"Box\",\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"desc\",\n" +
-                        "            \"taxCode\": \"C1S6\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingFee\": {\n" +
-                        "        \"unitPrice\": 25,\n" +
-                        "        \"totalPrice\": 5000,\n" +
-                        "        \"quantity\": 200,\n" +
-                        "        \"taxCode\": \"" + lengthOf257TaxCode + "\",\n" +
-                        "        \"manualSalesTax\": false,\n" +
-                        "        \"manualSalesTaxRate\": 0\n" +
-                        "    },\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
