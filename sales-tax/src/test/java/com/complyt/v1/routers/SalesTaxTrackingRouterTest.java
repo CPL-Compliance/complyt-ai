@@ -582,10 +582,44 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
-    public void upsertByState_Exists_Returns200() {
+    public void upsertByStateName_Exists_Returns200() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
         String state = newSalesTaxTracking.getState().getName();
+        SalesTaxTracking originalSalesTaxTracking = newSalesTaxTracking.withId(UUID.randomUUID().toString());
+        SalesTaxTrackingDto salesTaxTrackingDtoSent = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
+        SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDtoSent);
+        SalesTaxTracking receivedSalesTaxTrackingWithId = receivedSalesTaxTracking
+                .withId(UUID.randomUUID().toString());
+
+        SalesTaxTrackingDto expectedSalesTaxTrackingDto =
+                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(receivedSalesTaxTrackingWithId);
+
+        // When
+        when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
+        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state).build())
+                .bodyValue(salesTaxTrackingDtoSent)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .isEqualTo(expectedSalesTaxTrackingDto);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByStateAbbreviation_Exists_Returns200() {
+        // Given
+        SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
+        String state = newSalesTaxTracking.getState().getAbbreviation();
         SalesTaxTracking originalSalesTaxTracking = newSalesTaxTracking.withId(UUID.randomUUID().toString());
         SalesTaxTrackingDto salesTaxTrackingDtoSent = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
         SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDtoSent);

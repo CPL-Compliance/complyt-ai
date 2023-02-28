@@ -1,7 +1,8 @@
 package testUtils.templates.endpoints;
 
 public interface UpsertByStateRouterTestTemplate {
-    void upsertByState_Exists_Returns200();
+    void upsertByStateName_Exists_Returns200();
+    void upsertByStateAbbreviation_Exists_Returns200();
 
     void upsertByState_DoesntExists_Returns201();
 
