@@ -179,7 +179,7 @@ public class ObjectStub {
                 false, CalculationType.FIXED, "description", 0.5f);
     }
 
-    public Exemption createExemption(String id) {
+    public Exemption createExemption(String id) { //
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
         ValidationDates validationDates = new ValidationDates(localDateTime, localDateTime.plusYears(1));

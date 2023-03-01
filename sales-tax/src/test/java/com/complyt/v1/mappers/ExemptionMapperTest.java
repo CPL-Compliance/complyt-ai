@@ -37,7 +37,7 @@ public class ExemptionMapperTest {
 
         // Then
         assertEquals(exemptionDto, exemptionDtoResult);
-        //
+
     }
 
     @Test
