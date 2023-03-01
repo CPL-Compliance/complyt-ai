@@ -27,6 +27,7 @@ public interface TimestampsMapper {
     @Mapping(target = "createdDate", source = "timestamps.createdDate", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "updatedDate", source = "timestamps.updatedDate", qualifiedByName = "localDateTimeToString")
     TimestampsDto timestampsTotimestampsDto(Timestamps timestamps);
+    
     @Mapping(target = "createdDate", source = "timestampsDto.createdDate", qualifiedByName="parseStringToLocalDateTime")
     @Mapping(target = "updatedDate", source = "timestampsDto.updatedDate", qualifiedByName="parseStringToLocalDateTime")
     Timestamps timestampsDtoTotimestamps(TimestampsDto timestampsDto);

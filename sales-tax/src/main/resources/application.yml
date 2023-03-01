@@ -3,8 +3,8 @@ spring.application.name: sales-tax
 server.port: ${PORT:9898}
 
 spring.profiles.active:
-  - development
-  - fastTax
+  - @activeEnv@
+  - @activeTaxClient@
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit

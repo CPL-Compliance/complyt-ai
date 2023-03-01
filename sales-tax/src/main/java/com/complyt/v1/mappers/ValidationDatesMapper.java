@@ -1,9 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.ValidationDates;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.customer.exemption.ValidationDatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -17,16 +15,16 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface ValidationDatsMapper {
-    ValidationDatsMapper INSTANCE = Mappers.getMapper(ValidationDatsMapper.class);
+public interface ValidationDatesMapper {
+    ValidationDatesMapper INSTANCE = Mappers.getMapper(ValidationDatesMapper.class);
 
 
     @Mapping(target = "fromDate", source = "validationDates.fromDate", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "toDate", source = "validationDates.toDate", qualifiedByName = "localDateTimeToString")
-    ValidationDatesDto timestampsTotimestampsDto(ValidationDates validationDates);
+    ValidationDatesDto timestampsToTimestampsDto(ValidationDates validationDates);
     @Mapping(target = "fromDate", source = "validationDatesDto.fromDate", qualifiedByName="parseStringToLocalDateTime")
     @Mapping(target = "toDate", source = "validationDatesDto.toDate", qualifiedByName="parseStringToLocalDateTime")
-    ValidationDates timestampsDtoTotimestamps(ValidationDatesDto validationDatesDto);
+    ValidationDates timestampsDtoToTimestamps(ValidationDatesDto validationDatesDto);
 
     @Named("localDateTimeToString")
     default String localDateTimeToString(LocalDateTime dateTime) {
