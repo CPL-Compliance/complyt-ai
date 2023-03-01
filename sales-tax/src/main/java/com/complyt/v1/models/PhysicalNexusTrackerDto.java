@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @With
 @Schema(name = "PhysicalNexusTracker")
-public record PhysicalNexusTrackerDto(@NotNull(message = "Established may not be null") boolean established,
-                                      @NotNull(message = "EstablishedDate may not be null") LocalDateTime establishedDate) {
+public record PhysicalNexusTrackerDto(boolean established,
+                                      @NotNull(message = "Established Date may not be null") LocalDateTime establishedDate) {
 
 }

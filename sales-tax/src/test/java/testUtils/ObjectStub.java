@@ -11,6 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
@@ -173,6 +174,11 @@ public class ObjectStub {
                 false, CalculationType.FIXED, "description", 0.5f, null);
     }
 
+    public CitySalesTaxRules createCitySalesTaxRules() {
+        return new CitySalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0.5f);
+    }
+
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
@@ -249,6 +255,10 @@ public class ObjectStub {
                 0f, 0f, "", 0, 0, "", 0,
                 0, "", 0, 0, "", 0, 0, "",
                 0, 0, "");
+    }
+
+    public Address createAddress() {
+        return new Address("City", "Country", "County", "CA", "Street", "Zip");
     }
 
 }

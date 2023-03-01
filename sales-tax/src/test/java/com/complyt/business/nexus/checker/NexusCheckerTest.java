@@ -6,7 +6,6 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.Definition;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -54,7 +53,7 @@ public class NexusCheckerTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
         nexusCalculationSummary = createNexusCalculationSummary();
         nexusStateRule = createNexusStateRule();

@@ -7,7 +7,7 @@ import lombok.*;
 
 @Schema(name = "Status")
 public record StatusDto(
-        @NotBlank(message = "code may not be blank") @Size(min = 1, max = 256, message = "code should be 1-256 characters maximum") String code,
-        @NotBlank(message = "name may not be blank") @Size(min = 1, max = 256, message = "name should be 1-256 characters maximum") String name) {
+        @NotBlank(message = "Code may not be blank") @Size(min = 1, max = 256, message = "Code should be 1-256 characters maximum") String code,
+        @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name) {
 
 }

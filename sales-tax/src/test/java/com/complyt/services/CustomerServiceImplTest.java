@@ -1,10 +1,9 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.CustomerComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
@@ -43,7 +42,7 @@ class CustomerServiceImplTest {
     CustomerRepository customerRepository;
 
     @Mock
-    CustomerComplytIdHandler customerComplytIdHandler;
+    ComplytIdHandler<Customer> customerComplytIdHandler;
 
     Customer customer;
 
@@ -54,7 +53,7 @@ class CustomerServiceImplTest {
     @BeforeAll
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         String name = "Existing Customer";
         customer = objectStub.createCustomer(UUID.randomUUID().toString()).withName(name);
         source = objectStub.getUnifiedSource();

@@ -11,7 +11,6 @@ import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
@@ -75,7 +74,7 @@ class NexusServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
     }

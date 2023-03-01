@@ -13,7 +13,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +66,7 @@ public class SalesTaxServiceImplTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
     }
@@ -116,9 +115,9 @@ public class SalesTaxServiceImplTest {
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRate));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transactionWithRates);
+                .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
@@ -152,9 +151,9 @@ public class SalesTaxServiceImplTest {
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRate));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate))
-                .thenReturn(transactionWithRates);
+                .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);

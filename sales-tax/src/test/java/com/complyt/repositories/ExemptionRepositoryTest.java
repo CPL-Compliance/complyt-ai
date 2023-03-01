@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +49,7 @@ public class ExemptionRepositoryTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
         exemption = objectStub.createExemption(UUID.randomUUID().toString());
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());

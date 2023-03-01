@@ -1,7 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class CustomerMapperTest {
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         customer = objectStub.createCustomer(UUID.randomUUID().toString());
         customerNoTenantNorId = objectStub.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId()).withId(null);
         customerDto = objectStub.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());

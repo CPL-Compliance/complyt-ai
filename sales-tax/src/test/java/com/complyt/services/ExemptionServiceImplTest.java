@@ -1,13 +1,12 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.Status;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -45,7 +44,7 @@ public class ExemptionServiceImplTest {
     ExemptionRepository exemptionRepository;
 
     @Mock
-    ExemptionComplytIdHandler exemptionComplytIdHandler;
+    ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     Transaction transaction;
     Exemption exemption;
@@ -56,7 +55,7 @@ public class ExemptionServiceImplTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         customer = objectStub.createCustomer(customerId.toString());
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         exemption = objectStub.createExemption(UUID.randomUUID().toString());
@@ -161,7 +160,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        LocalDateTime createdDate = exemption.getValidationDates().getToDate().getTimestamp().plusYears(1);
+        LocalDateTime createdDate = exemption.getValidationDates().getToDate().plusYears(1);
         LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
@@ -178,7 +177,7 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1);
+        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().minusYears(1);
         LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction

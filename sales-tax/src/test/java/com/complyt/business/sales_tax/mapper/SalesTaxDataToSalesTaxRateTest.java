@@ -3,13 +3,14 @@ package com.complyt.business.sales_tax.mapper;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class SalesTaxDataToSalesTaxRateTest {
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
@@ -48,10 +49,10 @@ public class SalesTaxDataToSalesTaxRateTest {
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
         when(salesTaxData.isUnincorporated()).thenReturn(false);
 
-        SalesTaxRate actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+        StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
     }
 
     @Test
@@ -64,10 +65,10 @@ public class SalesTaxDataToSalesTaxRateTest {
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRate);
         when(salesTaxData.isUnincorporated()).thenReturn(true);
 
-        SalesTaxRate actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+        StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
     }
 
     @Test
@@ -80,6 +81,6 @@ public class SalesTaxDataToSalesTaxRateTest {
             salesTaxDataToSalesTaxRate.map(nullSalesTaxData);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxData is maßrked non-null but is null");
     }
 }

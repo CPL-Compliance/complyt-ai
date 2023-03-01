@@ -3,13 +3,14 @@ package com.complyt.domain.sales_tax.product_classification;
 import lombok.*;
 
 import java.util.Map;
+import java.util.Objects;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
 @With
 @ToString
-public class JurisdictionalSalesTaxRules {
+@Getter
+@EqualsAndHashCode
+@AllArgsConstructor
+public final class JurisdictionalSalesTaxRules implements SalesTaxRules {
     private final String name;
     private final String abbreviation;
     private final boolean taxable;
@@ -22,4 +23,5 @@ public class JurisdictionalSalesTaxRules {
     public boolean calculatedByPercentageCheck() {
         return taxable && specialTreatment && calculationType == CalculationType.PERCENTAGE;
     }
+
 }

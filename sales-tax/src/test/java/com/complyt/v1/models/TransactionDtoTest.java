@@ -2,7 +2,6 @@ package com.complyt.v1.models;
 
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.ObjectStub;
@@ -20,7 +19,7 @@ class TransactionDtoTest {
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         String transactionId = UUID.randomUUID().toString();
         transactionDto = objectStub.createTransactionDto(transactionId);
     }

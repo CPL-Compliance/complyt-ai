@@ -1,6 +1,5 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ class SalesTaxTrackingTest {
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         id = UUID.randomUUID().toString();
         tenantId = new ObjectId();
         localDateTime = LocalDateTime.now();

@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +50,7 @@ class CustomerRepositoryTest {
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), tenantId);
+                LocalDateTime.now(), tenantId);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         customer = objectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");

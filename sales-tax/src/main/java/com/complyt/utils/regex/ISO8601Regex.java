@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 Holds a const regular expression to check if datetime is in correct ISO8601 format
 
 Short explanation:
-=================
+********************
 the FIRST part checks for the format yyyy-mm-dd:
 # the year must be 4 digits, and month and days must be 2 digits (with 0 in the begging if one digit)
 
@@ -31,7 +31,7 @@ the SECOND part is OPTIONAL, and checks for the time and the offset:
 # OR checks if there is an offset in the format +/-hh:mm up to +/-18:00
 
 Extended explanation:
-====================
+********************
 (                                      # Start of the pattern
   (                                    # Start of the first group
     (                                  # Start of the first nested group
@@ -70,7 +70,7 @@ Extended explanation:
 
 
 Accepted formats and examples:
-================================
+*******************************
 yyyy-mm-dd
 yyyy-mm-ddThh:mm
 yyyy-mm-ddThh:mm. <from 0 to 9 digits after the dot>
@@ -90,7 +90,6 @@ yyyy-mm-ddThh:mm.-hh:mm
 2020-03-27T03:40:59.-18:00
 
  */
-@Getter
 public class ISO8601Regex {
      static final public String expression =
              "^(((20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\\d|2[0-8])" +

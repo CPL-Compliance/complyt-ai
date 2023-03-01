@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.TransactionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
@@ -12,7 +12,6 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.TransactionRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class TransactionServiceImplTest {
     CountyProvider countyProvider;
 
     @Mock
-    TransactionComplytIdHandler transactionComplytIdHandler;
+    ComplytIdHandler<Transaction> transactionComplytIdHandler;
 
     @Mock
     TransactionAmountsCollector<Transaction> transactionAmountsCollector;
@@ -67,7 +66,7 @@ class TransactionServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         customer = objectStub.createCustomer(transaction.getId());
         source = objectStub.getUnifiedSource();

@@ -3,48 +3,49 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.TransactionFacade;
+import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.models.TransactionDto;
-import com.complyt.v1.validators.ValidationHandler;
+import com.complyt.v1.models.*;
+import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @WebFluxTest
-@WithMockUser(username = "mock", password = "mock")
 @ContextConfiguration(classes = {TransactionRouter.class, TransactionHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class})
-public class TransactionRouterTest {
+public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     Transaction transaction;
 
@@ -52,32 +53,29 @@ public class TransactionRouterTest {
 
     @Autowired
     TransactionRouter transactionRouter;
-
-    @MockBean
-    private ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler;
-
+    String source;
+    ObjectStub objectStub;
     @MockBean
     private TransactionFacade transactionFacade;
-
     @Autowired
     private WebTestClient webTestClient;
 
-    String source;
-
     @BeforeEach
     void setUp() {
-        ObjectStub objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        objectStub = new ObjectStub(
+                LocalDateTime.now(), UUID.randomUUID().toString());
         transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
-                .withInternalTimestamps(null)
+                .withCustomer(null)
                 .withExternalTimestamps(null)
-                .withCustomer(null);
+                .withInternalTimestamps(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = objectStub.getUnifiedSource();
     }
 
+    @Override
     @Test
-    void getByExternalIdAndSource_FindsTransaction_ReturnsTransaction() {
+    @WithMockUser
+    public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
@@ -97,7 +95,75 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void getAll_ExpectTwoTransactions_ReturnsTwoTransactions() {
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_DoesntExists_Returns404() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    public void getByExternalIdAndSource_UnauthenticatedUser_Returns401() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByExternalIdAndSource_InternalServerError_Returns500() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAll_Exists_Returns200WithList() {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
@@ -127,7 +193,77 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void getAllBySource_ExpectTwoTransactions_ReturnsTwoTransactions() {
+    @Override
+    @WithMockUser
+    public void getAll_EmptyCollection_Returns200WithEmptyList() {
+        // Given
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
+
+        // When
+        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
+
+    @Test
+    @Override
+    public void getAll_UnauthenticatedUser_Returns401() {
+        // Given
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
+
+        // When
+        when(transactionFacade.getAll()).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_UserWithoutAuthorities_Returns403() {
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAll_InternalServerError_Returns500() {
+        // Given + When
+        when(transactionFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAllBySource_Exists_Returns200WithList() {
         // Given
         String firstId = UUID.randomUUID().toString();
         String secondId = UUID.randomUUID().toString();
@@ -157,7 +293,82 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void getByComplytId_FindsTransaction_ReturnsTransaction() {
+    @Override
+    @WithMockUser
+    public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(TransactionDto.class)
+                .value(transactionDtos -> transactionDtos, equalTo(allTransactionsWithNoId));
+    }
+
+    @Test
+    @Override
+    public void getAllBySource_UnauthenticatedUser_Returns401() {
+        // Given
+        String firstId = UUID.randomUUID().toString();
+        String secondId = UUID.randomUUID().toString();
+        Transaction firstTransaction = transaction.withExternalId(firstId);
+        Transaction secondTransaction = transaction.withExternalId(secondId);
+
+        // When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.just(firstTransaction, secondTransaction));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAllBySource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getAllBySource_InternalServerError_Returns500() {
+        // Given + When
+        when(transactionFacade.getAllBySource(source)).thenReturn(Flux.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByComplytId_Exists_Returns200() {
         // Given
         UUID complytId = transaction.getComplytId();
         when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
@@ -176,21 +387,85 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void upsert_NewTransactionCreated_ReturnsStatus201Created() {
+    @Override
+    @WithMockUser
+    public void getByComplytId_DoesntExists_Returns404() {
         // Given
+        UUID complytId = transaction.getComplytId();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
 
         // When + Then
-        when(transactionFacade.findByExternalIdAndSource(transactionDto.externalId(), source)).thenReturn(Mono.empty());
-        when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transaction));
-        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 
+    @Test
+    @Override
+    public void getByComplytId_UnauthenticatedUser_Returns401() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_InternalServerError_Returns500() {
+        // Given
+        UUID complytId = transaction.getComplytId();
+        when(transactionFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto))).thenReturn(Mono.just(transaction));
         TransactionDto expectedTransactionDto = TransactionMapper.INSTANCE.transactionToTransactionDto(transaction);
 
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + transactionDto.externalId())
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(transactionDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -201,7 +476,431 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void update_TransactionExists_ReturnsStatus200() {
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
+        // Given
+        ItemDto givenItemDto = new ItemDto(-25, 4, 8000, "description", "name", "C1S1", null, null, false, 0, null, TaxableCategoryDto.TAXABLE);
+        List<ItemDto> itemDtoList = objectStub.createItemDtos(false, false);
+        itemDtoList.add(givenItemDto);
+
+        TransactionDto givenTransaction = transactionDto.withShippingAddress(null).withItems(itemDtoList);
+
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Shipping address may not be null",
+                "Unit Price can not be a negative number"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DifferentSourceInBody_Returns400ConflictedData() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String differentSource = "9";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto.withSource(differentSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DifferentExternalIdInBody_Returns400ConflictedData() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String differentExternalId = UUID.randomUUID().toString();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withExternalId(differentExternalId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ExistWithDifferentComplytId_Returns400ConflictedData() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        UUID differentComplytId = UUID.randomUUID();
+
+        // When
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction.withComplytId(differentComplytId)));
+        when(transactionFacade.updateIfModified(externalId, source, transaction, transaction.withComplytId(differentComplytId))).thenReturn(Mono.error(new ConflictedDataApiException()));
+        when(transactionFacade.saveTransaction(any())).thenReturn(Mono.empty())
+        ;
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DoesntExistAndHasComplytId_Returns400ConflictedData() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(transactionFacade.saveTransaction(any())).thenReturn(Mono.error(new ConflictedDataApiException()))
+        ;
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_BlankSource_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String blankSource = "";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Source should be a single digit",
+                "Source may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withSource(blankSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_nonDigitSource_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String invalidSource = "d";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withSource(invalidSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Source should be a single digit]", message);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_MoreThenOneDigitSource_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String invalidSource = "10";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withSource(invalidSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Source should be a single digit]", message);
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_BlankExternalId_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String blankExternalId = "";
+        HashSet<String> expectedErrors = new HashSet<String>();
+        expectedErrors.addAll(List.of(
+                "External ID should be 1-256 characters maximum",
+                "External ID may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withExternalId(blankExternalId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String externalIdWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withExternalId(externalIdWithLengthOf257))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[External ID should be 1-256 characters maximum]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ComplytIdFailedToParse_Returns400() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String invalidComplytId = "hello";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"complytId\": \"" + invalidComplytId + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("Failed to read HTTP message", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    public void upsertByExternalIdAndSource_UnauthenticatedUser_Returns401() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_InternalServerError_Returns500() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(transactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = transactionDto.externalId();
         Transaction mappedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
@@ -211,7 +910,6 @@ public class TransactionRouterTest {
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
         when(transactionFacade.saveTransaction(mappedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.updateIfModified(externalId, source, mappedTransaction, transaction)).thenReturn(Mono.just(updatedTransaction));
-        when(transactionDtoValidationHandler.validate(any())).thenReturn(Mono.just(transactionDto));
 
         webTestClient
                 .mutateWith(csrf())
@@ -227,8 +925,10 @@ public class TransactionRouterTest {
                 .value(returnedTransaction -> returnedTransaction, equalTo(transactionDto));
     }
 
+    @Override
     @Test
-    void markAsCancelled_CancelsTransaction_TransactionStatusChanges() {
+    @WithMockUser
+    public void deleteByExternalIdAndSource_Exists_Returns204() {
         // Given
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
         String externalId = transactionDto.externalId();
@@ -247,7 +947,92 @@ public class TransactionRouterTest {
     }
 
     @Test
-    void getTransactionByExternalIdAndSourceRouterFunction_NullHandler_ThrowsException() {
+    @Override
+    @WithMockUser
+    public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        when(transactionFacade.markAsCancelled(externalId, source)).thenReturn(Mono.empty());
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    public void deleteByExternalIdAndSource_UnauthenticatedUser_Returns401() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void deleteByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void deleteByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        webTestClient
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void deleteByExternalIdAndSource_InternalServerError_Returns500() {
+        // Given
+        String externalId = transactionDto.externalId();
+
+        // When + Then
+        when(transactionFacade.markAsCancelled(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -261,8 +1046,10 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Override
     @Test
-    void getAllTransactionsRouterFunction_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -276,8 +1063,10 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Override
     @Test
-    void getAllTransactionsBySourceRouterFunction_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void getAllBySource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -291,8 +1080,10 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Override
     @Test
-    void getTransactionByComplytIdRouterFunction_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -306,8 +1097,10 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Override
     @Test
-    void upsertTransactionRouterFunction_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -321,8 +1114,10 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Override
     @Test
-    void deleteTransactionRouterFunction_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void deleteByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         TransactionHandler nullTransactionHandler = null;
         transactionRouter = new TransactionRouter();
@@ -336,4 +1131,1845 @@ public class TransactionRouterTest {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void getAny_InvalidUrl_Returns404() {
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/wrong/url")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void deleteAny_InvalidUrl_Returns404() {
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/wrong/url")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void putAny_InvalidUrl_Returns404() {
+        // Given + When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/wrong/url")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Shipping address may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "County should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP should be 1-20 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenBillingAddress = transactionDto.billingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenBillingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Billing address may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "County should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP should be 1-20 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        AddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullTransactionType_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Transaction Type may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withTransactionType(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullItemsList_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Items may not be null",
+                "Items list cannot be empty"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_EmptyItemsList_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Items list cannot be empty"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(new ArrayList<>()))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeAmountInSalesTax_Returns400validationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        SalesTaxDto salesTax = new SalesTaxDto(-0.1f, objectStub.createSalesTaxRatesDto());
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Amount can not be a negative number"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withSalesTax(salesTax))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThan256CreatedFrom_Returns400validationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String lengthOf257CreatedFrom = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Created From should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withCreatedFrom(lengthOf257CreatedFrom))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCreatedFrom_Returns400validationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String blankCreatedFrom = "";
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Created From should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withCreatedFrom(blankCreatedFrom))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_CustomerIdFailedToParse_Returns400() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        String invalidCustomerId = "0d3e260d-3555-4fb6-bcdd-926beb4bad51$";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"" + invalidCustomerId + "\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("Failed to read HTTP message", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCustomerId_Returns400() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withCustomerId(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Customer Id may not be null]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_InvalidCustomer_Returns400() {
+        // Given
+        String lengthOf257City = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab$";
+        CustomerDto invalidCustomerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
+                .withExternalTimestamps(null)
+                .withInternalTimestamps(null)
+                .withSource("")
+                .withAddress(new AddressDto(lengthOf257City, "country", null, "state", "street", "zip"));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Source should be a single digit",
+                "City should be 1-256 characters maximum",
+                "Source may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withCustomer(invalidCustomerDto))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullExternalTimestamps_Returns400ValidationError() {
+        // ???
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Created date may not be null]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Updated date may not be null]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"createdDate\":  \"\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Created date may not be null]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Updated date may not be null]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"createdDate\":  \"\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeUnitPriceInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(-25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Unit Price can not be a negative number]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeQuantityInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, -200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Quantity can not be a negative number]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeTotalPriceInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, -5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("[Total Price can not be a negative number]", map.get("message"));
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullNameInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", null, "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void upsert_BlankNameInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "", "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "C1S1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Name should be 1-256 characters maximum"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullTaxCodeInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", null, null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code may not be blank"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void upsert_BlankTaxCodeInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code should be 1-256 characters maximum",
+                "Tax Code may not be blank"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null, false, 0, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code should be 1-256 characters maximum"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, -0.5f, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Manual Sales Tax Rate's minimum value is 0"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LargerThanMaxManualSalesTaxRateInItem_Returns400ValidationError() {
+        // Given
+        List<ItemDto> itemList = new ArrayList<>();
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0.5f, null, null));
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Manual Sales Tax Rate's maximum value is 0.2"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withItems(itemList))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, -0.5f, 5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Manual Sales Tax Rate can not be a negative number"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, -5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Total Price can not be a negative number"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), null, null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code may not be blank"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "", null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code may not be blank",
+                "Tax Code should be 1-256 characters maximum"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
+        // Given
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null);
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Tax Code should be 1-256 characters maximum"));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
 }

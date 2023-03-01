@@ -1,15 +1,15 @@
 package com.complyt.domain.sales_tax.product_classification;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
+import java.util.Objects;
+
+@With
 @ToString
-public class CitySalesTaxRules {
+@Getter
+@EqualsAndHashCode
+@AllArgsConstructor
+public final class CitySalesTaxRules implements SalesTaxRules {
     private final String name;
     private final String abbreviation;
     private final boolean taxable;
@@ -17,4 +17,5 @@ public class CitySalesTaxRules {
     private final CalculationType calculationType;
     private final String description;
     private final float calculationValue;
+
 }

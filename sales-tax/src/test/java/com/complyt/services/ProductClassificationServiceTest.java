@@ -8,7 +8,6 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.ProductClassificationRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +53,7 @@ public class ProductClassificationServiceTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
         itemProductClassification0 = createItemProductClassification0();
         itemProductClassification1 = createItemProductClassification1();
@@ -143,23 +142,6 @@ public class ProductClassificationServiceTest {
         // Then
         StepVerifier.create(actualTransaction).expectNext(transactionWithData).verifyComplete();
     }
-
-//    @Test
-//    void getShippingFeeClassification_FindsClassification_ReturnsClassification() {
-//        // Given
-//        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-//        SalesTaxRate salesTaxRate = new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
-//        ShippingFee shippingFee = new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules, salesTaxRate, "C6S1");
-//        ProductClassification shippingClassification = createShippingFeeProductClassification();
-//        Transaction transaction = createTransaction().withShippingFee(shippingFee);
-//
-//        // When
-//        when(productClassificationRepository.findOneByTaxCode(transaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
-//        Mono<ProductClassification> productClassificationMono = productClassificationService.g
-//
-//        // Then
-//    }
-
 
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne() {
