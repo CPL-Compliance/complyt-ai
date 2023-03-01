@@ -81,6 +81,6 @@ public class SalesTaxDataToSalesTaxRateTest {
             salesTaxDataToSalesTaxRate.map(nullSalesTaxData);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxData is maßrked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
     }
 }
