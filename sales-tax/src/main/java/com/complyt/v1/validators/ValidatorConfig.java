@@ -55,8 +55,8 @@ public class ValidatorConfig {
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
 
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
-
         variableConflictChecksMap.put("state", StateCheckable.STATE_CONFLICT_CHECK);
+
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
     }
 }
