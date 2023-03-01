@@ -9,7 +9,7 @@ import lombok.*;
 @With
 @Schema(name = "validationDates")
 public record ValidationDatesDto(
-        @Valid @NotNull(message = "From Date timestamps may not be null") ComplytTimestampDto fromDate,
-        @Valid @NotNull(message = "To Date timestamps may not be null") ComplytTimestampDto toDate) {
+        @Valid @NotNull(message = "From Date may not be null") ComplytTimestampDto fromDate,
+        @Valid @NotNull(message = "To Date may not be null") ComplytTimestampDto toDate) {
 
 }

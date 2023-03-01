@@ -238,8 +238,8 @@ public class ObjectStub {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
-                new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null), complytTimestamp.getTimestamp(),
+                new PhysicalNexusTracker(false, complytTimestamp.getTimestamp()),
+                new EconomicNexusTracker(false, complytTimestamp.getTimestamp()), complytTimestamp.getTimestamp(),
                 true, complytTimestamp.getTimestamp());
     }
 
@@ -247,8 +247,8 @@ public class ObjectStub {
         StateDto state = new StateDto("CA", "02", "California");
         return new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 true,
-                new PhysicalNexusTrackerDto(false, null),
-                new EconomicNexusTrackerDto(false, null), complytTimestamp.getTimestamp(),
+                new PhysicalNexusTrackerDto(false, complytTimestampDto.getTimestamp()),
+                new EconomicNexusTrackerDto(false, complytTimestampDto.getTimestamp()), complytTimestamp.getTimestamp(),
                 true, complytTimestamp.getTimestamp());
     }
 

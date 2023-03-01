@@ -10,7 +10,7 @@ import lombok.ToString;
 
 @Schema(name = "State")
 public record StateDto(
-        @NotBlank(message = "abbreviation may not be blank") @Size(min = 1, max = 256, message = "abbreviation should be 1-256 characters maximum") String abbreviation,
-        @NotBlank(message = "code may not be blank") @Size(min = 1, max = 256, message = "code should be 1-256 characters maximum") String code,
-        @NotBlank(message = "name may not be blank") @Size(min = 1, max = 256, message = "name should be 1-256 characters maximum") String name) {
+        @NotBlank(message = "Abbreviation may not be blank") @Size(min = 1, max = 256, message = "Abbreviation should be 1-256 characters maximum") String abbreviation,
+        @NotBlank(message = "Code may not be blank") @Size(min = 1, max = 256, message = "Code should be 1-256 characters maximum") String code,
+        @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name) {
 }

@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.TransactionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
@@ -53,7 +53,7 @@ class TransactionServiceImplTest {
     CountyProvider countyProvider;
 
     @Mock
-    TransactionComplytIdHandler transactionComplytIdHandler;
+    ComplytIdHandler<Transaction> transactionComplytIdHandler;
 
     @Mock
     TransactionAmountsCollector<Transaction> transactionAmountsCollector;

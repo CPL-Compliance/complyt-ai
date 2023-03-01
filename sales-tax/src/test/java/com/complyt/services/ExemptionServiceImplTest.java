@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
@@ -45,7 +45,7 @@ public class ExemptionServiceImplTest {
     ExemptionRepository exemptionRepository;
 
     @Mock
-    ExemptionComplytIdHandler exemptionComplytIdHandler;
+    ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     Transaction transaction;
     Exemption exemption;

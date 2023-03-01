@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 @Schema(name = "Classification")
 public record ClassificationDto(
-        @NotBlank(message = "code may not be blank") @Size(min = 1, max = 256, message = "code should be 1-256 characters maximum") String code,
-        @NotBlank(message = "description may not be blank") @Size(min = 1, max = 256, message = "description should be 1-256 characters maximum") String description) {
+        @NotBlank(message = "Code may not be blank") @Size(min = 1, max = 256, message = "Code should be 1-256 characters maximum") String code,
+        @NotBlank(message = "Description may not be blank") @Size(min = 1, max = 256, message = "Description should be 1-256 characters maximum") String description) {
 
 }
