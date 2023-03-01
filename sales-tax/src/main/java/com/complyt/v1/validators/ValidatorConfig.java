@@ -24,30 +24,38 @@ public class ValidatorConfig {
 
     @Bean
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> map = new HashMap<>();
         map.put("source", CustomerDto.SOURCE_CONFLICT_CHECK);
         map.put("externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK);
+
         return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter, new DataConflictChecksProvider(map));
     }
 
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
         variableConflictChecksMap.put("source", TransactionDto.SOURCE_CONFLICT_CHECK);
         variableConflictChecksMap.put("externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK);
+
         return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
     }
 
     @Bean
     ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
         variableConflictChecksMap.put("complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK);
+
         return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
     }
 
     @Bean
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
+
         variableConflictChecksMap.put("state", StateCheckable.STATE_CONFLICT_CHECK);
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
     }
