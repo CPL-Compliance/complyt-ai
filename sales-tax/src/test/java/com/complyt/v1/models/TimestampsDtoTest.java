@@ -37,8 +37,8 @@ class TimestampsDtoTest {
 
         // When
         TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = LocalDateTime.parse(createdDate);
-        LocalDateTime actualUpdatedDate = LocalDateTime.parse(updatedDate);
+        LocalDateTime actualCreatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        LocalDateTime actualUpdatedDate = LocalDateTime.parse(updatedDate , DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
@@ -77,12 +77,12 @@ class TimestampsDtoTest {
 
         // When
         TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = LocalDateTime.parse(timeStampsDto.createdDate());
-        LocalDateTime actualUpdatedDate = LocalDateTime.parse(timeStampsDto.updatedDate());
+        LocalDateTime actualCreatedDate = LocalDate.parse(timeStampsDto.createdDate(), DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
+        LocalDateTime actualUpdatedDate = LocalDate.parse(timeStampsDto.updatedDate(), DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
 
         // Then
         Assertions.assertNotNull(actualCreatedDate);
-        Assertions.assertNotNull(actualUpdatedDate);
+        Assertions.assertNotNull(actualUpdatedDate); //TODO
         Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
         Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
     }

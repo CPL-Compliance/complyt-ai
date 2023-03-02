@@ -5,6 +5,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
@@ -2440,7 +2441,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                    assertEquals("Created " + DateErrorMessages.wrong_format_error_message, map.get("message"));
                 });
     }
 

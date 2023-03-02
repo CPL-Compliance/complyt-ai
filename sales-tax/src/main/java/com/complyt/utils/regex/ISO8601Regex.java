@@ -1,8 +1,5 @@
 package com.complyt.utils.regex;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 /*
 Holds a const regular expression to check if datetime is in correct ISO8601 format
 
@@ -24,7 +21,7 @@ the SECOND part is OPTIONAL, and checks for the time and the offset:
 
 (T([0-1]\d|2[0-3]):[0-5]\d(:[0-5]\d((\.\d{0,9})?))?
 # checks if the format is Thh:mm:ss.milliseconds, where the seconds and milliseconds are optional
-# the time after the T can be at to 23:59:59.999999999
+# the time after the T can be up to 23:59:59.999999999
 
 ([zZ]|((-|\+)(((0\d|1[0-7])(:[0-5]\d)?)|18(:00)?))?))?)$
 # checks for z or Z in the end of the last time part,
@@ -88,6 +85,7 @@ yyyy-mm-ddThh:mm.-hh:mm
 2020-03-27T03:40:59.003Z
 2020-03-27T03:40:59.1+09:58
 2020-03-27T03:40:59.-18:00
+2020-03-27T03:40:59+17:59
 
  */
 public class ISO8601Regex {
