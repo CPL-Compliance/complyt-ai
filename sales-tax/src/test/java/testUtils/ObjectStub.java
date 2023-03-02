@@ -261,4 +261,12 @@ public class ObjectStub {
         return new Address("City", "Country", "County", "CA", "Street", "Zip");
     }
 
+    public Timestamps createTimestamps() {
+        return new Timestamps(localDateTime.minusYears(1), localDateTime);
+    }
+
+    public TimestampsDto createTimestampsDto() {
+        return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
 }

@@ -4,6 +4,7 @@ import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
@@ -1429,7 +1430,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Created date may not be null]", message);
+                    assertTrue(message.contains("Created date may not be null"));
+                    assertTrue(message.contains("Created date may not be blank"));
                 });
     }
 
@@ -1468,7 +1470,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Updated date may not be null]", message);
+                    assertTrue(message.contains("Updated date may not be null"));
+                    assertTrue(message.contains("Updated date may not be blank"));
                 });
     }
 
@@ -1509,7 +1512,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[Updated " + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1550,7 +1553,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[Created " + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1589,7 +1592,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Created date may not be null]", message);
+                    assertTrue(message.contains("Created date may not be null"));
+                    assertTrue(message.contains("Created date may not be blank"));
                 });
     }
 
@@ -1600,7 +1604,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                        "Updated date may not be null",
+                        "Updated date may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -1628,8 +1635,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Updated date may not be null]", message);
-                });
+                    assertTrue(message.contains("Updated date may not be null"));
+                    assertTrue(message.contains("Updated date may not be blank"));                });
     }
 
     @Override
@@ -1669,7 +1676,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+
+                    assertEquals("[Updated " + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1710,7 +1718,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[Created " + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 }

@@ -1,6 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.ValidationDates;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.models.customer.exemption.ValidationDatesDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,6 +9,7 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -22,8 +24,9 @@ public interface ValidationDatesMapper {
     @Mapping(target = "fromDate", source = "validationDates.fromDate", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "toDate", source = "validationDates.toDate", qualifiedByName = "localDateTimeToString")
     ValidationDatesDto timestampsToTimestampsDto(ValidationDates validationDates);
-    @Mapping(target = "fromDate", source = "validationDatesDto.fromDate", qualifiedByName="parseStringToLocalDateTime")
-    @Mapping(target = "toDate", source = "validationDatesDto.toDate", qualifiedByName="parseStringToLocalDateTime")
+
+    @Mapping(target = "fromDate", source = "validationDatesDto.fromDate", qualifiedByName = "parseStringToLocalDateTime")
+    @Mapping(target = "toDate", source = "validationDatesDto.toDate", qualifiedByName = "parseStringToLocalDateTime")
     ValidationDates timestampsDtoToTimestamps(ValidationDatesDto validationDatesDto);
 
     @Named("localDateTimeToString")
@@ -32,7 +35,7 @@ public interface ValidationDatesMapper {
     }
 
     @Named("parseStringToLocalDateTime")
-    default LocalDateTime parseStringToLocalDateTime(String dateAsString) {
+    default LocalDateTime parseStringToLocalDateTime(String dateAsString) throws ParseException {
         try {
             LocalDateTime parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
             //log.debug("Input received as a LocalDate: " + parsedLocalDate);
@@ -56,6 +59,6 @@ public interface ValidationDatesMapper {
         } catch (Exception e) {
             //log.debug("Date has been received in invalid format : " + dateAsString);
         }
-        return null;
+        throw new ParseException("Failed on parsing string to LocalDateTime " + DateErrorMessages.wrong_format_error_message, 0);
     }
 }

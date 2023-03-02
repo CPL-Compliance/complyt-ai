@@ -1,6 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
@@ -62,5 +63,5 @@ public interface TimestampsMapper {
         } catch (Exception e) {
             log.debug("Date has been received in invalid format : " + dateAsString);
         }
-        throw new ParseException("Failed on parsing string to LocalDateTime Supported formats are 'YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ssZ', and 'YYYY-MM-DDTHH:mm:ss±hh:mm' (with a valid time zone offset).",0);}
+        throw new ParseException("Failed on parsing string to LocalDateTime " + DateErrorMessages.wrong_format_error_message,0);}
 }
