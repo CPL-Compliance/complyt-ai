@@ -79,7 +79,7 @@ public class ObjectStub {
                 id,
                 source,
                 "name",
-                new AddressDto("City", "Country", "County", "CA", "Street", "Zip"),
+                new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip"),
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
                 externalTimestamps
@@ -97,8 +97,8 @@ public class ObjectStub {
     }
 
     public TransactionDto createTransactionDto(String id) {
-        AddressDto billingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
-        AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
+        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip");
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(false, false);
         TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
