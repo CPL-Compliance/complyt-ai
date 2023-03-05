@@ -5,6 +5,7 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ExemptionHandler;
@@ -1713,7 +1714,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Created date may not be null"));
+                "Created date may not be null",
+                "Created date may not be blank"));
 
         // When + Then
         webTestClient
@@ -1770,7 +1772,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Updated date may not be null"));
+                "Updated date may not be null",
+                "Updated date may not be blank"));
 
         // When + Then
         webTestClient
@@ -1827,7 +1830,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "Updated date may not be blank",
+                "Updated " + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -1885,7 +1889,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "Created date may not be blank",
+                "Created " + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2265,7 +2270,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "From Date may not be null"));
+                "From date may not be null",
+                "From date may not be blank"));
 
         // When + Then
         webTestClient
@@ -2322,7 +2328,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "To Date may not be null"));
+                "To date may not be null",
+                "To date may not be blank"));
 
         // When + Then
         webTestClient
@@ -2379,7 +2386,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "To date may not be blank",
+                "To " + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2437,7 +2445,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "From date may not be blank",
+                "From " + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient

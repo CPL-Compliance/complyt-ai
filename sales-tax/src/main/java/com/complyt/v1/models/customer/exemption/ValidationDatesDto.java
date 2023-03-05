@@ -12,7 +12,7 @@ import lombok.*;
 @With
 @Schema(name = "validationDates")
 public record ValidationDatesDto(
-        @Valid @NotBlank(message = "From date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "From " + DateErrorMessages.wrong_format_error_message) String fromDate,
-        @Valid @NotBlank(message = "To date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "To " + DateErrorMessages.wrong_format_error_message) @NotNull(message = "To Date timestamps may not be null") String toDate) {
+        @Valid @NotBlank(message = "From date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "From " + DateErrorMessages.wrong_format_error_message) @NotNull(message = "From date may not be null") String fromDate,
+        @Valid @NotBlank(message = "To date may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "To " + DateErrorMessages.wrong_format_error_message) @NotNull(message = "To date may not be null") String toDate) {
 
 }

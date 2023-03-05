@@ -235,8 +235,8 @@ public class ObjectStub {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
-                new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null), localDateTime,
+                new PhysicalNexusTracker(false, localDateTime),
+                new EconomicNexusTracker(false, localDateTime), localDateTime,
                 true, localDateTime);
     }
 
