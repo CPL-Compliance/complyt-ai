@@ -8,11 +8,11 @@ import lombok.With;
 @With
 @Schema(name = "Address")
 public record MandatoryAddressDto(
-        @NotBlank @Size(max = 100, message = "City should be 1-256 characters maximum") String city,
-        @NotBlank @Size(max = 50, message = "Country should be 1-256 characters maximum") String country,
-        @Size(max = 100, message = "County should be 1-256 characters maximum") String county,
-        @NotBlank @Size(max = 100, message = "State should be 1-256 characters maximum") String state,
-        @NotBlank @Size(max = 200, message = "Street should be 1-256 characters maximum") String street,
+        @NotBlank @Size(max = 100, message = "City should be 1-100 characters maximum") String city,
+        @NotBlank @Size(max = 50, message = "Country should be 1-50 characters maximum") String country,
+        @Size(max = 100, message = "County should be 1-100 characters maximum") String county,
+        @NotBlank @Size(max = 100, message = "State should be 1-100 characters maximum") String state,
+        @NotBlank @Size(max = 200, message = "Street should be 1-200 characters maximum") String street,
         @NotBlank @Size(max = 20, message = "ZIP should be 1-20 characters maximum") String zip) {
 
 }

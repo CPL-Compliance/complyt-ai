@@ -709,7 +709,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String blankExternalId = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "External ID should be 1-256 characters maximum",
                 "External ID may not be blank"));
@@ -737,7 +737,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String externalIdWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
 
         // When + Then
         webTestClient
@@ -1197,14 +1197,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CountyBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCounty(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "County should be 1-256 characters maximum"));
+                "County should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1253,14 +1253,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCountry(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Country should be 1-256 characters maximum"));
+                "Country should be 1-50 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1281,14 +1281,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCity(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "City should be 1-256 characters maximum"));
+                "City should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1309,14 +1309,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withState(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "State should be 1-256 characters maximum"));
+                "State should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1337,14 +1337,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withStreet(testUtilities.stringWithLength(201));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Street should be 1-256 characters maximum"));
+                "Street should be 1-200 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1365,14 +1365,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CountyShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "County should be 1-256 characters maximum"));
+                "County should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1422,14 +1422,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Country should be 1-256 characters maximum"));
+                "Country should be 1-50 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1450,14 +1450,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "City should be 1-256 characters maximum"));
+                "City should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1478,14 +1478,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "State should be 1-256 characters maximum"));
+                "State should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1506,14 +1506,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Street should be 1-256 characters maximum"));
+                "Street should be 1-200 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1648,7 +1648,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String lengthOf257CreatedFrom = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        String lengthOf257CreatedFrom = testUtilities.stringWithLength(257);
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Created From should be 1-256 characters maximum"));
@@ -1787,18 +1787,18 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_InvalidCustomer_Returns400() {
         // Given
-        String lengthOf257City = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab$";
+        String lengthOf101City = testUtilities.stringWithLength(101);
         CustomerDto invalidCustomerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString())
                 .withExternalTimestamps(null)
                 .withInternalTimestamps(null)
                 .withSource("")
-                .withAddress(new OptionalAddressDto(lengthOf257City, "country", null, "state", "street", "zip"));
+                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip"));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Source should be a single digit",
-                "City should be 1-256 characters maximum",
+                "City should be 1-100 characters maximum",
                 "Source may not be blank"));
 
         // When + Then
@@ -2445,7 +2445,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "C1S1", null, null, false, 0, null, null));
+        itemList.add(new ItemDto(25, 200, 5000, "desc", testUtilities.stringWithLength(257), "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2536,7 +2536,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null, false, 0, null, null));
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", testUtilities.stringWithLength(257), null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2708,6 +2708,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     }
 
     @Override
+    @Test
+    @WithMockUser
     public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), "", null, null);
@@ -2740,7 +2742,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();

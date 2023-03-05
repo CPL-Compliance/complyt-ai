@@ -945,7 +945,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
-                .withState(new StateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "code", "name"));
+                .withState(new StateDto(testUtilities.stringWithLength(257), "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Abbreviation should be 1-256 characters maximum"));
@@ -971,7 +971,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
-                .withState(new StateDto("CA", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
+                .withState(new StateDto("CA", testUtilities.stringWithLength(257), "name"));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Code should be 1-256 characters maximum"));
@@ -997,7 +997,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
-                .withState(new StateDto("CA", "code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
+                .withState(new StateDto("CA", "code", testUtilities.stringWithLength(257)));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name should be 1-256 characters maximum"));

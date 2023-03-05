@@ -326,7 +326,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String nullExternalId = "";
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "External ID may not be blank",
                 "External ID should be 1-256 characters maximum"));
@@ -351,7 +351,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
-        String externalIdWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
         String source = customerDto.source();
 
         // When + Then
@@ -511,7 +511,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidName = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
                 "Name should be 1-256 characters maximum"));
@@ -537,7 +537,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String nameWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        String nameWithLengthOf257 = testUtilities.stringWithLength(257);
 
         // When + Then
         webTestClient
@@ -559,11 +559,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CountyAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip");
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -577,7 +577,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[County should be 1-256 characters maximum]", message);
+                    assertEquals("[County should be 1-100 characters maximum]", message);
                 });
     }
 
@@ -588,7 +588,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", "bacabbacabbacabbacab$");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21));
 
         // When + Then
         webTestClient
@@ -610,11 +610,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInAddress_Returns400ValidationError() {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -629,18 +629,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Country should be 1-256 characters maximum]", message);
+                    assertEquals("[Country should be 1-50 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "country", "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -655,18 +655,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[City should be 1-256 characters maximum]", message);
+                    assertEquals("[City should be 1-100 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip");
 
         // When + Then
         webTestClient
@@ -681,18 +681,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[State should be 1-256 characters maximum]", message);
+                    assertEquals("[State should be 1-100 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip");
 
         // When + Then
         webTestClient
@@ -707,7 +707,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Street should be 1-256 characters maximum]", message);
+                    assertEquals("[Street should be 1-200 characters maximum]", message);
                 });
     }
 
