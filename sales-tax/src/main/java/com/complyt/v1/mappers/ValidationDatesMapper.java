@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -19,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface ValidationDatesMapper {
     ValidationDatesMapper INSTANCE = Mappers.getMapper(ValidationDatesMapper.class);
+    Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
 
 
     @Mapping(target = "fromDate", source = "validationDates.fromDate", qualifiedByName = "localDateTimeToString")
@@ -38,22 +41,22 @@ public interface ValidationDatesMapper {
     default LocalDateTime parseStringToLocalDateTime(String dateAsString) throws ParseException {
         try {
             LocalDateTime parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
-            //log.debug("Input received as a LocalDate: " + parsedLocalDate);
+            log.debug("Input received as a LocalDate: " + parsedLocalDate);
 
             return parsedLocalDate;
         } catch (Exception ignore) {
         }
         try {
             LocalDateTime parsedLocalDateTime = LocalDateTime.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            //log.debug("Input received as a LocalDateTime: " + parsedLocalDateTime);
+            log.debug("Input received as a LocalDateTime: " + parsedLocalDateTime);
 
             return parsedLocalDateTime;
-        } catch (Exception ignore) {
-        }
+                } catch (Exception ignore) {
+                }
         try {
             ZonedDateTime zonedDate = ZonedDateTime.parse(dateAsString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
             LocalDateTime parsedDateWithOffset = LocalDateTime.ofInstant(zonedDate.toInstant(), ZoneOffset.UTC);
-            //log.debug("Input received as a ZonedDateTime: " + zonedDate);
+            log.debug("Input received as a ZonedDateTime: " + zonedDate);
 
             return parsedDateWithOffset;
         } catch (Exception e) {

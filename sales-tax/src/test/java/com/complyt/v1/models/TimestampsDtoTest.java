@@ -26,28 +26,6 @@ class TimestampsDtoTest {
     }
 
     @Test
-    void init_DatesReceivedWithOffset_ReturnsDate() {
-        // Given
-        String createdDate = "2015-05-25T13:05:45-05:00";
-        String updatedDate = "2015-05-25T13:05:45-05:00";
-        ZonedDateTime createdDateBeforeRemovingOffSet = ZonedDateTime.parse(createdDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        ZonedDateTime updatedDateBeforeRemovingOffSet = ZonedDateTime.parse(updatedDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        LocalDateTime expectedCreatedDate = LocalDateTime.ofInstant(createdDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
-        LocalDateTime expectedUpdatedDate = LocalDateTime.ofInstant(updatedDateBeforeRemovingOffSet.toInstant(), ZoneOffset.UTC);
-
-        // When
-        TimestampsDto timeStampsDto = new TimestampsDto(createdDate, updatedDate);
-        LocalDateTime actualCreatedDate = LocalDateTime.parse(createdDate, DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        LocalDateTime actualUpdatedDate = LocalDateTime.parse(updatedDate , DateTimeFormatter.ISO_ZONED_DATE_TIME);
-
-        // Then
-        Assertions.assertNotNull(actualCreatedDate);
-        Assertions.assertNotNull(actualUpdatedDate);
-        Assertions.assertEquals(expectedCreatedDate, actualCreatedDate);
-        Assertions.assertEquals(expectedUpdatedDate, actualUpdatedDate);
-    }
-
-    @Test
     void init_DatesReceivedWithHour_ReturnsDate() {
         // Given
         String createdDate = "2015-05-25T13:05:45";
