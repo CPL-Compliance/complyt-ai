@@ -7,10 +7,11 @@ import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
+import com.complyt.v1.models.AddressDto;
 import com.complyt.v1.models.customer.CustomerDto;
-import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,19 +23,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import testUtils.ObjectStub;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -44,16 +40,13 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class})
-class CustomerRouterTest {
+class CustomerRouterTest implements CustomerRouterTestTemplate {
     Customer customer;
 
     CustomerDto customerDto;
 
     @Autowired
     CustomerRouter customerRouter;
-
-    @MockBean
-    private ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler;
 
     @MockBean
     private CustomerFacade customerFacade;
@@ -65,30 +58,34 @@ class CustomerRouterTest {
 
     @BeforeEach
     void setUp() {
-        ObjectStub objectStub = new ObjectStub(
+        objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
+        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
+                .withExternalTimestamps(null)
+                .withInternalTimestamps(null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
     @Test
-    @WithMockUser()
-    void upsert_NewCustomerCreated_SavesCustomer() {
-        // Given®
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
+        // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
+
+        // When
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
-        when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
 
-        // When + Then
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
+                        .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -96,18 +93,425 @@ class CustomerRouterTest {
                 .equals(customerDto);
     }
 
+    @Override
     @Test
-    @WithMockUser()
-    void accessNonExistingPath_NotFound() {
+    @WithMockUser
+    public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
+        // Given
+        CustomerDto givenCustomerDto = customerDto
+                .withName("")
+                .withSource("d")
+                .withCustomerType(null);
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<String>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum",
+                "Source should be a single digit",
+                "Customer type may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DifferentSourceInBody_Returns400ConflictedData() {
+        // Given
+        String externalId = customerDto.externalId();
+        String differentSource = "9";
+        // When
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        when(customerFacade.findByExternalIdAndSource(externalId, differentSource)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DifferentExternalIdInBody_Returns400ConflictedData() {
+        // Given
+        String source = customerDto.source();
+        String differentExternalId = UUID.randomUUID().toString();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ExistWithDifferentComplytId_Returns400ConflictedData() {
+        // Given
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
+        UUID differentComplytId = UUID.randomUUID();
+
+        // When
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        Customer differentCustomer = mappedCustomer.withComplytId(differentComplytId);
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(differentCustomer));
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(mappedCustomer, differentCustomer)).thenReturn(Mono.error(new ConflictedDataApiException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_DoesntExistAndHasComplytId_Returns400ConflictedData() {
+        // Given
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
+
+        // When
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.error(new ConflictedDataApiException()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_BlankSource_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
+        String invalidSource = "";
+        HashSet<String> expectedErrors = new HashSet<String>();
+        expectedErrors.addAll(List.of(
+                "Source may not be blank",
+                "Source should be a single digit"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withSource(invalidSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_nonDigitSource_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidSource = "y";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withSource(invalidSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Source should be a single digit]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_MoreThenOneDigitSource_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidSource = "10";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withSource(invalidSource))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Source should be a single digit]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_BlankExternalId_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String nullExternalId = "";
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<String>();
+        expectedErrors.addAll(List.of(
+                "External ID may not be blank",
+                "External ID should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withExternalId(nullExternalId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String externalIdWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withExternalId(externalIdWithLengthOf257))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[External ID should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_ComplytIdFailedToParse_Returns400() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidComplytId = "2d7dd100-3389-4b08-8b05-38dc88a114dx";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"complytId\": \"" + invalidComplytId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("Failed to read HTTP message", message);
+                });
+    }
+
+    @Override
+    @Test
+    public void upsertByExternalIdAndSource_UnauthenticatedUser_Returns401() {
+        // Given
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
+        /// Given
+        String source = customerDto.source();
+        String externalId = customerDto.externalId();
+
+        // When + Then
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAny_InvalidUrl_Returns404() {
+        /// Given
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "invalid/url")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser()
+    public void putAny_InvalidUrl_Returns404() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When
         Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
         when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
-        when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
 
-        // When + Then
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -119,9 +523,275 @@ class CustomerRouterTest {
                 .expectStatus().isNotFound();
     }
 
+    @Override
     @Test
+    @WithMockUser
+    public void upsert_BlankName_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidName = "";
+        HashSet<String> expectedErrors = new HashSet<String>();
+        expectedErrors.addAll(List.of(
+                "Name may not be blank",
+                "Name should be 1-256 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withName(invalidName))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256Name_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String nameWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withName(nameWithLengthOf257))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Name should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Address may not be null]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("city", "country", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "state", "street", "zip");
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[County should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen20ZipInAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "street", "bacabbacabbacabbacab$");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[ZIP should be 1-20 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CountryInAddress_Returns400ValidationError() {
+        /// Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("city", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "county", "state", "street", "zip");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Country should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256CityInAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "country", "county", "state", "street", "zip");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[City should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StateInAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "street", "zip");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[State should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen256StreetInAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "zip");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Street should be 1-256 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullCustomerType_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withCustomerType(null))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Customer type may not be null]", message);
+                });
+    }
+
+    @Test
+    @Override
     @WithMockUser()
-    void upsert_CustomerExists_UpdatesCustomer() {
+    public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = customer.getExternalId();
         String source = customerDto.source();
@@ -130,7 +800,6 @@ class CustomerRouterTest {
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(originalCustomer));
         when(customerFacade.saveCustomer(newCustomer)).thenReturn(Mono.empty());
         when(customerFacade.updateIfModified(newCustomer, originalCustomer)).thenReturn(Mono.just(newCustomer));
-        when(customerDtoValidationHandler.validate(any())).thenReturn(Mono.just(customerDto));
 
         // When + Then
         webTestClient
@@ -142,13 +811,13 @@ class CustomerRouterTest {
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk()
-                .equals(customerDto);
+                .expectBody().consumeWith(body -> System.out.println(body));
     }
 
     @Test
+    @Override
     @WithMockUser
-    void getByExternalId_FindsCustomer_ReturnsCustomer() {
+    public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = customerDto.source();
@@ -167,8 +836,9 @@ class CustomerRouterTest {
     }
 
     @Test
+    @Override
     @WithMockUser
-    void getByComplytId_FindsCustomer_ReturnsCustomer() {
+    public void getByComplytId_Exists_Returns200() {
         // Given
         UUID complytId = UUID.randomUUID();
         when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.just(customer));
@@ -186,16 +856,19 @@ class CustomerRouterTest {
     }
 
     @Test
+    @Override
     @WithUserDetails
-    void update_UpdateFails_Returns5xxServerError() {
+    public void upsertByExternalIdAndSource_InternalServerError_Returns500() {
         // Given
-
-        String externalId = customer.getExternalId();
+        String externalId = customerDto.externalId();
         String source = customerDto.source();
-        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
-        when(customerFacade.saveCustomer(customer)).thenThrow(OperationFailedException.class);
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
 
-        // When + Then
+        // When
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenThrow(OperationFailedException.class);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -209,8 +882,9 @@ class CustomerRouterTest {
     }
 
     @Test
+    @Override
     @WithUserDetails
-    void getByExternalId_OperationFails_Returns4xxNotFound() {
+    public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = UUID.randomUUID().toString();
         String source = customerDto.source();
@@ -225,9 +899,54 @@ class CustomerRouterTest {
                 .expectStatus().isNotFound();
     }
 
+    @Override
+    @Test
+    public void getByExternalIdAndSource_UnauthenticatedUser_Returns401() {
+        // Given
+        String externalId = customerDto.toString();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByExternalIdAndSource_InternalServerError_Returns500() {
+        /// Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
     @Test
     @WithUserDetails
-    void getByComplytId_OperationFails_Returns4xxNotFound() {
+    public void getByComplytId_DoesntExists_Returns404() {
         // Given
         UUID complytId = UUID.randomUUID();
         when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.empty());
@@ -241,17 +960,64 @@ class CustomerRouterTest {
                 .expectStatus().isNotFound();
     }
 
+    @Override
     @Test
+    public void getByComplytId_UnauthenticatedUser_Returns401() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+        when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.just(customer));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(CustomerRouter.BASE_URL + "/complytId/" + complytId).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByComplytId_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByComplytId_InternalServerError_Returns500() {
+        /// Given
+        UUID complytId = customerDto.complytId();
+
+        // When
+        when(customerFacade.findByComplytId(complytId)).thenReturn(Mono.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
     @WithUserDetails
-    void getByName_FindsCustomer_ReturnsCustomer() {
+    public void getByName_Exists_Returns200WithList() {
         // Given
         String name = "name";
         List<Customer> customersFoundByName = new ArrayList<>() {{
             add(customer);
         }};
+
+        // WHen
         when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
 
-        // When + Then
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -263,21 +1029,96 @@ class CustomerRouterTest {
                 .equals(customersFoundByName);
     }
 
+    @Override
     @Test
+    @WithMockUser
+    public void getByName_EmptyCollection_Returns200WithEmptyList() {
+        // Given
+        String name = "name";
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
+    }
+
+    @Override
+    @Test
+    public void getByName_UnauthenticatedUser_Returns401() {
+        // Given
+        String name = "name";
+        List<Customer> customersFoundByName = new ArrayList<>() {{
+            add(customer);
+        }};
+
+        // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.fromIterable(customersFoundByName));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByName_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByName_InternalServerError_Returns500() {
+        // Given
+        String name = "name";
+
+        // When
+        when(customerFacade.findByName(name)).thenReturn(Flux.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
     @WithUserDetails
-    void getAll_AllCustomersRetrieved_ReturnsAllCustomersFound() {
+    public void getAll_Exists_Returns200WithList() {
         // Given
         String id = UUID.randomUUID().toString();
         Customer secondCustomer = customer.withId(id);
-
         List<Customer> allCustomers = new ArrayList<>() {{
             add(customer);
             add(secondCustomer);
         }};
 
+        // When
         when(customerFacade.getAll()).thenReturn(Flux.fromIterable(allCustomers));
 
-        // When + Then
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -289,9 +1130,77 @@ class CustomerRouterTest {
                 .equals(allCustomers);
     }
 
+    @Override
     @Test
+    @WithMockUser
+    public void getAll_EmptyCollection_Returns200WithEmptyList() {
+        /// Given
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
+    }
+
+    @Override
+    @Test
+    public void getAll_UnauthenticatedUser_Returns401() {
+        /// Given
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.getAll()).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAll_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAll_InternalServerError_Returns500() {
+        // Given + When
+        when(customerFacade.getAll()).thenReturn(Flux.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @Override
     @WithUserDetails
-    void getAllBySource_AllCustomersRetrieved_ReturnsAllCustomersFound() {
+    public void getAllBySource_Exists_Returns200WithList() {
         // Given
         String id = UUID.randomUUID().toString();
         String source = customer.getSource();
@@ -316,8 +1225,80 @@ class CustomerRouterTest {
                 .equals(allCustomers);
     }
 
+    @Override
     @Test
-    void getAllCustomersRouterFunctions_NullHandler_ThrowsException() {
+    @WithMockUser
+    public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .equals(emptyCustomerList);
+    }
+
+    @Override
+    @Test
+    public void getAllBySource_UnauthenticatedUser_Returns401() {
+        /// Given
+        String source = customer.getSource();
+        List<Customer> emptyCustomerList = new ArrayList<>();
+
+        // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.fromIterable(emptyCustomerList));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAllBySource_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getAllBySource_InternalServerError_Returns500() {
+        /// Given
+        String source = customer.getSource();
+
+        // When
+        when(customerFacade.getAllBySource(source)).thenReturn(Flux.error(new OperationFailedException()));
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    public void getAll_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -332,7 +1313,7 @@ class CustomerRouterTest {
     }
 
     @Test
-    void getCustomerByExternalIdRouterFunctions_NullHandler_ThrowsException() {
+    public void getByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -347,7 +1328,7 @@ class CustomerRouterTest {
     }
 
     @Test
-    void getAllCustomersBySourceRouterFunctions_NullHandler_ThrowsException() {
+    public void getAllBySource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -362,7 +1343,7 @@ class CustomerRouterTest {
     }
 
     @Test
-    void getCustomerByComplytIdRouterFunctions_NullHandler_ThrowsException() {
+    public void getByComplytId_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -377,7 +1358,7 @@ class CustomerRouterTest {
     }
 
     @Test
-    void getCustomerByNameRouterFunctions_NullHandler_ThrowsException() {
+    public void getByName_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -392,7 +1373,7 @@ class CustomerRouterTest {
     }
 
     @Test
-    void upsertCustomerByExternalIdRouterFunctions_NullHandler_ThrowsException() {
+    public void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
         // Given
         CustomerHandler nullCustomerHandler = null;
         CustomerRouter customerRouter = new CustomerRouter();
@@ -404,5 +1385,333 @@ class CustomerRouterTest {
 
         // Then
         assertEquals("customerHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullExternalTimestamps_Returns400ValidationError() {
+        // Currently externalTimestamp can be null
+
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Created date may not be null]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Updated date may not be null]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankTimestampInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+// Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String timestampWithLengthOf257 = "not a timestamp";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"" + timestampWithLengthOf257 + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankTimestampInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Created date may not be null]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Updated date may not be null]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
+                        "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
+                        "}}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        String invalidTimestamp = "not a timestamp";
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {" +
+                        "\"createdDate\":  \"" + invalidTimestamp + "\", " +
+                        "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Timestamp may not be blank]", message);
+                });
     }
 }

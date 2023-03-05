@@ -2,6 +2,10 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 springdoc:
   swagger-ui:
@@ -18,4 +22,4 @@ springdoc:
 management.endpoints.web.exposure.include: "*"
 logging:
   level:
-    web: debug
+    web: info

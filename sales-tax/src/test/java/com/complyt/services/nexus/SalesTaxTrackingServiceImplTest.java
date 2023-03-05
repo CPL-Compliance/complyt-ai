@@ -1,6 +1,6 @@
 package com.complyt.services.nexus;
 
-import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
@@ -50,7 +50,7 @@ public class SalesTaxTrackingServiceImplTest {
     ApplicationDateCreator applicationDateCreator;
 
     @Mock
-    SalesTaxTrackingComplytIdHandler complytIdHandler;
+    ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     SalesTaxTracking salesTaxTracking;
 

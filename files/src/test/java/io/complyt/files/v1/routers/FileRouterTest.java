@@ -1,6 +1,7 @@
 package io.complyt.files.v1.routers;
 
 import io.complyt.files.config.ApiExceptionConfig;
+import io.complyt.files.config.SecurityConfig;
 import io.complyt.files.domain.File;
 import io.complyt.files.services.FileService;
 import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
@@ -29,14 +30,14 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = {FileRouter.class, FileHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
-        GlobalExceptionHandler.class})
+        GlobalExceptionHandler.class,
+        SecurityConfig.class})
 @WebFluxTest
-public class FileRouterTest {
-    @Autowired
-    private ApplicationContext context;
-
+public class FileRouterTest implements FileRouterTestTemplate {
     @MockBean
     FileService fileService;
+    @Autowired
+    private ApplicationContext context;
 
     private WebTestClient webTestClient;
 
@@ -44,12 +45,14 @@ public class FileRouterTest {
 
     @BeforeEach
     void setUp() {
+        webTestClient = WebTestClient.bindToApplicationContext(context).build();
         objectStub = new ObjectStub();
         webTestClient = WebTestClient.bindToApplicationContext(context).build();
     }
 
     @Test
-    public void linkRoute_nullLinkHandler_ThrowsNullPointerException() {
+    @Override
+    public void get_NullHandler_ThrowsNullPointerException() {
         // Given
         FileRouter fileRouter = new FileRouter();
         FileHandler nullFileHandler = null;
@@ -62,8 +65,9 @@ public class FileRouterTest {
     }
 
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
-    public void linkRoute_getFile_fileReturned() {
+    @Override
+    @WithMockUser
+    public void get_Exists_Returns200() {
         // Given
         File file = objectStub.createFile();
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
@@ -83,11 +87,11 @@ public class FileRouterTest {
     }
 
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
-    public void linkRoute_pathDoesntExist_returnsNotFound404() {
+    @Override
+    @WithMockUser
+    public void getAny_InvalidUrl_Returns404() {
         // Given
         File file = objectStub.createFile();
-        FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
 
         // When
         when(fileService.find()).thenReturn(Mono.just(file));
@@ -102,8 +106,9 @@ public class FileRouterTest {
     }
 
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
-    public void linkRoute_resourceDoesntExist_returnsNotFound404() {
+    @Override
+    @WithMockUser
+    public void get_DoesntExist_Returns404() {
         // When
         when(fileService.find()).thenReturn(Mono.empty());
 
@@ -117,7 +122,8 @@ public class FileRouterTest {
     }
 
     @Test
-    public void linkRoute_getFile_unauthorized() {
+    @Override
+    public void get_UnauthenticatedUser_Returns401() {
         // Then
         webTestClient
                 .get()
@@ -127,9 +133,15 @@ public class FileRouterTest {
                 .expectStatus().isUnauthorized();
     }
 
+    @Override
+    public void get_UserWithoutAuthorities_Returns403() {
+        // ???
+    }
+
     @Test
-    @WithMockUser(authorities = "SCOPE_read:link")
-    public void linkRoute_getFile_internalError() {
+    @Override
+    @WithMockUser
+    public void get_InternalServerError_Returns500() {
         // When
         when(fileService.find()).thenThrow(RuntimeException.class);
 

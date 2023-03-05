@@ -11,6 +11,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.ComplytTimestamp;
@@ -176,6 +177,11 @@ public class ObjectStub {
                 false, CalculationType.FIXED, "description", 0.5f, null);
     }
 
+    public CitySalesTaxRules createCitySalesTaxRules() {
+        return new CitySalesTaxRules("California", "CA", true,
+                false, CalculationType.FIXED, "description", 0.5f);
+    }
+
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
@@ -232,8 +238,8 @@ public class ObjectStub {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
-                new PhysicalNexusTracker(false, null),
-                new EconomicNexusTracker(false, null), complytTimestamp.getTimestamp(),
+                new PhysicalNexusTracker(false, complytTimestamp.getTimestamp()),
+                new EconomicNexusTracker(false, complytTimestamp.getTimestamp()), complytTimestamp.getTimestamp(),
                 true, complytTimestamp.getTimestamp());
     }
 
@@ -241,8 +247,8 @@ public class ObjectStub {
         StateDto state = new StateDto("CA", "02", "California");
         return new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 true,
-                new PhysicalNexusTrackerDto(false, null),
-                new EconomicNexusTrackerDto(false, null), complytTimestamp.getTimestamp(),
+                new PhysicalNexusTrackerDto(false, complytTimestampDto.getTimestamp()),
+                new EconomicNexusTrackerDto(false, complytTimestampDto.getTimestamp()), complytTimestamp.getTimestamp(),
                 true, complytTimestamp.getTimestamp());
     }
 
@@ -252,6 +258,10 @@ public class ObjectStub {
                 0f, 0f, "", 0, 0, "", 0,
                 0, "", 0, 0, "", 0, 0, "",
                 0, 0, "");
+    }
+
+    public Address createAddress() {
+        return new Address("City", "Country", "County", "CA", "Street", "Zip");
     }
 
 }

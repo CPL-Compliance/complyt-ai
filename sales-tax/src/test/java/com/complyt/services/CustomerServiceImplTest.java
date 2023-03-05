@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.CustomerComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
@@ -43,7 +43,7 @@ class CustomerServiceImplTest {
     CustomerRepository customerRepository;
 
     @Mock
-    CustomerComplytIdHandler customerComplytIdHandler;
+    ComplytIdHandler<Customer> customerComplytIdHandler;
 
     Customer customer;
 

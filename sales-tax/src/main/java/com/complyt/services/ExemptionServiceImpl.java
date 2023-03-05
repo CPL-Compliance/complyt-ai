@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
@@ -25,7 +25,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ExemptionRepository exemptionRepository;
 
     @NonNull
-    private ExemptionComplytIdHandler complytIdHandler;
+    private ComplytIdHandler<Exemption> complytIdHandler;
 
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
@@ -51,6 +51,7 @@ public class ExemptionServiceImpl implements ExemptionService {
         return exemptionRepository.save(exemption);
     }
 
+    @Deprecated
     @Override
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionRepository.findById(id);

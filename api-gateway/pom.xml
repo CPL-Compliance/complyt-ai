@@ -9,12 +9,12 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
-    <version>0.10.0-SNAPSHOT</version>
+    <version>0.11.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>api-gateway</name>
@@ -34,19 +34,16 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
         </dependency>
-
         <!-- Spring Cloud Vault -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-vault-config</artifactId>
         </dependency>
         <!-- Spring Cloud Vault -->
-
         <!-- Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -57,14 +54,44 @@
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <!-- Security -->
-
         <!-- Discovery -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <!-- Discovery -->
-
+        <!-- Observability -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core-micrometer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+        <!-- Observability -->
+        <!-- Logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-json-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback.contrib</groupId>
+            <artifactId>logback-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <!-- Logging -->
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -92,7 +119,6 @@
             <scope>test</scope>
         </dependency>
         <!-- Test -->
-
         <!-- Other -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

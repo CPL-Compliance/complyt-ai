@@ -73,45 +73,36 @@ import java.lang.annotation.Target;
 public @interface PostExemptionApiInfo {
 
     String newExemptionExample = """
-            [{
-                     "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
-                     "state": {
-                         "abbreviation": "AZ",
-                         "code": "04",
-                         "name": "Arizona"
-                     },
-                     "classification": {
-                         "code": "code",
-                         "description": "description"
-                     },
-                     "validationDates": {
-                         "fromDate": {
-                             "timestamp": "2022-11-01T02:00:00"
-                         },
-                         "toDate": {
-                             "timestamp": "2023-02-28T02:00:00"
-                         }
-                     },
-                     "internalTimestamps": {
-                         "createdDate": {
-                             "timestamp": "2022-12-29T10:24:54.577"
-                         },
-                         "updatedDate": {
-                             "timestamp": "2022-12-29T10:24:54.577"
-                         }
-                     },
-                     "status": {
-                         "code": "code",
-                         "name": "name"
-                     },
-                     "certificate": {
-                         "certificateId": "id",
-                         "url": "url",
-                         "name": "name"
-                     },
-                     "exemptionType": "FULLY"
-                 }]
-            """;
+            {
+                "customerId": "b4320a2b-1ac1-4fae-96c1-f2d7c2cc14a6",
+                "state": {
+                    "abbreviation": "AZ",
+                    "code": "04",
+                    "name": "Arizona"
+                },
+                "classification": {
+                    "code": "code",
+                    "description": "description"
+                },
+                "validationDates": {
+                    "fromDate": "2022-11-01T02:00:00",
+                    "toDate": "2023-02-28T02:00:00"
+                },
+                "internalTimestamps": {
+                    "createdDate": "2022-12-29T10:24:54.577",
+                    "updatedDate": "2022-12-29T10:24:54.577"
+                },
+                "status": {
+                    "code": "code",
+                    "name": "name"
+                },
+                "certificate": {
+                    "certificateId": "id",
+                    "url": "url",
+                    "name": "name"
+                },
+                "exemptionType": "FULLY"
+            }""";
 
     String returnedExemptionExample = """
             [{

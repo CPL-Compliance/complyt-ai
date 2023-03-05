@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test Service - Development" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="Development">
+    <option name="ACTIVE_PROFILES" value="development" />
+    <module name="test-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.complyt.testService.TestServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

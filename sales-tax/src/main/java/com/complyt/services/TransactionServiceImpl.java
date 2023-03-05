@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.TransactionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
@@ -41,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
     CountyProvider countyProvider;
 
     @NonNull
-    private TransactionComplytIdHandler complytIdHandler;
+    private ComplytIdHandler<Transaction> complytIdHandler;
 
     @Override
     public Mono<Transaction> save(Transaction transaction) {
@@ -99,6 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(countyProvider::provide);
     }
 
+    @Deprecated
     @Override
     public Mono<Transaction> findById(String id) {
         return transactionRepository.findById(id);

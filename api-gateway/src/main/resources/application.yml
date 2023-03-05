@@ -1,6 +1,10 @@
 server.port: ${PORT:8765}
 auth0.audience: ${audience}
 
+# Observability
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.tracing.sampling.probability: 1.0
+
 spring:
   application:
     name: api-gateway
@@ -165,7 +169,7 @@ spring:
             - Method=GET
             - Path=/v1/exemptions/complytId/{complyt_id}
           filters:
-            - SetPath=/v1/exemptions/complytId{complyt_id}
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
         - id: sales-tax-post-exemption
           uri: lb://sales-tax
           predicates:
@@ -203,6 +207,13 @@ spring:
             - Path=/v1/nexus/state/{state}
           filters:
             - SetPath=/v1/nexus/state/{state}
+        - id: sales-tax-get-nexus-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/nexus/complytId/{complytId}
+          filters:
+            - SetPath=/v1/nexus/complytId/{complytId}
         - id: sales-tax-put-nexus
           uri: lb://sales-tax
           predicates:

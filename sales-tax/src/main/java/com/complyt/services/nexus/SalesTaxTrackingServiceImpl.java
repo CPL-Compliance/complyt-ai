@@ -1,11 +1,12 @@
 package com.complyt.services.nexus;
 
-import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.SalesTaxTrackingRepository;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -31,7 +32,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     ApplicationDateCreator applicationDateCreator;
 
-    @NonNull SalesTaxTrackingComplytIdHandler complytIdHandler;
+    @NonNull ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -67,8 +68,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                 .withEconomicNexusTracker(newTracker)
                 .withAppliedDate(appliedDate);
 
-        log.debug("Saving modified sales tax tracking :  " + modifiedTracking);
-        return save(modifiedTracking);
+        return ContextLogger.observeCtx("Saving modified sales tax tracking:  " + modifiedTracking, log::debug)
+                .then(save(modifiedTracking));
     }
 
     @Override
