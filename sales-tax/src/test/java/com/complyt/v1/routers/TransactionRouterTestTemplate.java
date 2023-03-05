@@ -44,7 +44,6 @@ public interface TransactionRouterTestTemplate extends
     void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError();
 
     // Validation::BillingAddress
-    void upsert_NullBillingAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError();
 

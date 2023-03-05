@@ -4,7 +4,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class TransactionTest {
 
     private Transaction transaction;
     private String transactionId;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     LocalDateTime localDateTime;
 
@@ -30,10 +30,10 @@ public class TransactionTest {
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
-        transaction = objectStub.createTransaction(transactionId);
+        transaction = testUtilities.createTransaction(transactionId);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class TransactionTest {
     void withId_DifferentId_ReturnTransaction() {
         // Given
         String differentId = UUID.randomUUID().toString();
-        Transaction expectedTransaction = objectStub.createTransaction(differentId)
+        Transaction expectedTransaction = testUtilities.createTransaction(differentId)
                 .withComplytId(transaction.getComplytId())
                 .withExternalId(transaction.getExternalId())
                 .withCustomer(transaction.getCustomer());

@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -44,18 +44,18 @@ class CustomerRepositoryTest {
 
     String source;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), tenantId);
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        customer = objectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
-        source = objectStub.getUnifiedSource();
+        customer = testUtilities.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
+        source = testUtilities.getUnifiedSource();
     }
 
     @Test

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,13 +41,13 @@ public class TransactionItemsAmountsCollectorTest {
 
     private Transaction transaction;
     private List<Taxable> items;
-    private ObjectStub objectStub;
+    private TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(new ObjectId().toString());
+        transaction = testUtilities.createTransaction(new ObjectId().toString());
         items = new ArrayList<>(transaction.getItems());
         transactionItemsAmountsCollector = new TransactionItemsAmountsCollector(
                 taxableItemsAmountCalculator,

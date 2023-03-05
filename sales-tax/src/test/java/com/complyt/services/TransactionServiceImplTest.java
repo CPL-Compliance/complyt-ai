@@ -26,7 +26,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,20 +61,20 @@ class TransactionServiceImplTest {
     Transaction transaction;
     Customer customer;
     String source;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(transaction.getId());
-        source = objectStub.getUnifiedSource();
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(transaction.getId());
+        source = testUtilities.getUnifiedSource();
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = testUtilities.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0).withTaxableCategory(TaxableCategory.TAXABLE).withTangibleCategory(TangibleCategory.TANGIBLE).withJurisdictionalSalesTaxRules(rules);
 
@@ -282,7 +282,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
-        Customer customer = objectStub.createCustomer(customerId.toString())
+        Customer customer = testUtilities.createCustomer(customerId.toString())
                 .withExternalId(externalId)
                 .withAddress(transaction.getShippingAddress());
 
@@ -412,7 +412,7 @@ class TransactionServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Transactions() {
         // Given
-        Transaction secondsTransaction = objectStub.createTransaction(new ObjectId().toString());
+        Transaction secondsTransaction = testUtilities.createTransaction(new ObjectId().toString());
 
         // Then
         when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction, secondsTransaction));

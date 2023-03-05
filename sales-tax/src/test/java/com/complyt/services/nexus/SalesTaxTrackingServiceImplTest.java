@@ -25,7 +25,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,13 +54,13 @@ public class SalesTaxTrackingServiceImplTest {
 
     SalesTaxTracking salesTaxTracking;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {

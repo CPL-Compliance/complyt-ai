@@ -5,7 +5,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,22 +19,22 @@ class SalesTaxTrackingWithNexusInfoTest {
     String id;
     String tenantId;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         id = UUID.randomUUID().toString();
         tenantId = (new ObjectId()).toString();
         approvalDate = LocalDateTime.now();
-        salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(objectStub.createSalesTaxTracking(new ObjectId().toString()), false);
+        salesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(testUtilities.createSalesTaxTracking(new ObjectId().toString()), false);
     }
 
     @Test
     void Equals_SameNexus_ReturnTrue() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getId())
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getId())
                 .withComplytId(salesTaxTrackingWithNexusInfo.getSalesTaxTracking().getComplytId());
         SalesTaxTrackingWithNexusInfo givenSalesTaxTrackingWithNexusInfo = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 

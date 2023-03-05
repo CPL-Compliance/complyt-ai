@@ -22,7 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,13 +49,13 @@ public class ProductClassificationServiceTest {
     String tenantId;
 
     Transaction transaction;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         itemProductClassification0 = createItemProductClassification0();
         itemProductClassification1 = createItemProductClassification1();
         shippingFeeProductClassification = createShippingFeeProductClassification();
@@ -82,7 +82,7 @@ public class ProductClassificationServiceTest {
     }
 
     private Map<String, JurisdictionalSalesTaxRules> createJurisdictionalSalesTaxRulesList() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
 
         return new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
@@ -90,14 +90,14 @@ public class ProductClassificationServiceTest {
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = testUtilities.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0)
                 .withTaxableCategory(TaxableCategory.TAXABLE)
                 .withTangibleCategory(TangibleCategory.TANGIBLE)
                 .withJurisdictionalSalesTaxRules(rules);
 
-        List<Item> modifiedItems = objectStub.createItems(true, true);
+        List<Item> modifiedItems = testUtilities.createItems(true, true);
         return transaction.withItems(modifiedItems);
     }
 
@@ -125,8 +125,8 @@ public class ProductClassificationServiceTest {
     @Test
     void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
         // Given
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
-        ShippingFee shippingFee = objectStub.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
+        ShippingFee shippingFee = testUtilities.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
         Transaction givenTransaction = transaction.withShippingFee(shippingFee);
         String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
         String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();

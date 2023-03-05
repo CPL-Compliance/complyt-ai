@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,14 +39,14 @@ public class NexusStateRuleRepositoryTest {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     NexusStateRule nexusStateRule;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
-        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
+        nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     @Test

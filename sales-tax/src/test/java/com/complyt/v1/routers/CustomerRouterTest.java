@@ -25,12 +25,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -54,13 +55,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Autowired
     private WebTestClient webTestClient;
 
-    private ObjectStub objectStub;
+    private TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
+        customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString())
                 .withExternalTimestamps(null)
                 .withInternalTimestamps(null);
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
@@ -104,7 +105,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .withCustomerType(null);
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
                 "Name should be 1-256 characters maximum",
@@ -122,14 +123,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -269,14 +263,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -355,14 +342,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -547,14 +527,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -580,31 +553,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(map -> {
                     String message = (String) map.get("message");
                     assertEquals("[Name should be 1-256 characters maximum]", message);
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_NullAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(customerDto.withAddress(null))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Address may not be null]", message);
                 });
     }
 

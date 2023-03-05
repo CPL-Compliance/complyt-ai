@@ -23,11 +23,12 @@ import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public class ObjectStub {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class TestUtilities {
 
     ComplytTimestamp complytTimestamp;
     ComplytTimestampDto complytTimestampDto;
@@ -39,13 +40,22 @@ public class ObjectStub {
 
     String source;
 
-    public ObjectStub(ComplytTimestamp complytTimestamp, String tenantId) {
+    public TestUtilities(ComplytTimestamp complytTimestamp, String tenantId) {
         this.complytTimestamp = complytTimestamp;
         this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
         source = "1";
+    }
+
+    public void checkErrorMessages(LinkedHashMap map, HashSet<String> expectedErrors) {
+        String message = (String) map.get("message");
+        String[] errors = message.substring(1, message.length() - 1).split(", ");
+        assertEquals(expectedErrors.size(), errors.length);
+        for (String err : errors) {
+            assertTrue(expectedErrors.contains(err));
+        }
     }
 
     public String getUnifiedSource() {

@@ -23,7 +23,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,15 +51,15 @@ public class ExemptionServiceImplTest {
     Exemption exemption;
     Customer customer;
     ObjectId customerId = new ObjectId();
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(customerId.toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(customerId.toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
     }
 
     @Test

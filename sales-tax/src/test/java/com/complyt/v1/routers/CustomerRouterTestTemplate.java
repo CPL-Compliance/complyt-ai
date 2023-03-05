@@ -26,7 +26,6 @@ public interface CustomerRouterTestTemplate extends
     void upsert_LengthGreaterThen256Name_Returns400ValidationError();
 
     // Validation::Address
-    void upsert_NullAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError();
 

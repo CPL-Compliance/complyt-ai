@@ -7,7 +7,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,17 +18,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class StateLevelSalesTaxRatesCalculatorTest {
 
     StateLevelSalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     @BeforeEach
     void setUp() {
         stateLevelSalesTaxRatesCalculator = new StateLevelSalesTaxRatesCalculator();
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxRate = objectStub.createSalesTaxRates();
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        salesTaxRate = testUtilities.createSalesTaxRates();
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
     }
 
     @Test

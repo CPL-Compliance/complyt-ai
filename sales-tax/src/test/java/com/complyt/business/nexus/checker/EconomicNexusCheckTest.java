@@ -6,7 +6,7 @@ import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EconomicNexusCheckTest {
 
     EconomicNexusChecker economicNexusChecker;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         economicNexusChecker = new EconomicNexusChecker();
     }
@@ -28,7 +28,7 @@ public class EconomicNexusCheckTest {
     @Test
     void check_CheckingNexusTracker_ReturnsIsEstablished() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString())
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString())
                 .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
 
         // When + Then

@@ -3,7 +3,7 @@ package com.complyt.domain.customer;
 import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,13 +15,13 @@ class CustomerTest {
     private Customer customer;
     private Customer anotherCustomer;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         anotherCustomer = new Customer(customer.getComplytId(), customer.getId(), customer.getExternalId(), customer.getSource(), customer.getName(), customer.getAddress(), customer.getTenantId(), customer.getCustomerType(), customer.getInternalTimestamps(), customer.getExternalTimestamps());
     }
 

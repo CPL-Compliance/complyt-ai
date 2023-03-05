@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,15 +46,15 @@ class TransactionRepositoryTest {
     Customer customer;
 
     String source;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(transaction.getId());
-        source = objectStub.getUnifiedSource();
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(transaction.getId());
+        source = testUtilities.getUnifiedSource();
     }
 
     void setMockToFindTransactionsCustomer(Transaction transaction, String tenantId, Customer customer) {

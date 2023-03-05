@@ -13,7 +13,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -36,18 +36,18 @@ class ValidationHandlerTest {
 
     @MockBean
     ServerRequest serverRequest;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
+        testUtilities = new TestUtilities(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
     }
 
     @Test
     void validate_ValidAndUnconflictedDto_ReturnsDto() {
         // Given
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
@@ -72,7 +72,7 @@ class ValidationHandlerTest {
     void validate_ValidButHasConflictsDto_ReturnsConflictedDataApiException() {
         // Given
         String differentExternalId = UUID.randomUUID().toString();
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
@@ -95,7 +95,7 @@ class ValidationHandlerTest {
     @Test
     void validate_InvalidDtoBodyWithPathVariables_ReturnsValidationError() {
         // Given
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
@@ -112,7 +112,7 @@ class ValidationHandlerTest {
     @Test
     void validate_NoPathVariablesButValidTransaction_ReturnsTransactionDto() {
         // Given
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
         Map<String,String> pathVariables = new HashMap<>();
 
         // When
@@ -127,7 +127,7 @@ class ValidationHandlerTest {
     @Test
     void validate_NoPathVariablesInvalidTransaction_ReturnsValidationError() {
         // Given
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
