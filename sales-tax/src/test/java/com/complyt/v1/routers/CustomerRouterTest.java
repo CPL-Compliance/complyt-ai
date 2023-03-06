@@ -1389,7 +1389,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @WithMockUser
     public void upsert_NullExternalTimestamps_Returns400ValidationError() {
-        // Currently externalTimestamp can be null
+        // Todo: Currently externalTimestamp can be null
 
     }
 
@@ -1558,107 +1558,122 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
@@ -1691,6 +1706,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
@@ -1737,6 +1756,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
@@ -1781,6 +1804,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
                         "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
@@ -1823,6 +1850,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
                         "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
@@ -1839,112 +1870,136 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
-        // Todo
+        //todo
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok()  {
         // Todo
     }
+
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
-
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok()  {
+        // Todo
     }
+
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok()  {
+        // Todo
+    }
+
 }

@@ -4,6 +4,7 @@ import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.error_messages.DateErrorMessages;
@@ -70,8 +71,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     void setUp() {
         objectStub = new ObjectStub(
                 LocalDateTime.now(), UUID.randomUUID().toString());
-        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
-                .withCustomer(null);
+        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = objectStub.getUnifiedSource();
     }
@@ -2259,19 +2259,99 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto("2023-03-27T17:00:00.999999999", transactionDto.externalTimestamps().updatedDate()));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
-    @Test@Override
+    @Test
+    @Override
+    @WithMockUser
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2285,42 +2365,204 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999Z",
+                        transactionDto.externalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999Z"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999+17:59",
+                        transactionDto.externalTimestamps().createdDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999+17:59"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
-    
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999-18:00",
+                        transactionDto.externalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00-18:00"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2341,7 +2583,34 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2610,8 +2879,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
                         "    \"externalTimestamps\":  {\n" +
-                                "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                                "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
                         "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
@@ -2634,84 +2903,560 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Created " + DateErrorMessages.wrong_format_error_message
+                ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-02-29T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-29T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Updated " + DateErrorMessages.wrong_format_error_message
+               ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Created " + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.9999999999\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Updated " + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00Z",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999Z"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999+17:59",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999+17:59"
+                        ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999-18:00",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
     @Override
     @WithMockUser
     public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().updatedDate(),
+                        "2023-03-27T00:00:00.999999999-18:00"
+                        ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2732,7 +3477,65 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
-        // TODO
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Override
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto("2023-03-27",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2740,35 +3543,30 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
         // Given
-        UUID complytId = transactionDto.complytId();
         String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto("2023-03-27", transactionDto.externalTimestamps().updatedDate()));
 
-        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(new TimestampsDto(
-                transactionDto.internalTimestamps().createdDate(),
-                "2023-03-27"
-        ));
         Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
 
-        // When
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
         when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
 
-
-        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
                 .bodyValue(givenTransactionDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
-                .isEqualTo(expectedTransaction);
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test

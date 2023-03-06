@@ -24,5 +24,5 @@ public interface InternalTimestampsValidationTestTemplate {
     void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError();
     void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError();
     void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok();
-    void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok();
+    void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok();
 }

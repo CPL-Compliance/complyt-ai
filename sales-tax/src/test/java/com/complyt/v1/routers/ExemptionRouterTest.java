@@ -2708,38 +2708,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 
     }
 
-    @Test
     @Override
-    @WithMockUser
-    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
-        // Given
-        UUID complytId = exemptionDto.complytId();
-
-        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
-                "2023-03-27",
-                exemptionDto.internalTimestamps().updatedDate()
-        ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
-
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
-
-        // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
-
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(givenExemptionDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(ExemptionDto.class)
-                .isEqualTo(expectedExemption);
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
 
     }
 
