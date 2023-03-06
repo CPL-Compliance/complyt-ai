@@ -31,6 +31,26 @@ public interface TransactionRouterTestTemplate extends
     // Validation::ShippingAddress
     void upsert_NullShippingAddress_Returns400ValidationError();
 
+    void upsert_NullCountryShippingAddress_Returns400ValidationError();
+
+    void upsert_NullCityShippingAddress_Returns400ValidationError();
+
+    void upsert_NullStateShippingAddress_Returns400ValidationError();
+
+    void upsert_NullStreetShippingAddress_Returns400ValidationError();
+
+    void upsert_NullZipShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankCountryShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankCityShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankStateShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankStreetShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankZipShippingAddress_Returns400ValidationError();
+
     void upsert_LengthGreaterThen100CountyShippingAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError();

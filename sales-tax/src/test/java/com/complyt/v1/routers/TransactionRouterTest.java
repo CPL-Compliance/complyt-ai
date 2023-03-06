@@ -1193,6 +1193,266 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 });
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCountryShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCityShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullStateShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullStreetShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullZipShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCountryShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCityShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStateShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStreetShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankZipShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
 
     @Test
     @Override
@@ -1217,9 +1477,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1245,9 +1503,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1273,9 +1529,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1301,9 +1555,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1329,9 +1581,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1357,9 +1607,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1385,10 +1633,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1414,9 +1659,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1442,9 +1685,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1470,9 +1711,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1498,9 +1737,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1526,9 +1763,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1553,9 +1788,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1581,9 +1814,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1608,9 +1839,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1636,9 +1865,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1664,9 +1891,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1692,9 +1917,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1753,9 +1976,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals("Failed to read HTTP message", map.get("message"));
-                });
+                .value(map -> assertEquals("Failed to read HTTP message", map.get("message")));
     }
 
     @Test
@@ -1777,9 +1998,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals("[Customer Id may not be null]", map.get("message"));
-                });
+                .value(map -> assertEquals("[Customer Id may not be null]", map.get("message")));
     }
 
     @Test
@@ -1812,9 +2031,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test

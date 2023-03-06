@@ -45,8 +45,7 @@ public class TransactionHandler {
 
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionFacade.findByExternalIdAndSource(externalId, source))
-                .map(transaction ->
-                        TransactionMapper.INSTANCE.transactionToTransactionDto(transaction))
+                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                 .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
@@ -59,9 +58,7 @@ public class TransactionHandler {
 
         Flux<TransactionDto> transactionDtoFlux = ContextLogger.observeCtx(logStr, log::info)
                 .thenMany(transactionFacade.getAll())
-                .map(transaction ->
-                        TransactionMapper.INSTANCE.transactionToTransactionDto(transaction)
-                )
+                .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
                 .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoFlux, TransactionDto.class);
