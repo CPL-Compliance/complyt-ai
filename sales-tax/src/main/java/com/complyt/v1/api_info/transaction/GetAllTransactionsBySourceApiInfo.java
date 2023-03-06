@@ -91,7 +91,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                         "specialTreatment": true,
                                         "calculationType": "FIXED",
                                         "description": "string",
-                                        "calculationValue": 0
+                                        "calculationValue": 0,
+                                        "cities": null
                                     },
                                     "salesTaxRate": {
                                         "cityDistrictRate": 0,
@@ -198,7 +199,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                     "specialTreatment": true,
                                     "calculationType": "FIXED",
                                     "description": "string",
-                                    "calculationValue": 0
+                                    "calculationValue": 0,
+                                    "cities": null
                                 },
                                 "salesTaxRate": {
                                     "cityDistrictRate": 0,
