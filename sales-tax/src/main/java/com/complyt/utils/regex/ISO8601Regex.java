@@ -88,7 +88,7 @@ yyyy-mm-ddThh:mm.-hh:mm
 2020-03-27T03:40:59+17:59
 
  */
-public class ISO8601Regex {
+public abstract class ISO8601Regex {
      static final public String expression =
              "^(((20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\\d|2[0-8])" +
             "|(20([0-9]{2})|2100)-(((0[13578]|1[02])-31)|((0[13-9]|1[0-2])-(29|30)))" +
