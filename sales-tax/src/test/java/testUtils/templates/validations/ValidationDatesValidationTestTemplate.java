@@ -9,8 +9,8 @@ public interface ValidationDatesValidationTestTemplate {
     void upsert_BlankTimestampInToDateInValidationDates_Returns400ValidationError();
 
     void upsert_BlankTimestampInFromDateInValidationDates_Returns400ValidationError();
-//    void upsert_29OfFebruaryNotInLeapYearInFromDateInValidationDates_Returns400ValidationError();
-//    void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError();
-//    void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError();
-//    void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError();
+    void upsert_29OfFebruaryNotInLeapYearInFromDateInValidationDates_Returns400ValidationError();
+    void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError();
+    void upsert_9DigitsAfterTheDotInSecondsInFromDate_Returns200Ok();
+    void upsert_9DigitsAfterTheDotInSecondsInToDate_Returns200Ok();
 }

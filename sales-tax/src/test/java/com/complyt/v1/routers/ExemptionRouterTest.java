@@ -2495,4 +2495,24 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                     }
                 });
     }
+
+    @Override
+    public void upsert_29OfFebruaryNotInLeapYearInFromDateInValidationDates_Returns400ValidationError() {
+
+    }
+
+    @Override
+    public void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError() {
+
+    }
+
+    @Override
+    public void upsert_9DigitsAfterTheDotInSecondsInFromDate_Returns200Ok() {
+
+    }
+
+    @Override
+    public void upsert_9DigitsAfterTheDotInSecondsInToDate_Returns200Ok() {
+
+    }
 }
