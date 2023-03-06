@@ -60,9 +60,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     void setUp() {
         objectStub = new ObjectStub(
                 LocalDateTime.now(), UUID.randomUUID().toString());
-        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null);
+        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
@@ -919,7 +917,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @WithMockUser
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
+        // TODO
     }
 
     @Override
@@ -1560,6 +1558,111 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
@@ -1731,5 +1834,117 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                     String message = (String) map.get("message");
                     assertEquals("[Created " + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+        // Todo
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
+
     }
 }

@@ -3,6 +3,7 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.error_messages.DateErrorMessages;
@@ -10,9 +11,13 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.TransactionHandler;
+import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.customer.exemption.ValidationDatesDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,9 +71,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         objectStub = new ObjectStub(
                 LocalDateTime.now(), UUID.randomUUID().toString());
         transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
-                .withCustomer(null)
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null);
+                .withCustomer(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
         source = objectStub.getUnifiedSource();
     }
@@ -138,7 +141,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
+        // Todo
     }
 
     @Test
@@ -240,7 +243,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void getAll_UserWithoutAuthorities_Returns403() {
-
+        // TODO
     }
 
     @Test
@@ -1929,8 +1932,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String lengthOf257City = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab$";
         CustomerDto invalidCustomerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null)
                 .withSource("")
                 .withAddress(new AddressDto(lengthOf257City, "country", null, "state", "street", "zip"));
         String externalId = transactionDto.externalId();
@@ -1966,7 +1967,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void upsert_NullExternalTimestamps_Returns400ValidationError() {
-        // ???
+        // Todo
     }
 
     @Test
@@ -2243,6 +2244,109 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test@Override
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+    
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
@@ -2291,6 +2395,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
                         "   }\n}")
@@ -2358,6 +2466,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
                         "   }\n}")
@@ -2425,6 +2537,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
                         "       \"updatedDate\":  \"\"\n" +
@@ -2493,6 +2609,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                                "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                                "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
                         "       \"createdDate\":  \"\"\n" +
@@ -2508,6 +2628,147 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         assertTrue(expectedErrors.contains(err));
                     }
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+        // TODO
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        UUID complytId = transactionDto.complytId();
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(new TimestampsDto(
+                transactionDto.internalTimestamps().createdDate(),
+                "2023-03-27"
+        ));
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .isEqualTo(expectedTransaction);
     }
 
     @Test
@@ -2972,7 +3233,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 });
     }
 
+    @Test
     @Override
+    @WithMockUser
     public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "", null, null);
