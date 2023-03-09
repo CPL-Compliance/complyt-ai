@@ -51,16 +51,4 @@ public class TImestampsMapperTest {
         assertEquals(timestamps, actualTimestamps);
     }
 
-    // Todo
-//    @Test
-//    void mapping_BlankTimeDateTimeFormat_throwsException() {
-//        // Given
-//        String givenDateTimeString = "";
-//
-//        // When
-//        ParseException parseException = assertThrows(ParseException.class, () -> TimestampsMapper.INSTANCE.parseStringToLocalDateTime(givenDateTimeString));
-//
-//        // Then
-//        assertEquals(parseException.getMessage(), "Failed on parsing string to LocalDateTime " + DateErrorMessages.wrong_format_error_message);
-//    }
 }

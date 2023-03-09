@@ -25,11 +25,11 @@ public interface ValidationDatesMapper {
 
     @Mapping(target = "fromDate", source = "validationDates.fromDate", qualifiedByName = "localDateTimeToString")
     @Mapping(target = "toDate", source = "validationDates.toDate", qualifiedByName = "localDateTimeToString")
-    ValidationDatesDto timestampsToTimestampsDto(ValidationDates validationDates);
+    ValidationDatesDto validationDatesToValidationDatesDto(ValidationDates validationDates);
 
     @Mapping(target = "fromDate", source = "validationDatesDto.fromDate", qualifiedByName = "parseStringToLocalDateTime")
     @Mapping(target = "toDate", source = "validationDatesDto.toDate", qualifiedByName = "parseStringToLocalDateTime")
-    ValidationDates timestampsDtoToTimestamps(ValidationDatesDto validationDatesDto);
+    ValidationDates validationDatesDtoToValidationDates(ValidationDatesDto validationDatesDto);
 
 
 }

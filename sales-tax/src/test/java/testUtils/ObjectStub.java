@@ -37,7 +37,7 @@ public class ObjectStub {
 
     String source;
 
-    public  ObjectStub(LocalDateTime localDateTime, String tenantId) {
+    public ObjectStub(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
@@ -242,7 +242,7 @@ public class ObjectStub {
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
         StateDto state = new StateDto("CA", "02", "California");
-        SalesTaxTrackingDto salesTaxTrackingDto =  new SalesTaxTrackingDto(UUID.randomUUID(), state,
+        SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
@@ -269,6 +269,14 @@ public class ObjectStub {
 
     public TimestampsDto createTimestampsDto() {
         return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
+    public ValidationDates createValidationDates() {
+        return new ValidationDates(localDateTime.minusYears(1), localDateTime);
+    }
+
+    public ValidationDatesDto createValidationDatesDto() {
+        return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
 }
