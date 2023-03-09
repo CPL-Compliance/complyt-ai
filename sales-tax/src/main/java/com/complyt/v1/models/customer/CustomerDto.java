@@ -20,5 +20,5 @@ public record CustomerDto(UUID complytId,
                           @Valid @NotNull(message = "Address may not be null") AddressDto address,
                           @NotNull(message = "Customer type may not be null") CustomerTypeDto customerType,
                           @Valid TimestampsDto internalTimestamps,
-                          @Valid @NotNull(message = "External timestamps may not be null") TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
+                          @Valid @NotNull(message = "External Timestamps may not be null") TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
 }
