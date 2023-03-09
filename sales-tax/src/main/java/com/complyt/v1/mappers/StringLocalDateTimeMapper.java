@@ -4,6 +4,7 @@ import com.complyt.v1.error_messages.DateErrorMessages;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 
 public interface StringLocalDateTimeMapper {
+    StringLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringLocalDateTimeMapper.class);
+
     Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
 
 
