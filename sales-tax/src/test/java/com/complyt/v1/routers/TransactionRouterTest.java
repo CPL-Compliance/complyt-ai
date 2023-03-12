@@ -66,6 +66,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
         transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
+                .withShippingFee(objectStub.createShippingFeeDto(true,false))
                 .withCustomer(null)
                 .withExternalTimestamps(null)
                 .withInternalTimestamps(null);
