@@ -90,18 +90,18 @@ public class ObjectStub {
     public Transaction createTransaction(String id) {
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        List<Item> items = createItems(false, false);
+        List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ShippingFee shippingFee = createShippingFee(false, false);
+        ShippingFee shippingFee = createShippingFee(true, false);
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
     public TransactionDto createTransactionDto(String id) {
         AddressDto billingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
         AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
-        List<ItemDto> items = createItemDtos(false, false);
+        List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
-        ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
+        ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
         return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 

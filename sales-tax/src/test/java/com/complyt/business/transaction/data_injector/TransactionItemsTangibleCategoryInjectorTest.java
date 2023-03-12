@@ -29,7 +29,8 @@ class TransactionItemsTangibleCategoryInjectorTest {
     void setUp() {
         objectStub = new ObjectStub(
                 new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString())
+                .withItems(objectStub.createItems(false,false));
         transactionItemsTangibleCategoryInjector = new TransactionItemsTangibleCategoryInjector(transaction);
     }
 
