@@ -1,8 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.v1.error_messages.DateErrorMessages;
-import jakarta.validation.constraints.NotNull;
-import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
@@ -17,13 +15,13 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface StringLocalDateTimeMapper {
-    StringLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringLocalDateTimeMapper.class);
+public interface StringToLocalDateTimeMapper {
+    StringToLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringToLocalDateTimeMapper.class);
 
     Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
 
 
-    @Named("localDateTimeToString")
+    @Named("parseLocalDateTimeToString")
     default String localDateTimeToString(LocalDateTime dateTime) {
         if ( dateTime == null ) {
             return null;

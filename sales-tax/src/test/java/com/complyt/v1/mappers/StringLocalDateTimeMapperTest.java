@@ -27,7 +27,7 @@ public class StringLocalDateTimeMapperTest {
         LocalDateTime givenLocalDateTime = dateLocalDateTime;
 
         // When
-        String actualDateString = StringLocalDateTimeMapper.INSTANCE.localDateTimeToString(givenLocalDateTime);
+        String actualDateString = StringToLocalDateTimeMapper.INSTANCE.localDateTimeToString(givenLocalDateTime);
 
         // Then
         assertEquals(dateString, actualDateString);
@@ -39,7 +39,7 @@ public class StringLocalDateTimeMapperTest {
         LocalDateTime givenLocalDateTime = null;
 
         // When
-        String actualDateString = StringLocalDateTimeMapper.INSTANCE.localDateTimeToString(givenLocalDateTime);
+        String actualDateString = StringToLocalDateTimeMapper.INSTANCE.localDateTimeToString(givenLocalDateTime);
 
         // Then
         assertNull(actualDateString);
@@ -51,7 +51,7 @@ public class StringLocalDateTimeMapperTest {
         String givenLocalDateTimeString = "2023-03-17";
 
         // When
-        LocalDateTime actualLocalDateTime = StringLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
+        LocalDateTime actualLocalDateTime = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
 
         // Then
         assertEquals(dateLocalDateTime, actualLocalDateTime);
@@ -63,7 +63,7 @@ public class StringLocalDateTimeMapperTest {
         String givenLocalDateTimeString = "2023-03-17T00:00";
 
         // When
-        LocalDateTime actualLocalDateTime = StringLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
+        LocalDateTime actualLocalDateTime = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
 
         // Then
         assertEquals(dateLocalDateTime, actualLocalDateTime);
@@ -75,7 +75,7 @@ public class StringLocalDateTimeMapperTest {
         String givenLocalDateTimeString = "2023-03-17T00:00+00:00";
 
         // When
-        LocalDateTime actualLocalDateTime = StringLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
+        LocalDateTime actualLocalDateTime = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
 
         // Then
         assertEquals(dateLocalDateTime, actualLocalDateTime);
@@ -87,7 +87,7 @@ public class StringLocalDateTimeMapperTest {
         String givenLocalDateTimeString = "2023-03-17T00:00Z";
 
         // When
-        LocalDateTime actualLocalDateTime = StringLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
+        LocalDateTime actualLocalDateTime = StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
 
         // Then
         assertEquals(dateLocalDateTime, actualLocalDateTime);
@@ -100,7 +100,7 @@ public class StringLocalDateTimeMapperTest {
 
         // When
         Exception exception = assertThrows(ParseException.class,
-                () -> StringLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString));
+                () -> StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString));
 
         // Then
         assertEquals(exceptionMessage, exception.getMessage());
