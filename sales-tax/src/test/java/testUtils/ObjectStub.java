@@ -90,6 +90,7 @@ public class ObjectStub {
         List<Item> items = createItems(false, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(false, false);
+
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
@@ -99,6 +100,7 @@ public class ObjectStub {
         List<ItemDto> items = createItemDtos(false, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(false, false);
+
         return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
