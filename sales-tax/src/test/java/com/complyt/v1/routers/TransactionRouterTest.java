@@ -2172,7 +2172,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message,
+                "updatedDate" + DateErrorMessages.wrong_format_error_message,
                 "updatedDate may not be blank"));
         // When + Then
         webTestClient
@@ -2240,7 +2240,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message,
+                "createdDate" + DateErrorMessages.wrong_format_error_message,
                 "createdDate may not be blank"));
         // When + Then
         webTestClient
@@ -2308,7 +2308,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2377,7 +2377,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2547,7 +2547,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2820,7 +2820,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2889,7 +2889,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -3134,7 +3134,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message,
+                "updatedDate" + DateErrorMessages.wrong_format_error_message,
                 "updatedDate may not be blank"));
         // When + Then
         webTestClient
@@ -3206,7 +3206,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message,
+                "createdDate" + DateErrorMessages.wrong_format_error_message,
                 "createdDate may not be blank"));
         // When + Then
         webTestClient
@@ -3278,7 +3278,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message
+                "createdDate" + DateErrorMessages.wrong_format_error_message
         ));
         // When + Then
         webTestClient
@@ -3350,7 +3350,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message
+                "updatedDate" + DateErrorMessages.wrong_format_error_message
         ));
         // When + Then
         webTestClient
@@ -3490,7 +3490,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message
+                "createdDate" + DateErrorMessages.wrong_format_error_message
         ));
         // When + Then
         webTestClient
@@ -3562,7 +3562,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message
+                "updatedDate" + DateErrorMessages.wrong_format_error_message
         ));
         // When + Then
         webTestClient
@@ -3838,7 +3838,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -3911,7 +3911,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient

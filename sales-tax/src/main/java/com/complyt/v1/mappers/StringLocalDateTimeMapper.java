@@ -1,6 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.v1.error_messages.DateErrorMessages;
+import jakarta.validation.constraints.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import org.mapstruct.NullValueMappingStrategy;
@@ -24,6 +25,10 @@ public interface StringLocalDateTimeMapper {
 
     @Named("localDateTimeToString")
     default String localDateTimeToString(LocalDateTime dateTime) {
+        if ( dateTime == null ) {
+            return null;
+        }
+
         return dateTime.toString();
     }
 

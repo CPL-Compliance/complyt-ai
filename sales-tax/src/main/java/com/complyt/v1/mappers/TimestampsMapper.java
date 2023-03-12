@@ -25,11 +25,11 @@ public interface TimestampsMapper {
     Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
 
 
-    @Mapping(target = "createdDate", source = "timestamps.createdDate", qualifiedByName = "localDateTimeToString")
-    @Mapping(target = "updatedDate", source = "timestamps.updatedDate", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "updatedDate", source = "updatedDate", qualifiedByName = "localDateTimeToString")
     TimestampsDto timestampsTotimestampsDto(Timestamps timestamps);
     
-    @Mapping(target = "createdDate", source = "timestampsDto.createdDate", qualifiedByName="parseStringToLocalDateTime")
-    @Mapping(target = "updatedDate", source = "timestampsDto.updatedDate", qualifiedByName="parseStringToLocalDateTime")
+    @Mapping(target = "createdDate", source = "createdDate", qualifiedByName="parseStringToLocalDateTime")
+    @Mapping(target = "updatedDate", source = "updatedDate", qualifiedByName="parseStringToLocalDateTime")
     Timestamps timestampsDtoTotimestamps(TimestampsDto timestampsDto);
 }

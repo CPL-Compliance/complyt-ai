@@ -23,12 +23,12 @@ public interface ValidationDatesMapper {
     ValidationDatesMapper INSTANCE = Mappers.getMapper(ValidationDatesMapper.class);
 
 
-    @Mapping(target = "fromDate", source = "validationDates.fromDate", qualifiedByName = "localDateTimeToString")
-    @Mapping(target = "toDate", source = "validationDates.toDate", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "fromDate", source = "fromDate", qualifiedByName = "localDateTimeToString")
+    @Mapping(target = "toDate", source = "toDate", qualifiedByName = "localDateTimeToString")
     ValidationDatesDto validationDatesToValidationDatesDto(ValidationDates validationDates);
 
-    @Mapping(target = "fromDate", source = "validationDatesDto.fromDate", qualifiedByName = "parseStringToLocalDateTime")
-    @Mapping(target = "toDate", source = "validationDatesDto.toDate", qualifiedByName = "parseStringToLocalDateTime")
+    @Mapping(target = "fromDate", source = "fromDate", qualifiedByName = "parseStringToLocalDateTime")
+    @Mapping(target = "toDate", source = "toDate", qualifiedByName = "parseStringToLocalDateTime")
     ValidationDates validationDatesDtoToValidationDates(ValidationDatesDto validationDatesDto);
 
 

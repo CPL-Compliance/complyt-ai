@@ -1,20 +1,18 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.ObjectStub;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TImestampsMapperTest {
+public class TimestampsMapperTest {
     private Timestamps timestamps;
     private TimestampsDto timestampsDto;
     ObjectStub objectStub;

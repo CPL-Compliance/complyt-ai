@@ -1549,7 +1549,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[updated" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1590,7 +1590,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[created" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1603,7 +1603,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -1652,7 +1652,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -1775,7 +1775,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -1824,7 +1824,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2095,7 +2095,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2144,7 +2144,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2364,7 +2364,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(map -> {
                     String message = (String) map.get("message");
 
-                    assertEquals("[updated" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -2409,7 +2409,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[created" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -2422,7 +2422,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2475,7 +2475,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2602,7 +2602,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2655,7 +2655,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2930,7 +2930,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "created" + DateErrorMessages.wrong_format_error_message));
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then
@@ -2983,7 +2983,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "updated" + DateErrorMessages.wrong_format_error_message));
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
 
 
         // When + Then

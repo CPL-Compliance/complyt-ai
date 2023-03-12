@@ -34,6 +34,18 @@ public class StringLocalDateTimeMapperTest {
     }
 
     @Test
+    void localDateTimeNull_String_ReturnsNull() {
+        // Given
+        LocalDateTime givenLocalDateTime = null;
+
+        // When
+        String actualDateString = StringLocalDateTimeMapper.INSTANCE.localDateTimeToString(givenLocalDateTime);
+
+        // Then
+        assertNull(actualDateString);
+    }
+
+    @Test
     void StringJustDate_LocalDateTime_ReturnLocalDateTime() throws ParseException {
         // Given
         String givenLocalDateTimeString = "2023-03-17";

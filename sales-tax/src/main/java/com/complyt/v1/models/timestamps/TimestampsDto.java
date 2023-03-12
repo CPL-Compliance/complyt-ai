@@ -12,7 +12,7 @@ import lombok.With;
 
 @With
 @Schema(name = "Timestamps")
-public record TimestampsDto(@Valid @NotBlank(message = "createdDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "created" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "createdDate may not be null") String createdDate,
-                            @Valid @NotBlank(message = "updatedDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "updated" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "updatedDate may not be null") String updatedDate) {
+public record TimestampsDto(@Valid @NotBlank(message = "createdDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "createdDate" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "createdDate may not be null") String createdDate,
+                            @Valid @NotBlank(message = "updatedDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "updatedDate" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "updatedDate may not be null") String updatedDate) {
 
 }
