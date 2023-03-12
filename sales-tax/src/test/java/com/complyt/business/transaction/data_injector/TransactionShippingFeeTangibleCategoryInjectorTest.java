@@ -28,7 +28,8 @@ public class TransactionShippingFeeTangibleCategoryInjectorTest {
     void setUp() {
         objectStub = new ObjectStub(
           LocalDateTime.now(), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = objectStub.createTransaction(UUID.randomUUID().toString())
+                .withShippingFee(objectStub.createShippingFee(false,false));
         transactionShippingFeeTangibleCategoryInjector = new TransactionShippingFeeTangibleCategoryInjector(transaction);
     }
 
