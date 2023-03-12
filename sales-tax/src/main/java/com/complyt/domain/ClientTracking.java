@@ -15,4 +15,5 @@ public class ClientTracking {
     private final String id;
     private final String tenantId;
     private Nexus nexus;
+    private String name;
 }
