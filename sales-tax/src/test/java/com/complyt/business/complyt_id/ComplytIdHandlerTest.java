@@ -1,7 +1,6 @@
 package com.complyt.business.complyt_id;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ class ComplytIdHandlerTest {
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        objectStub = new ObjectStub(LocalDateTime.now(), UUID.randomUUID().toString());
         complytIdHandler = new ComplytIdHandler<>();
         transaction = objectStub.createTransaction(UUID.randomUUID().toString());
     }

@@ -6,7 +6,6 @@ import com.complyt.domain.TransactionType;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -39,7 +38,7 @@ public class TransactionsFilterByNexusRulesTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         transactionsFilterByNexusRules = new TransactionsFilterByNexusRules();
         customer = objectStub.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactionList();

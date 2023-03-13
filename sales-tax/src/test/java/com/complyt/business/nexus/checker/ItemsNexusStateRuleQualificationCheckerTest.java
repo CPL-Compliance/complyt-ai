@@ -8,7 +8,6 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = objectStub.createTransaction(null);
         nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }

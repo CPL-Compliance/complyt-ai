@@ -1,6 +1,5 @@
 package com.complyt.v1.validators;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
@@ -45,7 +44,7 @@ class ValidatorConfigTest {
     void setUp() {
 
         validatorConfig = new ValidatorConfig();
-        objectStub = new ObjectStub(new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        objectStub = new ObjectStub(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test

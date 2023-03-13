@@ -1,6 +1,5 @@
 package com.complyt.domain.customer.exemption;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,17 +13,17 @@ class ValidationDatesTest {
     @BeforeEach
     void setup() {
         validationDates = new ValidationDates(
-                new ComplytTimestamp(LocalDateTime.of(2002, 2, 2, 2, 2, 2)),
-                new ComplytTimestamp(LocalDateTime.of(2003, 3, 3, 3, 3, 3)));
+                LocalDateTime.of(2002, 2, 2, 2, 2, 2),
+                LocalDateTime.of(2003, 3, 3, 3, 3, 3));
     }
 
     @Test
     void withUpdateDate_DifferentDate_ReturnValidationDates() {
         // Given
         ValidationDates expectedValidationDates = new ValidationDates(
-                new ComplytTimestamp(LocalDateTime.of(2002, 2, 2, 2, 2, 2)),
-                new ComplytTimestamp(LocalDateTime.of(2004, 4, 4, 4, 4, 4)));
-        ComplytTimestamp differentDate = new ComplytTimestamp(LocalDateTime.of(2004, 4, 4, 4, 4, 4));
+                LocalDateTime.of(2002, 2, 2, 2, 2, 2),
+                LocalDateTime.of(2004, 4, 4, 4, 4, 4));
+        LocalDateTime differentDate = LocalDateTime.of(2004, 4, 4, 4, 4, 4);
 
         // When
         ValidationDates actualValidationDates = validationDates.withToDate(differentDate);

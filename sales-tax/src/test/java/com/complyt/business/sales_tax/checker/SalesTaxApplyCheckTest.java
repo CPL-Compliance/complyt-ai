@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.checker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,20 +30,20 @@ public class SalesTaxApplyCheckTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
 
     private Transaction createTransactionWithAppliedReferenceDate() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().plusYears(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
         return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().minusYears(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
         return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
@@ -93,7 +92,7 @@ public class SalesTaxApplyCheckTest {
 
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
                 .withApproved(false)
-                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
+                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTrackingWithNoSalesTax);

@@ -2,7 +2,6 @@ package com.complyt.repositories;
 
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +43,7 @@ public class NexusStateRuleRepositoryTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
         nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
     }

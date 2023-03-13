@@ -1,6 +1,5 @@
 package com.complyt.v1.validators;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.models.TransactionDto;
@@ -41,7 +40,7 @@ class ValidationHandlerTest {
     @BeforeEach
     void setup() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
