@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class StringLocalDateTimeMapperTest {
+public class StringToLocalDateTimeMapperTest {
     private String dateString;
     private LocalDateTime dateLocalDateTime;
     private String exceptionMessage;
@@ -106,4 +106,15 @@ public class StringLocalDateTimeMapperTest {
         assertEquals(exceptionMessage, exception.getMessage());
     }
 
+    @Test
+    void StringDateNull_LocalDateTime_ReturnsNull() throws ParseException {
+        // Given
+        String givenLocalDateTimeString = null;
+
+        // When
+        LocalDateTime actualLocalDateTime =  StringToLocalDateTimeMapper.INSTANCE.parseStringToLocalDateTime(givenLocalDateTimeString);
+
+        // Then
+        assertNull(actualLocalDateTime);
+    }
 }
