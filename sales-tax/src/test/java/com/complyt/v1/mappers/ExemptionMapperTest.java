@@ -1,7 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,7 @@ public class ExemptionMapperTest {
 
     @BeforeEach
     void setup() {
-        TestUtilities testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        TestUtilities testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String tenantId = UUID.randomUUID().toString();
 
         exemption = testUtilities.createExemption(UUID.randomUUID().toString()).withTenantId(tenantId);
@@ -38,6 +36,7 @@ public class ExemptionMapperTest {
 
         // Then
         assertEquals(exemptionDto, exemptionDtoResult);
+
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.complyt.v1.validators;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import com.complyt.v1.models.TransactionDto;
@@ -40,15 +39,14 @@ class ValidationHandlerTest {
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
     void validate_ValidAndUnconflictedDto_ReturnsDto() {
         // Given
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
 
@@ -73,7 +71,7 @@ class ValidationHandlerTest {
         // Given
         String differentExternalId = UUID.randomUUID().toString();
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
 
@@ -96,7 +94,7 @@ class ValidationHandlerTest {
     void validate_InvalidDtoBodyWithPathVariables_ReturnsValidationError() {
         // Given
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
 
@@ -113,7 +111,7 @@ class ValidationHandlerTest {
     void validate_NoPathVariablesButValidTransaction_ReturnsTransactionDto() {
         // Given
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
 
         // When
         when(serverRequest.pathVariables()).thenReturn(pathVariables);
@@ -128,7 +126,7 @@ class ValidationHandlerTest {
     void validate_NoPathVariablesInvalidTransaction_ReturnsValidationError() {
         // Given
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString()).withTransactionType(null);
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
 

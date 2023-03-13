@@ -10,7 +10,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,8 +48,7 @@ public class NexusCalculatorTest {
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     private NexusStateRule createNexusStateRule() {

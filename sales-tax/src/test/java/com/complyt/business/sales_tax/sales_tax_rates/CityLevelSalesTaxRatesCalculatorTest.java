@@ -2,7 +2,6 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.TestUtilities;
@@ -24,7 +23,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void setUp() {
         cityLevelSalesTaxRatesCalculator = new CityLevelSalesTaxRatesCalculator();
         testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxRate = testUtilities.createSalesTaxRates();
         citySalesTaxRules = testUtilities.createCitySalesTaxRules();
     }

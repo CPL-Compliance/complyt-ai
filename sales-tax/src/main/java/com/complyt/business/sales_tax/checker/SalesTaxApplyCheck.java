@@ -17,7 +17,7 @@ public class SalesTaxApplyCheck implements SalesTaxApplyChecker<SalesTaxTracking
     private Transaction transaction;
 
     public boolean check(@NonNull SalesTaxTracking salesTaxTracking) {
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
         LocalDateTime applicationDate = salesTaxTracking.getAppliedDate();
 
         boolean isSalesTaxEnforced = salesTaxTracking.isEnforcesSalesTax();
@@ -29,5 +29,4 @@ public class SalesTaxApplyCheck implements SalesTaxApplyChecker<SalesTaxTracking
         log.debug("Is sales tax applied for transaction returned : " + isApplied);
         return isApplied;
     }
-
 }

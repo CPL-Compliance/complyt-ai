@@ -4,7 +4,6 @@ import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +37,7 @@ public class ShippingFeeSalesTaxRatesProviderTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRate = testUtilities.createSalesTaxRates();
         shippingFee = testUtilities.createShippingFee(false, false);

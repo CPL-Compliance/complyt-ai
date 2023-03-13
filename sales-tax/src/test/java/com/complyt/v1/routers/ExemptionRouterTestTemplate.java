@@ -79,4 +79,7 @@ public interface ExemptionRouterTestTemplate extends
 
     // Validations::ExemptionType
     void upsert_NullExemptionType_Returns400ValidationError();
+
+    void upsert_NullValidationDates_Returns400ValidationError();
+
 }

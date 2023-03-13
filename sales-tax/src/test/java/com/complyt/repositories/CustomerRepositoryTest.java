@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +49,7 @@ class CustomerRepositoryTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), tenantId);
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         customer = testUtilities.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
@@ -236,7 +234,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.save(customer)).thenReturn(Mono.just(dbCustomer));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(customer.getTenantId()));
 
         // Then
         Mono<Customer> monoSavedCustomer = customerRepository.save(customer);

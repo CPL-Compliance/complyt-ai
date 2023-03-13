@@ -5,7 +5,6 @@ import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionItemsAmountsCollector;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +44,7 @@ public class TransactionItemsAmountsCollectorTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(new ObjectId().toString());
         items = new ArrayList<>(transaction.getItems());
         transactionItemsAmountsCollector = new TransactionItemsAmountsCollector(

@@ -13,7 +13,6 @@ import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,8 +65,7 @@ public class SalesTaxServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
@@ -89,7 +87,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
         SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId)
-                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
+                .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);

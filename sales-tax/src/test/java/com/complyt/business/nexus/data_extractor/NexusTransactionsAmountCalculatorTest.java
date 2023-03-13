@@ -6,7 +6,6 @@ import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,8 +45,7 @@ public class NexusTransactionsAmountCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactions = createTransactions();
         nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }

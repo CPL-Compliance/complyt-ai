@@ -12,7 +12,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,8 +57,7 @@ public class SalesTaxTrackingServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
     }
 

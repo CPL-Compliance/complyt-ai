@@ -5,7 +5,6 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,17 +26,14 @@ import static org.mockito.Mockito.when;
 class TransactionShippingFeeInjectionCheckerTest {
 
 
+    TestUtilities testUtilities;
     @Mock
     private TransactionShippingFeeInjectionChecker injector;
-
     private Transaction transaction;
-
-    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         ShippingFee shippingFee = testUtilities.createShippingFee(false, false).withTaxCode("C6S1");
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         ReflectionTestUtils.setField(injector, "transaction", transaction, Transaction.class);

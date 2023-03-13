@@ -6,7 +6,6 @@ import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +44,7 @@ public class TaxableCollectionAmountExtractorTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         nexusStateRuleId = UUID.randomUUID().toString();
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());

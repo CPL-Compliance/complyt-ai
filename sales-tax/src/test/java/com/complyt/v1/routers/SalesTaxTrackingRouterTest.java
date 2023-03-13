@@ -3,7 +3,6 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
@@ -60,8 +59,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @BeforeEach
     void setUp() {
         salesTaxTrackingRouter = new SalesTaxTrackingRouter();
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto();
         salesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
     }
@@ -231,7 +229,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
-        String state = newSalesTaxTracking.getState().getName();
+        String  state = newSalesTaxTracking.getState().getName();
         SalesTaxTracking salesTaxTrackingWithId = newSalesTaxTracking.withId(UUID.randomUUID().toString());
         SalesTaxTrackingDto salesTaxTrackingDtoSent =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);

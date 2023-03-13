@@ -14,7 +14,6 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionServiceImpl;
 import com.complyt.services.nexus.NexusService;
@@ -65,8 +64,7 @@ public class TransactionFacadeTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
 
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());

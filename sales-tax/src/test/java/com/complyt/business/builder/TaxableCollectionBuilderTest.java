@@ -3,7 +3,6 @@ package com.complyt.business.builder;
 import com.complyt.business.sales_tax.checker.TaxableItemExistChecker;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,8 +36,7 @@ public class TaxableCollectionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 

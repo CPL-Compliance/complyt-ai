@@ -1,7 +1,6 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ public class SalesTaxTrackingMapperTest {
     @BeforeEach
     void setUp() {
         localDateTime = LocalDateTime.now();
-        testUtilities = new TestUtilities(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
         salesTaxTrackingNoTenantNorId = salesTaxTracking.withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId());
         salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId());

@@ -1,6 +1,5 @@
 package com.complyt.v1.models.customer;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +22,7 @@ public class CustomerDtoTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         customerDto = testUtilities.createCustomerDto(id);
         anotherCustomerDto = customerDto.withComplytId(customerDto.complytId());

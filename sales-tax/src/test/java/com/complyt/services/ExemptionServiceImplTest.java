@@ -7,7 +7,6 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.Status;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -55,8 +54,7 @@ public class ExemptionServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(customerId.toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         exemption = testUtilities.createExemption(UUID.randomUUID().toString());
@@ -161,8 +159,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().getTimestamp().plusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getToDate().plusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
@@ -178,8 +176,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().minusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));

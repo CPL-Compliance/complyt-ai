@@ -14,24 +14,25 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestUtilities {
 
-    ComplytTimestamp complytTimestamp;
-    ComplytTimestampDto complytTimestampDto;
+    LocalDateTime localDateTime;
     String tenantId;
 
     UUID customerIdOtherDomains;
@@ -40,9 +41,8 @@ public class TestUtilities {
 
     String source;
 
-    public TestUtilities(ComplytTimestamp complytTimestamp, String tenantId) {
-        this.complytTimestamp = complytTimestamp;
-        this.complytTimestampDto = new ComplytTimestampDto(complytTimestamp.getTimestamp().toString());
+    public TestUtilities(LocalDateTime localDateTime, String tenantId) {
+        this.localDateTime = localDateTime;
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
@@ -69,9 +69,9 @@ public class TestUtilities {
     }
 
     public Customer createCustomer(String id) {
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
-        ComplytTimestamp complytTimestampMinusOneMinute = new ComplytTimestamp(complytTimestamp.getTimestamp().minusMinutes(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestampMinusOneMinute, complytTimestamp);
+        Timestamps internalTimeStamps = new Timestamps(localDateTime, localDateTime);
+        LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTimeMinusOneMinute, localDateTime);
         return new Customer(
                 UUID.randomUUID(),
                 id,
@@ -87,9 +87,9 @@ public class TestUtilities {
     }
 
     public CustomerDto createCustomerDto(String id) {
-        TimestampsDto internalTimeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
-        ComplytTimestampDto complytTimestampMinusOneMinute = new ComplytTimestampDto(complytTimestampDto.getTimestamp().minusMinutes(1).toString());
-        TimestampsDto externalTimestamps = new TimestampsDto(complytTimestampMinusOneMinute, complytTimestampDto);
+        TimestampsDto internalTimeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
+        LocalDateTime localDateTimeMinusOneMinute = localDateTime.minusMinutes(1);
+        TimestampsDto externalTimestamps = new TimestampsDto(localDateTimeMinusOneMinute.toString(), localDateTime.toString());
         return new CustomerDto(
                 UUID.randomUUID(),
                 id,
@@ -107,7 +107,7 @@ public class TestUtilities {
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = createItems(true, false);
-        Timestamps timeStamps = new Timestamps(complytTimestamp, complytTimestamp);
+        Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
         return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
@@ -116,8 +116,9 @@ public class TestUtilities {
         OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip");
         MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(true, false);
-        TimestampsDto timeStamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+        TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
+
         return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
@@ -201,8 +202,8 @@ public class TestUtilities {
     public Exemption createExemption(String id) {
         State state = new State("CA", "02", "California");
         Classification classification = new Classification("code", "description");
-        ValidationDates validationDates = new ValidationDates(new ComplytTimestamp(complytTimestamp.getTimestamp().minusYears(1)), new ComplytTimestamp(complytTimestamp.getTimestamp().plusYears(1)));
-        Timestamps internalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
+        ValidationDates validationDates = new ValidationDates(localDateTime.minusYears(1), localDateTime.plusYears(1));
+        Timestamps internalTimestamps = new Timestamps(localDateTime, localDateTime);
         Status status = new Status("code", "name");
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
@@ -214,9 +215,9 @@ public class TestUtilities {
         StateDto state = new StateDto("CA", "02", "California");
         ClassificationDto classification = new ClassificationDto("code", "description");
         ValidationDatesDto validationDates = new ValidationDatesDto(
-                new ComplytTimestampDto(complytTimestamp.getTimestamp().minusYears(1).toString()),
-                new ComplytTimestampDto(complytTimestamp.getTimestamp().plusYears(1).toString()));
-        TimestampsDto internalTimestamps = new TimestampsDto(complytTimestampDto, complytTimestampDto);
+                localDateTime.minusYears(1).toString(),
+                localDateTime.plusYears(1).toString());
+        TimestampsDto internalTimestamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         StatusDto status = new StatusDto("code", "name");
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
@@ -254,18 +255,20 @@ public class TestUtilities {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, true,
-                new PhysicalNexusTracker(false, complytTimestamp.getTimestamp()),
-                new EconomicNexusTracker(false, complytTimestamp.getTimestamp()), complytTimestamp.getTimestamp(),
-                true, complytTimestamp.getTimestamp());
+                new PhysicalNexusTracker(false, localDateTime),
+                new EconomicNexusTracker(false, localDateTime), localDateTime,
+                true, localDateTime);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
         StateDto state = new StateDto("CA", "02", "California");
-        return new SalesTaxTrackingDto(UUID.randomUUID(), state,
+        SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), state,
                 true,
-                new PhysicalNexusTrackerDto(false, complytTimestampDto.getTimestamp()),
-                new EconomicNexusTrackerDto(false, complytTimestampDto.getTimestamp()), complytTimestamp.getTimestamp(),
-                true, complytTimestamp.getTimestamp());
+                new PhysicalNexusTrackerDto(false, localDateTime),
+                new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
+                true, localDateTime);
+
+        return salesTaxTrackingDto;
     }
 
     public Result createResult() {
@@ -278,6 +281,22 @@ public class TestUtilities {
 
     public Address createAddress() {
         return new Address("City", "Country", "County", "CA", "Street", "Zip");
+    }
+
+    public Timestamps createTimestamps() {
+        return new Timestamps(localDateTime.minusYears(1), localDateTime);
+    }
+
+    public TimestampsDto createTimestampsDto() {
+        return new TimestampsDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
+    public ValidationDates createValidationDates() {
+        return new ValidationDates(localDateTime.minusYears(1), localDateTime);
+    }
+
+    public ValidationDatesDto createValidationDatesDto() {
+        return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
 }

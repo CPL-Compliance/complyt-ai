@@ -4,7 +4,6 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWra
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -32,16 +31,14 @@ class TransactionZipTaxCountyFetcherTest {
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    TestUtilities testUtilities;
     @InjectMocks
     private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
     private Transaction transaction;
 
-    TestUtilities testUtilities;
-
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 

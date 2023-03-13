@@ -6,10 +6,7 @@ import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.With;
 
 import java.util.UUID;
@@ -23,5 +20,5 @@ public record CustomerDto(UUID complytId,
                           @Valid OptionalAddressDto address,
                           @NotNull(message = "Customer type may not be null") CustomerTypeDto customerType,
                           @Valid TimestampsDto internalTimestamps,
-                          @Valid TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
+                          @Valid @NotNull(message = "External Timestamps may not be null") TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
 }
