@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
+@Mapper
 public interface StringToLocalDateTimeMapper {
     StringToLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringToLocalDateTimeMapper.class);
 
@@ -32,6 +32,10 @@ public interface StringToLocalDateTimeMapper {
 
     @Named("parseStringToLocalDateTime")
     default LocalDateTime parseStringToLocalDateTime(String dateAsString) throws ParseException {
+        if ( dateAsString == null ) {
+            return null;
+        }
+
         try {
             LocalDateTime parsedLocalDate = LocalDate.parse(dateAsString, DateTimeFormatter.ISO_LOCAL_DATE).atTime(0, 0, 0);
             log.debug("Input received as a LocalDate: " + parsedLocalDate);
