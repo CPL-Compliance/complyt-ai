@@ -12,7 +12,7 @@
     </parent>
 
     <!-- Maven Coordinates -->
-    <artifactId>rates</artifactId>
+    <artifactId>sales-tax-rates</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 

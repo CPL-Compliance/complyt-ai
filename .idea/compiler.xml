@@ -25,8 +25,8 @@
         <module name="api-gateway" />
         <module name="test-service" />
         <module name="files" />
+        <module name="sales-tax-rates" />
         <module name="discovery-service" />
-        <module name="rates" />
         <module name="sales-tax" />
       </profile>
     </annotationProcessing>
@@ -47,8 +47,8 @@
       <module name="discovery-service" options="-parameters" />
       <module name="files" options="-parameters" />
       <module name="naming-server" options="-parameters" />
-      <module name="rates" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
+      <module name="sales-tax-rates" options="-parameters" />
       <module name="salestax" options="-parameters" />
       <module name="temp" options="-parameters" />
       <module name="test-service" options="-parameters" />

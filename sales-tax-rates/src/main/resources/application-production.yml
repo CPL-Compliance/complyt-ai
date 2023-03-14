@@ -2,15 +2,17 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@demo.dt2c3mf.mongodb.net/files
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/sales_tax_rates
 
-logging:
+  logging:
   level:
     root: INFO
     web: INFO

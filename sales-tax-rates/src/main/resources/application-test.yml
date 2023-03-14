@@ -8,7 +8,7 @@ eureka:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@test.bzk8n3u.mongodb.net/files
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@test.bzk8n3u.mongodb.net/sales_tax_rates
 
 logging:
   level:

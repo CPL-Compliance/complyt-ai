@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @Generated
-public class RatesApplication {
+public class SalesTaxRatesApplication {
     public static void main(String[] args) {
-        SpringApplication.run(RatesApplication.class, args);
+        SpringApplication.run(SalesTaxRatesApplication.class, args);
     }
 }
