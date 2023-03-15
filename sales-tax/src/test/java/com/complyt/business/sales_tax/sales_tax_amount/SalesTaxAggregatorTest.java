@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.sales_tax_amount;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,7 +32,7 @@ public class SalesTaxAggregatorTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
         transaction = objectStub.createTransaction(null)

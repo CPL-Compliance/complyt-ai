@@ -21,13 +21,13 @@ class ClientTrackingTest {
         id = UUID.randomUUID().toString();
         tenantId = UUID.randomUUID().toString();
         nexusDate = LocalDateTime.now();
-        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate));
+        clientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name");
     }
 
     @Test
     void Equals_sameClientTracking_ReturnsTrue() {
         // Given
-        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate));
+        ClientTracking givenClientTracking = new ClientTracking(id, tenantId, new Nexus(nexusDate), "name");
 
         // When
         boolean isEquals = clientTracking.equals(givenClientTracking);
@@ -41,7 +41,8 @@ class ClientTrackingTest {
         // Given
         String expectedString = "ClientTracking(id=" + clientTracking.getId() +
                 ", tenantId=" + clientTracking.getTenantId() +
-                ", nexus=" + clientTracking.getNexus() + ")";
+                ", nexus=" + clientTracking.getNexus() +
+                ", name=" + clientTracking.getName() + ")";
 
         // When
         String actualString = clientTracking.toString();

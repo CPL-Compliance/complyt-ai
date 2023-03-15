@@ -8,7 +8,6 @@ import com.complyt.domain.TransactionStatus;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,8 @@ class ExistingTransactionInternalDateInjectorTest {
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
         String tenantId = UUID.randomUUID().toString();
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(LocalDateTime.now());
-        Timestamps internalTimeStamps = new Timestamps(complytTimestamp, complytTimestamp);
+        LocalDateTime localDateTime_now = LocalDateTime.now();
+        Timestamps internalTimeStamps = new Timestamps(localDateTime_now, localDateTime_now);
         Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
         List<Item> items = new ArrayList<>() {
@@ -70,8 +69,8 @@ class ExistingTransactionInternalDateInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().getTimestamp().isAfter(beforeActionTime));
-        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().getTimestamp().isBefore(afterActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
+        assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
     }
 
 }

@@ -3,7 +3,6 @@ package com.complyt.facades;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.Status;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
@@ -45,7 +44,7 @@ public class ExemptionFacadeTest {
     @BeforeEach
     void setUp() {
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         exemption = objectStub.createExemption(UUID.randomUUID().toString());
     }
 

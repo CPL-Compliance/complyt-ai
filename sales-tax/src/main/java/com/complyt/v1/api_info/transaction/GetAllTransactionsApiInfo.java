@@ -128,20 +128,12 @@ public @interface GetAllTransactionsApiInfo {
                                 },
                                 "customerType": "RETAIL",
                                 "internalTimestamps": {
-                                    "createdDate": {
-                                        "timestamp": "2023-02-05T12:24:43.193Z"
-                                    },
-                                    "updatedDate": {
-                                        "timestamp": "2023-02-05T12:24:43.193Z"
-                                    }
+                                    "createdDate": "2023-02-05T12:24:43.193Z",
+                                    "updatedDate": "2023-02-05T12:24:43.193Z"
                                 },
                                 "externalTimestamps": {
-                                    "createdDate": {
-                                        "timestamp": "2023-02-05T12:24:43.193Z"
-                                    },
-                                    "updatedDate": {
-                                        "timestamp": "2023-02-05T12:24:43.193Z"
-                                    }
+                                    "createdDate": "2023-02-05T12:24:43.193Z",
+                                    "updatedDate": "2023-02-05T12:24:43.193Z"
                                 }
                             },
                             "salesTax": {
@@ -157,20 +149,12 @@ public @interface GetAllTransactionsApiInfo {
                             },
                             "transactionStatus": "ACTIVE",
                             "internalTimestamps": {
-                                "createdDate": {
-                                    "timestamp": "2023-02-05T12:24:43.193Z"
-                                },
-                                "updatedDate": {
-                                    "timestamp": "2023-02-05T12:24:43.193Z"
-                                }
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
                             },
                             "externalTimestamps": {
-                                "createdDate": {
-                                    "timestamp": "2023-02-05T12:24:43.193Z"
-                                },
-                                "updatedDate": {
-                                    "timestamp": "2023-02-05T12:24:43.193Z"
-                                }
+                                "createdDate": "2023-02-05T12:24:43.193Z",
+                                "updatedDate": "2023-02-05T12:24:43.193Z"
                             },
                             "transactionType": "SALES_ORDER",
                             "shippingFee": {

@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     void setUp() {
         stateLevelSalesTaxRatesCalculator = new StateLevelSalesTaxRatesCalculator();
         objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+                LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxRate = objectStub.createSalesTaxRates();
         jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
     }

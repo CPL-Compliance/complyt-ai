@@ -1,6 +1,5 @@
 package com.complyt.domain;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ public class TransactionTest {
     void setup() {
         localDateTime = LocalDateTime.now();
         objectStub = new ObjectStub(
-                new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+                localDateTime, UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
         transaction = objectStub.createTransaction(transactionId);
     }
