@@ -13,7 +13,6 @@ import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -53,12 +52,12 @@ public class NexusService {
     @NonNull
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
-    public Mono<SalesTaxTracking> findTrackingByState(String state) {
-        return salesTaxTrackingService.findByState(state).
-        switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)));
+    public Mono<SalesTaxTracking> findTrackingByState(@NonNull String state) {
+        return salesTaxTrackingService.findByState(state)
+                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)));
     }
 
-    public Mono<SalesTaxTracking> findTrackingByState(@NotNull Transaction transaction) {
+    public Mono<SalesTaxTracking> findTrackingByState(@NonNull Transaction transaction) {
         return findTrackingByState(transaction.getShippingAddress().getState());
     }
 
