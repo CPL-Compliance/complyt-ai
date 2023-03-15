@@ -15,7 +15,7 @@ import java.util.UUID;
 @Schema(name = "Transaction")
 public record TransactionDto(UUID complytId,
                              @Schema(description = "the attribute designed to receive a unique identifier provided by API consumers themselves (e.g. pass your own transaction ID)") @NotBlank(message = "External ID may not be blank") @Size(min = 1, max = 256, message = "External ID should be 1-256 characters maximum") String externalId,
-                             @Schema(pattern = "dfg") @NotBlank(message = "Source may not be blank") @Pattern(regexp = "[1-9]", message = "Source should be a single digit") String source,
+                             @NotBlank(message = "Source may not be blank") @Pattern(regexp = "[1-9]", message = "Source should be a single digit") String source,
                              @NotEmpty(message = "Items list cannot be empty") @NotNull(message = "Items may not be null") List<@Valid ItemDto> items,
                              @Valid OptionalAddressDto billingAddress,
                              @Valid @NotNull(message = "Shipping address may not be null") MandatoryAddressDto shippingAddress,
