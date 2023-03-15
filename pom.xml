@@ -50,6 +50,7 @@
         <logback-json-classic.version>0.1.5</logback-json-classic.version>
         <jackson-databind.version>2.14.1</jackson-databind.version>
         <spring-cloud-dependencies.version>2022.0.0</spring-cloud-dependencies.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
         <!-- Dependencies -->
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
