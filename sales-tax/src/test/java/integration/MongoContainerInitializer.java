@@ -10,8 +10,9 @@ import org.testcontainers.utility.DockerImageName;
 public abstract class MongoContainerInitializer {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(MongoContainerInitializer.class);
+    protected static final String MONGO_IMAGE = "mongo:5.0.15";
 
-    protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse("mongo"))
+    protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
             .withExposedPorts(27017)
             .withClasspathResourceMapping("sales_tax.dump", "sales_tax.dump", BindMode.READ_ONLY);
 
