@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,13 +39,12 @@ public class ExemptionFacadeTest {
 
     Exemption exemption;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
     }
 
     @Test

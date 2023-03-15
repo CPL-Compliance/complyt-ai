@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -25,19 +25,18 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     Transaction transaction;
 
     ShippingFee shippingFee;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        shippingFee = objectStub.createShippingFee(true, false);
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        shippingFee = testUtilities.createShippingFee(true, false);
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         transactionShippingFeeJurisdictionalRulesInjector = new TransactionShippingFeeJurisdictionalRulesInjector(transaction);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithTaxableRule() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
 
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
@@ -51,7 +50,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassificationsWithNotTaxableRule() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules().withTaxable(false);
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withTaxable(false);
 
         Map<String, JurisdictionalSalesTaxRules> shippingJurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
@@ -66,7 +65,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
 
 
     private Transaction createTransactionWithNotTaxableShippingFee() {
-        JurisdictionalSalesTaxRules notTaxableRules = objectStub.createJurisdictionalSalesTaxRules().withTaxable(false);
+        JurisdictionalSalesTaxRules notTaxableRules = testUtilities.createJurisdictionalSalesTaxRules().withTaxable(false);
         ShippingFee notTaxableShippingFee = transaction.getShippingFee()
                 .withJurisdictionalSalesTaxRules(notTaxableRules)
                 .withTaxableCategory(TaxableCategory.NOT_TAXABLE);
@@ -77,7 +76,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     void inject_InjectsDataToTransactionWithShippingFeeWithTaxableCategory_ReturnsModifiedTransaction() {
         // Given
         Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
-        ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(objectStub.createJurisdictionalSalesTaxRules());
+        ShippingFee shippingFeeWithRules = transaction.getShippingFee().withJurisdictionalSalesTaxRules(testUtilities.createJurisdictionalSalesTaxRules());
 
         Transaction transactionWithRules = transaction.withShippingFee(shippingFeeWithRules);
 
@@ -106,7 +105,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjectorTest {
     void inject_DoesNotInjectDataToTransactionBecauseShippingFessTaxCodeIsUnrecognized_ReturnsUnModifiedTransaction() {
         // Given
         Map<String, ProductClassification> mapTaxCodesToClassifications = createMapTaxCodesToClassificationsWithTaxableRule();
-        ShippingFee shippingFeeWithUnrecognizedTaxCode = objectStub.createShippingFee(false, false).withTaxCode("C7S1");
+        ShippingFee shippingFeeWithUnrecognizedTaxCode = testUtilities.createShippingFee(false, false).withTaxCode("C7S1");
 
         Transaction transactionWithShippingFeeWithUnrecognizedTaxCode = transaction.withShippingFee(shippingFeeWithUnrecognizedTaxCode);
         TransactionShippingFeeJurisdictionalRulesInjector transactionShippingFeeJurisdictionalRulesInjector =

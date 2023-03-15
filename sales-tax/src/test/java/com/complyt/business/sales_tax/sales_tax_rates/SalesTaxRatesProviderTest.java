@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -36,17 +36,16 @@ class SalesTaxRatesProviderTest {
 
     private SalesTaxRate salesTaxRate;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     Address address;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
-        salesTaxRate = objectStub.createSalesTaxRates();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
+        salesTaxRate = testUtilities.createSalesTaxRates();
         salesTaxRatesProvider = new SalesTaxRatesProvider(stateLevelSalesTaxRatesCalculator, cityLevelSalesTaxRatesCalculator);
-        address = objectStub.createAddress();
+        address = testUtilities.createAddress();
     }
 
     @Test
@@ -64,7 +63,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_CityDoesNotExistInCitiesMap_ReturnsSalesTaxRatesCalculatedByStateRate() {
         // Given
-        CitySalesTaxRules citySalesTaxRules = objectStub.createCitySalesTaxRules().withTaxable(false);
+        CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
                     put(address.getCity() + "UNEQUAL_SUFFIX", citySalesTaxRules);
@@ -83,7 +82,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_CalculatesSalesTaxRatesForStateAndCityLevels_ReturnsSalesTaxRates() {
         // Given
-        CitySalesTaxRules citySalesTaxRules = objectStub.createCitySalesTaxRules().withTaxable(false);
+        CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
                     put(address.getCity(), citySalesTaxRules);

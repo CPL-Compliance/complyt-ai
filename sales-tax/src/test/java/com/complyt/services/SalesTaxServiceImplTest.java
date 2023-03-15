@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,20 +61,19 @@ public class SalesTaxServiceImplTest {
     Transaction transaction;
 
     String salesTaxTrackingId;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test
     void handleSalesTaxCalculation_StateDoesntEnforceNexus_ReturnsSameTransaction() {
         // Given
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId)
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId)
                 .withEnforcesSalesTax(false);
 
         // When
@@ -87,7 +86,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_NexusIsNotAppliedYet_ReturnsSameTransaction() {
         // Given
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId)
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId)
                 .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
@@ -101,7 +100,7 @@ public class SalesTaxServiceImplTest {
     void handleSalesTaxCalculation_SalesTaxCalculated_TransactionModified() {
         // Given
         FastTaxData fastTaxData = new FastTaxData();
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
@@ -110,7 +109,7 @@ public class SalesTaxServiceImplTest {
         Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
         List<Taxable> taxAbles = new ArrayList<>(transaction.getItems());
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
@@ -135,7 +134,7 @@ public class SalesTaxServiceImplTest {
         }};
 
         FastTaxData fastTaxData = new FastTaxData().withTaxInfoItems(taxInfoItems);
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         SalesTax salesTax = new SalesTax(10, salesTaxRate);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
@@ -143,7 +142,7 @@ public class SalesTaxServiceImplTest {
         }};
         Transaction transactionWithRates = transaction.withItems(itemsWithRates);
         Transaction transactionWithSalesTax = transaction.withItems(itemsWithRates).withSalesTax(salesTax);
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         List<Taxable> taxAbles = new ArrayList<>() {{
             add(transaction.getItems().get(0));
         }};
@@ -165,7 +164,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_CustomerIsFullyExemptedInState_ReturnsTransactionWithOutSalesTax() {
         // Given
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
@@ -178,7 +177,7 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxTracking tracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         Transaction nullTransaction = null;
 
         // When + Then

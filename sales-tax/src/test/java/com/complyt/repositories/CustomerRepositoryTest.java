@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -43,18 +43,17 @@ class CustomerRepositoryTest {
 
     String source;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         tenantId = UUID.randomUUID().toString();
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), tenantId);
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        customer = objectStub.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
-        source = objectStub.getUnifiedSource();
+        customer = testUtilities.createCustomer(id).withExternalId(externalId).withName("Existing Customer");
+        source = testUtilities.getUnifiedSource();
     }
 
     @Test
@@ -235,7 +234,7 @@ class CustomerRepositoryTest {
         when(reactiveMongoTemplate.save(customer)).thenReturn(Mono.just(dbCustomer));
 
         // When
-        when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
+        when(tenantResolver.resolve()).thenReturn(Mono.just(customer.getTenantId()));
 
         // Then
         Mono<Customer> monoSavedCustomer = customerRepository.save(customer);

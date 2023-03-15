@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,16 +37,15 @@ class CustomerFacadeTest {
 
     Customer customer;
     String source;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeAll
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String id = UUID.randomUUID().toString();
         String externalId = UUID.randomUUID().toString();
-        customer = objectStub.createCustomer(id).withExternalId(externalId);
-        source = objectStub.getUnifiedSource();
+        customer = testUtilities.createCustomer(id).withExternalId(externalId);
+        source = testUtilities.getUnifiedSource();
     }
 
     @Test

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,26 +25,25 @@ public class SalesTaxApplyCheckTest {
     private SalesTaxApplyCheck salesTaxApplyCheck;
     private SalesTaxTracking salesTaxTracking;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
 
     private Transaction createTransactionWithAppliedReferenceDate() {
         LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().plusYears(1);
         Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
-        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        return testUtilities.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
         LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().minusYears(1);
         Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
-        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        return testUtilities.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     @Test

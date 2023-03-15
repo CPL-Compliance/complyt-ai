@@ -3,7 +3,7 @@ package com.complyt.domain.customer.exemption;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,19 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExemptionTest {
     private Exemption exemption;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        exemption = objectStub.createExemption(new ObjectId().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(new ObjectId().toString());
     }
 
     @Test
     void Equals_sameExemption_ReturnsTrue() {
         // Given
-        Exemption givenExemption = objectStub.createExemption(exemption.getId()).withComplytId(exemption.getComplytId());
+        Exemption givenExemption = testUtilities.createExemption(exemption.getId()).withComplytId(exemption.getComplytId());
 
         // When
         boolean isEquals = exemption.equals(givenExemption);

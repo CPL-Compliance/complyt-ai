@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,23 +31,21 @@ class TransactionZipTaxCountyFetcherTest {
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    TestUtilities testUtilities;
     @InjectMocks
     private TransactionZipTaxCountyFetcher transactionZipTaxCountyFetcher;
     private Transaction transaction;
 
-    ObjectStub objectStub;
-
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
-        Result result = objectStub.createResult();
+        Result result = testUtilities.createResult();
         List<Result> results = new ArrayList<>() {{
             add(result);
         }};

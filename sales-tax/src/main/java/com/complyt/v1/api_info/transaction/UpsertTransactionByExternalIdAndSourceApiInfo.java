@@ -164,7 +164,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                             "specialTreatment": true,
                             "calculationType": "FIXED",
                             "description": "string",
-                            "calculationValue": 0
+                            "calculationValue": 0,
+                            "cities": null
                         },
                         "salesTaxRate": {
                             "cityDistrictRate": 0,
@@ -255,7 +256,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                         "specialTreatment": true,
                         "calculationType": "FIXED",
                         "description": "string",
-                        "calculationValue": 0
+                        "calculationValue": 0,
+                        "cities": null
                     },
                     "salesTaxRate": {
                         "cityDistrictRate": 0,

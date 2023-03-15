@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,17 +40,16 @@ public class TaxableCollectionAmountExtractorTest {
     ObjectId customerId;
     String nexusStateRuleId;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         nexusStateRuleId = UUID.randomUUID().toString();
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        nexusStateRule = objectStub.createNexusStateRule(nexusStateRuleId);
-        List<Taxable> taxables = objectStub.createTaxables(transaction);
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        nexusStateRule = testUtilities.createNexusStateRule(nexusStateRuleId);
+        List<Taxable> taxables = testUtilities.createTaxables(transaction);
         taxableCollectionAmountExtractor = new TaxableCollectionAmountExtractor(qualificationChecker, taxables, nexusStateRule);
     }
 
@@ -89,7 +88,7 @@ public class TaxableCollectionAmountExtractorTest {
     void equals_sameExtractor_ReturnsTrue() {
         // Given
         TaxableCollectionAmountExtractor givenTaxableCollectionAmountExtractor =
-                new TaxableCollectionAmountExtractor(qualificationChecker, objectStub.createTaxables(transaction), nexusStateRule);
+                new TaxableCollectionAmountExtractor(qualificationChecker, testUtilities.createTaxables(transaction), nexusStateRule);
 
         // When
         boolean isEquals = taxableCollectionAmountExtractor.equals(givenTaxableCollectionAmountExtractor);
