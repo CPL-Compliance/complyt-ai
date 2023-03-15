@@ -1,10 +1,9 @@
 package com.complyt.domain;
 
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -14,11 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransactionTest {
 
+    TestUtilities testUtilities;
+    LocalDateTime localDateTime;
     private Transaction transaction;
     private String transactionId;
-    ObjectStub objectStub;
-
-    LocalDateTime localDateTime;
 
     @Test
     void testingAmountOfPropertiesInTransaction() {
@@ -30,10 +28,9 @@ public class TransactionTest {
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
-        transaction = objectStub.createTransaction(transactionId);
+        transaction = testUtilities.createTransaction(transactionId);
     }
 
     @Test
@@ -71,7 +68,7 @@ public class TransactionTest {
     void withId_DifferentId_ReturnTransaction() {
         // Given
         String differentId = UUID.randomUUID().toString();
-        Transaction expectedTransaction = objectStub.createTransaction(differentId)
+        Transaction expectedTransaction = testUtilities.createTransaction(differentId)
                 .withComplytId(transaction.getComplytId())
                 .withExternalId(transaction.getExternalId())
                 .withCustomer(transaction.getCustomer());

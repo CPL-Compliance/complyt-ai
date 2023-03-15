@@ -6,7 +6,6 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.NexusThreshold;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.Definition;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -49,13 +48,12 @@ public class NexusCheckerTest {
     SalesTaxTracking salesTaxTracking;
     NexusCalculationSummary nexusCalculationSummary;
     NexusStateRule nexusStateRule;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
         nexusCalculationSummary = createNexusCalculationSummary();
         nexusStateRule = createNexusStateRule();
     }

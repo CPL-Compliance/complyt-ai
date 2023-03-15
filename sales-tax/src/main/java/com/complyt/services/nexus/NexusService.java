@@ -77,7 +77,7 @@ public class NexusService {
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
         String state = transaction.getShippingAddress().getState();
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(state)

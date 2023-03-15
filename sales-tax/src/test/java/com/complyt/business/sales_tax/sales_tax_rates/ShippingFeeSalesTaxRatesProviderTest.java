@@ -4,16 +4,13 @@ import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -34,18 +31,17 @@ public class ShippingFeeSalesTaxRatesProviderTest {
     SalesTaxRate salesTaxRate;
     ShippingFee shippingFee;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     Address address;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
-        salesTaxRate = objectStub.createSalesTaxRates();
-        shippingFee = objectStub.createShippingFee(false, false);
-        address = objectStub.createAddress();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
+        salesTaxRate = testUtilities.createSalesTaxRates();
+        shippingFee = testUtilities.createShippingFee(false, false);
+        address = testUtilities.createAddress();
     }
 
     @Test

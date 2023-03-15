@@ -3,7 +3,6 @@ package com.complyt.repositories;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,15 +44,14 @@ public class ExemptionRepositoryTest {
     TenantResolver tenantResolver;
     Exemption exemption;
     Transaction transaction;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test

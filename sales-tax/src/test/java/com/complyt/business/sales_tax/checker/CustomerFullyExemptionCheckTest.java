@@ -4,13 +4,12 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.ValidationDates;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,15 +25,14 @@ public class CustomerFullyExemptionCheckTest {
 
     Exemption exemption;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customerFullyExemptionChecker = new CustomerFullyExemptionChecker(transaction);
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
     }
 
 
@@ -79,8 +77,8 @@ public class CustomerFullyExemptionCheckTest {
     void check_TransactionIsBeforeTimeFrame_ReturnsFalse() {
         // Given
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(
-                new ComplytTimestamp(LocalDateTime.now().plusYears(2)),
-                new ComplytTimestamp(LocalDateTime.now().plusYears(3))));
+                LocalDateTime.now().plusYears(2),
+                LocalDateTime.now().plusYears(3)));
 
         // When
         boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
@@ -93,8 +91,8 @@ public class CustomerFullyExemptionCheckTest {
     void check_TransactionIsAfterTimeFrame_ReturnsFalse() {
         // Given
         Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(
-                new ComplytTimestamp(LocalDateTime.now().minusYears(2)),
-                new ComplytTimestamp(LocalDateTime.now().minusYears(3))));
+                LocalDateTime.now().minusYears(2),
+                LocalDateTime.now().minusYears(3)));
 
         // When
         boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);

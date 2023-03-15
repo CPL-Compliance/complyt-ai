@@ -3,9 +3,9 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
@@ -13,6 +13,7 @@ import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -55,7 +56,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Autowired
     TransactionRouter transactionRouter;
     String source;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     @MockBean
     private TransactionFacade transactionFacade;
     @Autowired
@@ -63,14 +64,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString())
-                .withCustomer(null)
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null);
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString())
+                .withCustomer(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
-        source = objectStub.getUnifiedSource();
+        source = testUtilities.getUnifiedSource();
     }
 
     @Override
@@ -138,7 +136,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
+        // Todo
     }
 
     @Test
@@ -240,7 +238,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Override
     @WithMockUser
     public void getAll_UserWithoutAuthorities_Returns403() {
-
+        // TODO
     }
 
     @Test
@@ -482,7 +480,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsertByExternalIdAndSource_CoupleValidationsFailure_Returns400WithErrorList() {
         // Given
         ItemDto givenItemDto = new ItemDto(-25, 4, 8000, "description", "name", "C1S1", null, null, false, 0, null, TaxableCategoryDto.TAXABLE);
-        List<ItemDto> itemDtoList = objectStub.createItemDtos(false, false);
+        List<ItemDto> itemDtoList = testUtilities.createItemDtos(false, false);
         itemDtoList.add(givenItemDto);
 
         TransactionDto givenTransaction = transactionDto.withShippingAddress(null).withItems(itemDtoList);
@@ -507,12 +505,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -649,12 +642,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -718,7 +706,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String blankExternalId = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "External ID should be 1-256 characters maximum",
                 "External ID may not be blank"));
@@ -735,12 +723,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -751,7 +734,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String externalIdWithLengthOf257 = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
 
         // When + Then
         webTestClient
@@ -1203,27 +1186,308 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCountryShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCityShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullStateShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullStreetShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullZipShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCountryShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Country may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCountyShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "County should be 1-100 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCityShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStateShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStreetShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankZipShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CountyBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCounty(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "County should be 1-256 characters maximum"));
+                "County should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1236,14 +1500,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1253,7 +1510,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "ZIP should be 1-20 characters maximum"));
@@ -1269,27 +1526,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCountry(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Country should be 1-256 characters maximum"));
+                "Country should be 1-50 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1302,27 +1552,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCity(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "City should be 1-256 characters maximum"));
+                "City should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1335,27 +1578,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withState(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "State should be 1-256 characters maximum"));
+                "State should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1368,27 +1604,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenBillingAddress = transactionDto.billingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withStreet(testUtilities.stringWithLength(201));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Street should be 1-256 characters maximum"));
+                "Street should be 1-200 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1401,26 +1630,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullBillingAddress_Returns400ValidationError() {
+    public void upsert_BlankCountryBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withCountry("");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Billing address may not be null"));
+                "Country should be 1-50 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1429,31 +1652,154 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withBillingAddress(null))
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError() {
+    public void upsert_BlankCountyBillingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withCounty("");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "County should be 1-256 characters maximum"));
+                "County should be 1-100 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankCityBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withCity("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "City should be 1-100 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStateBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withState("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "State should be 1-100 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankStreetBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withStreet("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "Street should be 1-200 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankZipBillingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        OptionalAddressDto givenShippingAddress = transactionDto.billingAddress().withZip("");
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "ZIP should be 1-20 characters maximum"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withBillingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_LengthGreaterThen100CountyShippingAddress_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "County should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1466,14 +1812,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1483,7 +1822,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "ZIP should be 1-20 characters maximum"));
@@ -1499,27 +1838,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Country should be 1-256 characters maximum"));
+                "Country should be 1-50 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1532,27 +1864,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "City should be 1-256 characters maximum"));
+                "City should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1565,27 +1890,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withState("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "State should be 1-256 characters maximum"));
+                "State should be 1-100 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1598,27 +1916,20 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInShippingAddress_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        AddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1");
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Street should be 1-256 characters maximum"));
+                "Street should be 1-200 characters maximum"));
 
         // When + Then
         webTestClient
@@ -1631,14 +1942,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1663,14 +1967,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1696,14 +1993,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1728,14 +2018,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1745,7 +2028,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTaxDto salesTax = new SalesTaxDto(-0.1f, objectStub.createSalesTaxRatesDto());
+        SalesTaxDto salesTax = new SalesTaxDto(-0.1f, testUtilities.createSalesTaxRatesDto());
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Amount can not be a negative number"));
@@ -1761,14 +2044,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1778,7 +2054,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        String lengthOf257CreatedFrom = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1";
+        String lengthOf257CreatedFrom = testUtilities.stringWithLength(257);
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Created From should be 1-256 characters maximum"));
@@ -1794,14 +2070,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1827,14 +2096,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1893,9 +2155,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals("Failed to read HTTP message", map.get("message"));
-                });
+                .value(map -> assertEquals("Failed to read HTTP message", map.get("message")));
     }
 
     @Test
@@ -1917,9 +2177,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals("[Customer Id may not be null]", map.get("message"));
-                });
+                .value(map -> assertEquals("[Customer Id may not be null]", map.get("message")));
     }
 
     @Test
@@ -1927,18 +2185,16 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_InvalidCustomer_Returns400() {
         // Given
-        String lengthOf257City = "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab$";
-        CustomerDto invalidCustomerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null)
+        String lengthOf101City = testUtilities.stringWithLength(101);
+        CustomerDto invalidCustomerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString())
                 .withSource("")
-                .withAddress(new AddressDto(lengthOf257City, "country", null, "state", "street", "zip"));
+                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip"));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Source should be a single digit",
-                "City should be 1-256 characters maximum",
+                "City should be 1-100 characters maximum",
                 "Source may not be blank"));
 
         // When + Then
@@ -1949,6 +2205,64 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(transactionDto.withCustomer(invalidCustomerDto))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "External Timestamps may not be null"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"\n" +
+                        "   \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1965,17 +2279,14 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullExternalTimestamps_Returns400ValidationError() {
-        // ???
-    }
-
-    @Test
-    @Override
-    @WithMockUser
     public void upsert_NullCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate may not be null",
+                "createdDate may not be blank"));
 
         // When + Then
         webTestClient
@@ -2024,7 +2335,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Created date may not be null]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2035,7 +2351,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate may not be null",
+                "updatedDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2083,7 +2402,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Updated date may not be null]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2094,7 +2418,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message,
+                "updatedDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2143,7 +2470,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2154,7 +2486,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message,
+                "createdDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2203,17 +2538,25 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2254,7 +2597,695 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-29T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-29T02:00:00\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999",
+                        transactionDto.externalTimestamps().updatedDate()
+                ));
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999Z",
+                        transactionDto.externalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999Z"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999+17:59",
+                        transactionDto.externalTimestamps().createdDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999+17:59"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999-18:00",
+                        transactionDto.externalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00-18:00"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.externalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate may not be null",
+                "createdDate may not be blank"));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
                         "   }\n}")
@@ -2262,7 +3293,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Created date may not be null]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2273,7 +3309,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate may not be null",
+                "updatedDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2314,6 +3353,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
                         "   }\n}")
@@ -2321,7 +3364,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Updated date may not be null]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2332,7 +3380,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message,
+                "updatedDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2373,6 +3424,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
                         "       \"updatedDate\":  \"\"\n" +
@@ -2381,7 +3436,12 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -2392,7 +3452,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message,
+                "createdDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2433,6 +3496,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "    },\n" +
                         "    \"transactionType\": \"INVOICE\",\n" +
                         "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {\n" +
                         "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
                         "       \"createdDate\":  \"\"\n" +
@@ -2441,8 +3508,815 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("[Timestamp may not be blank]", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-02-29T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-29T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.9999999999\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message
+        ));
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\"\n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00Z",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999Z"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999+17:59",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27T00:00:00.999999999+17:59"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T00:00:00.999999999-18:00",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().updatedDate(),
+                        "2023-03-27T00:00:00.999999999-18:00"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
+                        "   \"source\": \"" + source + "\",\n" +
+                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                        "   \"items\": [\n" +
+                        "        {\n" +
+                        "            \"unitPrice\": 25,\n" +
+                        "            \"totalPrice\": 5000,\n" +
+                        "            \"name\": \"HW Installation Services\",\n" +
+                        "            \"quantity\": 200,\n" +
+                        "            \"description\": \"wd\",\n" +
+                        "            \"taxCode\": \"C1S1\",\n" +
+                        "            \"manualSalesTax\": false,\n" +
+                        "            \"manualSalesTaxRate\": 0\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"shippingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"billingAddress\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"transactionType\": \"INVOICE\",\n" +
+                        "    \"transactionStatus\": \"ACTIVE\"," +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
+                        "    },\n" +
+                        "    \"externalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        " \n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto(
+                        transactionDto.internalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Override
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
+                new TimestampsDto("2023-03-27",
+                        transactionDto.internalTimestamps().updatedDate()
+                ));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = transactionDto.externalId();
+        TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
+                new TimestampsDto("2023-03-27", transactionDto.externalTimestamps().updatedDate()));
+
+        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+
+        // When + Then
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransactionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(returnedTransaction -> returnedTransaction, equalTo(expectedTransaction));
     }
 
     @Test
@@ -2549,12 +4423,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2585,12 +4454,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2600,7 +4464,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256NameInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "C1S1", null, null, false, 0, null, null));
+        itemList.add(new ItemDto(25, 200, 5000, "desc", testUtilities.stringWithLength(257), "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2620,12 +4484,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2655,12 +4514,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2691,12 +4545,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2706,7 +4555,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
         // Given
         List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null, false, 0, null, null));
+        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", testUtilities.stringWithLength(257), null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2726,12 +4575,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2761,12 +4605,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2796,12 +4635,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2810,7 +4644,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeManualSalesRateTaxInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, -0.5f, 5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, -0.5f, 5000, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2830,12 +4664,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2844,7 +4673,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NegativeTotalPriceInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, -5000, null, objectStub.createSalesTaxRatesDto(), "C1S1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, -5000, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2864,12 +4693,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2878,7 +4702,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_NullTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), null, null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), null, null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2898,19 +4722,16 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
     @Override
+    @Test
+    @WithMockUser
     public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), "", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2931,12 +4752,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 
@@ -2945,7 +4761,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void upsert_LengthGreaterThan256TaxCodeInShippingFee_Returns400ValidationError() {
         // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, objectStub.createSalesTaxRatesDto(), "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", null, null);
+        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
@@ -2965,12 +4781,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
+                    testUtilities.checkErrorMessages(map, expectedErrors);
                 });
     }
 }

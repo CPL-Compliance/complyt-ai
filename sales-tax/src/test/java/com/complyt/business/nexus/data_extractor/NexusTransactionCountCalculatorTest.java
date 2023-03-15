@@ -13,7 +13,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -53,13 +52,12 @@ public class NexusTransactionCountCalculatorTest {
     Customer customer;
     ObjectId customerId;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactions();
         nexusStateRule = createNexusStateRule();
     }
@@ -86,7 +84,7 @@ public class NexusTransactionCountCalculatorTest {
 
     private List<Transaction> createTransactions() {
 
-        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         return new ArrayList<>() {{
             add(transaction);
         }};

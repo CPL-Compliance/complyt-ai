@@ -6,14 +6,13 @@ import com.complyt.domain.TransactionType;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,20 +33,19 @@ public class TransactionsFilterByNexusRulesTest {
     Transaction invoiceTransaction;
     Transaction salesOrderTransaction;
     Customer customer;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionsFilterByNexusRules = new TransactionsFilterByNexusRules();
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactionList();
-        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
+        nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     private List<Transaction> createTransactionList() {
-        invoiceTransaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        invoiceTransaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         salesOrderTransaction = invoiceTransaction
                 .withId(UUID.randomUUID().toString())
                 .withExternalId(UUID.randomUUID().toString())

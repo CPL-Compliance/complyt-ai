@@ -6,7 +6,6 @@ import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.nexus.NexusStateRule;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.utils.factory.NexusAmountAggregatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,14 +41,13 @@ public class NexusTransactionsAmountCalculatorTest {
     List<Transaction> transactions;
     NexusStateRule nexusStateRule;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactions = createTransactions();
-        nexusStateRule = objectStub.createNexusStateRule(UUID.randomUUID().toString());
+        nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }
 
     private Transaction createRefundTransaction() {
@@ -61,7 +59,7 @@ public class NexusTransactionsAmountCalculatorTest {
     }
 
     private List<Transaction> createTransactions() {
-        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         List<Item> secondTransactionItems = new ArrayList<>() {{
             add(transaction.getItems().get(0).withUnitPrice(1000).withTotalPrice(4000));
         }};

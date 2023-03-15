@@ -3,18 +3,18 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.timestamps.ComplytTimestamp;
+import com.complyt.domain.customer.exemption.ValidationDates;
+import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.models.StateDto;
-import com.complyt.v1.models.customer.exemption.CertificateDto;
-import com.complyt.v1.models.customer.exemption.ClassificationDto;
-import com.complyt.v1.models.customer.exemption.ExemptionDto;
-import com.complyt.v1.models.customer.exemption.StatusDto;
+import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -52,16 +52,13 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     ExemptionFacade exemptionFacade;
     Exemption exemption;
     ExemptionDto exemptionDto;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
-        exemptionDto = objectStub.createExemptionDto()
-                .withInternalTimestamps(null)
-                .withValidationDates(null);
+        exemptionDto = testUtilities.createExemptionDto();
         exemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
     }
 
@@ -194,14 +191,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -339,14 +329,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -432,7 +415,11 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"url\": \"url\",\n" +
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    }\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -952,14 +939,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -986,14 +966,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1019,14 +992,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1051,14 +1017,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1083,14 +1042,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1115,14 +1067,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1147,14 +1092,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1179,14 +1117,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1211,14 +1142,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1244,14 +1168,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1277,14 +1194,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1309,14 +1219,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1341,14 +1244,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1373,14 +1269,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1406,14 +1295,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1438,14 +1320,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1470,14 +1345,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1503,14 +1371,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1536,14 +1397,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1569,14 +1423,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1601,14 +1448,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1633,14 +1473,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1665,14 +1498,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1696,139 +1522,18 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
     @Override
     @WithMockUser
-    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+    public void upsert_NullValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Created date may not be null"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"internalTimestamps\": {\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        "}"
-                )
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
-        // Given
-        UUID complytId = exemptionDto.complytId();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "Updated date may not be null"));
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n" +
-                        "    \"complytId\": \"" + complytId + "\",\n" +
-                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"California\"\n" +
-                        "    },\n" +
-                        "    \"classification\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"description\": \"description\"\n" +
-                        "    },\n" +
-                        "    \"status\": {\n" +
-                        "        \"code\": \"code\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"certificate\": {\n" +
-                        "        \"certificateId\": \"id\",\n" +
-                        "        \"url\": \"url\",\n" +
-                        "        \"name\": \"name\"\n" +
-                        "    },\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"internalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        "}"
-                )
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
-    }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
-        // Given
-        UUID complytId = exemptionDto.complytId();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "Validation Dates may not be null"));
 
         // When + Then
         webTestClient
@@ -1861,7 +1566,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "    \"exemptionType\": \"FULLY\",\n" +
                         "    \"internalTimestamps\": {\n" +
                         "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"\"\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
                         "    }\n" +
                         "}"
                 )
@@ -1881,12 +1586,13 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "createdDate may not be null",
+                "createdDate may not be blank"));
 
         // When + Then
         webTestClient
@@ -1917,9 +1623,238 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NullUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate may not be null",
+                "updatedDate may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate may not be blank",
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_BlankTimestampInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate may not be blank",
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
                         "    \"internalTimestamps\": {\n" +
                         "        \"updatedDate\": \"2023-02-28T02:00:00\",\n" +
                         "        \"createdDate\": \"\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-29T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
                         "    }\n" +
                         "}"
                 )
@@ -1934,6 +1869,637 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         assertTrue(expectedErrors.contains(err));
                     }
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-29T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                "2023-03-27T03:40:59+09:50",
+                exemptionDto.internalTimestamps().updatedDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                exemptionDto.internalTimestamps().createdDate(),
+                "2023-03-27T03:40:59.999999999"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00.9999999999\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00.9999999999\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                "2023-03-27T03:40:59Z",
+                exemptionDto.internalTimestamps().updatedDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                exemptionDto.internalTimestamps().createdDate(),
+                "2023-03-27T03:40:59Z"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                "2023-03-27T03:40:59+09:50",
+                exemptionDto.internalTimestamps().updatedDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                exemptionDto.internalTimestamps().createdDate(),
+                "2023-03-27T03:40:59+09:50"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                "2023-03-27T03:40:59-18:00",
+                exemptionDto.internalTimestamps().updatedDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                exemptionDto.internalTimestamps().updatedDate(),
+                "2023-03-27T03:40:59-18:00"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withInternalTimestamps(new TimestampsDto(
+                exemptionDto.internalTimestamps().createdDate(),
+                "2023-03-27"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Override
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
+
     }
 
     @Test
@@ -1957,14 +2523,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1990,14 +2549,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2023,14 +2575,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2056,14 +2601,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2088,14 +2626,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2120,14 +2651,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2152,14 +2676,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2184,14 +2701,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2216,14 +2726,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2248,14 +2751,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2266,7 +2762,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "From Date may not be null"));
+                "fromDate may not be null",
+                "fromDate may not be blank"));
 
         // When + Then
         webTestClient
@@ -2305,14 +2802,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2323,7 +2813,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "To Date may not be null"));
+                "toDate may not be null",
+                "toDate may not be blank"));
 
         // When + Then
         webTestClient
@@ -2362,14 +2853,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2380,7 +2864,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "toDate may not be blank",
+                "toDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2420,14 +2905,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2438,7 +2916,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Timestamp may not be blank"));
+                "fromDate may not be blank",
+                "fromDate" + DateErrorMessages.wrong_format_error_message));
 
         // When + Then
         webTestClient
@@ -2478,6 +2957,62 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInFromDateInValidationDates_Returns400ValidationError() {
+// Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "fromDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2023-02-29T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
                     String[] errors = message.substring(1, message.length() - 1).split(", ");
@@ -2486,5 +3021,648 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         assertTrue(expectedErrors.contains(err));
                     }
                 });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInToDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "toDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2023-02-29T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInFromDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                "2023-03-27T03:40:59.999999999",
+                exemptionDto.validationDates().toDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInToDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                exemptionDto.validationDates().fromDate(),
+                "2023-03-27T03:40:59.999999999"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInFromDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "fromDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"fromDate\": \"2023-02-28T02:00:00.0000000000\",\n" +
+                        "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInToDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "toDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"validationDates\": {\n" +
+                        "        \"fromDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"toDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInFromDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                "2023-03-27T03:40:59Z",
+                exemptionDto.validationDates().toDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInToDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                exemptionDto.validationDates().fromDate(),
+                "2023-03-27T03:40:59Z"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInFromDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                "2023-03-27T03:40:59+09:50",
+                exemptionDto.validationDates().toDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInToDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                exemptionDto.validationDates().fromDate(),
+                "2023-03-27T03:40:59+09:50"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInFromDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                "2023-03-27T03:40:59.-18:00", exemptionDto.validationDates().toDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInToDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                exemptionDto.validationDates().fromDate(), "2023-03-27T03:40:59.-18:00"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InFromDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "fromDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00+18:01\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InToDateInValidationDates_Returns400ValidationError() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "toDate" + DateErrorMessages.wrong_format_error_message));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n" +
+                        "    \"complytId\": \"" + complytId + "\",\n" +
+                        "    \"customerId\": \"24105509-ff95-4408-b058-3eead7ae6fd7\",\n" +
+                        "    \"state\": {\n" +
+                        "        \"abbreviation\": \"CA\",\n" +
+                        "        \"code\": \"02\",\n" +
+                        "        \"name\": \"California\"\n" +
+                        "    },\n" +
+                        "    \"classification\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"description\": \"description\"\n" +
+                        "    },\n" +
+                        "    \"status\": {\n" +
+                        "        \"code\": \"code\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"certificate\": {\n" +
+                        "        \"certificateId\": \"id\",\n" +
+                        "        \"url\": \"url\",\n" +
+                        "        \"name\": \"name\"\n" +
+                        "    },\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"validationDates\": {\n" +
+                        "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
+                        "       \"toDate\": \"2022-11-01T02:00:00+18:01\"\n" +
+                        "    },\n" +
+                        "    \"internalTimestamps\": {\n" +
+                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                        "    }\n" +
+                        "}"
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetToDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                exemptionDto.validationDates().fromDate(),
+                "2023-03-27"
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetFromDateInValidationDates_Returns200Ok() {
+        // Given
+        UUID complytId = exemptionDto.complytId();
+
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
+                "2023-03-27",
+                exemptionDto.validationDates().toDate()
+        ));
+        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+
+        // When
+        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenExemptionDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ExemptionDto.class)
+                .isEqualTo(expectedExemption);
     }
 }

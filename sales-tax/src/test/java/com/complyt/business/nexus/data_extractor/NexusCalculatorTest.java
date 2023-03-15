@@ -10,7 +10,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,12 +44,11 @@ public class NexusCalculatorTest {
     TransactionsFilterByNexusRules transactionNexusFilter;
 
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -74,7 +72,7 @@ public class NexusCalculatorTest {
     }
 
     private List<Transaction> createTransactionsList() {
-        Transaction transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         Transaction secondTransaction = transaction.withId(UUID.randomUUID().toString()).withExternalId(UUID.randomUUID().toString());
         return new ArrayList<>() {{
             add(transaction);

@@ -1,7 +1,6 @@
 package com.complyt.business.nexus.checker;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,19 +21,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SalesTaxEnforcementCheckTest {
 
     SalesTaxEnforcementChecker salesTaxEnforcementChecker;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxEnforcementChecker = new SalesTaxEnforcementChecker();
     }
 
     @Test
     void check_CheckingSalesTaxTracking_ReturnsIsEnforcesSalesTax() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
 
         // When + Then
         boolean isEnforcesSalesTax = salesTaxEnforcementChecker.check(salesTaxTracking);

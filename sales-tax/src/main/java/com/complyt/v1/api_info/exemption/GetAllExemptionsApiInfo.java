@@ -75,20 +75,12 @@ public @interface GetAllExemptionsApiInfo {
                          "description": "description"
                      },
                      "validationDates": {
-                         "fromDate": {
-                             "timestamp": "2022-11-01T02:00:00"
-                         },
-                         "toDate": {
-                             "timestamp": "2023-02-28T02:00:00"
-                         }
+                         "fromDate": "2022-11-01T02:00:00",
+                         "toDate": "2023-02-28T02:00:00"
                      },
                      "internalTimestamps": {
-                         "createdDate": {
-                             "timestamp": "2022-12-29T10:24:54.577"
-                         },
-                         "updatedDate": {
-                             "timestamp": "2022-12-29T10:24:54.577"
-                         }
+                         "createdDate": "2022-12-29T10:24:54.577",
+                         "updatedDate": "2022-12-29T10:24:54.577"
                      },
                      "status": {
                          "code": "code",
