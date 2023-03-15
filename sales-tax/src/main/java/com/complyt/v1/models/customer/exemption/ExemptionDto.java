@@ -15,7 +15,7 @@ import java.util.UUID;
 public record ExemptionDto(UUID complytId, @NotNull(message = "Customer Id may not be null") UUID customerId,
                            @Valid @NotNull(message = "State may not be null") StateDto state,
                            @Valid @NotNull(message = "Classification may not be null") ClassificationDto classification,
-                           @Valid ValidationDatesDto validationDates,
+                           @Valid @NotNull(message = "Validation Dates may not be null") ValidationDatesDto validationDates,
                            @Valid TimestampsDto internalTimestamps,
                            @Valid @NotNull(message = "Status may not be null") StatusDto status,
                            @Valid @NotNull(message = "Certificate may not be null") CertificateDto certificate,

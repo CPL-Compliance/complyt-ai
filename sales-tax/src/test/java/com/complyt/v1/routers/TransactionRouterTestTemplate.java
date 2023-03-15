@@ -31,32 +31,65 @@ public interface TransactionRouterTestTemplate extends
     // Validation::ShippingAddress
     void upsert_NullShippingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountyShippingAddress_Returns400ValidationError();
+    void upsert_NullCountryShippingAddress_Returns400ValidationError();
+
+    void upsert_NullCityShippingAddress_Returns400ValidationError();
+
+    void upsert_NullStateShippingAddress_Returns400ValidationError();
+
+    void upsert_NullStreetShippingAddress_Returns400ValidationError();
+
+    void upsert_NullZipShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankCountryShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankCountyShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankCityShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankStateShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankStreetShippingAddress_Returns400ValidationError();
+
+    void upsert_BlankZipShippingAddress_Returns400ValidationError();
+
+    void upsert_LengthGreaterThen100CountyShippingAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen20ZipInShippingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountryInShippingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen50CountryInShippingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CityInShippingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100CityInShippingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StateInShippingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100StateInShippingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StreetInShippingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen200StreetInShippingAddress_Returns400ValidationError();
 
     // Validation::BillingAddress
-    void upsert_NullBillingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountyBillingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100CountyBillingAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen20ZipInBillingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountryInBillingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen50CountryInBillingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CityInBillingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100CityInBillingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StateInBillingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100StateInBillingAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StreetInBillingAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankCountryBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankCountyBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankCityBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankStateBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankStreetBillingAddress_Returns400ValidationError();
+
+    void upsert_BlankZipBillingAddress_Returns400ValidationError();
 
     // Validation::TransactionType
     void upsert_NullTransactionType_Returns400ValidationError();
@@ -81,4 +114,5 @@ public interface TransactionRouterTestTemplate extends
 
     // Validation::Customer
     void upsert_InvalidCustomer_Returns400();
+
 }

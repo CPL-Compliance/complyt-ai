@@ -2,10 +2,9 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,17 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CityLevelSalesTaxRatesCalculatorTest {
 
     CityLevelSalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     CitySalesTaxRules citySalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     @BeforeEach
     void setUp() {
         cityLevelSalesTaxRatesCalculator = new CityLevelSalesTaxRatesCalculator();
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxRate = objectStub.createSalesTaxRates();
-        citySalesTaxRules = objectStub.createCitySalesTaxRules();
+        testUtilities = new TestUtilities(
+                LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxRate = testUtilities.createSalesTaxRates();
+        citySalesTaxRules = testUtilities.createCitySalesTaxRules();
     }
 
     @Test

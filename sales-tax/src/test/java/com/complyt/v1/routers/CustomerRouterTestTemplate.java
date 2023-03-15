@@ -26,19 +26,30 @@ public interface CustomerRouterTestTemplate extends
     void upsert_LengthGreaterThen256Name_Returns400ValidationError();
 
     // Validation::Address
-    void upsert_NullAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100CountyAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen20ZipInAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CountryInAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen50CountryInAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256CityInAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100CityInAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StateInAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen100StateInAddress_Returns400ValidationError();
 
-    void upsert_LengthGreaterThen256StreetInAddress_Returns400ValidationError();
+    void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError();
+
+    void upsert_BlankCountryAddress_Returns400ValidationError();
+
+    void upsert_BlankCountyAddress_Returns400ValidationError();
+
+    void upsert_BlankCityAddress_Returns400ValidationError();
+
+    void upsert_BlankStateAddress_Returns400ValidationError();
+
+    void upsert_BlankStreetAddress_Returns400ValidationError();
+
+    void upsert_BlankZipAddress_Returns400ValidationError();
 
     // Validation::CustomerType
     void upsert_NullCustomerType_Returns400ValidationError();

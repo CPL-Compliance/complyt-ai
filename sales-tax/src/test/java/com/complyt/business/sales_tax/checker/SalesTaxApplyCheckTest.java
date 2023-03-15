@@ -3,7 +3,6 @@ package com.complyt.business.sales_tax.checker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,26 +25,25 @@ public class SalesTaxApplyCheckTest {
     private SalesTaxApplyCheck salesTaxApplyCheck;
     private SalesTaxTracking salesTaxTracking;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
 
     private Transaction createTransactionWithAppliedReferenceDate() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().plusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().plusYears(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
+        return testUtilities.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     private Transaction createTransactionWithReferenceDateNotApplied() {
-        ComplytTimestamp complytTimestamp = new ComplytTimestamp(salesTaxTracking.getAppliedDate().minusYears(1));
-        Timestamps externalTimestamps = new Timestamps(complytTimestamp, complytTimestamp);
-        return objectStub.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
+        LocalDateTime localDateTime = salesTaxTracking.getAppliedDate().minusYears(1);
+        Timestamps externalTimestamps = new Timestamps(localDateTime, localDateTime);
+        return testUtilities.createTransaction(UUID.randomUUID().toString()).withExternalTimestamps(externalTimestamps);
     }
 
     @Test
@@ -93,7 +91,7 @@ public class SalesTaxApplyCheckTest {
 
         SalesTaxTracking salesTaxTrackingWithNoSalesTax = salesTaxTracking
                 .withApproved(false)
-                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().getTimestamp().plusYears(1));
+                .withApprovalDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTrackingWithNoSalesTax);

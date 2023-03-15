@@ -4,7 +4,6 @@ import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.CustomerRepository;
 import org.bson.types.ObjectId;
@@ -21,7 +20,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -49,15 +48,14 @@ class CustomerServiceImplTest {
 
     String source;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeAll
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String name = "Existing Customer";
-        customer = objectStub.createCustomer(UUID.randomUUID().toString()).withName(name);
-        source = objectStub.getUnifiedSource();
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString()).withName(name);
+        source = testUtilities.getUnifiedSource();
     }
 
     @Test
@@ -70,11 +68,11 @@ class CustomerServiceImplTest {
         Customer actualCustomer = customerServiceImpl.injectDataToExistingCustomer(newCustomer, customer).block();
 
         // Then
-        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+        LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+        LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp();
-        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp();
+        LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+        LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
         Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
         Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
@@ -98,11 +96,11 @@ class CustomerServiceImplTest {
 
         // Then
         StepVerifier.create(actualCustomerMono).assertNext(actualCustomer -> {
-            LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = customerWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = actualCustomer.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = actualCustomer.getInternalTimestamps().getUpdatedDate();
 
             Assertions.assertEquals(expectedUpdatedDateTime.getYear(), actualUpdatedDateTime.getYear());
             Assertions.assertEquals(expectedUpdatedDateTime.getMonthValue(), actualUpdatedDateTime.getMonthValue());
@@ -260,7 +258,7 @@ class CustomerServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Customers() {
         // Given
-        Customer secondsCustomer = objectStub.createCustomer(new ObjectId().toString());
+        Customer secondsCustomer = testUtilities.createCustomer(new ObjectId().toString());
 
         // When
         when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer, secondsCustomer));

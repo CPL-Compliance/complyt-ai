@@ -4,7 +4,6 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWra
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,17 +31,15 @@ class TransactionFastTaxCountyFetcherTest {
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    TestUtilities testUtilities;
     @InjectMocks
     private TransactionFastTaxCountyFetcher transactionFastTaxCountyFetcher;
     private Transaction transaction;
 
-    ObjectStub objectStub;
-
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     private TaxInfoItem createTaxInfoItem() {

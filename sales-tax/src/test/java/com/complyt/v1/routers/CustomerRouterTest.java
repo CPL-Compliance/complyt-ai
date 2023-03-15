@@ -2,16 +2,17 @@ package com.complyt.v1.routers;
 
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.models.AddressDto;
+import com.complyt.v1.models.OptionalAddressDto;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -54,15 +56,12 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Autowired
     private WebTestClient webTestClient;
 
-    private ObjectStub objectStub;
+    private TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString())
-                .withExternalTimestamps(null)
-                .withInternalTimestamps(null);
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }
 
@@ -104,7 +103,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .withCustomerType(null);
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
                 "Name should be 1-256 characters maximum",
@@ -122,14 +121,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -269,14 +261,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -339,7 +324,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String nullExternalId = "";
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "External ID may not be blank",
                 "External ID should be 1-256 characters maximum"));
@@ -355,14 +340,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -371,7 +349,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     public void upsertByExternalIdAndSource_LengthGreaterThen256ExternalId_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
-        String externalIdWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
         String source = customerDto.source();
 
         // When + Then
@@ -531,7 +509,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidName = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
+        HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
                 "Name may not be blank",
                 "Name should be 1-256 characters maximum"));
@@ -547,14 +525,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -564,7 +535,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        String nameWithLengthOf257 = "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1";
+        String nameWithLengthOf257 = testUtilities.stringWithLength(257);
 
         // When + Then
         webTestClient
@@ -586,36 +557,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CountyAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(customerDto.withAddress(null))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Address may not be null]", message);
-                });
-    }
-
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_LengthGreaterThen256CountyAddress_Returns400ValidationError() {
-        // Given
-        String externalId = customerDto.externalId();
-        String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("city", "country", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip");
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -629,7 +575,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[County should be 1-256 characters maximum]", message);
+                    assertEquals("[County should be 1-100 characters maximum]", message);
                 });
     }
 
@@ -640,7 +586,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "street", "bacabbacabbacabbacab$");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21));
 
         // When + Then
         webTestClient
@@ -662,11 +608,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256CountryInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen50CountryInAddress_Returns400ValidationError() {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("city", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -681,18 +627,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Country should be 1-256 characters maximum]", message);
+                    assertEquals("[Country should be 1-50 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256CityInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100CityInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "country", "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip");
 
         // When + Then
         webTestClient
@@ -707,18 +653,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[City should be 1-256 characters maximum]", message);
+                    assertEquals("[City should be 1-100 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256StateInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen100StateInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("city", "country", "county", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip");
 
         // When + Then
         webTestClient
@@ -733,18 +679,18 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[State should be 1-256 characters maximum]", message);
+                    assertEquals("[State should be 1-100 characters maximum]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_LengthGreaterThen256StreetInAddress_Returns400ValidationError() {
+    public void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        AddressDto givenAddress = new AddressDto("city", "country", "county", "state", "baaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaabbaaccaab1", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip");
 
         // When + Then
         webTestClient
@@ -759,7 +705,163 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Street should be 1-256 characters maximum]", message);
+                    assertEquals("[Street should be 1-200 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankCountryAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withCountry("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Country should be 1-50 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankCountyAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withCounty("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[County should be 1-100 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankCityAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withCity("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[City should be 1-100 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankStateAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withState("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[State should be 1-100 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankStreetAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withStreet("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[Street should be 1-200 characters maximum]", message);
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankZipAddress_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        OptionalAddressDto givenAddress = customerDto.address().withZip("");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withAddress(givenAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    assertEquals("[ZIP should be 1-20 characters maximum]", message);
                 });
     }
 
@@ -919,7 +1021,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @WithMockUser
     public void getByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
+        // TODO
     }
 
     @Override
@@ -1391,8 +1493,45 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Test
     @WithMockUser
     public void upsert_NullExternalTimestamps_Returns400ValidationError() {
-        // Currently externalTimestamp can be null
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "External Timestamps may not be null"));
 
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\"\n" +
+                        "}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 
     @Override
@@ -1430,7 +1569,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Created date may not be null]", message);
+                    assertTrue(message.contains("createdDate may not be null"));
+                    assertTrue(message.contains("createdDate may not be blank"));
                 });
     }
 
@@ -1469,7 +1609,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Updated date may not be null]", message);
+                    assertTrue(message.contains("updatedDate may not be null"));
+                    assertTrue(message.contains("updatedDate may not be blank"));
                 });
     }
 
@@ -1510,7 +1651,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1551,17 +1692,21 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
     @Override
     @Test
     @WithMockUser
-    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInExternalTimestamps_Returns400ValidationError() {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
 
         // When + Then
         webTestClient
@@ -1582,6 +1727,637 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-29\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-02-29T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999",
+                        customerDto.externalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        customerDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.0000000000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00Z",
+                        customerDto.externalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        customerDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00Z"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00+17:59",
+                        customerDto.externalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        customerDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00+17:59"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00-18:00",
+                        customerDto.externalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        customerDto.externalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00-18"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000 + 18:01\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInExternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000 + 18:01\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        customerDto.externalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NullCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate may not be null",
+                "createdDate may not be blank"));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
@@ -1590,7 +2366,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Created date may not be null]", message);
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -1601,7 +2381,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate may not be null",
+                "updatedDate may not be blank"));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -1621,6 +2404,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"" +
                         "}}")
@@ -1629,7 +2416,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Updated date may not be null]", message);
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
@@ -1661,6 +2452,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"2023-01-24T08:00:00.000Z\"," +
                         "\"updatedDate\":  \"" + invalidTimestamp + "\"" +
@@ -1670,7 +2465,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+
+                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
 
@@ -1702,6 +2498,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "        \"zip\": \"Zip\"\n" +
                         "    },\n" +
                         "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                        "   },\n" +
                         "    \"internalTimestamps\":  {" +
                         "\"createdDate\":  \"" + invalidTimestamp + "\", " +
                         "\"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
@@ -1711,7 +2511,731 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamp may not be blank]", message);
+                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
                 });
     }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"internalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-29\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "},\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_29OfFebruaryNotInLeapYearInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "  \"internalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"" +
+                        "},\n" +
+                        "  \"externalTimestamps\":  {" +
+                        "       \"createdDate\":  \"2023-02-28\", \n" +
+                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"" +
+                        "}\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999",
+                        customerDto.internalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_9DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        customerDto.internalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00.999999999"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInCreatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.00000000000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_10DigitsAfterTheDotInSecondsInUpdatedDateInInternalTimestamp_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.0000000000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00Z",
+                        customerDto.internalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfZInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        customerDto.internalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00Z"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00+17:59",
+                        customerDto.internalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfPlusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        customerDto.internalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00+17:59"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInCreatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00-18:00",
+                        customerDto.internalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMinusTimeInUpdatedDateInInternalTimestamp_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        customerDto.internalTimestamps().createdDate(),
+                        "2023-03-27T17:00:00-18:00"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InCreatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "createdDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000+18:01\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_ZoneSetWithOffsetOfMoreThan18InUpdatedDateInInternalTimestamps_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        HashSet<String> expectedErrors = new HashSet<>();
+        expectedErrors.addAll(List.of(
+                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{\n    \"externalId\": \"" + externalId + "\",\n" +
+                        "    \"source\": \"" + source + "\",\n" +
+                        "    \"name\": \"name\",\n" +
+                        "    \"address\": {\n" +
+                        "        \"city\": \"City\",\n" +
+                        "        \"country\": \"Country\",\n" +
+                        "        \"county\": \"County\",\n" +
+                        "        \"state\": \"CA\",\n" +
+                        "        \"street\": \"Street\",\n" +
+                        "        \"zip\": \"Zip\"\n" +
+                        "    },\n" +
+                        "    \"customerType\": \"RETAIL\",\n" +
+                        "    \"internalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000+18:01\" \n" +
+                        "   },\n" +
+                        "    \"externalTimestamps\":  {\n" +
+                        "           \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                        "           \"updatedDate\":  \"2023-01-24T08:00:00.000Z\" \n" +
+                        "   }\n}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInUpdatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        customerDto.internalTimestamps().createdDate(),
+                        "2023-03-27"
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInInternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withInternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27T17:00:00.999999999",
+                        customerDto.internalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_JustDateWithNoTimeOffsetInCreatedDateInExternalTimestamps_Returns200Ok() {
+        // Given
+        String externalId = customer.getExternalId();
+        String source = customerDto.source();
+
+        CustomerDto givenCustomerDto = customerDto.withExternalTimestamps(
+                new TimestampsDto(
+                        "2023-03-27",
+                        customerDto.externalTimestamps().updatedDate()
+                ));
+        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+
+        // When + Then
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
+        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenCustomerDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(returnedCustomer -> returnedCustomer, equalTo(expectedCustomer));
+    }
+
 }

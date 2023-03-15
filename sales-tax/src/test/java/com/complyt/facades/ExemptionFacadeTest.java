@@ -3,7 +3,6 @@ package com.complyt.facades;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.Status;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
@@ -17,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,13 +39,12 @@ public class ExemptionFacadeTest {
 
     Exemption exemption;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
     }
 
     @Test

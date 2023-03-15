@@ -2,7 +2,6 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,13 +34,13 @@ public class SalesTaxTrackingFacadeTest {
 
     private SalesTaxTracking salesTaxTracking;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(
+                LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 
     @Test

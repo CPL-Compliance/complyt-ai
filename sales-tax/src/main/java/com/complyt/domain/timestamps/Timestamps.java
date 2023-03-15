@@ -2,6 +2,8 @@ package com.complyt.domain.timestamps;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
@@ -10,7 +12,7 @@ import lombok.*;
 public class Timestamps {
 
     @NonNull
-    private final ComplytTimestamp createdDate;
+    private final LocalDateTime createdDate;
     @NonNull
-    private final ComplytTimestamp updatedDate;
+    private final LocalDateTime updatedDate;
 }

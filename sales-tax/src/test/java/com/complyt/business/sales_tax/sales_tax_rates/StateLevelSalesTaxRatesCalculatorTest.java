@@ -3,11 +3,10 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,17 +17,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class StateLevelSalesTaxRatesCalculatorTest {
 
     StateLevelSalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     @BeforeEach
     void setUp() {
         stateLevelSalesTaxRatesCalculator = new StateLevelSalesTaxRatesCalculator();
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxRate = objectStub.createSalesTaxRates();
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxRate = testUtilities.createSalesTaxRates();
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
     }
 
     @Test

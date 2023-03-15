@@ -2,10 +2,9 @@ package com.complyt.business.date_injection;
 
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,13 +17,12 @@ public class ExistingCustomerInternalDateInjectorTest {
 
     Customer customer;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
     }
 
@@ -38,8 +36,8 @@ public class ExistingCustomerInternalDateInjectorTest {
         LocalDateTime afterActionTime = LocalDateTime.now();
 
         // Then
-        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp().isAfter(beforeActionTime));
-        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().getTimestamp().isBefore(afterActionTime));
-        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().getTimestamp().isBefore(beforeActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
+        assertTrue(actualCustomer.getInternalTimestamps().getCreatedDate().isBefore(beforeActionTime));
     }
 }

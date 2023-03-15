@@ -5,14 +5,13 @@ import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionItemsAmountsCollector;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,13 +40,12 @@ public class TransactionItemsAmountsCollectorTest {
 
     private Transaction transaction;
     private List<Taxable> items;
-    private ObjectStub objectStub;
+    private TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(new ObjectId().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(new ObjectId().toString());
         items = new ArrayList<>(transaction.getItems());
         transactionItemsAmountsCollector = new TransactionItemsAmountsCollector(
                 taxableItemsAmountCalculator,
