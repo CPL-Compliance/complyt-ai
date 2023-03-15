@@ -1,6 +1,8 @@
 package integration;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.domain.Transaction;
+import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.routers.TransactionRouter;
@@ -11,17 +13,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static org.mockito.Mockito.when;
+import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -30,14 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SimpleIntegrationTestIT extends MongoContainerInitializer {
 
     @Autowired
-    private WebTestClient webTestClient;
-
+    ReactiveMongoTemplate reactiveMongoTemplate;
     @MockBean
     TenantResolver tenantResolver;
+    @Autowired
+    private WebTestClient webTestClient;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("mydatabase"));
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @Test
@@ -52,9 +57,28 @@ public class SimpleIntegrationTestIT extends MongoContainerInitializer {
     }
 
     @WithMockUser
-    @Test void getAllTransaction_ReturnsAllTransactionIT() {
+    @Test
+    void getAllTransactionDirectlyAndCustomer_ReturnsAllTransactionIT() {
 
-        when(tenantResolver.resolve()).thenReturn(Mono.just( "org_SttAcBkK7b32w7kA"));
+        Flux<Transaction> transactionFlux = reactiveMongoTemplate.findAll(Transaction.class).map(transaction -> {
+            LOGGER.info("test!!! " + transaction);
+            return transaction;
+        });
+
+        Flux<Customer> customerFlux = reactiveMongoTemplate.findAll(Customer.class).map(customer -> {
+            LOGGER.info("test!!! " + customer);
+            return customer;
+        });
+
+        StepVerifier.create(transactionFlux).expectNextCount(1).verifyComplete();
+        StepVerifier.create(customerFlux).expectNextCount(2).verifyComplete();
+    }
+
+    @WithMockUser
+    @Test
+    void getAllTransaction_ReturnsAllTransactionIT() {
+
+        when(tenantResolver.resolve()).thenReturn(Mono.just("org_SttAcBkK7b32w7kA"));
 
         webTestClient
                 .get()
@@ -65,6 +89,6 @@ public class SimpleIntegrationTestIT extends MongoContainerInitializer {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> LOGGER.info("All transactions: " + transactionDtos.toString()));
+                .value(transactionDtos -> LOGGER.info(transactionDtos.size() + " transactions: " + transactionDtos));
     }
 }

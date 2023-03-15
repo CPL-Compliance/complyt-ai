@@ -4,6 +4,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -141,6 +142,6 @@ public class TransactionRepository {
 
         return ContextLogger.observeCtx("Searching for customer by query: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Customer.class))
-                .switchIfEmpty(Mono.error(new NotFoundException("Transaction's Customer wasn't found")));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 }
