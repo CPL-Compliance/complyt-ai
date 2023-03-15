@@ -29,5 +29,4 @@ public record TransactionDto(UUID complytId,
                              @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
                              float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount)
         implements SourceCheckable, ExternalIdCheckable {
-
 }
