@@ -279,7 +279,7 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_TransactionPassed_NotFindingNexus_ThrowsException() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String state = transaction.getShippingAddress().getState();
 
         // When
@@ -294,7 +294,7 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_StatePassed_NotFindingNexus_ThrowsException() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String state = transaction.getShippingAddress().getState();
 
         // When
