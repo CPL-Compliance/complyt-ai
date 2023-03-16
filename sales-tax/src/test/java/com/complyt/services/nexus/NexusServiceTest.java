@@ -308,9 +308,8 @@ class NexusServiceTest {
     }
 
     @Test
-    void findTrackingByState_NullTransactionPassed_NotFindingNexus_ThrowsException() {
+    void findTrackingByState_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxTracking salesTaxTracking = objectStub.createSalesTaxTracking(salesTaxTrackingId);
         Transaction nullTransaction = null;
 
         // When
@@ -320,6 +319,20 @@ class NexusServiceTest {
 
         // Then
         assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void findTrackingByState_NullStringPassed_ThrowsException() {
+        // Given
+        String nullStateString = null;
+
+        // When
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.findTrackingByState(nullStateString));
+
+        // Then
+        assertEquals("state is marked non-null but is null", nullPointerException.getMessage());
     }
 
 }
