@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,13 +35,12 @@ public class ProductClassificationRepositoryTest {
     ReactiveMongoTemplate reactiveMongoTemplate;
 
     ProductClassification productClassification;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = new HashMap<>() {{
             put(jurisdictionalSalesTaxRules.getAbbreviation(), jurisdictionalSalesTaxRules);
         }};

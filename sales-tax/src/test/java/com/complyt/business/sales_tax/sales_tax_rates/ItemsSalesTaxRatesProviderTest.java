@@ -8,13 +8,12 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,16 +35,15 @@ public class ItemsSalesTaxRatesProviderTest {
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     Address address;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
-        salesTaxRate = objectStub.createSalesTaxRates();
-        address = objectStub.createAddress();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
+        salesTaxRate = testUtilities.createSalesTaxRates();
+        address = testUtilities.createAddress();
     }
 
     private List<Item> createItems() {

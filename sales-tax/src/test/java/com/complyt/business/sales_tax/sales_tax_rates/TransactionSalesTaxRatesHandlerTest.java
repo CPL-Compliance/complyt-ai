@@ -7,7 +7,6 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -15,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,21 +38,20 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Mock
     private ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
     Address address;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        address = objectStub.createAddress();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        address = testUtilities.createAddress();
     }
 
     @Test
     void setRates_SetsRatesToTransactionWithNoShippingFee_ReturnsModifiedTransaction() {
         // Given
-        Transaction transaction = objectStub.createTransaction(null).withShippingFee(null);
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        Transaction transaction = testUtilities.createTransaction(null).withShippingFee(null);
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -71,9 +69,9 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_SetsRatesToTransactionWithShippingFee_ReturnsModifiedTransaction() {
         // Given
-        ShippingFee shippingFee = objectStub.createShippingFee(false, false);
-        Transaction transaction = objectStub.createTransaction(null).withShippingFee(shippingFee);
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        ShippingFee shippingFee = testUtilities.createShippingFee(false, false);
+        Transaction transaction = testUtilities.createTransaction(null).withShippingFee(shippingFee);
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
@@ -93,7 +91,7 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         Transaction nullTransaction = null;
 
         // When
@@ -107,7 +105,7 @@ public class TransactionSalesTaxRatesHandlerTest {
     void setRates_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
         SalesTaxRate nullSalesTaxRate = null;
-        Transaction transaction = objectStub.createTransaction(null);
+        Transaction transaction = testUtilities.createTransaction(null);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));

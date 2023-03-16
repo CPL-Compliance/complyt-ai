@@ -21,12 +21,16 @@ import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
+import java.util.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ObjectStub {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class TestUtilities {
 
     LocalDateTime localDateTime;
     String tenantId;
@@ -37,12 +41,27 @@ public class ObjectStub {
 
     String source;
 
-    public ObjectStub(LocalDateTime localDateTime, String tenantId) {
+    public TestUtilities(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
         source = "1";
+    }
+
+    public void checkErrorMessages(LinkedHashMap map, HashSet<String> expectedErrors) {
+        String message = (String) map.get("message");
+        String[] errors = message.substring(1, message.length() - 1).split(", ");
+        assertEquals(expectedErrors.size(), errors.length);
+        for (String err : errors) {
+            assertTrue(expectedErrors.contains(err));
+        }
+    }
+
+    public String stringWithLength(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; 0 < length; length--) stringBuilder.append('a');
+        return stringBuilder.toString();
     }
 
     public String getUnifiedSource() {
@@ -76,7 +95,7 @@ public class ObjectStub {
                 id,
                 source,
                 "name",
-                new AddressDto("City", "Country", "County", "CA", "Street", "Zip"),
+                new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip"),
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
                 externalTimestamps
@@ -94,8 +113,8 @@ public class ObjectStub {
     }
 
     public TransactionDto createTransactionDto(String id) {
-        AddressDto billingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
-        AddressDto shippingAddress = new AddressDto("City", "Country", "County", "CA", "Street", "Zip");
+        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip");
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip");
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);

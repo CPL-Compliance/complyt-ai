@@ -29,7 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -52,14 +52,13 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     ExemptionFacade exemptionFacade;
     Exemption exemption;
     ExemptionDto exemptionDto;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
-        exemptionDto = objectStub.createExemptionDto();
+        exemptionDto = testUtilities.createExemptionDto();
         exemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
     }
 
@@ -192,14 +191,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -337,14 +329,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -954,14 +939,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -988,14 +966,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1021,14 +992,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1053,14 +1017,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1085,14 +1042,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1117,14 +1067,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1149,14 +1092,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1181,14 +1117,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1213,14 +1142,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1246,14 +1168,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1279,14 +1194,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1311,14 +1219,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1343,14 +1244,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1375,14 +1269,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1408,14 +1295,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1440,14 +1320,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1472,14 +1345,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1505,14 +1371,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1538,14 +1397,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1571,14 +1423,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1603,14 +1448,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1635,14 +1473,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1667,14 +1498,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1698,14 +1522,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1818,14 +1635,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1881,14 +1691,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -1945,14 +1748,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2009,14 +1805,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2734,14 +2523,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2767,14 +2549,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2800,14 +2575,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2833,14 +2601,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2865,14 +2626,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2897,14 +2651,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2929,14 +2676,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2961,14 +2701,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -2993,14 +2726,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -3025,14 +2751,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -3083,14 +2802,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -3141,14 +2853,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -3200,14 +2905,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test
@@ -3259,14 +2957,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Test

@@ -20,7 +20,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -48,15 +48,14 @@ class CustomerServiceImplTest {
 
     String source;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeAll
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String name = "Existing Customer";
-        customer = objectStub.createCustomer(UUID.randomUUID().toString()).withName(name);
-        source = objectStub.getUnifiedSource();
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString()).withName(name);
+        source = testUtilities.getUnifiedSource();
     }
 
     @Test
@@ -259,7 +258,7 @@ class CustomerServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Customers() {
         // Given
-        Customer secondsCustomer = objectStub.createCustomer(new ObjectId().toString());
+        Customer secondsCustomer = testUtilities.createCustomer(new ObjectId().toString());
 
         // When
         when(customerRepository.findAllBySource(source)).thenReturn(Flux.just(customer, secondsCustomer));

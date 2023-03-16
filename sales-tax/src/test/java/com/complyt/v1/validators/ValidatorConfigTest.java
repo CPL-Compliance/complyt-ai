@@ -14,7 +14,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -38,20 +38,20 @@ class ValidatorConfigTest {
     @MockBean
     DataConflictChecksProvider dataConflictChecksProvider;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
 
         validatorConfig = new ValidatorConfig();
-        objectStub = new ObjectStub(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
     void customerDtoValidationHandler_ReturnsValidationHandler() {
         // Given
         ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler = validatorConfig.customerDtoValidationHandler(springValidatorAdapter);
-        CustomerDto customerDto = objectStub.createCustomerDto(UUID.randomUUID().toString());
+        CustomerDto customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString());
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", customerDto.externalId());
         pathVariables.put("source", customerDto.source());
@@ -72,7 +72,7 @@ class ValidatorConfigTest {
     void transactionDtoValidationHandler_ReturnsValidationHandler() {
         // Given
         ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
-        TransactionDto transactionDto = objectStub.createTransactionDto(UUID.randomUUID().toString());
+        TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
@@ -93,7 +93,7 @@ class ValidatorConfigTest {
     void exemptionDtoValidationHandler_ReturnsValidationHandler() {
         // Given
         ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler = validatorConfig.exemptionDtoValidationHandler(springValidatorAdapter);
-        ExemptionDto exemptionDto = objectStub.createExemptionDto();
+        ExemptionDto exemptionDto = testUtilities.createExemptionDto();
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("complytId", exemptionDto.complytId().toString());
 
@@ -112,7 +112,7 @@ class ValidatorConfigTest {
     void salesTaxTrackingDtoValidationHandler_ReturnsValidationHandler() {
         // Given
         ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler = validatorConfig.salesTaxTrackingDtoValidationHandler(springValidatorAdapter);
-        SalesTaxTrackingDto salesTaxTrackingDto = objectStub.createSalesTaxTrackingDto();
+        SalesTaxTrackingDto salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto();
         Map<String,String> pathVariables = new HashMap<>();
         pathVariables.put("state", salesTaxTrackingDto.state().name());
 
