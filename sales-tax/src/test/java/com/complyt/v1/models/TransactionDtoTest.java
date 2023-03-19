@@ -4,7 +4,7 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,15 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TransactionDtoTest {
 
+    TestUtilities testUtilities;
     private TransactionDto transactionDto;
-    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String transactionId = UUID.randomUUID().toString();
-        transactionDto = objectStub.createTransactionDto(transactionId);
+        transactionDto = testUtilities.createTransactionDto(transactionId);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -62,7 +61,7 @@ class TransactionDtoTest {
     void withComplytId_DifferentId_ReturnTransactionDto() {
         // Given
         UUID differentId = UUID.randomUUID();
-        TransactionDto expectedTransactionDto = objectStub.createTransactionDto(transactionDto.externalId())
+        TransactionDto expectedTransactionDto = testUtilities.createTransactionDto(transactionDto.externalId())
                 .withComplytId(differentId)
                 .withExternalId(transactionDto.externalId())
                 .withCustomerId(transactionDto.customerId())

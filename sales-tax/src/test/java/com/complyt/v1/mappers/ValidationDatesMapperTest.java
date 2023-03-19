@@ -1,12 +1,10 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.exemption.ValidationDates;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.customer.exemption.ValidationDatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,16 +12,15 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValidationDatesMapperTest {
+    TestUtilities testUtilities;
     private ValidationDates validationDates;
     private ValidationDatesDto validationDatesDto;
-    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        validationDates = objectStub.createValidationDates();
-        validationDatesDto = objectStub.createValidationDatesDto();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        validationDates = testUtilities.createValidationDates();
+        validationDatesDto = testUtilities.createValidationDatesDto();
     }
 
     @Test

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,20 +18,20 @@ class ComplytIdHandlerTest {
     ComplytIdHandler<Transaction> complytIdHandler;
 
     Transaction transaction;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         complytIdHandler = new ComplytIdHandler<>();
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
 
     @Test
     void checkComplytIdOfUpdatedEqualsToOld_HasEqualComplytId_ReturnsComplytIdProperty() {
         // Given
         UUID complytId = transaction.getComplytId();
-        Transaction newTransaction = objectStub.createTransaction(UUID.randomUUID().toString()).withComplytId(complytId);
+        Transaction newTransaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withComplytId(complytId);
 
         // When
         Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
@@ -43,7 +43,7 @@ class ComplytIdHandlerTest {
     @Test
     void checkComplytIdOfUpdatedEqualsToOld_HasNoComplytId_ReturnsComplytIdProperty() {
         // Given
-        Transaction newTransaction = objectStub.createTransaction(UUID.randomUUID().toString()).withComplytId(null);
+        Transaction newTransaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withComplytId(null);
 
         // When
         Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);
@@ -56,7 +56,7 @@ class ComplytIdHandlerTest {
     void checkComplytIdOfUpdatedEqualsToOld_HasUnequalComplytId_ReturnsConflictedDataApiException() {
         // Given
         UUID differentComplytId = UUID.randomUUID();
-        Transaction newTransaction = objectStub.createTransaction(UUID.randomUUID().toString()).withComplytId(differentComplytId);
+        Transaction newTransaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withComplytId(differentComplytId);
 
         // When
         Mono<Transaction> transactionMono = complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(newTransaction, transaction);

@@ -7,7 +7,7 @@ import lombok.*;
 
 @Schema(name = "Item")
 public record ItemDto(@PositiveOrZero(message = "Unit Price can not be a negative number") float unitPrice,
-                      @PositiveOrZero(message = "Quantity can not be a negative number") int quantity,
+                      @PositiveOrZero(message = "Quantity can not be a negative number") float quantity,
                       @PositiveOrZero(message = "Total Price can not be a negative number") float totalPrice,
                       String description,
                       @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name,

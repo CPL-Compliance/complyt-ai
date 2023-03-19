@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,19 +22,18 @@ class TransactionItemsTangibleCategoryInjectorTest {
 
     TransactionItemsTangibleCategoryInjector transactionItemsTangibleCategoryInjector;
     Transaction transaction;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString())
-                .withItems(objectStub.createItems(false,false));
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
+                .withItems(testUtilities.createItems(false, false));
         transactionItemsTangibleCategoryInjector = new TransactionItemsTangibleCategoryInjector(transaction);
     }
 
     private Map<String, ProductClassification> createMapTaxCodesToClassifications() {
-        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         Map<String, JurisdictionalSalesTaxRules> item1JurisdictionalSalesTaxRulesMap = new HashMap<>() {{
             put("CA", jurisdictionalSalesTaxRules);
         }};
@@ -62,7 +61,7 @@ class TransactionItemsTangibleCategoryInjectorTest {
     void inject_ClassificationsMapContainItemsTaxCode_TransactionModified() {
         // Given
         Map<String, ProductClassification> classifications = createMapTaxCodesToClassifications();
-        Transaction expectedTransaction = transaction.withItems(objectStub.createItems(false, true));
+        Transaction expectedTransaction = transaction.withItems(testUtilities.createItems(false, true));
 
         // When
         Mono<Transaction> transactionMono = transactionItemsTangibleCategoryInjector.inject(classifications);

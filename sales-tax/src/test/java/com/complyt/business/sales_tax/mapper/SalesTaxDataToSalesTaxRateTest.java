@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,18 +32,17 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Mock
     SalesTaxData salesTaxData;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     @Test
     void map_MapsIncorporatedAddress_ReturnsSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = objectStub.createSalesTaxRates();
+        SalesTaxRate expectedSalesTaxRate = testUtilities.createSalesTaxRates();
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
@@ -58,7 +57,7 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        SalesTaxRate salesTaxRate = objectStub.createSalesTaxRates();
+        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
         SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0).withCityDistrictRate(0);
 
         // When
