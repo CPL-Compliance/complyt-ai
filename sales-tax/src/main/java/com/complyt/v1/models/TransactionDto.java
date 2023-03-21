@@ -26,7 +26,7 @@ public record TransactionDto(UUID complytId,
                              @Valid @NotNull(message = "External Timestamps may not be null") TimestampsDto externalTimestamps,
                              @NotNull(message = "Transaction Type may not be null") TransactionTypeDto transactionType,
                              @Valid ShippingFeeDto shippingFee,
-                             @Size(min = 1, max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
+                             @Size(max = 256, message = "Created From should be 1-256 characters maximum") String createdFrom,
                              float taxableItemsAmount, float tangibleItemsAmount, float totalItemsAmount)
         implements SourceCheckable, ExternalIdCheckable {
 }
