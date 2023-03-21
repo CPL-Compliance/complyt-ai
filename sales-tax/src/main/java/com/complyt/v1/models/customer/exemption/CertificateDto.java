@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.With;
 
 @With
-@Schema(name = "Certificate", description = FieldsDescriptions.certificate)
+@Schema(name = "Certificate")
 public record CertificateDto(
         @NotNull(message = "Certificate.id" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "Certificate.id" + StringErrorMessages.minmax_256_error) String certificateId,
         @NotNull(message = "Certificate.url" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "Certificate.url" + StringErrorMessages.minmax_256_error) String url,

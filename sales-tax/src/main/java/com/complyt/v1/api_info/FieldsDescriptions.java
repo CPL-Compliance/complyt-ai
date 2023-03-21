@@ -16,7 +16,7 @@ public interface FieldsDescriptions {
 
     String exemption = "An exemption from sales tax associated with a customer";
 
-    String salesTaxTracking = "";
+    String salesTaxTracking = "Tracks the organization's sales tax status in each US state";
 
     // General
     String complyt_id = "The unique identifier in Complyt of the "; // add Dto
@@ -30,8 +30,6 @@ public interface FieldsDescriptions {
     String internal_timestamps = "read-only. The APIs internal timestamps for this resource";
 
     String external_timestamps = "External timestamps, which should reference the dates in your originating system since these are the timestamps used for sales tax calculation";
-
-    String state = "";
 
     // In Transaction
     String item = "An item included in the transaction";
@@ -58,25 +56,15 @@ public interface FieldsDescriptions {
 
     String address_of_customer = "The customer's Address";
 
-    String name = "";
+    String name_of_customer = "The customer's name";
 
-    String customer_type = "";
+    String customer_type = "Indicates whether the customer is 'retail'/'reseller'/'marketplace'";
 
     // In exemption
 
-    String validation_dates = "";
+    String validation_dates = "Determains the timeframe that the exemption is valid for";
 
-    String certificate = "";
 
-    String classification = "";
+    String classification = "Indicates on which product classifications the the customer exepmt for";
 
-    String status_of_exemption = "";
-
-    String exemption_type = "";
-
-    // In SalesTaxTracking
-
-    String physical_nexus_tracker = "";
-
-    String economic_nexus_tracker = "";
 }

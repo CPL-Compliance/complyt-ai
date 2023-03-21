@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
-@Schema(name = "EconomicNexusTracker", description = FieldsDescriptions.economic_nexus_tracker)
+@Schema(name = "EconomicNexusTracker")
 public record EconomicNexusTrackerDto(
         @NotNull(message = "EconomicNexusTracker.established" + DtoErrorMessages.not_null_error) boolean established,
         @NotNull(message = "EconomicNexusTracker.establishedDate" + DtoErrorMessages.not_null_error) LocalDateTime establishedDate) {

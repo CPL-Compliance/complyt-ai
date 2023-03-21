@@ -21,7 +21,7 @@ import java.util.UUID;
 public record CustomerDto(@Schema(description = FieldsDescriptions.complyt_id + "customer") UUID complytId,
                           @Schema(description = FieldsDescriptions.external_id) @NotNull(message = "externalId" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "externalId" + StringErrorMessages.minmax_256_error) String externalId,
                           @Schema(description = FieldsDescriptions.source) @NotNull(message = "source" + DtoErrorMessages.not_null_error) @Pattern(regexp = "[1-9]", message = "source" + StringErrorMessages.single_digit_error) String source,
-                          @NotNull(message = "name" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "name" + StringErrorMessages.minmax_256_error) String name,
+                          @Schema(description = FieldsDescriptions.name_of_customer) @NotNull(message = "name" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "name" + StringErrorMessages.minmax_256_error) String name,
                           @Schema(ref = "addressOfCustomer") @Valid OptionalAddressDto address,
                           @NotNull(message = "customerType" + DtoErrorMessages.not_null_error) CustomerTypeDto customerType,
                           @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
