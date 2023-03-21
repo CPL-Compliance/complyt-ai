@@ -48,7 +48,7 @@ public class SimpleIntegrationTestIT extends MongoContainerInitializer {
     @Test
     void getAllTransaction_ReturnsAllTransactionIT() {
 
-        when(tenantResolver.resolve()).thenReturn(Mono.just("org_SttAcBkK7b32w7kA"));
+        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
 
         webTestClient
                 .get()

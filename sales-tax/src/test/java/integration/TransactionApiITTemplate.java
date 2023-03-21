@@ -14,4 +14,7 @@ public interface TransactionApiITTemplate extends
 
     void upsertByExternalIdAndSource_DoesntExistsAndCustomerDoesntExists_Returns404();
     void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500();
+    void upsertByExternalIdAndSource_DoesntExistsAndPassedEconomicNexus_Returns200();
+
+    void upsertByExternalIdAndSource_DoesntExistsAndHavePhysicalNexus_Returns200();
 }
