@@ -1,6 +1,5 @@
 package com.complyt.v1.routers;
 
-import testUtils.templates.endpoints.*;
 import testUtils.ut.templates.endpoints.*;
 import testUtils.ut.templates.validations.InternalTimestampsValidationTestTemplate;
 import testUtils.ut.templates.validations.StateValidationTestTemplate;
