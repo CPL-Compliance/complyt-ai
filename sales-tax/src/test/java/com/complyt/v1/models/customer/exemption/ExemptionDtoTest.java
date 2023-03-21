@@ -2,7 +2,7 @@ package com.complyt.v1.models.customer.exemption;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.ut.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

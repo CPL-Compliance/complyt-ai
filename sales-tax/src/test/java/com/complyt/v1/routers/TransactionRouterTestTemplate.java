@@ -1,10 +1,11 @@
 package com.complyt.v1.routers;
 
 import testUtils.templates.endpoints.*;
-import testUtils.templates.validations.ExternalTimestampsValidationTestTemplate;
-import testUtils.templates.validations.InternalTimestampsValidationTestTemplate;
-import testUtils.templates.validations.ItemValidationTestTemplate;
-import testUtils.templates.validations.ShippingFeeValidationTestTemplate;
+import testUtils.ut.templates.endpoints.*;
+import testUtils.ut.templates.validations.ExternalTimestampsValidationTestTemplate;
+import testUtils.ut.templates.validations.InternalTimestampsValidationTestTemplate;
+import testUtils.ut.templates.validations.ItemValidationTestTemplate;
+import testUtils.ut.templates.validations.ShippingFeeValidationTestTemplate;
 
 public interface TransactionRouterTestTemplate extends
         GetByExternalIdAndSourceRouterTestTemplate,

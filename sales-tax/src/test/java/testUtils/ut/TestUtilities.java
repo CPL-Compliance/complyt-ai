@@ -1,4 +1,4 @@
-package testUtils;
+package testUtils.ut;
 
 import com.complyt.domain.*;
 import com.complyt.domain.customer.Customer;

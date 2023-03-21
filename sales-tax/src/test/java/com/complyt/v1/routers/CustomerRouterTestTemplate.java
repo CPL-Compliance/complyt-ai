@@ -1,8 +1,9 @@
 package com.complyt.v1.routers;
 
 import testUtils.templates.endpoints.*;
-import testUtils.templates.validations.ExternalTimestampsValidationTestTemplate;
-import testUtils.templates.validations.InternalTimestampsValidationTestTemplate;
+import testUtils.ut.templates.endpoints.*;
+import testUtils.ut.templates.validations.ExternalTimestampsValidationTestTemplate;
+import testUtils.ut.templates.validations.InternalTimestampsValidationTestTemplate;
 
 public interface CustomerRouterTestTemplate extends
         GetByExternalIdAndSourceRouterTestTemplate,

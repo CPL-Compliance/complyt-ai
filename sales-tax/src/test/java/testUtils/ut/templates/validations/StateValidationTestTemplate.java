@@ -1,4 +1,4 @@
-package testUtils.templates.validations;
+package testUtils.ut.templates.validations;
 
 public interface StateValidationTestTemplate {
     void upsert_NullState_Returns400ValidationError();

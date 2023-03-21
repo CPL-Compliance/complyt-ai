@@ -1,4 +1,4 @@
-package testUtils.templates.endpoints;
+package testUtils.ut.templates.endpoints;
 
 public interface DeleteByExternalIdAndSourceRouterTestTemplate {
     void deleteByExternalIdAndSource_Exists_Returns204();

@@ -3,7 +3,7 @@ package com.complyt.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.ut.TestUtilities;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;

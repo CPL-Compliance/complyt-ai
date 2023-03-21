@@ -1,4 +1,4 @@
-package testUtils.templates.endpoints;
+package testUtils.ut.templates.endpoints;
 
 public interface GetByStateRouterTestTemplate {
     void getByState_Exists_Returns200WithList();

@@ -3,8 +3,6 @@ package com.complyt.v1.routers;
 import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.customer.exemption.ValidationDates;
-import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.error_messages.DateErrorMessages;
@@ -29,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
+import testUtils.ut.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;

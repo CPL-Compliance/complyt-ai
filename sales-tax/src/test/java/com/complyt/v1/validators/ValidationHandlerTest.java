@@ -12,7 +12,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.ut.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

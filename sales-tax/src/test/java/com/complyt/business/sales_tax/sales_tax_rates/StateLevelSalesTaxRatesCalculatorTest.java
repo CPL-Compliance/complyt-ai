@@ -6,7 +6,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.ut.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

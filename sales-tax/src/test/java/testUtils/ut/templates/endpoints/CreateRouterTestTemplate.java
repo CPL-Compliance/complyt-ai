@@ -1,4 +1,4 @@
-package testUtils.templates.endpoints;
+package testUtils.ut.templates.endpoints;
 
 public interface CreateRouterTestTemplate {
     void createByComplytId_Valid_Returns201();

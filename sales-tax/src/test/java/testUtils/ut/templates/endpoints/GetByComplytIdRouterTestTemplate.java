@@ -1,4 +1,4 @@
-package testUtils.templates.endpoints;
+package testUtils.ut.templates.endpoints;
 
 public interface GetByComplytIdRouterTestTemplate {
     void getByComplytId_Exists_Returns200();

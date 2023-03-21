@@ -1,4 +1,4 @@
-package testUtils.templates.validations;
+package testUtils.ut.templates.validations;
 
 public interface ExternalTimestampsValidationTestTemplate {
     void upsert_NullExternalTimestamps_Returns400ValidationError();

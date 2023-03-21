@@ -1,9 +1,10 @@
 package com.complyt.v1.routers;
 
 import testUtils.templates.endpoints.*;
-import testUtils.templates.validations.InternalTimestampsValidationTestTemplate;
-import testUtils.templates.validations.StateValidationTestTemplate;
-import testUtils.templates.validations.ValidationDatesValidationTestTemplate;
+import testUtils.ut.templates.endpoints.*;
+import testUtils.ut.templates.validations.InternalTimestampsValidationTestTemplate;
+import testUtils.ut.templates.validations.StateValidationTestTemplate;
+import testUtils.ut.templates.validations.ValidationDatesValidationTestTemplate;
 
 public interface ExemptionRouterTestTemplate extends
         GetByComplytIdRouterTestTemplate,
