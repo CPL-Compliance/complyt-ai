@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -274,4 +275,63 @@ class NexusServiceTest {
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
     }
+
+    @Test
+    void findTrackingByState_TransactionPassed_NotFindingNexus_ThrowsException() {
+        // Given
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        String state = transaction.getShippingAddress().getState();
+
+        // When
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(state);
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectError(NotFoundException.class);
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("No salesTaxTracking with state " + state);
+    }
+
+    @Test
+    void findTrackingByState_StatePassed_NotFindingNexus_ThrowsException() {
+        // Given
+        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        String state = transaction.getShippingAddress().getState();
+
+        // When
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().getState());
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectError(NotFoundException.class);
+        StepVerifier.create(salesTaxTrackingMono).expectErrorMessage("No salesTaxTracking with state " + state);
+    }
+
+    @Test
+    void findTrackingByState_NullTransactionPassed_ThrowsException() {
+        // Given
+        Transaction nullTransaction = null;
+
+        // When
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.findTrackingByState(nullTransaction));
+
+        // Then
+        assertEquals("transaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void findTrackingByState_NullStringPassed_ThrowsException() {
+        // Given
+        String nullStateString = null;
+
+        // When
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.findTrackingByState(nullStateString));
+
+        // Then
+        assertEquals("state is marked non-null but is null", nullPointerException.getMessage());
+    }
+
 }
