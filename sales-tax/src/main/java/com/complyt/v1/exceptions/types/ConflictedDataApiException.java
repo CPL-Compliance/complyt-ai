@@ -4,7 +4,7 @@ import com.complyt.annotations.Generated;
 
 @Generated
 public class ConflictedDataApiException extends ComplytApiException {
-    private static final String message = "The requested operation failed because there was an unresolvable conflict between two or more inputs.";
+    private static final String message = "The requested operation failed because there was an unresolvable conflict between two or more inputs";
 
     public ConflictedDataApiException() {
         super(message);

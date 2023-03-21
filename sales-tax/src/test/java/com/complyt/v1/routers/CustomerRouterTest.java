@@ -1,10 +1,13 @@
 package com.complyt.v1.routers;
 
-import com.complyt.config.ApiExceptionConfig;
 import com.complyt.domain.customer.Customer;
 import com.complyt.facades.CustomerFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
-import com.complyt.v1.error_messages.DateErrorMessages;
+import com.complyt.v1.config.ApiExceptionConfig;
+import com.complyt.v1.config.ValidatorConfig;
+import com.complyt.v1.config.error_messages.DataConflictErrorMessages;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
@@ -13,7 +16,6 @@ import com.complyt.v1.mappers.CustomerMapper;
 import com.complyt.v1.models.OptionalAddressDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
-import com.complyt.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,12 +105,10 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .withCustomerType(null);
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "Name may not be blank",
-                "Name should be 1-256 characters maximum",
-                "Source should be a single digit",
-                "Customer type may not be null"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "name" + StringErrorMessages.minmax_256_error,
+                "source" + StringErrorMessages.single_digit_error,
+                "customerType" + DtoErrorMessages.not_null_error));
 
         // When + Then
         webTestClient
@@ -148,7 +148,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
                 });
     }
 
@@ -172,7 +172,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
                 });
     }
 
@@ -204,7 +204,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
                 });
     }
 
@@ -233,7 +233,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("The requested operation failed because there was an unresolvable conflict between two or more inputs.", map.get("message"));
+                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
                 });
     }
 
@@ -245,10 +245,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "";
-        HashSet<String> expectedErrors = new HashSet<String>();
-        expectedErrors.addAll(List.of(
-                "Source may not be blank",
-                "Source should be a single digit"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "source" + StringErrorMessages.single_digit_error));
 
         // When + Then
         webTestClient
@@ -272,6 +270,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "y";
+        Set<String> expectedErrors = new HashSet<>(List.of("source" + StringErrorMessages.single_digit_error));
 
         // When + Then
         webTestClient
@@ -284,10 +283,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Source should be a single digit]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -298,6 +294,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "10";
+        Set<String> expectedErrors = new HashSet<>(List.of("source" + StringErrorMessages.single_digit_error));
 
         // When + Then
         webTestClient
@@ -310,10 +307,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Source should be a single digit]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -324,10 +318,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String nullExternalId = "";
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "External ID may not be blank",
-                "External ID should be 1-256 characters maximum"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "externalId" + StringErrorMessages.minmax_256_error));
 
         // When + Then
         webTestClient
@@ -351,6 +343,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
         String source = customerDto.source();
+        Set<String> expectedErrors = new HashSet<>(List.of("externalId" + StringErrorMessages.minmax_256_error));
 
         // When + Then
         webTestClient
@@ -363,10 +356,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[External ID should be 1-256 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -509,10 +499,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidName = "";
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "Name may not be blank",
-                "Name should be 1-256 characters maximum"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "name" + StringErrorMessages.minmax_256_error));
 
         // When + Then
         webTestClient
@@ -536,6 +524,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String nameWithLengthOf257 = testUtilities.stringWithLength(257);
+        Set<String> expectedErrors = new HashSet<>(List.of("name" + StringErrorMessages.minmax_256_error));
 
         // When + Then
         webTestClient
@@ -548,10 +537,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Name should be 1-256 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -562,6 +548,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.county" + StringErrorMessages.minmax_100_error));
+
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -573,10 +561,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[County should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -587,6 +572,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip" + StringErrorMessages.minmax_20_error));
 
         // When + Then
         webTestClient
@@ -599,10 +585,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[ZIP should be 1-20 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -613,6 +596,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.country" + StringErrorMessages.minmax_50_error));
 
         // When + Then
         webTestClient
@@ -625,10 +609,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Country should be 1-50 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -639,6 +620,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.city" + StringErrorMessages.minmax_100_error));
 
         // When + Then
         webTestClient
@@ -651,10 +633,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[City should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -665,7 +644,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip");
-
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.state" + StringErrorMessages.minmax_100_error));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -677,10 +656,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[State should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -691,6 +667,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.minmax_200_error));
 
         // When + Then
         webTestClient
@@ -703,10 +680,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Street should be 1-200 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -717,6 +691,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withCountry("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.country" + StringErrorMessages.minmax_50_error));
 
         // When + Then
         webTestClient
@@ -729,10 +704,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Country should be 1-50 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -743,6 +715,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withCounty("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.county" + StringErrorMessages.minmax_100_error));
 
         // When + Then
         webTestClient
@@ -755,10 +728,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[County should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -769,6 +739,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withCity("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.city" + StringErrorMessages.minmax_100_error));
 
         // When + Then
         webTestClient
@@ -781,10 +752,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[City should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -795,6 +763,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withState("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.state" + StringErrorMessages.minmax_100_error));
 
         // When + Then
         webTestClient
@@ -807,10 +776,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[State should be 1-100 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -821,6 +787,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withStreet("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.minmax_200_error));
 
         // When + Then
         webTestClient
@@ -833,10 +800,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[Street should be 1-200 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -847,6 +811,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = customerDto.address().withZip("");
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip" + StringErrorMessages.minmax_20_error));
 
         // When + Then
         webTestClient
@@ -859,10 +824,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[ZIP should be 1-20 characters maximum]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -886,7 +848,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Customer type may not be null]", message);
+                    assertEquals("[customerType may not be null]", message);
                 });
     }
 
@@ -1496,9 +1458,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "External Timestamps may not be null"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "externalTimestamps" + DtoErrorMessages.not_null_error));
 
 
         // When + Then
@@ -1524,14 +1485,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -1569,8 +1523,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertTrue(message.contains("createdDate may not be null"));
-                    assertTrue(message.contains("createdDate may not be blank"));
+                    assertTrue(message.contains("Timestamps.createdDate" + DtoErrorMessages.not_null_error));
                 });
     }
 
@@ -1609,8 +1562,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertTrue(message.contains("updatedDate may not be null"));
-                    assertTrue(message.contains("updatedDate may not be blank"));
+                    assertTrue(message.contains("Timestamps.updatedDate" + DtoErrorMessages.not_null_error));
+                    assertTrue(message.contains("Timestamps.updatedDate" + DtoErrorMessages.not_null_error));
                 });
     }
 
@@ -1651,7 +1604,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[Timestamps.updatedDate" + DtoErrorMessages.date_format_error + "]", message);
                 });
     }
 
@@ -1692,7 +1645,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[Timestamps.createdDate" + DtoErrorMessages.date_format_error + "]", message);
                 });
     }
 
@@ -1703,9 +1656,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -1734,14 +1686,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -1752,9 +1697,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -1783,14 +1727,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -1875,9 +1812,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -1906,14 +1842,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -1924,9 +1853,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -1955,14 +1883,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2195,9 +2116,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2226,14 +2146,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2244,9 +2157,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2275,14 +2187,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2330,10 +2235,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate may not be null",
-                "createdDate may not be blank"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.not_null_error,
+                "Timestamps.createdDate" + DtoErrorMessages.not_null_error));
 
         // When + Then
         webTestClient
@@ -2364,14 +2268,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -2381,10 +2278,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate may not be null",
-                "updatedDate may not be blank"));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.not_null_error,
+                "Timestamps.updatedDate" + DtoErrorMessages.not_null_error));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2414,14 +2310,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override
@@ -2466,7 +2355,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(map -> {
                     String message = (String) map.get("message");
 
-                    assertEquals("[updatedDate" + DateErrorMessages.wrong_format_error_message + "]", message);
+                    assertEquals("[Timestamps.updatedDate" + DtoErrorMessages.date_format_error + "]", message);
                 });
     }
 
@@ -2478,6 +2367,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidTimestamp = "not a timestamp";
+        Set<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
         // When + Then
         webTestClient
@@ -2509,10 +2400,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    assertEquals("[createdDate" + DateErrorMessages.wrong_format_error_message + "]", message);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
@@ -2522,9 +2410,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2557,14 +2444,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2575,9 +2455,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2610,14 +2489,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2702,9 +2574,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2737,14 +2608,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -2755,9 +2619,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -2790,14 +2653,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -3030,9 +2886,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "createdDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -3065,14 +2920,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
 
@@ -3083,9 +2931,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "updatedDate" + DateErrorMessages.wrong_format_error_message));
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
 
 
         // When + Then
@@ -3118,14 +2965,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    String message = (String) map.get("message");
-                    String[] errors = message.substring(1, message.length() - 1).split(", ");
-                    assertEquals(expectedErrors.size(), errors.length);
-                    for (String err : errors) {
-                        assertTrue(expectedErrors.contains(err));
-                    }
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
     }
 
     @Override

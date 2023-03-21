@@ -1,9 +1,12 @@
-package com.complyt.v1.validators;
+package com.complyt.v1.config;
 
+import com.complyt.v1.config.error_messages.DataConflictErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.validators.DataConflictChecksProvider;
+import com.complyt.v1.validators.ValidationHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +68,7 @@ class ValidatorConfigTest {
         Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(customerDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
+        StepVerifier.create(customerDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
     }
 
     @Test
@@ -86,7 +89,7 @@ class ValidatorConfigTest {
         Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(transactionDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
+        StepVerifier.create(transactionDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
     }
 
     @Test
@@ -105,7 +108,7 @@ class ValidatorConfigTest {
         Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(exemptionDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
+        StepVerifier.create(exemptionDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
     }
 
     @Test
@@ -124,6 +127,6 @@ class ValidatorConfigTest {
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage("The requested operation failed because there was an unresolvable conflict between two or more inputs.");
+        StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
     }
 }

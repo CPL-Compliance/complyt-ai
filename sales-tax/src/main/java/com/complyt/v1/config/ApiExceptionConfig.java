@@ -1,9 +1,16 @@
-package com.complyt.config;
+package com.complyt.v1.config;
 
 import com.complyt.annotations.Generated;
+import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
+import com.complyt.v1.models.timestamps.TimestampsDto;
+import io.swagger.v3.core.converter.AnnotatedType;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.converter.ResolvedSchema;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

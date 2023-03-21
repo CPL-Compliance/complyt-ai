@@ -1,6 +1,6 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.v1.error_messages.DateErrorMessages;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ public class StringToLocalDateTimeMapperTest {
     void setUp() {
         dateString = "2023-03-17T00:00";
         dateLocalDateTime = LocalDateTime.parse(dateString);
-        exceptionMessage = "Failed on parsing string to LocalDateTime " + DateErrorMessages.wrong_format_error_message;
+        exceptionMessage = "Failed on parsing string to LocalDateTime " + DtoErrorMessages.date_format_error;
     }
 
     @Test

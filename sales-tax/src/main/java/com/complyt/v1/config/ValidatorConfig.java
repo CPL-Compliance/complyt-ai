@@ -1,4 +1,4 @@
-package com.complyt.v1.validators;
+package com.complyt.v1.config;
 
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
@@ -6,6 +6,8 @@ import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.validators.DataConflictChecksProvider;
+import com.complyt.v1.validators.ValidationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @Configuration
 public class ValidatorConfig {

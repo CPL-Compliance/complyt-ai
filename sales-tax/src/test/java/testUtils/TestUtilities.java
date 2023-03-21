@@ -49,7 +49,7 @@ public class TestUtilities {
         source = "1";
     }
 
-    public void checkErrorMessages(LinkedHashMap map, HashSet<String> expectedErrors) {
+    public void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
         String message = (String) map.get("message");
         String[] errors = message.substring(1, message.length() - 1).split(", ");
         assertEquals(expectedErrors.size(), errors.length);

@@ -1,14 +1,16 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.api_info.FieldsDescriptions;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.With;
 
 import java.time.LocalDateTime;
 
 @With
-@Schema(name = "PhysicalNexusTracker")
+@Schema(name = "PhysicalNexusTracker", description = FieldsDescriptions.physical_nexus_tracker)
 public record PhysicalNexusTrackerDto(boolean established,
-                                      @NotNull(message = "Established Date may not be null") LocalDateTime establishedDate) {
+                                      @NotNull(message = "PhysicalNexusTracker.establishedDate" + DtoErrorMessages.not_null_error) LocalDateTime establishedDate) {
 
 }
