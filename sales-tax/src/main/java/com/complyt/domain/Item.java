@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Item implements Taxable {
     private float unitPrice;
-    private int quantity;
+    private float quantity;
     private float totalPrice;
     private String description;
     private String name;
