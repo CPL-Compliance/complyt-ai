@@ -46,13 +46,14 @@ public class OpenApiConfig {
 
     }
 
-    private Components getCustomSchemas() {
+    public Components getCustomSchemas() {
         return new Components()
-                .addSchemas("internalTimestamps", getExistingSchema(TimestampsDto.class).description(FieldsDescriptions.internal_timestamps))
-                .addSchemas("externalTimestamps", getExistingSchema(TimestampsDto.class).description(FieldsDescriptions.external_timestamps))
-                .addSchemas("billingAddress", getExistingSchema(OptionalAddressDto.class).description(FieldsDescriptions.billing_address))
-                .addSchemas("addressOfCustomer", getExistingSchema(OptionalAddressDto.class).description(FieldsDescriptions.address_of_customer))
-                .addSchemas("shippingAddress", getExistingSchema(MandatoryAddressDto.class).description(FieldsDescriptions.shipping_address));
+                .addSchemas("internalTimestamps", getExistingSchema(TimestampsDto.class).description(FieldsDescriptions.INTERNAL_TIMESTAMPS))
+                .addSchemas("externalTimestamps", getExistingSchema(TimestampsDto.class).description(FieldsDescriptions.EXTERNAL_TIMESTAMPS))
+                .addSchemas("billingAddress", getExistingSchema(OptionalAddressDto.class).description(FieldsDescriptions.BILLING_ADDRESS))
+                .addSchemas("addressOfCustomer", getExistingSchema(OptionalAddressDto.class).description(FieldsDescriptions.ADDRESS_OF_CUSTOMER))
+                .addSchemas("shippingAddress", getExistingSchema(MandatoryAddressDto.class).description(FieldsDescriptions.SHIPPING_ADDRESS))
+                .addSchemas("timestamp", getExistingSchema(String.class).pattern(null).description(FieldsDescriptions.TIMESTAMP_FORMAT));
     }
 
     private Schema getExistingSchema(Class className) {

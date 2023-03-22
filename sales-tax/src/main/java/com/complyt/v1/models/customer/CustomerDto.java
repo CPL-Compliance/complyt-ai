@@ -17,13 +17,13 @@ import lombok.With;
 import java.util.UUID;
 
 @With
-@Schema(name = "Customer", description = FieldsDescriptions.customer)
-public record CustomerDto(@Schema(description = FieldsDescriptions.complyt_id + "customer") UUID complytId,
-                          @Schema(description = FieldsDescriptions.external_id) @NotNull(message = "externalId" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "externalId" + StringErrorMessages.minmax_256_error) String externalId,
-                          @Schema(description = FieldsDescriptions.source) @NotNull(message = "source" + DtoErrorMessages.not_null_error) @Pattern(regexp = "[1-9]", message = "source" + StringErrorMessages.single_digit_error) String source,
-                          @Schema(description = FieldsDescriptions.name_of_customer) @NotNull(message = "name" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "name" + StringErrorMessages.minmax_256_error) String name,
+@Schema(name = "Customer", description = FieldsDescriptions.CUSTOMER)
+public record CustomerDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "customer") UUID complytId,
+                          @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId" + StringErrorMessages.MINMAX_256_ERROR) String externalId,
+                          @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source" + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "[1-9]", message = "source" + StringErrorMessages.SINGLE_DIGIT_ERROR) String source,
+                          @Schema(description = FieldsDescriptions.NAME_OF_CUSTOMER) @NotNull(message = "name" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "name" + StringErrorMessages.MINMAX_256_ERROR) String name,
                           @Schema(ref = "addressOfCustomer") @Valid OptionalAddressDto address,
-                          @NotNull(message = "customerType" + DtoErrorMessages.not_null_error) CustomerTypeDto customerType,
+                          @NotNull(message = "customerType" + DtoErrorMessages.NOT_NULL_ERROR) CustomerTypeDto customerType,
                           @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
-                          @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps" + DtoErrorMessages.not_null_error) TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
+                          @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps" + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
 }

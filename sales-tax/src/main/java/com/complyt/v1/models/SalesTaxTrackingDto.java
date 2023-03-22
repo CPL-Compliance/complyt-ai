@@ -12,12 +12,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @With
-@Schema(name = "SalesTaxTracking", description = FieldsDescriptions.salesTaxTracking)
-public record SalesTaxTrackingDto(@Schema(description = FieldsDescriptions.complyt_id + "salesTaxTracking") UUID complytId,
-                                  @Valid @NotNull(message = "state" + DtoErrorMessages.not_null_error) StateDto state,
-                                  boolean enforcesSalesTax,
-                                  @Valid @NotNull(message = "physicalNexusTracker" + DtoErrorMessages.not_null_error) PhysicalNexusTrackerDto physicalNexusTracker,
-                                  @Valid @NotNull(message = "economicNexusTracker" + DtoErrorMessages.not_null_error) EconomicNexusTrackerDto economicNexusTracker,
-                                  LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
+@Schema(name = "SalesTaxTracking", description = FieldsDescriptions.SALES_TAX_TRACKING)
+public record SalesTaxTrackingDto(
+        @Schema(description = FieldsDescriptions.COMPLYT_ID + "salesTaxTracking") UUID complytId,
+        @Valid @NotNull(message = "state" + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+        boolean enforcesSalesTax,
+        @Valid @NotNull(message = "physicalNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
+        @Valid @NotNull(message = "economicNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
+        LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
         implements StateCheckable {
 }

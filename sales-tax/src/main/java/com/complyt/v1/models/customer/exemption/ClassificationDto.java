@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-@Schema(name = "Classification", description = FieldsDescriptions.classification)
+@Schema(name = "Classification", description = FieldsDescriptions.CLASSIFICATION)
 public record ClassificationDto(
-        @NotNull(message = "Classification.code" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "Classification.code" + StringErrorMessages.minmax_256_error) String code,
-        @NotNull(message = "Classification.description" + DtoErrorMessages.not_null_error) @Size(min = 1, max = 256, message = "Classification.description" + StringErrorMessages.minmax_256_error) String description) {
+        @NotNull(message = "Classification.code" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Classification.code" + StringErrorMessages.MINMAX_256_ERROR) String code,
+        @NotNull(message = "Classification.description" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Classification.description" + StringErrorMessages.MINMAX_256_ERROR) String description) {
 
 }

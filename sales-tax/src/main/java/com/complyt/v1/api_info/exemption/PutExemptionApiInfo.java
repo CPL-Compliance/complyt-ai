@@ -1,6 +1,5 @@
 package com.complyt.v1.api_info.exemption;
 
-import com.complyt.v1.api_info.customer.UpsertCustomerByExternalIdAndSourceApiInfo;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -85,6 +84,7 @@ public @interface PutExemptionApiInfo {
     String newExemptionExample = """
             {
                 "customerId": "b4320a2b-1ac1-4fae-96c1-f2d7c2cc14a6",
+                "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                 "state": {
                     "abbreviation": "AZ",
                     "code": "04",

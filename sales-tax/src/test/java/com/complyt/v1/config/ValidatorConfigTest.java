@@ -1,6 +1,6 @@
 package com.complyt.v1.config;
 
-import com.complyt.v1.config.error_messages.DataConflictErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
@@ -55,7 +55,7 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler = validatorConfig.customerDtoValidationHandler(springValidatorAdapter);
         CustomerDto customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString());
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", customerDto.externalId());
         pathVariables.put("source", customerDto.source());
 
@@ -68,7 +68,7 @@ class ValidatorConfigTest {
         Mono<CustomerDto> customerDtoMono = customerDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(customerDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
+        StepVerifier.create(customerDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
     }
 
     @Test
@@ -76,7 +76,7 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler = validatorConfig.transactionDtoValidationHandler(springValidatorAdapter);
         TransactionDto transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString());
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("externalId", transactionDto.externalId());
         pathVariables.put("source", transactionDto.source());
 
@@ -89,7 +89,7 @@ class ValidatorConfigTest {
         Mono<TransactionDto> transactionDtoMono = transactionDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(transactionDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
+        StepVerifier.create(transactionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
     }
 
     @Test
@@ -97,7 +97,7 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler = validatorConfig.exemptionDtoValidationHandler(springValidatorAdapter);
         ExemptionDto exemptionDto = testUtilities.createExemptionDto();
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("complytId", exemptionDto.complytId().toString());
 
         // When
@@ -108,7 +108,7 @@ class ValidatorConfigTest {
         Mono<ExemptionDto> exemptionDtoMono = exemptionDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(exemptionDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
+        StepVerifier.create(exemptionDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
     }
 
     @Test
@@ -116,7 +116,7 @@ class ValidatorConfigTest {
         // Given
         ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler = validatorConfig.salesTaxTrackingDtoValidationHandler(springValidatorAdapter);
         SalesTaxTrackingDto salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto();
-        Map<String,String> pathVariables = new HashMap<>();
+        Map<String, String> pathVariables = new HashMap<>();
         pathVariables.put("state", salesTaxTrackingDto.state().name());
 
         // When
@@ -127,6 +127,6 @@ class ValidatorConfigTest {
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = salesTaxTrackingDtoValidationHandler.validate(serverRequest);
 
         // Then
-        StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage(DataConflictErrorMessages.generic_message);
+        StepVerifier.create(salesTaxTrackingDtoMono).expectErrorMessage(GenericErrorMessages.DATA_CONFLICT_ERROR);
     }
 }

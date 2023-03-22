@@ -6,7 +6,7 @@ import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
-import com.complyt.v1.config.error_messages.DataConflictErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
@@ -34,7 +34,8 @@ import testUtils.TestUtilities;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -174,9 +175,9 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .withState(new StateDto("Ma", "09", ""))
                 .withCertificate(new CertificateDto("id", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error,
-                "Certificate.url" + DtoErrorMessages.not_null_error,
-                "status" + DtoErrorMessages.not_null_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR,
+                "Certificate.url" + DtoErrorMessages.NOT_NULL_ERROR,
+                "status" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -310,9 +311,9 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .withCertificate(new CertificateDto("id", null, "name"));
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error,
-                "Certificate.url" + DtoErrorMessages.not_null_error,
-                "status" + DtoErrorMessages.not_null_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR,
+                "Certificate.url" + DtoErrorMessages.NOT_NULL_ERROR,
+                "status" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -349,7 +350,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -372,7 +373,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -422,7 +423,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -919,7 +920,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("", "desc"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.code" + StringErrorMessages.minmax_256_error));
+                "Classification.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -944,7 +945,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", ""));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.description" + StringErrorMessages.minmax_256_error));
+                "Classification.description" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -969,7 +970,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto(null, "desc"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.code" + DtoErrorMessages.not_null_error));
+                "Classification.code" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -994,7 +995,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.description" + DtoErrorMessages.not_null_error));
+                "Classification.description" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1018,7 +1019,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "desc"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.code" + StringErrorMessages.minmax_256_error));
+                "Classification.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1042,7 +1043,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withClassification(new ClassificationDto("code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Classification.description" + StringErrorMessages.minmax_256_error));
+                "Classification.description" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1066,7 +1067,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(null);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "status" + DtoErrorMessages.not_null_error));
+                "status" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1090,7 +1091,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto(null, "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.code" + DtoErrorMessages.not_null_error));
+                "Status.code" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1114,7 +1115,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.name" + DtoErrorMessages.not_null_error));
+                "Status.name" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1138,7 +1139,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.code" + StringErrorMessages.minmax_256_error));
+                "Status.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1162,7 +1163,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", ""));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.name" + StringErrorMessages.minmax_256_error));
+                "Status.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1186,7 +1187,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.name" + StringErrorMessages.minmax_256_error));
+                "Status.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1210,7 +1211,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withStatus(new StatusDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Status.code" + StringErrorMessages.minmax_256_error));
+                "Status.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1234,7 +1235,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(null);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "certificate" + DtoErrorMessages.not_null_error));
+                "certificate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1259,7 +1260,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto(null, "url", "name"));
 
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.id" + DtoErrorMessages.not_null_error));
+                "Certificate.id" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1283,7 +1284,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.url" + DtoErrorMessages.not_null_error));
+                "Certificate.url" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1307,7 +1308,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.name" + DtoErrorMessages.not_null_error));
+                "Certificate.name" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1331,7 +1332,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("", "url", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.id" + StringErrorMessages.minmax_256_error));
+                "Certificate.id" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1355,7 +1356,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.url" + StringErrorMessages.minmax_256_error));
+                "Certificate.url" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1379,7 +1380,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", ""));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.name" + StringErrorMessages.minmax_256_error));
+                "Certificate.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1403,7 +1404,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "url", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.id" + StringErrorMessages.minmax_256_error));
+                "Certificate.id" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1427,7 +1428,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.url" + StringErrorMessages.minmax_256_error));
+                "Certificate.url" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1451,7 +1452,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withCertificate(new CertificateDto("id", "url", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Certificate.name" + StringErrorMessages.minmax_256_error));
+                "Certificate.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -1474,7 +1475,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "exemptionType" + DtoErrorMessages.not_null_error));
+                "exemptionType" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1497,7 +1498,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "validationDates" + DtoErrorMessages.not_null_error));
+                "validationDates" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1537,7 +1538,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1547,8 +1548,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.not_null_error,
-                "Timestamps.createdDate" + DtoErrorMessages.not_null_error));
+                "Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR,
+                "Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1601,8 +1602,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.not_null_error,
-                "Timestamps.updatedDate" + DtoErrorMessages.not_null_error));
+                "Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR,
+                "Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1656,7 +1657,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1711,7 +1712,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1766,7 +1767,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1811,7 +1812,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1821,7 +1822,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1866,7 +1867,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1944,7 +1945,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -1989,7 +1990,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1999,7 +2000,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2044,7 +2045,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -2262,7 +2263,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2307,7 +2308,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -2317,7 +2318,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.date_format_error));
+                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2362,7 +2363,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -2412,7 +2413,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "state" + DtoErrorMessages.not_null_error));
+                "state" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2436,7 +2437,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + StringErrorMessages.minmax_256_error));
+                "State.abbreviation" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2460,7 +2461,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + StringErrorMessages.minmax_256_error));
+                "State.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2484,7 +2485,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", ""));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2508,7 +2509,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + StringErrorMessages.minmax_256_error));
+                "State.abbreviation" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2532,7 +2533,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + StringErrorMessages.minmax_256_error));
+                "State.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2556,7 +2557,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", "baabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaab1"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -2580,7 +2581,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto(null, "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + DtoErrorMessages.not_null_error));
+                "State.abbreviation" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2604,7 +2605,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + DtoErrorMessages.not_null_error));
+                "State.code" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2628,7 +2629,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         UUID complytId = exemptionDto.complytId();
         ExemptionDto givenExemptionDto = exemptionDto.withState(new StateDto("CA", "code", null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + DtoErrorMessages.not_null_error));
+                "State.name" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2651,7 +2652,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.fromDate" + DtoErrorMessages.not_null_error));
+                "ValidationDates.fromDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2700,7 +2701,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.toDate" + DtoErrorMessages.not_null_error));
+                "ValidationDates.toDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2749,7 +2750,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.toDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.toDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2799,7 +2800,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.fromDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.fromDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2849,7 +2850,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
 // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.fromDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.fromDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2894,7 +2895,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -2904,7 +2905,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.toDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.toDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2949,7 +2950,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -3028,7 +3029,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.fromDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.fromDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -3068,7 +3069,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -3078,7 +3079,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.toDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.toDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -3118,7 +3119,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -3330,7 +3331,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.fromDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.fromDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -3375,7 +3376,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -3385,7 +3386,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = exemptionDto.complytId();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ValidationDates.toDate" + DtoErrorMessages.date_format_error));
+                "ValidationDates.toDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -3430,7 +3431,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test

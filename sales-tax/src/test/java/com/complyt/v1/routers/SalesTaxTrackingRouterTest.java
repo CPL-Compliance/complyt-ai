@@ -1,12 +1,12 @@
 package com.complyt.v1.routers;
 
-import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
+import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
-import com.complyt.v1.config.error_messages.DataConflictErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
@@ -34,7 +34,8 @@ import testUtils.TestUtilities;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -232,7 +233,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTracking newSalesTaxTracking = salesTaxTracking.withComplytId(null).withId(null).withTenantId(null);
-        String  state = newSalesTaxTracking.getState().getName();
+        String state = newSalesTaxTracking.getState().getName();
         SalesTaxTracking salesTaxTrackingWithId = newSalesTaxTracking.withId(UUID.randomUUID().toString());
         SalesTaxTrackingDto salesTaxTrackingDtoSent =
                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(newSalesTaxTracking);
@@ -263,11 +264,11 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
-                .withState(new StateDto("CA","","name"))
-                .withEconomicNexusTracker(new EconomicNexusTrackerDto(true,null));
+                .withState(new StateDto("CA", "", "name"))
+                .withEconomicNexusTracker(new EconomicNexusTrackerDto(true, null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + StringErrorMessages.minmax_256_error,
-                "EconomicNexusTracker.establishedDate" + DtoErrorMessages.not_null_error));
+                "State.code" + StringErrorMessages.MINMAX_256_ERROR,
+                "EconomicNexusTracker.establishedDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -280,7 +281,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -289,7 +290,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsertByState_DifferentStateInBody_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
-                .withState(new StateDto("CA","code",salesTaxTrackingDto.state().name() + "boo"));
+                .withState(new StateDto("CA", "code", salesTaxTrackingDto.state().name() + "boo"));
         String stateName = salesTaxTrackingDto.state().name();
         // When + Then
         webTestClient
@@ -303,7 +304,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -333,7 +334,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -360,7 +361,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals(DataConflictErrorMessages.generic_message, map.get("message"));
+                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
                 });
     }
 
@@ -737,7 +738,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "physicalNexusTracker" + DtoErrorMessages.not_null_error));
+                "physicalNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -750,7 +751,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -762,7 +763,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withPhysicalNexusTracker(new PhysicalNexusTrackerDto(false, null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "PhysicalNexusTracker.establishedDate" + DtoErrorMessages.not_null_error));
+                "PhysicalNexusTracker.establishedDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -775,7 +776,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -785,7 +786,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "economicNexusTracker" + DtoErrorMessages.not_null_error));
+                "economicNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -798,7 +799,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -810,7 +811,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withEconomicNexusTracker(new EconomicNexusTrackerDto(false, null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "EconomicNexusTracker.establishedDate" + DtoErrorMessages.not_null_error));
+                "EconomicNexusTracker.establishedDate" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -823,7 +824,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -835,7 +836,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(null);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "state" + DtoErrorMessages.not_null_error));
+                "state" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -848,7 +849,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -860,7 +861,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("", "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + StringErrorMessages.minmax_256_error));
+                "State.abbreviation" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -873,7 +874,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -885,7 +886,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + StringErrorMessages.minmax_256_error));
+                "State.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -898,7 +899,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -910,7 +911,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", ""));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -923,7 +924,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -935,7 +936,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto(testUtilities.stringWithLength(257), "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + StringErrorMessages.minmax_256_error));
+                "State.abbreviation" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -948,7 +949,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -960,7 +961,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", testUtilities.stringWithLength(257), "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + StringErrorMessages.minmax_256_error));
+                "State.code" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -973,7 +974,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -985,7 +986,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", testUtilities.stringWithLength(257)));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + StringErrorMessages.minmax_256_error));
+                "State.name" + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -998,7 +999,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1010,7 +1011,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto(null, "code", "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation" + DtoErrorMessages.not_null_error));
+                "State.abbreviation" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1023,7 +1024,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1035,7 +1036,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", null, "name"));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code" + DtoErrorMessages.not_null_error));
+                "State.code" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1048,7 +1049,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -1060,7 +1061,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", null));
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name" + DtoErrorMessages.not_null_error));
+                "State.name" + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -1073,6 +1074,6 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map,expectedErrors));
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+
 @Mapper
 public interface StringToLocalDateTimeMapper {
     StringToLocalDateTimeMapper INSTANCE = Mappers.getMapper(StringToLocalDateTimeMapper.class);
@@ -22,7 +23,7 @@ public interface StringToLocalDateTimeMapper {
 
     @Named("parseLocalDateTimeToString")
     default String localDateTimeToString(LocalDateTime dateTime) {
-        if ( dateTime == null ) {
+        if (dateTime == null) {
             return null;
         }
 
@@ -31,7 +32,7 @@ public interface StringToLocalDateTimeMapper {
 
     @Named("parseStringToLocalDateTime")
     default LocalDateTime parseStringToLocalDateTime(String dateAsString) throws ParseException {
-        if ( dateAsString == null ) {
+        if (dateAsString == null) {
             return null;
         }
 
@@ -58,6 +59,6 @@ public interface StringToLocalDateTimeMapper {
         } catch (Exception e) {
             log.debug("Date has been received in invalid format : " + dateAsString);
         }
-        throw new ParseException("Failed on parsing string to LocalDateTime " + DtoErrorMessages.date_format_error, 0);
+        throw new ParseException("Failed on parsing string to LocalDateTime " + DtoErrorMessages.DATE_FORMAT_ERROR, 0);
     }
 }

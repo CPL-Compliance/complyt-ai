@@ -33,7 +33,8 @@ class OpenApiConfigTest {
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")
-                                .url("http://springdoc.org")));
+                                .url("http://springdoc.org")))
+                .components(openApiConfig.getCustomSchemas());
 
         // When
         OpenAPI actualOpenAPI = openApiConfig.openAPIConfiguration();

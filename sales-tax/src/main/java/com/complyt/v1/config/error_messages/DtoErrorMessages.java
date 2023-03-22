@@ -1,14 +1,14 @@
 package com.complyt.v1.config.error_messages;
 
+import com.complyt.v1.api_info.FieldsDescriptions;
+
 public interface DtoErrorMessages {
 
-    String not_null_error = " may not be null";
+    String NOT_NULL_ERROR = " may not be null";
 
-    String list_not_empty_error = " list cannot be empty";
+    String LIST_NOT_EMPTY_ERROR = " list cannot be empty";
 
-    String date_format_error = " is in an illegal format - " +
-            "For date/time fields please provide a valid ISO8601 format. " +
-            "Supported formats are 'YYYY-MM-DD'/ 'YYYY-MM-DDTHH:mm:ssZ'/ and 'YYYY-MM-DDTHH:mm:ss±hh:mm' " +
-            "(with a valid time zone offset).";
+    String DATE_FORMAT_ERROR = " is in an illegal format - " +
+            "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
 }
