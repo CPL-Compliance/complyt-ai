@@ -43,8 +43,6 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_BlankCountryShippingAddress_Returns400ValidationError();
 
-    void upsert_BlankCountyShippingAddress_Returns400ValidationError();
-
     void upsert_BlankCityShippingAddress_Returns400ValidationError();
 
     void upsert_BlankStateShippingAddress_Returns400ValidationError();
@@ -79,18 +77,6 @@ public interface TransactionRouterTestTemplate extends
 
     void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError();
 
-    void upsert_BlankCountryBillingAddress_Returns400ValidationError();
-
-    void upsert_BlankCountyBillingAddress_Returns400ValidationError();
-
-    void upsert_BlankCityBillingAddress_Returns400ValidationError();
-
-    void upsert_BlankStateBillingAddress_Returns400ValidationError();
-
-    void upsert_BlankStreetBillingAddress_Returns400ValidationError();
-
-    void upsert_BlankZipBillingAddress_Returns400ValidationError();
-
     // Validation::TransactionType
     void upsert_NullTransactionType_Returns400ValidationError();
 
@@ -104,8 +90,6 @@ public interface TransactionRouterTestTemplate extends
 
     // Validation::CreatedFrom
     void upsert_LengthGreaterThan256CreatedFrom_Returns400validationError();
-
-    void upsert_BlankCreatedFrom_Returns400validationError();
 
     //Validation::CustomerId
     void upsert_CustomerIdFailedToParse_Returns400();

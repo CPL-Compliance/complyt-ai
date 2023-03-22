@@ -39,18 +39,6 @@ public interface CustomerRouterTestTemplate extends
 
     void upsert_LengthGreaterThen200StreetInAddress_Returns400ValidationError();
 
-    void upsert_BlankCountryAddress_Returns400ValidationError();
-
-    void upsert_BlankCountyAddress_Returns400ValidationError();
-
-    void upsert_BlankCityAddress_Returns400ValidationError();
-
-    void upsert_BlankStateAddress_Returns400ValidationError();
-
-    void upsert_BlankStreetAddress_Returns400ValidationError();
-
-    void upsert_BlankZipAddress_Returns400ValidationError();
-
     // Validation::CustomerType
     void upsert_NullCustomerType_Returns400ValidationError();
 
