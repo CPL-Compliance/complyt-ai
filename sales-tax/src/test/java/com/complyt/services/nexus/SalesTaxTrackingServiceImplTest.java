@@ -1,6 +1,6 @@
 package com.complyt.services.nexus;
 
-import com.complyt.business.complyt_id.SalesTaxTrackingComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
@@ -12,7 +12,6 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +24,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,17 +49,16 @@ public class SalesTaxTrackingServiceImplTest {
     ApplicationDateCreator applicationDateCreator;
 
     @Mock
-    SalesTaxTrackingComplytIdHandler complytIdHandler;
+    ComplytIdHandler<SalesTaxTracking> complytIdHandler;
 
     SalesTaxTracking salesTaxTracking;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(new ObjectId().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(new ObjectId().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished() {

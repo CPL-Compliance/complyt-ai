@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -51,12 +52,13 @@ public class NexusService {
     @NonNull
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
-    public Mono<SalesTaxTracking> findTrackingByState(String state) {
-        return salesTaxTrackingService.findByState(state);
+    public Mono<SalesTaxTracking> findTrackingByState(@NonNull String state) {
+        return salesTaxTrackingService.findByState(state)
+                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)));
     }
 
-    public Mono<SalesTaxTracking> findTrackingByState(Transaction transaction) {
-        return salesTaxTrackingService.findByState(transaction.getShippingAddress().getState());
+    public Mono<SalesTaxTracking> findTrackingByState(@NonNull Transaction transaction) {
+        return findTrackingByState(transaction.getShippingAddress().getState());
     }
 
     public Mono<NexusStateRule> findRuleByState(String state) {
@@ -77,7 +79,7 @@ public class NexusService {
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
         String state = transaction.getShippingAddress().getState();
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate().getTimestamp();
+        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
         return clientTrackingService.getNexusInfo()
                 .flatMap(nexusInfo -> findRuleByState(state)

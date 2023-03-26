@@ -66,8 +66,7 @@ public class CustomerHandler {
 
         return ContextLogger.observeCtx(logStr, log::info).then(customerDtoValidationHandler.validate(serverRequest))
                 .flatMap(customerDto -> ContextLogger.observeCtx(customerDto.toString(), log::info).thenReturn(customerDto))
-                .map(customerDto ->
-                        CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto))
+                .map(CustomerMapper.INSTANCE::customerDtoToCustomer)
                 .flatMap(receivedCustomer ->
                         customerfacade.findByExternalIdAndSource(externalId, source)
                                 .flatMap(originalCustomer -> customerfacade.updateIfModified(receivedCustomer, originalCustomer)

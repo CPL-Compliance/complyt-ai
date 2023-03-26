@@ -1,16 +1,10 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.timestamps.ComplytTimestamp;
-import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.*;
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
-import org.bson.types.ObjectId;
 import com.complyt.v1.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,18 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TransactionMapperTest {
 
+    TestUtilities testUtilities;
     private Transaction transaction;
     private Transaction transactionNoTenantNorId;
     private TransactionDto transactionDto;
-    ObjectStub objectStub;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
-        transactionDto = objectStub.createTransactionDto(transaction.getId())
+        transactionDto = testUtilities.createTransactionDto(transaction.getId())
                 .withComplytId(transaction.getComplytId())
                 .withCustomer(CustomerMapper.INSTANCE.customerToCustomerDto(transaction.getCustomer()));
     }

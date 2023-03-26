@@ -3,14 +3,13 @@ package com.complyt.business.sales_tax.sales_tax_amount;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,17 +27,16 @@ public class SalesTaxAggregatorTest {
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     Transaction transaction;
 
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        jurisdictionalSalesTaxRules = objectStub.createJurisdictionalSalesTaxRules();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxAggregator = new SalesTaxAggregator();
-        transaction = objectStub.createTransaction(null)
-                .withItems(objectStub.createItemsWithSalesTaxRate(true, true))
-                .withShippingFee(objectStub.createShippingFeeWithSalesTaxRates(true, true));
+        transaction = testUtilities.createTransaction(null)
+                .withItems(testUtilities.createItemsWithSalesTaxRate(true, true))
+                .withShippingFee(testUtilities.createShippingFeeWithSalesTaxRates(true, true));
     }
 
     @Test
@@ -47,7 +45,7 @@ public class SalesTaxAggregatorTest {
         float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRate().getTaxRate() * item.getTotalPrice()).reduce(Float::sum).get();
         float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRate().getTaxRate() * transaction.getShippingFee().getTotalPrice();
         float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
-        List<Taxable> taxAbles = objectStub.createTaxables(transaction);
+        List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 
         // When
         float actualAmount = salesTaxAggregator.aggregate(taxAbles);

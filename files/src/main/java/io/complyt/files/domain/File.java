@@ -1,5 +1,6 @@
 package io.complyt.files.domain;
 
+import io.complyt.files.domain.properties.ComplytIdProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -12,8 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@With
 @Document(collection = "file")
-public class File {
+public class File implements ComplytIdProperty {
 
     @NonNull
     UUID complytId;

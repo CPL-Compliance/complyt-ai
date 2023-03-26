@@ -7,9 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 
 @Schema(name = "JurisdictionalSalesTaxRules")
-public record JurisdictionalSalesTaxRulesDto(String name, String abbreviation, boolean taxable,
-                                             boolean specialTreatment, CalculationType calculationType,
-                                             String description, float calculationValue,
-                                             Map<String, CitySalesTaxRules> cities) {
+public record JurisdictionalSalesTaxRulesDto(
+        String name,
+        String abbreviation,
+        boolean taxable,
+        boolean specialTreatment, CalculationType calculationType,
+        String description,
+        float calculationValue,
+        Map<String, CitySalesTaxRules> cities) {
 
 }

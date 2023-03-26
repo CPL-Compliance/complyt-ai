@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class AddressDtoTest {
+class OptionalAddressDtoTest {
 
     private final String city = "City";
     private final String country = "Country";
@@ -13,17 +13,17 @@ class AddressDtoTest {
     private final String state = "State";
     private final String street = "Street";
     private final String zip = "1111";
-    private AddressDto addressDto;
+    private OptionalAddressDto addressDto;
 
     @BeforeEach
     void setup() {
-        addressDto = new AddressDto(city, country, county, state, street, zip);
+        addressDto = new OptionalAddressDto(city, country, county, state, street, zip);
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "AddressDto[city=" + city +
+        String expectedString = "OptionalAddressDto[city=" + city +
                 ", country=" + country +
                 ", county=" + county +
                 ", state=" + state +
@@ -40,10 +40,10 @@ class AddressDtoTest {
     @Test
     void withCity_differentCity_ReturnAddressDto() {
         // given
-        AddressDto expectedAddressDto = new AddressDto("New York", country, county, state, street, zip);
+        OptionalAddressDto expectedAddressDto = new OptionalAddressDto("New York", country, county, state, street, zip);
 
         // When
-        AddressDto actualAddressDto = addressDto.withCity("New York");
+        OptionalAddressDto actualAddressDto = addressDto.withCity("New York");
 
         // Then
         assertEquals(expectedAddressDto, actualAddressDto);

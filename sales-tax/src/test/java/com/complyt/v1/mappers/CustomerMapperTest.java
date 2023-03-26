@@ -1,11 +1,10 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.customer.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,15 +17,14 @@ public class CustomerMapperTest {
     private Customer customer;
     private Customer customerNoTenantNorId;
     private CustomerDto customerDto;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(UUID.randomUUID().toString());
-        customerNoTenantNorId = objectStub.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId()).withId(null);
-        customerDto = objectStub.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
+        customerNoTenantNorId = testUtilities.createCustomer(customer.getId()).withTenantId(null).withComplytId(customer.getComplytId()).withId(null);
+        customerDto = testUtilities.createCustomerDto(customer.getId()).withComplytId(customer.getComplytId());
     }
 
     @Test

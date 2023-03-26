@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.CustomerComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewCustomerInternalTimestampsInjector;
 import com.complyt.domain.customer.Customer;
@@ -26,7 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @NonNull
-    private CustomerComplytIdHandler customerComplytIdHandler;
+    private ComplytIdHandler<Customer> complytIdHandler;
 
     @Override
     public Mono<Customer> save(@NonNull Customer customer) {
@@ -46,18 +46,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Mono<Customer> injectDataToNewCustomer(Customer customer) {
         return Mono.just(customer)
-                .map(customerComplytIdHandler::insertComplytIdToNew)
+                .map(complytIdHandler::insertComplytIdToNew)
                 .map(NewCustomerInternalTimestampsInjector::new)
                 .map(NewCustomerInternalTimestampsInjector::inject);
     }
 
     @Override
     public Mono<Customer> checkCustomerNotHavingComplytId(@NonNull Customer newCustomer) {
-        return customerComplytIdHandler.checkNewDontHaveComplytId(newCustomer);
+        return complytIdHandler.checkNewDontHaveComplytId(newCustomer);
     }
 
     public Mono<Customer> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Customer modifiedCustomer, @NonNull final Customer originalCustomer) {
-        return customerComplytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer);
+        return complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(modifiedCustomer, originalCustomer);
     }
 
     @Override

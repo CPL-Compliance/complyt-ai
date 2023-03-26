@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.TransactionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.timestamps_injection.ExistingTransactionInternalTimestampsInjector;
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
@@ -12,7 +12,6 @@ import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.repositories.TransactionRepository;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,7 +52,7 @@ class TransactionServiceImplTest {
     CountyProvider countyProvider;
 
     @Mock
-    TransactionComplytIdHandler transactionComplytIdHandler;
+    ComplytIdHandler<Transaction> transactionComplytIdHandler;
 
     @Mock
     TransactionAmountsCollector<Transaction> transactionAmountsCollector;
@@ -61,20 +60,19 @@ class TransactionServiceImplTest {
     Transaction transaction;
     Customer customer;
     String source;
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(transaction.getId());
-        source = objectStub.getUnifiedSource();
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(transaction.getId());
+        source = testUtilities.getUnifiedSource();
     }
 
     private Transaction createTransactionWithProductClassificationData() {
-        JurisdictionalSalesTaxRules rules = objectStub.createJurisdictionalSalesTaxRules();
+        JurisdictionalSalesTaxRules rules = testUtilities.createJurisdictionalSalesTaxRules();
 
         Item item = transaction.getItems().get(0).withTaxableCategory(TaxableCategory.TAXABLE).withTangibleCategory(TangibleCategory.TANGIBLE).withJurisdictionalSalesTaxRules(rules);
 
@@ -282,7 +280,7 @@ class TransactionServiceImplTest {
         // Given
         String externalId = UUID.randomUUID().toString();
         UUID customerId = UUID.randomUUID();
-        Customer customer = objectStub.createCustomer(customerId.toString())
+        Customer customer = testUtilities.createCustomer(customerId.toString())
                 .withExternalId(externalId)
                 .withAddress(transaction.getShippingAddress());
 
@@ -355,11 +353,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
@@ -392,11 +390,11 @@ class TransactionServiceImplTest {
 
         // Then
         StepVerifier.create(transactionMono).expectNextMatches(transaction -> {
-            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime expectedCreatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getCreatedDate();
+            LocalDateTime expectedUpdatedDateTime = transactionWithUpdatedDates.getInternalTimestamps().getUpdatedDate();
 
-            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate().getTimestamp();
-            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate().getTimestamp();
+            LocalDateTime actualCreatedDateTime = transaction.getInternalTimestamps().getCreatedDate();
+            LocalDateTime actualUpdatedDateTime = transaction.getInternalTimestamps().getUpdatedDate();
 
             return expectedUpdatedDateTime.getYear() == actualUpdatedDateTime.getYear() &&
                     expectedUpdatedDateTime.getMonthValue() == actualUpdatedDateTime.getMonthValue() &&
@@ -412,7 +410,7 @@ class TransactionServiceImplTest {
     @Test
     void findAllBySource_SourceExists_Returns2Transactions() {
         // Given
-        Transaction secondsTransaction = objectStub.createTransaction(new ObjectId().toString());
+        Transaction secondsTransaction = testUtilities.createTransaction(new ObjectId().toString());
 
         // Then
         when(transactionRepository.findAllBySource(source)).thenReturn(Flux.just(transaction, secondsTransaction));

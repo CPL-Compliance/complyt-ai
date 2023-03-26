@@ -136,20 +136,12 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             "    },\n" +
             "    \"customerType\": \"RETAIL\",\n" +
             "    \"internalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2023-01-10T17:40:44.357\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2023-01-11T17:10:21.275\"\n" +
-            "        }\n" +
+            "        \"createdDate\": \"2023-01-10T17:40:44.357\",\n" +
+            "        \"updatedDate\": \"2023-01-11T17:10:21.275\"\n" +
             "    },\n" +
             "    \"externalTimestamps\": {\n" +
-            "        \"createdDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T07:00:00\"\n" +
-            "        },\n" +
-            "        \"updatedDate\": {\n" +
-            "            \"timestamp\": \"2022-10-19T09:07:54.585\"\n" +
-            "        }\n" +
+            "        \"createdDate\": \"2022-10-19T07:00:00\",\n" +
+            "        \"updatedDate\":\"2022-10-19T09:07:54.585\"\n" +
             "    }\n" +
             "}]";
 }

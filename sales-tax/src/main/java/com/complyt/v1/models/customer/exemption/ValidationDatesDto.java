@@ -1,15 +1,18 @@
 package com.complyt.v1.models.customer.exemption;
 
-import com.complyt.v1.models.timestamps.ComplytTimestampDto;
+import com.complyt.utils.regex.ISO8601Regex;
+import com.complyt.v1.error_messages.DateErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @With
 @Schema(name = "validationDates")
 public record ValidationDatesDto(
-        @Valid @NotNull(message = "From Date timestamps may not be null") ComplytTimestampDto fromDate,
-        @Valid @NotNull(message = "To Date timestamps may not be null") ComplytTimestampDto toDate) {
+        @Valid @NotBlank(message = "fromDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "fromDate" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "fromDate may not be null") String fromDate,
+        @Valid @NotBlank(message = "toDate may not be blank") @Pattern(regexp = ISO8601Regex.expression, message = "toDate" + DateErrorMessages.wrong_format_error_message) @NotNull(message = "toDate may not be null") String toDate) {
 
 }

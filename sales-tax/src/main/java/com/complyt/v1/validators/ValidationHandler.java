@@ -1,5 +1,6 @@
 package com.complyt.v1.validators;
 
+import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -23,7 +25,15 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     U validator;
 
-    public final Mono<T> validate(final ServerRequest request) {
+    @NonNull
+    DataConflictChecksProvider<T> dataConflictChecksProvider;
+
+    private Mono<T> onValidationErrors(Errors errors) {
+        return Mono.error(new ObjectNotValidApiException(errors));
+    }
+
+
+    private Mono<T> validateRequestBody(final ServerRequest request) {
         return request.bodyToMono(validationClass)
                 .flatMap(body -> {
                     Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
@@ -37,7 +47,13 @@ public class ValidationHandler<T, U extends Validator> {
                 });
     }
 
-    private Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
+    public final Mono<T> validate(final ServerRequest serverRequest) {
+        return this.validateRequestBody(serverRequest)
+                .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
+                        .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
+                                .flatMap(check -> check.apply(body, serverRequest)))
+                        .all(valid -> valid)
+                        .flatMap(allValid -> allValid ? Mono.just(body) :
+                                Mono.error(new ConflictedDataApiException())));
     }
 }

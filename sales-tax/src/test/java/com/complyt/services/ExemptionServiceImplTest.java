@@ -1,13 +1,12 @@
 package com.complyt.services;
 
-import com.complyt.business.complyt_id.ExemptionComplytIdHandler;
+import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
 import com.complyt.domain.customer.exemption.Status;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -23,7 +22,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,21 +44,20 @@ public class ExemptionServiceImplTest {
     ExemptionRepository exemptionRepository;
 
     @Mock
-    ExemptionComplytIdHandler exemptionComplytIdHandler;
+    ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     Transaction transaction;
     Exemption exemption;
     Customer customer;
     ObjectId customerId = new ObjectId();
-    ObjectStub objectStub;
+    TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        objectStub = new ObjectStub(
-                new ComplytTimestamp(LocalDateTime.now()), UUID.randomUUID().toString());
-        customer = objectStub.createCustomer(customerId.toString());
-        transaction = objectStub.createTransaction(UUID.randomUUID().toString());
-        exemption = objectStub.createExemption(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(customerId.toString());
+        transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        exemption = testUtilities.createExemption(UUID.randomUUID().toString());
     }
 
     @Test
@@ -161,8 +159,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateExpired_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getToDate().getTimestamp().plusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getToDate().plusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
@@ -178,8 +176,8 @@ public class ExemptionServiceImplTest {
     @Test
     void isFullyExempted_NotExemptedBecauseDateIsYetToCome_ReturnsFalse() {
         // Given
-        ComplytTimestamp createdDate = new ComplytTimestamp(exemption.getValidationDates().getFromDate().getTimestamp().minusYears(1));
-        ComplytTimestamp updatedDate = new ComplytTimestamp(LocalDateTime.now());
+        LocalDateTime createdDate = exemption.getValidationDates().getFromDate().minusYears(1);
+        LocalDateTime updatedDate = LocalDateTime.now();
 
         Transaction transactionWithDateLaterThanExemptionDate = transaction
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));

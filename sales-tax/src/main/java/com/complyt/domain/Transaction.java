@@ -1,6 +1,7 @@
 package com.complyt.domain;
 
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @With
 @AllArgsConstructor
 @Document(collection = "transaction")
-public class Transaction {
+public class Transaction implements ComplytIdProperty {
 
     UUID complytId;
     @Id

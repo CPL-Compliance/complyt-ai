@@ -1,15 +1,10 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
-import com.complyt.v1.models.EconomicNexusTrackerDto;
-import com.complyt.v1.models.PhysicalNexusTrackerDto;
-import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.StateDto;
-import com.complyt.domain.timestamps.ComplytTimestamp;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,15 +18,15 @@ public class SalesTaxTrackingMapperTest {
     private SalesTaxTracking salesTaxTrackingNoTenantNorId;
     private SalesTaxTrackingDto salesTaxTrackingDto;
     private LocalDateTime localDateTime;
-    private ObjectStub objectStub;
+    private TestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         localDateTime = LocalDateTime.now();
-        objectStub = new ObjectStub(new ComplytTimestamp(localDateTime), UUID.randomUUID().toString());
-        salesTaxTracking = objectStub.createSalesTaxTracking(UUID.randomUUID().toString());
+        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
         salesTaxTrackingNoTenantNorId = salesTaxTracking.withTenantId(null).withId(null).withComplytId(salesTaxTracking.getComplytId());
-        salesTaxTrackingDto = objectStub.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId());
+        salesTaxTrackingDto = testUtilities.createSalesTaxTrackingDto().withComplytId(salesTaxTracking.getComplytId());
     }
 
     @Test

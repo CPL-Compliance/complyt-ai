@@ -46,7 +46,8 @@ public class TransactionHandler {
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionFacade.findByExternalIdAndSource(externalId, source))
                 .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
+                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -85,7 +86,8 @@ public class TransactionHandler {
         Mono<TransactionDto> transactionDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionFacade.findByComplytId(complytId))
                 .map(TransactionMapper.INSTANCE::transactionToTransactionDto)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto));
+                .flatMap(transactionDto -> ContextLogger.observeCtx("<-- Returned Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(transactionDtoMono, TransactionDto.class);
     }
@@ -97,7 +99,7 @@ public class TransactionHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         return ContextLogger.observeCtx(logStr, log::info)
-                .then(transactionDtoValidationHandler.validate(serverRequest))
+                .then(transactionDtoValidationHandler.validate(serverRequest)
                 .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info).thenReturn(transactionDto))
                 .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
                 .flatMap(receivedTransaction ->
@@ -107,7 +109,7 @@ public class TransactionHandler {
                                         .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
                                 .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)
                                         .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                        .flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class))));
+                                        .flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))));
     }
 
     @TransactionDeletePermission
