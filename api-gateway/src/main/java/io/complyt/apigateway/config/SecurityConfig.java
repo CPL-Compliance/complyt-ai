@@ -77,6 +77,7 @@ public class SecurityConfig {
                 .pathMatchers("/actuator/health",
                         "/files/v3/api-docs",
                         "/sales-tax/v3/api-docs",
+                        "/sales-tax-rates/v3/api-docs",
                         "/v3/api-docs/**",
                         "/webjars/**",
                         "/swagger-ui*/**"
