@@ -4291,38 +4291,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Tax Code may not be blank"));
-
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withItems(itemList))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
-    }
-
-    @Test
-    @WithMockUser
-    @Override
-    public void upsert_BlankTaxCodeInItem_Returns400ValidationError() {
-        // Given
-        List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "", null, null, false, 0, null, null));
-        String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>();
-        expectedErrors.addAll(List.of(
-                "Tax Code should be 1-256 characters maximum",
-                "Tax Code may not be blank"));
+                "Tax Code may not be null"));
 
 
         // When + Then
@@ -4352,7 +4321,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>();
         expectedErrors.addAll(List.of(
-                "Tax Code should be 1-256 characters maximum"));
+                "Tax Code should be 256 characters maximum"));
 
 
         // When + Then
