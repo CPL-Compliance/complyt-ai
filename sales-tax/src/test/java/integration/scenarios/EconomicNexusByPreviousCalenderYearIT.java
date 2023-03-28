@@ -48,7 +48,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
 
     private LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
 
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "Florida", "2100 NW 42nd Ave", "33142");
+    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142");
     private UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148");
 
     @DynamicPropertySource
