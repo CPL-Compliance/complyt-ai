@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+@With
 @Schema(name = "Item")
 public record ItemDto(@PositiveOrZero(message = "Unit Price can not be a negative number") float unitPrice,
                       @PositiveOrZero(message = "Quantity can not be a negative number") float quantity,

@@ -1,0 +1,19 @@
+spring.application.name: sales-tax
+
+server.port: ${PORT:9898}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+    enabled: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+spring:
+  data:
+    mongodb:
+      uuid-representation: standard
+

@@ -1,15 +1,19 @@
 package integration;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 
+@Slf4j
 public abstract class MongoContainerInitializer {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(MongoContainerInitializer.class);
+    protected static final Logger LOGGER = log;
+
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
 
     protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
@@ -18,9 +22,9 @@ public abstract class MongoContainerInitializer {
 
     static {
         MONGO_CONTAINER.start();
-        MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(LOGGER));
+        MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
         try {
-            LOGGER.info("restoring database: " + MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax.dump").getStdout());
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax.dump");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

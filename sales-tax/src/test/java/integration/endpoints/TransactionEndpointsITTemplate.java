@@ -1,0 +1,20 @@
+package integration.endpoints;
+
+import testUtils.it.templates.*;
+
+public interface TransactionEndpointsITTemplate extends
+        UpsertByExternalIdAndSourceITTemplate,
+        GetByExternalIdAndSourceITTemplate,
+        GetAllITTemplate,
+        GetAllBySourceTTemplate,
+        DeleteByExternalIdAndSourceITTemplate {
+
+    void upsertByExternalIdAndSource_DoesntExistsAndCustomerDoesntExists_Returns404();
+
+    void upsertByExternalIdAndSource_ExistsAndCustomerDoesntExists_Returns404();
+
+    void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500();
+
+    void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500();
+
+}

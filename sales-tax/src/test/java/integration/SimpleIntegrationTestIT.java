@@ -4,6 +4,7 @@ import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.routers.TransactionRouter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -22,10 +24,10 @@ import reactor.core.publisher.Mono;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
+@Slf4j
 public class SimpleIntegrationTestIT extends MongoContainerInitializer {
 
     @MockBean
@@ -40,7 +42,7 @@ public class SimpleIntegrationTestIT extends MongoContainerInitializer {
 
     @Test
     void isContainerUpIT() {
-        LOGGER.info("containerName: " + MONGO_CONTAINER.getContainerName());
+        log.info("containerName: " + MONGO_CONTAINER.getContainerName());
         assertEquals(MONGO_IMAGE, MONGO_CONTAINER.getDockerImageName());
     }
 
@@ -59,6 +61,6 @@ public class SimpleIntegrationTestIT extends MongoContainerInitializer {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TransactionDto.class)
-                .value(transactionDtos -> LOGGER.info(transactionDtos.size() + " transactions: " + transactionDtos));
+                .value(transactionDtos -> log.info(transactionDtos.size() + " transactions: " + transactionDtos));
     }
 }

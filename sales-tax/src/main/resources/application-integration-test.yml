@@ -1,0 +1,13 @@
+spring.cloud.vault.enabled: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+
+
