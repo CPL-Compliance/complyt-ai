@@ -106,9 +106,9 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "name" + StringErrorMessages.MINMAX_256_ERROR,
-                "source" + StringErrorMessages.SINGLE_DIGIT_ERROR,
-                "customerType" + DtoErrorMessages.NOT_NULL_ERROR));
+                "name " + StringErrorMessages.MINMAX_256_ERROR,
+                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
+                "customerType " + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -246,7 +246,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         String invalidSource = "";
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "source" + StringErrorMessages.SINGLE_DIGIT_ERROR));
+                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
 
         // When + Then
         webTestClient
@@ -270,7 +270,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "y";
-        Set<String> expectedErrors = new HashSet<>(List.of("source" + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
 
         // When + Then
         webTestClient
@@ -294,7 +294,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String invalidSource = "10";
-        Set<String> expectedErrors = new HashSet<>(List.of("source" + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
 
         // When + Then
         webTestClient
@@ -319,7 +319,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String nullExternalId = "";
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "externalId" + StringErrorMessages.MINMAX_256_ERROR));
+                "externalId " + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -343,7 +343,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String externalIdWithLengthOf257 = testUtilities.stringWithLength(257);
         String source = customerDto.source();
-        Set<String> expectedErrors = new HashSet<>(List.of("externalId" + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("externalId " + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -500,7 +500,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         String invalidName = "";
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "name" + StringErrorMessages.MINMAX_256_ERROR));
+                "name " + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -524,7 +524,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         String nameWithLengthOf257 = testUtilities.stringWithLength(257);
-        Set<String> expectedErrors = new HashSet<>(List.of("name" + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("name " + StringErrorMessages.MINMAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -548,7 +548,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip");
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.county" + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MINMAX_100_ERROR));
 
         // When + Then
         webTestClient
@@ -572,7 +572,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21));
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip" + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
 
         // When + Then
         webTestClient
@@ -596,7 +596,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip");
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.country" + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MINMAX_50_ERROR));
 
         // When + Then
         webTestClient
@@ -620,7 +620,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip");
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.city" + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MINMAX_100_ERROR));
 
         // When + Then
         webTestClient
@@ -644,7 +644,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip");
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.state" + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MINMAX_100_ERROR));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -1315,7 +1315,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "externalTimestamps" + DtoErrorMessages.NOT_NULL_ERROR));
+                "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR));
 
 
         // When + Then
@@ -1379,7 +1379,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertTrue(message.contains("Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR));
+                    assertTrue(message.contains("Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR));
                 });
     }
 
@@ -1418,8 +1418,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertTrue(message.contains("Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR));
-                    assertTrue(message.contains("Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR));
+                    assertTrue(message.contains("Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+                    assertTrue(message.contains("Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR));
                 });
     }
 
@@ -1460,7 +1460,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
+                    assertEquals("[Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
                 });
     }
 
@@ -1501,7 +1501,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> {
                     String message = (String) map.get("message");
-                    assertEquals("[Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
+                    assertEquals("[Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
                 });
     }
 
@@ -1513,7 +1513,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -1554,7 +1554,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -1669,7 +1669,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -1710,7 +1710,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -1973,7 +1973,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2014,7 +2014,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2092,8 +2092,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR,
+                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR));
 
         // When + Then
         webTestClient
@@ -2135,8 +2135,8 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR,
+                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2211,7 +2211,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .value(map -> {
                     String message = (String) map.get("message");
 
-                    assertEquals("[Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
+                    assertEquals("[Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR + "]", message);
                 });
     }
 
@@ -2224,7 +2224,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String source = customerDto.source();
         String invalidTimestamp = "not a timestamp";
         Set<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
         // When + Then
         webTestClient
@@ -2267,7 +2267,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2312,7 +2312,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2431,7 +2431,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2476,7 +2476,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2743,7 +2743,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then
@@ -2788,7 +2788,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR));
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
 
 
         // When + Then

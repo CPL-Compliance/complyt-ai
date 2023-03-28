@@ -11,7 +11,7 @@ import lombok.With;
 
 @With
 public record TimestampsDto(
-        @Schema(ref = "timestamp") @Valid @Pattern(regexp = ISO8601Regex.expression, message = "Timestamps.createdDate" + DtoErrorMessages.DATE_FORMAT_ERROR) @NotNull(message = "Timestamps.createdDate" + DtoErrorMessages.NOT_NULL_ERROR) String createdDate,
-        @Schema(ref = "timestamp") @Valid @Pattern(regexp = ISO8601Regex.expression, message = "Timestamps.updatedDate" + DtoErrorMessages.DATE_FORMAT_ERROR) @NotNull(message = "Timestamps.updatedDate" + DtoErrorMessages.NOT_NULL_ERROR) String updatedDate) {
+        @Schema(ref = "timestamp") @Valid @Pattern(regexp = ISO8601Regex.expression, message = "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR) @NotNull(message = "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR) String createdDate,
+        @Schema(ref = "timestamp") @Valid @Pattern(regexp = ISO8601Regex.expression, message = "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR) @NotNull(message = "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR) String updatedDate) {
 
 }

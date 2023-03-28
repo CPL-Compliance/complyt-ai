@@ -15,10 +15,10 @@ import java.util.UUID;
 @Schema(name = "SalesTaxTracking", description = FieldsDescriptions.SALES_TAX_TRACKING)
 public record SalesTaxTrackingDto(
         @Schema(description = FieldsDescriptions.COMPLYT_ID + "salesTaxTracking") UUID complytId,
-        @Valid @NotNull(message = "state" + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+        @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
         boolean enforcesSalesTax,
-        @Valid @NotNull(message = "physicalNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
-        @Valid @NotNull(message = "economicNexusTracker" + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
+        @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
+        @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
         LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
         implements StateCheckable {
 }

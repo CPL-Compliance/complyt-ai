@@ -8,11 +8,11 @@ import lombok.With;
 @With
 @Schema(name = "Address")
 public record OptionalAddressDto(
-        @Size(max = 100, message = "Address.city" + StringErrorMessages.MINMAX_100_ERROR) String city,
-        @Size(max = 50, message = "Address.country" + StringErrorMessages.MINMAX_50_ERROR) String country,
-        @Size(max = 100, message = "Address.county" + StringErrorMessages.MINMAX_100_ERROR) String county,
-        @Size(max = 100, message = "Address.state" + StringErrorMessages.MINMAX_100_ERROR) String state,
+        @Size(max = 100, message = "Address.city " + StringErrorMessages.MINMAX_100_ERROR) String city,
+        @Size(max = 50, message = "Address.country " + StringErrorMessages.MINMAX_50_ERROR) String country,
+        @Size(max = 100, message = "Address.county " + StringErrorMessages.MINMAX_100_ERROR) String county,
+        @Size(max = 100, message = "Address.state " + StringErrorMessages.MINMAX_100_ERROR) String state,
         @Size(max = 200, message = "Address.street" + StringErrorMessages.MINMAX_200_ERROR) String street,
-        @Size(max = 20, message = "Address.zip" + StringErrorMessages.MINMAX_20_ERROR) String zip) {
+        @Size(max = 20, message = "Address.zip " + StringErrorMessages.MINMAX_20_ERROR) String zip) {
 
 }

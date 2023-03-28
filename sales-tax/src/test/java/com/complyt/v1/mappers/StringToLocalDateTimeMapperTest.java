@@ -18,7 +18,7 @@ public class StringToLocalDateTimeMapperTest {
     void setUp() {
         dateString = "2023-03-17T00:00";
         dateLocalDateTime = LocalDateTime.parse(dateString);
-        exceptionMessage = "Failed on parsing string to LocalDateTime " + DtoErrorMessages.DATE_FORMAT_ERROR;
+        exceptionMessage = "Failed on parsing string to LocalDateTime  " + DtoErrorMessages.DATE_FORMAT_ERROR;
     }
 
     @Test

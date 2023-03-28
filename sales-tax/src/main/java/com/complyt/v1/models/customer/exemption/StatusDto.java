@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 @Schema(name = "Status")
 public record StatusDto(
-        @NotNull(message = "Status.code" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Status.code" + StringErrorMessages.MINMAX_256_ERROR) String code,
-        @NotNull(message = "Status.name" + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Status.name" + StringErrorMessages.MINMAX_256_ERROR) String name) {
+        @NotNull(message = "Status.code " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Status.code " + StringErrorMessages.MINMAX_256_ERROR) String code,
+        @NotNull(message = "Status.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "Status.name " + StringErrorMessages.MINMAX_256_ERROR) String name) {
 
 }

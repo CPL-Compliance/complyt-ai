@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 @With
 @Schema(name = "PhysicalNexusTracker")
 public record PhysicalNexusTrackerDto(boolean established,
-                                      @NotNull(message = "PhysicalNexusTracker.establishedDate" + DtoErrorMessages.NOT_NULL_ERROR) LocalDateTime establishedDate) {
+                                      @NotNull(message = "PhysicalNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR) LocalDateTime establishedDate) {
 
 }

@@ -15,12 +15,12 @@ import java.util.UUID;
 @With
 @Schema(name = "Exemption", description = FieldsDescriptions.EXEMPTION)
 public record ExemptionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "exemption") UUID complytId,
-                           @Schema(description = FieldsDescriptions.CUSTOMER_ID + "exemption") @NotNull(message = "customerId" + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
-                           @Valid @NotNull(message = "state" + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
-                           @Valid @NotNull(message = "classification" + DtoErrorMessages.NOT_NULL_ERROR) ClassificationDto classification,
-                           @Valid @NotNull(message = "validationDates" + DtoErrorMessages.NOT_NULL_ERROR) ValidationDatesDto validationDates,
+                           @Schema(description = FieldsDescriptions.CUSTOMER_ID + "exemption") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
+                           @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+                           @Valid @NotNull(message = "classification " + DtoErrorMessages.NOT_NULL_ERROR) ClassificationDto classification,
+                           @Valid @NotNull(message = "validationDates " + DtoErrorMessages.NOT_NULL_ERROR) ValidationDatesDto validationDates,
                            @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
-                           @Valid @NotNull(message = "status" + DtoErrorMessages.NOT_NULL_ERROR) StatusDto status,
-                           @Valid @NotNull(message = "certificate" + DtoErrorMessages.NOT_NULL_ERROR) CertificateDto certificate,
-                           @NotNull(message = "exemptionType" + DtoErrorMessages.NOT_NULL_ERROR) ExemptionTypeDto exemptionType) implements ComplytIdCheckable {
+                           @Valid @NotNull(message = "status " + DtoErrorMessages.NOT_NULL_ERROR) StatusDto status,
+                           @Valid @NotNull(message = "certificate " + DtoErrorMessages.NOT_NULL_ERROR) CertificateDto certificate,
+                           @NotNull(message = "exemptionType " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionTypeDto exemptionType) implements ComplytIdCheckable {
 }
