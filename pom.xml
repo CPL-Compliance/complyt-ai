@@ -25,6 +25,12 @@
         <module>files</module>
         <module>sales-tax-rates</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+    </dependencies>
 
     <name>Complyt</name>
     <description>This is a product made by Complyt</description>

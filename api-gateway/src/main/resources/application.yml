@@ -234,3 +234,14 @@ spring:
             - SetPath=/v1/files
         # ---- Files ----
         # ==== Files Service ====
+        # ==== Sales Tax Rates Service ====
+        # ---- SalesTaxRates ----
+        - id: files-get-link
+          uri: lb://sales-tax-rates
+          predicates:
+            - Method=GET
+            - Path=/v1/sales_tax_rates
+          filters:
+            - SetPath=/v1/sales_tax_rates
+        # ---- SalesTaxRates ----
+        # ==== Sales Tax Rates Service ====
