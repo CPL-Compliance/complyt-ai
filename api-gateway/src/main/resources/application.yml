@@ -236,7 +236,7 @@ spring:
         # ==== Files Service ====
         # ==== Sales Tax Rates Service ====
         # ---- SalesTaxRates ----
-        - id: files-get-link
+        - id: sales-tax-rates-get-sales-tax-rates
           uri: lb://sales-tax-rates
           predicates:
             - Method=GET
