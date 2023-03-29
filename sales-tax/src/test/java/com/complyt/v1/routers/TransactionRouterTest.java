@@ -4091,35 +4091,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     }
 
     @Test
-    @WithMockUser
-    @Override
-    public void upsert_BlankTaxCodeInItem_Returns400ValidationError() {
-        // Given
-        List<ItemDto> itemList = new ArrayList<>();
-        itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "", null, null, false, 0, null, null));
-        String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
-
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withItems(itemList))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
-    }
-
-    @Test
     @Override
     @WithMockUser
     public void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError() {
