@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.*;
 
 @Configuration
-public class    ExemptionRouter {
+public class ExemptionRouter {
 
     public static final String BASE_URL = "/v1/exemptions";
 

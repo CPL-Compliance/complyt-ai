@@ -1,16 +1,19 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.api_info.FieldsDescriptions;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.NumericErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-@Schema(name = "ShippingFee")
+@Schema(name = "ShippingFee", description = FieldsDescriptions.SHIPPING_FEE)
 public record ShippingFeeDto(boolean manualSalesTax,
-                             @PositiveOrZero(message = "Manual Sales Tax Rate can not be a negative number") float manualSalesTaxRate,
-                             @PositiveOrZero(message = "Total Price can not be a negative number") float totalPrice,
+                             @PositiveOrZero(message = "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) float manualSalesTaxRate,
+                             @PositiveOrZero(message = "ShippingFee.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) float totalPrice,
                              JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules, SalesTaxRateDto salesTaxRate,
-                             @NotBlank(message = "Tax Code may not be blank") @Size(min = 1, max = 256, message = "Tax Code should be 1-256 characters maximum") String taxCode,
+                             @NotNull(message = "ShippingFee.taxCode " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "ShippingFee.taxCode " + StringErrorMessages.MINMAX_256_ERROR) String taxCode,
                              TaxableCategoryDto taxableCategory, TangibleCategoryDto tangibleCategory) {
 }

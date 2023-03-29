@@ -1,5 +1,6 @@
 package com.complyt.v1.exceptions;
 
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.exceptions.types.ComplytApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -24,8 +25,6 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
     @NonNull
     private final HttpStatus defaultStatus;
 
-    private static final String GENERIC_ERROR_MESSAGE = "The request failed due to an internal error. Please contact support@complyt.io if this continues";
-
     @Override
     public Map<String, Object> getErrorAttributes(ServerRequest request, ErrorAttributeOptions options) {
         Throwable error = getError(request);
@@ -45,7 +44,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
 
     private String extractMessage(HttpStatus httpStatus, Throwable error) {
         if (httpStatus == HttpStatus.INTERNAL_SERVER_ERROR) {
-            return GENERIC_ERROR_MESSAGE;
+            return GenericErrorMessages.INTERNAL_SERVER_ERROR;
         } else if (error instanceof ServerWebInputException serverWebInputException) {
             return serverWebInputException.getReason();
         } else {

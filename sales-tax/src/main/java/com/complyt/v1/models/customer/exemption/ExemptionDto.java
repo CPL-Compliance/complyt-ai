@@ -1,5 +1,7 @@
 package com.complyt.v1.models.customer.exemption;
 
+import com.complyt.v1.api_info.FieldsDescriptions;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.timestamps.TimestampsDto;
@@ -11,13 +13,14 @@ import lombok.With;
 import java.util.UUID;
 
 @With
-@Schema(name = "Exemption")
-public record ExemptionDto(UUID complytId, @NotNull(message = "Customer Id may not be null") UUID customerId,
-                           @Valid @NotNull(message = "State may not be null") StateDto state,
-                           @Valid @NotNull(message = "Classification may not be null") ClassificationDto classification,
-                           @Valid @NotNull(message = "Validation Dates may not be null") ValidationDatesDto validationDates,
-                           @Valid TimestampsDto internalTimestamps,
-                           @Valid @NotNull(message = "Status may not be null") StatusDto status,
-                           @Valid @NotNull(message = "Certificate may not be null") CertificateDto certificate,
-                           @NotNull(message = "Exemption Type may not be null") ExemptionTypeDto exemptionType) implements ComplytIdCheckable {
+@Schema(name = "Exemption", description = FieldsDescriptions.EXEMPTION)
+public record ExemptionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "exemption") UUID complytId,
+                           @Schema(description = FieldsDescriptions.CUSTOMER_ID + "exemption") @NotNull(message = "customerId " + DtoErrorMessages.NOT_NULL_ERROR) UUID customerId,
+                           @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
+                           @Valid @NotNull(message = "classification " + DtoErrorMessages.NOT_NULL_ERROR) ClassificationDto classification,
+                           @Valid @NotNull(message = "validationDates " + DtoErrorMessages.NOT_NULL_ERROR) ValidationDatesDto validationDates,
+                           @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
+                           @Valid @NotNull(message = "status " + DtoErrorMessages.NOT_NULL_ERROR) StatusDto status,
+                           @Valid @NotNull(message = "certificate " + DtoErrorMessages.NOT_NULL_ERROR) CertificateDto certificate,
+                           @NotNull(message = "exemptionType " + DtoErrorMessages.NOT_NULL_ERROR) ExemptionTypeDto exemptionType) implements ComplytIdCheckable {
 }

@@ -18,8 +18,8 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
      * - calculated by fixed value to override the original sales tax rate
      * - calculated by certain percentage of the original sales tax rate
      *
-     * @param jurisdictionalSalesTaxRules   - Rules to declare how sales tax rate should be calculated
-     * @param originalSalesTaxRate - Sales tax rate given by external resource regarding the current transaction's address
+     * @param jurisdictionalSalesTaxRules - Rules to declare how sales tax rate should be calculated
+     * @param originalSalesTaxRate        - Sales tax rate given by external resource regarding the current transaction's address
      * @return
      */
     public SalesTaxRate calculate(@NonNull JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules, @NonNull SalesTaxRate originalSalesTaxRate) {

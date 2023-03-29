@@ -100,7 +100,7 @@ import java.lang.annotation.Target;
 
 public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
     String sourceExample = "1";
-    String externalIdExample = "999444";
+    String externalIdExample = "465813";
     String newTransactionExample = """
             {
                "externalId": "465813",
@@ -133,7 +133,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                    "street": "3098 N Remington Ave",
                    "zip": "93711-5508"
                },
-               "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
+               "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                "externalTimestamps": {
                    "createdDate":  "2023-02-05T12:24:43.193Z",
                    "updatedDate":  "2023-02-05T12:24:43.193Z"
