@@ -35,4 +35,34 @@ public interface ITUtilities {
                 "FL", "Florida", "0.06",
                 "0.070", "SERVICES", "33142")));
     }
+
+    static FastTaxData stubFastTaxNewYork() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "New York", "0", "0.045",
+                "New York", "0.00375", "0",
+                List.of(new InformationComponent("CountyFIPS", "061")),
+                "", "", "0",
+                "NY", "Florida", "0.04",
+                "0.08875", "SERVICES", "10001")));
+    }
+
+    static FastTaxData stubFastTaxMinnesota() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Minneapolis", "0", "0.0500",
+                "Hennepin", "0", "0.00150",
+                List.of(new InformationComponent("CountyFIPS", "053")),
+                "", "", "0.00500",
+                "MN", "Minnesota", "0.06875",
+                "0.08025", "SERVICES", "55410")));
+    }
+
+    static FastTaxData stubFastTaxConnecticut() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "West Haven", "0", "0",
+                "New Haven", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "009")),
+                "", "", "0",
+                "CT", "Connecticut", "0.06350",
+                "0.06350", "SERVICES", "06516")));
+    }
 }

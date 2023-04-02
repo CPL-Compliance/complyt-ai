@@ -3,6 +3,7 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.models.EconomicNexusTrackerDto;
 import com.complyt.v1.models.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.TransactionDto;
@@ -24,7 +25,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.it.ITUtilities;
-import testUtils.it.templates.economic_nexus.EconomicNexusBySpecificCustomersITTemplate;
+import testUtils.it.templates.economic_nexus.EconomicNexusByAmountOrCountITTemplate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -38,14 +39,15 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient
-public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitializer implements EconomicNexusBySpecificCustomersITTemplate {
+public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitializer implements EconomicNexusByAmountOrCountITTemplate {
 
     /*
-     * State Rule: Florida
-     * TimeFrame: Previous Calendar Year
-     * Threshold: Amount: 0.1M
-     * Customers: Only Retail
+     * State Rule: Minnesota
+     * TimeFrame: Previous Twelve Months
+     * Threshold: Amount: 0.1M OR Count: 20 (Changed from 200)
+     * Items: Only RETAIL OR MARKETPLACE
      */
+
 
     @MockBean
     private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
@@ -54,11 +56,13 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
     @Autowired
     private WebTestClient webTestClient;
 
+
     private LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
 
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142");
+    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "MN", "4401 York Ave S", "55410");
 
-    private UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148");
+    private UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e");
+
     private UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3");
 
     @DynamicPropertySource
@@ -69,17 +73,16 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxFlorida()));
+        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxMinnesota()));
     }
-
 
     @Order(1)
     @Test
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndDoesntPassedEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10028", customerId,
-                        ITUtilities.stubItemDto().withUnitPrice(1).withQuantity(10).withTotalPrice(10))
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10048", customerId,
+                        ITUtilities.stubItemDto().withQuantity(1).withUnitPrice(10).withTotalPrice(10))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -87,31 +90,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10028")
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
-    }
-
-    @Order(1)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertTransaction_NewAndCustomerNotIncludedInNexusCalculation_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10029", customerIdOfReseller,
-                        ITUtilities.stubItemDto().withUnitPrice(10000).withQuantity(12).withTotalPrice(120000))
-                .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
-
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10029")
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10048")
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -129,7 +108,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/FL")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -146,8 +125,8 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndPassedEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10021", customerId,
-                        ITUtilities.stubItemDto().withUnitPrice(10000).withQuantity(12).withTotalPrice(120000))
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10041", customerId,
+                        ITUtilities.stubItemDto().withQuantity(6).withUnitPrice(10000).withTotalPrice(60000))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -155,7 +134,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10021")
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10041")
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -173,7 +152,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Florida")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -182,13 +161,13 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
-                    assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse("2022-01-01T00:00"));
+                    assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
 
                     webTestClient
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/FL")
+                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)
@@ -204,22 +183,22 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewInRangeOfEconomicNexus_Returns201WithSalesTax() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10022", customerId)
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10042", customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(5).toString(), LocalDateTime.now().toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
 
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10022")
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10042")
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 700));
+                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 802.5));
     }
 
     @Order(5)
@@ -227,14 +206,15 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewOutOfRangeOfEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10023", customerId)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10043", customerId)
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.minusMonths(1).toString(), LocalDateTime.now().toString()));
 
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10023")
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10043")
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -244,4 +224,83 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
                 .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
     }
 
+    @Order(6)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertSalesTaxTracking_ResetNexusToNotEstablished_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(receivedSalesTaxTracking ->
+                        webTestClient
+                                .mutateWith(csrf())
+                                .put()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                                        .build())
+                                .bodyValue(receivedSalesTaxTracking.withApproved(false).withEconomicNexusTracker(new EconomicNexusTrackerDto(false, LocalDateTime.now())))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody(SalesTaxTrackingDto.class)
+                                .value(updatedSalesTaxTracking -> {
+                                    assertFalse(updatedSalesTaxTracking.approved());
+                                    assertFalse(updatedSalesTaxTracking.economicNexusTracker().established());
+                                }));
+    }
+
+    @Order(7)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_NewAndPassedNexusByCount_Returns201() {
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10045", customerId,
+                        ITUtilities.stubItemDto().withQuantity(2).withUnitPrice(100).withTotalPrice(200))
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
+
+        for (int i = 1; i < 10; i++) {
+            final int finalI = i;
+            webTestClient
+                    .mutateWith(csrf())
+                    .put()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(TransactionRouter.BASE_URL + "/source/1/externalId/10045" + finalI)
+                            .build())
+                    .bodyValue(givenTransaction.withExternalId("10045" + finalI))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(TransactionDto.class)
+                    .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
+        }
+    }
+
+    @Order(8)
+    @Test
+    @Override
+    @WithMockUser
+    public void getSalesTaxTracking_CheckEconomicNexusEstablishedByCount_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(receivedSalesTaxTracking -> {
+                    assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
+                    assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
+                    assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse(referenceDate.toString()));
+                });
+    }
 }

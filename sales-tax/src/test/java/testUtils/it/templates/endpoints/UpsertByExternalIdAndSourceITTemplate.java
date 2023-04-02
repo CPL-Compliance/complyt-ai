@@ -1,4 +1,4 @@
-package testUtils.it.templates;
+package testUtils.it.templates.endpoints;
 
 public interface UpsertByExternalIdAndSourceITTemplate {
 
