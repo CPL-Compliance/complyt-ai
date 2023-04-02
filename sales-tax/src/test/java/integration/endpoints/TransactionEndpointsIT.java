@@ -2,8 +2,11 @@ package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.MandatoryAddressDto;
 import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.TransactionStatusDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.MongoContainerInitializer;
@@ -23,8 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.it.ITUtilities;
 
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -241,7 +243,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/notexisting")
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/notExisting")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -351,9 +353,14 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto("someId", customerId)
-                .withInternalTimestamps(new TimestampsDto("","2021-10-10T07:00:00"))
-                .withSource("").withTaxableItemsAmount(-4)
-                .withShippingAddress(referenceAddress);
+                .withInternalTimestamps(new TimestampsDto("", "2021-10-10T07:00:00"))
+                .withSource("")
+                .withShippingAddress(referenceAddress.withCity(""));
+        Set expectedErrors = new HashSet<>(List.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR,
+                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
+                "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -366,16 +373,47 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
                 .value(map -> {
-                    assertEquals("", map.get("message"));
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
                 });
     }
 
-    @Order(2)
+    @Order(4)
     @Test
     @Override
     @WithMockUser
     public void deleteByExternalIdAndSource_Exists_Returns204() {
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
 
+    @Order(5)
+    @Test
+    @Override
+    @WithMockUser
+    public void get_checkDeletion_Returns200() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class).value(transactionDto ->
+                        assertEquals(transactionDto.transactionStatus(), TransactionStatusDto.CANCELLED));
     }
 
     @Order(2)
@@ -383,46 +421,14 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
-
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void deleteByExternalIdAndSource_UnauthenticatedUser_Returns401() {
-
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void deleteByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void deleteByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
-
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void deleteByExternalIdAndSource_InternalServerError_Returns500() {
-
-    }
-
-    @Order(2)
-    @Test
-    @Override
-    @WithMockUser
-    public void deleteByExternalIdAndSource_NullHandler_ThrowsNullPointerException() {
-
+        webTestClient
+                .mutateWith(csrf())
+                .delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/notExisting")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
