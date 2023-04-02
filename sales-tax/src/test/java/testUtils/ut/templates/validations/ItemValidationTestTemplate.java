@@ -16,8 +16,6 @@ public interface ItemValidationTestTemplate {
 
     void upsert_NullTaxCodeInItem_Returns400ValidationError();
 
-    void upsert_BlankTaxCodeInItem_Returns400ValidationError();
-
     void upsert_LengthGreaterThen256TaxCodeInItem_Returns400ValidationError();
 
     void upsert_NegativeManualSalesTaxRateInItem_Returns400ValidationError();

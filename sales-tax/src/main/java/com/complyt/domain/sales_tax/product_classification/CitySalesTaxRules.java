@@ -2,8 +2,6 @@ package com.complyt.domain.sales_tax.product_classification;
 
 import lombok.*;
 
-import java.util.Objects;
-
 @With
 @ToString
 @Getter

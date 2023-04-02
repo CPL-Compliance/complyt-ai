@@ -21,6 +21,6 @@ public class ComplytIdHandler<T extends ComplytIdProperty> {
     }
 
     public T insertComplytIdToNew(@NonNull T newEntity) {
-        return (T)newEntity.withComplytId(UUID.randomUUID());
+        return (T) newEntity.withComplytId(UUID.randomUUID());
     }
 }

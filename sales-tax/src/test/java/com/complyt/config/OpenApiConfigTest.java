@@ -1,5 +1,6 @@
 package com.complyt.config;
 
+import com.complyt.v1.config.OpenApiConfig;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
@@ -32,7 +33,8 @@ class OpenApiConfigTest {
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")
-                                .url("http://springdoc.org")));
+                                .url("http://springdoc.org")))
+                .components(openApiConfig.getCustomSchemas());
 
         // When
         OpenAPI actualOpenAPI = openApiConfig.openAPIConfiguration();

@@ -6,8 +6,6 @@ import reactor.test.StepVerifier;
 
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ContextLoggerTest {
     @Test
     void observeCtx_PrintsLogInContext_ReturnsMonoEmpty() {

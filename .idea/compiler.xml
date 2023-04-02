@@ -32,6 +32,7 @@
     <bytecodeTargetLevel>
       <module name="config-server" target="17" />
       <module name="naming-server" target="17" />
+      <module name="sales-tax-rates" target="17" />
       <module name="salestax" target="17" />
       <module name="temp" target="17" />
       <module name="testService" target="17" />
