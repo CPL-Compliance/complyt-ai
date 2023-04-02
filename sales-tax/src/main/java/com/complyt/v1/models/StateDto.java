@@ -1,16 +1,14 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 @Schema(name = "State")
 public record StateDto(
-        @NotBlank(message = "Abbreviation may not be blank") @Size(min = 1, max = 256, message = "Abbreviation should be 1-256 characters maximum") String abbreviation,
-        @NotBlank(message = "Code may not be blank") @Size(min = 1, max = 256, message = "Code should be 1-256 characters maximum") String code,
-        @NotBlank(message = "Name may not be blank") @Size(min = 1, max = 256, message = "Name should be 1-256 characters maximum") String name) {
+        @NotNull(message = "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR) String abbreviation,
+        @NotNull(message = "State.code " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.code " + StringErrorMessages.MINMAX_256_ERROR) String code,
+        @NotNull(message = "State.name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "State.name " + StringErrorMessages.MINMAX_256_ERROR) String name) {
 }

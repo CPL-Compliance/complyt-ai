@@ -9,7 +9,6 @@ import testUtils.TestUtilities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NewCustomerInternalDateInjectorTest {

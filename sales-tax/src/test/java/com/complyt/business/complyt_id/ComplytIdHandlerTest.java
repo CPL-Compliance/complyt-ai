@@ -108,7 +108,7 @@ class ComplytIdHandlerTest {
                 complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(givenTransaction, transaction));
 
         // Then
-        assertEquals("newEntity is marked non-null but is null",exception.getMessage());
+        assertEquals("newEntity is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -121,7 +121,7 @@ class ComplytIdHandlerTest {
                 complytIdHandler.checkComplytIdOfUpdatedEqualsToOld(transaction, givenTransaction));
 
         // Then
-        assertEquals("oldEntity is marked non-null but is null",exception.getMessage());
+        assertEquals("oldEntity is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -134,7 +134,7 @@ class ComplytIdHandlerTest {
                 complytIdHandler.checkNewDontHaveComplytId(givenTransaction));
 
         // Then
-        assertEquals("newEntity is marked non-null but is null",exception.getMessage());
+        assertEquals("newEntity is marked non-null but is null", exception.getMessage());
     }
 
     @Test
@@ -144,10 +144,10 @@ class ComplytIdHandlerTest {
 
         // When
         Exception exception = assertThrows(NullPointerException.class, () ->
-            complytIdHandler.insertComplytIdToNew(givenTransaction));
+                complytIdHandler.insertComplytIdToNew(givenTransaction));
 
         // Then
-        assertEquals("newEntity is marked non-null but is null",exception.getMessage());
+        assertEquals("newEntity is marked non-null but is null", exception.getMessage());
     }
 
 }

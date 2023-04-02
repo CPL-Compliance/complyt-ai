@@ -100,16 +100,16 @@ public class TransactionHandler {
 
         return ContextLogger.observeCtx(logStr, log::info)
                 .then(transactionDtoValidationHandler.validate(serverRequest)
-                .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info).thenReturn(transactionDto))
-                .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
-                .flatMap(receivedTransaction ->
-                        transactionFacade.findByExternalIdAndSource(externalId, source)
-                                .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, source, receivedTransaction, originalTransaction)
-                                        .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                        .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
-                                .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)
-                                        .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
-                                        .flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))));
+                        .flatMap(transactionDto -> ContextLogger.observeCtx("--> Body: " + transactionDto, log::info).thenReturn(transactionDto))
+                        .map(TransactionMapper.INSTANCE::transactionDtoToTransaction)
+                        .flatMap(receivedTransaction ->
+                                transactionFacade.findByExternalIdAndSource(externalId, source)
+                                        .flatMap(originalTransaction -> transactionFacade.updateIfModified(externalId, source, receivedTransaction, originalTransaction)
+                                                .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
+                                                .flatMap(savedTransaction -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))
+                                        .switchIfEmpty(transactionFacade.saveTransaction(receivedTransaction)
+                                                .flatMap(savedTransaction -> ContextLogger.observeCtx("<-- Returned Body: " + savedTransaction, log::info).thenReturn(savedTransaction))
+                                                .flatMap(savedTransaction -> ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(Mono.just(TransactionMapper.INSTANCE.transactionToTransactionDto(savedTransaction)), TransactionDto.class)))));
     }
 
     @TransactionDeletePermission
