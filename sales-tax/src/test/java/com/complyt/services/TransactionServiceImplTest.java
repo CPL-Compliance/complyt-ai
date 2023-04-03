@@ -25,7 +25,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,12 +60,12 @@ class TransactionServiceImplTest {
     Transaction transaction;
     Customer customer;
     String source;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(transaction.getId());
         source = testUtilities.getUnifiedSource();

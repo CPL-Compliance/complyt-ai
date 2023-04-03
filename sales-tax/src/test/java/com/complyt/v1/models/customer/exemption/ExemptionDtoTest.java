@@ -2,7 +2,7 @@ package com.complyt.v1.models.customer.exemption;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,12 +17,12 @@ class ExemptionDtoTest {
 
     private String exemptionId;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         exemptionId = UUID.randomUUID().toString();
         exemptionDto = testUtilities.createExemptionDto();
     }

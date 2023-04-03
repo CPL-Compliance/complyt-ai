@@ -29,7 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -53,11 +53,11 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     ExemptionFacade exemptionFacade;
     Exemption exemption;
     ExemptionDto exemptionDto;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         exemptionRouter = new ExemptionRouter();
         exemptionDto = testUtilities.createExemptionDto();
         exemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);

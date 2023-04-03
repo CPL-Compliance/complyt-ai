@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ public class NexusTransactionsAmountCalculatorTest {
     List<Transaction> transactions;
     NexusStateRule nexusStateRule;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactions = createTransactions();
         nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }

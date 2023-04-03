@@ -4,7 +4,7 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TransactionDtoTest {
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     private TransactionDto transactionDto;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String transactionId = UUID.randomUUID().toString();
         transactionDto = testUtilities.createTransactionDto(transactionId);
     }

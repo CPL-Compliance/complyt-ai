@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,11 +22,11 @@ class TransactionItemsTangibleCategoryInjectorTest {
 
     TransactionItemsTangibleCategoryInjector transactionItemsTangibleCategoryInjector;
     Transaction transaction;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString())
                 .withItems(testUtilities.createItems(false, false));
         transactionItemsTangibleCategoryInjector = new TransactionItemsTangibleCategoryInjector(transaction);

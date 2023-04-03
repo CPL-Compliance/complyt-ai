@@ -44,6 +44,9 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Autowired
     private WebTestClient webTestClient;
 
+    private StateDto existingState = new StateDto("AZ", "04", "Arizona");
+    private StateDto newState = new StateDto("AL", "01", "Alabama");
+
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
@@ -76,8 +79,10 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
+        // Given
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -95,16 +100,20 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
+        // Given
+        String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/cba95b8d-ef9b-4f4d-831d-377621556b50")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.complytId(), UUID.fromString("cba95b8d-ef9b-4f4d-831d-377621556b50")));
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.complytId(), UUID.fromString(complytId)));
     }
 
     @Order(2)
@@ -112,10 +121,11 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/1111111-1111-1111-1111-111111111111")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/complytId/" + ITUtilities.NON_EXISTING_COMPLYT_ID)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -145,13 +155,13 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Arizona")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.state().name(), "Arizona"));
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.state().name(), existingState.name()));
     }
 
     @Order(2)
@@ -162,13 +172,13 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/AZ")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.state().name(), "Arizona"));
+                .value(salesTaxTrackingDto -> assertEquals(salesTaxTrackingDto.state().name(), existingState.name()));
     }
 
     @Order(2)
@@ -179,7 +189,7 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/AL")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -194,35 +204,11 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Alabama")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
-    }
-
-    @Order(4)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertByState_Exists_Returns200() {
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", "Alabama"));
-
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Alabama")
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(salesTaxTrackingDto)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(SalesTaxTrackingDto.class)
-                .value(resultSalesTaxTrackingDto -> assertEquals(
-                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()),
-                        resultSalesTaxTrackingDto)
-                );
     }
 
     @Order(3)
@@ -230,13 +216,15 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void upsertByState_DoesntExists_Returns201() {
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", "Alabama"));
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Alabama")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -249,19 +237,47 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
                 );
     }
 
+    @Order(4)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByState_Exists_Returns200() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(resultSalesTaxTrackingDto -> assertEquals(
+                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()),
+                        resultSalesTaxTrackingDto)
+                );
+    }
+
     @Order(1)
     @Test
     @Override
     @WithMockUser
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", "Alabama"))
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
                 .withComplytId(UUID.randomUUID());
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Alabama")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)
@@ -274,9 +290,11 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", "Alabama"))
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
                 .withComplytId(UUID.randomUUID());
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
@@ -294,18 +312,19 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer imple
     @Override
     @WithMockUser
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
+        // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", null))
                 .withEconomicNexusTracker(null);
-
         Set expectedErrors = Set.of(
                 "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR,
                 "State.name " + DtoErrorMessages.NOT_NULL_ERROR);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/Alabama")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(salesTaxTrackingDto)

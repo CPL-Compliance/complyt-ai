@@ -43,6 +43,9 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Autowired
     private WebTestClient webTestClient;
 
+    // Given
+    private String source = "1";
+
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
@@ -58,10 +61,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getAllBySource_Exists_Returns200() {
+        // Given
+        String differentSource = "2";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/2")
+                        .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -76,10 +83,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
+        // Given
+        String differentSource = "9";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/9")
+                        .path(CustomerRouter.BASE_URL + "/source/" + differentSource)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -94,6 +105,7 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getAll_Exists_Returns200() {
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -114,6 +126,7 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     public void getByAll_DoesntExists_Returns200EmptyList() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -132,17 +145,21 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
+        // Given
+        String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"; //complytId of existing customer
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/complytId/4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5")
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(CustomerDto.class)
                 .value(customerDto ->
-                        assertEquals(customerDto.complytId(), UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5")));
+                        assertEquals(customerDto.complytId(), UUID.fromString(complytId)));
     }
 
     @Order(2)
@@ -150,10 +167,11 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/complytId/1111111-1111-1111-1111-111111111111")
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + ITUtilities.NON_EXISTING_COMPLYT_ID)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -165,10 +183,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByComplytId_complytIdDoesntParse_Returns500() {
+        // Given
+        String invalidComplytId = "gg";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/complytId/gg")
+                        .path(CustomerRouter.BASE_URL + "/complytId/" + invalidComplytId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -180,10 +202,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
+        // Given
+        String externalId = "1586";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1586")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -195,10 +221,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
+        // Given
+        String externalId = "nonExisting";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/notExisting")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -210,10 +240,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByName_Exists_Returns200() {
+        // Given
+        String name = "best";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/best")
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -227,10 +261,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByName_DoesntExists_Returns200EmptyList() {
+        // Given
+        String name = "nonExisting";
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/name/notExisting")
+                        .path(CustomerRouter.BASE_URL + "/name/" + name)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -244,13 +282,16 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_Exists_Returns200() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("1001");
+        // Given
+        String externalId = "1001";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1001")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -263,13 +304,16 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("1001");
+        // Given
+        String externalId = "1001";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1001")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(customerDto)
                 .accept(MediaType.APPLICATION_JSON)
@@ -282,13 +326,16 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("1002").withComplytId(UUID.randomUUID());
+        // Given
+        String externalId = "1002";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId).withComplytId(UUID.randomUUID());
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1002")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)
@@ -301,13 +348,17 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("1002");
+        // Given
+        String externalId = "1002";
+        String differentSource = "9";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/9/externalId/1002")
+                        .path(CustomerRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)
@@ -320,13 +371,17 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("someId");
+        // Given
+        String externalId = "someId";
+        String differentExternalId = "differentId";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId);
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/differentId")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)
@@ -339,18 +394,21 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
-        CustomerDto customerDto = ITUtilities.stubCustomerDto("1003")
+        // Given
+        String externalId = "1003";
+        CustomerDto customerDto = ITUtilities.stubCustomerDto(externalId)
                 .withCustomerType(null).withName(null);
         Set expectedErrors = Set.of(
                 "name " + DtoErrorMessages.NOT_NULL_ERROR,
                 "customerType " + DtoErrorMessages.NOT_NULL_ERROR
         );
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1003")
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)

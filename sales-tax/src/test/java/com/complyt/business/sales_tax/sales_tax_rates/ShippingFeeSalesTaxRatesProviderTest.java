@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,13 +31,13 @@ public class ShippingFeeSalesTaxRatesProviderTest {
     SalesTaxRate salesTaxRate;
     ShippingFee shippingFee;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     Address address;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
         salesTaxRate = testUtilities.createSalesTaxRates();
         shippingFee = testUtilities.createShippingFee(false, false);

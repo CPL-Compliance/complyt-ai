@@ -56,14 +56,11 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Autowired
     private WebTestClient webTestClient;
 
-
+    // Given
     private LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
-
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "MN", "4401 York Ave S", "55410");
-
-    private UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e");
-
-    private UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3");
+    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "Minnesota", "4401 York Ave S", "55410");
+    private UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
+    private String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -81,16 +78,19 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndDoesntPassedEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10048", customerId,
+        // Given
+        String externalId = "10048";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(1).withUnitPrice(10).withTotalPrice(10))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10048")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -125,16 +125,19 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndPassedEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10041", customerId,
+        // Given
+        String externalId = "10041";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(6).withUnitPrice(10000).withTotalPrice(60000))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10041")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -152,7 +155,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -167,7 +170,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
                             .mutateWith(csrf())
                             .put()
                             .uri(uriBuilder -> uriBuilder
-                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                                     .build())
                             .bodyValue(receivedSalesTaxTracking.withApproved(true))
                             .accept(MediaType.APPLICATION_JSON)
@@ -183,15 +186,18 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewInRangeOfEconomicNexus_Returns201WithSalesTax() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10042", customerId)
+        // Given
+        String externalId = "10042";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10042")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -206,15 +212,18 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewOutOfRangeOfEconomicNexus_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10043", customerId)
+        // Given
+        String externalId = "10043";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.minusMonths(1).toString(), LocalDateTime.now().toString()));
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10043")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -232,7 +241,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -243,7 +252,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
                                 .mutateWith(csrf())
                                 .put()
                                 .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                                         .build())
                                 .bodyValue(receivedSalesTaxTracking.withApproved(false).withEconomicNexusTracker(new EconomicNexusTrackerDto(false, LocalDateTime.now())))
                                 .accept(MediaType.APPLICATION_JSON)
@@ -261,20 +270,24 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndPassedNexusByCount_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10045", customerId,
+        // Given
+        String externalId = "10045";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withQuantity(2).withUnitPrice(100).withTotalPrice(200))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
+        // Then
+        // The database contains 11 transaction created in October 2021
         for (int i = 1; i < 10; i++) {
             final int finalI = i;
             webTestClient
                     .mutateWith(csrf())
                     .put()
                     .uri(uriBuilder -> uriBuilder
-                            .path(TransactionRouter.BASE_URL + "/source/1/externalId/10045" + finalI)
+                            .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId + finalI)
                             .build())
-                    .bodyValue(givenTransaction.withExternalId("10045" + finalI))
+                    .bodyValue(givenTransaction.withExternalId(externalId + finalI))
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isCreated()
@@ -291,7 +304,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends MongoContainerInitial
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/MN")
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

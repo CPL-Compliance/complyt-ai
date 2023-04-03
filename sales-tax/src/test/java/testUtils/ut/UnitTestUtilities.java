@@ -27,7 +27,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestUtilities {
+public class UnitTestUtilities {
 
     LocalDateTime localDateTime;
     String tenantId;
@@ -38,7 +38,7 @@ public class TestUtilities {
 
     String source;
 
-    public TestUtilities(LocalDateTime localDateTime, String tenantId) {
+    public UnitTestUtilities(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
         this.tenantId = tenantId;
         customerIdOtherDomains = UUID.randomUUID();

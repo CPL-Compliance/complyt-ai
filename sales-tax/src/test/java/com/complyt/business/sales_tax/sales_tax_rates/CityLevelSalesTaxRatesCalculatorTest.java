@@ -4,7 +4,7 @@ import com.complyt.domain.sales_tax.SalesTaxRate;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CityLevelSalesTaxRatesCalculatorTest {
 
     CityLevelSalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     CitySalesTaxRules citySalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     @BeforeEach
     void setUp() {
         cityLevelSalesTaxRatesCalculator = new CityLevelSalesTaxRatesCalculator();
-        testUtilities = new TestUtilities(
+        testUtilities = new UnitTestUtilities(
                 LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxRate = testUtilities.createSalesTaxRates();
         citySalesTaxRules = testUtilities.createCitySalesTaxRules();

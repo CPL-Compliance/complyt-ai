@@ -5,7 +5,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EconomicNexusCheckTest {
 
     EconomicNexusChecker economicNexusChecker;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         economicNexusChecker = new EconomicNexusChecker();
     }
 

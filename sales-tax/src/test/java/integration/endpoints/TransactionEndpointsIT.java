@@ -30,6 +30,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -45,10 +46,10 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Autowired
     private WebTestClient webTestClient;
 
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5");
-
+    // Given
+    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "85034");
-
+    private String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -66,13 +67,16 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsAndCustomerDoesntExists_Returns404() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10001", UUID.fromString("1111111-1111-1111-1111-111111111111"))
+        String externalId = "10001";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, UUID.fromString(ITUtilities.NON_EXISTING_COMPLYT_ID))
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10001")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -85,13 +89,16 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ExistsAndCustomerDoesntExists_Returns404() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10002", UUID.fromString("1111111-1111-1111-1111-111111111111"))
+        // Given
+        String externalId = "10002";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, UUID.fromString(ITUtilities.NON_EXISTING_COMPLYT_ID))
                 .withShippingAddress(referenceAddress);
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10002")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/10002")
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -104,13 +111,17 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10003", customerId)
-                .withShippingAddress(referenceAddress.withState("AK"));
+        // Given
+        String externalId = "10003";
+        String nonExistingState = "Nilfgaard";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress.withState(nonExistingState));
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10003")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -123,13 +134,17 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10002", customerId)
-                .withShippingAddress(referenceAddress.withState("AK"));
+        // Given
+        String externalId = "10002";
+        String nonExistingState = "Nilfgaard";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress.withState(nonExistingState));
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10002")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -139,7 +154,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10002")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -206,6 +221,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     public void getByAll_DoesntExists_Returns200EmptyList() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -223,16 +239,21 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
+        //Given
+        String externalId = "10000";
+        UUID complytId = UUID.fromString("8b377411-da68-4807-8616-ee3a07c849f8"); // complytId of existing transaction
+
+        // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10000")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
-                .value(transaction -> assertEquals(transaction.complytId(), UUID.fromString("8b377411-da68-4807-8616-ee3a07c849f8")));
+                .value(transaction -> assertEquals(transaction.complytId(), complytId));
     }
 
     @Order(2)
@@ -243,7 +264,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/notExisting")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/notExisting")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -255,13 +276,17 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_Exists_Returns200() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10004", customerId)
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -274,13 +299,17 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10004", customerId)
+        //Given
+        String externalId = "10004";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -293,14 +322,18 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10005", customerId)
+        // Given
+        String externalId = "10005";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withComplytId(UUID.randomUUID())
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10005")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -313,13 +346,18 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
+        // Given
+        String externalId = "10005";
+        String differentSource = "2";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto("10005", customerId)
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/2/externalId/10005")
+                        .path(TransactionRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -332,14 +370,19 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("someId", customerId)
+        // Given
+        String externalId = "someId";
+        String differentExternalId = "differentId";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withComplytId(UUID.randomUUID())
                 .withShippingAddress(referenceAddress);
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/different")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -352,7 +395,10 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto("someId", customerId)
+        // Given
+        String externalId = "someId";
+        String differentExternalId = "differentId";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withInternalTimestamps(new TimestampsDto("", "2021-10-10T07:00:00"))
                 .withSource("")
                 .withShippingAddress(referenceAddress.withCity(""));
@@ -361,11 +407,12 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
                 "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
                 "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
 
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/different")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .bodyValue(givenTransaction)
                 .accept(MediaType.APPLICATION_JSON)
@@ -387,11 +434,15 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void deleteByExternalIdAndSource_Exists_Returns204() {
+        // Given
+        String externalId = "10004";
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .delete()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -403,11 +454,15 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void get_checkDeletion_Returns200() {
+        // Given
+        String externalId = "10004";
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/10004")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -425,7 +480,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
                 .mutateWith(csrf())
                 .delete()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/1/externalId/notExisting")
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/notExisting")
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -437,11 +492,15 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
+        // Given
+        String complytId = "8b377411-da68-4807-8616-ee3a07c849f8"; // complytId of existing transaction
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/complytId/8b377411-da68-4807-8616-ee3a07c849f8")
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + complytId)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -453,11 +512,12 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
     @Override
     @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/complytId/1111111-1111-1111-1111-111111111111")
+                        .path(TransactionRouter.BASE_URL + "/complytId/" + ITUtilities.NON_EXISTING_COMPLYT_ID)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

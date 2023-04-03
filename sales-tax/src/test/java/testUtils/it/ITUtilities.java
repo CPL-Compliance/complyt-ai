@@ -1,6 +1,5 @@
 package testUtils.it;
 
-import com.complyt.domain.State;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
@@ -14,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ITUtilities {
+
+    String NON_EXISTING_COMPLYT_ID = "1111111-1111-1111-1111-111111111111";
 
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {

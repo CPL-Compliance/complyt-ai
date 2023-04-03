@@ -28,7 +28,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -67,14 +67,14 @@ class NexusServiceTest {
     private NexusChecker nexusChecker;
 
     private Transaction transaction;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     String salesTaxTrackingId;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }

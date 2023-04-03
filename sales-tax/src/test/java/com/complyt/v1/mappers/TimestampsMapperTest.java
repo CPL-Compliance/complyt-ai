@@ -4,7 +4,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.TestUtilities;
+import testUtils.ut.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,13 +12,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TimestampsMapperTest {
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     private Timestamps timestamps;
     private TimestampsDto timestampsDto;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(
+        testUtilities = new UnitTestUtilities(
                 LocalDateTime.now(), UUID.randomUUID().toString());
         timestamps = testUtilities.createTimestamps();
         timestampsDto = testUtilities.createTimestampsDto();
