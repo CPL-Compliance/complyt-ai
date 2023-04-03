@@ -6,7 +6,7 @@ public interface GetByStateITTemplate {
 
     void getByStateAbbreviation_Exists_Returns200();
 
-    void getByStateAbbreviation_DoesntExists_Returns201();
+    void getByStateAbbreviation_DoesntExists_Returns404();
 
     void getByStateName_DoesntExists_Returns404();
 }

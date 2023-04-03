@@ -1,5 +1,6 @@
 package testUtils.it;
 
+import com.complyt.domain.State;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
@@ -27,6 +28,13 @@ public interface ITUtilities {
         return new CustomerDto(null, externalId, "1",
                 "stub customer", null, CustomerTypeDto.RETAIL,
                 null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()));
+    }
+
+    static SalesTaxTrackingDto stubSalesTaxTrackingDto(StateDto state) {
+        return new SalesTaxTrackingDto(null, state, true,
+                new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
+                new EconomicNexusTrackerDto(false, LocalDateTime.now()),
+                LocalDateTime.now(), false, LocalDateTime.now());
     }
 
     static ItemDto stubItemDto() {

@@ -2,6 +2,7 @@ package integration.endpoints;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.routers.CustomerRouter;
 import integration.MongoContainerInitializer;
@@ -21,6 +22,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.it.ITUtilities;
 
+import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -192,7 +195,14 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/notExisting")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Order(2)
@@ -200,15 +210,33 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void getByName_Exists_Returns200() {
-
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/best")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> assertTrue(list.size() > 0));
     }
 
     @Order(2)
     @Test
     @Override
     @WithMockUser
-    public void getByName_DoesntExists_Returns404() {
-
+    public void getByName_DoesntExists_Returns200EmptyList() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/name/notExisting")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(CustomerDto.class)
+                .value(list -> assertEquals(list.size(), 0));
     }
 
     @Order(3)
@@ -254,7 +282,18 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
+        CustomerDto customerDto = ITUtilities.stubCustomerDto("1002").withComplytId(UUID.randomUUID());
 
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1002")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -262,7 +301,18 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
+        CustomerDto customerDto = ITUtilities.stubCustomerDto("1002");
 
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/9/externalId/1002")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -270,7 +320,18 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
+        CustomerDto customerDto = ITUtilities.stubCustomerDto("someId");
 
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/differentId")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Order(2)
@@ -278,6 +339,32 @@ public class CustomerEndpointsIT extends MongoContainerInitializer implements Cu
     @Override
     @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
+        CustomerDto customerDto = ITUtilities.stubCustomerDto("1003")
+                .withCustomerType(null).withName(null);
+        Set expectedErrors = Set.of(
+                "name " + DtoErrorMessages.NOT_NULL_ERROR,
+                "customerType " + DtoErrorMessages.NOT_NULL_ERROR
+        );
 
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/1/externalId/1003")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto)
+                .exchange()
+
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> {
+                    String message = (String) map.get("message");
+                    String[] errors = message.substring(1, message.length() - 1).split(", ");
+                    assertEquals(expectedErrors.size(), errors.length);
+                    for (String err : errors) {
+                        assertTrue(expectedErrors.contains(err));
+                    }
+                });
     }
 }
