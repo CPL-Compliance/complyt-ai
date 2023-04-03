@@ -242,6 +242,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitial
         // Given
         String externalId = "10023";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
 
         // Then
