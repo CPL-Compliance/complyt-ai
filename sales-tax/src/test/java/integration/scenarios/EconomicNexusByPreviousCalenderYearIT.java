@@ -9,7 +9,7 @@ import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
-import integration.MongoContainerInitializer;
+import integration.MongoContainerInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,7 +38,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient
-public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitializer implements EconomicNexusBySpecificCustomersITTemplate {
+public class EconomicNexusByPreviousCalenderYearIT extends MongoContainerInitializerIT implements EconomicNexusBySpecificCustomersITTemplate {
 
     /*
      * State Rule: Florida

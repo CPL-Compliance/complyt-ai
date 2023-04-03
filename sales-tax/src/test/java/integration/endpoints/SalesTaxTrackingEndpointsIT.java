@@ -6,7 +6,7 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
-import integration.MongoContainerInitializer;
+import integration.MongoContainerInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,7 +37,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializer implements SalesTaxTrackingEndpointsITTemplate {
+public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;

@@ -1,7 +1,5 @@
 package integration;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.testcontainers.containers.BindMode;
@@ -10,7 +8,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
-public abstract class MongoContainerInitializer {
+public abstract class MongoContainerInitializerIT {
 
     protected static final Logger LOGGER = log;
 
