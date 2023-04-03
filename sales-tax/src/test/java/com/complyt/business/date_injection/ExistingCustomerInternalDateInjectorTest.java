@@ -4,7 +4,7 @@ import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimesta
 import com.complyt.domain.customer.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.UnitTestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -4,7 +4,7 @@ import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.ut.UnitTestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

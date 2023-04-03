@@ -22,8 +22,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.it.ITUtilities;
-import testUtils.it.templates.economic_nexus.EconomicNexusOnlyTaxableItemsITTemplate;
+import testUtils.integration_test.ITUtilities;
+import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTaxableItemsITTemplate;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

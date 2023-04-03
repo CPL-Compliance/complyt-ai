@@ -21,7 +21,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.it.ITUtilities;
+import testUtils.integration_test.ITUtilities;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
