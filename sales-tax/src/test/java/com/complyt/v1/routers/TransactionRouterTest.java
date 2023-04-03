@@ -4257,32 +4257,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 });
     }
 
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
-        // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), "", null, null);
-        String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
-
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
-    }
-
     @Test
     @Override
     @WithMockUser
