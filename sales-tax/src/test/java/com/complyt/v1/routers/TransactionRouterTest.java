@@ -1829,7 +1829,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         String lengthOf257CreatedFrom = testUtilities.stringWithLength(257);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "createdFrom " + StringErrorMessages.MINMAX_256_ERROR));
+                "createdFrom " + StringErrorMessages.MAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -4266,7 +4266,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
+                "ShippingFee.taxCode " + StringErrorMessages.MAX_256_ERROR));
 
 
         // When + Then
