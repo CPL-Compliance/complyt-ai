@@ -4,6 +4,8 @@ import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.v1.models.*;
+import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,12 @@ public interface ITUtilities {
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220"), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, 0, 0, 0);
+    }
+
+    static CustomerDto stubCustomerDto(String externalId) {
+        return new CustomerDto(null, externalId, "1",
+                "stub customer", null, CustomerTypeDto.RETAIL,
+                null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()));
     }
 
     static ItemDto stubItemDto() {

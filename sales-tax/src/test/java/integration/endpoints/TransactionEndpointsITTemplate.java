@@ -5,6 +5,7 @@ import testUtils.it.templates.endpoints.*;
 public interface TransactionEndpointsITTemplate extends
         UpsertByExternalIdAndSourceITTemplate,
         GetByExternalIdAndSourceITTemplate,
+        GetByComplytIdITTemplate,
         GetAllITTemplate,
         GetAllBySourceTTemplate,
         DeleteByExternalIdAndSourceITTemplate {

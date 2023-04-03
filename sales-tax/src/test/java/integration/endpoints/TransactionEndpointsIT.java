@@ -431,4 +431,52 @@ public class TransactionEndpointsIT extends MongoContainerInitializer implements
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_Exists_Returns200() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/8b377411-da68-4807-8616-ee3a07c849f8")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_DoesntExists_Returns404() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/1111111-1111-1111-1111-111111111111")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    @WithMockUser
+    public void getByComplytId_complytIdDoesntParse_Returns500() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/complytId/notExisting")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
 }
