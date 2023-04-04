@@ -22,6 +22,7 @@ public class SalesTaxAggregator {
         Optional<Float> amount = taxables.stream().map(Taxable::calculateSalesTaxAmount).reduce(Float::sum);
         log.debug("Sales tax amount calculated : " + amount);
 
-        return (float) (Math.round(amount.get() * 100.0) / 100.0);
+        String taxAmountAsStrng = String.format("%.2f", amount.get());
+        return Float.parseFloat(taxAmountAsStrng);
     }
 }
