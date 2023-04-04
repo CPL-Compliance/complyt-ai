@@ -4,7 +4,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,11 +18,11 @@ class SalesTaxTrackingWithNexusInfoTest {
     String id;
     String tenantId;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         id = UUID.randomUUID().toString();
         tenantId = (new ObjectId()).toString();
         approvalDate = LocalDateTime.now();

@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,12 +38,12 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Mock
     private ShippingFeeSalesTaxRatesProvider shippingFeeSalesTaxRatesProvider;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     Address address;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         address = testUtilities.createAddress();
     }
 

@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -26,14 +26,14 @@ import static org.mockito.Mockito.when;
 class TransactionShippingFeeInjectionCheckerTest {
 
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     @Mock
     private TransactionShippingFeeInjectionChecker injector;
     private Transaction transaction;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         ShippingFee shippingFee = testUtilities.createShippingFee(false, false).withTaxCode("C6S1");
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString()).withShippingFee(shippingFee);
         ReflectionTestUtils.setField(injector, "transaction", transaction, Transaction.class);

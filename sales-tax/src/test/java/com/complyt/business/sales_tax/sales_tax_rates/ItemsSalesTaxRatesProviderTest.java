@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,12 +35,12 @@ public class ItemsSalesTaxRatesProviderTest {
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     Address address;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
         salesTaxRate = testUtilities.createSalesTaxRates();
         address = testUtilities.createAddress();

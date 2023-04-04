@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,11 +37,11 @@ public class NexusAmountAggregatorFactoryTest {
 
     Transaction transaction;
     NexusStateRule nexusStateRule;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         nexusStateRule = testUtilities.createNexusStateRule(UUID.randomUUID().toString());
     }

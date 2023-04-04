@@ -1,10 +1,10 @@
 package com.complyt.v1.routers;
 
-import testUtils.templates.endpoints.GetAllRouterTestTemplate;
-import testUtils.templates.endpoints.GetByComplytIdRouterTestTemplate;
-import testUtils.templates.endpoints.GetByStateRouterTestTemplate;
-import testUtils.templates.endpoints.UpsertByStateRouterTestTemplate;
-import testUtils.templates.validations.StateValidationTestTemplate;
+import testUtils.unit_test.templates.endpoints.GetAllRouterTestTemplate;
+import testUtils.unit_test.templates.endpoints.GetByComplytIdRouterTestTemplate;
+import testUtils.unit_test.templates.endpoints.GetByStateRouterTestTemplate;
+import testUtils.unit_test.templates.endpoints.UpsertByStateRouterTestTemplate;
+import testUtils.unit_test.templates.validations.StateValidationTestTemplate;
 
 public interface SalesTaxTrackingRouterTestTemplate extends
         GetAllRouterTestTemplate,

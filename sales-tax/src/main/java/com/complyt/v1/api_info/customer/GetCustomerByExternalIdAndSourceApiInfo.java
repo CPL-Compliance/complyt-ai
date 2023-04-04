@@ -80,8 +80,8 @@ public @interface GetCustomerByExternalIdAndSourceApiInfo {
     String sourceExample = "1";
     String customerExample = "{\n" +
             "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-            "    \"externalId: " + externalIdExample + ",\n" +
-            "    \"source: " + sourceExample + ",\n" +
+            "    \"externalId\": " + externalIdExample + ",\n" +
+            "    \"source\": " + sourceExample + ",\n" +
             "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
