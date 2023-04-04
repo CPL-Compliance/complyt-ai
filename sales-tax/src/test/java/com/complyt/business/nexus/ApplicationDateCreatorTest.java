@@ -52,9 +52,9 @@ public class ApplicationDateCreatorTest {
     void create_YearFromSeptemberToSeptemberPassedAndDateIsPriorToSeptember30Th_ReturnsApplyNextSeptember() {
         // Given
         TimeFrame timeFrame = TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER;
-        LocalDateTime september30 = LocalDateTime.now()
-                .withMonth(9)
-                .withDayOfMonth(30)
+        LocalDateTime firstOfOctober = LocalDateTime.now()
+                .withMonth(10)
+                .withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
@@ -64,16 +64,16 @@ public class ApplicationDateCreatorTest {
         LocalDateTime actualApplicationDate = applicationDateCreator.create(timeFrame, referenceDate);
 
         // When + Then
-        assertEquals(september30, actualApplicationDate);
+        assertEquals(firstOfOctober, actualApplicationDate);
     }
 
     @Test
     void create_YearFromSeptemberToSeptemberPassedAndDateIsLaterThenSeptember30Th_ReturnsApplyNextSeptember() {
         // Given
         TimeFrame timeFrame = TimeFrame.YEAR_FROM_SEPTEMBER_TO_SEPTEMBER;
-        LocalDateTime nextSeptember30 = LocalDateTime.now()
-                .withMonth(9)
-                .withDayOfMonth(30)
+        LocalDateTime nextFirstOfOctober = LocalDateTime.now()
+                .withMonth(10)
+                .withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
@@ -84,7 +84,7 @@ public class ApplicationDateCreatorTest {
         LocalDateTime actualApplicationDate = applicationDateCreator.create(timeFrame, referenceDate);
 
         // When + Then
-        assertEquals(nextSeptember30, actualApplicationDate);
+        assertEquals(nextFirstOfOctober, actualApplicationDate);
     }
 
 
