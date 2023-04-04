@@ -4,7 +4,7 @@ import com.complyt.business.timestamps_injection.ExistingCustomerInternalTimesta
 import com.complyt.domain.customer.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,11 +17,11 @@ public class ExistingCustomerInternalDateInjectorTest {
 
     Customer customer;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         existingCustomerInternalTimestampsInjector = new ExistingCustomerInternalTimestampsInjector(customer);
     }

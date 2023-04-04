@@ -105,36 +105,35 @@ public @interface PostExemptionApiInfo {
             }""";
 
     String returnedExemptionExample = """
-            [{
-                     "complytId": "f2cfcad9-d4e2-4ade-96b4-e83b7d402933",
-                     "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
-                     "state": {
-                         "abbreviation": "AZ",
-                         "code": "04",
-                         "name": "Arizona"
-                     },
-                     "classification": {
-                         "code": "code",
-                         "description": "description"
-                     },
-                     "validationDates": {
-                         "fromDate": "2022-11-01T02:00:00",
-                         "toDate": "2023-02-28T02:00:00"
-                     },
-                     "internalTimestamps": {
-                         "2022-12-29T10:24:54.577",
-                         "updatedDate": "2022-12-29T10:24:54.577"
-                     },
-                     "status": {
-                         "code": "code",
-                         "name": "name"
-                     },
-                     "certificate": {
-                         "certificateId": "id",
-                         "url": "url",
-                         "name": "name"
-                     },
-                     "exemptionType": "FULLY"
-                 }]
-            """;
+            {
+                "complytId": "f2cfcad9-d4e2-4ade-96b4-e83b7d402933",
+                "customerId": "85627561-bf73-45b7-ba09-8d2540a51541",
+                "state": {
+                    "abbreviation": "AZ",
+                    "code": "04",
+                    "name": "Arizona"
+                },
+                "classification": {
+                    "code": "code",
+                    "description": "description"
+                },
+                "validationDates": {
+                    "fromDate": "2022-11-01T02:00:00",
+                    "toDate": "2023-02-28T02:00:00"
+                },
+                "internalTimestamps": {
+                    "createdDate": "2022-12-29T10:24:54.577",
+                    "updatedDate": "2022-12-29T10:24:54.577"
+                },
+                "status": {
+                    "code": "code",
+                    "name": "name"
+                },
+                "certificate": {
+                    "certificateId": "id",
+                    "url": "url",
+                    "name": "name"
+                },
+                "exemptionType": "FULLY"
+            }""";
 }

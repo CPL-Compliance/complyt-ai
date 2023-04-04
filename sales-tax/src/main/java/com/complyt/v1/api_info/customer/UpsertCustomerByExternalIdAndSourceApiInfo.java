@@ -102,8 +102,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String sourceExample = "1";
     String newCustomerExample = "{\n" +
-            "    \"externalId\":" + externalIdExample + ",\n" +
-            "    \"source\": " + sourceExample + ",\n" +
+            "    \"externalId\": \"" + externalIdExample + "\",\n" +
+            "    \"source\": \"" + sourceExample + "\",\n" +
             "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
@@ -123,8 +123,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String returnedCustomerExample = "[{\n" +
             "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
             "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-            "    \"externalId\": " + externalIdExample + ",\n" +
-            "    \"source\": " + sourceExample + ",\n" +
+            "    \"externalId\": \"" + externalIdExample + "\",\n" +
+            "    \"source\": \"" + sourceExample + "\",\n" +
             "    \"name\": \"Complyt\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +

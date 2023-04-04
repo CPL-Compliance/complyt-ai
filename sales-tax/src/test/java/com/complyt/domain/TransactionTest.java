@@ -3,7 +3,7 @@ package com.complyt.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransactionTest {
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     LocalDateTime localDateTime;
     private Transaction transaction;
     private String transactionId;
@@ -28,7 +28,7 @@ public class TransactionTest {
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.now();
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(transactionId);
     }

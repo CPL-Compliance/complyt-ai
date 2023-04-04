@@ -12,7 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,11 +33,11 @@ public class TransactionsFilterByNexusRulesTest {
     Transaction invoiceTransaction;
     Transaction salesOrderTransaction;
     Customer customer;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionsFilterByNexusRules = new TransactionsFilterByNexusRules();
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
         transactions = createTransactionList();
