@@ -28,7 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,13 +58,13 @@ public class TransactionFacadeTest {
     Transaction transaction;
     Customer customer;
     Transaction transactionNoId;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     String source;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         MockitoAnnotations.openMocks(this);
 
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());

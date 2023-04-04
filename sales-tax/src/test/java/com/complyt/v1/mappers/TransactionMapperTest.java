@@ -4,7 +4,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.v1.models.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TransactionMapperTest {
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     private Transaction transaction;
     private Transaction transactionNoTenantNorId;
     private TransactionDto transactionDto;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         transactionNoTenantNorId = transaction.withTenantId(null).withCustomer(transaction.getCustomer().withTenantId(null).withId(null)).withId(null);
         transactionDto = testUtilities.createTransactionDto(transaction.getId())

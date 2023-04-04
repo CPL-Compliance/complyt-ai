@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -41,33 +41,33 @@ public class ProductClassificationServiceTest {
     @Mock
     ProductClassificationRepository productClassificationRepository;
 
-    ProductClassification itemProductClassification0;
-    ProductClassification itemProductClassification1;
+    ProductClassification firstItemProductClassification;
+    ProductClassification secondItemProductClassification;
     ProductClassification shippingFeeProductClassification;
     ObjectId customerId;
     String tenantId;
 
     Transaction transaction;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
-        itemProductClassification0 = createItemProductClassification0();
-        itemProductClassification1 = createItemProductClassification1();
+        firstItemProductClassification = createFirstItemProductClassification();
+        secondItemProductClassification = createSecondItemProductClassification();
         shippingFeeProductClassification = createShippingFeeProductClassification();
         customerId = new ObjectId();
         tenantId = UUID.randomUUID().toString();
     }
 
-    private ProductClassification createItemProductClassification0() {
+    private ProductClassification createFirstItemProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C1S1", "description",
                 "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
     }
 
-    private ProductClassification createItemProductClassification1() {
+    private ProductClassification createSecondItemProductClassification() {
         Map<String, JurisdictionalSalesTaxRules> jurisdictionalSalesTaxRulesList = createJurisdictionalSalesTaxRulesList();
         return new ProductClassification("id", "C3S1", "description",
                 "title", jurisdictionalSalesTaxRulesList, TangibleCategory.TANGIBLE);
@@ -112,8 +112,8 @@ public class ProductClassificationServiceTest {
                 .withCustomer(givenTransaction.getCustomer());
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(itemProductClassification0));
-        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(itemProductClassification1));
+        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(firstItemProductClassification));
+        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(secondItemProductClassification));
         Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
 
         // Then
@@ -133,8 +133,8 @@ public class ProductClassificationServiceTest {
                 .withShippingFee(shippingFee);
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(itemProductClassification0));
-        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(itemProductClassification1));
+        when(productClassificationRepository.findOneByTaxCode(taxCode0)).thenReturn(Mono.just(firstItemProductClassification));
+        when(productClassificationRepository.findOneByTaxCode(taxCode1)).thenReturn(Mono.just(secondItemProductClassification));
         when(productClassificationRepository.findOneByTaxCode(givenTransaction.getShippingFee().getTaxCode())).thenReturn(Mono.just(shippingClassification));
         Mono<Transaction> actualTransaction = productClassificationService.getTransactionWithRelevantProductClassificationData(givenTransaction);
 
@@ -145,14 +145,14 @@ public class ProductClassificationServiceTest {
     @Test
     void findOneByTaxCode_FindsOne_ReturnsOne() {
         // Given
-        String taxCode = itemProductClassification0.getTaxCode();
+        String taxCode = firstItemProductClassification.getTaxCode();
 
         // When
-        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(itemProductClassification0));
+        when(productClassificationRepository.findOneByTaxCode(taxCode)).thenReturn(Mono.just(firstItemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.findOneByTaxCode(taxCode);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification0).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(firstItemProductClassification).verifyComplete();
     }
 
     @Test
@@ -172,9 +172,9 @@ public class ProductClassificationServiceTest {
     @Test
     void findAll_FindsAllClassifications_ReturnsAllClassifications() {
         // Given
-        ProductClassification otherProductClassification = itemProductClassification0.withDescription("second classification").withTaxCode("C2S1");
+        ProductClassification otherProductClassification = firstItemProductClassification.withDescription("second classification").withTaxCode("C2S1");
         List<ProductClassification> productClassifications = new ArrayList<ProductClassification>() {{
-            add(itemProductClassification0);
+            add(firstItemProductClassification);
             add(otherProductClassification);
         }};
 
@@ -183,33 +183,33 @@ public class ProductClassificationServiceTest {
         Flux<ProductClassification> productClassificationFlux = productClassificationService.findAll();
 
         // Then
-        StepVerifier.create(productClassificationFlux).expectNext(itemProductClassification0, otherProductClassification).verifyComplete();
+        StepVerifier.create(productClassificationFlux).expectNext(firstItemProductClassification, otherProductClassification).verifyComplete();
     }
 
     @Test
     void save_SavesClassification_ReturnsClassification() {
         // Given
-        ProductClassification productClassificationNoId = itemProductClassification0.withId(null);
+        ProductClassification productClassificationNoId = firstItemProductClassification.withId(null);
 
         // When
-        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(itemProductClassification0));
+        when(productClassificationRepository.save(productClassificationNoId)).thenReturn(Mono.just(firstItemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.save(productClassificationNoId);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification0).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(firstItemProductClassification).verifyComplete();
     }
 
     @Test
     void findById_FindClassification_ReturnsClassification() {
         // Given
-        String id = itemProductClassification0.getId();
+        String id = firstItemProductClassification.getId();
 
         // When
-        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(itemProductClassification0));
+        when(productClassificationRepository.findById(id)).thenReturn(Mono.just(firstItemProductClassification));
         Mono<ProductClassification> productClassificationMono = productClassificationService.findById(id);
 
         // Then
-        StepVerifier.create(productClassificationMono).expectNext(itemProductClassification0).verifyComplete();
+        StepVerifier.create(productClassificationMono).expectNext(firstItemProductClassification).verifyComplete();
     }
 
     @Test

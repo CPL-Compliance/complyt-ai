@@ -5,6 +5,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.SalesTaxData;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
@@ -12,6 +13,35 @@ import reactor.core.publisher.Mono;
 @Generated
 @EqualsAndHashCode
 public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
+    private final String json = "{\n" +
+            "    \"TaxInfoItems\": [\n" +
+            "        {\n" +
+            "            \"Zip\": \"95220\",\n" +
+            "            \"City\": \"Acampo\",\n" +
+            "            \"County\": \"San Joaquin\",\n" +
+            "            \"StateName\": \"California\",\n" +
+            "            \"StateAbbreviation\": \"CA\",\n" +
+            "            \"TaxRate\": \"0.0775\",\n" +
+            "            \"StateRate\": \"0.06\",\n" +
+            "            \"CityRate\": \"0\",\n" +
+            "            \"CountyRate\": \"0.0125\",\n" +
+            "            \"CityDistrictRate\": \"0\",\n" +
+            "            \"CountyDistrictRate\": \"0.005\",\n" +
+            "            \"SpecialDistrictRate\": \"0\",\n" +
+            "            \"NotesCodes\": \"\",\n" +
+            "            \"NotesDesc\": \"\",\n" +
+            "            \"InformationComponents\": [\n" +
+            "                {\n" +
+            "                    \"Name\": \"CountyFIPS\",\n" +
+            "                    \"Value\": \"077\"\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            \"TotalTaxExempt\": \"LABOR/FREIGHT/SERVICES\"\n" +
+            "        }\n" +
+            "    ],\n" +
+            "    \"MatchLevel\": \"Address\"\n" +
+            "}";
+
     public StubFastTaxWebClientWrapper() {
         super(null, null, null, null, null);
     }
@@ -24,7 +54,6 @@ public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperB
     @Override
     public Mono<SalesTaxData> findByAddress(@NonNull Address address) {
         return Mono.fromCallable(() -> {
-            String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": [{\"City\": \"Englewood\",\"CityDistrictRate\": \"0\",\"CityRate\": \"0.035\",\"County\": \"Arapahoe\",\"CountyDistrictRate\": \"0.011\",\"CountyRate\": \"0.0025\",\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}],\"NotesCodes\": \"1\",\"NotesDesc\": \"IsUnincorporated\",\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\",\"StateName\": \"Colorado\",\"StateRate\": \"0.029\",\"TaxRate\": \"0.0775\",\"TotalTaxExempt\": \"LABOR/SERVICES\",\"Zip\": \"80112\"}]}";
             ObjectMapper objectMapper = new ObjectMapper();
             FastTaxData fastTaxData = objectMapper.readValue(json, FastTaxData.class);
 

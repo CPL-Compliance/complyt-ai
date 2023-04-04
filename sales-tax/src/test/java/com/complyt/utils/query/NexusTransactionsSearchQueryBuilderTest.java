@@ -66,8 +66,8 @@ public class NexusTransactionsSearchQueryBuilderTest {
 
         Query queryToAssert = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
-        Query expectedQuery = queryToAssert.addCriteria(Criteria.where("shippingAddress.state")
-                .is(nexusStateRule.getState().getAbbreviation()));
+        Query expectedQuery = queryToAssert.addCriteria(new Criteria().orOperator(Criteria.where("shippingAddress.state")
+                .is(nexusStateRule.getState().getAbbreviation()), Criteria.where("shippingAddress.state").is(nexusStateRule.getState().getName())));
 
         // When
         when(timeFrameQueryBuilder.buildNexusTimeFrame(nexus, nexusStateRule, dateReference)).thenReturn(queryToSend);

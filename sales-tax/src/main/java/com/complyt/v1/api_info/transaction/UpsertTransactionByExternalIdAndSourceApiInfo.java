@@ -238,7 +238,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                     "updatedDate": "2023-02-05T12:24:43.193Z"
                 },
                 "externalTimestamps": {
-                    "createdDate": "2023-02-05T12:24:43.193Z"
+                    "createdDate": "2023-02-05T12:24:43.193Z",
                     "updatedDate": "2023-02-05T12:24:43.193Z"
                 },
                 "transactionType": "SALES_ORDER",

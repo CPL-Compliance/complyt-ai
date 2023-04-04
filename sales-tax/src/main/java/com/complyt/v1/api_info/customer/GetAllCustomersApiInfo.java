@@ -79,7 +79,7 @@ public @interface GetAllCustomersApiInfo {
             "    },\n" +
             "    \"externalTimestamps\": {\n" +
             "        \"createdDate\": \"2022-10-19T07:00:00\",\n" +
-            "        \"updatedDate\": \2022-10-19T09:07:54.585\"\n" +
+            "        \"updatedDate\": \"2022-10-19T09:07:54.585\"\n" +
             "    }\n" +
             "}]";
 }
