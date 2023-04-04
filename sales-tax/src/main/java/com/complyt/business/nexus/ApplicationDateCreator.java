@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 
@@ -41,18 +42,20 @@ public class ApplicationDateCreator {
 
     private LocalDateTime applyNextSeptember(LocalDateTime referenceDate) {
 
+
         LocalDateTime firstOfOctober = referenceDate
                 .withMonth(10)
                 .withDayOfMonth(1)
-                .withHour(0)
+                .withHour(6)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
         LocalDateTime applicationDate;
 
-        // from october 1st to december 31st
+        // from October 1st to December 31st
         if (referenceDate.compareTo(firstOfOctober) >= 0) {
             applicationDate = firstOfOctober.plusYears(1);
+        // from January 1st to September 30th
         } else {
             applicationDate = firstOfOctober;
         }
