@@ -1,16 +1,17 @@
 package com.complyt.v1.handler;
 
 import com.complyt.facade.SalesTaxRatesFacade;
+import com.complyt.observability.ContextLogger;
 import com.complyt.security.permissions.SalesTaxRatesReadPermission;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.SalesTaxRatesMapper;
-import com.complyt.observability.ContextLogger;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class SalesTaxRatesHandler {
     SalesTaxRatesFacade salesTaxRatesFacade;
 
     @NonNull
-    AddressDtoQueryParamsExtractor addressDtoQueryParamsExtractor;
+    QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
 
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {

@@ -2,6 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
+import com.complyt.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,19 +20,20 @@ public class SalesTaxRatesRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<AddressWithSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
+    public Mono<AddressWithSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String state) {
         Query query = Query.query(Criteria
                 .where("address.city").is(address.getCity())
                 .and("address.street").is(address.getStreet())
                 .and("address.zip").is(address.getZip())
         );
-        log.info("Searching for rates by address: " + query);
 
-        return reactiveMongoTemplate.findOne(query, AddressWithSalesTaxRates.class, collection);
+        return ContextLogger.observeCtx("Searching for rates in " + state + ", by address: " + query, log::debug)
+                .then(reactiveMongoTemplate.findOne(query, AddressWithSalesTaxRates.class, state));
     }
 
     public Mono<AddressWithSalesTaxRates> save(@NonNull AddressWithSalesTaxRates addressWithSalesTaxRates, @NonNull String collection) {
-        return reactiveMongoTemplate.save(addressWithSalesTaxRates, collection);
+        return ContextLogger.observeCtx("Saving address with rates: " + addressWithSalesTaxRates, log::debug)
+                .then(reactiveMongoTemplate.save(addressWithSalesTaxRates, collection));
     }
 
 }

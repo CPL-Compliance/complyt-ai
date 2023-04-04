@@ -10,5 +10,6 @@ import java.time.LocalDateTime;
 public class AddressWithSalesTaxRates {
     Address address;
     SalesTaxRates salesTaxRates;
+    LocalDateTime createdDate;
     LocalDateTime expireAt;
 }
