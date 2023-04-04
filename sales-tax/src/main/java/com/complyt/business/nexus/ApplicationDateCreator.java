@@ -41,9 +41,9 @@ public class ApplicationDateCreator {
 
     private LocalDateTime applyNextSeptember(LocalDateTime referenceDate) {
 
-        LocalDateTime september30 = referenceDate
-                .withMonth(9)
-                .withDayOfMonth(30)
+        LocalDateTime firstOfOctober = referenceDate
+                .withMonth(10)
+                .withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
@@ -51,10 +51,10 @@ public class ApplicationDateCreator {
         LocalDateTime applicationDate;
 
         // from october 1st to december 31st
-        if (referenceDate.compareTo(september30) >= 0) {
-            applicationDate = september30.plusYears(1);
+        if (referenceDate.compareTo(firstOfOctober) >= 0) {
+            applicationDate = firstOfOctober.plusYears(1);
         } else {
-            applicationDate = september30;
+            applicationDate = firstOfOctober;
         }
         log.info("Creating sales tax application date : " + applicationDate);
 
