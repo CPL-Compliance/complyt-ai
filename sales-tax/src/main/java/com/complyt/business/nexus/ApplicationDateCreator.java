@@ -46,7 +46,7 @@ public class ApplicationDateCreator {
         LocalDateTime firstOfOctober = referenceDate
                 .withMonth(10)
                 .withDayOfMonth(1)
-                .withHour(6)
+                .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
