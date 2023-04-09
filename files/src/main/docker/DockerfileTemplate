@@ -1,4 +1,4 @@
-FROM openjdk
+FROM amazoncorretto:17-al2023-jdk
 VOLUME /tmp
 
 ADD maven/${fileName}.jar ${fileName}.jar
