@@ -5,4 +5,4 @@ RUN yum install -y wget
 RUN wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
 ADD maven/${fileName}.jar ${fileName}.jar
 RUN sh -c 'touch /${fileName}.jar'
-ENTRYPOINT ["sh", "-c", "export DD_AGENT_HOST=\$(curl http://169.254.169.254/latest/meta-data/local-ipv4); java -Djava.security.egd=file:/dev/./urandom -javaagent:/app/dd-java-agent.jar -jar /${fileName}.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/${fileName}.jar"]
