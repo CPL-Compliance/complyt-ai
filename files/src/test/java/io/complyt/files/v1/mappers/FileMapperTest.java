@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,13 +17,11 @@ class FileMapperTest {
     private File file;
     private FileDto fileDto;
 
-    private ObjectStub objectStub = new ObjectStub();
-
     @BeforeEach
     void setUp() {
         String linkStr = "http:localhost";
-        file = objectStub.createFile();
-        fileDto = objectStub.createFileDto(file.getComplytId());
+        file = TestUtilities.createFile();
+        fileDto = TestUtilities.createFileDto(file.getComplytId());
     }
 
     @Test

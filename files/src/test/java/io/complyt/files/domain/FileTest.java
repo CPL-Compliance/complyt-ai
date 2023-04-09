@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,17 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class FileTest {
     private File file;
-    ObjectStub objectStub = new ObjectStub();
 
     @BeforeEach
     public void setUp() {
-        file = objectStub.createFile();
+        file = TestUtilities.createFile();
     }
 
     @Test
     public void equals_IdenticalLinks_Equal() {
         // Given + When
-        File referenceFile = objectStub.createFile(file.getComplytId(), file.getId());
+        File referenceFile = TestUtilities.createFile(file.getComplytId(), file.getId());
 
         // Then
         assertEquals(file, referenceFile);
