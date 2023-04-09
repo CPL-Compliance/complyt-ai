@@ -1,6 +1,8 @@
-FROM openjdk
+FROM amazoncorretto
 VOLUME /tmp
 
+RUN yum install -y wget
+RUN wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
 ADD maven/${fileName}.jar ${fileName}.jar
 RUN sh -c 'touch /${fileName}.jar'
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/${fileName}.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-javaagent:dd-java-agent.jar", "-Ddd.profiling.enabled=true", "-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.trace.sample.rate=1", "-Ddd.appsec.enabled=true", "-Ddd.service=files", "-Ddd.env=production", "-jar", "/${fileName}.jar"]
