@@ -22,9 +22,4 @@ public class SalesTaxApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
     }
-
-    @PostConstruct
-    void setUTCTimeZone(){
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-    }
 }

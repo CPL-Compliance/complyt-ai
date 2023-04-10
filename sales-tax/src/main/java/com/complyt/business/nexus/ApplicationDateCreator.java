@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 
@@ -14,6 +13,12 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 @Slf4j
 public class ApplicationDateCreator {
 
+    /**
+     * This class defines the date for which the economic nexus is going to be applied
+     *
+     * @param timeFrame     the time frame for summing transactions for checking if economic nexus is passed, defined by the rules of each state
+     * @param referenceDate the created date of the last transaction inserted to the system
+     */
     public LocalDateTime create(@NonNull TimeFrame timeFrame, @NonNull LocalDateTime referenceDate) {
         if (timeFrame.equals(TimeFrame.PREVIOUS_CALENDER_YEAR)) {
             return applyNextCalenderYear(referenceDate);
@@ -55,7 +60,7 @@ public class ApplicationDateCreator {
         // from October 1st to December 31st
         if (referenceDate.compareTo(firstOfOctober) >= 0) {
             applicationDate = firstOfOctober.plusYears(1);
-        // from January 1st to September 30th
+            // from January 1st to September 30th
         } else {
             applicationDate = firstOfOctober;
         }
