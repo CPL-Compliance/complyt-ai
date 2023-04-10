@@ -18,6 +18,7 @@ public class ApplicationDateCreator {
      *
      * @param timeFrame     the time frame for summing transactions for checking if economic nexus is passed, defined by the rules of each state
      * @param referenceDate the created date of the last transaction inserted to the system
+     * @return the applied date of the economic nexus
      */
     public LocalDateTime create(@NonNull TimeFrame timeFrame, @NonNull LocalDateTime referenceDate) {
         if (timeFrame.equals(TimeFrame.PREVIOUS_CALENDER_YEAR)) {
