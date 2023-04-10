@@ -9,7 +9,11 @@ import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,18 +90,7 @@ public interface ITUtilities {
 
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
-                .header("alg", "RS256")
                 .header("typ", "JWT")
-                //.claim("iss", "https://development-complyt.us.auth0.com/")
-                //.claim("aud", "https://sales-tax-service/")
-                .claim("tenant_id", "it_tenant")
-                .claim("scope", "create:customer delete:customer " +
-                        "read:customer update:customer create:transaction " +
-                        "read:transaction update:transaction delete:transaction " +
-                        "read:state create:exemption update:exemption " +
-                        "delete:exemption read:exemption create:nexus " +
-                        "read:nexus delete:nexus update:nexus read:link");
-                //.claim("gty", "client-credentials");
-
+                .claim("tenant_id", "it_tenant");
     }
 }

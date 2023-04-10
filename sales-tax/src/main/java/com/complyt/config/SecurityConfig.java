@@ -66,7 +66,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Profile({"development", "penetration-test", "demo", "test", "default"})
+    @Profile({"development", "penetration-test", "demo", "test", "default", "integration-test"})
     @Bean
     public SecurityWebFilterChain nonProductionSecurityWebFilterChain(ServerHttpSecurity http) {
         // CORS

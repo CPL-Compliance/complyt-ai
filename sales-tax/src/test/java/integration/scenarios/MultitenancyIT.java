@@ -1,6 +1,7 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
+import com.complyt.config.SecurityConfig;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -20,9 +21,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -34,20 +40,18 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(classes = SalesTaxApplication.class)
+@SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureWebTestClient
+@ActiveProfiles({"integration-test", "stubFastTax"})
+@AutoConfigureWebTestClient()
 public class MultitenancyIT extends MongoContainerInitializerIT implements MultitenancyITTemplate {
 
     private String source = "1";
     private  UUID customerComplytIdFromDatabase = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5");
 
-    @MockBean
-    private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
 
@@ -58,7 +62,7 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
 
     @BeforeEach
     void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("multi_tenancy_it_tenant"));
+        //when(tenantResolver.resolve()).thenReturn(Mono.just("multi_tenancy_it_tenant"));
     }
 
     @Test
