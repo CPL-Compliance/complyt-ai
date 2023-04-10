@@ -7,6 +7,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -81,5 +82,22 @@ public interface ITUtilities {
                 "", "", "0",
                 "CT", "Connecticut", "0.06350",
                 "0.06350", "SERVICES", "06516")));
+    }
+
+    static Jwt.Builder stubJwt() {
+        return Jwt.withTokenValue("token")
+                .header("alg", "RS256")
+                .header("typ", "JWT")
+                //.claim("iss", "https://development-complyt.us.auth0.com/")
+                //.claim("aud", "https://sales-tax-service/")
+                .claim("tenant_id", "it_tenant")
+                .claim("scope", "create:customer delete:customer " +
+                        "read:customer update:customer create:transaction " +
+                        "read:transaction update:transaction delete:transaction " +
+                        "read:state create:exemption update:exemption " +
+                        "delete:exemption read:exemption create:nexus " +
+                        "read:nexus delete:nexus update:nexus read:link");
+                //.claim("gty", "client-credentials");
+
     }
 }
