@@ -8,6 +8,7 @@ import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.SalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
+import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -32,12 +34,16 @@ public class SalesTaxRatesHandler {
     @NonNull
     QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
 
+    @NonNull
+    ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
+
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<SalesTaxRatesDto> salesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoQueryParamsExtractor.extract(serverRequest))
+                .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(salesTaxRatesFacade::findByAddress)
                 .map(SalesTaxRatesMapper.INSTANCE::salesTaxRatesToSalesTaxRatesDto)

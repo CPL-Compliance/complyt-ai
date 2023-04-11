@@ -27,19 +27,29 @@ public class ValidationHandler<T, U extends Validator> {
         return Mono.error(new ObjectNotValidApiException(errors));
     }
 
+    public Mono<T> validate(final T object) {
+        Errors errors = new BeanPropertyBindingResult(object, validationClass.getName());
+        validator.validate(object, errors);
 
-    private Mono<T> validateRequestBody(final ServerRequest request) {
-        return request.bodyToMono(validationClass)
-                .flatMap(body -> {
-                    Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
-                    validator.validate(body, errors);
-
-                    if (errors.getAllErrors().isEmpty()) {
-                        return Mono.just(body);
-                    } else {
-                        return onValidationErrors(errors);
-                    }
-                });
+        if (errors.getAllErrors().isEmpty()) {
+            return Mono.just(object);
+        } else {
+            return onValidationErrors(errors);
+        }
     }
+
+//    private Mono<T> validateRequestBody(final ServerRequest request) {
+//        return request.bodyToMono(validationClass)
+//                .flatMap(body -> {
+//                    Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
+//                    validator.validate(body, errors);
+//
+//                    if (errors.getAllErrors().isEmpty()) {
+//                        return Mono.just(body);
+//                    } else {
+//                        return onValidationErrors(errors);
+//                    }
+//                });
+//    }
 
 }

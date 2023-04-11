@@ -4,8 +4,10 @@ import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.validators.ValidationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
+@Configuration
 public class ValidatorConfig {
 
     @Bean
