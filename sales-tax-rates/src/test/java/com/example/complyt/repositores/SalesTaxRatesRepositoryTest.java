@@ -34,8 +34,8 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void findByAddress_FindsAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
         // Given
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createNewYorkAddressWithSalesTaxRates();
-        Address address = TestUtilities.createAddressInNewYork();
+        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        Address address = TestUtilities.createAddressInCalifornia();
         Query query = TestUtilities.createAddressSearchQuery(address);
         String state = "new_york";
 
@@ -50,8 +50,8 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void save_SavesAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
         // Given
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createNewYorkAddressWithSalesTaxRates();
-        String state = "new_york";
+        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        String state = "california";
 
         // When
         when(reactiveMongoTemplate.save(addressWithSalesTaxRates, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
