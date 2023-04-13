@@ -12,4 +12,8 @@ public class SalesTaxRates {
     float countyRate;
     float stateRate;
     float taxRate;
+
+    public static SalesTaxRates zeroSalesTaxRates() {
+        return new SalesTaxRates(0, 0, 0, 0, 0, 0);
+    }
 }
