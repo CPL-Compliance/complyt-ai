@@ -58,7 +58,6 @@ public class TestUtilities {
     public String stringWithLength(int length) {
         StringBuilder stringBuilder = new StringBuilder();
         for (; 0 < length; length--) stringBuilder.append('a');
-        System.out.println(stringBuilder);
         return stringBuilder.toString();
     }
 
