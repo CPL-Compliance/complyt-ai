@@ -73,7 +73,7 @@ public @interface GetCustomerByNameApiInfo {
             "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
             "    \"externalId\": \"999444\",\n" +
             "    \"source\": \"1\",\n" +
-            "    \"name: " + nameExample + ",\n" +
+            "    \"name\": \"" + nameExample + "\",\n" +
             "    \"address\": {\n" +
             "        \"city\": \"Sacramento\",\n" +
             "        \"country\": \"US\",\n" +

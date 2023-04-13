@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -58,11 +58,11 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Autowired
     private WebTestClient webTestClient;
 
-    private TestUtilities testUtilities;
+    private UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         customerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString());
         customer = CustomerMapper.INSTANCE.customerDtoToCustomer(customerDto);
     }

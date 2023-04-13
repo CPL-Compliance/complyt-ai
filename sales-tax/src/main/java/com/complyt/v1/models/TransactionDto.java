@@ -35,7 +35,7 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps,
                              @NotNull(message = "transactionType " + DtoErrorMessages.NOT_NULL_ERROR) TransactionTypeDto transactionType,
                              @Valid ShippingFeeDto shippingFee,
-                             @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MINMAX_256_ERROR) String createdFrom,
+                             @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
                              @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) float taxableItemsAmount,
                              @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) float tangibleItemsAmount,
                              float totalItemsAmount)

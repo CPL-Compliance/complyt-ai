@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,11 +44,11 @@ public class NexusCalculatorTest {
     TransactionsFilterByNexusRules transactionNexusFilter;
 
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setup() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
     }
 
     private NexusStateRule createNexusStateRule() {

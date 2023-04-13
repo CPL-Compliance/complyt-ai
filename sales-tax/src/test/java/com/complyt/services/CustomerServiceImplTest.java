@@ -20,7 +20,7 @@ import org.webjars.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -48,11 +48,11 @@ class CustomerServiceImplTest {
 
     String source;
 
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeAll
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         String name = "Existing Customer";
         customer = testUtilities.createCustomer(UUID.randomUUID().toString()).withName(name);
         source = testUtilities.getUnifiedSource();

@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,11 +61,11 @@ public class SalesTaxServiceImplTest {
     Transaction transaction;
 
     String salesTaxTrackingId;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }

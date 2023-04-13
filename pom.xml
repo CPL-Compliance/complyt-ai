@@ -57,6 +57,7 @@
         <logback-json-classic.version>0.1.5</logback-json-classic.version>
         <jackson-databind.version>2.14.1</jackson-databind.version>
         <spring-cloud-dependencies.version>2022.0.0</spring-cloud-dependencies.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
         <!-- Dependencies -->
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -169,6 +170,23 @@
                 <scope>test</scope>
             </dependency>
             <!-- Test -->
+            <!-- Testcontainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mongodb</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <!-- Testcontainers -->
             <!-- Other -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
@@ -252,29 +270,15 @@
                                     </assembly>
                                     <tags>
                                         <tag>latest</tag>
-                                        <tag>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</tag>
+                                        <tag>
+                                            ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+                                        </tag>
                                     </tags>
                                 </build>
                             </image>
                         </images>
                     </configuration>
                     <executions>
-                        <execution>
-                            <id>start</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>build</goal>
-                                <goal>start</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>stop</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>stop</goal>
-                                <goal>remove</goal>
-                            </goals>
-                        </execution>
                         <execution>
                             <id>build-and-push-to-container-registry</id>
                             <phase>deploy</phase>

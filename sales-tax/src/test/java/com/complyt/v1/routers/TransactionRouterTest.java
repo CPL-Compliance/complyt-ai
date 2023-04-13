@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,7 +60,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Autowired
     TransactionRouter transactionRouter;
     String source;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     @MockBean
     private TransactionFacade transactionFacade;
     @Autowired
@@ -68,7 +68,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
     @BeforeEach
     void setUp() {
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transactionDto = testUtilities.createTransactionDto(UUID.randomUUID().toString())
                 .withCustomer(null);
         transaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto);
@@ -1829,7 +1829,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         String lengthOf257CreatedFrom = testUtilities.stringWithLength(257);
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "createdFrom " + StringErrorMessages.MINMAX_256_ERROR));
+                "createdFrom " + StringErrorMessages.MAX_256_ERROR));
 
         // When + Then
         webTestClient
@@ -4257,32 +4257,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 });
     }
 
-    @Override
-    @Test
-    @WithMockUser
-    public void upsert_BlankTaxCodeInShippingFee_Returns400ValidationError() {
-        // Given
-        ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), "", null, null);
-        String externalId = transactionDto.externalId();
-        String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
-
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(transactionDto.withShippingFee(givenShippingFee))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
-    }
-
     @Test
     @Override
     @WithMockUser
@@ -4292,7 +4266,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
+                "ShippingFee.taxCode " + StringErrorMessages.MAX_256_ERROR));
 
 
         // When + Then

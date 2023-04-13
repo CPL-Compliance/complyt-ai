@@ -6,7 +6,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import testUtils.TestUtilities;
+import testUtils.unit_test.UnitTestUtilities;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class StateLevelSalesTaxRatesCalculatorTest {
 
     StateLevelSalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
-    TestUtilities testUtilities;
+    UnitTestUtilities testUtilities;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     SalesTaxRate salesTaxRate;
 
     @BeforeEach
     void setUp() {
         stateLevelSalesTaxRatesCalculator = new StateLevelSalesTaxRatesCalculator();
-        testUtilities = new TestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
+        testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxRate = testUtilities.createSalesTaxRates();
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
     }
