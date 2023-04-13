@@ -8,15 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.mockito.Mockito.when;
-
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 public class SalesTaxRatesRepositoryTest {
 
@@ -59,5 +59,63 @@ public class SalesTaxRatesRepositoryTest {
 
         // Then
         StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(addressWithSalesTaxRates).verifyComplete();
+    }
+
+    @Test
+    void save_NullCollectionPassed_ThrowsException() {
+        // Given
+        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        String nullCollection = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRatesRepository.save(addressWithSalesTaxRates, nullCollection);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+    }
+
+    @Test
+    void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
+        // Given
+        AddressWithSalesTaxRates nullAddressWithSalesTaxRates = null;
+        String state = "california";
+
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRatesRepository.save(nullAddressWithSalesTaxRates, state);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
+    }
+
+    @Test
+    void findByAddress_NullCollectionPassed_ThrowsException() {
+        // Given
+        Address address = TestUtilities.createAddressInCalifornia();
+        String nullCollection = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRatesRepository.findByAddress(address, nullCollection);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+    }
+
+    @Test
+    void findByAddress_NullAddressPassed_ThrowsException() {
+        // Given
+        Address nullAddress = null;
+        String state = "california";
+
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxRatesRepository.findByAddress(nullAddress, state);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
     }
 }

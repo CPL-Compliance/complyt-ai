@@ -31,12 +31,12 @@ public class SalesTaxRatesServiceImpl implements SalesTaxRatesService {
 
     @Override
     public Mono<SalesTaxRates> findByAddress(@NonNull Address address) {
-        String state = StatesMap.statesToCollections.get(address.getState());
+        String collection = StatesMap.statesToCollections.get(address.getState());
 
-        return salesTaxRatesRepository.findByAddress(address, state)
+        return salesTaxRatesRepository.findByAddress(address, collection)
                 .switchIfEmpty(salesTaxWebClientWrapper.findByAddress(address)
                         .flatMap(salesTaxDataToSalesTaxRate::map)
-                        .flatMap(salesTaxRates -> salesTaxRatesRepository.save(new AddressWithSalesTaxRates(address, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1)), state)))
+                        .flatMap(salesTaxRates -> salesTaxRatesRepository.save(new AddressWithSalesTaxRates(address, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1)), collection)))
                 .map(AddressWithSalesTaxRates::getSalesTaxRates);
     }
 

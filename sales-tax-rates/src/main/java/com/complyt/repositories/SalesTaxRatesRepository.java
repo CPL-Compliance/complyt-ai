@@ -20,15 +20,15 @@ public class SalesTaxRatesRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<AddressWithSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String state) {
+    public Mono<AddressWithSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
         Query query = Query.query(Criteria
                 .where("address.city").is(address.getCity())
                 .and("address.street").is(address.getStreet())
                 .and("address.zip").is(address.getZip())
         );
 
-        return ContextLogger.observeCtx("Searching for rates in " + state + ", by address: " + query, log::debug)
-                .then(reactiveMongoTemplate.findOne(query, AddressWithSalesTaxRates.class, state));
+        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::debug)
+                .then(reactiveMongoTemplate.findOne(query, AddressWithSalesTaxRates.class, collection));
     }
 
     public Mono<AddressWithSalesTaxRates> save(@NonNull AddressWithSalesTaxRates addressWithSalesTaxRates, @NonNull String collection) {
