@@ -1,5 +1,6 @@
 package com.example.complyt.domain.fast_tax;
 
+import com.complyt.domain.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

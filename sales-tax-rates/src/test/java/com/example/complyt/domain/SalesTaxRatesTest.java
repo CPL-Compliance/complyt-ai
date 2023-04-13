@@ -24,7 +24,7 @@ class SalesTaxRatesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRate(cityDistrictRate=" + rate +
+        String expectedString = "SalesTaxRates(cityDistrictRate=" + rate +
                 ", cityRate=" + rate +
                 ", countyDistrictRate=" + rate +
                 ", countyRate=" + rate +
