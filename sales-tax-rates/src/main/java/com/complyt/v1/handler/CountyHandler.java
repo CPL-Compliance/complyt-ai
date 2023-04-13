@@ -1,13 +1,11 @@
 package com.complyt.v1.handler;
 
-import com.complyt.facade.SalesTaxRatesFacade;
+import com.complyt.facade.CountyFacade;
+import com.complyt.security.permissions.county.CountyReadPermission;
 import com.complyt.utils.observability.ContextLogger;
-import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressMapper;
-import com.complyt.v1.mappers.SalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.SalesTaxRatesDto;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
@@ -26,10 +24,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SalesTaxRatesHandler {
+public class CountyHandler {
 
     @NonNull
-    SalesTaxRatesFacade salesTaxRatesFacade;
+    CountyFacade countyFacade;
 
     @NonNull
     QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
@@ -37,20 +35,19 @@ public class SalesTaxRatesHandler {
     @NonNull
     ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
 
-    @SalesTaxRatesReadPermission
-    public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
+    @CountyReadPermission
+    public Mono<ServerResponse> getCountyByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<SalesTaxRatesDto> salesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
+        Mono<String> salesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoQueryParamsExtractor.extract(serverRequest))
                 .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
-                .flatMap(salesTaxRatesFacade::findByAddress)
-                .map(SalesTaxRatesMapper.INSTANCE::salesTaxRatesToSalesTaxRatesDto)
-                .flatMap(salesTaxRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + salesTaxRatesDto, log::info).thenReturn(salesTaxRatesDto))
+                .flatMap(countyFacade::findByAddress)
+                .flatMap(county -> ContextLogger.observeCtx("<-- Returned Body: " + county, log::info).thenReturn(county))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxRatesDtoMono, SalesTaxRatesDto.class);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(salesTaxRatesDtoMono, String.class);
     }
 
 }

@@ -2,7 +2,7 @@ package com.example.complyt.repositores;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.repositories.SalesTaxRatesRepository;
+import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
 import com.testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class SalesTaxRatesRepositoryTest {
 
     @InjectMocks
-    SalesTaxRatesRepository salesTaxRatesRepository;
+    AddressWithSalesTaxRatesRepository salesTaxRatesRepository;
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;

@@ -6,6 +6,6 @@ import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
 public interface SalesTaxRatesService {
-    Mono<SalesTaxRates> findByAddress(@NonNull Address address);
 
+    Mono<SalesTaxRates> findByAddress(@NonNull Address address);
 }

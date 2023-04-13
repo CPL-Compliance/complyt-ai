@@ -21,7 +21,7 @@
 //
 //import static org.mockito.Mockito.when;
 //
-//public class SalesTaxRatesServiceImplTest {
+//public class AddressWithSalesTaxRatesServiceImplTest {
 //
 //    @InjectMocks
 //    SalesTaxRatesServiceImpl salesTaxRatesService;

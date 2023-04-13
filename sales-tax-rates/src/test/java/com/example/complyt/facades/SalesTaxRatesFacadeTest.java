@@ -3,7 +3,7 @@ package com.example.complyt.facades;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.facade.SalesTaxRatesFacade;
-import com.complyt.services.SalesTaxRatesServiceImpl;
+import com.complyt.services.SalesTaxRatesService;
 import com.testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ public class SalesTaxRatesFacadeTest {
     SalesTaxRatesFacade salesTaxRatesFacade;
 
     @Mock
-    SalesTaxRatesServiceImpl salesTaxRatesService;
+    SalesTaxRatesService salesTaxRatesService;
 
     @Test
     void findByAddress_RatesReturnedFromService_ReturnsRates() {

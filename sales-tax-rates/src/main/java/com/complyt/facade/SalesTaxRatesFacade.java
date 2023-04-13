@@ -2,7 +2,7 @@ package com.complyt.facade;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.services.SalesTaxRatesServiceImpl;
+import com.complyt.services.SalesTaxRatesService;
 import lombok.NonNull;
 import lombok.Value;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class SalesTaxRatesFacade {
 
     @NonNull
-    SalesTaxRatesServiceImpl salesTaxRatesServiceImpl;
+    SalesTaxRatesService salesTaxRatesServiceImpl;
 
     public Mono<SalesTaxRates> findByAddress(@NonNull Address address) {
         return salesTaxRatesServiceImpl.findByAddress(address);

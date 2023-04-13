@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @Repository
 @Slf4j
 @AllArgsConstructor
-public class SalesTaxRatesRepository {
+public class AddressWithSalesTaxRatesRepository {
 
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
