@@ -28,8 +28,8 @@ class OpenApiConfigTest {
         // Given
         OpenAPI expectedOpenApi = new OpenAPI()
                 .info(new Info()
-                        .title("Sales-Tax API")
-                        .description("Sales-Tax API")
+                        .title("Sales-Tax-Rates API")
+                        .description("Sales-Tax-Rates API")
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")
