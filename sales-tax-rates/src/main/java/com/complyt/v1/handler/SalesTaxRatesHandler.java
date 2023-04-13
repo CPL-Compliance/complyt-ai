@@ -1,7 +1,7 @@
 package com.complyt.v1.handler;
 
 import com.complyt.facade.SalesTaxRatesFacade;
-import com.complyt.observability.ContextLogger;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.security.permissions.SalesTaxRatesReadPermission;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressMapper;

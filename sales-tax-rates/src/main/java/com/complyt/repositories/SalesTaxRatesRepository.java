@@ -2,7 +2,7 @@ package com.complyt.repositories;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.observability.ContextLogger;
+import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

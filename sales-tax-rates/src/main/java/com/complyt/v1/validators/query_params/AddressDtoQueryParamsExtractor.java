@@ -1,6 +1,6 @@
 package com.complyt.v1.validators.query_params;
 
-import com.complyt.observability.ContextLogger;
+import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.model.AddressDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.complyt.observability;
+package com.complyt.utils.observability;
 
 import io.micrometer.context.ContextSnapshot;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
