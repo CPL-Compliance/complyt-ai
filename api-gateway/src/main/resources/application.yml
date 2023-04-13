@@ -59,6 +59,12 @@ spring:
             - Path=/sales-tax/**
           filters:
             - RewritePath=/sales-tax/(?<path>.*), /$\{path}
+        - id: sales-tax-rates-service
+          uri: lb://sales-tax-rates-service
+          predicates:
+            - Path=/sales-tax-rates/**
+          filters:
+            - RewritePath=/sales-tax-rates/(?<path>.*), /$\{path}
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
