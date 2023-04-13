@@ -243,30 +243,30 @@ workflows:
             - deploy
           service_name: "discovery-service"
 
-    sales-tax-rates-workflow:
-      when: << pipeline.parameters.run-sales-tax-rates-workflow >>
-      jobs:
-        - verify:
-            filters:
-              branches:
-                only:
-                  - /^(main.+|(?!main).*)$/
-            service_directory: "sales-tax-rates"
+  sales-tax-rates-workflow:
+    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "sales-tax-rates"
 
-        - deploy:
-            filters:
-              branches:
-                only:
-                  - main
-            service_directory: "sales-tax-rates"
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "sales-tax-rates"
 
-        - send-test-coverage-reports:
-            requires:
-              - verify
-              - deploy
-            service_directory: "sales-tax-rates"
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "sales-tax-rates"
 
-        - update-ecs-service:
-            requires:
-              - deploy
-            service_name: "sales-tax-rates"
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "sales-tax-rates"
