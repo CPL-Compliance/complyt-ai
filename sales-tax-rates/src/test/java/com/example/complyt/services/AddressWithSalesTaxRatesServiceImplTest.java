@@ -19,8 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -98,6 +96,34 @@ public class AddressWithSalesTaxRatesServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
+    }
+
+    @Test
+    void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
+        // Given
+        String collection = "collection";
+        AddressWithSalesTaxRates nullAddressWithSalesTaxRates = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            addressWithSalesTaxRatesService.save(nullAddressWithSalesTaxRates,collection);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
+    }
+
+    @Test
+    void save_NullCollectionPassed_ThrowsException() {
+        // Given
+        String nullCollection = null;
+        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            addressWithSalesTaxRatesService.save(addressWithSalesTaxRates,nullCollection);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
     }
 
 }

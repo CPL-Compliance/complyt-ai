@@ -42,7 +42,7 @@ public class AddressWithSalesTaxRatesServiceImpl implements AddressWithSalesTaxR
                         .flatMap(addressWithSalesTaxRates -> save(addressWithSalesTaxRates, collection)));
     }
 
-    private Mono<AddressWithSalesTaxRates> setBeforeSave(@NonNull Address address, @NotNull SalesTaxData salesTaxData) {
+    private Mono<AddressWithSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
         return countyFetcher.fetch(salesTaxData)
                 .flatMap(county -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
