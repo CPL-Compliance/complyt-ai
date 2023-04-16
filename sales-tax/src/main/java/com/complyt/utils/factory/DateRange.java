@@ -73,9 +73,9 @@ public class DateRange {
         }
 
         public static DateRange newYearFromSeptember(@NonNull LocalDateTime referenceDate) {
-            LocalDateTime september30 = referenceDate
-                    .withMonth(9)
-                    .withDayOfMonth(30)
+            LocalDateTime firstOfOctober = referenceDate
+                    .withMonth(10)
+                    .withDayOfMonth(1)
                     .withHour(0)
                     .withMinute(0)
                     .withSecond(0)
@@ -84,10 +84,10 @@ public class DateRange {
             LocalDateTime startDate, endDate;
 
             // from october 1st to december 31st
-            if (referenceDate.compareTo(september30) < 0) {
-                startDate = september30.minusYears(1);
+            if (referenceDate.compareTo(firstOfOctober) < 0) {
+                startDate = firstOfOctober.minusYears(1);
             } else {
-                startDate = september30;
+                startDate = firstOfOctober;
             }
 
             endDate = startDate.plusYears(1);

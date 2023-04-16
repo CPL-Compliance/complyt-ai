@@ -13,6 +13,13 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 @Slf4j
 public class ApplicationDateCreator {
 
+    /**
+     * This class defines the date for which the economic nexus is going to be applied
+     *
+     * @param timeFrame     the time frame for summing transactions for checking if economic nexus is passed, defined by the rules of each state
+     * @param referenceDate the created date of the last transaction inserted to the system
+     * @return the applied date of the economic nexus
+     */
     public LocalDateTime create(@NonNull TimeFrame timeFrame, @NonNull LocalDateTime referenceDate) {
         if (timeFrame.equals(TimeFrame.PREVIOUS_CALENDER_YEAR)) {
             return applyNextCalenderYear(referenceDate);
@@ -41,20 +48,22 @@ public class ApplicationDateCreator {
 
     private LocalDateTime applyNextSeptember(LocalDateTime referenceDate) {
 
-        LocalDateTime september30 = referenceDate
-                .withMonth(9)
-                .withDayOfMonth(30)
+
+        LocalDateTime firstOfOctober = referenceDate
+                .withMonth(10)
+                .withDayOfMonth(1)
                 .withHour(0)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
         LocalDateTime applicationDate;
 
-        // from october 1st to december 31st
-        if (referenceDate.compareTo(september30) >= 0) {
-            applicationDate = september30.plusYears(1);
+        // from October 1st to December 31st
+        if (referenceDate.compareTo(firstOfOctober) >= 0) {
+            applicationDate = firstOfOctober.plusYears(1);
+            // from January 1st to September 30th
         } else {
-            applicationDate = september30;
+            applicationDate = firstOfOctober;
         }
         log.info("Creating sales tax application date : " + applicationDate);
 
