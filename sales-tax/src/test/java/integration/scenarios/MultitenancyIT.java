@@ -11,6 +11,7 @@ import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.MongoContainerInitializerIT;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -29,10 +28,12 @@ import testUtils.integration_test.ITUtilities;
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = {SalesTaxApplication.class})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
 public class MultitenancyIT extends MongoContainerInitializerIT implements MultitenancyITTemplate {
 
@@ -48,6 +49,7 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
+    @Order(1)
     @Test
     @Override
     public void getCustomer_ExistsInOtherTenant_Returns404() {
@@ -76,9 +78,9 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
                 .expectStatus().isOk();
     }
 
+    @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void getTransaction_ExistsInOtherTenant_Returns404() {
         // Given
         String externalId = "10000";
@@ -105,9 +107,9 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
                 .expectStatus().isOk();
     }
 
+    @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void getSalesTaxTracking_ExistsInOtherTenant_Returns404() {
         // Given
         String stateName = "Arizona";
@@ -134,9 +136,9 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
                 .expectStatus().isOk();
     }
 
+    @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void putCustomer_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a customer from the database: "Bestcompany Com"
         String externalId = "1586";
@@ -169,11 +171,11 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
                                 .value(map -> assertEquals(map.get("message"), GenericErrorMessages.DATA_CONFLICT_ERROR)));
     }
 
+    @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void putTransaction_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
-        // Given - details of a customer from the database
+        // Given - details of a transaction from the database
         String externalId = "10000";
 
         // Then
@@ -205,9 +207,9 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
 
     }
 
+    @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void putSalesTaxTracking_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a salesTaxTracking from the database
         StateDto state = new StateDto("AZ", "04", "Arizona");
@@ -239,5 +241,164 @@ public class MultitenancyIT extends MongoContainerInitializerIT implements Multi
                                 .expectBody(LinkedHashMap.class)
                                 .value(map -> assertEquals(map.get("message"), GenericErrorMessages.DATA_CONFLICT_ERROR)));
 
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    public void putCustomer_ExistsInOtherTenant_Returns200WithoutDataLeak() {
+        // Given - details of a customer from the database: "Bestcompany Com"
+        String externalId = "1586";
+
+        // Then
+        webTestClient
+                .mutateWith(defaultTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(customerDto -> {
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .mutateWith(differentTenantMutator)
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(customerDto.withComplytId(null))
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(CustomerDto.class)
+                            .value(receivedCustomerDto -> assertNotEquals(receivedCustomerDto.complytId(), customerDto.complytId()));
+
+                    webTestClient
+                            .mutateWith(defaultTenantMutator)
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isOk()
+                            .expectBody(CustomerDto.class)
+                            .value(receivedCustomerDto -> assertEquals(customerDto, receivedCustomerDto));
+                });
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    public void putTransaction_ExistsInOtherTenant_Returns200WithoutDataLeak() {
+        // Given - details of a transaction from the database
+        String externalId = "10000";
+        String customerExternalId = "1586";
+
+        // Then
+        webTestClient
+                .mutateWith(defaultTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+
+                    webTestClient
+                            .mutateWith(differentTenantMutator)
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isOk()
+                            .expectBody(CustomerDto.class)
+                            .value(customerDto -> {
+
+                                webTestClient
+                                        .mutateWith(csrf())
+                                        .mutateWith(differentTenantMutator)
+                                        .put()
+                                        .uri(uriBuilder -> uriBuilder
+                                                .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                                .build())
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .bodyValue(transactionDto.withComplytId(null).withCustomerId(customerDto.complytId()))
+                                        .exchange()
+                                        .expectStatus().isCreated()
+                                        .expectBody(TransactionDto.class)
+                                        .value(receivedTransactionDto -> assertNotEquals(receivedTransactionDto.complytId(), transactionDto.complytId()));
+
+                                webTestClient
+                                        .mutateWith(defaultTenantMutator)
+                                        .get()
+                                        .uri(uriBuilder -> uriBuilder
+                                                .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                                .build())
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .exchange()
+                                        .expectStatus().isOk()
+                                        .expectBody(TransactionDto.class)
+                                        .value(receivedTransactionDto -> assertEquals(transactionDto, receivedTransactionDto));
+
+                            });
+                });
+    }
+
+    @Order(2)
+    @Test
+    @Override
+    public void putSalesTaxTracking_ExistsInOtherTenant_Returns200WithoutDataLeak() {
+        // Given - details of a customer from the database: "Bestcompany Com"
+        StateDto state = new StateDto("AZ", "04", "Arizona");
+
+        // Then
+        webTestClient
+                .mutateWith(defaultTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .mutateWith(differentTenantMutator)
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(salesTaxTrackingDto.withComplytId(null))
+                            .exchange()
+                            .expectStatus().isCreated()
+                            .expectBody(SalesTaxTrackingDto.class)
+                            .value(receivedSalesTaxTrackingDto -> assertNotEquals(receivedSalesTaxTrackingDto.complytId(), salesTaxTrackingDto.complytId()));
+
+                    webTestClient
+                            .mutateWith(defaultTenantMutator)
+                            .get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.abbreviation())
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .exchange()
+                            .expectStatus().isOk()
+                            .expectBody(SalesTaxTrackingDto.class)
+                            .value(receivedSalesTaxTrackingDto -> assertEquals(salesTaxTrackingDto, receivedSalesTaxTrackingDto));
+                });
     }
 }

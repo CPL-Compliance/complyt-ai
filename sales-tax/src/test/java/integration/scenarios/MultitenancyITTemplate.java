@@ -8,4 +8,7 @@ public interface MultitenancyITTemplate {
     void putCustomer_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict();
     void putTransaction_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict();
     void putSalesTaxTracking_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict();
+    void putCustomer_ExistsInOtherTenant_Returns200WithoutDataLeak();
+    void putTransaction_ExistsInOtherTenant_Returns200WithoutDataLeak();
+    void putSalesTaxTracking_ExistsInOtherTenant_Returns200WithoutDataLeak();
 }
