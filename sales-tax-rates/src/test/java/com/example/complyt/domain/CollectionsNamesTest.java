@@ -8,8 +8,6 @@ public class CollectionsNamesTest {
 
     @Test
     void testsToCollectionsNames() {
-        CollectionsNames collectionsNames = new CollectionsNames();
-
         Assertions.assertEquals("alabama",CollectionsNames.ALABAMA);
         Assertions.assertEquals("alaska",CollectionsNames.ALASKA);
         Assertions.assertEquals("arizona",CollectionsNames.ARIZONA);

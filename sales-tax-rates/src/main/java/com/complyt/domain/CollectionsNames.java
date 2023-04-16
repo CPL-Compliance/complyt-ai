@@ -1,6 +1,9 @@
 package com.complyt.domain;
 
-public class CollectionsNames {
+public final class CollectionsNames {
+
+    private CollectionsNames(){}
+
     public static final String ALABAMA = "alabama";
     public static final String ALASKA = "alaska";
     public static final String ARIZONA = "arizona";
