@@ -5,9 +5,9 @@ import com.complyt.domain.Address;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
 import com.testUtils.TestUtilities;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -22,8 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(MockitoExtension.class)
 class ZipTaxCountyFetcherTest {
 
-    @InjectMocks
     private ZipTaxCountyFetcher zipTaxCountyFetcher;
+
+    @BeforeEach
+    void setUp() {
+        zipTaxCountyFetcher = new ZipTaxCountyFetcher();
+    }
 
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
@@ -45,7 +49,7 @@ class ZipTaxCountyFetcherTest {
     @Test
     void equals_SameTransactionZipTaxCountyFetcher_ReturnsTrue() {
         // Given
-        ZipTaxCountyFetcher givenZipTaxCountyFetcher = zipTaxCountyFetcher;
+        ZipTaxCountyFetcher givenZipTaxCountyFetcher = new ZipTaxCountyFetcher();
 
         // When
         boolean isEquals = zipTaxCountyFetcher.equals(givenZipTaxCountyFetcher);

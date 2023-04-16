@@ -5,10 +5,10 @@ import com.complyt.domain.Address;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.testUtils.TestUtilities;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -24,9 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FastTaxCountyFetcherTest {
 
-    @InjectMocks
     private FastTaxCountyFetcher fastTaxCountyFetcher;
 
+    @BeforeEach
+    void setUp(){
+        fastTaxCountyFetcher = new FastTaxCountyFetcher();
+    }
 
     private TaxInfoItem createTaxInfoItem() {
         return new TaxInfoItem("city", "", "", "injectedCounty", "", "", null, "", "", "", "", "", "", "", "", "");
@@ -53,7 +56,7 @@ class FastTaxCountyFetcherTest {
     @Test
     void equals_SameTransactionFastTaxCountyFetcher_ReturnsTrue() {
         // Given
-        FastTaxCountyFetcher givenFastTaxCountyFetcher = fastTaxCountyFetcher;
+        FastTaxCountyFetcher givenFastTaxCountyFetcher = new FastTaxCountyFetcher();
 
         // When
         boolean isEquals = fastTaxCountyFetcher.equals(givenFastTaxCountyFetcher);
