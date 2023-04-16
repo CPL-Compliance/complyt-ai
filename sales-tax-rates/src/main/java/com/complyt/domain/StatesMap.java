@@ -3,7 +3,11 @@ package com.complyt.domain;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StatesMap {
+public final class StatesMap {
+
+    private StatesMap() {
+    }
+
     public static final Map<String, String> statesToCollections = new HashMap<>() {{
         put("AL", CollectionsNames.ALABAMA);
         put("Alabama", CollectionsNames.ALABAMA);
