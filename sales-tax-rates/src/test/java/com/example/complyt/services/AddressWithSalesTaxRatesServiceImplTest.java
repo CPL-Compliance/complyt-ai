@@ -11,18 +11,18 @@ import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
 import com.complyt.services.AddressWithSalesTaxRatesServiceImpl;
 import com.testUtils.TestUtilities;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -63,6 +63,19 @@ public class AddressWithSalesTaxRatesServiceImplTest {
 
         // Then
         StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressWithSalesTaxRates).verifyComplete();
+    }
+
+    @Test
+    void findByAddress_NullAddressPassed_ThrowsException() {
+        // Given
+        Address nullAddress = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            addressWithSalesTaxRatesService.findByAddress(nullAddress);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
     }
 
 }

@@ -81,7 +81,6 @@ public class SalesTaxRatesRepositoryTest {
         AddressWithSalesTaxRates nullAddressWithSalesTaxRates = null;
         String state = "california";
 
-
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             salesTaxRatesRepository.save(nullAddressWithSalesTaxRates, state);
@@ -109,7 +108,6 @@ public class SalesTaxRatesRepositoryTest {
         // Given
         Address nullAddress = null;
         String state = "california";
-
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
