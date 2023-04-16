@@ -88,6 +88,16 @@ public interface ITUtilities {
                 "0.06350", "SERVICES", "06516")));
     }
 
+    static FastTaxData stubFastTaxGeorgia() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Atlanta", "0", "0.01900",
+                "Fulton", "0", "0.03000",
+                List.of(new InformationComponent("CountyFIPS", "121")),
+                "", "", "0",
+                "GA", "Georgia", "0.0400",
+                "0.08900", "LABOR/SERVICES", "30303-3192")));
+    }
+
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
                 .header("typ", "JWT")
