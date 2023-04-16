@@ -8,7 +8,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
-public abstract class MongoContainerInitializerIT {
+public abstract class TestContainersInitializerIT {
 
     protected static final Logger LOGGER = log;
 
@@ -16,13 +16,13 @@ public abstract class MongoContainerInitializerIT {
 
     protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
             .withExposedPorts(27017)
-            .withClasspathResourceMapping("sales_tax.dump", "sales_tax.dump", BindMode.READ_ONLY);
+            .withClasspathResourceMapping("files.dump", "files.dump", BindMode.READ_ONLY);
 
     static {
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
         try {
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax.dump");
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=files.dump");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

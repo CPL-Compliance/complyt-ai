@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.mockito.Mockito.when;
 
@@ -31,7 +31,6 @@ class FileRepositoryTest {
     @Mock
     TenantResolver tenantResolver;
 
-    ObjectStub objectStub = new ObjectStub();
 
     File file;
 
@@ -39,9 +38,9 @@ class FileRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        tenantId = objectStub.getTenantId();
+        tenantId = TestUtilities.tenantId;
         MockitoAnnotations.openMocks(this);
-        file = objectStub.createFile();
+        file = TestUtilities.createFile();
     }
 
     @Test

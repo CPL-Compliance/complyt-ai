@@ -21,7 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,12 +41,9 @@ public class FileRouterTest implements FileRouterTestTemplate {
 
     private WebTestClient webTestClient;
 
-    private ObjectStub objectStub;
-
     @BeforeEach
     void setUp() {
         webTestClient = WebTestClient.bindToApplicationContext(context).build();
-        objectStub = new ObjectStub();
         webTestClient = WebTestClient.bindToApplicationContext(context).build();
     }
 
@@ -69,7 +66,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void get_Exists_Returns200() {
         // Given
-        File file = objectStub.createFile();
+        File file = TestUtilities.createFile();
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
 
         // When
@@ -91,7 +88,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void getAny_InvalidUrl_Returns404() {
         // Given
-        File file = objectStub.createFile();
+        File file = TestUtilities.createFile();
 
         // When
         when(fileService.find()).thenReturn(Mono.just(file));
