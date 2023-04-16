@@ -11,7 +11,7 @@ import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,8 +30,7 @@ import testUtils.integration_test.ITUtilities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -40,7 +39,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
-public class PhysicalNexusIT extends MongoContainerInitializerIT implements PhysicalNexusITTemplate {
+public class PhysicalNexusIT extends TestContainersInitializerIT implements PhysicalNexusITTemplate {
 
     /*
      * State Rule: Georgia
@@ -127,7 +126,9 @@ public class PhysicalNexusIT extends MongoContainerInitializerIT implements Phys
                                 .bodyValue(salesTaxTrackingDto
                                         .withApproved(true)
                                         .withPhysicalNexusTracker(
-                                                new PhysicalNexusTrackerDto(true, referenceDate)))
+                                                new PhysicalNexusTrackerDto(true, referenceDate))
+                                        .withAppliedDate(referenceDate)
+                                        .withApprovalDate(referenceDate))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()
@@ -144,7 +145,7 @@ public class PhysicalNexusIT extends MongoContainerInitializerIT implements Phys
         String externalId = "10062";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(),referenceDate.toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
 
         // Then
         webTestClient
@@ -161,27 +162,90 @@ public class PhysicalNexusIT extends MongoContainerInitializerIT implements Phys
                 .value(transactionDto -> assertEquals(890, transactionDto.salesTax().amount()));
     }
 
-    @Order(1)
+    @Order(3)
     @Test
     @Override
     @WithMockUser
     public void upsertTransaction_NewAndBeforePhysicalNexus_Returns201NoTaxes() {
+        //Given
+        String externalId = "10063";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.minusYears(1).toString(), referenceDate.toString()));
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
     }
 
-    @Order(1)
+    @Order(4)
     @Test
     @Override
     @WithMockUser
     public void upsertSalesTaxTracking_EnforcesSalesTaxToFalse_Returns200() {
+        //Given
+        State state = new State("GA", "13", "Georgia");
 
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto ->
+
+                        webTestClient
+                                .mutateWith(csrf())
+                                .put()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .build())
+                                .bodyValue(salesTaxTrackingDto
+                                        .withEnforcesSalesTax(false))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody(SalesTaxTrackingDto.class)
+                                .value(transactionDto -> assertFalse(transactionDto.enforcesSalesTax())));
     }
 
-    @Order(1)
+    @Order(5)
     @Test
     @Override
     @WithMockUser
     public void upsertTransaction_WithPhysicalNexusButNoEnforcedSalesTax_Returns201NoTaxes() {
+        //Given
+        String externalId = "10064";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
     }
 }

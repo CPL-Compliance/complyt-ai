@@ -9,7 +9,7 @@ import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
-public class MultitenancyIT extends MongoContainerInitializerIT implements MultitenancyITTemplate {
+public class MultitenancyIT extends TestContainersInitializerIT implements MultitenancyITTemplate {
 
     private JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
     private JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
