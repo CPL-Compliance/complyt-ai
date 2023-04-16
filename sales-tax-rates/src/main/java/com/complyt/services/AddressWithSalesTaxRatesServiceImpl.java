@@ -8,7 +8,6 @@ import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.StatesMap;
 import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;

@@ -106,7 +106,7 @@ public class AddressWithSalesTaxRatesServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(nullAddressWithSalesTaxRates,collection);
+            addressWithSalesTaxRatesService.save(nullAddressWithSalesTaxRates, collection);
         });
 
         assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
@@ -120,7 +120,7 @@ public class AddressWithSalesTaxRatesServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(addressWithSalesTaxRates,nullCollection);
+            addressWithSalesTaxRatesService.save(addressWithSalesTaxRates, nullCollection);
         });
 
         assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
