@@ -81,18 +81,18 @@ public class DateRangeTest {
     @Test
     void newYearFromSeptember_CurrentDatePassedSeptember_DateRangeReturned() {
         // Given
-        LocalDateTime september30 = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
-        LocalDateTime referenceDate = september30.plusDays(1);
+        LocalDateTime firstOfOctober = LocalDateTime.now().withMonth(10).withDayOfMonth(1);
+        LocalDateTime referenceDate = firstOfOctober.plusDays(1);
 
-        LocalDateTime expectedEndDate = september30.plusYears(1);
+        LocalDateTime expectedEndDate = firstOfOctober.plusYears(1);
 
         // When
         DateRange expectedDateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
 
         // Then
-        assertEquals(expectedDateRange.getStart().getYear(), september30.getYear());
-        assertEquals(expectedDateRange.getStart().getMonthValue(), september30.getMonthValue());
-        assertEquals(expectedDateRange.getStart().getDayOfMonth(), september30.getDayOfMonth());
+        assertEquals(expectedDateRange.getStart().getYear(), firstOfOctober.getYear());
+        assertEquals(expectedDateRange.getStart().getMonthValue(), firstOfOctober.getMonthValue());
+        assertEquals(expectedDateRange.getStart().getDayOfMonth(), firstOfOctober.getDayOfMonth());
         assertEquals(expectedDateRange.getEnd().getYear(), expectedEndDate.getYear());
         assertEquals(expectedDateRange.getEnd().getMonthValue(), expectedEndDate.getMonthValue());
         assertEquals(expectedDateRange.getEnd().getDayOfMonth(), expectedEndDate.getDayOfMonth());
@@ -101,10 +101,10 @@ public class DateRangeTest {
     @Test
     void newYearFromSeptember_PriorToSeptember_DateRangeReturned() {
         // Given
-        LocalDateTime september30 = LocalDateTime.now().withMonth(9).withDayOfMonth(30);
-        LocalDateTime referenceDate = september30.minusDays(1);
+        LocalDateTime firstOfOctober = LocalDateTime.now().withMonth(10).withDayOfMonth(1);
+        LocalDateTime referenceDate = firstOfOctober.minusDays(1);
 
-        LocalDateTime expectedStartDate = september30.minusYears(1);
+        LocalDateTime expectedStartDate = firstOfOctober.minusYears(1);
         LocalDateTime expectedEndDate = expectedStartDate.plusYears(1);
 
         // When
