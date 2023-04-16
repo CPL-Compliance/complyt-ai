@@ -1,7 +1,6 @@
 package com.complyt.services;
 
 import com.complyt.business.data_fetcher.CountyFetcher;
-import com.complyt.business.data_injector.DataInjector;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
