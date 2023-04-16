@@ -11,7 +11,6 @@ import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -19,7 +18,6 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class AddressWithSalesTaxRatesServiceImpl implements AddressWithSalesTaxRatesService {
 
     @NonNull
@@ -49,7 +47,7 @@ public class AddressWithSalesTaxRatesServiceImpl implements AddressWithSalesTaxR
                 .flatMap(county -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
                             Address addressWithCounty = address.withCounty(county);
-                            return new AddressWithSalesTaxRates(addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1));
+                            return new AddressWithSalesTaxRates(null, addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1));
                         }));
     }
 

@@ -50,15 +50,37 @@ public class AddressWithSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
-        SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
-        FastTaxData fastTaxData = new FastTaxData();
+//        SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
 
-        AddressWithSalesTaxRates expectedAddressWithSalesTaxRates =
-                new AddressWithSalesTaxRates(califoniaAddress, californiaRates, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        AddressWithSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
 
         // When
-        when(salesTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(fastTaxData));
+        when(salesTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.empty());
         when(addressWithSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
+        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
+
+        // Then
+        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressWithSalesTaxRates).verifyComplete();
+    }
+
+    @Test
+    void findByAddress_AddressWithSalesTaxRatesNotFoundInDB_SavesNewAddressWithSalesTaxRates() {
+        // Given
+        Address califoniaAddress = TestUtilities.createAddressInCalifornia();
+        Address californiaAddressWithCounty = califoniaAddress.withCounty("Fresno");
+        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
+        SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
+        AddressWithSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+
+        FastTaxData fastTaxData = TestUtilities.createFastTaxData();
+
+        // When
+        when(addressWithSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
+        when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxData));
+        when(countyFetcher.fetch(fastTaxData)).thenReturn(Mono.just(californiaAddressWithCounty.getCounty()));
+        when(addressWithSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
+        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(californiaRates));
+
         Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
 
         // Then

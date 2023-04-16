@@ -3,11 +3,17 @@ package com.testUtils;
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
+import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
+
+import java.util.UUID;
+
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TestUtilities {
 
@@ -23,7 +29,7 @@ public class TestUtilities {
         Address address = createAddressInNewYork();
         SalesTaxRates salesTaxRates = createNewYorkSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
-        return new AddressWithSalesTaxRates(address, salesTaxRates, now, now.plusMinutes(1));
+        return new AddressWithSalesTaxRates(UUID.randomUUID().toString(), address, salesTaxRates, now, now.plusMinutes(1));
     }
 
     public static Address createAddressInCalifornia() {
@@ -38,7 +44,7 @@ public class TestUtilities {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
-        return new AddressWithSalesTaxRates(address, salesTaxRates, now, now.plusMinutes(1));
+        return new AddressWithSalesTaxRates(UUID.randomUUID().toString(), address, salesTaxRates, now, now.plusMinutes(1));
     }
 
     public static Query createAddressSearchQuery(Address address) {
@@ -46,6 +52,13 @@ public class TestUtilities {
                 .where("address.city").is(address.getCity())
                 .and("address.street").is(address.getStreet())
                 .and("address.zip").is(address.getZip()));
+    }
+
+    public static FastTaxData createFastTaxData() {
+        String matchLevel = "Address";
+        TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "Fresno", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
+        List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
+        return new FastTaxData(matchLevel, taxInfoItems);
     }
 
     public static Result createResult() {
