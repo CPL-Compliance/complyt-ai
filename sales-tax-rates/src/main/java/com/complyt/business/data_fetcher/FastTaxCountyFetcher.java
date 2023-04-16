@@ -1,11 +1,9 @@
 package com.complyt.business.data_fetcher;
 
-import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -13,9 +11,6 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Component
 public class FastTaxCountyFetcher implements CountyFetcher {
-
-    @NonNull
-    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
 
     @Override
     public Mono<String> fetch(SalesTaxData salesTaxData) {

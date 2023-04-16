@@ -3,6 +3,7 @@ package com.testUtils;
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
+import com.complyt.domain.zip_tax.Result;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -45,6 +46,14 @@ public class TestUtilities {
                 .where("address.city").is(address.getCity())
                 .and("address.street").is(address.getStreet())
                 .and("address.zip").is(address.getZip()));
+    }
+
+    public static Result createResult() {
+        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
+                0f, 0f, 0f, 0f, "", 0f, 0, "",
+                0f, 0f, "", 0, 0, "", 0,
+                0, "", 0, 0, "", 0, 0, "",
+                0, 0, "");
     }
 }
 
