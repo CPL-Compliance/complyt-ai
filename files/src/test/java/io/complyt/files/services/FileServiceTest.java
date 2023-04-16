@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.mockito.Mockito.when;
 
@@ -25,7 +25,6 @@ class FileServiceTest {
     @Mock
     FileRepository fileRepository;
 
-    ObjectStub objectStub = new ObjectStub();
 
     @BeforeEach
     void setUp() {
@@ -35,7 +34,7 @@ class FileServiceTest {
     @Test
     void find_tenantIdExistsInCollection_ReturnsLink() {
         // Given
-        File file = objectStub.createFile();
+        File file = TestUtilities.createFile();
 
         // When
         when(fileRepository.find()).thenReturn(Mono.just(file));
