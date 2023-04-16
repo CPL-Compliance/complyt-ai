@@ -59,7 +59,7 @@ public interface ITUtilities {
                 "New York", "0.00375", "0",
                 List.of(new InformationComponent("CountyFIPS", "061")),
                 "", "", "0",
-                "NY", "Florida", "0.04",
+                "NY", "New York", "0.04",
                 "0.08875", "SERVICES", "10001")));
     }
 
