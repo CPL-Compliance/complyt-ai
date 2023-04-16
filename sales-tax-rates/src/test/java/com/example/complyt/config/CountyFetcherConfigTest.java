@@ -2,19 +2,14 @@ package com.example.complyt.config;
 
 import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
 import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
-import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.config.CountyFetcherConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CountyFetcherConfigTest {
 
-    @Mock
-    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
     CountyFetcherConfig countyFetcherConfig;
 
     @BeforeEach
@@ -25,11 +20,10 @@ public class CountyFetcherConfigTest {
     @Test
     void transactionFastTaxCountyFetcher_SalesTaxWebClientWrapper_ReturnedTransactionFastTaxCountyFetcher() {
         // Given
-        salesTaxWebClientWrapper = new StubFastTaxWebClientWrapper(); // any salesTaxWebClientWrapper
-        FastTaxCountyFetcher expectedFastTaxCountyFetcher = new FastTaxCountyFetcher(salesTaxWebClientWrapper);
+        FastTaxCountyFetcher expectedFastTaxCountyFetcher = new FastTaxCountyFetcher();
 
         // When
-        FastTaxCountyFetcher actualFastTaxCountyFetcher = countyFetcherConfig.FastTaxCountyFetcher(salesTaxWebClientWrapper);
+        FastTaxCountyFetcher actualFastTaxCountyFetcher = countyFetcherConfig.FastTaxCountyFetcher();
 
         // Then
         assertEquals(expectedFastTaxCountyFetcher, actualFastTaxCountyFetcher);
@@ -38,11 +32,10 @@ public class CountyFetcherConfigTest {
     @Test
     void transactionZipTaxCountyFetcher_SalesTaxWebClientWrapper_ReturnedTransactionZipTaxCountyFetcher() {
         // Given
-        salesTaxWebClientWrapper = new StubFastTaxWebClientWrapper(); // any salesTaxWebClientWrapper
-        ZipTaxCountyFetcher expectedZipTaxCountyFetcher = new ZipTaxCountyFetcher(salesTaxWebClientWrapper);
+        ZipTaxCountyFetcher expectedZipTaxCountyFetcher = new ZipTaxCountyFetcher();
 
         // When
-        ZipTaxCountyFetcher actualZipTaxCountyFetcher = countyFetcherConfig.ZipTaxCountyFetcher(salesTaxWebClientWrapper);
+        ZipTaxCountyFetcher actualZipTaxCountyFetcher = countyFetcherConfig.ZipTaxCountyFetcher();
 
         // Then
         assertEquals(expectedZipTaxCountyFetcher, actualZipTaxCountyFetcher);
