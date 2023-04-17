@@ -11,7 +11,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 public class ValidatorConfig {
 
     @Bean
-    ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+    public ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
         return new ValidationHandler<>(AddressDto.class, springValidatorAdapter);
     }
 }

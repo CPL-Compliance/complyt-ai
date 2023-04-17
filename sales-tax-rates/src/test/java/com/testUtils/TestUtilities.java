@@ -9,6 +9,7 @@ import com.complyt.domain.zip_tax.Result;
 
 import java.util.UUID;
 
+import com.complyt.v1.model.AddressDto;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -34,6 +35,10 @@ public class TestUtilities {
 
     public static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+    public static AddressDto createAddressDtoInCalifornia() {
+        return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
     }
 
     public static SalesTaxRates createCaliforniaSalesTaxRates() {
