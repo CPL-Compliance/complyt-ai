@@ -7,14 +7,22 @@ import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
 
+import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import com.complyt.v1.model.AddressDto;
+import com.google.common.collect.Multimap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestUtilities {
 
@@ -73,5 +81,15 @@ public class TestUtilities {
                 0, "", 0, 0, "", 0, 0, "",
                 0, 0, "");
     }
+
+    public static void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
+        String message = (String) map.get("message");
+        String[] errors = message.substring(1, message.length() - 1).split(", ");
+        assertEquals(expectedErrors.size(), errors.length);
+        for (String err : errors) {
+            assertTrue(expectedErrors.contains(err));
+        }
+    }
+
 }
 

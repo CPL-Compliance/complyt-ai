@@ -10,11 +10,12 @@ import reactor.core.publisher.Mono;
 public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<AddressDto> {
 
     public Mono<AddressDto> extract(ServerRequest serverRequest) {
-        String state = serverRequest.queryParam("state").orElse("");
-        String city = serverRequest.queryParam("city").orElse("");
-        String street = serverRequest.queryParam("street").orElse("");
-        String zip = serverRequest.queryParam("zip").orElse("");
-        AddressDto address = new AddressDto(city, "US", null, state, street, zip);
+        String state = serverRequest.queryParam("state").orElse(null);
+        String country = serverRequest.queryParam("country").orElse(null);
+        String city = serverRequest.queryParam("city").orElse(null);
+        String street = serverRequest.queryParam("street").orElse(null);
+        String zip = serverRequest.queryParam("zip").orElse(null);
+        AddressDto address = new AddressDto(city, country, null, state, street, zip);
 
         return ContextLogger.observeCtx("Address extracted from request query params: " + address, log::debug)
                 .then(Mono.just(address));
