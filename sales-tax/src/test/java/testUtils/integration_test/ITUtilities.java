@@ -98,6 +98,16 @@ public interface ITUtilities {
                 "0.08900", "LABOR/SERVICES", "30303-3192")));
     }
 
+    static FastTaxData stubFastTaxIndiana() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Indianapolis", "0", "0",
+                "Marion", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "097")),
+                "", "", "0",
+                "IN", "Indiana", "0.07000",
+                "0.07000", "LABOR/SERVICES", "46202-5109")));
+    }
+
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
                 .header("typ", "JWT")

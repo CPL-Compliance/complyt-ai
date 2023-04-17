@@ -5,10 +5,9 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClient
 import com.complyt.domain.State;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.MandatoryAddressDto;
-import com.complyt.v1.models.PhysicalNexusTrackerDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.ShippingFeeDto;
 import com.complyt.v1.models.TransactionDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -39,13 +38,14 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
-public class PhysicalNexusIT extends TestContainersInitializerIT implements PhysicalNexusITTemplate {
+public class ShippingFeesIT extends TestContainersInitializerIT implements ShippingFeesITTemplate {
 
     /*
-     * State Rule: Georgia
-     * TimeFrame: Current Taxable Year
-     * Threshold: Count: 200 AND Amount: 100000
-     * Items: Only TANGIBLE
+     * State Rule: Indiana
+     * TimeFrame: Current Calendar Year
+     * Threshold: Count: 200 OR Amount 100000
+     * Customers: Only RETAIL OR RESELLER
+     * Items: Only TANGIBLE (Changed from TANGIBLE OR TAXABLE)
      */
 
     @MockBean
@@ -56,7 +56,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     private WebTestClient webTestClient;
 
     private LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "30303");
+    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202");
     private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private String source = "1";
 
@@ -69,17 +69,20 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxGeorgia()));
+        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxIndiana()));
     }
 
     @Order(1)
     @Test
     @Override
     @WithMockUser
-    public void upsertTransaction_NewAndDoesntHavePhysicalNexus_Returns201NoTaxes() {
-        //Given
-        String externalId = "10061";
+    public void upsertTransaction_ShippingFeesNotPassingEconomicNexus_Returns200NoTaxes() {
+        //Given (C?S1 Tangible)
+        String externalId = "10071";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(new ShippingFeeDto(false, 0,
+                        2000, null, null,
+                        "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
         // Then
@@ -94,16 +97,74 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(null, transactionDto.salesTax()));
+                .value(transactionDto -> assertEquals(null, transactionDto.shippingFee().salesTaxRate()));
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_ShippingFeesNotTangibleAndNotAddedToThresholdCalculation_Returns200NoTaxes() {
+
+        //Given (C6S1 Intangible)
+        String externalId = "10072";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(new ShippingFeeDto(false, 0,
+                        85000, null, null,
+                        "C6S1", null, null))
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertEquals(null, transactionDto.shippingFee().salesTaxRate()));
     }
 
     @Order(2)
     @Test
     @Override
     @WithMockUser
-    public void upsertSalesTaxTracking_createdPhysicalNexus_Returns200() {
+    public void upsertTransaction_ShippingFeesPassingEconomicNexus_Returns200NoTaxes() {
+
+        //Given (C?S1 Tangible)
+        String externalId = "10073";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(new ShippingFeeDto(false, 0,
+                        85000, null, null,
+                        "C?S1", null, null))
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200() {
         //Given
-        State state = new State("GA", "13", "Georgia");
+        State state = new State("IN", "18", "Indiana");
 
         // Then
         webTestClient
@@ -124,116 +185,26 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
                                         .build())
                                 .bodyValue(salesTaxTrackingDto
-                                        .withApproved(true)
-                                        .withPhysicalNexusTracker(
-                                                new PhysicalNexusTrackerDto(true, referenceDate))
-                                        .withAppliedDate(referenceDate)
-                                        .withApprovalDate(referenceDate))
+                                        .withApproved(true))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(transactionDto -> assertTrue(transactionDto.physicalNexusTracker().established())));
-    }
-
-    @Order(3)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertTransaction_NewAndAfterPhysicalNexus_Returns201WithTaxes() {
-        //Given
-        String externalId = "10062";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(890, transactionDto.salesTax().amount()));
-    }
-
-    @Order(3)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertTransaction_NewAndBeforePhysicalNexus_Returns201NoTaxes() {
-        //Given
-        String externalId = "10063";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.minusDays(g1).toString(), referenceDate.toString()));
-
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                        .build())
-                .bodyValue(givenTransaction)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+                                .value(recievedSalesTaxTrackingDto -> assertTrue(recievedSalesTaxTrackingDto.economicNexusTracker().established())));
     }
 
     @Order(4)
     @Test
     @Override
     @WithMockUser
-    public void upsertSalesTaxTracking_EnforcesSalesTaxToFalse_Returns200() {
-        //Given
-        State state = new State("GA", "13", "Georgia");
-
-        // Then
-        webTestClient
-                .get()
-                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto ->
-
-                        webTestClient
-                                .mutateWith(csrf())
-                                .put()
-                                .uri(uriBuilder -> uriBuilder
-                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
-                                        .build())
-                                .bodyValue(salesTaxTrackingDto
-                                        .withEnforcesSalesTax(false))
-                                .accept(MediaType.APPLICATION_JSON)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .expectBody(SalesTaxTrackingDto.class)
-                                .value(transactionDto ->
-                                        assertFalse(transactionDto.enforcesSalesTax())));
-    }
-
-    @Order(5)
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertTransaction_WithPhysicalNexusButNoEnforcedSalesTax_Returns201NoTaxes() {
-        //Given
-        String externalId = "10064";
+    public void upsertTransaction_ShippingFeesWithNexus_Returns200WithTaxes() {
+        //Given (C?S1 Tangible)
+        String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
+                .withShippingFee(new ShippingFeeDto(false, 0,
+                        10000, null, null,
+                        "C?S1", null, null))
+                .withShippingAddress(referenceAddress);
 
         // Then
         webTestClient
@@ -247,6 +218,40 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
+                    assertEquals(transactionDto.salesTax().amount(), 1400);
+                });
+    }
+
+    @Order(4)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_ShippingFeesWithNexusButNotTaxable_Returns200NoTaxes() {
+        //Given (C7S1 Nontaxable)
+        String externalId = "10075";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingFee(new ShippingFeeDto(false, 0,
+                        10000, null, null,
+                        "C7S1", null, null))
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertEquals(0, transactionDto.shippingFee().salesTaxRate().taxRate());
+                    assertEquals(700, transactionDto.salesTax().amount());
+                });
     }
 }
