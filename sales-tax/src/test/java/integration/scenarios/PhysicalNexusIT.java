@@ -171,7 +171,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         String externalId = "10063";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.minusDays(g1).toString(), referenceDate.toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.minusDays(1).toString(), referenceDate.toString()));
 
         // Then
         webTestClient
