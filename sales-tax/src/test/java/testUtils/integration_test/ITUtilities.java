@@ -108,6 +108,16 @@ public interface ITUtilities {
                 "0.07000", "LABOR/SERVICES", "46202-5109")));
     }
 
+    static FastTaxData stubFastTaxMaine() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Cape Elizabeth", "0", "0",
+                "Cumberland", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "005")),
+                "", "", "0",
+                "IN", "Indiana", "0.0.05500",
+                "0.0.05500", "LABOR/FREIGHT/SERVICES", "04107-1929")));
+    }
+
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
                 .header("typ", "JWT")
