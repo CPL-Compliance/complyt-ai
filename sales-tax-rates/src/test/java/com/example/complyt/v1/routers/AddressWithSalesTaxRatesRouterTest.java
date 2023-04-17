@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
@@ -380,6 +382,21 @@ public class AddressWithSalesTaxRatesRouterTest {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    public void findByAddress_NullHandler_ThrowsNullPointerException() {
+        // Given
+        AddressWithSalesTaxRatesHandler nullAddressWithSalesTaxRatesHandler = null;
+        AddressWithSalesTaxRatesRouter addressWithSalesTaxRatesRouter = new AddressWithSalesTaxRatesRouter();
+
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            addressWithSalesTaxRatesRouter.getAddressWithSalesTaxRatesByAddress(nullAddressWithSalesTaxRatesHandler);
+        });
+
+        // Then
+        assertEquals("addressWithSalesTaxRatesHandler is marked non-null but is null", exception.getMessage());
     }
 
 }
