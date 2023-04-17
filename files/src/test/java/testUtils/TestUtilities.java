@@ -2,16 +2,20 @@ package testUtils;
 
 import io.complyt.files.domain.File;
 import io.complyt.files.v1.models.FileDto;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
 public interface TestUtilities {
-     String linkStr = "https://youtu.be/dQw4w9WgXcQ";
-     String tenantId = UUID.randomUUID().toString();
+    String linkStr = "https://youtu.be/dQw4w9WgXcQ";
+    String tenantId = UUID.randomUUID().toString();
+
+    static Jwt.Builder stubJwt() {
+        return Jwt.withTokenValue("token")
+                .header("typ", "JWT")
+                .claim("tenant_id", "it_tenant");
+    }
 
     static File createFile() {
         return new File(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr);

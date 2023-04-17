@@ -7,7 +7,11 @@ public interface PhysicalNexusITTemplate {
 
     void upsertTransaction_NewAndAfterPhysicalNexus_Returns201WithTaxes();
 
-    void upsertTransaction_NewAndBeforePhysicalNexus_Returns201NoTaxes();
+    void upsertTransaction_NewAndBeforeApprovedPhysicalNexus_Returns201NoTaxes();
+
+    void upsertSalesTaxTracking_ApprovedDateBeforeAppliedDate_Returns200();
+
+    void upsertTransaction_NewAndBeforeAppliedPhysicalNexus_Returns201NoTaxes();
 
     void upsertSalesTaxTracking_EnforcesSalesTaxToFalse_Returns200();
 

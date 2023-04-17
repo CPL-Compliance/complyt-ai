@@ -114,8 +114,18 @@ public interface ITUtilities {
                 "Cumberland", "0", "0",
                 List.of(new InformationComponent("CountyFIPS", "005")),
                 "", "", "0",
-                "IN", "Indiana", "0.0.05500",
-                "0.0.05500", "LABOR/FREIGHT/SERVICES", "04107-1929")));
+                "IN", "Indiana", "0.05500",
+                "0.05500", "LABOR/FREIGHT/SERVICES", "04107-1929")));
+    }
+
+    static FastTaxData stubFastTaxKentucky() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Louisville", "0", "0",
+                "Jefferson", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "111")),
+                "", "", "0",
+                "KY", "Kentucky", "0.06000",
+                "0.06000", "LABOR/SERVICES", "40127-2430")));
     }
 
     static Jwt.Builder stubJwt() {

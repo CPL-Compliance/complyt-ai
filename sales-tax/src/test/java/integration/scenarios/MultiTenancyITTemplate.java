@@ -1,6 +1,6 @@
 package integration.scenarios;
 
-public interface MultitenancyITTemplate {
+public interface MultiTenancyITTemplate {
 
     void getCustomer_ExistsInOtherTenant_Returns404();
 

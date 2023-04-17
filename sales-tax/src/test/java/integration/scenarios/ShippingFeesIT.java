@@ -133,6 +133,24 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Test
     @Override
     @WithMockUser
+    public void getSalesTaxTracking_checkEconomicNexusNotPassed_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> assertFalse(salesTaxTrackingDto.economicNexusTracker().established()));
+
+    }
+
+    @Order(3)
+    @Test
+    @Override
+    @WithMockUser
     public void upsertTransaction_ShippingFeesPassingEconomicNexus_Returns200NoTaxes() {
 
         //Given (C?S1 Tangible)
@@ -158,7 +176,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
     }
 
-    @Order(3)
+    @Order(4)
     @Test
     @Override
     @WithMockUser
@@ -193,7 +211,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                                 .value(recievedSalesTaxTrackingDto -> assertTrue(recievedSalesTaxTrackingDto.economicNexusTracker().established())));
     }
 
-    @Order(4)
+    @Order(5)
     @Test
     @Override
     @WithMockUser
@@ -224,7 +242,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 });
     }
 
-    @Order(4)
+    @Order(5)
     @Test
     @Override
     @WithMockUser
@@ -252,6 +270,38 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .value(transactionDto -> {
                     assertEquals(0, transactionDto.shippingFee().salesTaxRate().taxRate());
                     assertEquals(700, transactionDto.salesTax().amount());
+                });
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_ShippingFeesWithManualSalesTaxRate_Returns200WithManualTaxes() {
+        //Given (C?S1 Tangible)
+        String externalId = "10076";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withUnitPrice(10).withTotalPrice(10))
+                .withShippingFee(new ShippingFeeDto(true, 0.15f,
+                        10000, null, null,
+                        "C?S1", null, null))
+                .withShippingAddress(referenceAddress);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> {
+                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
+                    assertEquals(transactionDto.salesTax().amount(), 1500.7f);
                 });
     }
 }

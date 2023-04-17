@@ -31,15 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
 
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
-public class MultitenancyIT extends TestContainersInitializerIT implements MultitenancyITTemplate {
+public class MultiTenancyIT extends TestContainersInitializerIT implements MultiTenancyITTemplate {
 
-    private JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
-    private JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
-    private String source = "1";
+    private final JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
+    private final JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
+    private final String source = "1";
 
     @Autowired
     private WebTestClient webTestClient;
@@ -310,48 +309,47 @@ public class MultitenancyIT extends TestContainersInitializerIT implements Multi
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> {
+                .value(transactionDto ->
 
-                    webTestClient
-                            .mutateWith(differentTenantMutator)
-                            .get()
-                            .uri(uriBuilder -> uriBuilder
-                                    .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
-                                    .build())
-                            .accept(MediaType.APPLICATION_JSON)
-                            .exchange()
-                            .expectStatus().isOk()
-                            .expectBody(CustomerDto.class)
-                            .value(customerDto -> {
+                        webTestClient
+                                .mutateWith(differentTenantMutator)
+                                .get()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
+                                        .build())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody(CustomerDto.class)
+                                .value(customerDto -> {
 
-                                webTestClient
-                                        .mutateWith(csrf())
-                                        .mutateWith(differentTenantMutator)
-                                        .put()
-                                        .uri(uriBuilder -> uriBuilder
-                                                .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                                                .build())
-                                        .accept(MediaType.APPLICATION_JSON)
-                                        .bodyValue(transactionDto.withComplytId(null).withCustomerId(customerDto.complytId()))
-                                        .exchange()
-                                        .expectStatus().isCreated()
-                                        .expectBody(TransactionDto.class)
-                                        .value(receivedTransactionDto -> assertNotEquals(receivedTransactionDto.complytId(), transactionDto.complytId()));
+                                    webTestClient
+                                            .mutateWith(csrf())
+                                            .mutateWith(differentTenantMutator)
+                                            .put()
+                                            .uri(uriBuilder -> uriBuilder
+                                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                                    .build())
+                                            .accept(MediaType.APPLICATION_JSON)
+                                            .bodyValue(transactionDto.withComplytId(null).withCustomerId(customerDto.complytId()))
+                                            .exchange()
+                                            .expectStatus().isCreated()
+                                            .expectBody(TransactionDto.class)
+                                            .value(receivedTransactionDto -> assertNotEquals(receivedTransactionDto.complytId(), transactionDto.complytId()));
 
-                                webTestClient
-                                        .mutateWith(defaultTenantMutator)
-                                        .get()
-                                        .uri(uriBuilder -> uriBuilder
-                                                .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
-                                                .build())
-                                        .accept(MediaType.APPLICATION_JSON)
-                                        .exchange()
-                                        .expectStatus().isOk()
-                                        .expectBody(TransactionDto.class)
-                                        .value(receivedTransactionDto -> assertEquals(transactionDto, receivedTransactionDto));
+                                    webTestClient
+                                            .mutateWith(defaultTenantMutator)
+                                            .get()
+                                            .uri(uriBuilder -> uriBuilder
+                                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                                    .build())
+                                            .accept(MediaType.APPLICATION_JSON)
+                                            .exchange()
+                                            .expectStatus().isOk()
+                                            .expectBody(TransactionDto.class)
+                                            .value(receivedTransactionDto -> assertEquals(transactionDto, receivedTransactionDto));
 
-                            });
-                });
+                                }));
     }
 
     @Order(2)

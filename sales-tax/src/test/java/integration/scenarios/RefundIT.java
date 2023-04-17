@@ -24,10 +24,10 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -183,5 +183,108 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(salesTaxTrackingDto -> assertFalse(salesTaxTrackingDto.economicNexusTracker().established()));
 
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertSalesTaxTracking_AddPhysicalNexus_Returns200() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(receivedSalesTaxTracking ->
+
+                        webTestClient
+                                .mutateWith(csrf())
+                                .put()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + referenceAddress.state())
+                                        .build())
+                                .bodyValue(receivedSalesTaxTracking
+                                        .withApproved(true)
+                                        .withPhysicalNexusTracker(
+                                                new PhysicalNexusTrackerDto(true, referenceDate))
+                                        .withAppliedDate(referenceDate)
+                                        .withApprovalDate(referenceDate))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody(SalesTaxTrackingDto.class)
+                                .value(updatedSalesTaxTracking -> assertTrue(updatedSalesTaxTracking.approved())));
+    }
+
+    @Order(6)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_NewAfterPhysicalNexus_Returns201WithTaxes() {
+        // Given
+        String externalId = "10084";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+                        ITUtilities.stubItemDto().withTotalPrice(80000).withQuantity(2).withUnitPrice(40000))
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(receivedTransaction -> assertEquals(4400, receivedTransaction.salesTax().amount()));
+    }
+
+    @Order(7)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_RefundOfHalfTheAmount_Returns201() {
+        // Given
+        String externalIdOfOriginal = "10084";
+        String externalIdOfRefund = "10085";
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfOriginal)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto ->
+
+                        webTestClient
+                                .mutateWith(csrf())
+                                .put()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalIdOfRefund)
+                                        .build())
+                                .bodyValue(transactionDto
+                                        .withComplytId(null)
+                                        .withExternalId(externalIdOfRefund)
+                                        .withTransactionType(TransactionTypeDto.REFUND)
+                                        .withCreatedFrom(externalIdOfOriginal)
+                                        .withItems(List.of(ITUtilities.stubItemDto().withTotalPrice(40000).withUnitPrice(40000)))
+                                        .withSalesTax(transactionDto.salesTax().withAmount(transactionDto.salesTax().amount() / 2))
+                                )
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isCreated()
+                                .expectBody(TransactionDto.class)
+                                .value(receivedTransaction -> assertEquals(2200, receivedTransaction.salesTax().amount())));
     }
 }

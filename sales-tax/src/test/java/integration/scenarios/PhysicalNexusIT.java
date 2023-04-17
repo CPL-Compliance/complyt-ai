@@ -128,7 +128,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                         .withPhysicalNexusTracker(
                                                 new PhysicalNexusTrackerDto(true, referenceDate))
                                         .withAppliedDate(referenceDate)
-                                        .withApprovalDate(referenceDate))
+                                        .withApprovalDate(referenceDate.plusMonths(1)))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isOk()
@@ -145,7 +145,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
         String externalId = "10062";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(2).toString(), referenceDate.toString()));
 
         // Then
         webTestClient
@@ -162,16 +162,16 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .value(transactionDto -> assertEquals(890, transactionDto.salesTax().amount()));
     }
 
-    @Order(3)
+    @Order(4)
     @Test
     @Override
     @WithMockUser
-    public void upsertTransaction_NewAndBeforePhysicalNexus_Returns201NoTaxes() {
+    public void upsertTransaction_NewAndBeforeApprovedPhysicalNexus_Returns201NoTaxes() {
         //Given
         String externalId = "10063";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.minusDays(1).toString(), referenceDate.toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusDays(10).toString(), referenceDate.toString()));
 
         // Then
         webTestClient
@@ -188,7 +188,69 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .value(transactionDto -> assertNull(transactionDto.salesTax()));
     }
 
-    @Order(4)
+    @Order(5)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertSalesTaxTracking_ApprovedDateBeforeAppliedDate_Returns200() {
+        //Given
+        State state = new State("GA", "13", "Georgia");
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getAbbreviation())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto ->
+
+                        webTestClient
+                                .mutateWith(csrf())
+                                .put()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state.getName())
+                                        .build())
+                                .bodyValue(salesTaxTrackingDto
+                                        .withApprovalDate(referenceDate.minusMonths(1)))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .exchange()
+                                .expectStatus().isOk()
+                                .expectBody(SalesTaxTrackingDto.class)
+                                .value(recievedSalesTaxTrackingDto -> assertTrue(recievedSalesTaxTrackingDto.appliedDate()
+                                        .isAfter(recievedSalesTaxTrackingDto.approvalDate()))));
+    }
+
+    @Order(6)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertTransaction_NewAndBeforeAppliedPhysicalNexus_Returns201NoTaxes() {
+        //Given
+        String externalId = "10064";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.minusDays(10).toString(), referenceDate.toString()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Order(7)
     @Test
     @Override
     @WithMockUser
@@ -224,13 +286,13 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                         assertFalse(transactionDto.enforcesSalesTax())));
     }
 
-    @Order(5)
+    @Order(8)
     @Test
     @Override
     @WithMockUser
     public void upsertTransaction_WithPhysicalNexusButNoEnforcedSalesTax_Returns201NoTaxes() {
         //Given
-        String externalId = "10064";
+        String externalId = "10065";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), referenceDate.toString()));
