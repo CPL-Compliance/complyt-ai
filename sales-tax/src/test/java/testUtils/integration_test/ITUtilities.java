@@ -9,11 +9,7 @@ import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.UUID;
 
