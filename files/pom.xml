@@ -152,6 +152,20 @@
             <scope>test</scope>
         </dependency>
         <!-- Test -->
+        <!-- Testcontainers -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
+        </dependency>
+        <!-- Testcontainers -->
         <!-- Other -->
         <dependency>
             <groupId>org.projectlombok</groupId>

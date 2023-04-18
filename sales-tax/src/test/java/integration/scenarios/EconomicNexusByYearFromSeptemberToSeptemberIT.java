@@ -9,7 +9,7 @@ import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,13 +38,13 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient
-public class EconomicNexusByYearFromSeptemberToSeptemberIT extends MongoContainerInitializerIT implements EconomicNexusOnlyTaxableItemsITTemplate {
+public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainersInitializerIT implements EconomicNexusOnlyTaxableItemsITTemplate {
 
     /*
      * State Rule: Connecticut
      * TimeFrame: Year From September To September
      * Threshold: Count: 20 (Changed from 200 AND Amount: 0.1M)
-     * Customers: Only Retail OR MARKETPLACE
+     * Customers: Only RETAIL OR MARKETPLACE
      * Items: Only Taxable
      */
 
@@ -56,7 +56,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends MongoContaine
     private WebTestClient webTestClient;
 
     // Given
-    private LocalDateTime referenceDate = LocalDateTime.parse("2019-11-11T07:00:00");
+    private LocalDateTime referenceDate = LocalDateTime.parse("2019-10-01T07:00:00");
     private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516");
     private UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
     private String source = "1";
@@ -198,7 +198,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends MongoContaine
                 .value(receivedSalesTaxTracking -> {
                     assertTrue(receivedSalesTaxTracking.economicNexusTracker().established());
                     assertEquals(receivedSalesTaxTracking.economicNexusTracker().establishedDate(), LocalDateTime.parse(referenceDate.toString()));
-                    assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse("2020-09-30T00:00"));
+                    assertEquals(receivedSalesTaxTracking.appliedDate(), LocalDateTime.parse("2020-10-01T00:00"));
 
                     webTestClient
                             .mutateWith(csrf())
@@ -224,7 +224,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends MongoContaine
         String externalId = "10053";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress)
-                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(11).toString(), LocalDateTime.now().toString()));
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusYears(1).toString(), LocalDateTime.now().toString()));
 
         // Then
         webTestClient
