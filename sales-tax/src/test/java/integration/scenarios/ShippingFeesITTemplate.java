@@ -12,9 +12,9 @@ public interface ShippingFeesITTemplate {
 
     void upsertSalesTaxTracking_ApproveEconomicNexus_Returns200();
 
-    void upsertTransaction_ShippingFeesWithNexus_Returns200WithTaxes();
+    void upsertTransaction_ShippingFeesAfterNexusPassed_Returns200WithTaxes();
 
-    void upsertTransaction_ShippingFeesWithNexusButNotTaxable_Returns200NoTaxes();
+    void upsertTransaction_ShippingFeesNotTaxableAfterNexusPassed_Returns200NoTaxes();
 
     void upsertTransaction_ShippingFeesWithManualSalesTaxRate_Returns200WithManualTaxes();
 }

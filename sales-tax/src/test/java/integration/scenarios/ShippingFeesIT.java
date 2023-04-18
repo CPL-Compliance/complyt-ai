@@ -97,7 +97,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(null, transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
     }
 
     @Order(1)
@@ -126,7 +126,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(null, transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
     }
 
     @Order(2)
@@ -215,7 +215,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Test
     @Override
     @WithMockUser
-    public void upsertTransaction_ShippingFeesWithNexus_Returns200WithTaxes() {
+    public void upsertTransaction_ShippingFeesAfterNexusPassed_Returns200WithTaxes() {
         //Given (C?S1 Tangible)
         String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
@@ -246,7 +246,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Test
     @Override
     @WithMockUser
-    public void upsertTransaction_ShippingFeesWithNexusButNotTaxable_Returns200NoTaxes() {
+    public void upsertTransaction_ShippingFeesNotTaxableAfterNexusPassed_Returns200NoTaxes() {
         //Given (C7S1 Nontaxable)
         String externalId = "10075";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
