@@ -155,7 +155,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -172,7 +172,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -204,7 +204,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
