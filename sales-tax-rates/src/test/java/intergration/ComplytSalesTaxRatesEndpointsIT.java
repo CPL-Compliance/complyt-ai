@@ -79,6 +79,36 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Order(2)
     @Test
     @WithMockUser
+    // This Test is for retrieving an existing rates object from DB
+    public void findByAddress_AddressInCaliforniaAndExists_ReturnsAddressWithSalesTaxRates() {
+        // Given
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
+
+        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("county", stubFastTaxAddress.county())
+                        .queryParam("country", stubFastTaxAddress.country())
+                        .queryParam("state", stubFastTaxAddress.state())
+                        .queryParam("city", stubFastTaxAddress.city())
+                        .queryParam("street", stubFastTaxAddress.street())
+                        .queryParam("zip", stubFastTaxAddress.zip())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ComplytSalesTaxRatesDto.class)
+                .value(addressWithSalesTaxRatesDto -> assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty));
+    }
+
+    @Order(3)
+    @Test
+    @WithMockUser
     public void findByAddress_AddressInCaliforniaAndDoesNotExist_InsertsNewAddressWithSalesTaxRatesAndReturnsIt2() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withStreet("new Street");
@@ -105,35 +135,6 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                     assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty);
                     assertEquals(addressWithSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
-    }
-
-    @Order(3)
-    @Test
-    @WithMockUser
-    public void findByAddress_AddressInCaliforniaAndExists_ReturnsAddressWithSalesTaxRates() {
-        // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
-
-        AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
-
-        // When + Then
-        webTestClient
-                .mutateWith(csrf())
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
-                        .queryParam("county", stubFastTaxAddress.county())
-                        .queryParam("country", stubFastTaxAddress.country())
-                        .queryParam("state", stubFastTaxAddress.state())
-                        .queryParam("city", stubFastTaxAddress.city())
-                        .queryParam("street", stubFastTaxAddress.street())
-                        .queryParam("zip", stubFastTaxAddress.zip())
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(ComplytSalesTaxRatesDto.class)
-                .value(addressWithSalesTaxRatesDto -> assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty));
     }
 
 }
