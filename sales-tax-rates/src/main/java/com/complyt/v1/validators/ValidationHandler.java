@@ -38,18 +38,4 @@ public class ValidationHandler<T, U extends Validator> {
         }
     }
 
-//    private Mono<T> validateRequestBody(final ServerRequest request) {
-//        return request.bodyToMono(validationClass)
-//                .flatMap(body -> {
-//                    Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
-//                    validator.validate(body, errors);
-//
-//                    if (errors.getAllErrors().isEmpty()) {
-//                        return Mono.just(body);
-//                    } else {
-//                        return onValidationErrors(errors);
-//                    }
-//                });
-//    }
-
 }
