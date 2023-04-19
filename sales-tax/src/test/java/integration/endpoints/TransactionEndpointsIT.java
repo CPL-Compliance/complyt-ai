@@ -138,6 +138,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializerIT implemen
         String nonExistingState = "Nilfgaard";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress.withState(nonExistingState));
+
         // Then
         webTestClient
                 .mutateWith(csrf())

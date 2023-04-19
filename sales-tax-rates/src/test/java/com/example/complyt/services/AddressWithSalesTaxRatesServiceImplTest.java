@@ -10,7 +10,7 @@ import com.complyt.domain.StatesMap;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
 import com.complyt.services.AddressWithSalesTaxRatesServiceImpl;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

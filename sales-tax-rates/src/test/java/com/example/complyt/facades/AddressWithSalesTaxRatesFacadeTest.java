@@ -4,7 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.facade.AddressWithSalesTaxRatesFacade;
 import com.complyt.services.AddressWithSalesTaxRatesService;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

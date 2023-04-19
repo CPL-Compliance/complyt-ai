@@ -1,9 +1,10 @@
-package com.testUtils;
+package testUtils;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.InformationComponent;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
 
@@ -12,6 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.complyt.v1.model.AddressDto;
+import com.complyt.v1.model.AddressWithSalesTaxRatesDto;
+import com.complyt.v1.model.SalesTaxRatesDto;
 import com.google.common.collect.Multimap;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -53,6 +56,10 @@ public class TestUtilities {
         return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
     }
 
+    public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+    }
+
     public static AddressWithSalesTaxRates createCaliforniaAddressWithSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
@@ -74,6 +81,10 @@ public class TestUtilities {
         return new FastTaxData(matchLevel, taxInfoItems);
     }
 
+    public static AddressDto createStubFastTaxAddressDto() {
+        return new AddressDto("Englewood", "US", null, "CO", "street", "80112");
+    }
+
     public static Result createResult() {
         return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
                 0f, 0f, 0f, 0f, "", 0f, 0, "",
@@ -91,5 +102,24 @@ public class TestUtilities {
         }
     }
 
-}
+    public static FastTaxData stubFastTaxNewYork() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Fresno", "0.00375", "0",
+                "Fresno", "0.00725", "0.0125",
+                List.of(new InformationComponent("CountyFIPS", "C1")
+                        , new InformationComponent("CountyFIPS", "019")),
+                "", "", "0",
+                "CA", "California", "0.06",
+                "0.08350", "LABOR/FREIGHT/SERVICES", "93711-5508")));
+    }
 
+    public static AddressWithSalesTaxRatesDto createCaliforniaAddressWithSalesTaxRatesDto() {
+        AddressDto address = createAddressDtoInCalifornia();
+        SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
+        return new AddressWithSalesTaxRatesDto(address, salesTaxRates);
+    }
+
+    public static SalesTaxRatesDto createStubFastTaxSalesTaxRates() {
+        return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.0025f, 0.029f, 0.0775f);
+    }
+}

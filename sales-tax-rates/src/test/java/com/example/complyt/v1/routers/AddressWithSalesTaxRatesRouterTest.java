@@ -17,7 +17,7 @@ import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.AddressWithSalesTaxRatesDto;
 import com.complyt.v1.router.AddressWithSalesTaxRatesRouter;
 import com.example.complyt.config.SecurityConfig;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -28,9 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -355,7 +353,6 @@ public class AddressWithSalesTaxRatesRouterTest {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
-
     }
 
     @Test
@@ -383,6 +380,7 @@ public class AddressWithSalesTaxRatesRouterTest {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
+
 
     @Test
     public void findByAddress_NullHandler_ThrowsNullPointerException() {

@@ -4,7 +4,7 @@ import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
 import com.complyt.domain.Address;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

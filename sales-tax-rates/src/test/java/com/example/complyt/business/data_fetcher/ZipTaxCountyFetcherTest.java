@@ -4,7 +4,7 @@ import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
 import com.complyt.domain.Address;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

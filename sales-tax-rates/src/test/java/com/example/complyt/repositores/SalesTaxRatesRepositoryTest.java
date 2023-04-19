@@ -3,7 +3,7 @@ package com.example.complyt.repositores;
 import com.complyt.domain.Address;
 import com.complyt.domain.AddressWithSalesTaxRates;
 import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
-import com.testUtils.TestUtilities;
+import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
