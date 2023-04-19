@@ -65,7 +65,7 @@ public class ComplytSalesTaxRatesRouterTest {
         // When
         when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
         ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = AddressWithSalesTaxRatesMapper.INSTANCE
-                .addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto(addressWithSalesTaxRates);
+                .complytSalesTaxRatesToComplytSalesTaxRates(addressWithSalesTaxRates);
 
         // Then
         webTestClient

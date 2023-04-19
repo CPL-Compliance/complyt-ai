@@ -1,6 +1,5 @@
 package com.complyt.v1.handler;
 
-import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.facade.ComplytSalesTaxRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -16,13 +15,11 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -49,7 +46,7 @@ public class ComplytSalesTaxRatesHandler {
                 .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
-                .map(AddressWithSalesTaxRatesMapper.INSTANCE::addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto)
+                .map(AddressWithSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
                 .flatMap(addressWithSalesTaxRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + addressWithSalesTaxRatesDto, log::info).thenReturn(addressWithSalesTaxRatesDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
