@@ -1,6 +1,7 @@
 package intergration;
 
 import com.complyt.SalesTaxRatesApplication;
+import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
@@ -48,7 +49,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Order(1)
     @Test
     @WithMockUser
-    public void findByAddress_AddressInCaliforniaAndDoesNotExist_InsertsNewAddressWithSalesTaxRatesAndReturnsIt() {
+    public void findByAddress_FirstAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
@@ -80,7 +81,8 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Test
     @WithMockUser
     // This Test is for retrieving an existing rates object from DB
-    public void findByAddress_AddressInCaliforniaAndExists_ReturnsAddressWithSalesTaxRates() {
+    // There is no getAll endpoint for checking if it exists but there were tests to it, and it has been validated
+    public void findByAddress_AddressInColoradoAndExists_ReturnsComplytSalesTaxRates() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
 
@@ -109,7 +111,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Order(3)
     @Test
     @WithMockUser
-    public void findByAddress_AddressInCaliforniaAndDoesNotExist_InsertsNewAddressWithSalesTaxRatesAndReturnsIt2() {
+    public void findByAddress_AddressInColoradoAndDoesNotExist_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withStreet("new Street");
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");

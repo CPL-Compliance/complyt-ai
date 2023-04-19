@@ -1,5 +1,6 @@
 package com.complyt.v1.handler;
 
+import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.facade.ComplytSalesTaxRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
 import com.complyt.utils.observability.ContextLogger;
@@ -15,11 +16,13 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -29,7 +32,7 @@ import reactor.core.publisher.Mono;
 public class ComplytSalesTaxRatesHandler {
 
     @NonNull
-    ComplytSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
+    ComplytSalesTaxRatesFacade complytSalesTaxRatesFacadeFacade;
 
     @NonNull
     QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
@@ -37,20 +40,22 @@ public class ComplytSalesTaxRatesHandler {
     @NonNull
     ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
 
+    @NonNull
+    ReactiveMongoTemplate reactiveMongoTemplate;
+
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ComplytSalesTaxRatesDto> addressWithSalesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
+        Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoQueryParamsExtractor.extract(serverRequest))
                 .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
-                .flatMap(addressWithSalesTaxRatesFacade::findByAddress)
+                .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
                 .map(AddressWithSalesTaxRatesMapper.INSTANCE::addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto)
                 .flatMap(addressWithSalesTaxRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + addressWithSalesTaxRatesDto, log::info).thenReturn(addressWithSalesTaxRatesDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(addressWithSalesTaxRatesDtoMono, ComplytSalesTaxRatesDto.class);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);
     }
-
 }
