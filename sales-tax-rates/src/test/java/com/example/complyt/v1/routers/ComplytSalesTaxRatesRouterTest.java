@@ -383,7 +383,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
     @Test
     @WithMockUser
-    public void get_InternalServerError_Returns500() {
+    public void findByAddress_InternalServerError_Returns500() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
         Address address = TestUtilities.createAddressInCalifornia();
@@ -405,6 +405,29 @@ public class ComplytSalesTaxRatesRouterTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    @WithMockUser
+    public void getAny_InvalidUrl_Returns404() {
+
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ComplytSalesTaxRatesRouter.BASE_URL + "/resource_not_found").build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    public void get_UnauthenticatedUser_Returns401() {
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(ComplytSalesTaxRatesRouter.BASE_URL).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized();
     }
 
     @Test
