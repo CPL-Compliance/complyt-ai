@@ -12,7 +12,7 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handler.ComplytSalesTaxRatesHandler;
 import com.complyt.v1.mappers.AddressMapper;
-import com.complyt.v1.mappers.AddressWithSalesTaxRatesMapper;
+import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
@@ -64,7 +64,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         // When
         when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = AddressWithSalesTaxRatesMapper.INSTANCE
+        ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE
                 .complytSalesTaxRatesToComplytSalesTaxRates(addressWithSalesTaxRates);
 
         // Then

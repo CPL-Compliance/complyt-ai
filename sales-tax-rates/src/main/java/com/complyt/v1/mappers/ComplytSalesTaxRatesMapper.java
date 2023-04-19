@@ -7,8 +7,8 @@ import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface AddressWithSalesTaxRatesMapper {
-    AddressWithSalesTaxRatesMapper INSTANCE = Mappers.getMapper(AddressWithSalesTaxRatesMapper.class);
+public interface ComplytSalesTaxRatesMapper {
+    ComplytSalesTaxRatesMapper INSTANCE = Mappers.getMapper(ComplytSalesTaxRatesMapper.class);
 
     ComplytSalesTaxRates complytSalesTaxRatesDtoToComplytSalesTaxRates(ComplytSalesTaxRatesDto salesTaxRatesDto);
 

@@ -32,58 +32,58 @@ public class SalesTaxRatesRepositoryTest {
     }
 
     @Test
-    void findByAddress_FindsAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
+    void findByAddress_FindsComplytSalesTaxRates_ReturnsComplytSalesTaxRates() {
         // Given
-        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         Address address = TestUtilities.createAddressInCalifornia();
         Query query = TestUtilities.createAddressSearchQuery(address);
         String state = "new_york";
 
         // When
-        when(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.findByAddress(address, state);
+        when(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, state)).thenReturn(Mono.just(complytSalesTaxRates));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = salesTaxRatesRepository.findByAddress(address, state);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(addressWithSalesTaxRates).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
     }
 
     @Test
-    void save_SavesAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
+    void save_SavesComplytSalesTaxRates_ReturnsComplytSalesTaxRates() {
         // Given
-        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         String state = "california";
 
         // When
-        when(reactiveMongoTemplate.save(addressWithSalesTaxRates, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.save(addressWithSalesTaxRates, state);
+        when(reactiveMongoTemplate.save(complytSalesTaxRates, state)).thenReturn(Mono.just(complytSalesTaxRates));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = salesTaxRatesRepository.save(complytSalesTaxRates, state);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(addressWithSalesTaxRates).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
     }
 
     @Test
     void save_NullCollectionPassed_ThrowsException() {
         // Given
-        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         String nullCollection = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRatesRepository.save(addressWithSalesTaxRates, nullCollection);
+            salesTaxRatesRepository.save(complytSalesTaxRates, nullCollection);
         });
 
         assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
     }
 
     @Test
-    void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
+    void save_NullComplytSalesTaxRatesPassed_ThrowsException() {
         // Given
-        ComplytSalesTaxRates nullAddressWithSalesTaxRates = null;
+        ComplytSalesTaxRates nullComplytSalesTaxRates = null;
         String state = "california";
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxRatesRepository.save(nullAddressWithSalesTaxRates, state);
+            salesTaxRatesRepository.save(nullComplytSalesTaxRates, state);
         });
 
         assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");

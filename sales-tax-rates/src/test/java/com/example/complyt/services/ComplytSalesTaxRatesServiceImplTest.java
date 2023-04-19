@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class ComplytSalesTaxRatesServiceImplTest {
 
     @InjectMocks
-    ComplytSalesTaxRatesServiceImpl addressWithSalesTaxRatesService;
+    ComplytSalesTaxRatesServiceImpl complytSalesTaxRatesService;
 
     @Mock
     ComplytSalesTaxRatesRepository complytSalesTaxRatesRepository;
@@ -44,24 +44,24 @@ public class ComplytSalesTaxRatesServiceImplTest {
 
 
     @Test
-    void findByAddress_FindsAddressWithRates_ReturnsRates() {
+    void findByAddress_FindsComplytSalesTaxRates_ReturnsRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
 
-        ComplytSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.empty());
-        when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
-        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
+        when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedComplytSalesTaxRates));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesService.findByAddress(califoniaAddress);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressWithSalesTaxRates).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRates).verifyComplete();
     }
 
     @Test
-    void findByAddress_AddressWithSalesTaxRatesNotFoundInDB_SavesNewAddressWithSalesTaxRates() {
+    void findByAddress_ComplytSalesTaxRatesNotFoundInDB_SavesNewComplytSalesTaxRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         Address californiaAddressWithCounty = califoniaAddress.withCounty("Fresno");
@@ -78,7 +78,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(californiaRates));
 
-        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesService.findByAddress(califoniaAddress);
 
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRates).verifyComplete();
@@ -91,24 +91,24 @@ public class ComplytSalesTaxRatesServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.findByAddress(nullAddress);
+            complytSalesTaxRatesService.findByAddress(nullAddress);
         });
 
         assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
     }
 
     @Test
-    void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
+    void save_NullComplytSalesTaxRatesPassed_ThrowsException() {
         // Given
         String collection = "collection";
         ComplytSalesTaxRates nullComplytSalesTaxRates = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(nullComplytSalesTaxRates, collection);
+            complytSalesTaxRatesService.save(nullComplytSalesTaxRates, collection);
         });
         
-        assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");
     }
 
     @Test
@@ -119,7 +119,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(complytSalesTaxRates, nullCollection);
+            complytSalesTaxRatesService.save(complytSalesTaxRates, nullCollection);
         });
 
         assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");

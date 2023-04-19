@@ -5,7 +5,7 @@ import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermiss
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressMapper;
-import com.complyt.v1.mappers.AddressWithSalesTaxRatesMapper;
+import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.validators.ValidationHandler;
@@ -46,8 +46,8 @@ public class ComplytSalesTaxRatesHandler {
                 .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
-                .map(AddressWithSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
-                .flatMap(addressWithSalesTaxRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + addressWithSalesTaxRatesDto, log::info).thenReturn(addressWithSalesTaxRatesDto))
+                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
+                .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info).thenReturn(complytSalesTaxRates))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(complytSalesTaxRatesDto, ComplytSalesTaxRatesDto.class);

@@ -51,8 +51,8 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     }
 
     @Override
-    public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates addressWithSalesTaxRates, @NonNull String collection) {
-        return complytSalesTaxRatesRepository.save(addressWithSalesTaxRates, collection);
+    public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection) {
+        return complytSalesTaxRatesRepository.save(complytSalesTaxRates, collection);
     }
 
 }

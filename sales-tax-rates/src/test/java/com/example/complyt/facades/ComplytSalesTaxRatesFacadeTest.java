@@ -34,10 +34,10 @@ public class ComplytSalesTaxRatesFacadeTest {
 
         // When
         when(complytSalesTaxRatesService.findByAddress(address)).thenReturn(Mono.just(expectedComplytSalesTaxRatesFacade));
-        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = complytSalesTaxRatesFacade.findByAddress(address);
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesFacade.findByAddress(address);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRatesFacade).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRatesFacade).verifyComplete();
     }
 
     @Test
