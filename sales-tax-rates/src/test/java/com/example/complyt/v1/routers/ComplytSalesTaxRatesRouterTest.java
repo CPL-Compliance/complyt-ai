@@ -5,17 +5,17 @@ import com.complyt.config.QueryParamsExtractorConfig;
 import com.complyt.config.error_messages.DtoErrorMessages;
 import com.complyt.config.error_messages.StringErrorMessages;
 import com.complyt.domain.Address;
-import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.facade.AddressWithSalesTaxRatesFacade;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.facade.ComplytSalesTaxRatesFacade;
 import com.complyt.v1.config.ValidatorConfig;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
-import com.complyt.v1.handler.AddressWithSalesTaxRatesHandler;
+import com.complyt.v1.handler.ComplytSalesTaxRatesHandler;
 import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.AddressWithSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.AddressWithSalesTaxRatesDto;
-import com.complyt.v1.router.AddressWithSalesTaxRatesRouter;
+import com.complyt.v1.model.ComplytSalesTaxRatesDto;
+import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import com.example.complyt.config.SecurityConfig;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
@@ -37,41 +37,41 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
-@ContextConfiguration(classes = {AddressWithSalesTaxRatesRouter.class, AddressWithSalesTaxRatesHandler.class, ApiExceptionConfig.class,
+@ContextConfiguration(classes = {ComplytSalesTaxRatesRouter.class, ComplytSalesTaxRatesHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalExceptionHandler.class,
         GlobalErrorAttributes.class,
         QueryParamsExtractorConfig.class,
         SecurityConfig.class})
-public class AddressWithSalesTaxRatesRouterTest {
+public class ComplytSalesTaxRatesRouterTest {
 
     @Autowired
-    AddressWithSalesTaxRatesRouter addressWithSalesTaxRatesRouter;
+    ComplytSalesTaxRatesRouter addressWithSalesTaxRatesRouter;
 
     @Autowired
     private WebTestClient webTestClient;
 
     @MockBean
-    private AddressWithSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
+    private ComplytSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
 
     @Test
     @WithMockUser
     public void findByAddress_AddressWithSalesTaxRatesFound_Returns200() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         // When
         when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        AddressWithSalesTaxRatesDto addressWithSalesTaxRatesDto = AddressWithSalesTaxRatesMapper.INSTANCE
+        ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = AddressWithSalesTaxRatesMapper.INSTANCE
                 .addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto(addressWithSalesTaxRates);
 
         // Then
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -81,7 +81,7 @@ public class AddressWithSalesTaxRatesRouterTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(AddressWithSalesTaxRatesDto.class)
+                .expectBody(ComplytSalesTaxRatesDto.class)
                 .value(addressWithSalesTaxRatesItem -> addressWithSalesTaxRatesItem, equalTo(addressWithSalesTaxRatesDto));
     }
 
@@ -99,7 +99,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -125,7 +125,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -153,7 +153,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("street", addressDto.street())
@@ -180,7 +180,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -208,7 +208,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("city", addressDto.city())
                         .queryParam("street", addressDto.street())
@@ -234,7 +234,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -262,7 +262,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
@@ -288,7 +288,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -316,7 +316,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
@@ -342,7 +342,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("country", addressDto.country())
                         .queryParam("state", addressDto.state())
                         .queryParam("city", addressDto.city())
@@ -369,7 +369,7 @@ public class AddressWithSalesTaxRatesRouterTest {
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(AddressWithSalesTaxRatesRouter.BASE_URL)
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
                         .queryParam("zip", addressDto.zip())
                         .queryParam("city", addressDto.city())
                         .queryParam("state", addressDto.state())
@@ -381,16 +381,15 @@ public class AddressWithSalesTaxRatesRouterTest {
                 .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
-
     @Test
     public void findByAddress_NullHandler_ThrowsNullPointerException() {
         // Given
-        AddressWithSalesTaxRatesHandler nullAddressWithSalesTaxRatesHandler = null;
-        AddressWithSalesTaxRatesRouter addressWithSalesTaxRatesRouter = new AddressWithSalesTaxRatesRouter();
+        ComplytSalesTaxRatesHandler nullComplytSalesTaxRatesHandler = null;
+        ComplytSalesTaxRatesRouter complytSalesTaxRates = new ComplytSalesTaxRatesRouter();
 
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesRouter.getAddressWithSalesTaxRatesByAddress(nullAddressWithSalesTaxRatesHandler);
+            complytSalesTaxRates.getComplytSalesTaxRatesByAddress(nullComplytSalesTaxRatesHandler);
         });
 
         // Then

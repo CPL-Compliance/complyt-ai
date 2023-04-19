@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.v1.model.AddressWithSalesTaxRatesDto;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
@@ -10,8 +10,8 @@ import org.mapstruct.factory.Mappers;
 public interface AddressWithSalesTaxRatesMapper {
     AddressWithSalesTaxRatesMapper INSTANCE = Mappers.getMapper(AddressWithSalesTaxRatesMapper.class);
 
-    AddressWithSalesTaxRates addressWithSalesTaxRatesDtoToAddressWithSalesTaxRates(AddressWithSalesTaxRatesDto salesTaxRatesDto);
+    ComplytSalesTaxRates addressWithSalesTaxRatesDtoToAddressWithSalesTaxRates(ComplytSalesTaxRatesDto salesTaxRatesDto);
 
-    AddressWithSalesTaxRatesDto addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto(AddressWithSalesTaxRates addressWithSalesTaxRates);
+    ComplytSalesTaxRatesDto addressWithSalesTaxRatesToAddressWithSalesTaxRatesDto(ComplytSalesTaxRates addressWithSalesTaxRates);
 
 }

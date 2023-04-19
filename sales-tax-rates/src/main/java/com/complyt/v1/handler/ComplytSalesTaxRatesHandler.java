@@ -1,13 +1,13 @@
 package com.complyt.v1.handler;
 
-import com.complyt.facade.AddressWithSalesTaxRatesFacade;
+import com.complyt.facade.ComplytSalesTaxRatesFacade;
 import com.complyt.security.permissions.sales_tax_rates.SalesTaxRatesReadPermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.AddressWithSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
-import com.complyt.v1.model.AddressWithSalesTaxRatesDto;
+import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.validators.ValidationHandler;
 import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
@@ -26,10 +26,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AddressWithSalesTaxRatesHandler {
+public class ComplytSalesTaxRatesHandler {
 
     @NonNull
-    AddressWithSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
+    ComplytSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
 
     @NonNull
     QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
@@ -41,7 +41,7 @@ public class AddressWithSalesTaxRatesHandler {
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<AddressWithSalesTaxRatesDto> addressWithSalesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
+        Mono<ComplytSalesTaxRatesDto> addressWithSalesTaxRatesDtoMono = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoQueryParamsExtractor.extract(serverRequest))
                 .flatMap(addressDtoValidationHandler::validate)
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
@@ -50,7 +50,7 @@ public class AddressWithSalesTaxRatesHandler {
                 .flatMap(addressWithSalesTaxRatesDto -> ContextLogger.observeCtx("<-- Returned Body: " + addressWithSalesTaxRatesDto, log::info).thenReturn(addressWithSalesTaxRatesDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(addressWithSalesTaxRatesDtoMono, AddressWithSalesTaxRatesDto.class);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(addressWithSalesTaxRatesDtoMono, ComplytSalesTaxRatesDto.class);
     }
 
 }

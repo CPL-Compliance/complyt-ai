@@ -4,12 +4,12 @@ import com.complyt.business.data_fetcher.CountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
-import com.complyt.domain.AddressWithSalesTaxRates;
+import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.StatesMap;
 import com.complyt.domain.fast_tax.FastTaxData;
-import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
-import com.complyt.services.AddressWithSalesTaxRatesServiceImpl;
+import com.complyt.repositories.ComplytSalesTaxRatesRepository;
+import com.complyt.services.ComplytSalesTaxRatesServiceImpl;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +25,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AddressWithSalesTaxRatesServiceImplTest {
+public class ComplytSalesTaxRatesServiceImplTest {
 
     @InjectMocks
-    AddressWithSalesTaxRatesServiceImpl addressWithSalesTaxRatesService;
+    ComplytSalesTaxRatesServiceImpl addressWithSalesTaxRatesService;
 
     @Mock
-    AddressWithSalesTaxRatesRepository addressWithSalesTaxRatesRepository;
+    ComplytSalesTaxRatesRepository complytSalesTaxRatesRepository;
 
     @Mock
     SalesTaxWebClientWrapper salesTaxWebClientWrapper;
@@ -48,14 +48,13 @@ public class AddressWithSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
-//        SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
 
-        AddressWithSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.empty());
-        when(addressWithSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
-        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
+        when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
+        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
 
         // Then
         StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressWithSalesTaxRates).verifyComplete();
@@ -68,21 +67,21 @@ public class AddressWithSalesTaxRatesServiceImplTest {
         Address californiaAddressWithCounty = califoniaAddress.withCounty("Fresno");
         String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
-        AddressWithSalesTaxRates expectedAddressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
         FastTaxData fastTaxData = TestUtilities.createFastTaxData();
 
         // When
-        when(addressWithSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
+        when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
         when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxData));
         when(countyFetcher.fetch(fastTaxData)).thenReturn(Mono.just(californiaAddressWithCounty.getCounty()));
-        when(addressWithSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedAddressWithSalesTaxRates));
+        when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(californiaRates));
 
-        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = addressWithSalesTaxRatesService.findByAddress(califoniaAddress);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressWithSalesTaxRates).verifyComplete();
+        StepVerifier.create(complytSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRates).verifyComplete();
     }
 
     @Test
@@ -102,13 +101,13 @@ public class AddressWithSalesTaxRatesServiceImplTest {
     void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
         // Given
         String collection = "collection";
-        AddressWithSalesTaxRates nullAddressWithSalesTaxRates = null;
+        ComplytSalesTaxRates nullComplytSalesTaxRates = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(nullAddressWithSalesTaxRates, collection);
+            addressWithSalesTaxRatesService.save(nullComplytSalesTaxRates, collection);
         });
-
+        
         assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
     }
 
@@ -116,11 +115,11 @@ public class AddressWithSalesTaxRatesServiceImplTest {
     void save_NullCollectionPassed_ThrowsException() {
         // Given
         String nullCollection = null;
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            addressWithSalesTaxRatesService.save(addressWithSalesTaxRates, nullCollection);
+            addressWithSalesTaxRatesService.save(complytSalesTaxRates, nullCollection);
         });
 
         assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");

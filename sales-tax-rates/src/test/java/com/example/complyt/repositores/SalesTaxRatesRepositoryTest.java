@@ -1,8 +1,8 @@
 package com.example.complyt.repositores;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.repositories.AddressWithSalesTaxRatesRepository;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class SalesTaxRatesRepositoryTest {
 
     @InjectMocks
-    AddressWithSalesTaxRatesRepository salesTaxRatesRepository;
+    ComplytSalesTaxRatesRepository salesTaxRatesRepository;
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
@@ -34,14 +34,14 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void findByAddress_FindsAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
         // Given
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         Address address = TestUtilities.createAddressInCalifornia();
         Query query = TestUtilities.createAddressSearchQuery(address);
         String state = "new_york";
 
         // When
-        when(reactiveMongoTemplate.findOne(query, AddressWithSalesTaxRates.class, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.findByAddress(address, state);
+        when(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
+        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.findByAddress(address, state);
 
         // Then
         StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(addressWithSalesTaxRates).verifyComplete();
@@ -50,12 +50,12 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void save_SavesAddressWithSalesTaxRates_ReturnsAddressWithSalesTaxRates() {
         // Given
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         String state = "california";
 
         // When
         when(reactiveMongoTemplate.save(addressWithSalesTaxRates, state)).thenReturn(Mono.just(addressWithSalesTaxRates));
-        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.save(addressWithSalesTaxRates, state);
+        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = salesTaxRatesRepository.save(addressWithSalesTaxRates, state);
 
         // Then
         StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(addressWithSalesTaxRates).verifyComplete();
@@ -64,7 +64,7 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void save_NullCollectionPassed_ThrowsException() {
         // Given
-        AddressWithSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
         String nullCollection = null;
 
         // When + Then
@@ -78,7 +78,7 @@ public class SalesTaxRatesRepositoryTest {
     @Test
     void save_NullAddressWithSalesTaxRatesPassed_ThrowsException() {
         // Given
-        AddressWithSalesTaxRates nullAddressWithSalesTaxRates = null;
+        ComplytSalesTaxRates nullAddressWithSalesTaxRates = null;
         String state = "california";
 
         // When + Then

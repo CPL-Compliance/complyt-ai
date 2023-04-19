@@ -1,9 +1,9 @@
 package com.example.complyt.facades;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.AddressWithSalesTaxRates;
-import com.complyt.facade.AddressWithSalesTaxRatesFacade;
-import com.complyt.services.AddressWithSalesTaxRatesService;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.facade.ComplytSalesTaxRatesFacade;
+import com.complyt.services.ComplytSalesTaxRatesService;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,26 +18,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AddressWithSalesTaxRatesFacadeTest {
+public class ComplytSalesTaxRatesFacadeTest {
 
     @InjectMocks
-    AddressWithSalesTaxRatesFacade addressWithSalesTaxRatesFacade;
+    ComplytSalesTaxRatesFacade complytSalesTaxRatesFacade;
 
     @Mock
-    AddressWithSalesTaxRatesService addressWithSalesTaxRatesService;
+    ComplytSalesTaxRatesService complytSalesTaxRatesService;
 
     @Test
     void findByAddress_RatesReturnedFromService_ReturnsRates() {
         // Given
-        AddressWithSalesTaxRates expectedAddressSalesTaxRates = TestUtilities.createCaliforniaAddressWithSalesTaxRates();
+        ComplytSalesTaxRates expectedComplytSalesTaxRatesFacade = TestUtilities.createCaliforniaComplytSalesTaxRates();
         Address address = TestUtilities.createAddressInCalifornia();
 
         // When
-        when(addressWithSalesTaxRatesService.findByAddress(address)).thenReturn(Mono.just(expectedAddressSalesTaxRates));
-        Mono<AddressWithSalesTaxRates> addressWithSalesTaxRatesMono = addressWithSalesTaxRatesFacade.findByAddress(address);
+        when(complytSalesTaxRatesService.findByAddress(address)).thenReturn(Mono.just(expectedComplytSalesTaxRatesFacade));
+        Mono<ComplytSalesTaxRates> addressWithSalesTaxRatesMono = complytSalesTaxRatesFacade.findByAddress(address);
 
         // Then
-        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedAddressSalesTaxRates).verifyComplete();
+        StepVerifier.create(addressWithSalesTaxRatesMono).expectNext(expectedComplytSalesTaxRatesFacade).verifyComplete();
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AddressWithSalesTaxRatesFacadeTest {
         Address nullAddress = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> addressWithSalesTaxRatesFacade.findByAddress(nullAddress));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.findByAddress(nullAddress));
 
         assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
     }

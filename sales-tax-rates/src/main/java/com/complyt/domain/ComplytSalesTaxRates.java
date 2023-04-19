@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Value
 @With
-public class AddressWithSalesTaxRates {
+public class ComplytSalesTaxRates {
     @Id
     String id;
     Address address;
