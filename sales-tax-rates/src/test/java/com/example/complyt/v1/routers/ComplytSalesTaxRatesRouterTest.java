@@ -17,7 +17,6 @@ import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import com.example.complyt.config.SecurityConfig;
-import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -27,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import testUtils.TestUtilities;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -379,6 +379,32 @@ public class ComplytSalesTaxRatesRouterTest {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void get_InternalServerError_Returns500() {
+        // Given
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
+        Address address = TestUtilities.createAddressInCalifornia();
+
+        // When
+        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenThrow(RuntimeException.class);
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
