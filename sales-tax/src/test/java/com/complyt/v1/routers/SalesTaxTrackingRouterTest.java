@@ -147,6 +147,27 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
+    public void upsertByState_NoBody_Returns400() {
+        // Given
+        String state = "CA";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void getByState_UserWithoutAuthorities_Returns403() {
         // ???
     }

@@ -24,6 +24,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
 
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -395,6 +396,125 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                             .expectStatus().isOk()
                             .expectBody(SalesTaxTrackingDto.class)
                             .value(receivedSalesTaxTrackingDto -> assertEquals(salesTaxTrackingDto, receivedSalesTaxTrackingDto));
+                });
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    public void putTransaction_CustomerIdExistingInAnotherTenant_Returns404() {
+        // Given
+        String externalId = "10001";
+        UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5");
+        TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerId);
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutateWith(differentTenantMutator)
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto
+                        .withShippingAddress(transactionDto.shippingAddress().withState("AZ")))
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Order(5)
+    @Test
+    @Override
+    public void putTransaction_SalesTaxTrackingOfShippingAddressExistInAnotherTenant_Returns404() {
+        // Given
+        String externalId = "10001";
+        String customerExternalId = "1586";
+
+        webTestClient
+                .mutateWith(differentTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(customerDto -> {
+
+                    TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerDto.complytId());
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .mutateWith(differentTenantMutator)
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(transactionDto
+                                    .withShippingAddress(transactionDto.shippingAddress().withState("CA")))
+                            .exchange()
+                            .expectStatus().isNotFound();
+                });
+    }
+
+    @Order(6)
+    @Test
+    @Override
+    public void putSalesTaxTracking_SalesTaxTrackingWithStateRuleOfTaxableYear_Returns201() {
+        // Given
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("CA", "3463456", "California"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutateWith(differentTenantMutator)
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(salesTaxTrackingDto)
+                .exchange()
+                .expectStatus().isCreated();
+    }
+
+    @Order(7)
+    @Test
+    @Override
+    public void putTransaction_ClientTrackingNotExistingForTenant_Returns404() {
+        // Given
+        String externalId = "10002";
+        String customerExternalId = "1586";
+
+        // Then
+        webTestClient
+                .mutateWith(differentTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + customerExternalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(CustomerDto.class)
+                .value(customerDto -> {
+
+                    TransactionDto transactionDto = ITUtilities.stubTransactionDto(externalId, customerDto.complytId());
+
+                    webTestClient
+                            .mutateWith(csrf())
+                            .mutateWith(differentTenantMutator)
+                            .put()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                                    .build())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .bodyValue(transactionDto)
+                            .exchange()
+                            .expectStatus().isNotFound();
                 });
     }
 }

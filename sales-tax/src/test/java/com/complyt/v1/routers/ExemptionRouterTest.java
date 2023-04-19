@@ -141,6 +141,27 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .expectStatus().is5xxServerError();
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByComplytId_NoBody_Returns400() {
+        // Given
+        UUID complytId = UUID.randomUUID();
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ExemptionRouter.BASE_URL + "/complytId/" + complytId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
+    }
+
     @WithUserDetails()
     @Override
     @Test

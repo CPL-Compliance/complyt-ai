@@ -24,5 +24,7 @@ public interface UpsertByComplytIdRouterTestTemplate {
     void upsertByComplytId_InternalServerError_Returns500();
 
     void upsertByComplytId_NullHandler_ThrowsNullPointerException();
+
+    void upsertByComplytId_NoBody_Returns400();
 }
 

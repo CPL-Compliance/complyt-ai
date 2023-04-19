@@ -1082,6 +1082,27 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
     }
 
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NoBody_Returns400() {
+        // Given
+        String externalId = "0";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
+    }
+
     @Override
     @Test
     @WithMockUser
