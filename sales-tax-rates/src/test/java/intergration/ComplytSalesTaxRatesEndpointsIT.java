@@ -132,9 +132,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ComplytSalesTaxRatesDto.class)
-                .value(addressWithSalesTaxRatesDto -> {
-                    assertEquals(addressWithSalesTaxRatesDto.address(), addressWithCounty);
-                    assertEquals(addressWithSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
+                .value(complytSalesTaxRatesDto -> {
+                    assertEquals(complytSalesTaxRatesDto.address(), addressWithCounty);
+                    assertEquals(complytSalesTaxRatesDto.salesTaxRates(), stubFastTaxSalesTaxRates);
                 });
     }
 
