@@ -31,9 +31,9 @@ public class ComplytSalesTaxRatesRepository {
                 .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));
     }
 
-    public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates addressWithSalesTaxRates, @NonNull String collection) {
-        return ContextLogger.observeCtx("Saving address with rates: " + addressWithSalesTaxRates, log::debug)
-                .then(reactiveMongoTemplate.save(addressWithSalesTaxRates, collection));
+    public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection) {
+        return ContextLogger.observeCtx("Saving ComplytSalesTaxRates: " + complytSalesTaxRates, log::debug)
+                .then(reactiveMongoTemplate.save(complytSalesTaxRates, collection));
     }
 
 }

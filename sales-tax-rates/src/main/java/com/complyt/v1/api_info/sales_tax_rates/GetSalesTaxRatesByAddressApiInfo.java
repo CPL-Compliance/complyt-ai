@@ -101,12 +101,12 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
     String complytSalesTaxRatesExample = """
             {
                 "address": {
-                        "city": "New York",
-                        "country": "US",
-                        "county": "New York",
-                        "state": "NY",
-                        "street": "160 Broadway",
-                        "zip": "10038"
+                    "city": "New York",
+                    "country": "US",
+                    "county": "New York",
+                    "state": "NY",
+                    "street": "160 Broadway",
+                    "zip": "10038"
                 },
                 "salesTaxRates": {
                     "cityDistrictRate": 0.0,
@@ -116,6 +116,6 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
                     "stateRate": 0.04,
                     "taxRate": 0.08875
                 }
+            }
             """;
-
 }
