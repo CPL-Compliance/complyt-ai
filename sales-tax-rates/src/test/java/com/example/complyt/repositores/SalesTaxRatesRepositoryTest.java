@@ -86,7 +86,7 @@ public class SalesTaxRatesRepositoryTest {
             salesTaxRatesRepository.save(nullAddressWithSalesTaxRates, state);
         });
 
-        assertEquals(nullPointerException.getMessage(), "addressWithSalesTaxRates is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");
     }
 
     @Test
