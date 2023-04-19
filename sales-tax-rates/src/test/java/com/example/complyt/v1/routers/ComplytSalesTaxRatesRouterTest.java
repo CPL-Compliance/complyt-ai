@@ -393,7 +393,7 @@ public class ComplytSalesTaxRatesRouterTest {
         });
 
         // Then
-        assertEquals("addressWithSalesTaxRatesHandler is marked non-null but is null", exception.getMessage());
+        assertEquals("complytSalesTaxRatesHandler is marked non-null but is null", exception.getMessage());
     }
 
 }

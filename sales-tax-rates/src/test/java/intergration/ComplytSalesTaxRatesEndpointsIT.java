@@ -1,7 +1,6 @@
 package intergration;
 
 import com.complyt.SalesTaxRatesApplication;
-import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.model.SalesTaxRatesDto;

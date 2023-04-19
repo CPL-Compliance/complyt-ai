@@ -40,9 +40,6 @@ public class ComplytSalesTaxRatesHandler {
     @NonNull
     ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
 
-    @NonNull
-    ReactiveMongoTemplate reactiveMongoTemplate;
-
     @SalesTaxRatesReadPermission
     public Mono<ServerResponse> getSalesTaxRatesByAddress(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());

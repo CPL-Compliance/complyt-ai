@@ -27,9 +27,14 @@ import java.lang.annotation.Target;
                 operation =
                 @Operation(
                         security = @SecurityRequirement(name = "bearerAuth"),
-                        description = "Get SalesTaxRates by Address",
-                        operationId = "getSalesTaxRatesByAddress",
+                        description = "Get ComplytSalesTaxRates by Address",
+                        operationId = "getComplytSalesTaxRatesByAddress",
                         parameters = {
+                                @Parameter(in = ParameterIn.QUERY,
+                                        name = "country",
+                                        description = "Address country",
+                                        examples = @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.countryExample,
+                                                name = GetSalesTaxRatesByAddressApiInfo.countryExample)),
                                 @Parameter(in = ParameterIn.QUERY,
                                         name = "state",
                                         description = "Address state",
@@ -61,7 +66,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = SalesTaxRatesDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.salesTaxRatesExample)
+                                                                @ExampleObject(value = GetSalesTaxRatesByAddressApiInfo.complytSalesTaxRatesExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -87,19 +92,30 @@ import java.lang.annotation.Target;
 })
 
 public @interface GetSalesTaxRatesByAddressApiInfo {
+    String countryExample = "US";
     String stateExample = "NY";
     String cityExample = "New York";
     String streetExample = "541 6th Ave";
     String zipExample = "10011";
 
-    String salesTaxRatesExample = """
+    String complytSalesTaxRatesExample = """
             {
-                "cityDistrictRate": 0.0,
-                "cityRate": 0.045,
-                "countyDistrictRate": 0.00375,
-                "countyRate": 0.0,
-                "stateRate": 0.04,
-                "taxRate": 0.08875
-            }
+                "address": {
+                        "city": "New York",
+                        "country": "US",
+                        "county": "New York",
+                        "state": "NY",
+                        "street": "160 Broadway",
+                        "zip": "10038"
+                },
+                "salesTaxRates": {
+                    "cityDistrictRate": 0.0,
+                    "cityRate": 0.045,
+                    "countyDistrictRate": 0.00375,
+                    "countyRate": 0.0,
+                    "stateRate": 0.04,
+                    "taxRate": 0.08875
+                }
             """;
+
 }
