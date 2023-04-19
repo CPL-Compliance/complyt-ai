@@ -10,8 +10,8 @@ import org.mapstruct.factory.Mappers;
 public interface ComplytSalesTaxRatesMapper {
     ComplytSalesTaxRatesMapper INSTANCE = Mappers.getMapper(ComplytSalesTaxRatesMapper.class);
 
-    ComplytSalesTaxRates complytSalesTaxRatesDtoToComplytSalesTaxRates(ComplytSalesTaxRatesDto salesTaxRatesDto);
+    ComplytSalesTaxRates complytSalesTaxRatesDtoToComplytSalesTaxRates(ComplytSalesTaxRatesDto complytSalesTaxRatesDto);
 
-    ComplytSalesTaxRatesDto complytSalesTaxRatesToComplytSalesTaxRates(ComplytSalesTaxRates addressWithSalesTaxRates);
+    ComplytSalesTaxRatesDto complytSalesTaxRatesToComplytSalesTaxRates(ComplytSalesTaxRates complytSalesTaxRates);
 
 }
