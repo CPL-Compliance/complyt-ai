@@ -219,7 +219,7 @@ class TransactionServiceImplTest {
     @Test
     void markAsCancelled_ChangesTransactionsStatus_ReturnsUpdatedTransaction() throws InterruptedException {
         // Given
-        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED).withCustomer(null);
 
         // When
         when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));
