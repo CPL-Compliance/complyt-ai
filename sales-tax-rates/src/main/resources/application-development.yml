@@ -1,0 +1,18 @@
+eureka:
+  client:
+    enabled: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@${CLUSTER_ID}.mongodb.net/sales_tax_rates
+
+logging:
+  level:
+    root: info
