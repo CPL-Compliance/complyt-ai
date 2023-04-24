@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 @Generated
 @EqualsAndHashCode
-public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
+public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase {
     public StubFastTaxWebClientWrapper() {
         super(null, null, null, null, null);
     }

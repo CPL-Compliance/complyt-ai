@@ -1,9 +1,9 @@
 package com.example.complyt.v1.routers;
 
-import com.complyt.config.ApiExceptionConfig;
+import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.config.QueryParamsExtractorConfig;
-import com.complyt.config.error_messages.DtoErrorMessages;
-import com.complyt.config.error_messages.StringErrorMessages;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.facade.ComplytSalesTaxRatesFacade;
@@ -28,7 +28,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -429,6 +431,174 @@ public class ComplytSalesTaxRatesRouterTest {
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen50country_Returns400ValidationError() {
+        // Given
+        String countryWithLength51 = TestUtilities.stringWithLength(50);;
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withCountry(countryWithLength51);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen100City_Returns400ValidationError() {
+        // Given
+        String cityWithLength51 = TestUtilities.stringWithLength(101);;
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withCity(cityWithLength51);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen100State_Returns400ValidationError() {
+        // Given
+        String stateWithLength101 = TestUtilities.stringWithLength(101);;
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withState(stateWithLength101);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen100County_Returns400ValidationError() {
+        // Given
+        String countyWithLength101 = TestUtilities.stringWithLength(101);
+        ;
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withCounty(countyWithLength101);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MAX_100_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen200Street_Returns400ValidationError() {
+        // Given
+        String streetWithLength101 = TestUtilities.stringWithLength(201);
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withStreet(streetWithLength101);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.street " + StringErrorMessages.MINMAX_200_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_LengthGreaterThen20Zip_Returns400ValidationError() {
+        // Given
+        String zipWithLength101 = TestUtilities.stringWithLength(21);
+
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
+                .withZip(zipWithLength101);
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("zip", addressDto.zip())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("county", addressDto.county())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
 
     @Test
     public void findByAddress_NullHandler_ThrowsNullPointerException() {

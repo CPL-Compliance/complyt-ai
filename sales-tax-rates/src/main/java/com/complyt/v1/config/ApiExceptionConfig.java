@@ -1,4 +1,4 @@
-package com.complyt.config;
+package com.complyt.v1.config;
 
 import com.complyt.annotations.Generated;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;

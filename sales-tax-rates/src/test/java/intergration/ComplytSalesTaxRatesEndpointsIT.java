@@ -25,7 +25,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 
 @ExtendWith(SpringExtension.class)
@@ -56,7 +55,6 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
 
         // When + Then
         webTestClient
-                .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
@@ -89,7 +87,6 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
 
         // When + Then
         webTestClient
-                .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)
@@ -118,7 +115,6 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
 
         // When + Then
         webTestClient
-                .mutateWith(csrf())
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(ComplytSalesTaxRatesRouter.BASE_URL)

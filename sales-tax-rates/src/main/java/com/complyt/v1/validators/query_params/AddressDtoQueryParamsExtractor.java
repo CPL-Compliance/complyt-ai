@@ -15,7 +15,8 @@ public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<Addr
         String city = serverRequest.queryParam("city").orElse(null);
         String street = serverRequest.queryParam("street").orElse(null);
         String zip = serverRequest.queryParam("zip").orElse(null);
-        AddressDto address = new AddressDto(city, country, null, state, street, zip);
+        String county = serverRequest.queryParam("county").orElse(null);
+        AddressDto address = new AddressDto(city, country, county, state, street, zip);
 
         return ContextLogger.observeCtx("Address extracted from request query params: " + address, log::debug)
                 .then(Mono.just(address));

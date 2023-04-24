@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 
 @EqualsAndHashCode
-public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase implements SalesTaxWebClientWrapper {
+public class FastTaxWebClientWrapper extends SalesTaxWebClientWrapperBase {
 
     public FastTaxWebClientWrapper(WebClient webClient, String scheme, String host, String path, Pair<String, String> key) {
         super(webClient, scheme, host, path, key);

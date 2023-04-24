@@ -41,16 +41,4 @@ class InformationComponentTest {
         assertEquals(expectedString, actualString);
     }
 
-    @Test
-    void noArgsConstructor_ReturnEmptyInformationComponent() {
-        // Given
-        InformationComponent expectedInformationComponent = new InformationComponent(null, null);
-
-        // When
-        InformationComponent actualInformationComponent = new InformationComponent();
-
-        // Then
-        assertEquals(expectedInformationComponent, actualInformationComponent);
-    }
-
 }

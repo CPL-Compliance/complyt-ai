@@ -31,7 +31,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestUtilities {
+public interface TestUtilities {
 
     public static Address createAddressInNewYork() {
         return new Address("New York", "US", null, "NY", "160 Broadway", "10038");
@@ -125,6 +125,12 @@ public class TestUtilities {
 
     public static SalesTaxRatesDto createStubFastTaxSalesTaxRates() {
         return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.0025f, 0.029f, 0.0775f);
+    }
+
+    public static String stringWithLength(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; 0 < length; length--) stringBuilder.append('a');
+        return stringBuilder.toString();
     }
 
 }

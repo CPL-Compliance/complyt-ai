@@ -3,6 +3,9 @@ package com.example.complyt.repositores;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class SalesTaxRatesRepositoryTest {
 
     @InjectMocks
@@ -25,11 +29,6 @@ public class SalesTaxRatesRepositoryTest {
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void findByAddress_FindsComplytSalesTaxRates_ReturnsComplytSalesTaxRates() {

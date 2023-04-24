@@ -29,8 +29,6 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Mock
     SalesTaxData salesTaxData;
 
-    TestUtilities testUtilities;
-
     @Test
     void map_MapsIncorporatedAddress_ReturnsSalesTaxRate() {
         // Given
