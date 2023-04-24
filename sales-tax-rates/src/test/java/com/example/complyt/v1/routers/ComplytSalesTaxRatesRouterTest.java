@@ -436,7 +436,7 @@ public class ComplytSalesTaxRatesRouterTest {
     @WithMockUser
     public void findByAddress_LengthGreaterThen50country_Returns400ValidationError() {
         // Given
-        String countryWithLength51 = TestUtilities.stringWithLength(50);;
+        String countryWithLength51 = TestUtilities.stringWithLength(51);
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withCountry(countryWithLength51);

@@ -24,7 +24,6 @@
         <module>api-gateway</module>
         <module>files</module>
         <module>sales-tax-rates</module>
-        <module>abc</module>
     </modules>
     <dependencies>
         <dependency>
