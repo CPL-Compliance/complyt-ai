@@ -1622,13 +1622,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999",
                         customerDto.externalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1659,13 +1659,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.externalTimestamps().createdDate(),
                         "2023-03-27T17:00:00.999999999"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1778,13 +1778,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00Z",
                         customerDto.externalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1815,13 +1815,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.externalTimestamps().createdDate(),
                         "2023-03-27T17:00:00Z"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1852,13 +1852,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00+17:59",
                         customerDto.externalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1889,13 +1889,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.externalTimestamps().createdDate(),
                         "2023-03-27T17:00:00+17:59"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1926,13 +1926,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00-18:00",
                         customerDto.externalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -1963,13 +1963,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.externalTimestamps().createdDate(),
                         "2023-03-27T17:00:00-18"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2082,13 +2082,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.externalTimestamps().createdDate(),
                         "2023-03-27"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2384,13 +2384,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999",
                         customerDto.internalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2421,13 +2421,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.internalTimestamps().createdDate(),
                         "2023-03-27T17:00:00.999999999"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2548,13 +2548,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00Z",
                         customerDto.internalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2585,13 +2585,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.internalTimestamps().createdDate(),
                         "2023-03-27T17:00:00Z"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2622,13 +2622,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00+17:59",
                         customerDto.internalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2659,13 +2659,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.internalTimestamps().createdDate(),
                         "2023-03-27T17:00:00+17:59"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2696,13 +2696,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00-18:00",
                         customerDto.internalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2733,13 +2733,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.internalTimestamps().createdDate(),
                         "2023-03-27T17:00:00-18:00"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2859,13 +2859,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         customerDto.internalTimestamps().createdDate(),
                         "2023-03-27"
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2896,13 +2896,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999",
                         customerDto.internalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient
@@ -2933,13 +2933,13 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         "2023-03-27",
                         customerDto.externalTimestamps().updatedDate()
                 ));
-        Customer recievedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
-        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(recievedCustomer);
+        Customer receivedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
+        CustomerDto expectedCustomer = CustomerMapper.INSTANCE.customerToCustomerDto(receivedCustomer);
 
         // When + Then
         when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(customer));
-        when(customerFacade.saveCustomer(recievedCustomer)).thenReturn(Mono.empty());
-        when(customerFacade.updateIfModified(recievedCustomer, customer)).thenReturn(Mono.just(recievedCustomer));
+        when(customerFacade.saveCustomer(receivedCustomer)).thenReturn(Mono.empty());
+        when(customerFacade.updateIfModified(receivedCustomer, customer)).thenReturn(Mono.just(receivedCustomer));
 
         // When + Then
         webTestClient

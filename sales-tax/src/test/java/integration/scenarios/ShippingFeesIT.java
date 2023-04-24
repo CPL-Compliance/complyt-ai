@@ -208,7 +208,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(recievedSalesTaxTrackingDto -> assertTrue(recievedSalesTaxTrackingDto.economicNexusTracker().established())));
+                                .value(receivedSalesTaxTrackingDto -> assertTrue(receivedSalesTaxTrackingDto.economicNexusTracker().established())));
     }
 
     @Order(5)

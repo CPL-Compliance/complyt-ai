@@ -184,7 +184,7 @@ class TransactionServiceImplTest {
 
         // When
         when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
 
         Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
 

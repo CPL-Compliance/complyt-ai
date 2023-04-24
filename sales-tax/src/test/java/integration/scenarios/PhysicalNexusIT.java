@@ -133,7 +133,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(transactionDto -> assertTrue(transactionDto.physicalNexusTracker().established())));
+                                .value(receivedSalesTaxTrackingDto -> assertTrue(receivedSalesTaxTrackingDto.physicalNexusTracker().established())));
     }
 
     @Order(3)
@@ -220,8 +220,8 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(recievedSalesTaxTrackingDto -> assertTrue(recievedSalesTaxTrackingDto.appliedDate()
-                                        .isAfter(recievedSalesTaxTrackingDto.approvalDate()))));
+                                .value(receivedSalesTaxTrackingDto -> assertTrue(receivedSalesTaxTrackingDto.appliedDate()
+                                        .isAfter(receivedSalesTaxTrackingDto.approvalDate()))));
     }
 
     @Order(6)
@@ -282,8 +282,8 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(transactionDto ->
-                                        assertFalse(transactionDto.enforcesSalesTax())));
+                                .value(receivedSalesTaxTrackingDto ->
+                                        assertFalse(receivedSalesTaxTrackingDto.enforcesSalesTax())));
     }
 
     @Order(8)

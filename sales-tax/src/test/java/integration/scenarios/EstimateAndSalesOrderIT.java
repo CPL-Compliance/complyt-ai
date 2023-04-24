@@ -172,7 +172,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                                 .exchange()
                                 .expectStatus().isOk()
                                 .expectBody(SalesTaxTrackingDto.class)
-                                .value(transactionDto -> assertTrue(transactionDto.physicalNexusTracker().established())));
+                                .value(receivedSalesTaxTrackingDto -> assertTrue(receivedSalesTaxTrackingDto.physicalNexusTracker().established())));
     }
 
     @Order(4)

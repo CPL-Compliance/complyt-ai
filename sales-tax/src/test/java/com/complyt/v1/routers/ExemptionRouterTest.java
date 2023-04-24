@@ -1902,12 +1902,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59+09:50",
                 exemptionDto.internalTimestamps().updatedDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -1936,12 +1936,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.internalTimestamps().createdDate(),
                 "2023-03-27T03:40:59.999999999"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2080,12 +2080,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59Z",
                 exemptionDto.internalTimestamps().updatedDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2114,12 +2114,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.internalTimestamps().createdDate(),
                 "2023-03-27T03:40:59Z"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2148,12 +2148,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59+09:50",
                 exemptionDto.internalTimestamps().updatedDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2183,12 +2183,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.internalTimestamps().createdDate(),
                 "2023-03-27T03:40:59+09:50"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2218,12 +2218,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59-18:00",
                 exemptionDto.internalTimestamps().updatedDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2253,12 +2253,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.internalTimestamps().updatedDate(),
                 "2023-03-27T03:40:59-18:00"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2398,12 +2398,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.internalTimestamps().createdDate(),
                 "2023-03-27"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -2985,12 +2985,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59.999999999",
                 exemptionDto.validationDates().toDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3019,12 +3019,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.validationDates().fromDate(),
                 "2023-03-27T03:40:59.999999999"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3154,12 +3154,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59Z",
                 exemptionDto.validationDates().toDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3188,12 +3188,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.validationDates().fromDate(),
                 "2023-03-27T03:40:59Z"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3222,12 +3222,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27T03:40:59+09:50",
                 exemptionDto.validationDates().toDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3256,12 +3256,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.validationDates().fromDate(),
                 "2023-03-27T03:40:59+09:50"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3289,12 +3289,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
                 "2023-03-27T03:40:59.-18:00", exemptionDto.validationDates().toDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3322,12 +3322,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto(
                 exemptionDto.validationDates().fromDate(), "2023-03-27T03:40:59.-18:00"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3466,12 +3466,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 exemptionDto.validationDates().fromDate(),
                 "2023-03-27"
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
 
         // Then
@@ -3500,12 +3500,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 "2023-03-27",
                 exemptionDto.validationDates().toDate()
         ));
-        Exemption recievedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
+        Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
 
-        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(recievedExemption);
+        ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
 
         // When
-        when(exemptionFacade.update(recievedExemption, exemption.getComplytId())).thenReturn(Mono.just(recievedExemption));
+        when(exemptionFacade.update(receivedExemption, exemption.getComplytId())).thenReturn(Mono.just(receivedExemption));
 
         // Then
         webTestClient
