@@ -240,8 +240,8 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         //Given
-        String externalId = "10000";
-        UUID complytId = UUID.fromString("8b377411-da68-4807-8616-ee3a07c849f8"); // complytId of existing transaction
+        String externalId = "10002";
+        UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
 
         // Then
         webTestClient
@@ -515,7 +515,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
-        String complytId = "8b377411-da68-4807-8616-ee3a07c849f8"; // complytId of existing transaction
+        String complytId = "88d951b8-4804-4bef-929a-cfd3670a82fa"; // complytId of existing transaction
 
         // Then
         webTestClient

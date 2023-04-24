@@ -81,7 +81,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Override
     public void getTransaction_ExistsInOtherTenant_Returns404() {
         // Given
-        String externalId = "10000";
+        String externalId = "10002";
 
         // Then
         webTestClient
@@ -174,7 +174,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Override
     public void putTransaction_WithComplytIdAndExistsInOtherTenant_Returns400DataConflict() {
         // Given - details of a transaction from the database
-        String externalId = "10000";
+        String externalId = "10002";
 
         // Then
         webTestClient
@@ -294,7 +294,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Override
     public void putTransaction_ExistsInOtherTenant_Returns200WithoutDataLeak() {
         // Given - details of a transaction from the database
-        String externalId = "10000";
+        String externalId = "10002";
         String customerExternalId = "1586";
 
         // Then
