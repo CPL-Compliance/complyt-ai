@@ -51,7 +51,8 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
         return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
-                .flatMap(isFullyExempted -> isFullyExempted ? Mono.just(transactionWithOutSalesTax) : calculate(transactionWithOutSalesTax)) :
+                .flatMap(isFullyExempted -> isFullyExempted ? Mono.just(transactionWithOutSalesTax) :
+                        calculate(transactionWithOutSalesTax)) :
                 Mono.just(transactionWithOutSalesTax);
     }
 

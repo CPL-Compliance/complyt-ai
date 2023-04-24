@@ -8,4 +8,6 @@ public interface GenericErrorMessages {
 
     String NOT_FOUND_ERROR = "The requested operation failed because a resource associated with the request could not be found.";
 
+    String MISSING_BODY_ERROR = "The requested operation failed because no request body has been provided";
+
 }
