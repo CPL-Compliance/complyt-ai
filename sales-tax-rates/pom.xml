@@ -16,7 +16,7 @@
     <!-- Maven Coordinates -->
 
     <name>sales-tax-rates</name>
-    <description>This is a service for managing sales Tax rates</description>
+    <description>This is a service for managing Sales Tax rates</description>
     <packaging>jar</packaging>
 
     <properties>
