@@ -27,7 +27,7 @@ class FastTaxCountyFetcherTest {
     private FastTaxCountyFetcher fastTaxCountyFetcher;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         fastTaxCountyFetcher = new FastTaxCountyFetcher();
     }
 
@@ -42,7 +42,7 @@ class FastTaxCountyFetcherTest {
         List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
             add(taxInfoItem);
         }};
-        FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems);
+        FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems, "1");
         Address addressNoCounty = TestUtilities.createAddressInCalifornia();
         Address addressWithInjectedCounty = addressNoCounty.withCounty(fastTaxData.getTaxInfoItems().get(0).getCounty());
 

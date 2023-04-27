@@ -82,7 +82,7 @@ public interface TestUtilities {
         String matchLevel = "Address";
         TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "Fresno", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
         List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
-        return new FastTaxData(matchLevel, taxInfoItems);
+        return new FastTaxData(matchLevel, taxInfoItems,"1");
     }
 
     static AddressDto createStubFastTaxAddressDto() {
@@ -114,7 +114,7 @@ public interface TestUtilities {
                         , new InformationComponent("CountyFIPS", "019")),
                 "", "", "0",
                 "CA", "California", "0.06",
-                "0.08350", "LABOR/FREIGHT/SERVICES", "93711-5508")));
+                "0.08350", "LABOR/FREIGHT/SERVICES", "93711-5508")),"1");
     }
 
     static ComplytSalesTaxRatesDto createCaliforniaAddressWithSalesTaxRatesDto() {

@@ -5,10 +5,13 @@ import lombok.*;
 
 import java.util.List;
 
-@Value
-@Builder
+@Getter
+@EqualsAndHashCode
+@ToString
 @With
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class TaxInfoItem {
     String city;

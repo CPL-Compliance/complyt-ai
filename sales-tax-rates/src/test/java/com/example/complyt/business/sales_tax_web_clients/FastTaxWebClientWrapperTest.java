@@ -85,7 +85,7 @@ public class FastTaxWebClientWrapperTest {
     void findByAddress_validAddress_ReturnsSalesTaxData() {
         // Given
         Address address = new Address("city", "country", "county", "state", "street", "zip");
-        FastTaxData fastTaxData = new FastTaxData("test", new ArrayList<>());
+        FastTaxData fastTaxData = new FastTaxData("test", new ArrayList<>(), "1");
 
         // When
         when(webClient.get()).thenReturn(requestHeadersUriSpecMock);

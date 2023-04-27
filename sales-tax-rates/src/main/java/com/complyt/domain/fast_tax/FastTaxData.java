@@ -6,9 +6,12 @@ import lombok.*;
 
 import java.util.List;
 
+@Getter
+@EqualsAndHashCode
 @With
+@ToString
 @AllArgsConstructor
-@Value
+@NoArgsConstructor
 @Builder
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class FastTaxData implements SalesTaxData {

@@ -28,7 +28,7 @@ public class FastTaxDataTest {
         List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
             add(taxInfoItem);
         }};
-        return new FastTaxData("lvl", taxInfoItemList);
+        return new FastTaxData("lvl", taxInfoItemList, "1");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class FastTaxDataTest {
     @Test
     void Builder_Build_ReturnFastTaxData() {
         // Given + When
-        FastTaxData actualFastTaxData = new FastTaxData("lvl", fastTaxData.getTaxInfoItems());
+        FastTaxData actualFastTaxData = new FastTaxData("lvl", fastTaxData.getTaxInfoItems(), "1");
 
         // Then
         assertEquals(fastTaxData, actualFastTaxData);
