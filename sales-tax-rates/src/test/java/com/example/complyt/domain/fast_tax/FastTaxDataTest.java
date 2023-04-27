@@ -5,6 +5,7 @@ import com.complyt.domain.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtils.TestUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FastTaxDataTest {
 
-    private final String UNINCORPORATED_CODE = "1";
     private FastTaxData fastTaxData;
 
     @BeforeEach
@@ -23,10 +23,12 @@ public class FastTaxDataTest {
     }
 
     private FastTaxData createFastTaxData() {
+        String UNINCORPORATED_CODE = "1";
+        TaxInfoItem taxInfoItem = TestUtilities.createTaxInfoItemWithNullValues().withNotesCodes(UNINCORPORATED_CODE);
         List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
-            add(new TaxInfoItem().withNotesCodes(UNINCORPORATED_CODE));
+            add(taxInfoItem);
         }};
-        return new FastTaxData().withTaxInfoItems(taxInfoItemList).withMatchLevel("lvl");
+        return new FastTaxData("lvl", taxInfoItemList);
     }
 
     @Test
@@ -55,8 +57,9 @@ public class FastTaxDataTest {
     void isUnincorporated_FastTaxDataIsNotUnincorporated_ReturnFalse() {
         // Given
         String INCORPORATED_CODE = "2";
+        TaxInfoItem taxInfoItem = TestUtilities.createTaxInfoItemWithNullValues().withNotesCodes(INCORPORATED_CODE);
         List<TaxInfoItem> taxInfoItemList = new ArrayList<>() {{
-            add(new TaxInfoItem().withNotesCodes(INCORPORATED_CODE));
+            add(taxInfoItem);
         }};
         fastTaxData = fastTaxData
                 .withTaxInfoItems(taxInfoItemList);
@@ -97,7 +100,7 @@ public class FastTaxDataTest {
     @Test
     void Builder_Build_ReturnFastTaxData() {
         // Given + When
-        FastTaxData actualFastTaxData = FastTaxData.builder().taxInfoItems(fastTaxData.getTaxInfoItems()).matchLevel("lvl").build();
+        FastTaxData actualFastTaxData = new FastTaxData("lvl", fastTaxData.getTaxInfoItems());
 
         // Then
         assertEquals(fastTaxData, actualFastTaxData);

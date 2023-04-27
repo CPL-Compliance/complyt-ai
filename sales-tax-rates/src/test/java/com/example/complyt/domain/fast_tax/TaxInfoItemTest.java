@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TaxInfoItemTest {
-    private final String UNINCORPORATED_CODE = "1";
     private TaxInfoItem taxInfoItem;
 
     @BeforeEach
@@ -66,18 +65,6 @@ class TaxInfoItemTest {
 
         // Then
         assertEquals(taxInfoItem, actualTaxInfoItem);
-    }
-
-    @Test
-    void noArgsConstructor_ReturnEmptyTaxInfoItem() {
-        // Given
-        TaxInfoItem expectedTaxInfoItem = TaxInfoItem.builder().city(null).cityDistrictRate(null).cityRate(null).county(null).countyDistrictRate(null).countyRate(null).informationComponents(null).notesCodes(null).notesDesc(null).specialDistrictRate(null).stateAbbreviation(null).stateName(null).stateRate(null).taxRate(null).totalTaxExempt(null).zip(null).build();
-
-        // When
-        TaxInfoItem actualTaxInfoItem = new TaxInfoItem();
-
-        // Then
-        assertEquals(expectedTaxInfoItem, actualTaxInfoItem);
     }
 
 }
