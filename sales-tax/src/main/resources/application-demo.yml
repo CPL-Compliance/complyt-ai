@@ -1,7 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@demo.dt2c3mf.mongodb.net/sales_tax
+      uri: ${mongo-uri}
+      database: ${db-name}
 
 eureka:
   client:
