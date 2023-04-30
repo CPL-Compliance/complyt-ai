@@ -107,7 +107,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
             complytSalesTaxRatesService.save(nullComplytSalesTaxRates, collection);
         });
-        
+
         assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");
     }
 
@@ -123,6 +123,21 @@ public class ComplytSalesTaxRatesServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+    }
+
+    @Test
+    void findByAddress_RepositoryThrowsException_ThrowsException() {
+        // Given
+        Address address = TestUtilities.createAddressInCalifornia();
+        String collection = StatesMap.statesToCollections.get(address.getState());
+        when(complytSalesTaxRatesRepository.findByAddress(address, collection)).thenThrow(RuntimeException.class);
+
+        // When + Then
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
+            complytSalesTaxRatesService.findByAddress(address);
+        });
+
+        assertEquals(RuntimeException.class, runtimeException.getClass());
     }
 
 }
