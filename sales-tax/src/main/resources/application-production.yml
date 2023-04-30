@@ -10,7 +10,8 @@ eureka:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@cluster0.tlaie.mongodb.net/sales_tax
+      uri: ${mongo-uri}
+      database: ${db-name}
 
 springdoc:
   api-docs:
