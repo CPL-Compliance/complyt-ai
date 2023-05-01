@@ -26,5 +26,7 @@ public interface UpsertByStateRouterTestTemplate {
     void upsertByState_InternalServerError_Returns500();
 
     void upsertByState_NullHandler_ThrowsNullPointerException();
+
+    void upsertByState_NoBody_Returns400();
 }
 

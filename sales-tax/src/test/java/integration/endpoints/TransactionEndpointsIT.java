@@ -3,13 +3,14 @@ package integration.endpoints;
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.MandatoryAddressDto;
 import com.complyt.v1.models.TransactionDto;
 import com.complyt.v1.models.TransactionStatusDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import com.complyt.v1.routers.TransactionRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,7 +39,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TransactionEndpointsIT extends MongoContainerInitializerIT implements TransactionEndpointsITTemplate {
+public class TransactionEndpointsIT extends TestContainersInitializerIT implements TransactionEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -240,8 +241,8 @@ public class TransactionEndpointsIT extends MongoContainerInitializerIT implemen
     @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         //Given
-        String externalId = "10000";
-        UUID complytId = UUID.fromString("8b377411-da68-4807-8616-ee3a07c849f8"); // complytId of existing transaction
+        String externalId = "10002";
+        UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
 
         // Then
         webTestClient
@@ -429,6 +430,28 @@ public class TransactionEndpointsIT extends MongoContainerInitializerIT implemen
                 });
     }
 
+    @Order(1)
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NoBody_Returns400() {
+        // Given
+        String externalId = "0";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
+    }
+
     @Order(4)
     @Test
     @Override
@@ -493,7 +516,7 @@ public class TransactionEndpointsIT extends MongoContainerInitializerIT implemen
     @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
-        String complytId = "8b377411-da68-4807-8616-ee3a07c849f8"; // complytId of existing transaction
+        String complytId = "88d951b8-4804-4bef-929a-cfd3670a82fa"; // complytId of existing transaction
 
         // Then
         webTestClient

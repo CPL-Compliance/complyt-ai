@@ -184,7 +184,7 @@ class TransactionServiceImplTest {
 
         // When
         when(transactionRepository.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionRepository.save(transaction)).thenReturn(Mono.just(transaction));
+        when(transactionRepository.save(transaction.withCustomer(null))).thenReturn(Mono.just(transaction));
 
         Mono<Transaction> transactionMono = transactionService.update(externalId, source, transaction);
 
@@ -219,7 +219,7 @@ class TransactionServiceImplTest {
     @Test
     void markAsCancelled_ChangesTransactionsStatus_ReturnsUpdatedTransaction() throws InterruptedException {
         // Given
-        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
+        Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED).withCustomer(null);
 
         // When
         when(transactionRepository.findByExternalIdAndSource(transaction.getExternalId(), source)).thenReturn(Mono.just(transaction));

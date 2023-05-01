@@ -10,13 +10,13 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -54,7 +54,7 @@ public class NexusService {
 
     public Mono<SalesTaxTracking> findTrackingByState(@NonNull String state) {
         return salesTaxTrackingService.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)));
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     public Mono<SalesTaxTracking> findTrackingByState(@NonNull Transaction transaction) {
@@ -87,7 +87,8 @@ public class NexusService {
                             Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, stateRule, referenceDate);
                             return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
                                     .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state));
-                        }));
+                        }))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule, LocalDateTime referenceDate, String state) {

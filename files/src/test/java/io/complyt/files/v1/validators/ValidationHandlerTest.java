@@ -10,7 +10,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.ObjectStub;
+import testUtils.TestUtilities;
 
 import static org.mockito.Mockito.when;
 
@@ -26,16 +26,9 @@ class ValidationHandlerTest {
     @MockBean
     ServerRequest serverRequest;
 
-    ObjectStub objectStub;
-
-    @BeforeEach
-    void setup() {
-        objectStub = new ObjectStub();
-    }
-
     @Test
     void validate_validCustomer_returnsCustomerDto() {
-        FileDto customerDto = objectStub.createFileDto();
+        FileDto customerDto = TestUtilities.createFileDto();
         when(serverRequest.bodyToMono(FileDto.class)).thenReturn(Mono.just(customerDto));
         Mono<FileDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
 
@@ -44,7 +37,7 @@ class ValidationHandlerTest {
 
     @Test
     void validate_invalidCustomerDto_returnsError() {
-        FileDto customerDto = objectStub.createFileDto().withLink("");
+        FileDto customerDto = TestUtilities.createFileDto().withLink("");
         when(serverRequest.bodyToMono(FileDto.class)).thenReturn(Mono.just(customerDto));
         Mono<FileDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
 

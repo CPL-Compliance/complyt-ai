@@ -7,6 +7,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -81,5 +82,51 @@ public interface ITUtilities {
                 "", "", "0",
                 "CT", "Connecticut", "0.06350",
                 "0.06350", "SERVICES", "06516")));
+    }
+
+    static FastTaxData stubFastTaxGeorgia() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Atlanta", "0", "0.01900",
+                "Fulton", "0", "0.03000",
+                List.of(new InformationComponent("CountyFIPS", "121")),
+                "", "", "0",
+                "GA", "Georgia", "0.0400",
+                "0.08900", "LABOR/SERVICES", "30303-3192")));
+    }
+
+    static FastTaxData stubFastTaxIndiana() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Indianapolis", "0", "0",
+                "Marion", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "097")),
+                "", "", "0",
+                "IN", "Indiana", "0.07000",
+                "0.07000", "LABOR/SERVICES", "46202-5109")));
+    }
+
+    static FastTaxData stubFastTaxMaine() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Cape Elizabeth", "0", "0",
+                "Cumberland", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "005")),
+                "", "", "0",
+                "IN", "Indiana", "0.05500",
+                "0.05500", "LABOR/FREIGHT/SERVICES", "04107-1929")));
+    }
+
+    static FastTaxData stubFastTaxKentucky() {
+        return new FastTaxData("Address", List.of(new TaxInfoItem(
+                "Louisville", "0", "0",
+                "Jefferson", "0", "0",
+                List.of(new InformationComponent("CountyFIPS", "111")),
+                "", "", "0",
+                "KY", "Kentucky", "0.06000",
+                "0.06000", "LABOR/SERVICES", "40127-2430")));
+    }
+
+    static Jwt.Builder stubJwt() {
+        return Jwt.withTokenValue("token")
+                .header("typ", "JWT")
+                .claim("tenant_id", "it_tenant");
     }
 }

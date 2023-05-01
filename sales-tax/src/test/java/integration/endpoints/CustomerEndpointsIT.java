@@ -3,9 +3,10 @@ package integration.endpoints;
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.routers.CustomerRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,7 +37,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CustomerEndpointsIT extends MongoContainerInitializerIT implements CustomerEndpointsITTemplate {
+public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -424,5 +425,24 @@ public class CustomerEndpointsIT extends MongoContainerInitializerIT implements 
                         assertTrue(expectedErrors.contains(err));
                     }
                 });
+    }
+
+    @Override
+    public void upsertByExternalIdAndSource_NoBody_Returns400() {
+        // Given
+        String externalId = "0";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 }

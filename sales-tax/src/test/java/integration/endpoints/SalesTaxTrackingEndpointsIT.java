@@ -3,10 +3,11 @@ package integration.endpoints;
 import com.complyt.SalesTaxApplication;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
-import integration.MongoContainerInitializerIT;
+import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,7 +38,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = SalesTaxApplication.class)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
+public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
@@ -155,7 +156,7 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -172,7 +173,7 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.name())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + existingState.abbreviation())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -204,7 +205,7 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT imp
         webTestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.abbreviation())
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + newState.name())
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -340,5 +341,24 @@ public class SalesTaxTrackingEndpointsIT extends MongoContainerInitializerIT imp
                     }
                 });
         ;
+    }
+
+    @Override
+    public void upsertByState_NoBody_Returns400() {
+        // Given
+        String state = "CA";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 }

@@ -11,4 +11,6 @@ public interface UpsertByStateITTemplate {
     void upsertByState_ConflictingState_Returns400ConflictedData();
 
     void upsertByState_DoesntPassValidation_Returns400CValidationError();
+
+    void upsertByState_NoBody_Returns400();
 }
