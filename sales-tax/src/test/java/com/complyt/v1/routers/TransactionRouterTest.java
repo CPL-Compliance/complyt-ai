@@ -6,8 +6,8 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
-import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.NumericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
@@ -1080,6 +1080,27 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
 
         // Then
         assertEquals("transactionHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertByExternalIdAndSource_NoBody_Returns400() {
+        // Given
+        String externalId = "0";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(LinkedHashMap.class)
+                .value(map -> assertEquals(GenericErrorMessages.MISSING_BODY_ERROR, map.get("message")));
     }
 
     @Override
@@ -2382,13 +2403,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999",
                         transactionDto.externalTimestamps().updatedDate()
                 ));
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2416,13 +2437,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2450,13 +2471,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2545,13 +2566,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.externalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2579,13 +2600,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999Z"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2613,13 +2634,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.externalTimestamps().createdDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2647,13 +2668,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00.999999999+17:59"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2681,13 +2702,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.externalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2715,13 +2736,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T17:00:00-18:00"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -2871,13 +2892,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3285,13 +3306,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.internalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3319,13 +3340,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T00:00:00.999999999"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3481,13 +3502,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.internalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3515,13 +3536,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T00:00:00.999999999Z"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3549,13 +3570,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.internalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3583,13 +3604,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T00:00:00.999999999+17:59"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3617,13 +3638,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.internalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3651,13 +3672,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27T00:00:00.999999999-18:00"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3815,13 +3836,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         "2023-03-27"
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3846,13 +3867,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         transactionDto.internalTimestamps().updatedDate()
                 ));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())
@@ -3877,13 +3898,13 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto givenTransactionDto = transactionDto.withExternalTimestamps(
                 new TimestampsDto("2023-03-27", transactionDto.externalTimestamps().updatedDate()));
 
-        Transaction recievedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
-        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(recievedTransaction);
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
 
         // When + Then
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
-        when(transactionFacade.saveTransaction(recievedTransaction)).thenReturn(Mono.empty());
-        when(transactionFacade.updateIfModified(externalId, source, recievedTransaction, transaction)).thenReturn(Mono.just(recievedTransaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
 
         webTestClient
                 .mutateWith(csrf())

@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -22,14 +23,16 @@ import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = FilesApplication.class)
 @AutoConfigureWebTestClient
 public class FilesEndpointsIT extends TestContainersInitializerIT implements FilesEndpointsITTemplate {
 
-    @MockBean
-    private TenantResolver tenantResolver;
+    private final SecurityMockServerConfigurers.JwtMutator differentTenantMutator = mockJwt().jwt(TestUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
+    private final SecurityMockServerConfigurers.JwtMutator defaultTenantMutator = mockJwt().jwt(TestUtilities.stubJwt().build());
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -38,16 +41,12 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("files"));
     }
 
-    @BeforeEach
-    void setup() {
-        when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-    }
-
     @Test
     @Override
     @WithMockUser
     public void getFile_Exists_Returns200() {
         webTestClient
+                .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(FileRouter.BASE_URL)
@@ -63,11 +62,8 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
     @Override
     @WithMockUser
     public void getFile_DoesntExists_Returns404() {
-        // Given
-        when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
-
-        // Then
         webTestClient
+                .mutateWith(differentTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(FileRouter.BASE_URL)

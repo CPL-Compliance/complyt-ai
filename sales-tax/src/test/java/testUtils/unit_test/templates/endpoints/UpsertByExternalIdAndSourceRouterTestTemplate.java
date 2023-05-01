@@ -36,5 +36,7 @@ public interface UpsertByExternalIdAndSourceRouterTestTemplate {
     void upsertByExternalIdAndSource_InternalServerError_Returns500();
 
     void upsertByExternalIdAndSource_NullHandler_ThrowsNullPointerException();
+
+    void upsertByExternalIdAndSource_NoBody_Returns400();
 }
 
