@@ -2,6 +2,7 @@ package com.complyt.domain.fast_tax;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TaxInfoItem {
     String city;
     String cityDistrictRate;
