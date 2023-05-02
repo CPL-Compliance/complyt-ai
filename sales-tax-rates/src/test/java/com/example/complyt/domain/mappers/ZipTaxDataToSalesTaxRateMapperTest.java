@@ -23,7 +23,6 @@ class ZipTaxDataToSalesTaxRateMapperTest {
 
     private Result result;
 
-
     @BeforeEach
     void setUp() {
         result = Result.builder()

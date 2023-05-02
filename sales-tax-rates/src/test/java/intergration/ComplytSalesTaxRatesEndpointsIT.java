@@ -83,7 +83,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Order(2)
     @Test
     @WithMockUser
-    public void findByAddress_FirstAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt2() {
+    public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfSecondAddress");
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
@@ -113,7 +113,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @Order(3)
     @Test
     @WithMockUser
-    public void findByAddress_AddressInColoradoAndDoesNotExist_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
+    public void findByAddress_ThirdAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withStreet("new Street");
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");

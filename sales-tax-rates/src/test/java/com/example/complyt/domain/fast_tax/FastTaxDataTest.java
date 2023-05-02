@@ -106,5 +106,4 @@ public class FastTaxDataTest {
         assertEquals(fastTaxData, actualFastTaxData);
     }
 
-
 }
