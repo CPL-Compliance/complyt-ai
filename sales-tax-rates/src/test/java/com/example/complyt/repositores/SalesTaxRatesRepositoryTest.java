@@ -71,7 +71,7 @@ public class SalesTaxRatesRepositoryTest {
             salesTaxRatesRepository.save(complytSalesTaxRates, nullCollection);
         });
 
-        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "collection " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class SalesTaxRatesRepositoryTest {
             salesTaxRatesRepository.save(nullComplytSalesTaxRates, state);
         });
 
-        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class SalesTaxRatesRepositoryTest {
             salesTaxRatesRepository.findByAddress(address, nullCollection);
         });
 
-        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "collection " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
@@ -113,6 +113,6 @@ public class SalesTaxRatesRepositoryTest {
             salesTaxRatesRepository.findByAddress(nullAddress, state);
         });
 
-        assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "address " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 }

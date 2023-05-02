@@ -612,7 +612,7 @@ public class ComplytSalesTaxRatesRouterTest {
         });
 
         // Then
-        assertEquals("complytSalesTaxRatesHandler is marked non-null but is null", exception.getMessage());
+        assertEquals("complytSalesTaxRatesHandler " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE, exception.getMessage());
     }
 
 }

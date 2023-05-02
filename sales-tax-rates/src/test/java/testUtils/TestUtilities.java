@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public interface TestUtilities {
 
+    String LOMBOK_NON_NULL_ANNOTATION_MESSAGE = "is marked non-null but is null";
+
     static Address createAddressInNewYork() {
         return new Address("New York", "US", null, "NY", "160 Broadway", "10038");
     }

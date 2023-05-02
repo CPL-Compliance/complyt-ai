@@ -64,7 +64,7 @@ class FastTaxCountyFetcherTest {
             fastTaxCountyFetcher.fetch(nullSalesTaxData);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test

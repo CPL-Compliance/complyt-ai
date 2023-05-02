@@ -6,6 +6,7 @@ import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
+import org.junit.jupiter.api.BeforeAll;
 import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ class ZipTaxCountyFetcherTest {
             zipTaxCountyFetcher.fetch(nullSalesTaxData);
         });
 
-        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test

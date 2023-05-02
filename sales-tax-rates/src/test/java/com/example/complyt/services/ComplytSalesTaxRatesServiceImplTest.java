@@ -94,7 +94,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
             complytSalesTaxRatesService.findByAddress(nullAddress);
         });
 
-        assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "address " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
             complytSalesTaxRatesService.save(nullComplytSalesTaxRates, collection);
         });
 
-        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
             complytSalesTaxRatesService.save(complytSalesTaxRates, nullCollection);
         });
 
-        assertEquals(nullPointerException.getMessage(), "collection is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "collection " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 
     @Test

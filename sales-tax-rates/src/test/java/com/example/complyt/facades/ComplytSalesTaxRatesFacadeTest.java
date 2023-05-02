@@ -48,6 +48,6 @@ public class ComplytSalesTaxRatesFacadeTest {
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> complytSalesTaxRatesFacade.findByAddress(nullAddress));
 
-        assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "address " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
 }
