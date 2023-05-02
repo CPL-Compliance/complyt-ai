@@ -37,7 +37,7 @@ class FastTaxCountyFetcherTest {
     }
 
     @Test
-    void inject_InjectsCounty_ReturnsTransaction() {
+    void fetch_FetchesCounty_ReturnsCounty() {
         // Given
         TaxInfoItem taxInfoItem = createTaxInfoItem();
         List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
@@ -68,7 +68,7 @@ class FastTaxCountyFetcherTest {
     }
 
     @Test
-    void equals_SameTransactionFastTaxCountyFetcher_ReturnsTrue() {
+    void equals_SameFetcherFastTaxCountyFetcher_ReturnsTrue() {
         // Given
         FastTaxCountyFetcher givenFastTaxCountyFetcher = new FastTaxCountyFetcher();
 

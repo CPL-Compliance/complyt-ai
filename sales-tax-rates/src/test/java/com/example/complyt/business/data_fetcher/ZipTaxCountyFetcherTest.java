@@ -2,12 +2,9 @@ package com.example.complyt.business.data_fetcher;
 
 import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
 import com.complyt.domain.Address;
-import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
-import org.junit.jupiter.api.BeforeAll;
-import testUtils.TestUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.TestUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
