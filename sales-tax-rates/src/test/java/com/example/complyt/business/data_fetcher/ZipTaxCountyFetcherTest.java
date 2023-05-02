@@ -2,6 +2,8 @@ package com.example.complyt.business.data_fetcher;
 
 import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
 import com.complyt.domain.Address;
+import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
 import testUtils.TestUtilities;
@@ -16,7 +18,7 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -30,7 +32,7 @@ class ZipTaxCountyFetcherTest {
     }
 
     @Test
-    void inject_InjectsCounty_ReturnsTransaction() {
+    void fetch_FetchesCounty_ReturnsCounty() {
         // Given
         Result result = TestUtilities.createResult();
         List<Result> results = new ArrayList<>() {{
@@ -47,6 +49,19 @@ class ZipTaxCountyFetcherTest {
     }
 
     @Test
+    void fetch_NullSalesTaxDataPassed_ThrowsException() {
+        // Given
+        SalesTaxData nullSalesTaxData = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            zipTaxCountyFetcher.fetch(nullSalesTaxData);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
+    }
+
+    @Test
     void equals_SameTransactionZipTaxCountyFetcher_ReturnsTrue() {
         // Given
         ZipTaxCountyFetcher givenZipTaxCountyFetcher = new ZipTaxCountyFetcher();
@@ -57,4 +72,5 @@ class ZipTaxCountyFetcherTest {
         // Then
         assertTrue(isEquals);
     }
+
 }

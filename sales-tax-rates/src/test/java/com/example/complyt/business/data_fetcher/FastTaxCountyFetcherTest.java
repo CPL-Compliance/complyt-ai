@@ -2,6 +2,7 @@ package com.example.complyt.business.data_fetcher;
 
 import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
 import com.complyt.domain.Address;
+import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import testUtils.TestUtilities;
@@ -17,7 +18,7 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +52,19 @@ class FastTaxCountyFetcherTest {
 
         // Then
         StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
+    }
+
+    @Test
+    void fetch_NullSalesTaxDataPassed_ThrowsException() {
+        // Given
+        SalesTaxData nullSalesTaxData = null;
+
+        // When + Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            fastTaxCountyFetcher.fetch(nullSalesTaxData);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "salesTaxData is marked non-null but is null");
     }
 
     @Test
