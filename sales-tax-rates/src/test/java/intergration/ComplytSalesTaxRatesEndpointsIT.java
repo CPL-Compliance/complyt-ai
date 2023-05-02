@@ -57,7 +57,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto();
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
-        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRates();
+        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
         webTestClient
@@ -87,7 +87,7 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
         // Given
         AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfSecondAddress");
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
-        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRates();
+        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
         webTestClient
@@ -115,9 +115,9 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
     @WithMockUser
     public void findByAddress_ThirdAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         // Given
-        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withStreet("new Street");
+        AddressDto stubFastTaxAddress = TestUtilities.createStubFastTaxAddressDto().withCity("cityOfThirdAddress");
         AddressDto addressWithCounty = stubFastTaxAddress.withCounty("Arapahoe");
-        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRates();
+        SalesTaxRatesDto stubFastTaxSalesTaxRates = TestUtilities.createStubFastTaxSalesTaxRatesDto();
 
         // When + Then
         webTestClient
@@ -140,12 +140,11 @@ public class ComplytSalesTaxRatesEndpointsIT extends MongoContainerInitializerIT
                 });
     }
 
-
     @Order(4)
     @Test
     // This Test is for retrieving existing rates object from DB
     // There is no getAll endpoint for checking if it exists but there were tests to it, and it has been validated
-    public void findByAddress_AddressInColoradoAndExists_ReturnsComplytSalesTaxRates() {
+    public void findAll_FindsAllInsertedComplytSalesTaxRates_ChecksCount() {
         Flux<ComplytSalesTaxRates> complytSalesTaxRatesFlux = reactiveMongoTemplate.findAll(ComplytSalesTaxRates.class, "colorado");
 
         StepVerifier.create(complytSalesTaxRatesFlux).expectNextCount(3).verifyComplete();
