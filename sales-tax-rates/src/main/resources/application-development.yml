@@ -11,7 +11,8 @@ eureka:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.datasource.username}:${spring.datasource.password}@${CLUSTER_ID}.mongodb.net/sales_tax_rates
+      uri: ${mongo-uri}
+      database: ${db-name}
 
 logging:
   level:
