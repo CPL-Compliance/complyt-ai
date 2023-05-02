@@ -15,15 +15,8 @@ import java.util.UUID;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
-import lombok.NonNull;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -73,9 +66,9 @@ public interface TestUtilities {
 
     static Query createAddressSearchQuery(Address address) {
         return Query.query(Criteria
-                .where("address.city").is(address.getCity())
-                .and("address.street").is(address.getStreet())
-                .and("address.zip").is(address.getZip()));
+                .where("address.city").is(address.city())
+                .and("address.street").is(address.street())
+                .and("address.zip").is(address.zip()));
     }
 
     static FastTaxData createFastTaxData() {

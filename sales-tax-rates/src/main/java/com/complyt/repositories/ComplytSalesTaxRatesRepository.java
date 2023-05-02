@@ -22,9 +22,9 @@ public class ComplytSalesTaxRatesRepository {
 
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address, @NonNull String collection) {
         Query query = Query.query(Criteria
-                .where("address.city").is(address.getCity())
-                .and("address.street").is(address.getStreet())
-                .and("address.zip").is(address.getZip())
+                .where("address.city").is(address.city())
+                .and("address.street").is(address.street())
+                .and("address.zip").is(address.zip())
         );
 
         return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::debug)

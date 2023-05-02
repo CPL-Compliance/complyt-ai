@@ -43,7 +43,7 @@ class ZipTaxCountyFetcherTest {
         Mono<String> countyMono = zipTaxCountyFetcher.fetch(zipTaxData);
 
         // Then
-        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.getCounty()).verifyComplete();
+        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
     }
 
     @Test

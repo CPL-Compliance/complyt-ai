@@ -3,12 +3,8 @@ package com.complyt.domain;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StatesMap {
-
-    private StatesMap() {
-    }
-
-    public static final Map<String, String> statesToCollections = new HashMap<>() {{
+public interface StatesMap {
+    Map<String, String> statesToCollections = new HashMap<>() {{
         put("AL", CollectionsNames.ALABAMA);
         put("Alabama", CollectionsNames.ALABAMA);
         put("AK", CollectionsNames.ALASKA);

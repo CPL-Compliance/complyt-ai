@@ -50,7 +50,7 @@ class FastTaxCountyFetcherTest {
         Mono<String> countyMono = fastTaxCountyFetcher.fetch(fastTaxData);
 
         // Then
-        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.getCounty()).verifyComplete();
+        StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
     }
 
     @Test

@@ -24,12 +24,12 @@ class SalesTaxRatesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRates(cityDistrictRate=" + rate +
+        String expectedString = "SalesTaxRates[cityDistrictRate=" + rate +
                 ", cityRate=" + rate +
                 ", countyDistrictRate=" + rate +
                 ", countyRate=" + rate +
                 ", stateRate=" + rate +
-                ", taxRate=" + rate + ")";
+                ", taxRate=" + rate + "]";
 
         // When
         String actualString = salesTaxRates.toString();
@@ -56,12 +56,12 @@ class SalesTaxRatesTest {
         SalesTaxRates givenSalesTaxRate = SalesTaxRates.zeroSalesTaxRates();
 
         // Then
-        assertEquals(0, givenSalesTaxRate.getTaxRate());
-        assertEquals(0, givenSalesTaxRate.getStateRate());
-        assertEquals(0, givenSalesTaxRate.getCityRate());
-        assertEquals(0, givenSalesTaxRate.getCityDistrictRate());
-        assertEquals(0, givenSalesTaxRate.getCountyRate());
-        assertEquals(0, givenSalesTaxRate.getCountyDistrictRate());
+        assertEquals(0, givenSalesTaxRate.taxRate());
+        assertEquals(0, givenSalesTaxRate.stateRate());
+        assertEquals(0, givenSalesTaxRate.cityRate());
+        assertEquals(0, givenSalesTaxRate.cityDistrictRate());
+        assertEquals(0, givenSalesTaxRate.countyRate());
+        assertEquals(0, givenSalesTaxRate.countyDistrictRate());
     }
 
 }

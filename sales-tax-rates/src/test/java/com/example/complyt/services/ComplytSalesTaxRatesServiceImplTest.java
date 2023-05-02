@@ -47,7 +47,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_FindsComplytSalesTaxRates_ReturnsRates() {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
+        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
 
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
@@ -65,7 +65,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // Given
         Address califoniaAddress = TestUtilities.createAddressInCalifornia();
         Address californiaAddressWithCounty = califoniaAddress.withCounty("Fresno");
-        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.getState());
+        String collectionName = StatesMap.statesToCollections.get(califoniaAddress.state());
         SalesTaxRates californiaRates = TestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
@@ -74,7 +74,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
         // When
         when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.empty());
         when(salesTaxWebClientWrapper.findByAddress(califoniaAddress)).thenReturn(Mono.just(fastTaxData));
-        when(countyFetcher.fetch(fastTaxData)).thenReturn(Mono.just(californiaAddressWithCounty.getCounty()));
+        when(countyFetcher.fetch(fastTaxData)).thenReturn(Mono.just(californiaAddressWithCounty.county()));
         when(complytSalesTaxRatesRepository.save(any(), any())).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(californiaRates));
 
@@ -129,7 +129,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     void findByAddress_RepositoryThrowsException_ThrowsException() {
         // Given
         Address address = TestUtilities.createAddressInCalifornia();
-        String collection = StatesMap.statesToCollections.get(address.getState());
+        String collection = StatesMap.statesToCollections.get(address.state());
         when(complytSalesTaxRatesRepository.findByAddress(address, collection)).thenThrow(RuntimeException.class);
 
         // When + Then
