@@ -1,9 +1,9 @@
 package com.complyt.domain.mappers;
 
-import com.complyt.domain.zip_tax.Result;
-import com.complyt.domain.zip_tax.ZipTaxData;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
+import com.complyt.domain.zip_tax.Result;
+import com.complyt.domain.zip_tax.ZipTaxData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;

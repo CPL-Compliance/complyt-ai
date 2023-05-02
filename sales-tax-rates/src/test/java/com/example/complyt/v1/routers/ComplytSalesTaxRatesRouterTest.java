@@ -1,13 +1,13 @@
 package com.example.complyt.v1.routers;
 
-import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.config.QueryParamsExtractorConfig;
-import com.complyt.v1.config.error_messages.DtoErrorMessages;
-import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.facade.ComplytSalesTaxRatesFacade;
+import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
+import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handler.ComplytSalesTaxRatesHandler;

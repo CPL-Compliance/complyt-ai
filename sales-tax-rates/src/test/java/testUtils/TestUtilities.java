@@ -7,11 +7,6 @@ import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.InformationComponent;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
-
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.UUID;
-
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
@@ -19,7 +14,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

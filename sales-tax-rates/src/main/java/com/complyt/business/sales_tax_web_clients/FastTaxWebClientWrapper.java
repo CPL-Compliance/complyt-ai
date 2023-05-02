@@ -1,8 +1,8 @@
 package com.complyt.business.sales_tax_web_clients;
 
-import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.fast_tax.FastTaxData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;

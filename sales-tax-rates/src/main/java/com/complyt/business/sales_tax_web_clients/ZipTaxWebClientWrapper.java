@@ -1,8 +1,8 @@
 package com.complyt.business.sales_tax_web_clients;
 
-import com.complyt.domain.zip_tax.ZipTaxData;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.zip_tax.ZipTaxData;
 import lombok.EqualsAndHashCode;
 import org.javatuples.Pair;
 import org.springframework.http.HttpHeaders;

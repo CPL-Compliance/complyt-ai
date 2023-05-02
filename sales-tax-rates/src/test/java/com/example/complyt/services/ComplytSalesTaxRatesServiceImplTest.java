@@ -10,7 +10,6 @@ import com.complyt.domain.StatesMap;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
 import com.complyt.services.ComplytSalesTaxRatesServiceImpl;
-import testUtils.TestUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import testUtils.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

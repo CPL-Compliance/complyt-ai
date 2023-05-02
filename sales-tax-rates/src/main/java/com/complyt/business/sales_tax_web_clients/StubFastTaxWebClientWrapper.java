@@ -1,9 +1,9 @@
 package com.complyt.business.sales_tax_web_clients;
 
 import com.complyt.annotations.Generated;
-import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.fast_tax.FastTaxData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
