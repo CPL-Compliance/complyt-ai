@@ -46,7 +46,7 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
                 .flatMap(county -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
                             Address addressWithCounty = address.withCounty(county);
-                            return new ComplytSalesTaxRates(null, addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMinutes(1));
+                            return new ComplytSalesTaxRates(null, addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusWeeks(1));
                         }));
     }
 
