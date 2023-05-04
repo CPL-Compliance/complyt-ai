@@ -1,8 +1,8 @@
 package com.complyt.v1.config;
 
 import com.complyt.annotations.Generated;
-import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import org.springframework.boot.autoconfigure.web.WebProperties;

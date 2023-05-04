@@ -23,6 +23,7 @@
         <module>discovery-service</module>
         <module>api-gateway</module>
         <module>files</module>
+        <module>sales-tax-rates</module>
     </modules>
 
     <name>Complyt</name>
@@ -568,12 +569,6 @@
             <id>test</id>
             <properties>
                 <activeEnv>test</activeEnv>
-            </properties>
-        </profile>
-        <profile>
-            <id>penetration-test</id>
-            <properties>
-                <activeEnv>penetration-test</activeEnv>
             </properties>
         </profile>
         <!-- Environment Profiles -->
