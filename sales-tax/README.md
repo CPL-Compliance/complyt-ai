@@ -1,1 +1,1 @@
-# SalesTaxRates
+# SalesTax
