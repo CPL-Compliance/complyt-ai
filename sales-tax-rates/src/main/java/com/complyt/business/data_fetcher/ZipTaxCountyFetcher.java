@@ -16,7 +16,7 @@ public class ZipTaxCountyFetcher implements CountyFetcher {
     @Override
     public Mono<String> fetch(@NonNull SalesTaxData salesTaxData) {
         ZipTaxData zipTaxData = (ZipTaxData) salesTaxData;
-        String countyFromZipTax = zipTaxData.getResults().get(0).getGeoCounty();
+        String countyFromZipTax = zipTaxData.getResults().get(0).geoCounty();
         return Mono.just(countyFromZipTax);
     }
 }

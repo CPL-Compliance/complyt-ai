@@ -31,8 +31,8 @@ class InformationComponentTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "InformationComponent(name=" + informationComponent.getName() +
-                ", value=" + informationComponent.getValue() + ")";
+        String expectedString = "InformationComponent[name=" + informationComponent.name() +
+                ", value=" + informationComponent.value() + "]";
 
         // When
         String actualString = informationComponent.toString();

@@ -12,7 +12,6 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 public class FastTaxData implements SalesTaxData {
     String matchLevel;
@@ -21,7 +20,7 @@ public class FastTaxData implements SalesTaxData {
 
     @Override
     public boolean isUnincorporated() {
-        return taxInfoItems != null && taxInfoItems.get(0).getNotesCodes().equals(UNINCORPORATED_CODE);
+        return taxInfoItems != null && taxInfoItems.get(0).notesCodes().equals(UNINCORPORATED_CODE);
     }
 
 }

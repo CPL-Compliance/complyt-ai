@@ -45,7 +45,7 @@ class FastTaxCountyFetcherTest {
         }};
         FastTaxData fastTaxData = new FastTaxData("0", taxInfoItems, "1");
         Address addressNoCounty = TestUtilities.createAddressInCalifornia();
-        Address addressWithInjectedCounty = addressNoCounty.withCounty(fastTaxData.getTaxInfoItems().get(0).getCounty());
+        Address addressWithInjectedCounty = addressNoCounty.withCounty(fastTaxData.getTaxInfoItems().get(0).county());
 
         // When
         Mono<String> countyMono = fastTaxCountyFetcher.fetch(fastTaxData);

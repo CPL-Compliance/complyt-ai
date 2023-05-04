@@ -22,22 +22,22 @@ class TaxInfoItemTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "TaxInfoItem(city=" + taxInfoItem.getCity() +
-                ", cityDistrictRate=" + taxInfoItem.getCityDistrictRate() +
-                ", cityRate=" + taxInfoItem.getCityRate() +
-                ", county=" + taxInfoItem.getCounty() +
-                ", countyDistrictRate=" + taxInfoItem.getCountyDistrictRate() +
-                ", countyRate=" + taxInfoItem.getCityRate() +
-                ", informationComponents=" + taxInfoItem.getInformationComponents() +
-                ", notesCodes=" + taxInfoItem.getNotesCodes() +
-                ", notesDesc=" + taxInfoItem.getNotesDesc() +
-                ", specialDistrictRate=" + taxInfoItem.getSpecialDistrictRate() +
-                ", stateAbbreviation=" + taxInfoItem.getStateAbbreviation() +
-                ", stateName=" + taxInfoItem.getStateName() +
-                ", stateRate=" + taxInfoItem.getStateRate() +
-                ", taxRate=" + taxInfoItem.getTaxRate() +
-                ", totalTaxExempt=" + taxInfoItem.getTotalTaxExempt() +
-                ", zip=" + taxInfoItem.getZip() + ")";
+        String expectedString = "TaxInfoItem[city=" + taxInfoItem.city() +
+                ", cityDistrictRate=" + taxInfoItem.cityDistrictRate() +
+                ", cityRate=" + taxInfoItem.cityRate() +
+                ", county=" + taxInfoItem.county() +
+                ", countyDistrictRate=" + taxInfoItem.countyDistrictRate() +
+                ", countyRate=" + taxInfoItem.cityRate() +
+                ", informationComponents=" + taxInfoItem.informationComponents() +
+                ", notesCodes=" + taxInfoItem.notesCodes() +
+                ", notesDesc=" + taxInfoItem.notesDesc() +
+                ", specialDistrictRate=" + taxInfoItem.specialDistrictRate() +
+                ", stateAbbreviation=" + taxInfoItem.stateAbbreviation() +
+                ", stateName=" + taxInfoItem.stateName() +
+                ", stateRate=" + taxInfoItem.stateRate() +
+                ", taxRate=" + taxInfoItem.taxRate() +
+                ", totalTaxExempt=" + taxInfoItem.totalTaxExempt() +
+                ", zip=" + taxInfoItem.zip() + "]";
 
         // When
         String actualString = taxInfoItem.toString();
@@ -61,7 +61,11 @@ class TaxInfoItemTest {
     @Test
     void Builder_Build_ReturnTaxInfoItemTest() {
         // Given + When
-        TaxInfoItem actualTaxInfoItem = TaxInfoItem.builder().city("city").cityDistrictRate("").cityRate("").county("").countyDistrictRate("").countyRate("").informationComponents(null).notesCodes("").notesDesc("").specialDistrictRate("").stateAbbreviation("").stateName("").stateRate("").taxRate("").totalTaxExempt("").zip("").build();
+        TaxInfoItem actualTaxInfoItem = new TaxInfoItem(
+                "city","","","",
+                "", "",null,
+                "","", "","",
+                "","", "","","");
 
         // Then
         assertEquals(taxInfoItem, actualTaxInfoItem);

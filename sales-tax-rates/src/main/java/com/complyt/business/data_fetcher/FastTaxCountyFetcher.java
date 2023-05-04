@@ -16,7 +16,7 @@ public class FastTaxCountyFetcher implements CountyFetcher {
     @Override
     public Mono<String> fetch(@NonNull SalesTaxData salesTaxData) {
         FastTaxData fastTaxData = (FastTaxData) salesTaxData;
-        String countyFromFastTax = fastTaxData.getTaxInfoItems().get(0).getCounty();
+        String countyFromFastTax = fastTaxData.getTaxInfoItems().get(0).county();
         return Mono.just(countyFromFastTax);
     }
 }

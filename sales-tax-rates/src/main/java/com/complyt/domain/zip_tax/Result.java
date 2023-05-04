@@ -2,45 +2,13 @@ package com.complyt.domain.zip_tax;
 
 import lombok.*;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class Result {
-    private String geoPostalCode;
-    private String geoCity;
-    private String geoCounty;
-    private String geoState;
-    private double taxSales;
-    private double taxUse;
-    private String txbService;
-    private String txbFreight;
-    private double stateSalesTax;
-    private double stateUseTax;
-    private double citySalesTax;
-    private double cityUseTax;
-    private String cityTaxCode;
-    private double countySalesTax;
-    private long countyUseTax;
-    private String countyTaxCode;
-    private double districtSalesTax;
-    private double districtUseTax;
-    private String district1Code;
-    private double district1SalesTax;
-    private double district1UseTax;
-    private String district2Code;
-    private long district2SalesTax;
-    private long district2UseTax;
-    private String district3Code;
-    private long district3SalesTax;
-    private long district3UseTax;
-    private String district4Code;
-    private double district4SalesTax;
-    private double district4UseTax;
-    private String district5Code;
-    private long district5SalesTax;
-    private long district5UseTax;
-    private String originDestination;
+public record Result(String geoPostalCode, String geoCity, String geoCounty, String geoState, double taxSales,
+                     double taxUse, String txbService, String txbFreight, double stateSalesTax, double stateUseTax,
+                     double citySalesTax, double cityUseTax, String cityTaxCode, double countySalesTax,
+                     long countyUseTax, String countyTaxCode, double districtSalesTax, double districtUseTax,
+                     String district1Code, double district1SalesTax, double district1UseTax, String district2Code,
+                     long district2SalesTax, long district2UseTax, String district3Code, long district3SalesTax,
+                     long district3UseTax, String district4Code, double district4SalesTax, double district4UseTax,
+                     String district5Code, long district5SalesTax, long district5UseTax, String originDestination) {
 }

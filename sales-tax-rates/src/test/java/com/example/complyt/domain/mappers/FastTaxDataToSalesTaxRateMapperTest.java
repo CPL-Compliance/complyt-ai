@@ -23,19 +23,11 @@ class FastTaxDataToSalesTaxRateMapperTest {
 
     @BeforeEach
     void setUp() {
-        taxInfoItem = TaxInfoItem.builder()
-                .cityDistrictRate("0")
-                .cityRate("0")
-                .taxRate("0")
-                .countyRate("0")
-                .countyDistrictRate("0")
-                .stateRate("0")
-                .build();
+        taxInfoItem = new TaxInfoItem(null, "0", "0", null, "0", "0",
+                null, null, null, null, null, null, "0",
+                "0", null, null);
 
-        fastTaxData = FastTaxData.builder()
-                .matchLevel("street")
-                .taxInfoItems(Collections.singletonList(taxInfoItem))
-                .build();
+        fastTaxData = new FastTaxData("street", Collections.singletonList(taxInfoItem), "1");
     }
 
     @Test

@@ -39,7 +39,7 @@ class ZipTaxCountyFetcherTest {
         }};
         ZipTaxData zipTaxData = new ZipTaxData("version", 0, results);
         Address addressNoCounty = TestUtilities.createAddressInCalifornia();
-        Address addressWithInjectedCounty = addressNoCounty.withCounty(zipTaxData.getResults().get(0).getGeoCounty());
+        Address addressWithInjectedCounty = addressNoCounty.withCounty(zipTaxData.getResults().get(0).geoCounty());
 
         Mono<String> countyMono = zipTaxCountyFetcher.fetch(zipTaxData);
 
