@@ -63,15 +63,4 @@ public class ZipTaxDataTest {
         Assertions.assertFalse(isUnincorporated);
     }
 
-    @Test
-    void noArgsConstructor_ReturnEmptyZipTaxData() {
-        // Given + When
-        ZipTaxData givenZipTaxData = new ZipTaxData();
-
-        // Then
-        assertNull(givenZipTaxData.getVersion());
-        assertEquals(0f, givenZipTaxData.getRCode());
-        assertNull(givenZipTaxData.getResults());
-    }
-
 }

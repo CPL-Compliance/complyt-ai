@@ -34,10 +34,9 @@ class ZipTaxDataToSalesTaxRateMapperTest {
                 .stateSalesTax(0L)
                 .build();
 
-        zipTaxData = new ZipTaxData();
         List<Result> resultList = new ArrayList<>();
         resultList.add(result);
-        zipTaxData = zipTaxData.withVersion("1").withRCode(1).withResults(resultList);
+        zipTaxData = new ZipTaxData("1",1,resultList);
     }
 
     @Test

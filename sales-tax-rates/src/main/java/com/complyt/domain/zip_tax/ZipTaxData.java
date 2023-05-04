@@ -5,16 +5,12 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@EqualsAndHashCode
-@ToString
 @With
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class ZipTaxData implements SalesTaxData {
-    private String version;
-    private long rCode;
-    private List<Result> results;
+    String version;
+    long rCode;
+    List<Result> results;
 
     @Override
     public boolean isUnincorporated() {

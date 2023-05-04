@@ -15,18 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SalesTaxDataToSalesTaxRateMapperTest {
 
-    private TaxInfoItem taxInfoItem;
     private SalesTaxData salesTaxData;
 
     @BeforeEach
     void setup() {
 
-        taxInfoItem = new TaxInfoItem(
-                null,"0","0",null,"0","0",
-                null,null,null,null,
-                null,null,"0","0",null,null);
+        TaxInfoItem taxInfoItem = new TaxInfoItem(
+                null, "0", "0", null, "0", "0",
+                null, null, null, null,
+                null, null, "0", "0", null, null);
 
-        salesTaxData = new FastTaxData("street", Collections.singletonList(taxInfoItem),"1");
+        salesTaxData = new FastTaxData("street", Collections.singletonList(taxInfoItem), "1");
     }
 
     @Test
