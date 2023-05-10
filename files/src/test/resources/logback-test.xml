@@ -34,4 +34,6 @@
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
     </root>
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="org.apache.http" level="WARN"/>
 </configuration>

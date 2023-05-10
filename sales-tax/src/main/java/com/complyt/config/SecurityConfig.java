@@ -91,4 +91,28 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    @Profile({"integration-test"})
+    @Bean
+    public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
+        // CORS
+
+        // CSRF
+        http.csrf().disable();
+
+        // Authentication and Authorization
+        http.authorizeExchange()
+                .pathMatchers("/actuator/health",
+                        "/v3/api-docs/**",
+                        "/webjars/**",
+                        "/swagger-ui*/**"
+                ).permitAll()
+                .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
+                .anyExchange().authenticated();
+
+        // OAuth2
+        http.oauth2ResourceServer().jwt();
+
+        return http.build();
+    }
 }

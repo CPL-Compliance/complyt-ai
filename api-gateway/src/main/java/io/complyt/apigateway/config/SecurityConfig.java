@@ -27,6 +27,7 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
+    @Profile({"development", "demo", "test", "default", "production"})
     @Bean
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
@@ -62,7 +63,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Profile({"development", "penetration-test", "demo", "test", "default"})
+    @Profile({"development", "demo", "test", "default"})
     @Bean
     public SecurityWebFilterChain nonProductionSecurityWebFilterChain(ServerHttpSecurity http) {
         // CORS
@@ -87,6 +88,24 @@ public class SecurityConfig {
 
         // OAuth2
         http.oauth2ResourceServer().jwt();
+
+        return http.build();
+    }
+
+    @Profile({"integration-test"})
+    @Bean
+    public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
+
+        http.csrf().disable();
+
+        // Authentication and Authorization
+        http.authorizeExchange()
+                .anyExchange().permitAll();
+
+        http.anonymous();
+
+        http.httpBasic().disable()
+                .formLogin().disable();
 
         return http.build();
     }

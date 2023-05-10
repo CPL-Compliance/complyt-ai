@@ -179,6 +179,12 @@
                 <artifactId>mongodb</artifactId>
                 <version>${testcontainers.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-resolver-dns-native-macos</artifactId>
+                <classifier>osx-aarch_64</classifier>
+                <version>${netty-resolver-dns-native-macos.version}</version>
+            </dependency>
             <!-- Testcontainers -->
             <!-- Other -->
             <dependency>
@@ -571,9 +577,9 @@
             </properties>
         </profile>
         <profile>
-            <id>penetration-test</id>
+            <id>integration-test</id>
             <properties>
-                <activeEnv>penetration-test</activeEnv>
+                <activeEnv>integration-test</activeEnv>
             </properties>
         </profile>
         <!-- Environment Profiles -->

@@ -1,0 +1,13 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${INTEGRATION-DISCOVERY-URI}
+    should-unregister-on-shutdown: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+
+logging:
+  level:
+    root: info
