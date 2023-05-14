@@ -94,7 +94,6 @@ public class TransactionHandler {
     }
 
     @TransactionCreatePermission
-    @TransactionUpdatePermission
     public Mono<ServerResponse> upsert(ServerRequest serverRequest) {
         String externalId = serverRequest.pathVariable("externalId");
         String source = serverRequest.pathVariable("source");

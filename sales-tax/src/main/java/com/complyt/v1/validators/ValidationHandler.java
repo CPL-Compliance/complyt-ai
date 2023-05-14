@@ -1,7 +1,7 @@
 package com.complyt.v1.validators;
 
-import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
+import com.complyt.v1.exceptions.types.MissingBodyApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -148,6 +148,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String nonExistingState = "Nilfgaard";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress.withState(nonExistingState));
+
         // Then
         webTestClient
                 .put()
