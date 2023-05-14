@@ -96,7 +96,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
         // CORS
-           
+
         // CSRF
         http.csrf().disable();
 
