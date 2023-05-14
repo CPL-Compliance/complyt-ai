@@ -97,7 +97,6 @@ public class SecurityConfig {
     public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
 
         http.csrf().disable();
-
         // Authentication and Authorization
         http.authorizeExchange()
                 .anyExchange().permitAll();
