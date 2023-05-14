@@ -220,6 +220,7 @@ workflows:
     when: << pipeline.parameters.run-discovery-service-workflow >>
     jobs:
       - verify:
+          name: verify-discovery-service
           filters:
             branches:
               only:
@@ -235,7 +236,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+            - verify-discovery-service
             - deploy
           service_directory: "discovery-service"
 
@@ -250,6 +251,7 @@ workflows:
       - verify:
           requires:
             - verify-api-gateway
+            - verify-discovery-service
           filters:
             branches:
               only:
