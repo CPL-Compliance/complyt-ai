@@ -191,7 +191,7 @@ workflows:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
       - verify:
-          #name: "api-gateway-verify"
+          name: verify-api-gateway
           filters:
             branches:
               only:
@@ -207,7 +207,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+            - verify-api-gateway
             - deploy
           service_directory: "api-gateway"
 
