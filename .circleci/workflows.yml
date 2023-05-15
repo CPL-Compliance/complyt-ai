@@ -135,6 +135,9 @@ workflows:
     when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
       - verify:
+          requires:
+            - verify-api-gateway
+            - verify-discovery-service
           filters:
             branches:
               only:
@@ -163,6 +166,9 @@ workflows:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
       - verify:
+          requires:
+            - verify-api-gateway
+            - verify-discovery-service
           filters:
             branches:
               only:
