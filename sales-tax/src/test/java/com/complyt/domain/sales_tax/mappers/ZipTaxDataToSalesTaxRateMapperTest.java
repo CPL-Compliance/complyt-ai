@@ -1,6 +1,6 @@
 package com.complyt.domain.sales_tax.mappers;
 
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,10 +43,10 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_ZipTaxData_ReturnSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
+        SalesTaxRates actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(zipTaxData);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -55,10 +55,10 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_Result_ReturnSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
+        SalesTaxRates actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map(result);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -67,7 +67,7 @@ class ZipTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_nullResult_ReturnNull() {
         // Given + When
-        SalesTaxRate actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map((Result) null);
+        SalesTaxRates actualSalesTaxRate = ZipTaxDataToSalesTaxRateMapper.INSTANCE.map((Result) null);
 
         // Then
         assertNull(actualSalesTaxRate);

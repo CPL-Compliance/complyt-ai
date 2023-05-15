@@ -60,7 +60,7 @@ public class SalesTaxDtoTest {
     @Test
     void toString_StringMatches_Equal() {
         String salesTaxDtoToString = "SalesTaxDto[amount=" + salesTaxDto.amount() +
-                ", salesTaxRate=" + salesTaxDto.salesTaxRate() + "]";
+                ", salesTaxRates=" + salesTaxDto.salesTaxRates() + "]";
         assertEquals(salesTaxDto.toString(), salesTaxDtoToString);
     }
 

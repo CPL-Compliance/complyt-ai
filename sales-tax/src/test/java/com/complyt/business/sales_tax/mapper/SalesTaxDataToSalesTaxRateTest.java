@@ -1,7 +1,7 @@
 package com.complyt.business.sales_tax.mapper;
 
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class SalesTaxDataToSalesTaxRateTest {
 
     @InjectMocks
-    SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
+    ComplytSalesTaxRatesToSalesTaxRates salesTaxDataToSalesTaxRate;
 
     @Mock
     SalesTaxDataToSalesTaxRateMapper salesTaxDataToSalesTaxRateMapper;
@@ -42,13 +42,13 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsIncorporatedAddress_ReturnsSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = testUtilities.createSalesTaxRates();
+        SalesTaxRates expectedSalesTaxRate = testUtilities.createSalesTaxRates();
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(expectedSalesTaxRate);
         when(salesTaxData.isUnincorporated()).thenReturn(false);
 
-        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRates> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
         StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
@@ -57,14 +57,14 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0).withCityDistrictRate(0);
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0).withCityDistrictRate(0);
 
         // When
-        when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRates);
         when(salesTaxData.isUnincorporated()).thenReturn(true);
 
-        Mono<SalesTaxRate> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+        Mono<SalesTaxRates> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
 
         // Then
         StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();

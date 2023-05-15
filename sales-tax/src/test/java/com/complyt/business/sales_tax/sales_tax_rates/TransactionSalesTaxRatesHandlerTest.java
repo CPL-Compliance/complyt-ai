@@ -4,7 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,16 +51,16 @@ public class TransactionSalesTaxRatesHandlerTest {
     void setRates_SetsRatesToTransactionWithNoShippingFee_ReturnsModifiedTransaction() {
         // Given
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(null);
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
-        Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        Item itemWithRates = transaction.getItems().get(0).withSalesTaxRates(salesTaxRates);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
         }};
         Transaction expectedTransaction = transaction.withItems(modifiedItems);
 
         // When
-        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, address)).thenReturn(modifiedItems);
-        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, address)).thenReturn(modifiedItems);
+        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
 
         // Then
         StepVerifier.create(actualTransaction).expectNext(expectedTransaction).verifyComplete();
@@ -71,18 +71,18 @@ public class TransactionSalesTaxRatesHandlerTest {
         // Given
         ShippingFee shippingFee = testUtilities.createShippingFee(false, false);
         Transaction transaction = testUtilities.createTransaction(null).withShippingFee(shippingFee);
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
-        Item itemWithRates = transaction.getItems().get(0).withSalesTaxRate(salesTaxRate);
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        Item itemWithRates = transaction.getItems().get(0).withSalesTaxRates(salesTaxRates);
         List<Item> modifiedItems = new ArrayList<>() {{
             add(itemWithRates);
         }};
-        ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRate(salesTaxRate);
+        ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRates(salesTaxRates);
         Transaction expectedTransaction = transaction.withItems(modifiedItems).withShippingFee(shippingFeeWithRates);
 
         // When
-        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRate, transaction.getShippingAddress())).thenReturn(modifiedItems);
-        when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate, transaction.getShippingAddress())).thenReturn(shippingFeeWithRates);
-        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate);
+        when(itemsSalesTaxRatesProvider.setSalesTaxRates(transaction.getItems(), salesTaxRates, transaction.getShippingAddress())).thenReturn(modifiedItems);
+        when(shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRates, transaction.getShippingAddress())).thenReturn(shippingFeeWithRates);
+        Mono<Transaction> actualTransaction = transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates);
 
         // Then
         StepVerifier.create(actualTransaction).expectNext(expectedTransaction).verifyComplete();
@@ -91,11 +91,11 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_NullTransactionPassed_ThrowsException() {
         // Given
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
         Transaction nullTransaction = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(nullTransaction, salesTaxRate));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(nullTransaction, salesTaxRates));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -104,14 +104,14 @@ public class TransactionSalesTaxRatesHandlerTest {
     @Test
     void setRates_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
-        SalesTaxRate nullSalesTaxRate = null;
+        SalesTaxRates nullSalesTaxRate = null;
         Transaction transaction = testUtilities.createTransaction(null);
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> transactionSalesTaxRatesHandler.setRates(transaction, nullSalesTaxRate));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "salesTaxRate is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "salesTaxRates is marked non-null but is null");
     }
 
 }

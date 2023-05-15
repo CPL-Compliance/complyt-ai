@@ -1,7 +1,7 @@
 package com.complyt.domain.sales_tax.mappers;
 
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import org.mapstruct.Mapper;
@@ -19,14 +19,14 @@ public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxR
     @Mapping(target = "countyRate", source = "countyRate")
     @Mapping(target = "countyDistrictRate", source = "countyDistrictRate")
     @Mapping(target = "stateRate", source = "stateRate")
-    SalesTaxRate map(TaxInfoItem taxInfoItem);
+    SalesTaxRates map(TaxInfoItem taxInfoItem);
 
     @Override
-    default SalesTaxRate map(SalesTaxData salesTaxData) {
+    default SalesTaxRates map(SalesTaxData salesTaxData) {
         FastTaxData fastTaxData = ((FastTaxData) salesTaxData);
         TaxInfoItem taxInfoItem = fastTaxData.getTaxInfoItems().get(0);
-        SalesTaxRate salesTaxRate = map(taxInfoItem);
+        SalesTaxRates salesTaxRates = map(taxInfoItem);
 
-        return salesTaxRate;
+        return salesTaxRates;
     }
 }

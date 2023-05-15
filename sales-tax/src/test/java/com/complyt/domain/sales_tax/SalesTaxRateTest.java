@@ -9,15 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SalesTaxRateTest {
 
     private final float rate = 0.5f;
-    private SalesTaxRate salesTaxRate;
+    private SalesTaxRates salesTaxRates;
 
-    private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(rate, rate, rate, rate, rate, rate);
+    private SalesTaxRates createSalesTaxRates() {
+        return new SalesTaxRates(rate, rate, rate, rate, rate, rate);
     }
 
     @BeforeEach
     void setup() {
-        salesTaxRate = createSalesTaxRates();
+        salesTaxRates = createSalesTaxRates();
     }
 
     @Test
@@ -31,7 +31,7 @@ class SalesTaxRateTest {
                 ", taxRate=" + rate + ")";
 
         // When
-        String actualString = salesTaxRate.toString();
+        String actualString = salesTaxRates.toString();
 
         // Then
         assertEquals(expectedString, actualString);
@@ -40,10 +40,10 @@ class SalesTaxRateTest {
     @Test
     void Equals_SameSalesTaxRate_ReturnTrue() {
         // Given
-        SalesTaxRate givenSalesTaxRate = createSalesTaxRates();
+        SalesTaxRates givenSalesTaxRate = createSalesTaxRates();
 
         // When
-        boolean isEquals = salesTaxRate.equals(givenSalesTaxRate);
+        boolean isEquals = salesTaxRates.equals(givenSalesTaxRate);
 
         // Then
         assertTrue(isEquals);
@@ -52,15 +52,15 @@ class SalesTaxRateTest {
     @Test
     void zeroSalesTaxRate_ReturnSalesTaxRate() {
         // Given + When
-        SalesTaxRate givenSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates givenSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // Then
-        assertEquals(0, givenSalesTaxRate.getTaxRate());
-        assertEquals(0, givenSalesTaxRate.getStateRate());
-        assertEquals(0, givenSalesTaxRate.getCityRate());
-        assertEquals(0, givenSalesTaxRate.getCityDistrictRate());
-        assertEquals(0, givenSalesTaxRate.getCountyRate());
-        assertEquals(0, givenSalesTaxRate.getCountyDistrictRate());
+        assertEquals(0, givenSalesTaxRate.taxRate());
+        assertEquals(0, givenSalesTaxRate.stateRate());
+        assertEquals(0, givenSalesTaxRate.cityRate());
+        assertEquals(0, givenSalesTaxRate.cityDistrictRate());
+        assertEquals(0, givenSalesTaxRate.countyRate());
+        assertEquals(0, givenSalesTaxRate.countyDistrictRate());
     }
 
 }

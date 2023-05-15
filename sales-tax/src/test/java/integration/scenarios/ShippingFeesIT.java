@@ -97,7 +97,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(1)
@@ -126,7 +126,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(2)
@@ -173,7 +173,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(4)
@@ -237,7 +237,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
+                    assertNotNull(transactionDto.shippingFee().salesTaxRates());
                     assertEquals(transactionDto.salesTax().amount(), 1400);
                 });
     }
@@ -268,7 +268,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertEquals(0, transactionDto.shippingFee().salesTaxRate().taxRate());
+                    assertEquals(0, transactionDto.shippingFee().salesTaxRates().taxRate());
                     assertEquals(700, transactionDto.salesTax().amount());
                 });
     }
@@ -300,7 +300,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
+                    assertNotNull(transactionDto.shippingFee().salesTaxRates());
                     assertEquals(transactionDto.salesTax().amount(), 1500.7f);
                 });
     }

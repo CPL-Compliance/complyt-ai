@@ -2,7 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ public class ShippingFeeTest {
 
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, rules, SalesTaxRate.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        return new ShippingFee(false, 0, 1000, rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
@@ -46,13 +46,13 @@ public class ShippingFeeTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = shippingFee.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = shippingFee.getSalesTaxRate().getTaxRate() * rulesByPercentage.getCalculationValue();
-        SalesTaxRate salesTaxRate = shippingFee.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
+        float rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate() * rulesByPercentage.getCalculationValue();
+        SalesTaxRates salesTaxRates = shippingFee.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage)
-                .withSalesTaxRate(salesTaxRate);
+                .withSalesTaxRates(salesTaxRates);
 
         float expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
-                shippingFeeWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+                shippingFeeWithRuleByPercentage.getSalesTaxRates().taxRate();
 
         // When + Then
         float actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
@@ -78,7 +78,7 @@ public class ShippingFeeTest {
                 ", manualSalesTaxRate=" + shippingFee.getManualSalesTaxRate() +
                 ", totalPrice=" + shippingFee.getTotalPrice() +
                 ", jurisdictionalSalesTaxRules=" + shippingFee.getJurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + shippingFee.getSalesTaxRate() +
+                ", salesTaxRates=" + shippingFee.getSalesTaxRates() +
                 ", taxCode=" + shippingFee.getTaxCode() +
                 ", taxableCategory=" + shippingFee.getTaxableCategory() +
                 ", tangibleCategory=" + shippingFee.getTangibleCategory() + ")";

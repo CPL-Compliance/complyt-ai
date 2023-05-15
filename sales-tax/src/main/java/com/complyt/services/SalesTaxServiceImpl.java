@@ -2,15 +2,15 @@ package com.complyt.services;
 
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
-import com.complyt.business.sales_tax.mapper.SalesTaxDataToSalesTaxRate;
+import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxData;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +27,10 @@ import java.util.function.Function;
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    private ComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
-    private SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
+    private ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
 
     @NonNull
     @Qualifier("exemptionServiceImpl")
@@ -62,13 +62,13 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .flatMap(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
-    private Function<SalesTaxData, Mono<Transaction>> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxData -> salesTaxDataToSalesTaxRate.map(salesTaxData)
-                .flatMap(salesTaxRate -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRate)
+    private Function<ComplytSalesTaxRates, Mono<Transaction>> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
+        return salesTaxData -> complytSalesTaxRatesToSalesTaxRates.map(salesTaxData)
+                .flatMap(salesTaxRates -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
                             float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
-                            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRate);
+                            SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRates);
 
                             return transactionWithRates.withSalesTax(salesTax);
                         }));

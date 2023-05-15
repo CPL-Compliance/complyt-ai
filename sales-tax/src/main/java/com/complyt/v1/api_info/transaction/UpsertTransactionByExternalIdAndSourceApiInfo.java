@@ -167,7 +167,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                             "calculationValue": 0,
                             "cities": null
                         },
-                        "salesTaxRate": {
+                        "salesTaxRates": {
                             "cityDistrictRate": 0,
                             "cityRate": 0,
                             "countyDistrictRate": 0,
@@ -223,7 +223,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 },
                 "salesTax": {
                     "amount": 0,
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,
@@ -259,7 +259,7 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                         "calculationValue": 0,
                         "cities": null
                     },
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,

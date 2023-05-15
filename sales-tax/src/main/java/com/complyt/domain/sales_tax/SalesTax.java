@@ -9,5 +9,5 @@ import lombok.*;
 @With
 public class SalesTax {
     private float amount;
-    private SalesTaxRate salesTaxRate;
+    private SalesTaxRates salesTaxRates;
 }

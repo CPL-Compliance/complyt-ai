@@ -1,7 +1,7 @@
 package com.complyt.domain.sales_tax.mappers;
 
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.sales_tax.zip_tax.ZipTaxData;
 import org.mapstruct.Mapper;
@@ -19,14 +19,14 @@ public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRa
     @Mapping(target = "countyRate", source = "countySalesTax")
     @Mapping(target = "countyDistrictRate", source = "district5SalesTax")
     @Mapping(target = "stateRate", source = "stateSalesTax")
-    SalesTaxRate map(Result result);
+    SalesTaxRates map(Result result);
 
     @Override
-    default SalesTaxRate map(SalesTaxData salesTaxData) {
+    default SalesTaxRates map(SalesTaxData salesTaxData) {
         ZipTaxData zipTaxData = ((ZipTaxData) salesTaxData);
         Result result = zipTaxData.getResults().get(0);
-        SalesTaxRate salesTaxRate = map(result);
+        SalesTaxRates salesTaxRates = map(result);
 
-        return salesTaxRate;
+        return salesTaxRates;
     }
 }

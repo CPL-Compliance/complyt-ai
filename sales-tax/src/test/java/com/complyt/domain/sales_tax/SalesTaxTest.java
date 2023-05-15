@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SalesTaxTest {
     private SalesTax salesTax;
 
-    private SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+    private SalesTaxRates createSalesTaxRates() {
+        return new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
     }
 
     @BeforeEach
@@ -29,7 +29,7 @@ public class SalesTaxTest {
     void toString_ReturnsString() {
         // Given
         String expectedString = "SalesTax(amount=" + salesTax.getAmount() +
-                ", salesTaxRate=" + salesTax.getSalesTaxRate() + ")";
+                ", salesTaxRates=" + salesTax.getSalesTaxRate() + ")";
 
         // When
         String actualString = salesTax.toString();
@@ -41,8 +41,8 @@ public class SalesTaxTest {
     @Test
     void Equals_SameSalesTax_ReturnsTrue() {
         // Given
-        SalesTaxRate salesTaxRate = createSalesTaxRates();
-        SalesTax givenSalesTax = new SalesTax(1000, salesTaxRate);
+        SalesTaxRates salesTaxRates = createSalesTaxRates();
+        SalesTax givenSalesTax = new SalesTax(1000, salesTaxRates);
 
         // When
         boolean isEquals = salesTax.equals(givenSalesTax);

@@ -8,15 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRateDtoTest {
     private final float rate = 0.5f;
-    private SalesTaxRateDto salesTaxRateDto;
+    private SalesTaxRatesDto salesTaxRatesDto;
 
-    private SalesTaxRateDto createSalesTaxRateDto() {
-        return new SalesTaxRateDto(rate, rate, rate, rate, rate, rate);
+    private SalesTaxRatesDto createSalesTaxRateDto() {
+        return new SalesTaxRatesDto(rate, rate, rate, rate, rate, rate);
     }
 
     @BeforeEach
     void setup() {
-        salesTaxRateDto = createSalesTaxRateDto();
+        salesTaxRatesDto = createSalesTaxRateDto();
     }
 
     @Test
@@ -27,7 +27,7 @@ class SalesTaxRateDtoTest {
                 ", countyRate=" + rate + ", stateRate=" + rate + ", taxRate=" + rate + "]";
 
         // When
-        String actualString = salesTaxRateDto.toString();
+        String actualString = salesTaxRatesDto.toString();
 
         // Then
         assertEquals(expectedString, actualString);
@@ -36,10 +36,10 @@ class SalesTaxRateDtoTest {
     @Test
     void Equals_SameSalesTaxRateDto_ReturnTrue() {
         // Given
-        SalesTaxRateDto givenSalesTaxRateDto = createSalesTaxRateDto();
+        SalesTaxRatesDto givenSalesTaxRateDto = createSalesTaxRateDto();
 
         // When
-        boolean isEquals = salesTaxRateDto.equals(givenSalesTaxRateDto);
+        boolean isEquals = salesTaxRatesDto.equals(givenSalesTaxRateDto);
 
         // Then
         assertTrue(isEquals);

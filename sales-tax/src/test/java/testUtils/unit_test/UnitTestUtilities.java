@@ -9,7 +9,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -158,12 +158,12 @@ public class UnitTestUtilities {
         }};
     }
 
-    public SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+    public SalesTaxRates createSalesTaxRates() {
+        return new SalesTaxRates(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
     }
 
-    public SalesTaxRateDto createSalesTaxRatesDto() {
-        return new SalesTaxRateDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+    public SalesTaxRatesDto createSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
     }
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {

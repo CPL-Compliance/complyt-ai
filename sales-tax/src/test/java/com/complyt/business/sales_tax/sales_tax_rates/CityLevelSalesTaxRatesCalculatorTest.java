@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,14 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     CityLevelSalesTaxRatesCalculator cityLevelSalesTaxRatesCalculator;
     UnitTestUtilities testUtilities;
     CitySalesTaxRules citySalesTaxRules;
-    SalesTaxRate salesTaxRate;
+    SalesTaxRates salesTaxRates;
 
     @BeforeEach
     void setUp() {
         cityLevelSalesTaxRatesCalculator = new CityLevelSalesTaxRatesCalculator();
         testUtilities = new UnitTestUtilities(
                 LocalDateTime.now(), UUID.randomUUID().toString());
-        salesTaxRate = testUtilities.createSalesTaxRates();
+        salesTaxRates = testUtilities.createSalesTaxRates();
         citySalesTaxRules = testUtilities.createCitySalesTaxRules();
     }
 
@@ -32,10 +32,10 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void calculate_CityRuleIsNotTaxable_ReturnsZeroCityRate() {
         // Given
         CitySalesTaxRules nonTaxableCityRule = citySalesTaxRules.withTaxable(false);
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0);
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0);
 
         // When
-        SalesTaxRate actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(nonTaxableCityRule, salesTaxRate);
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(nonTaxableCityRule, salesTaxRates);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -47,21 +47,21 @@ public class CityLevelSalesTaxRatesCalculatorTest {
         CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
 
         // When
-        SalesTaxRate actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRate);
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRates);
 
         // Then
-        assertEquals(salesTaxRate, actualSalesTaxRate);
+        assertEquals(salesTaxRates, actualSalesTaxRate);
     }
 
     @Test
     void calculate_CityRuleIsTaxable_ReturnsTaxableCityRateWithRemainingRatesAsZero() {
         // Given
         CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true);
-        SalesTaxRate zeroSalesTaxRateWithCityRate = SalesTaxRate.zeroSalesTaxRate().withCityRate(salesTaxRate.getCityRate());
-        SalesTaxRate expectedSalesTaxRate = zeroSalesTaxRateWithCityRate.withTaxRate(salesTaxRate.getCityRate());
+        SalesTaxRates zeroSalesTaxRateWithCityRate = SalesTaxRates.zeroSalesTaxRate().withCityRate(salesTaxRates.cityRate());
+        SalesTaxRates expectedSalesTaxRate = zeroSalesTaxRateWithCityRate.withTaxRate(salesTaxRates.cityRate());
 
         // When
-        SalesTaxRate actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, zeroSalesTaxRateWithCityRate);
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, zeroSalesTaxRateWithCityRate);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -71,11 +71,11 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void calculate_CityRuleIsNonTaxable_ReturnsZeroRates() {
         // Given
         CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(false);
-        SalesTaxRate zeroSalesTaxRateWithCityRate = SalesTaxRate.zeroSalesTaxRate().withCityRate(salesTaxRate.getCityRate());
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates zeroSalesTaxRateWithCityRate = SalesTaxRates.zeroSalesTaxRate().withCityRate(salesTaxRates.cityRate());
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, zeroSalesTaxRateWithCityRate);
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, zeroSalesTaxRateWithCityRate);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -88,7 +88,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            cityLevelSalesTaxRatesCalculator.calculate(nullCitySalesTaxRules, salesTaxRate);
+            cityLevelSalesTaxRatesCalculator.calculate(nullCitySalesTaxRules, salesTaxRates);
         });
 
         assertEquals(nullPointerException.getMessage(), "citySalesTaxRules is marked non-null but is null");
@@ -97,7 +97,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_NullSalesTaxRatePassed_ThrowsException() {
         // Given
-        SalesTaxRate nullSalesTaxRate = null;
+        SalesTaxRates nullSalesTaxRate = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {

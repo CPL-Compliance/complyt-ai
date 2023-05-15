@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.Assertions;
@@ -19,24 +19,24 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     StateLevelSalesTaxRatesCalculator stateLevelSalesTaxRatesCalculator;
     UnitTestUtilities testUtilities;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    SalesTaxRate salesTaxRate;
+    SalesTaxRates salesTaxRates;
 
     @BeforeEach
     void setUp() {
         stateLevelSalesTaxRatesCalculator = new StateLevelSalesTaxRatesCalculator();
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        salesTaxRate = testUtilities.createSalesTaxRates();
+        salesTaxRates = testUtilities.createSalesTaxRates();
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
     }
 
     @Test
     void calculateSalesTaxRate_StateLevelNotTaxable_ReturnsZeroTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When
-        SalesTaxRate actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+        SalesTaxRates actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRates);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -48,18 +48,18 @@ public class StateLevelSalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules.withSpecialTreatment(false);
 
         // When
-        SalesTaxRate actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+        SalesTaxRates actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRates);
 
         // Then
-        assertEquals(salesTaxRate, actualSalesTaxRate);
+        assertEquals(salesTaxRates, actualSalesTaxRate);
     }
 
     @Test
     void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
         // Given
         float fixedStateRateValue = 0.1f;
-        float calculatedTaxRateValue = salesTaxRate.getTaxRate() - salesTaxRate.getStateRate() + fixedStateRateValue;
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate
+        float calculatedTaxRateValue = salesTaxRates.taxRate() - salesTaxRates.stateRate() + fixedStateRateValue;
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates
                 .withStateRate(fixedStateRateValue)
                 .withTaxRate(calculatedTaxRateValue);
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = jurisdictionalSalesTaxRules
@@ -68,7 +68,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
                 .withCalculationValue(fixedStateRateValue);
 
         // When
-        SalesTaxRate actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRate);
+        SalesTaxRates actualSalesTaxRate = stateLevelSalesTaxRatesCalculator.calculate(givenJurisdictionalSalesTaxRules, salesTaxRates);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -80,22 +80,22 @@ public class StateLevelSalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.PERCENTAGE)
                 .withSpecialTreatment(true);
-        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRate.getTaxRate();
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withTaxRate(calculatedRate);
+        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRates.taxRate();
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(calculatedRate);
 
         // When + Then
-        SalesTaxRate returnedRate = stateLevelSalesTaxRatesCalculator.calculate(percentageCalculationTypeRule, salesTaxRate);
+        SalesTaxRates returnedRate = stateLevelSalesTaxRatesCalculator.calculate(percentageCalculationTypeRule, salesTaxRates);
         Assertions.assertEquals(expectedSalesTaxRate, returnedRate);
     }
 
     @Test
     void getRateByRules_NotTaxable_ReturnsZeroRate() {
         // Given
-        SalesTaxRate zeroSalesTaxRate = new SalesTaxRate(0, 0, 0, 0, 0, 0);
+        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(0, 0, 0, 0, 0, 0);
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
-        SalesTaxRate returnedRate = stateLevelSalesTaxRatesCalculator.calculate(notTaxableRule, salesTaxRate);
+        SalesTaxRates returnedRate = stateLevelSalesTaxRatesCalculator.calculate(notTaxableRule, salesTaxRates);
         Assertions.assertEquals(returnedRate, zeroSalesTaxRate);
     }
 
@@ -106,7 +106,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            stateLevelSalesTaxRatesCalculator.calculate(nullJurisdictionalSalesTaxRules, salesTaxRate);
+            stateLevelSalesTaxRatesCalculator.calculate(nullJurisdictionalSalesTaxRules, salesTaxRates);
         });
 
         assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
@@ -115,7 +115,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculate_NullSalesTaxRatesPassed_ThrowsException() {
         // Given
-        SalesTaxRate nullSalesTaxRate = null;
+        SalesTaxRates nullSalesTaxRate = null;
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {

@@ -13,8 +13,8 @@ eureka:
 
 logging:
   level:
-    root: INFO
-    web: INFO
+    root: DEBUG
+    web: DEBUG
     org:
       springframework:
         security: INFO

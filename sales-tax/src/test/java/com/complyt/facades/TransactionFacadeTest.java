@@ -12,7 +12,7 @@ import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionServiceImpl;
@@ -104,8 +104,8 @@ public class TransactionFacadeTest {
     }
 
     private SalesTax createSalesTax() {
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
-        return new SalesTax(1000, salesTaxRate);
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        return new SalesTax(1000, salesTaxRates);
     }
 
     @Test
@@ -327,7 +327,7 @@ public class TransactionFacadeTest {
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
-        SalesTax salesTax = new SalesTax(100, new SalesTaxRate(0, 0, 0, 0, 0, 0));
+        SalesTax salesTax = new SalesTax(100, new SalesTaxRates(0, 0, 0, 0, 0, 0));
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())

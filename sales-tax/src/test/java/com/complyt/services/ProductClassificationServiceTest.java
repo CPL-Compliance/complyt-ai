@@ -5,7 +5,7 @@ import com.complyt.domain.ShippingFee;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.ProductClassification;
 import com.complyt.repositories.ProductClassificationRepository;
@@ -123,8 +123,8 @@ public class ProductClassificationServiceTest {
     @Test
     void getTransactionWithRelevantProductClassificationData_InjectsDataToTransactionWithShippingFee_ReturnsTransaction() {
         // Given
-        SalesTaxRate salesTaxRate = testUtilities.createSalesTaxRates();
-        ShippingFee shippingFee = testUtilities.createShippingFee(true, true).withSalesTaxRate(salesTaxRate);
+        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        ShippingFee shippingFee = testUtilities.createShippingFee(true, true).withSalesTaxRates(salesTaxRates);
         Transaction givenTransaction = transaction.withShippingFee(shippingFee);
         String taxCode0 = givenTransaction.getItems().get(0).getTaxCode();
         String taxCode1 = givenTransaction.getItems().get(1).getTaxCode();

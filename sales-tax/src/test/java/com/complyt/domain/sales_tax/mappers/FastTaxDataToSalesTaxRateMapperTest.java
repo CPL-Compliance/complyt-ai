@@ -1,6 +1,6 @@
 package com.complyt.domain.sales_tax.mappers;
 
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,10 +40,10 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_TaxInfoItem_ReturnSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
+        SalesTaxRates actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -52,10 +52,10 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_FastTaxData_ReturnSalesTaxRate() {
         // Given + When
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(fastTaxData);
+        SalesTaxRates actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(fastTaxData);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -64,7 +64,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_nullTaxInfoItem_ReturnNull() {
         // Given + When
-        SalesTaxRate actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
+        SalesTaxRates actualSalesTaxRate = FastTaxDataToSalesTaxRateMapper.INSTANCE.map((TaxInfoItem) null);
 
         // Then
         assertNull(actualSalesTaxRate);

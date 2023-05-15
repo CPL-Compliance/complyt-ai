@@ -1,7 +1,7 @@
 package com.complyt.domain.sales_tax.mappers;
 
 import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -9,5 +9,5 @@ import org.mapstruct.factory.Mappers;
 public interface SalesTaxDataToSalesTaxRateMapper {
     SalesTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(SalesTaxDataToSalesTaxRateMapper.class);
 
-    SalesTaxRate map(SalesTaxData salesTaxData);
+    SalesTaxRates map(SalesTaxData salesTaxData);
 }
