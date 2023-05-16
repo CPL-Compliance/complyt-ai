@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface ComplytSalesTaxRatesToSalesTaxRatesMapper {
+
     ComplytSalesTaxRatesToSalesTaxRatesMapper INSTANCE = Mappers.getMapper(ComplytSalesTaxRatesToSalesTaxRatesMapper.class);
 
     @Mapping(target = "cityDistrictRate", source = "salesTaxRates.cityDistrictRate")

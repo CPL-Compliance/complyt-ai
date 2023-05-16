@@ -76,7 +76,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isOk()
                 .expectBodyList(CustomerDto.class)
                 .value(list ->
-                        assertEquals(list.size(), 1));
+                        assertEquals(1, list.size()));
     }
 
     @Order(2)

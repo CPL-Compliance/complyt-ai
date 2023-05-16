@@ -1,7 +1,5 @@
 package com.complyt.proxies;
 
-import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.v1.models.ComplytSalesTaxRatesDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

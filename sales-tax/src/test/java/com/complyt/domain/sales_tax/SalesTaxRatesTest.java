@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SalesTaxRateTest {
+class SalesTaxRatesTest {
 
     private final float rate = 0.5f;
     private SalesTaxRates salesTaxRates;
@@ -23,12 +23,12 @@ class SalesTaxRateTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRate(cityDistrictRate=" + rate +
+        String expectedString = "SalesTaxRates[cityDistrictRate=" + rate +
                 ", cityRate=" + rate +
                 ", countyDistrictRate=" + rate +
                 ", countyRate=" + rate +
                 ", stateRate=" + rate +
-                ", taxRate=" + rate + ")";
+                ", taxRate=" + rate + "]";
 
         // When
         String actualString = salesTaxRates.toString();

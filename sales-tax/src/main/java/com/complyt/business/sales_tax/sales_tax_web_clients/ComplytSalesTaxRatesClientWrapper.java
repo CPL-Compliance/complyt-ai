@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ComplytSalesTaxRatesClientWrapper {
+public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapper<ComplytSalesTaxRates> {
 
     @Autowired
     SalesTaxRatesServiceProxy salesTaxRatesServiceProxy;

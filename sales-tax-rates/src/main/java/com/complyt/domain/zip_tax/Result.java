@@ -1,6 +1,6 @@
 package com.complyt.domain.zip_tax;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record Result(String geoPostalCode, String geoCity, String geoCounty, String geoState, double taxSales,

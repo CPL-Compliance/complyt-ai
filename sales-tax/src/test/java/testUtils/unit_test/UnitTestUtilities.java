@@ -9,6 +9,7 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
@@ -294,6 +295,29 @@ public class UnitTestUtilities {
 
     public ValidationDatesDto createValidationDatesDto() {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
+    public static Address createAddressInCalifornia() {
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+    public static MandatoryAddressDto createAddressDtoInCalifornia() {
+        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+    public static SalesTaxRates createCaliforniaSalesTaxRates() {
+        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+    }
+
+    public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+    }
+
+    public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+        Address address = createAddressInCalifornia();
+        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
+        LocalDateTime now = LocalDateTime.now();
+        return new ComplytSalesTaxRates(address, salesTaxRates);
     }
 
 }

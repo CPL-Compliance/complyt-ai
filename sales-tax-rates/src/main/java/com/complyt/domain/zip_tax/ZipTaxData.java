@@ -1,7 +1,8 @@
 package com.complyt.domain.zip_tax;
 
 import com.complyt.domain.SalesTaxData;
-import lombok.*;
+import lombok.Value;
+import lombok.With;
 
 import java.util.List;
 

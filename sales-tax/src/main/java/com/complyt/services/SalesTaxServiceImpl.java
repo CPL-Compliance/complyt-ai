@@ -27,7 +27,7 @@ import java.util.function.Function;
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private ComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
+    private ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
 
     @NonNull
     private ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
@@ -58,12 +58,12 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
-        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
+        return complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())
                 .flatMap(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 
     private Function<ComplytSalesTaxRates, Mono<Transaction>> createFunctionInjectSalesTaxToTransaction(Transaction transaction) {
-        return salesTaxData -> complytSalesTaxRatesToSalesTaxRates.map(salesTaxData)
+        return complytSalesTaxRates -> complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)
                 .flatMap(salesTaxRates -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);

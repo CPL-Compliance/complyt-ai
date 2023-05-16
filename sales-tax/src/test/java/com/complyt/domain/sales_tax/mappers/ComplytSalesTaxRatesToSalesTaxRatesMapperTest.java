@@ -9,17 +9,17 @@ import testUtils.unit_test.UnitTestUtilities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class SalesTaxDataToSalesTaxRateMapperTest {
+class ComplytSalesTaxRatesToSalesTaxRatesMapperTest {
 
     private ComplytSalesTaxRates complytSalesTaxRates;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
     }
 
     @Test
-    void map_SalesTaxData_ReturnSalesTaxRate() {
+    void map_ComplytSalesTaxRates_ReturnSalesTaxRate() {
         // Given
         SalesTaxRates expectedSalesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
 
@@ -31,11 +31,8 @@ public class SalesTaxDataToSalesTaxRateMapperTest {
     }
 
     @Test
-    void map_nullSalesTaxData_ReturnNull() {
-        // Given
-        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
-
-        // When
+    void map_nullComplytSalesTaxRates_ReturnNull() {
+        // Given + When
         SalesTaxRates actualSalesTaxRates = ComplytSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(null);
 
         // Then

@@ -4,15 +4,14 @@ import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Item;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +40,10 @@ public class SalesTaxServiceImplTest {
     SalesTaxServiceImpl salesTaxService;
 
     @Mock
-    SalesTaxWebClientWrapper salesTaxWebClientWrapper;
+    ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
 
     @Mock
-    ComplytSalesTaxRatesToSalesTaxRates salesTaxDataToSalesTaxRate;
+    ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
 
     @Mock
     ExemptionService exemptionService;
@@ -99,8 +98,8 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_SalesTaxCalculated_TransactionModified() {
         // Given
-        FastTaxData fastTaxData = new FastTaxData();
-        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         SalesTax salesTax = new SalesTax(10, salesTaxRates);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
@@ -113,8 +112,8 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRates));
+        when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
+        when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
@@ -128,13 +127,8 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_SalesTaxDataIsUnincorporated_SalesTaxCalculatedAndTransactionModified() {
         // Given
-        String unincorporatedCode = "1";
-        List<TaxInfoItem> taxInfoItems = new ArrayList<>() {{
-            add(new TaxInfoItem().withNotesCodes(unincorporatedCode));
-        }};
-
-        FastTaxData fastTaxData = new FastTaxData().withTaxInfoItems(taxInfoItems);
-        SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
+        ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
         SalesTax salesTax = new SalesTax(10, salesTaxRates);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
@@ -149,8 +143,8 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
-        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(fastTaxData));
-        when(salesTaxDataToSalesTaxRate.map(fastTaxData)).thenReturn(Mono.just(salesTaxRates));
+        when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
+        when(complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates)).thenReturn(Mono.just(salesTaxRates));
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);

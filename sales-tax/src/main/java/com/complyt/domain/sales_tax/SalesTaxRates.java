@@ -1,6 +1,6 @@
 package com.complyt.domain.sales_tax;
 
-import lombok.*;
+import lombok.With;
 
 @With
 public record SalesTaxRates(float cityDistrictRate, float cityRate, float countyDistrictRate, float countyRate,

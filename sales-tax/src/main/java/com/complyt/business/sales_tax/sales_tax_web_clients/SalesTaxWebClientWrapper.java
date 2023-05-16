@@ -1,12 +1,10 @@
 package com.complyt.business.sales_tax.sales_tax_web_clients;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.sales_tax.SalesTaxData;
-import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-public interface SalesTaxWebClientWrapper {
-    Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state);
+public interface SalesTaxWebClientWrapper<T> {
+    Mono<T> findByAddress(String state, String country, String county, String city, String street, String zip);
 
-    Mono<SalesTaxData> findByAddress(@NonNull final Address address);
+    Mono<T> findByAddress(final Address address);
 }
