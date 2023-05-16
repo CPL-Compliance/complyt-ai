@@ -44,14 +44,14 @@ class TransactionFastTaxCountyFetcherTest {
 
         Transaction transactionWithInjectedCounty = transaction
                 .withShippingAddress(transaction.getShippingAddress()
-                        .withCounty(addressWithCounty.getCounty()));
+                        .withCounty(addressWithCounty.county()));
 
         // When
         when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
         Mono<String> countyMono = transactionCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().getCounty()).verifyComplete();
+        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().county()).verifyComplete();
     }
 
 }

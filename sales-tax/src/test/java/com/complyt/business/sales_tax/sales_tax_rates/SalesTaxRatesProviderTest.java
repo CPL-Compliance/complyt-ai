@@ -66,7 +66,7 @@ class SalesTaxRatesProviderTest {
         CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
-                    put(address.getCity() + "UNEQUAL_SUFFIX", citySalesTaxRules);
+                    put(address.city() + "UNEQUAL_SUFFIX", citySalesTaxRules);
                 }}
         );
         SalesTaxRates expectedSalesTaxRates = salesTaxRates.withStateRate(0.5f);
@@ -85,7 +85,7 @@ class SalesTaxRatesProviderTest {
         CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
-                    put(address.getCity(), citySalesTaxRules);
+                    put(address.city(), citySalesTaxRules);
                 }}
         );
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0);

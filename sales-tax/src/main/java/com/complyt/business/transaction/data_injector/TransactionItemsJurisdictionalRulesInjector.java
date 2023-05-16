@@ -41,7 +41,7 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
     }
 
     private List<Item> createItemsWithRules(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        String state = transaction.getShippingAddress().getState();
+        String state = transaction.getShippingAddress().state();
         List<Item> modifiedItems = new ArrayList<>();
 
         for (Item item : transaction.getItems()) {

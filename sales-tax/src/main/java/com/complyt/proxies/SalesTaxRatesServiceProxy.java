@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 @ReactiveFeignClient(name = "SALES-TAX-RATES")
 public interface SalesTaxRatesServiceProxy {
+
     @GetMapping("/v1/sales_tax_rates")
     Mono<ComplytSalesTaxRatesDto> findByAddress(
             @RequestParam(name = "state") String state, @RequestParam(name = "country") String country,

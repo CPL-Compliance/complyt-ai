@@ -19,6 +19,6 @@ public class TransactionCountyFetcher implements CountyFetcher {
     @Override
     public Mono<String> fetch(Address address) {
         return complytSalesTaxRatesClientWrapper.findByAddress(address)
-                .map(complytSalesTaxRates -> complytSalesTaxRates.address().getCounty());
+                .map(complytSalesTaxRates -> complytSalesTaxRates.address().county());
     }
 }

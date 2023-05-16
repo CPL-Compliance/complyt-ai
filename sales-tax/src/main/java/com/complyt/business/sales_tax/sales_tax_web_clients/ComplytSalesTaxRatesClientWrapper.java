@@ -4,11 +4,16 @@ import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapper<ComplytSalesTaxRates> {
 
     @Autowired
@@ -20,7 +25,7 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapp
     }
 
     public Mono<ComplytSalesTaxRates> findByAddress(Address address) {
-        return findByAddress(address.getState(), address.getCountry(), address.getCounty(), address.getCity(), address.getStreet(), address.getZip());
+        return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip());
     }
 
 }
