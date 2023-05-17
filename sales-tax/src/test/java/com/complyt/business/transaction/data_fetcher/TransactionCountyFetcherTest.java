@@ -1,6 +1,6 @@
 package com.complyt.business.transaction.data_fetcher;
 
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Address;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
@@ -20,12 +20,12 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionFastTaxCountyFetcherTest {
+class TransactionCountyFetcherTest {
 
     @InjectMocks
     private TransactionCountyFetcher transactionCountyFetcher;
     @Mock
-    ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
+    StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
     UnitTestUtilities testUtilities;
     private Transaction transaction;
 
@@ -34,7 +34,7 @@ class TransactionFastTaxCountyFetcherTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
-
+    
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given
@@ -47,7 +47,7 @@ class TransactionFastTaxCountyFetcherTest {
                         .withCounty(addressWithCounty.county()));
 
         // When
-        when(complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
+        when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
         Mono<String> countyMono = transactionCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then

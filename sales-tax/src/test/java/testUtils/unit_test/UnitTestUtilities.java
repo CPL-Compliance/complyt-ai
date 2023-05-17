@@ -298,25 +298,24 @@ public class UnitTestUtilities {
     }
 
     public static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
     }
 
     public static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
     }
 
     public static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
     }
 
     public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
     }
 
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
-        LocalDateTime now = LocalDateTime.now();
         return new ComplytSalesTaxRates(address, salesTaxRates);
     }
 

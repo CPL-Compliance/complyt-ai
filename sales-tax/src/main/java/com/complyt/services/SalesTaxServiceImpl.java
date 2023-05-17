@@ -5,7 +5,8 @@ import com.complyt.business.sales_tax.checker.SalesTaxApplyCheck;
 import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -27,7 +28,7 @@ import java.util.function.Function;
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
+    private StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
 
     @NonNull
     private ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
@@ -58,7 +59,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
     @Override
     public Mono<Transaction> calculate(@NonNull Transaction transaction) {
-        return complytSalesTaxRatesClientWrapper.findByAddress(transaction.getShippingAddress())
+        return salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())
                 .flatMap(createFunctionInjectSalesTaxToTransaction(transaction));
     }
 

@@ -4,7 +4,7 @@ import com.complyt.business.builder.TaxableCollectionBuilder;
 import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates;
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Item;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
@@ -40,7 +40,7 @@ public class SalesTaxServiceImplTest {
     SalesTaxServiceImpl salesTaxService;
 
     @Mock
-    ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
+    StubComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
 
     @Mock
     ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;

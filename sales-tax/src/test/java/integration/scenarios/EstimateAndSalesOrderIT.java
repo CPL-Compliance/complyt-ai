@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.*;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
@@ -26,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -43,8 +41,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
      */
 
     @MockBean
-    private ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
-    @MockBean
     private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
@@ -54,7 +50,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 
-
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
@@ -63,7 +58,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(complytSalesTaxRatesClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.createCaliforniaComplytSalesTaxRates()));
     }
 
     @Order(1)
@@ -199,7 +193,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(7200, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(9300, transactionDto.salesTax().amount()));
     }
 
     @Order(4)
@@ -226,6 +220,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(7200, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(9300, transactionDto.salesTax().amount()));
     }
 }
