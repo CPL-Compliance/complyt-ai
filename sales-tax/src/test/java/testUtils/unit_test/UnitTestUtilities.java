@@ -319,4 +319,10 @@ public class UnitTestUtilities {
         return new ComplytSalesTaxRates(address, salesTaxRates);
     }
 
+    public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
+        MandatoryAddressDto address = createAddressDtoInCalifornia();
+        SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
+        return new ComplytSalesTaxRatesDto(address, salesTaxRates);
+    }
+
 }

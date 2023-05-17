@@ -4,11 +4,13 @@ import com.complyt.annotations.Generated;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
+@EqualsAndHashCode
 @Generated
 public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapper<ComplytSalesTaxRates> {
     @Override

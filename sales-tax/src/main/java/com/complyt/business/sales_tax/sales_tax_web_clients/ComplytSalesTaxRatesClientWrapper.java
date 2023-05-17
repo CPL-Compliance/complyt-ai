@@ -6,11 +6,13 @@ import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
+@EqualsAndHashCode
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapper<ComplytSalesTaxRates> {

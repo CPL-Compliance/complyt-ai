@@ -597,4 +597,17 @@ class TransactionServiceImplTest {
 
         assertEquals(nullPointerException.getMessage(), "source is marked non-null but is null");
     }
+
+    @Test
+    void findById_NullIdPassed_ThrowsNullPointerException() {
+        // Given
+        String nullId = null;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            transactionService.findById(nullId);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "id is marked non-null but is null");
+    }
 }
