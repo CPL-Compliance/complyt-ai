@@ -13,15 +13,16 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class SalesTaxWebClientWrapperConfig {
 
-    @Profile({"complytRates"})
-    @Bean("salesTaxWebClientWrapper")
+    @Profile({"complytTaxEngine"})
+    @Bean
     public SalesTaxWebClientWrapper<ComplytSalesTaxRates> complytSalesTaxRatesClientWrapper(@Autowired SalesTaxRatesServiceProxy salesTaxRatesServiceProxy) {
         return new ComplytSalesTaxRatesClientWrapper(salesTaxRatesServiceProxy);
     }
 
-    @Profile({"default, stubFastTax"})
-    @Bean("salesTaxWebClientWrapper")
+    @Profile({"complytStubTax", "default"})
+    @Bean
     public SalesTaxWebClientWrapper<ComplytSalesTaxRates> stubComplytSalesTaxRatesClientWrapper() {
         return new StubComplytSalesTaxRatesClientWrapper();
     }
+
 }

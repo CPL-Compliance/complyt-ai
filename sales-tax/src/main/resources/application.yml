@@ -4,7 +4,7 @@ server.port: ${PORT:9898}
 
 spring.profiles.active:
   - @activeEnv@
-  - stubFastTax
+  - @activeTaxClient@
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit

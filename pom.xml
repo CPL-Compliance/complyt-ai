@@ -583,6 +583,15 @@
             </activation>
         </profile>
         <profile>
+            <id>complytTaxEngine</id>
+            <properties>
+                <activeTaxClient>complytTaxEngine</activeTaxClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
             <id>zipTax</id>
             <properties>
                 <activeTaxClient>zipTax</activeTaxClient>
@@ -592,6 +601,12 @@
             <id>stubFastTax</id>
             <properties>
                 <activeTaxClient>stubFastTax</activeTaxClient>
+            </properties>
+        </profile>
+        <profile>
+            <id>complytStubTax</id>
+            <properties>
+                <activeTaxClient>complytStubTax</activeTaxClient>
             </properties>
         </profile>
         <!-- Tax Client Profiles -->

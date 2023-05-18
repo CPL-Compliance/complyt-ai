@@ -8,10 +8,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-@Component
 @EqualsAndHashCode
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

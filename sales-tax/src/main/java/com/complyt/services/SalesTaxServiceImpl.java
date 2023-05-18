@@ -6,7 +6,6 @@ import com.complyt.business.sales_tax.mapper.ComplytSalesTaxRatesToSalesTaxRates
 import com.complyt.business.sales_tax.sales_tax_amount.SalesTaxAggregator;
 import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHandler;
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.nexus.SalesTaxTracking;
@@ -28,7 +27,7 @@ import java.util.function.Function;
 public class SalesTaxServiceImpl implements SalesTaxService {
 
     @NonNull
-    private StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
+    private SalesTaxWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
 
     @NonNull
     private ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
