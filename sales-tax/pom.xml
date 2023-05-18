@@ -194,6 +194,26 @@
         <!-- Other -->
     </dependencies>
 
+    <profiles>
+        <!-- Tax Client Profiles -->
+        <profile>
+            <id>complytTaxEngine</id>
+            <properties>
+                <activeTaxClient>complytTaxEngine</activeTaxClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>complytStubTax</id>
+            <properties>
+                <activeTaxClient>complytStubTax</activeTaxClient>
+            </properties>
+        </profile>
+        <!-- Tax Client Profiles -->
+    </profiles>
+
     <build>
         <plugins>
             <plugin>

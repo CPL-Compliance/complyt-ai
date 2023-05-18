@@ -201,6 +201,33 @@
 
     </dependencies>
 
+    <profiles>
+        <!-- Tax Client Profiles -->
+        <profile>
+            <id>fastTax</id>
+            <properties>
+                <activeTaxClient>fastTax</activeTaxClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>zipTax</id>
+            <properties>
+                <activeTaxClient>zipTax</activeTaxClient>
+            </properties>
+        </profile>
+        <profile>
+            <id>stubFastTax</id>
+            <properties>
+                <activeTaxClient>stubFastTax</activeTaxClient>
+            </properties>
+        </profile>
+        <!-- Tax Client Profiles -->
+    </profiles>
+
+
     <build>
         <plugins>
             <plugin>
