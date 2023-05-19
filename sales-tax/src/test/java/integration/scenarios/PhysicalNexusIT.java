@@ -154,7 +154,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(transactionDto.salesTax().amount(), 775));
+                .value(transactionDto -> assertEquals(775, transactionDto.salesTax().amount()));
     }
 
     @Order(4)

@@ -231,7 +231,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.shippingFee().salesTaxRates());
-                    assertEquals(transactionDto.salesTax().amount(), 1550);
+                    assertEquals(1550, transactionDto.salesTax().amount());
                 });
     }
 
@@ -262,7 +262,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertEquals(transactionDto.shippingFee().salesTaxRates().taxRate(), 0);
-                    assertEquals(transactionDto.salesTax().amount(), 775);
+                    assertEquals(775, transactionDto.salesTax().amount());
                 });
     }
 
@@ -294,7 +294,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.shippingFee().salesTaxRates());
-                    assertEquals(transactionDto.salesTax().amount(), 1500.7750244140625);
+                    assertEquals(1500.7750244140625, transactionDto.salesTax().amount());
                 });
     }
 }

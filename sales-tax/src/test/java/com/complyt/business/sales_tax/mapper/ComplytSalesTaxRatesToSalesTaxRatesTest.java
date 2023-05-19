@@ -24,13 +24,13 @@ import static org.mockito.Mockito.when;
 public class ComplytSalesTaxRatesToSalesTaxRatesTest {
 
     @InjectMocks
-    ComplytSalesTaxRatesToSalesTaxRates salesTaxDataToSalesTaxRate;
+    ComplytSalesTaxRatesToSalesTaxRates complytSalesTaxRatesToSalesTaxRates;
 
     @Mock
     ComplytSalesTaxRatesToSalesTaxRatesMapper complytSalesTaxRatesToSalesTaxRatesMapper;
 
     @Mock
-    ComplytSalesTaxRates c;
+    ComplytSalesTaxRates complytSalesTaxRates;
 
     UnitTestUtilities testUtilities;
 
@@ -41,14 +41,14 @@ public class ComplytSalesTaxRatesToSalesTaxRatesTest {
 
 
     @Test
-    void map_Maps_ReturnsSalesTaxRateWithCityRatesAsZeros() {
+    void map_MapsComplytSalesTaxRatesToSalesTaxRates_ReturnsSalesTaxRates() {
         // Given
         SalesTaxRates expectedSalesTaxRate = testUtilities.createSalesTaxRates();
 
         // When
-        when(complytSalesTaxRatesToSalesTaxRatesMapper.map(c)).thenReturn(expectedSalesTaxRate);
+        when(complytSalesTaxRatesToSalesTaxRatesMapper.map(complytSalesTaxRates)).thenReturn(expectedSalesTaxRate);
 
-        Mono<SalesTaxRates> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(c);
+        Mono<SalesTaxRates> actualSalesTaxRate = complytSalesTaxRatesToSalesTaxRates.map(complytSalesTaxRates);
 
         // Then
         StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
@@ -61,7 +61,7 @@ public class ComplytSalesTaxRatesToSalesTaxRatesTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxDataToSalesTaxRate.map(nullComplytSalesTaxRates);
+            complytSalesTaxRatesToSalesTaxRates.map(nullComplytSalesTaxRates);
         });
 
         assertEquals(nullPointerException.getMessage(), "complytSalesTaxRates is marked non-null but is null");

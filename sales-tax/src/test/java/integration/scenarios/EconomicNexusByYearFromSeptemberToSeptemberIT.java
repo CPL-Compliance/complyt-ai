@@ -52,10 +52,10 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
     private WebTestClient webTestClient;
 
     // Given
-    private LocalDateTime referenceDate = LocalDateTime.parse("2019-10-01T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516");
-    private UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
-    private String source = "1";
+    private final LocalDateTime referenceDate = LocalDateTime.parse("2019-10-01T07:00:00");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516");
+    private final UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
+    private final String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -232,7 +232,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 775));
+                .value(receivedTransaction -> assertEquals(775, receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

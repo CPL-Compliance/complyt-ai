@@ -239,7 +239,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 6200));
+                .value(receivedTransaction -> assertEquals(6200, receivedTransaction.salesTax().amount()));
     }
 
     @Order(7)
@@ -280,6 +280,6 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                 .exchange()
                                 .expectStatus().isCreated()
                                 .expectBody(TransactionDto.class)
-                                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 3100)));
+                                .value(receivedTransaction -> assertEquals(3100, receivedTransaction.salesTax().amount())));
     }
 }
