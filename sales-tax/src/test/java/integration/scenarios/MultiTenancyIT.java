@@ -305,7 +305,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
         // Given - details of a transaction from the database
         String externalId = "10002";
         String customerExternalId = "1586";
-when(complytSalesTaxRatesClientWrapper.findByAddress(any())).thenReturn(Mono.just(UnitTestUtilities.createCaliforniaComplytSalesTaxRates()));
+
         // Then
         webTestClient
                 .mutateWith(defaultTenantMutator)

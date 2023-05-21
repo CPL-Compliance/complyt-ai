@@ -6,7 +6,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
             <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-                <prettyPrint>true</prettyPrint>
+                <prettyPrint>false</prettyPrint>
             </jsonFormatter>
             <appendLineSeparator>true</appendLineSeparator>
             <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
@@ -16,7 +16,7 @@
         <file>${LOGS_FOLDER}/${LOGS_FILENAME}.log</file>
         <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
             <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
-                <prettyPrint>true</prettyPrint>
+                <prettyPrint>false</prettyPrint>
             </jsonFormatter>
             <appendLineSeparator>true</appendLineSeparator>
             <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
