@@ -45,4 +45,5 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
     }
+
 }
