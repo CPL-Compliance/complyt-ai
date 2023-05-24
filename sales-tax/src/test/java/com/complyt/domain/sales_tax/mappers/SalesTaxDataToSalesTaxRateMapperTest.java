@@ -1,61 +1,44 @@
 package com.complyt.domain.sales_tax.mappers;
 
-import com.complyt.domain.sales_tax.SalesTaxData;
-import com.complyt.domain.sales_tax.SalesTaxRate;
-import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
-import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
+import testUtils.unit_test.UnitTestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SalesTaxDataToSalesTaxRateMapperTest {
 
-    private TaxInfoItem taxInfoItem;
-    private SalesTaxData salesTaxData;
+    private ComplytSalesTaxRates complytSalesTaxRates;
 
     @BeforeEach
     void setup() {
-
-        taxInfoItem = TaxInfoItem.builder()
-                .cityDistrictRate("0")
-                .cityRate("0")
-                .taxRate("0")
-                .countyRate("0")
-                .countyDistrictRate("0")
-                .stateRate("0")
-                .build();
-
-        salesTaxData = FastTaxData.builder()
-                .matchLevel("street")
-                .taxInfoItems(Collections.singletonList(taxInfoItem))
-                .build();
+        complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
     }
 
     @Test
     void map_SalesTaxData_ReturnSalesTaxRate() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
 
         // When
-        SalesTaxRate actualSalesTaxRate = SalesTaxDataToSalesTaxRateMapper.INSTANCE.map(salesTaxData);
+        SalesTaxRates actualSalesTaxRates = ComplytSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(complytSalesTaxRates);
 
         // Then
-        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+        assertEquals(expectedSalesTaxRates, actualSalesTaxRates);
     }
 
     @Test
     void map_nullSalesTaxData_ReturnNull() {
         // Given
-        SalesTaxRate expectedSalesTaxRate = SalesTaxRate.zeroSalesTaxRate();
+        SalesTaxRates expectedSalesTaxRate = SalesTaxRates.zeroSalesTaxRate();
 
         // When
-        SalesTaxRate actualSalesTaxRate = SalesTaxDataToSalesTaxRateMapper.INSTANCE.map(null);
+        SalesTaxRates actualSalesTaxRates = ComplytSalesTaxRatesToSalesTaxRatesMapper.INSTANCE.map(null);
 
         // Then
-        assertNull(actualSalesTaxRate);
+        assertNull(actualSalesTaxRates);
     }
 }

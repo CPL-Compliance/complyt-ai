@@ -33,7 +33,7 @@ public class ExemptionRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
                             .and("customerId").is(transaction.getCustomerId())
-                            .and("state.abbreviation").is(transaction.getShippingAddress().getState()));
+                            .and("state.abbreviation").is(transaction.getShippingAddress().state()));
 
                     return ContextLogger.observeCtx("Searching for exemption by query: " + query, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));

@@ -2,7 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 
 public interface Taxable {
@@ -14,13 +14,13 @@ public interface Taxable {
 
     JurisdictionalSalesTaxRules getJurisdictionalSalesTaxRules();
 
-    Taxable withSalesTaxRate(SalesTaxRate salesTaxRate);
+    Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
     float getTotalPrice();
 
     boolean isManualSalesTax();
 
-    SalesTaxRate getSalesTaxRate();
+    SalesTaxRates getSalesTaxRates();
 
     float getManualSalesTaxRate();
 
@@ -33,7 +33,7 @@ public interface Taxable {
             return getManualSalesTaxAmount();
         }
 
-        return getTotalPrice() * getSalesTaxRate().getTaxRate();
+        return getTotalPrice() * getSalesTaxRates().taxRate();
     }
 
     Taxable withTangibleCategory(TangibleCategory intangible);

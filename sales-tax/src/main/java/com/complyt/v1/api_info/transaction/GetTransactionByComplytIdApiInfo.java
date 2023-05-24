@@ -97,7 +97,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                             "calculationValue": 0,
                             "cities": null
                         },
-                        "salesTaxRate": {
+                        "salesTaxRates": {
                             "cityDistrictRate": 0,
                             "cityRate": 0,
                             "countyDistrictRate": 0,
@@ -153,7 +153,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                 },
                 "salesTax": {
                     "amount": 0,
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,
@@ -189,7 +189,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                         "calculationValue": 0,
                         "cities": null
                     },
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,

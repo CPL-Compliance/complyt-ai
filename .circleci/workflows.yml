@@ -125,7 +125,7 @@ jobs:
           aws-region: AWS_DEFAULT_REGION
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
-          cluster-name: 'Complyt'
+          cluster-name: 'production'
           container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'

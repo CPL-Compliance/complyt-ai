@@ -31,7 +31,7 @@ public class SalesTaxWebClientWrapperConfig {
                 fastTaxWebClientWrapperProperties.getKey());
     }
 
-    @Profile("zipTax")
+    @Profile({"zipTax"})
     @Bean("salesTaxWebClientWrapper")
     public ZipTaxWebClientWrapper zipTaxWebClientWrapper(WebClient webClient) {
         return new ZipTaxWebClientWrapper(webClient,

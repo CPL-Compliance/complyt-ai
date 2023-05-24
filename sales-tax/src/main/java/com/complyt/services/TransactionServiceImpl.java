@@ -101,7 +101,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Deprecated
     @Override
-    public Mono<Transaction> findById(String id) {
+    public Mono<Transaction> findById(@NonNull String id) {
         return transactionRepository.findById(id);
     }
 

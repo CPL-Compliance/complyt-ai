@@ -73,7 +73,7 @@ public class CustomerMapperTest {
         Customer actualCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomerDto);
 
         // Then
-        assertEquals(null, actualCustomer);
+        assertNull(actualCustomer);
     }
 
     @Test
@@ -85,6 +85,6 @@ public class CustomerMapperTest {
         CustomerDto actualCustomerDto = CustomerMapper.INSTANCE.customerToCustomerDto(givenCustomer);
 
         // Then
-        assertEquals(givenCustomer, actualCustomerDto);
+        assertNull(actualCustomerDto);
     }
 }

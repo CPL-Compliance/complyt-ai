@@ -45,8 +45,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Autowired
     private WebTestClient webTestClient;
 
-    private StateDto existingState = new StateDto("AZ", "04", "Arizona");
-    private StateDto newState = new StateDto("AL", "01", "Alabama");
+    private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
+    private final StateDto newState = new StateDto("AL", "01", "Alabama");
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

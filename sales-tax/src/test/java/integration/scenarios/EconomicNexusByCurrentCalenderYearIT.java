@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -47,8 +45,6 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
      * Items: Only Tangible
      */
 
-    @MockBean
-    private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
     @MockBean
     private TenantResolver tenantResolver;
     @Autowired
@@ -68,9 +64,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxNewYork()));
     }
-
 
     @Order(1)
     @Test
@@ -126,7 +120,6 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                         ITUtilities.stubItemDto().withQuantity(5).withUnitPrice(900).withTotalPrice(4500).withTaxCode("C2S1"))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
-
 
         // Then
         webTestClient
@@ -265,7 +258,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 887.5));
+                .value(receivedTransaction -> assertEquals(775, receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

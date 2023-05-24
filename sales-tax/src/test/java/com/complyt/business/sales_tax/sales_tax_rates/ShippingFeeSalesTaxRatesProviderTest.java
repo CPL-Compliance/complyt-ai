@@ -2,7 +2,7 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class ShippingFeeSalesTaxRatesProviderTest {
     SalesTaxRatesProvider salesTaxRatesCalculator;
 
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    SalesTaxRate salesTaxRate;
+    SalesTaxRates salesTaxRates;
     ShippingFee shippingFee;
 
     UnitTestUtilities testUtilities;
@@ -39,7 +39,7 @@ public class ShippingFeeSalesTaxRatesProviderTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules().withSpecialTreatment(true);
-        salesTaxRate = testUtilities.createSalesTaxRates();
+        salesTaxRates = testUtilities.createSalesTaxRates();
         shippingFee = testUtilities.createShippingFee(false, false);
         address = testUtilities.createAddress();
     }
@@ -47,11 +47,11 @@ public class ShippingFeeSalesTaxRatesProviderTest {
     @Test
     void setSalesTaxRates_SetsRatesToShippingFee_ReturnsModifiedShippingFee() {
         // Given
-        ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRate(salesTaxRate);
+        ShippingFee shippingFeeWithRates = shippingFee.withSalesTaxRates(salesTaxRates);
 
         // When
-        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate, address)).thenReturn(salesTaxRate);
-        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRate, address);
+        when(salesTaxRatesCalculator.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRates, address)).thenReturn(salesTaxRates);
+        ShippingFee actualShippingFee = shippingFeeSalesTaxRatesProvider.setSalesTaxRates(shippingFee, salesTaxRates, address);
 
         // Then
         assertEquals(shippingFeeWithRates, actualShippingFee);

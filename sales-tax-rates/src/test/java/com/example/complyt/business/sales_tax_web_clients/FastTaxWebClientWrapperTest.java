@@ -8,7 +8,6 @@ import com.complyt.domain.fast_tax.FastTaxData;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -16,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -29,9 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FastTaxWebClientWrapperTest {
     @InjectMocks
     FastTaxWebClientWrapper fastTaxWebClientWrapper;

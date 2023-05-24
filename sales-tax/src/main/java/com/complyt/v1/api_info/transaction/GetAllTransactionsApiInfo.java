@@ -83,7 +83,7 @@ public @interface GetAllTransactionsApiInfo {
                                         "calculationValue": 0,
                                         "cities": null
                                     },
-                                    "salesTaxRate": {
+                                    "salesTaxRates": {
                                         "cityDistrictRate": 0,
                                         "cityRate": 0,
                                         "countyDistrictRate": 0,
@@ -139,7 +139,7 @@ public @interface GetAllTransactionsApiInfo {
                             },
                             "salesTax": {
                                 "amount": 0,
-                                "salesTaxRate": {
+                                "salesTaxRates": {
                                     "cityDistrictRate": 0,
                                     "cityRate": 0,
                                     "countyDistrictRate": 0,
@@ -175,7 +175,7 @@ public @interface GetAllTransactionsApiInfo {
                                     "calculationValue": 0,
                                     "cities": null
                                 },
-                                "salesTaxRate": {
+                                "salesTaxRates": {
                                     "cityDistrictRate": 0,
                                     "cityRate": 0,
                                     "countyDistrictRate": 0,

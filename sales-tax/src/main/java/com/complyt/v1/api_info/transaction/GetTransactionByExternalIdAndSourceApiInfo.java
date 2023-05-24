@@ -101,7 +101,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                             "calculationValue": 0,
                             "cities": null
                         },
-                        "salesTaxRate": {
+                        "salesTaxRates": {
                             "cityDistrictRate": 0,
                             "cityRate": 0,
                             "countyDistrictRate": 0,
@@ -157,7 +157,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                 },
                 "salesTax": {
                     "amount": 0,
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,
@@ -192,7 +192,7 @@ public @interface GetTransactionByExternalIdAndSourceApiInfo {
                         "description": "string",
                         "calculationValue": 0
                     },
-                    "salesTaxRate": {
+                    "salesTaxRates": {
                         "cityDistrictRate": 0,
                         "cityRate": 0,
                         "countyDistrictRate": 0,

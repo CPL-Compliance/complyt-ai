@@ -2,7 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +17,11 @@ class ItemTest {
 
     @BeforeEach
     void setUp() {
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", 0.07f, null);
-        item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+        item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRates, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
     }
 
     @Test
@@ -40,14 +40,14 @@ class ItemTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRate().getTaxRate();
-        SalesTaxRate salesTaxRate = item.getSalesTaxRate().withTaxRate(rateAfterPercentageCut);
+        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRates().taxRate();
+        SalesTaxRates salesTaxRates = item.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
 
         Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
-                .withSalesTaxRate(salesTaxRate);
+                .withSalesTaxRates(salesTaxRates);
 
         float expectedAmount = itemWithRuleByPercentage.getTotalPrice()
-                * itemWithRuleByPercentage.getSalesTaxRate().getTaxRate();
+                * itemWithRuleByPercentage.getSalesTaxRates().taxRate();
 
         // When + Then
         float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
@@ -57,11 +57,11 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-        SalesTaxRate salesTaxRate = new SalesTaxRate(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
         JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", 0.07f, null);
-        Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRate, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
+        Item givenItem = item = new Item(2000, 4, 8000, "description", "name", "taxCode", rule, salesTaxRates, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE);
 
         // When
         boolean isEquals = item.equals(givenItem);
@@ -80,7 +80,7 @@ class ItemTest {
                 ", name=" + item.getName() +
                 ", taxCode=" + item.getTaxCode() +
                 ", jurisdictionalSalesTaxRules=" + item.getJurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + item.getSalesTaxRate() +
+                ", salesTaxRates=" + item.getSalesTaxRates() +
                 ", manualSalesTax=" + item.isManualSalesTax() +
                 ", manualSalesTaxRate=" + item.getManualSalesTaxRate() +
                 ", tangibleCategory=" + item.getTangibleCategory() +

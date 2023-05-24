@@ -1,7 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.Address;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ class SalesTaxRatesProviderTest {
 
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
 
-    private SalesTaxRate salesTaxRate;
+    private SalesTaxRates salesTaxRates;
 
     UnitTestUtilities testUtilities;
     Address address;
@@ -43,7 +43,7 @@ class SalesTaxRatesProviderTest {
     void setup() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
-        salesTaxRate = testUtilities.createSalesTaxRates();
+        salesTaxRates = testUtilities.createSalesTaxRates();
         salesTaxRatesProvider = new SalesTaxRatesProvider(stateLevelSalesTaxRatesCalculator, cityLevelSalesTaxRatesCalculator);
         address = testUtilities.createAddress();
     }
@@ -53,11 +53,11 @@ class SalesTaxRatesProviderTest {
         // Given
 
         // When
-        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate);
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRate, address);
+        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRules, salesTaxRates)).thenReturn(salesTaxRates);
+        SalesTaxRates actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRates, address);
 
         // Then
-        assertEquals(actualSalesTaxRate, salesTaxRate);
+        assertEquals(actualSalesTaxRate, salesTaxRates);
     }
 
     @Test
@@ -66,14 +66,14 @@ class SalesTaxRatesProviderTest {
         CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
-                    put(address.getCity() + "UNEQUAL_SUFFIX", citySalesTaxRules);
+                    put(address.city() + "UNEQUAL_SUFFIX", citySalesTaxRules);
                 }}
         );
-        SalesTaxRate expectedSalesTaxRates = salesTaxRate.withStateRate(0.5f);
+        SalesTaxRates expectedSalesTaxRates = salesTaxRates.withStateRate(0.5f);
 
         // When
-        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRate)).thenReturn(expectedSalesTaxRates);
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRate, address);
+        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRates)).thenReturn(expectedSalesTaxRates);
+        SalesTaxRates actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRates, address);
 
         // Then
         assertEquals(actualSalesTaxRate, expectedSalesTaxRates);
@@ -85,16 +85,16 @@ class SalesTaxRatesProviderTest {
         CitySalesTaxRules citySalesTaxRules = testUtilities.createCitySalesTaxRules().withTaxable(false);
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithCity = jurisdictionalSalesTaxRules.withCities(
                 new HashMap<>() {{
-                    put(address.getCity(), citySalesTaxRules);
+                    put(address.city(), citySalesTaxRules);
                 }}
         );
-        SalesTaxRate expectedSalesTaxRate = salesTaxRate.withCityRate(0);
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0);
 
         // When
-        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRate)).thenReturn(salesTaxRate);
-        when(cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, salesTaxRate)).thenReturn(salesTaxRate.withCityRate(0));
+        when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRates)).thenReturn(salesTaxRates);
+        when(cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, salesTaxRates)).thenReturn(salesTaxRates.withCityRate(0));
 
-        SalesTaxRate actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRate, address);
+        SalesTaxRates actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRates, address);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
@@ -106,7 +106,7 @@ class SalesTaxRatesProviderTest {
         JurisdictionalSalesTaxRules nullJurisdictionalSalesTaxRules = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(nullJurisdictionalSalesTaxRules, salesTaxRate, address));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(nullJurisdictionalSalesTaxRules, salesTaxRates, address));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
@@ -115,7 +115,7 @@ class SalesTaxRatesProviderTest {
     @Test
     void provide_NullSalesTaxRatePassed_ThrowsException() {
         // Given
-        SalesTaxRate nullSalesTaxRate = null;
+        SalesTaxRates nullSalesTaxRate = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, nullSalesTaxRate, address));
@@ -130,7 +130,7 @@ class SalesTaxRatesProviderTest {
         Address nullAddress = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRate, nullAddress));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxRatesProvider.provide(jurisdictionalSalesTaxRules, salesTaxRates, nullAddress));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "address is marked non-null but is null");

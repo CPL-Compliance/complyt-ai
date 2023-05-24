@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -47,7 +46,6 @@ public class SalesTaxTrackingRepositoryTest {
     @BeforeEach
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
-        MockitoAnnotations.openMocks(this);
         salesTaxTracking = testUtilities.createSalesTaxTracking(UUID.randomUUID().toString());
     }
 

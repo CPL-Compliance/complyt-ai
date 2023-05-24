@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.timestamps.TimestampsDto;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -47,16 +45,14 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
      */
 
     @MockBean
-    private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
-    @MockBean
     private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
 
-    private LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "04107");
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private String source = "1";
+    private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Cape Elizabeth", "US", null, "ME", "12 Captain Strout Cir", "04107");
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+    private final String source = "1";
 
 
     @DynamicPropertySource
@@ -67,7 +63,6 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxMaine()));
     }
 
     @Order(1)
@@ -244,7 +239,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(4400, receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(6200, receivedTransaction.salesTax().amount()));
     }
 
     @Order(7)
@@ -285,6 +280,6 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                 .exchange()
                                 .expectStatus().isCreated()
                                 .expectBody(TransactionDto.class)
-                                .value(receivedTransaction -> assertEquals(2200, receivedTransaction.salesTax().amount())));
+                                .value(receivedTransaction -> assertEquals(3100, receivedTransaction.salesTax().amount())));
     }
 }

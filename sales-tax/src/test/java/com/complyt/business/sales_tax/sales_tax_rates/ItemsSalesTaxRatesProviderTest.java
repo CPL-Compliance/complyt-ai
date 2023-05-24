@@ -4,7 +4,7 @@ import com.complyt.domain.Address;
 import com.complyt.domain.Item;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class ItemsSalesTaxRatesProviderTest {
     @Mock
     SalesTaxRatesProvider salesTaxRateCalculator;
     JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    SalesTaxRate salesTaxRate;
+    SalesTaxRates salesTaxRates;
 
     UnitTestUtilities testUtilities;
     Address address;
@@ -42,7 +42,7 @@ public class ItemsSalesTaxRatesProviderTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         jurisdictionalSalesTaxRules = testUtilities.createJurisdictionalSalesTaxRules();
-        salesTaxRate = testUtilities.createSalesTaxRates();
+        salesTaxRates = testUtilities.createSalesTaxRates();
         address = testUtilities.createAddress();
     }
 
@@ -54,7 +54,7 @@ public class ItemsSalesTaxRatesProviderTest {
     }
 
     private List<Item> setRatesToItems(List<Item> items) {
-        return items.stream().map(item -> item.withSalesTaxRate(salesTaxRate)).collect(Collectors.toList());
+        return items.stream().map(item -> item.withSalesTaxRates(salesTaxRates)).collect(Collectors.toList());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class ItemsSalesTaxRatesProviderTest {
         List<Item> itemsWithRates = setRatesToItems(items);
 
         // When
-        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRate, address)).thenReturn(salesTaxRate);
-        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(items, salesTaxRate, address);
+        when(salesTaxRateCalculator.provide(jurisdictionalSalesTaxRules, salesTaxRates, address)).thenReturn(salesTaxRates);
+        List<Item> actualItems = itemsSalesTaxRatesProvider.setSalesTaxRates(items, salesTaxRates, address);
 
         // Then
         assertEquals(itemsWithRates, actualItems);

@@ -44,7 +44,7 @@ class ShippingFeeDtoTest {
                 + ", manualSalesTaxRate=" + shippingFeeDto.manualSalesTaxRate() +
                 ", totalPrice=" + shippingFeeDto.totalPrice() +
                 ", jurisdictionalSalesTaxRules=" + shippingFeeDto.jurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + shippingFeeDto.salesTaxRate() +
+                ", salesTaxRates=" + shippingFeeDto.salesTaxRates() +
                 ", taxCode=" + shippingFeeDto.taxCode() +
                 ", taxableCategory=" + shippingFeeDto.taxableCategory() +
                 ", tangibleCategory=" + shippingFeeDto.tangibleCategory() + "]";

@@ -9,7 +9,8 @@ import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.nexus.enums.TimeFrame;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -158,12 +159,12 @@ public class UnitTestUtilities {
         }};
     }
 
-    public SalesTaxRate createSalesTaxRates() {
-        return new SalesTaxRate(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+    public SalesTaxRates createSalesTaxRates() {
+        return new SalesTaxRates(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
     }
 
-    public SalesTaxRateDto createSalesTaxRatesDto() {
-        return new SalesTaxRateDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+    public SalesTaxRatesDto createSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
     }
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -294,6 +295,34 @@ public class UnitTestUtilities {
 
     public ValidationDatesDto createValidationDatesDto() {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
+    public static Address createAddressInCalifornia() {
+        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+    public static MandatoryAddressDto createAddressDtoInCalifornia() {
+        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+    public static SalesTaxRates createCaliforniaSalesTaxRates() {
+        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
+    }
+
+    public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
+    }
+
+    public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+        Address address = createAddressInCalifornia();
+        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
+        return new ComplytSalesTaxRates(address, salesTaxRates);
+    }
+
+    public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
+        MandatoryAddressDto address = createAddressDtoInCalifornia();
+        SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
+        return new ComplytSalesTaxRatesDto(address, salesTaxRates);
     }
 
 }
