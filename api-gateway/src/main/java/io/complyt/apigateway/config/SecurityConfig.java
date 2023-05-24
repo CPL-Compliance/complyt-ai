@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import reactor.core.publisher.Mono;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -27,9 +28,9 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Profile({"development", "demo", "test", "default", "production"})
+    @Profile({"development", "demo", "test", "default", "production", "integration-test"})
     @Bean
-    JwtDecoder jwtDecoder() {
+    JwtDecoder productionJwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
@@ -96,7 +97,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
 
-        //http.csrf().disable();
+        http.csrf().disable();
         // Authentication and Authorization
         http.authorizeExchange()
                 .anyExchange().permitAll();
@@ -106,6 +107,53 @@ public class SecurityConfig {
         http.httpBasic().disable()
                 .formLogin().disable();
 
+        //http.oauth2ResourceServer().jwt();
         return http.build();
     }
+
+//    @Bean
+//    @Profile({"integration-test"})
+//    ReactiveJwtDecoder integrationTestJwtDecoder() {
+//        /*
+//        By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
+//        indeed intended for our app. Adding our own validator is easy to do:
+//        */
+//        return new ReactiveJwtDecoder() {
+//            @Override
+//            public Mono<Jwt> decode(String token) throws JwtException {
+//                return Mono.just(Jwt.withTokenValue("token")
+//                        .header("typ", "JWT")
+//                        .issuer("https://localhost")
+//                        .claim("tenant_id", "it_tenant")
+//                        .claim("scope", "create:customer delete:customer read:customer " +
+//                                "update:customer create:transaction read:transaction " +
+//                                "update:transaction delete:transaction read:state " +
+//                                "create:exemption update:exemption delete:exemption " +
+//                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link").build());
+//            }
+//        };
+//    }
+
+//    @Bean
+//    @Profile({"integration-test"})
+//    JwtDecoder integrationTestJwtDecoder2() {
+//        /*
+//        By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
+//        indeed intended for our app. Adding our own validator is easy to do:
+//        */
+//        return new JwtDecoder() {
+//            @Override
+//            public Jwt decode(String token) throws JwtException {
+//                return Jwt.withTokenValue("token")
+//                        .header("typ", "JWT")
+//                        .issuer("https://localhost")
+//                        .claim("tenant_id", "it_tenant")
+//                        .claim("scope", "create:customer delete:customer read:customer " +
+//                                "update:customer create:transaction read:transaction " +
+//                                "update:transaction delete:transaction read:state " +
+//                                "create:exemption update:exemption delete:exemption " +
+//                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link").build();
+//            }
+//        };
+//    }
 }

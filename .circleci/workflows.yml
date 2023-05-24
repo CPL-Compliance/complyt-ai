@@ -129,15 +129,16 @@ jobs:
           container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'
+  image-for-integration-test:
+    steps:
+      - run:
+          command: docker buildx create --use
 
 workflows:
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
       - verify:
-          requires:
-            - verify-api-gateway
-            - verify-discovery-service
           filters:
             branches:
               only:
@@ -166,9 +167,6 @@ workflows:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
       - verify:
-          requires:
-            - verify-api-gateway
-            - verify-discovery-service
           filters:
             branches:
               only:
@@ -197,7 +195,6 @@ workflows:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
       - verify:
-          name: verify-api-gateway
           filters:
             branches:
               only:
@@ -213,7 +210,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify-api-gateway
+            - verify
             - deploy
           service_directory: "api-gateway"
 
@@ -226,7 +223,6 @@ workflows:
     when: << pipeline.parameters.run-discovery-service-workflow >>
     jobs:
       - verify:
-          name: verify-discovery-service
           filters:
             branches:
               only:
@@ -242,7 +238,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify-discovery-service
+            - verify
             - deploy
           service_directory: "discovery-service"
 
@@ -255,9 +251,6 @@ workflows:
     when: << pipeline.parameters.run-sales-tax-rates-workflow >>
     jobs:
       - verify:
-          requires:
-            - verify-api-gateway
-            - verify-discovery-service
           filters:
             branches:
               only:

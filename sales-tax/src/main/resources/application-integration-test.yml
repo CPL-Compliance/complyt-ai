@@ -1,0 +1,34 @@
+#auth0.audience: complyt-integration-test
+auth0.audience: null
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka/
+    should-unregister-on-shutdown: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 30
+    hostname: localhost
+    instance-id: localhost:${server.port}
+
+
+logging:
+  level:
+    root: info
+
+spring:
+  cloud:
+    vault:
+      enabled: false
+  security:
+    oauth2.resourceserver.jwt.issuer-uri: https://integration-test-complyt.us.auth0.com/
+    #oauth2.resourceserver.jwt.issuer-uri: https://dumb
+  data:
+    mongodb:
+      uri: mongodb://mongodb:27017
+      database: sales_tax
+management:
+  server:
+    port: ${PORT:9898}

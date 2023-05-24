@@ -1,13 +1,240 @@
+server.port: ${PORT:8765}
+
+auth0.audience: null
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${INTEGRATION-DISCOVERY-URI}
+      defaultZone: http://discovery:8761/eureka/
     should-unregister-on-shutdown: true
+    register-with-eureka: true
+    enabled: true
   instance:
-    prefer-ip-address: true
     lease-renewal-interval-in-seconds: 30
+    prefer-ip-address: true
 
 
 logging:
   level:
     root: info
+
+spring:
+  security.oauth2.resourceserver.jwt.issuer-uri: null
+#  autoconfigure.exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  application:
+    name: api-gateway
+  cloud:
+    vault:
+      enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      metrics.enabled: true
+      routes:
+        # ==== Open API ====
+        - id: files-service
+          uri: lb://files-service
+          predicates:
+            - Path=/files/**
+          filters:
+            - RewritePath=/files/(?<path>.*), /$\{path}
+        - id: sales-tax-service
+          uri: lb://sales-tax-service
+          predicates:
+            - Path=/sales-tax/**
+          filters:
+            - RewritePath=/sales-tax/(?<path>.*), /$\{path}
+        - id: sales-tax-rates-service
+          uri: lb://sales-tax-rates-service
+          predicates:
+            - Path=/sales-tax-rates/**
+          filters:
+            - RewritePath=/sales-tax-rates/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+        # ==== Open API ====
+        # ==== Sales Tax Service ====
+        # ---- Transaction ----
+        - id: sales-tax-get-transactions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions
+          filters:
+            - SetPath=/v1/transactions
+        - id: sales-tax-get-transactions-by-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/source/{source}
+          filters:
+            - SetPath=/v1/transactions/source/{source}
+        - id: sales-tax-get-transaction-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+        - id: sales-tax-get-transaction-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/transactions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/transactions/complytId/{complyt_id}
+        - id: sales-tax-put-transaction-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+        - id: sales-tax-delete-transaction-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/transactions/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/transactions/source/{source}/externalId/{external_id}
+        # ---- Transaction ----
+        # ---- Customer ----
+        - id: sales-tax-get-customers
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers
+          filters:
+            - SetPath=/v1/customers
+        - id: sales-tax-get-customers-by-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/source/{source}
+          filters:
+            - SetPath=/v1/customers/source/{source}
+        - id: sales-tax-get-customer-by-name
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/name/{name}
+          filters:
+            - SetPath=/v1/customers/name/{name}
+        - id: sales-tax-get-customer-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/customers/source/{source}/externalId/{external_id}
+        - id: sales-tax-get-customer-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/customers/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/customers/complytId/{complyt_id}
+        - id: sales-tax-put-customer-by-external-id-and-source
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/customers/source/{source}/externalId/{external_id}
+          filters:
+            - SetPath=/v1/customers/source/{source}/externalId/{external_id}
+        # ---- Customer ----
+        # ---- Exemption ----
+        - id: sales-tax-get-exemptions
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-get-exemption-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/exemptions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
+        - id: sales-tax-post-exemption
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/exemptions
+          filters:
+            - SetPath=/v1/exemptions
+        - id: sales-tax-put-exemption-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/exemptions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
+        - id: sales-tax-delete-exemption-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=DELETE
+            - Path=/v1/exemptions/complytId/{complyt_id}
+          filters:
+            - SetPath=/v1/exemptions/complytId/{complyt_id}
+        # ---- Exemption ----
+        # ---- Nexus ----
+        - id: sales-tax-get-nexuses
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/nexus
+          filters:
+            - SetPath=/v1/nexus
+        - id: sales-tax-get-nexus-by-state
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/nexus/state/{state}
+          filters:
+            - SetPath=/v1/nexus/state/{state}
+        - id: sales-tax-get-nexus-by-complyt-id
+          uri: lb://sales-tax
+          predicates:
+            - Method=GET
+            - Path=/v1/nexus/complytId/{complytId}
+          filters:
+            - SetPath=/v1/nexus/complytId/{complytId}
+        - id: sales-tax-put-nexus
+          uri: lb://sales-tax
+          predicates:
+            - Method=PUT
+            - Path=/v1/nexus/state/{state}
+          filters:
+            - SetPath=/v1/nexus/state/{state}
+        # ---- Nexus ----
+        # ==== Sales Tax Service ====
+        # ==== Files Service ====
+        # ---- Files ----
+        - id: files-get-link
+          uri: lb://files
+          predicates:
+            - Method=GET
+            - Path=/v1/files
+          filters:
+            - SetPath=/v1/files
+        # ---- Files ----
+        # ==== Files Service ====
+        # ==== Sales Tax Rates Service ====
+        # ---- SalesTaxRates ----
+        - id: sales-tax-rates-get-sales-tax-rates
+          uri: lb://sales-tax-rates
+          predicates:
+            - Method=GET
+            - Path=/v1/sales_tax_rates
+          filters:
+            - SetPath=/v1/sales_tax_rates
+        # ---- SalesTaxRates ----
+        # ==== Sales Tax Rates Service ====
