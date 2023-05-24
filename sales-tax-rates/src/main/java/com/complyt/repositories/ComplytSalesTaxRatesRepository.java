@@ -27,12 +27,12 @@ public class ComplytSalesTaxRatesRepository {
                 .and("address.zip").is(address.zip())
         );
 
-        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::debug)
+        return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::info)
                 .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));
     }
 
     public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection) {
-        return ContextLogger.observeCtx("Saving ComplytSalesTaxRates: " + complytSalesTaxRates, log::debug)
+        return ContextLogger.observeCtx("Saving ComplytSalesTaxRates: " + complytSalesTaxRates, log::info)
                 .then(reactiveMongoTemplate.save(complytSalesTaxRates, collection));
     }
 
