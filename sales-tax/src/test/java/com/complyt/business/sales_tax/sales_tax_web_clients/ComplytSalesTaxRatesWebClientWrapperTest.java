@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.models.ComplytSalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,19 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
 
         // Then
         StepVerifier.create(complytSalesTaxRatesMono).expectNext(complytSalesTaxRates).verifyComplete();
+    }
+
+    @Test
+    void findByAddress_Returns500InternalError_ThrowsAnError() {
+        // Given
+        Address address = UnitTestUtilities.createAddressInCalifornia();
+
+        // When
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip())).thenReturn(Mono.error(new ObjectNotFoundApiException()));
+        Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
+
+        // Then
+        StepVerifier.create(complytSalesTaxRatesMono).expectError(ObjectNotFoundApiException.class).verify();
     }
 
 }
