@@ -105,5 +105,7 @@ public interface StatesMap {
         put("West Virginia", CollectionsNames.WEST_VIRGINIA);
         put("WI", CollectionsNames.WISCONSIN);
         put("Wisconsin", CollectionsNames.WISCONSIN);
+        put("WY", CollectionsNames.WYOMING);
+        put("Wyoming", CollectionsNames.WYOMING);
     }};
 }
