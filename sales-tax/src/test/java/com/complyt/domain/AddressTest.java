@@ -17,8 +17,8 @@ class AddressTest {
 
     @BeforeEach
     void setUp() {
-        address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP");
+        address = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
+        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
     }
 
     @Test

@@ -1,6 +1,8 @@
 package com.complyt.business.data_fetcher;
 
+import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
+import com.complyt.domain.mappers.address.ZipTaxDataToAddressMapper;
 import com.complyt.domain.zip_tax.ZipTaxData;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -11,12 +13,13 @@ import reactor.core.publisher.Mono;
 @EqualsAndHashCode
 @AllArgsConstructor
 @Component
-public class ZipTaxCountyFetcher implements CountyFetcher {
+public class ZipTaxAddressFetcher implements AddressFetcher {
 
     @Override
-    public Mono<String> fetch(@NonNull SalesTaxData salesTaxData) {
+    public Mono<Address> fetch(@NonNull SalesTaxData salesTaxData) {
         ZipTaxData zipTaxData = (ZipTaxData) salesTaxData;
-        String countyFromZipTax = zipTaxData.getResults().get(0).geoCounty();
-        return Mono.just(countyFromZipTax);
+        Address address = ZipTaxDataToAddressMapper.INSTANCE.map(zipTaxData);
+
+        return Mono.just(address);
     }
 }

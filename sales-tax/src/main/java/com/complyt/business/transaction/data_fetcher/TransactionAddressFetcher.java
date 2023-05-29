@@ -1,0 +1,33 @@
+package com.complyt.business.transaction.data_fetcher;
+
+import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
+import com.complyt.domain.Address;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+@EqualsAndHashCode
+@AllArgsConstructor
+@Component
+public class TransactionAddressFetcher implements AddressFetcher {
+
+    @NonNull
+    private SalesTaxWebClientWrapper<ComplytSalesTaxRates> salesTaxWebClientWrapper;
+
+    @Override
+    public Mono<Address> fetch(Address address) {
+        return salesTaxWebClientWrapper.findByAddress(address)
+                .map(complytSalesTaxRates -> new Address(
+                        complytSalesTaxRates.address().city(),
+                        complytSalesTaxRates.address().country(),
+                        complytSalesTaxRates.address().county(),
+                        complytSalesTaxRates.address().state(),
+                        complytSalesTaxRates.address().street(),
+                        complytSalesTaxRates.address().zip(),
+                        complytSalesTaxRates.address().isPartial())
+                );
+    }
+}

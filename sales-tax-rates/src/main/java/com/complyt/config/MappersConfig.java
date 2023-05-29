@@ -1,7 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
-import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.ZipTaxDataToSalesTaxRateMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

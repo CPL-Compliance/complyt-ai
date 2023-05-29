@@ -1,4 +1,4 @@
-package com.complyt.domain.mappers;
+package com.complyt.domain.mappers.sales_tax;
 
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;

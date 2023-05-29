@@ -76,7 +76,7 @@ public class UnitTestUtilities {
                 id,
                 source,
                 "name",
-                new Address("City", "Country", "County", "CA", "Street", "Zip"),
+                new Address("City", "Country", "County", "CA", "Street", "Zip", false),
                 tenantId,
                 CustomerType.RETAIL,
                 internalTimeStamps,
@@ -93,7 +93,7 @@ public class UnitTestUtilities {
                 id,
                 source,
                 "name",
-                new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip"),
+                new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false),
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
                 externalTimestamps
@@ -102,8 +102,8 @@ public class UnitTestUtilities {
 
 
     public Transaction createTransaction(String id) {
-        Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
@@ -111,13 +111,13 @@ public class UnitTestUtilities {
     }
 
     public TransactionDto createTransactionDto(String id) {
-        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip");
-        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip");
+        OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
+        MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
 
-        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0, false);
+        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -278,7 +278,7 @@ public class UnitTestUtilities {
     }
 
     public Address createAddress() {
-        return new Address("City", "Country", "County", "CA", "Street", "Zip");
+        return new Address("City", "Country", "County", "CA", "Street", "Zip", false);
     }
 
     public Timestamps createTimestamps() {
@@ -298,11 +298,11 @@ public class UnitTestUtilities {
     }
 
     public static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
+        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     public static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508");
+        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     public static SalesTaxRates createCaliforniaSalesTaxRates() {

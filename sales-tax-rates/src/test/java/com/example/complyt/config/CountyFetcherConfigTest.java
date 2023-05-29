@@ -1,7 +1,7 @@
 package com.example.complyt.config;
 
-import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
-import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
+import com.complyt.business.data_fetcher.FastTaxAddressFetcher;
+import com.complyt.business.data_fetcher.ZipTaxAddressFetcher;
 import com.complyt.config.CountyFetcherConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +20,10 @@ public class CountyFetcherConfigTest {
     @Test
     void transactionFastTaxCountyFetcher_SalesTaxWebClientWrapper_ReturnedTransactionFastTaxCountyFetcher() {
         // Given
-        FastTaxCountyFetcher expectedFastTaxCountyFetcher = new FastTaxCountyFetcher();
+        FastTaxAddressFetcher expectedFastTaxCountyFetcher = new FastTaxAddressFetcher();
 
         // When
-        FastTaxCountyFetcher actualFastTaxCountyFetcher = countyFetcherConfig.FastTaxCountyFetcher();
+        FastTaxAddressFetcher actualFastTaxCountyFetcher = countyFetcherConfig.FastTaxCountyFetcher();
 
         // Then
         assertEquals(expectedFastTaxCountyFetcher, actualFastTaxCountyFetcher);
@@ -32,10 +32,10 @@ public class CountyFetcherConfigTest {
     @Test
     void transactionZipTaxCountyFetcher_SalesTaxWebClientWrapper_ReturnedTransactionZipTaxCountyFetcher() {
         // Given
-        ZipTaxCountyFetcher expectedZipTaxCountyFetcher = new ZipTaxCountyFetcher();
+        ZipTaxAddressFetcher expectedZipTaxCountyFetcher = new ZipTaxAddressFetcher();
 
         // When
-        ZipTaxCountyFetcher actualZipTaxCountyFetcher = countyFetcherConfig.ZipTaxCountyFetcher();
+        ZipTaxAddressFetcher actualZipTaxCountyFetcher = countyFetcherConfig.ZipTaxCountyFetcher();
 
         // Then
         assertEquals(expectedZipTaxCountyFetcher, actualZipTaxCountyFetcher);

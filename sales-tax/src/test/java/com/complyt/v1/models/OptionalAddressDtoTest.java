@@ -17,7 +17,7 @@ class OptionalAddressDtoTest {
 
     @BeforeEach
     void setup() {
-        addressDto = new OptionalAddressDto(city, country, county, state, street, zip);
+        addressDto = new OptionalAddressDto(city, country, county, state, street, zip, false);
     }
 
     @Test
@@ -40,7 +40,7 @@ class OptionalAddressDtoTest {
     @Test
     void withCity_differentCity_ReturnAddressDto() {
         // given
-        OptionalAddressDto expectedAddressDto = new OptionalAddressDto("New York", country, county, state, street, zip);
+        OptionalAddressDto expectedAddressDto = new OptionalAddressDto("New York", country, county, state, street, zip, false);
 
         // When
         OptionalAddressDto actualAddressDto = addressDto.withCity("New York");

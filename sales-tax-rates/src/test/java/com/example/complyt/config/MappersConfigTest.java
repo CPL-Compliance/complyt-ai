@@ -1,8 +1,8 @@
 package com.example.complyt.config;
 
 import com.complyt.config.MappersConfig;
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
-import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.ZipTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

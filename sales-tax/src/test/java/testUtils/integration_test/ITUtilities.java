@@ -24,9 +24,9 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220"), customerId,
+                null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, 0, 0, 0, false);
+                TransactionTypeDto.INVOICE, null, null, 0, 0, 0);
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -134,11 +134,11 @@ public interface ITUtilities {
     }
 
     public static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {

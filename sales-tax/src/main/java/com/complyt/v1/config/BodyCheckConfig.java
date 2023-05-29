@@ -14,15 +14,10 @@ public interface BodyCheckConfig {
 
     static boolean checkShippingAddress(MandatoryAddressDto addressDto) {
         return addressDto.state() != null &&
-                validateLength(addressDto.state(), 1, 100) &&
                 addressDto.street() != null &&
-                validateLength(addressDto.street(), 1, 200) &&
                 addressDto.city() != null &&
-                validateLength(addressDto.city(), 1, 100) &&
                 addressDto.country() != null &&
-                validateLength(addressDto.country(), 1, 50) &&
-                addressDto.zip() != null &&
-                validateLength(addressDto.zip(), 1, 20);
+                addressDto.zip() != null ;
     }
 
     static boolean validateLength(String value, int min, int max) {

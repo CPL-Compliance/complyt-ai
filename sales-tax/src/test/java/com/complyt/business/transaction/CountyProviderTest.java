@@ -1,6 +1,6 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_fetcher.CountyFetcher;
+import com.complyt.business.transaction.data_fetcher.AddressFetcher;
 import com.complyt.domain.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class CountyProviderTest {
     CountyProvider countyProvider;
 
     @Mock
-    CountyFetcher countyFetcher;
+    AddressFetcher countyFetcher;
     UnitTestUtilities testUtilities;
 
     @BeforeEach

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 class TransactionCountyFetcherTest {
 
     @InjectMocks
-    private TransactionCountyFetcher transactionCountyFetcher;
+    private TransactionAddressFetcher transactionCountyFetcher;
     @Mock
     StubComplytSalesTaxRatesClientWrapper salesTaxWebClientWrapper;
     UnitTestUtilities testUtilities;
@@ -48,10 +48,10 @@ class TransactionCountyFetcherTest {
 
         // When
         when(salesTaxWebClientWrapper.findByAddress(transaction.getShippingAddress())).thenReturn(Mono.just(complytSalesTaxRates));
-        Mono<String> countyMono = transactionCountyFetcher.fetch(transaction.getShippingAddress());
+        Mono<Address> addressMono = transactionCountyFetcher.fetch(transaction.getShippingAddress());
 
         // Then
-        StepVerifier.create(countyMono).expectNext(transactionWithInjectedCounty.getShippingAddress().county()).verifyComplete();
+        StepVerifier.create(addressMono).expectNext(transactionWithInjectedCounty.getShippingAddress()).verifyComplete();
     }
 
 }

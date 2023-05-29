@@ -1955,7 +1955,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String lengthOf101City = testUtilities.stringWithLength(101);
         CustomerDto invalidCustomerDto = testUtilities.createCustomerDto(UUID.randomUUID().toString())
                 .withSource("")
-                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip"));
+                .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip", false));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         HashSet<String> expectedErrors = new HashSet<>(List.of(

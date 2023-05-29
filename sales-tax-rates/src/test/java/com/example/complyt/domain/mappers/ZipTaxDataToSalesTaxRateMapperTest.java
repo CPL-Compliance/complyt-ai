@@ -1,7 +1,7 @@
 package com.example.complyt.domain.mappers;
 
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.ZipTaxDataToSalesTaxRateMapper;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.domain.zip_tax.ZipTaxData;
 import org.junit.jupiter.api.BeforeEach;

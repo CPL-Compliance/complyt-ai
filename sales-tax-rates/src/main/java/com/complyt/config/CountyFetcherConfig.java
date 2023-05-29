@@ -1,7 +1,7 @@
 package com.complyt.config;
 
-import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
-import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
+import com.complyt.business.data_fetcher.FastTaxAddressFetcher;
+import com.complyt.business.data_fetcher.ZipTaxAddressFetcher;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +13,13 @@ public class CountyFetcherConfig {
 
     @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("countyFetcher")
-    public FastTaxCountyFetcher FastTaxCountyFetcher() {
-        return new FastTaxCountyFetcher();
+    public FastTaxAddressFetcher FastTaxCountyFetcher() {
+        return new FastTaxAddressFetcher();
     }
 
     @Profile({"zipTax"})
     @Bean("countyFetcher")
-    public ZipTaxCountyFetcher ZipTaxCountyFetcher() {
-        return new ZipTaxCountyFetcher();
+    public ZipTaxAddressFetcher ZipTaxCountyFetcher() {
+        return new ZipTaxAddressFetcher();
     }
 }

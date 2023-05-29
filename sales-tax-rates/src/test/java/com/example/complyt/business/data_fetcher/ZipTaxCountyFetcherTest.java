@@ -1,6 +1,6 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.ZipTaxCountyFetcher;
+import com.complyt.business.data_fetcher.ZipTaxAddressFetcher;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.zip_tax.Result;
@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class ZipTaxCountyFetcherTest {
 
-    private ZipTaxCountyFetcher zipTaxCountyFetcher;
+    private ZipTaxAddressFetcher zipTaxCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        zipTaxCountyFetcher = new ZipTaxCountyFetcher();
+        zipTaxCountyFetcher = new ZipTaxAddressFetcher();
     }
 
     @Test
@@ -41,7 +41,7 @@ class ZipTaxCountyFetcherTest {
         Address addressNoCounty = TestUtilities.createAddressInCalifornia();
         Address addressWithInjectedCounty = addressNoCounty.withCounty(zipTaxData.getResults().get(0).geoCounty());
 
-        Mono<String> countyMono = zipTaxCountyFetcher.fetch(zipTaxData);
+        Mono<Address> countyMono = zipTaxCountyFetcher.fetch(zipTaxData);
 
         // Then
         StepVerifier.create(countyMono).expectNext(addressWithInjectedCounty.county()).verifyComplete();
@@ -63,7 +63,7 @@ class ZipTaxCountyFetcherTest {
     @Test
     void equals_SameTransactionZipTaxCountyFetcher_ReturnsTrue() {
         // Given
-        ZipTaxCountyFetcher givenZipTaxCountyFetcher = new ZipTaxCountyFetcher();
+        ZipTaxAddressFetcher givenZipTaxCountyFetcher = new ZipTaxAddressFetcher();
 
         // When
         boolean isEquals = zipTaxCountyFetcher.equals(givenZipTaxCountyFetcher);

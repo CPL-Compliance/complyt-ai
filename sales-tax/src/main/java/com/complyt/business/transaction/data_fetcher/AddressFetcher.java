@@ -3,6 +3,6 @@ package com.complyt.business.transaction.data_fetcher;
 import com.complyt.domain.Address;
 import reactor.core.publisher.Mono;
 
-public interface CountyFetcher {
-    Mono<String> fetch(Address address);
+public interface AddressFetcher {
+    Mono<Address> fetch(Address address);
 }

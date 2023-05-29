@@ -4,7 +4,7 @@ import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
-import com.complyt.domain.mappers.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_fetcher.CountyFetcher;
+import com.complyt.business.transaction.data_fetcher.AddressFetcher;
 import com.complyt.business.transaction.data_injector.TransactionCountyInjector;
 import com.complyt.domain.Transaction;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class CountyProvider implements SalesTaxDataProvider<Transaction> {
 
     @NonNull
-    private CountyFetcher countyFetcher;
+    private AddressFetcher countyFetcher;
 
     public Mono<Transaction> provide(Transaction transaction) {
         return countyFetcher.fetch(transaction.getShippingAddress())

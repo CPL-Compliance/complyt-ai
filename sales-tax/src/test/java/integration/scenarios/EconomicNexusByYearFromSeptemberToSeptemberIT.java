@@ -53,7 +53,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
 
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2019-10-01T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("West Haven", "US", null, "CT", "300 Boston Post Rd", "06516", false);
     private final UUID customerId = UUID.fromString("49755739-892a-4807-882c-68b0e209a980"); // complytId of an existing customer in the database
     private final String source = "1";
 

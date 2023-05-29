@@ -3,7 +3,7 @@ package com.example.complyt.domain.mappers;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.sales_tax.FastTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
