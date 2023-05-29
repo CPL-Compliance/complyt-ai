@@ -29,7 +29,7 @@ public class TransactionShippingFeeJurisdictionalRulesInjector extends Transacti
         }
 
         return Mono.fromCallable(() -> {
-            String state = transaction.getShippingAddress().getState();
+            String state = transaction.getShippingAddress().state();
             ProductClassification classification = mapTaxCodesToClassifications.get(transaction.getShippingFee().getTaxCode());
             JurisdictionalSalesTaxRules rules = classification.getJurisdictionalSalesTaxRules().get(state);
 

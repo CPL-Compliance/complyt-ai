@@ -13,7 +13,7 @@ class ItemDtoTest {
     @BeforeEach
     void setup() {
         itemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
     }
 
@@ -21,7 +21,7 @@ class ItemDtoTest {
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
         ItemDto givenItemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRateDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
 
         // When
@@ -41,7 +41,7 @@ class ItemDtoTest {
                 ", name=" + itemDto.name() +
                 ", taxCode=" + itemDto.taxCode() +
                 ", jurisdictionalSalesTaxRules=" + itemDto.jurisdictionalSalesTaxRules() +
-                ", salesTaxRate=" + itemDto.salesTaxRate() +
+                ", salesTaxRates=" + itemDto.salesTaxRates() +
                 ", manualSalesTax=" + itemDto.manualSalesTax() +
                 ", manualSalesTaxRate=" + itemDto.manualSalesTaxRate() +
                 ", tangibleCategory=" + itemDto.tangibleCategory() +

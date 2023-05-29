@@ -12,7 +12,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax-rates</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>sales-tax-rates</name>
@@ -200,6 +200,33 @@
         <!-- Spring Cloud Eureka -->
 
     </dependencies>
+
+    <profiles>
+        <!-- Tax Client Profiles -->
+        <profile>
+            <id>fastTax</id>
+            <properties>
+                <activeTaxClient>fastTax</activeTaxClient>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>zipTax</id>
+            <properties>
+                <activeTaxClient>zipTax</activeTaxClient>
+            </properties>
+        </profile>
+        <profile>
+            <id>stubFastTax</id>
+            <properties>
+                <activeTaxClient>stubFastTax</activeTaxClient>
+            </properties>
+        </profile>
+        <!-- Tax Client Profiles -->
+    </profiles>
+
 
     <build>
         <plugins>

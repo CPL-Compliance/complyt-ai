@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.domain.State;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.MandatoryAddressDto;
@@ -31,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -49,16 +47,14 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
      */
 
     @MockBean
-    private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
-    @MockBean
     private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
 
-    private LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "30303");
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private String source = "1";
+    private final LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Atlanta", "US", null, "GA", "50 Upper Alabama St", "30303");
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+    private final String source = "1";
 
 
     @DynamicPropertySource
@@ -69,7 +65,6 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxGeorgia()));
     }
 
     @Order(1)
@@ -159,7 +154,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(890, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(775, transactionDto.salesTax().amount()));
     }
 
     @Order(4)

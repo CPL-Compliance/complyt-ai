@@ -43,6 +43,8 @@ public interface StatesMap {
         put("Kentucky", CollectionsNames.KENTUCKY);
         put("LA", CollectionsNames.LOUISIANA);
         put("Louisiana", CollectionsNames.LOUISIANA);
+        put("MA", CollectionsNames.MASSACHUSETTS);
+        put("Massachusetts", CollectionsNames.MASSACHUSETTS);
         put("ME", CollectionsNames.MAINE);
         put("Maine", CollectionsNames.MAINE);
         put("MD", CollectionsNames.MARYLAND);
@@ -103,5 +105,7 @@ public interface StatesMap {
         put("West Virginia", CollectionsNames.WEST_VIRGINIA);
         put("WI", CollectionsNames.WISCONSIN);
         put("Wisconsin", CollectionsNames.WISCONSIN);
+        put("WY", CollectionsNames.WYOMING);
+        put("Wyoming", CollectionsNames.WYOMING);
     }};
 }

@@ -2,15 +2,9 @@ package com.complyt.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 class AddressTest {
     private final String city = "City";
     private final String country = "Country";
@@ -34,7 +28,7 @@ class AddressTest {
 
     @Test
     void canEqual_BothAddress_Equal() {
-        assertTrue(address.canEqual(referenceAddress));
+        assertEquals(address, referenceAddress);
     }
 
     @Test
@@ -44,42 +38,42 @@ class AddressTest {
 
     @Test
     void getCity_City_Equal() {
-        assertEquals(city, address.getCity());
+        assertEquals(city, address.city());
     }
 
     @Test
     void getCountry_Country_Equal() {
-        assertEquals(country, address.getCountry());
+        assertEquals(country, address.country());
     }
 
     @Test
     void getCounty_County_Equal() {
-        assertEquals(county, address.getCounty());
+        assertEquals(county, address.county());
     }
 
     @Test
     void getState_ValueIsState_Equal() {
-        assertEquals(state, address.getState());
+        assertEquals(state, address.state());
     }
 
     @Test
     void getStreet_ValueIsStreet_Equal() {
-        assertEquals(street, address.getStreet());
+        assertEquals(street, address.street());
     }
 
     @Test
     void getZip_ValueIsZip_Equal() {
-        assertEquals(zip, address.getZip());
+        assertEquals(zip, address.zip());
     }
 
     @Test
     void toString_SameStrings_Equal() {
-        String referenceString = "Address(city=" + city +
+        String referenceString = "Address[city=" + city +
                 ", country=" + country +
                 ", county=" + county +
                 ", state=" + state +
                 ", street=" + street +
-                ", zip=" + zip + ")";
+                ", zip=" + zip + "]";
 
         assertEquals(referenceString, address.toString());
     }
@@ -89,7 +83,7 @@ class AddressTest {
         String newCity = "New City";
         referenceAddress = address.withCity(newCity);
 
-        assertEquals(referenceAddress.getCity(), newCity);
+        assertEquals(referenceAddress.city(), newCity);
     }
 
     @Test
@@ -97,7 +91,7 @@ class AddressTest {
         String newCountry = "New Country";
         referenceAddress = address.withCountry(newCountry);
 
-        assertEquals(referenceAddress.getCountry(), newCountry);
+        assertEquals(referenceAddress.country(), newCountry);
     }
 
     @Test
@@ -105,7 +99,7 @@ class AddressTest {
         String newCounty = "New County";
         referenceAddress = address.withCounty(newCounty);
 
-        assertEquals(referenceAddress.getCounty(), newCounty);
+        assertEquals(referenceAddress.county(), newCounty);
     }
 
     @Test
@@ -113,7 +107,7 @@ class AddressTest {
         String newState = "New State";
         referenceAddress = address.withState(newState);
 
-        assertEquals(referenceAddress.getState(), newState);
+        assertEquals(referenceAddress.state(), newState);
     }
 
     @Test
@@ -121,7 +115,7 @@ class AddressTest {
         String newStreet = "New Street";
         referenceAddress = address.withStreet(newStreet);
 
-        assertEquals(referenceAddress.getStreet(), newStreet);
+        assertEquals(referenceAddress.street(), newStreet);
     }
 
     @Test
@@ -129,6 +123,6 @@ class AddressTest {
         String newZip = "New ZIP";
         referenceAddress = address.withZip(newZip);
 
-        assertEquals(referenceAddress.getZip(), newZip);
+        assertEquals(referenceAddress.zip(), newZip);
     }
 }

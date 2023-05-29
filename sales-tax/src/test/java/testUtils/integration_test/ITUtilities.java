@@ -1,5 +1,8 @@
 package testUtils.integration_test;
 
+import com.complyt.domain.Address;
+import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
 import com.complyt.domain.sales_tax.fast_tax.InformationComponent;
 import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
@@ -134,5 +137,28 @@ public interface ITUtilities {
                         "update:transaction delete:transaction read:state " +
                         "create:exemption update:exemption delete:exemption " +
                         "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+    }
+
+    public static Address createAddressInCalifornia() {
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+     static MandatoryAddressDto createAddressDtoInCalifornia() {
+        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    }
+
+     static SalesTaxRates createCaliforniaSalesTaxRates() {
+        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+    }
+
+     static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+    }
+
+     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+        Address address = createAddressInCalifornia();
+        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
+        LocalDateTime now = LocalDateTime.now();
+        return new ComplytSalesTaxRates(address, salesTaxRates);
     }
 }

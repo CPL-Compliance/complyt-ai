@@ -2,7 +2,7 @@ package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.ShippingFee;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +16,8 @@ public class ShippingFeeSalesTaxRatesProvider implements TaxableSalesTaxRatesPro
     @NonNull
     private SalesTaxRatesProvider salesTaxRatesProvider;
 
-    public ShippingFee setSalesTaxRates(ShippingFee shippingFee, SalesTaxRate salesTaxRate, Address address) {
-        SalesTaxRate shippingFeeSalesTaxRate = salesTaxRatesProvider.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRate, address);
-        return shippingFee.withSalesTaxRate(shippingFeeSalesTaxRate);
+    public ShippingFee setSalesTaxRates(ShippingFee shippingFee, SalesTaxRates salesTaxRates, Address address) {
+        SalesTaxRates shippingFeeSalesTaxRate = salesTaxRatesProvider.provide(shippingFee.getJurisdictionalSalesTaxRules(), salesTaxRates, address);
+        return shippingFee.withSalesTaxRates(shippingFeeSalesTaxRate);
     }
 }

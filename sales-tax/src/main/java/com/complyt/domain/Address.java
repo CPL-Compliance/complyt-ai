@@ -1,17 +1,7 @@
 package com.complyt.domain;
 
-import lombok.*;
+import lombok.With;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
-public class Address {
-    private String city;
-    private String country;
-    private String county;
-    private String state;
-    private String street;
-    private String zip;
+public record Address(String city, String country, String county, String state, String street, String zip) {
 }

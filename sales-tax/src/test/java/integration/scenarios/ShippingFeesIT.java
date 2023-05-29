@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.domain.State;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.MandatoryAddressDto;
@@ -26,11 +25,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -49,16 +46,13 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
      */
 
     @MockBean
-    private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
-    @MockBean
     private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
 
-    private LocalDateTime referenceDate = LocalDateTime.parse("2020-10-01T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202");
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private String source = "1";
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202");
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+    private final String source = "1";
 
 
     @DynamicPropertySource
@@ -69,7 +63,6 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxIndiana()));
     }
 
     @Order(1)
@@ -97,7 +90,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(1)
@@ -126,7 +119,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(2)
@@ -173,7 +166,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRate()));
+                .value(transactionDto -> assertNull(transactionDto.shippingFee().salesTaxRates()));
     }
 
     @Order(4)
@@ -237,8 +230,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
-                    assertEquals(transactionDto.salesTax().amount(), 1400);
+                    assertNotNull(transactionDto.shippingFee().salesTaxRates());
+                    assertEquals(1550, transactionDto.salesTax().amount());
                 });
     }
 
@@ -268,8 +261,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertEquals(0, transactionDto.shippingFee().salesTaxRate().taxRate());
-                    assertEquals(700, transactionDto.salesTax().amount());
+                    assertEquals(transactionDto.shippingFee().salesTaxRates().taxRate(), 0);
+                    assertEquals(775, transactionDto.salesTax().amount());
                 });
     }
 
@@ -300,8 +293,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertNotNull(transactionDto.shippingFee().salesTaxRate());
-                    assertEquals(transactionDto.salesTax().amount(), 1500.7f);
+                    assertNotNull(transactionDto.shippingFee().salesTaxRates());
+                    assertEquals(1500.7750244140625, transactionDto.salesTax().amount());
                 });
     }
 }

@@ -119,12 +119,12 @@ class NexusServiceTest {
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
-        when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
         when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(false);
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.calculateNexusTracking(transaction);
 
@@ -157,12 +157,12 @@ class NexusServiceTest {
 
         // When
         when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
-        when(nexusStateRuleService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
         when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(true);
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
         when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished, nexusStateRule, referenceDate))
                 .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
 
@@ -178,8 +178,8 @@ class NexusServiceTest {
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().getState());
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().state());
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTracking).verifyComplete();
@@ -191,7 +191,7 @@ class NexusServiceTest {
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction);
 
         // Then
@@ -220,7 +220,7 @@ class NexusServiceTest {
 
         // When
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(true);
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.just(salesTaxTracking));
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
         Mono<SalesTaxTrackingWithNexusInfo> salesTaxTrackingDecoratorMono = nexusService.hasNexus(transaction);
 
         // Then
@@ -280,10 +280,10 @@ class NexusServiceTest {
     void findTrackingByState_TransactionPassed_NotFindingNexus_ThrowsException() {
         // Given
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
-        String state = transaction.getShippingAddress().getState();
+        String state = transaction.getShippingAddress().state();
 
         // When
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.empty());
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.empty());
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(state);
 
         // Then
@@ -295,11 +295,11 @@ class NexusServiceTest {
     void findTrackingByState_StatePassed_NotFindingNexus_ThrowsException() {
         // Given
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
-        String state = transaction.getShippingAddress().getState();
+        String state = transaction.getShippingAddress().state();
 
         // When
-        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().getState())).thenReturn(Mono.empty());
-        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().getState());
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.empty());
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.findTrackingByState(transaction.getShippingAddress().state());
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectError(NotFoundException.class);

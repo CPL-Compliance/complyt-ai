@@ -2,7 +2,7 @@ package com.complyt.domain;
 
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
-import com.complyt.domain.sales_tax.SalesTaxRate;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.*;
 
@@ -19,7 +19,7 @@ public class Item implements Taxable {
     private String name;
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
-    private SalesTaxRate salesTaxRate;
+    private SalesTaxRates salesTaxRates;
     private boolean manualSalesTax;
     private float manualSalesTaxRate;
     private TangibleCategory tangibleCategory;

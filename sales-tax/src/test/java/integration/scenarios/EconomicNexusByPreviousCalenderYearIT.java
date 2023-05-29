@@ -1,7 +1,6 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.business.sales_tax.sales_tax_web_clients.StubFastTaxWebClientWrapper;
 import com.complyt.security.TenantResolver;
 import com.complyt.v1.models.MandatoryAddressDto;
 import com.complyt.v1.models.SalesTaxTrackingDto;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -48,18 +46,16 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
      */
 
     @MockBean
-    private StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper;
-    @MockBean
     private TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
 
     //Given
-    private LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142");
-    private UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148"); // complytId of an existing customer in the database
-    private UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3"); // complytId of an existing customer in the database
-    private String source = "1";
+    private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142");
+    private final UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148"); // complytId of an existing customer in the database
+    private final UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3"); // complytId of an existing customer in the database
+    private final String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -69,9 +65,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        when(stubFastTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.just(ITUtilities.stubFastTaxFlorida()));
     }
-
 
     @Order(1)
     @Test
@@ -231,7 +225,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 700));
+                .value(receivedTransaction -> assertEquals(receivedTransaction.salesTax().amount(), 775));
     }
 
     @Order(5)
