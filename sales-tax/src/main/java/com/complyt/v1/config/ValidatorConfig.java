@@ -35,9 +35,9 @@ public class ValidatorConfig {
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
 
-        Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
-        variableConflictChecksMap.put("source", TransactionDto.SOURCE_CONFLICT_CHECK);
-        variableConflictChecksMap.put("externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK);
+        Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = Map.of(
+        "source", TransactionDto.SOURCE_CONFLICT_CHECK,
+        "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK);
 
         return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
     }

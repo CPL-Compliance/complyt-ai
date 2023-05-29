@@ -1,7 +1,7 @@
 package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
-import com.complyt.config.MappersConfig;
+import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
@@ -11,19 +11,20 @@ import com.complyt.v1.routers.CustomerRouter;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.integration_test.ITUtilities;
 
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -34,23 +35,19 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @SpringBootTest(classes = {SalesTaxApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureWebTestClient()
-@ContextConfiguration(classes = MappersConfig.class)
-@ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public class MultiTenancyIT extends TestContainersInitializerIT implements MultiTenancyITTemplate {
 
     private final JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
     private final JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
     private final String source = "1";
-
+    @Mock
+    ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
+    @Autowired
     private WebTestClient webTestClient;
 
-    @BeforeEach
-    void setup() {
-        webTestClient = WebTestClient.bindToServer().baseUrl(String.format(
-                "http://%s:%d/",
-                API_GATEWAY_CONTAINER.getHost(),
-                API_GATEWAY_CONTAINER.getFirstMappedPort()
-        )).build();
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
     }
 
     @Order(1)
@@ -114,35 +111,30 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void getSalesTaxTracking_ExistsInOtherTenant_Returns404() {
         // Given
         String stateName = "Arizona";
 
         // Then
-            webTestClient
-                    //.mutateWith(differentTenantMutator)
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
-                            //.path("agadoo")
-                            .build())
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().isNotFound();
-
         webTestClient
-                //.mutateWith(defaultTenantMutator)
+                .mutateWith(differentTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> {
-                    int x = 1;
-                });
+                .expectStatus().isNotFound();
+
+        webTestClient
+                .mutateWith(defaultTenantMutator)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
     }
 
     @Order(1)

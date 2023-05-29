@@ -186,6 +186,16 @@
                 <classifier>osx-aarch_64</classifier>
                 <version>${netty-resolver-dns-native-macos.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-oauth2-client</artifactId>
+                <version>3.0.0</version>
+            </dependency>
             <!-- Testcontainers -->
             <!-- Other -->
             <dependency>

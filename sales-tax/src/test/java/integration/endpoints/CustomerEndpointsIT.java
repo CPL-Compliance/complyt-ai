@@ -15,9 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -34,53 +32,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@SpringBootTest(classes = SalesTaxApplication.class
-        , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
-        , properties = {"server.port=9898", "management.server.port=9898"}
-)
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = SalesTaxApplication.class)
+@AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public class CustomerEndpointsIT extends TestContainersInitializerIT implements CustomerEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
-    @MockBean
-    JwtDecoder jwtDecoder;
+    @Autowired
+    private WebTestClient webTestClient;
 
     // Given
-
-    private WebTestClient webTestClient;
     private String source = "1";
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+    }
 
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        webTestClient = WebTestClient.bindToServer().baseUrl(String.format(
-                "http://%s:%d/",
-                API_GATEWAY_CONTAINER.getHost(),
-                API_GATEWAY_CONTAINER.getFirstMappedPort()
-        )).build();
-    }
-
-    @Order(-1)
-    @Test
-    public void checkConnection() {
-        while (isServiceRouted) {
-            webTestClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/v1/customers")
-                            .build())
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().value(status -> isServiceRouted = status == 503);
-        }
     }
 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getAllBySource_Exists_Returns200() {
         // Given
         String differentSource = "2";
@@ -96,13 +76,13 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isOk()
                 .expectBodyList(CustomerDto.class)
                 .value(list ->
-                        assertEquals(list.size(), 1));
+                        assertEquals(1, list.size()));
     }
 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
         // Given
         String differentSource = "9";
@@ -124,7 +104,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getAll_Exists_Returns200() {
         // Then
         webTestClient
@@ -143,7 +123,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
 
@@ -164,7 +144,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"; //complytId of existing customer
@@ -186,7 +166,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -202,7 +182,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByComplytId_complytIdDoesntParse_Returns500() {
         // Given
         String invalidComplytId = "gg";
@@ -221,7 +201,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1586";
@@ -240,7 +220,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = "nonExisting";
@@ -259,7 +239,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByName_Exists_Returns200() {
         // Given
         String name = "best";
@@ -280,7 +260,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void getByName_DoesntExists_Returns200EmptyList() {
         // Given
         String name = "nonExisting";
@@ -301,7 +281,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(3)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1001";
@@ -309,7 +289,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -323,7 +303,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = "1001";
@@ -331,7 +311,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -345,7 +325,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
@@ -353,7 +333,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -367,7 +347,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
@@ -376,7 +356,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
@@ -390,7 +370,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
         // Given
         String externalId = "someId";
@@ -399,7 +379,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
@@ -413,7 +393,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:customer","SCOPE_read:customer"})
+    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
         String externalId = "1003";
@@ -426,7 +406,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -454,7 +434,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)

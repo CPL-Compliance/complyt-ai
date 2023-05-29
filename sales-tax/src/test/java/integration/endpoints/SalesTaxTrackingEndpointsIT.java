@@ -16,9 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -35,55 +33,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@SpringBootTest(classes = SalesTaxApplication.class
-        , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
-        , properties = {"server.port=9898", "management.server.port=9898"}
-)
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = SalesTaxApplication.class)
+@AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
 
     @MockBean
     TenantResolver tenantResolver;
-    @MockBean
-    JwtDecoder jwtDecoder;
-
-    // Given
-
+    @Autowired
     private WebTestClient webTestClient;
 
-    private StateDto existingState = new StateDto("AZ", "04", "Arizona");
-    private StateDto newState = new StateDto("AL", "01", "Alabama");
+    private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
+    private final StateDto newState = new StateDto("AL", "01", "Alabama");
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+    }
 
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
-        webTestClient = WebTestClient.bindToServer().baseUrl(String.format(
-                "http://%s:%d/",
-                API_GATEWAY_CONTAINER.getHost(),
-                API_GATEWAY_CONTAINER.getFirstMappedPort()
-        )).build();
-    }
-
-    @Order(-1)
-    @Test
-    public void checkConnection() {
-        while (isServiceRouted) {
-            webTestClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/v1/customers")
-                            .build())
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().value(status -> isServiceRouted = status == 503);
-        }
     }
 
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getAll_Exists_Returns200() {
         webTestClient
                 .get()
@@ -100,7 +78,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         // Given
         when(tenantResolver.resolve()).thenReturn(Mono.just("different_tenant"));
@@ -121,7 +99,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
@@ -142,7 +120,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -158,7 +136,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByComplytId_complytIdDoesntParse_Returns500() {
         webTestClient
                 .get()
@@ -173,7 +151,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByStateName_Exists_Returns200() {
         webTestClient
                 .get()
@@ -190,7 +168,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByStateAbbreviation_Exists_Returns200() {
         webTestClient
                 .get()
@@ -207,7 +185,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByStateAbbreviation_DoesntExists_Returns404() {
         webTestClient
                 .get()
@@ -222,7 +200,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void getByStateName_DoesntExists_Returns404() {
         webTestClient
                 .get()
@@ -237,14 +215,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(3)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void upsertByState_DoesntExists_Returns201() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
@@ -263,14 +241,14 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(4)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void upsertByState_Exists_Returns200() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
@@ -289,7 +267,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
@@ -297,7 +275,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().name())
@@ -311,7 +289,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState)
@@ -319,7 +297,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/dope")
@@ -333,7 +311,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser(authorities = {"SCOPE_create:nexus","SCOPE_read:nexus"})
+    @WithMockUser
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
         // Given
         SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(new StateDto("AL", "01", null))
@@ -344,7 +322,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + salesTaxTrackingDto.state().abbreviation())
@@ -372,7 +350,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                
+                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + state)

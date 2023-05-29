@@ -1,10 +1,7 @@
-#auth0.audience: complyt-integration-test
 auth0.audience: null
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://discovery:8761/eureka/
     should-unregister-on-shutdown: true
     register-with-eureka: true
   instance:
@@ -18,16 +15,15 @@ logging:
   level:
     root: info
 
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://host.docker.internal:8080/realms/integration-test/protocol/openid-connect/certs
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8080/realms/integration-test
+
 spring:
   cloud:
     vault:
       enabled: false
-  security:
-    oauth2.resourceserver.jwt.issuer-uri: https://integration-test-complyt.us.auth0.com/
-    #oauth2.resourceserver.jwt.issuer-uri: https://dumb
   data:
     mongodb:
-      uri: mongodb://mongodb:27017
       database: sales_tax
 management:
   server:

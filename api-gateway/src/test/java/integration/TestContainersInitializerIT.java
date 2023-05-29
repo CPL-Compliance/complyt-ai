@@ -4,9 +4,12 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
@@ -25,6 +28,7 @@ public abstract class TestContainersInitializerIT {
     protected static GenericContainer DISCOVERY_CONTAINER;
     protected static GenericContainer SALES_TAX_CONTAINER;
     protected static boolean isSalesTaxRegistered;
+    protected static String token;
 
     static {
         //Discovery Container
@@ -38,7 +42,7 @@ public abstract class TestContainersInitializerIT {
                                 .entryPoint("java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"))
         ).withExposedPorts(8761);
         DISCOVERY_CONTAINER.start();
-        Testcontainers.exposeHostPorts(DISCOVERY_CONTAINER.getMappedPort(8761));
+        Testcontainers.exposeHostPorts(DISCOVERY_CONTAINER.getMappedPort(8761), 8080, 27017);
 
         // Mongo Container
         MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
@@ -55,7 +59,7 @@ public abstract class TestContainersInitializerIT {
                                 .add("sales-tax-0.15.0-SNAPSHOT.jar", "app.jar")
                                 .run("sh -c 'touch app.jar'")
                                 .entryPoint("java", "-Dspring.profiles.active=integration-test, stubFastTax",
-                                        "-Dspring.data.mongodb.uri=" + MONGO_CONTAINER.getReplicaSetUrl("sales_tax"),
+                                        "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" +  MONGO_CONTAINER.getMappedPort(27017),
                                         "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
                                         "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar")
                         )).withExposedPorts(9898)
@@ -71,6 +75,24 @@ public abstract class TestContainersInitializerIT {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        WebTestClient getTokenClient = WebTestClient.bindToServer().baseUrl("http://localhost:8080/").build();
+        getTokenClient
+                .post()
+                .uri(uriBuilder ->
+                        uriBuilder.path("/realms/integration-test/protocol/openid-connect/token")
+                                .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters
+                        .fromFormData("grant_type", "password")
+                        .with("client_id", "integation-test-client")
+                        .with("username", "test-user")
+                        .with("password", "password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.access_token").value(receivedToken ->
+                        token = receivedToken.toString());
     }
 
     @DynamicPropertySource

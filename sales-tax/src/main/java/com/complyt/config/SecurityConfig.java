@@ -135,15 +135,20 @@ public class SecurityConfig {
         By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
         indeed intended for our app. Adding our own validator is easy to do:
         */
-        return token -> Jwt.withTokenValue("token")
-                .header("typ", "JWT")
-                .issuer("https://localhost")
-                .claim("tenant_id", "it_tenant")
-                .claim("scope", "create:customer delete:customer read:customer " +
-                        "update:customer create:transaction read:transaction " +
-                        "update:transaction delete:transaction read:state " +
-                        "create:exemption update:exemption delete:exemption " +
-                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link").build();
+        return new JwtDecoder() {
+            @Override
+            public Jwt decode(String token) throws JwtException {
+                return Jwt.withTokenValue("token")
+                        .header("typ", "JWT")
+                        .issuer("https://localhost")
+                        .claim("tenant_id", "it_tenant")
+                        .claim("scope", "create:customer delete:customer read:customer " +
+                                "update:customer create:transaction read:transaction " +
+                                "update:transaction delete:transaction read:state " +
+                                "create:exemption update:exemption delete:exemption " +
+                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link").build();
+            }
+        };
     }
 
 }
