@@ -117,7 +117,7 @@ public class SalesTaxServiceImplTest {
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
-        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then
@@ -148,7 +148,7 @@ public class SalesTaxServiceImplTest {
         when(transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates))
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
-        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.getAmount());
+        when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
 
         // Then

@@ -94,9 +94,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
-                .map(transactionItemsAmountsCollector::collect)
-                .flatMap(countyProvider::provide);
+        return countyProvider.provide(transaction)
+                .flatMap(productClassificationServiceImpl::getTransactionWithRelevantProductClassificationData)
+                .map(transactionItemsAmountsCollector::collect);
     }
 
     @Deprecated

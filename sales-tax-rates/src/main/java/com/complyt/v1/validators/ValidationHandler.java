@@ -22,6 +22,9 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     U validator;
 
+    @NonNull
+    DataConflictChecksProvider<T> dataConflictChecksProvider;
+
     private Mono<T> onValidationErrors(Errors errors) {
         return Mono.error(new ObjectNotValidApiException(errors));
     }

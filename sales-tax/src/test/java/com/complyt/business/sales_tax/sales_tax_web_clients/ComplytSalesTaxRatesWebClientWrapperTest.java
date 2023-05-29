@@ -39,7 +39,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         ComplytSalesTaxRatesDto complytSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesToComplytSalesTaxRatesDto(complytSalesTaxRates);
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip())).thenReturn(Mono.just(complytSalesTaxRatesDto));
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial())).thenReturn(Mono.just(complytSalesTaxRatesDto));
 
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
 
@@ -53,7 +53,7 @@ public class ComplytSalesTaxRatesWebClientWrapperTest {
         Address address = UnitTestUtilities.createAddressInCalifornia();
 
         // When
-        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip())).thenReturn(Mono.error(new ObjectNotFoundApiException()));
+        when(salesTaxRatesServiceProxy.findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial())).thenReturn(Mono.error(new ObjectNotFoundApiException()));
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesClientWrapper.findByAddress(address);
 
         // Then

@@ -26,7 +26,7 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220"), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, 0, 0, 0);
+                TransactionTypeDto.INVOICE, null, null, 0, 0, 0, false);
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -137,19 +137,19 @@ public interface ITUtilities {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
     }
 
-     static MandatoryAddressDto createAddressDtoInCalifornia() {
+    static MandatoryAddressDto createAddressDtoInCalifornia() {
         return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
     }
 
-     static SalesTaxRates createCaliforniaSalesTaxRates() {
+    static SalesTaxRates createCaliforniaSalesTaxRates() {
         return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
     }
 
-     static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+    static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
         return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
     }
 
-     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+    static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
