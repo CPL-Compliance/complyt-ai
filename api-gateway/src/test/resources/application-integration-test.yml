@@ -16,18 +16,7 @@ logging:
   level:
     root: info
 
-#spring.security.oauth2.client:
-#  registration:
-#    keycloak:
-#      client-id: integation-test-client
-#      authorization-grant-type: authorization_code
-#      scope: openid
-#  provider:
-#    keycloak:
-#      user-name-attribute: preferred_username
-#      issuer-uri: http://localhost:8080/realms/integration-test
-
-spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8080/realms/integration-test
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8080/realms/test-realm
 
 spring:
   application:

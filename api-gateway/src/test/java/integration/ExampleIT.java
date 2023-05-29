@@ -2,7 +2,10 @@ package integration;
 
 
 import io.complyt.apigateway.ApiGatewayApplication;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
 
 @SpringBootTest(classes = ApiGatewayApplication.class
         , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
@@ -37,6 +39,8 @@ public class ExampleIT extends TestContainersInitializerIT {
                     .uri(uriBuilder -> uriBuilder
                             .path("/v1/customers")
                             .build())
+                    .headers(headers -> headers
+                            .setBearerAuth(token))
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().value(status -> isSalesTaxRegistered = status != 503);
@@ -58,9 +62,7 @@ public class ExampleIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
-                .value(string -> {
-                    System.out.println(string.toString());
-                });
+                .value(string -> System.out.println(string.toString()));
 
     }
 

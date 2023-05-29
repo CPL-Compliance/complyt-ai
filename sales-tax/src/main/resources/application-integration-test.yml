@@ -15,8 +15,8 @@ logging:
   level:
     root: info
 
-spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://host.docker.internal:8080/realms/integration-test/protocol/openid-connect/certs
-spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8080/realms/integration-test
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri: http://host.docker.internal:8080/realms/test-realm/protocol/openid-connect/certs
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8080/realms/test-realm
 
 spring:
   cloud:
@@ -25,6 +25,3 @@ spring:
   data:
     mongodb:
       database: sales_tax
-management:
-  server:
-    port: ${PORT:9898}

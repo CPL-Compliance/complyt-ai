@@ -5,7 +5,6 @@ import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -20,7 +19,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.nio.file.Path;
 
 @Slf4j
-@ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public abstract class TestContainersInitializerIT {
 
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
@@ -56,16 +54,16 @@ public abstract class TestContainersInitializerIT {
                         .withFileFromPath(".", Path.of("../sales-tax/target"))
                         .withDockerfileFromBuilder(builder -> builder
                                 .from("amazoncorretto:17-al2023-jdk")
-                                .add("sales-tax-0.15.0-SNAPSHOT.jar", "app.jar")
+                                .add("sales-tax-0.15.1-SNAPSHOT.jar", "app.jar")
                                 .run("sh -c 'touch app.jar'")
-                                .entryPoint("java", "-Dspring.profiles.active=integration-test, stubFastTax",
-                                        "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" +  MONGO_CONTAINER.getMappedPort(27017),
+                                .entryPoint("java", "-Dspring.profiles.active=integration-test, complytStubTax",
+                                        "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" + MONGO_CONTAINER.getMappedPort(27017),
                                         "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
                                         "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar")
                         )).withExposedPorts(9898)
                 .withAccessToHost(true)
                 .withCreateContainerCmdModifier(cmd -> cmd
-                                .withPortBindings(new PortBinding(Ports.Binding.bindPort(9898), new ExposedPort(9898)))
+                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(9898), new ExposedPort(9898)))
                 );
         SALES_TAX_CONTAINER.start();
 
@@ -76,16 +74,17 @@ public abstract class TestContainersInitializerIT {
             throw new RuntimeException(e);
         }
 
+        // Retrieve Token
         WebTestClient getTokenClient = WebTestClient.bindToServer().baseUrl("http://localhost:8080/").build();
         getTokenClient
                 .post()
                 .uri(uriBuilder ->
-                        uriBuilder.path("/realms/integration-test/protocol/openid-connect/token")
+                        uriBuilder.path("/realms/test-realm/protocol/openid-connect/token")
                                 .build())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters
                         .fromFormData("grant_type", "password")
-                        .with("client_id", "integation-test-client")
+                        .with("client_id", "test-client")
                         .with("username", "test-user")
                         .with("password", "password"))
                 .exchange()
