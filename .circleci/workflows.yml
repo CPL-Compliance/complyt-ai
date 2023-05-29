@@ -129,10 +129,6 @@ jobs:
           container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'
-  image-for-integration-test:
-    steps:
-      - run:
-          command: docker buildx create --use
 
 workflows:
   sales-tax-workflow:
