@@ -9,26 +9,26 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
-@EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
+//@EnableWebFluxSecurity
+//@EnableReactiveMethodSecurity
 public class SecurityConfig  //extends SecurityConfigurerAdapter
 {
 
-    @Profile({"integration-test"})
-    @Bean
-    public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
-
-        // Authentication and Authorization
-        http.authorizeExchange()
-                .anyExchange().permitAll();
-        http.anonymous();
-        http.httpBasic().disable();
-        //        .formLogin().disable();
-
-        //http.oauth2ResourceServer().jwt();
-
-        return http.build();
-    }
+//    @Profile({"integration-test"})
+//    @Bean
+//    public SecurityWebFilterChain integrationTestSecurityWebFilterChain(ServerHttpSecurity http) {
+//
+//        // Authentication and Authorization
+//        http.authorizeExchange()
+//                .anyExchange().permitAll();
+//        http.anonymous();
+//        http.httpBasic().disable();
+//        //        .formLogin().disable();
+//
+//        //http.oauth2ResourceServer().jwt();
+//
+//        return http.build();
+//    }
 
 //    @Bean
 //    JwtDecoder jwtDecoder() {
