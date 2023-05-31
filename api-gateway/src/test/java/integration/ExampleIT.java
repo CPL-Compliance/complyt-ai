@@ -24,9 +24,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public class ExampleIT extends TestContainersInitializerIT {
 
-    @MockBean
-    JwtDecoder jwtDecoder;
-
     @Autowired
     WebTestClient webTestClient;
 
@@ -45,7 +42,6 @@ public class ExampleIT extends TestContainersInitializerIT {
                     .exchange()
                     .expectStatus().value(status -> isSalesTaxRegistered = status != 503);
         }
-
     }
 
     @Order(1)

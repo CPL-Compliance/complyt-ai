@@ -3,13 +3,13 @@ package integration;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
+import dasniko.testcontainers.keycloak.KeycloakContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -25,10 +25,19 @@ public abstract class TestContainersInitializerIT {
     protected static final MongoDBContainer MONGO_CONTAINER;
     protected static GenericContainer DISCOVERY_CONTAINER;
     protected static GenericContainer SALES_TAX_CONTAINER;
+    protected static KeycloakContainer KEYCLOAK_CONTAINER;
     protected static boolean isSalesTaxRegistered;
     protected static String token;
 
     static {
+        // OAuth Server
+        KEYCLOAK_CONTAINER = new KeycloakContainer()
+                .withExposedPorts(8080)
+                .withCreateContainerCmdModifier(cmd -> cmd
+                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(8080), new ExposedPort(8080))))
+                .withRealmImportFile("realm-export.json");
+        KEYCLOAK_CONTAINER.start();
+
         //Discovery Container
         DISCOVERY_CONTAINER = new GenericContainer<>(
                 new ImageFromDockerfile()
@@ -40,7 +49,6 @@ public abstract class TestContainersInitializerIT {
                                 .entryPoint("java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"))
         ).withExposedPorts(8761);
         DISCOVERY_CONTAINER.start();
-        Testcontainers.exposeHostPorts(DISCOVERY_CONTAINER.getMappedPort(8761), 8080, 27017);
 
         // Mongo Container
         MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))

@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     @Profile({"development", "demo", "test", "default", "production"})
     @Bean
-    JwtDecoder productionJwtDecoder() {
+    JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator(audience);
