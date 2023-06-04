@@ -21,8 +21,8 @@ public class SalesTaxTest {
     @Test
     void toString_ReturnsString() {
         // Given
-        String expectedString = "SalesTax(amount=" + salesTax.amount() +
-                ", salesTaxRates=" + salesTax.salesTaxRates() + ")";
+        String expectedString = "SalesTax[amount=" + salesTax.amount() +
+                ", salesTaxRates=" + salesTax.salesTaxRates() + "]";
 
         // When
         String actualString = salesTax.toString();

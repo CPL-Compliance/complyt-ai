@@ -80,7 +80,7 @@ public class FastTaxWebClientWrapperTest {
     @Test
     void findByAddress_validAddress_ReturnsSalesTaxData() {
         // Given
-        Address address = new Address("city", "country", "county", "state", "street", "zip");
+        Address address = new Address("city", "country", "county", "state", "street", "zip", false);
         FastTaxData fastTaxData = new FastTaxData("test", new ArrayList<>(), "1");
 
         // When

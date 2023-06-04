@@ -1,6 +1,6 @@
 package com.complyt.business.transaction;
 
-import com.complyt.business.transaction.data_fetcher.AddressFetcher;
+import com.complyt.business.transaction.data_fetcher.CountyFetcher;
 import com.complyt.domain.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +22,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CountyProviderTest {
+public class AddressProviderTest {
 
     @InjectMocks
-    CountyProvider countyProvider;
+    CountyProvider addressProvider;
 
     @Mock
-    AddressFetcher countyFetcher;
+    CountyFetcher countyFetcher;
+
     UnitTestUtilities testUtilities;
 
     @BeforeEach
@@ -38,17 +39,15 @@ public class CountyProviderTest {
     }
 
     @Test
-    void provide_GetsCountyAndInjectsIt_ReturnsTransaction() {
+    void provide_GetsAddressAndInjectsIt_ReturnsTransaction() {
         // Given
         Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
-        String injectedCounty = "InjectedCounty";
-        Transaction transactionWithCounty = transaction.withShippingAddress(transaction.getShippingAddress().withCounty(injectedCounty));
 
         // When
-        when(countyFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(injectedCounty));
-        Mono<Transaction> transactionMono = countyProvider.provide(transaction);
+        when(countyFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(transaction.getShippingAddress().county()));
+        Mono<Transaction> transactionMono = addressProvider.provide(transaction);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionWithCounty).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
     }
 }

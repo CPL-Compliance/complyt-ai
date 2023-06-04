@@ -14,11 +14,12 @@ public class AddressDtoTest {
     private final String state = "State";
     private final String street = "Street";
     private final String zip = "1111";
+    private final boolean isPartial = false;
     private AddressDto addressDto;
 
     @BeforeEach
     void setup() {
-        addressDto = new AddressDto(city, country, county, state, street, zip);
+        addressDto = new AddressDto(city, country, county, state, street, zip, false);
     }
 
     @Test
@@ -29,7 +30,8 @@ public class AddressDtoTest {
                 ", county=" + county +
                 ", state=" + state +
                 ", street=" + street +
-                ", zip=" + zip + "]";
+                ", zip=" + zip +
+                ", isPartial=" + isPartial + "]";
 
         // When
         String actualString = addressDto.toString();
@@ -41,7 +43,7 @@ public class AddressDtoTest {
     @Test
     void withCity_differentCity_ReturnAddressDto() {
         // given
-        AddressDto expectedAddressDto = new AddressDto("New York", country, county, state, street, zip);
+        AddressDto expectedAddressDto = new AddressDto("New York", country, county, state, street, zip, false);
 
         // When
         AddressDto actualAddressDto = addressDto.withCity("New York");

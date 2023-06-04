@@ -1,6 +1,6 @@
 package com.example.complyt.business.data_fetcher;
 
-import com.complyt.business.data_fetcher.FastTaxAddressFetcher;
+import com.complyt.business.data_fetcher.FastTaxCountyFetcher;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.fast_tax.FastTaxData;
@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FastTaxCountyFetcherTest {
 
-    private FastTaxAddressFetcher fastTaxCountyFetcher;
+    private FastTaxCountyFetcher fastTaxCountyFetcher;
 
     @BeforeEach
     void setUp() {
-        fastTaxCountyFetcher = new FastTaxAddressFetcher();
+        fastTaxCountyFetcher = new FastTaxCountyFetcher();
     }
 
     private TaxInfoItem createTaxInfoItem() {
@@ -70,7 +70,7 @@ class FastTaxCountyFetcherTest {
     @Test
     void equals_SameFetcherFastTaxCountyFetcher_ReturnsTrue() {
         // Given
-        FastTaxAddressFetcher givenFastTaxCountyFetcher = new FastTaxAddressFetcher();
+        FastTaxCountyFetcher givenFastTaxCountyFetcher = new FastTaxCountyFetcher();
 
         // When
         boolean isEquals = fastTaxCountyFetcher.equals(givenFastTaxCountyFetcher);

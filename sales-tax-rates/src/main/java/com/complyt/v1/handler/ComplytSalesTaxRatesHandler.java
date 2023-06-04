@@ -32,9 +32,6 @@ public class ComplytSalesTaxRatesHandler {
     ComplytSalesTaxRatesFacade complytSalesTaxRatesFacadeFacade;
 
     @NonNull
-    QueryParamsExtractor<AddressDto> addressDtoQueryParamsExtractor;
-
-    @NonNull
     ValidationHandler<AddressDto, SpringValidatorAdapter> addressDtoValidationHandler;
 
     @SalesTaxRatesReadPermission
@@ -42,11 +39,10 @@ public class ComplytSalesTaxRatesHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
-                .then(addressDtoQueryParamsExtractor.extract(serverRequest))
-                .flatMap(addressDtoValidationHandler::validate)
+                .then(addressDtoValidationHandler.validate(serverRequest))
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
-                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
+                .map(c ->ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesToComplytSalesTaxRates(c))
                 .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info).thenReturn(complytSalesTaxRates))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 

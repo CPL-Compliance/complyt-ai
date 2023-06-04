@@ -1,6 +1,6 @@
 package com.example.complyt.services;
 
-import com.complyt.business.data_fetcher.AddressFetcher;
+import com.complyt.business.data_fetcher.CountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
@@ -40,7 +40,7 @@ public class ComplytSalesTaxRatesServiceImplTest {
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @Mock
-    AddressFetcher countyFetcher;
+    CountyFetcher countyFetcher;
 
 
     @Test

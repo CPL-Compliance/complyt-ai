@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.data_fetcher.AddressFetcher;
+import com.complyt.business.data_fetcher.CountyFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
@@ -29,11 +29,11 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    AddressFetcher countyFetcher;
+    CountyFetcher countyFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
-        String collection = StatesMap.statesToCollections.get(address.state());
+        String collection = StatesMap.statesToCollections.getOrDefault(address.state(), "default");
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
                 .switchIfEmpty(salesTaxWebClientWrapper.findByAddress(address)
