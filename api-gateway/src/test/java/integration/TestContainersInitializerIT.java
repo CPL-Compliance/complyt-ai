@@ -35,7 +35,7 @@ public abstract class TestContainersInitializerIT {
                 .withExposedPorts(8080)
                 .withCreateContainerCmdModifier(cmd -> cmd
                         .withPortBindings(new PortBinding(Ports.Binding.bindPort(8080), new ExposedPort(8080))))
-                .withRealmImportFile("realm-export.json");
+                .withRealmImportFile("realm-export-try.json");
         KEYCLOAK_CONTAINER.start();
 
         //Discovery Container
