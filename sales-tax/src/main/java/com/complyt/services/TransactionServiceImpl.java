@@ -88,15 +88,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Mono<Transaction> injectDataToNewTransaction(@NonNull Transaction transaction) {
         return injectCommonDataToNewAndModifiedTransaction(transaction)
-                .map(complytIdHandler::insertComplytIdToNew)
-                .map(NewTransactionInternalTimestampsInjector::new)
-                .map(NewTransactionInternalTimestampsInjector::inject);
+                .map(t -> complytIdHandler.insertComplytIdToNew(t))
+                .map(y -> new NewTransactionInternalTimestampsInjector(y))
+                .map(x -> x.inject());
     }
 
     private Mono<Transaction> injectCommonDataToNewAndModifiedTransaction(Transaction transaction) {
-        return countyProvider.provide(transaction)
-                .flatMap(productClassificationServiceImpl::getTransactionWithRelevantProductClassificationData)
-                .map(transactionItemsAmountsCollector::collect);
+        return productClassificationServiceImpl.getTransactionWithRelevantProductClassificationData(transaction)
+                .map(x -> transactionItemsAmountsCollector.collect(x))
+                .flatMap(y -> countyProvider.provide(y));
     }
 
     @Deprecated
