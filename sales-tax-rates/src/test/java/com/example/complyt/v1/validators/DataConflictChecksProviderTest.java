@@ -21,21 +21,30 @@ public class DataConflictChecksProviderTest {
 
     @BeforeEach
     void setup() {
-        Map<String, BiFunction<AddressDto, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap();
-        dataConflictChecksProvider = new DataConflictChecksProvider<>(null, Map.of());
+        dataConflictChecksProvider = new DataConflictChecksProvider<>(null, Map.of(
+                "specialVariable", (x, y) -> Mono.just(true)));
     }
 
     @Test
-    void getCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+    void getPathVariableCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
         // Given + When
-        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("externalId").flatMap(check -> check.apply(null, null));
+        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("").flatMap(check -> check.apply(null, null));
 
         // Then
         StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
     }
 
     @Test
-    void getCheck_Null_Variable_ReturnsNullPointerException() {
+    void getPathVariableCheck_VariableCheckFound_ReturnsSpecificCheck() {
+        // Given + When
+        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("specialVariable").flatMap(check -> check.apply(null, null));
+
+        // Then
+        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+    }
+
+    @Test
+    void getPathVariableCheck_Null_Variable_ReturnsNullPointerException() {
         // When
         Exception nullPointerException = assertThrows(NullPointerException.class, () -> {
             dataConflictChecksProvider.getPathVariableCheck(null);
