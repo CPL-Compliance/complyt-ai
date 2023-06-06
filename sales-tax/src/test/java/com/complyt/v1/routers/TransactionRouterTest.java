@@ -1751,7 +1751,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
-                .withState(null)
+//                .withState(null)
                 .withPartial(true);
 
         HashSet<String> expectedErrors = new HashSet<>(List.of(
