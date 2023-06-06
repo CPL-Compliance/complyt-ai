@@ -445,13 +445,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
-    }
-
-    @Override
-    @Test
-    @WithMockUser
     public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         /// Given
         String source = customerDto.source();
