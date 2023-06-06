@@ -1,0 +1,19 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${discovery-service-uri}
+  instance:
+    prefer-ip-address: true
+
+springdoc:
+  swagger-ui:
+    use-root-path: true
+    urls:
+      - name: files
+        url: /v3/api-docs/files
+      - name: sales-tax
+        url: /v3/api-docs/sales-tax
+      - name: sales-tax-rates
+        url: /v3/api-docs/sales-tax-rates
+  api-docs:
+    version: openapi_3_0
