@@ -530,9 +530,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
-                });
+                .value(map -> assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message")));
     }
 
     @Test
@@ -555,9 +553,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
-                });
+                .value(map -> assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message")));
     }
 
     @Test
@@ -793,9 +789,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals("Failed to read HTTP message", map.get("message"));
-                });
+                .value(map -> assertEquals("Failed to read HTTP message", map.get("message")));
     }
 
     @Test
@@ -815,13 +809,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isUnauthorized();
-    }
-
-    @Test
-    @Override
-    @WithMockUser
-    public void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
     }
 
     @Test
@@ -1751,7 +1738,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
-//                .withState(null)
+                .withState(null)
                 .withPartial(true);
 
         HashSet<String> expectedErrors = new HashSet<>(List.of(
