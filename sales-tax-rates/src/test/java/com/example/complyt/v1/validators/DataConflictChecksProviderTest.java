@@ -1,0 +1,57 @@
+package com.example.complyt.v1.validators;
+
+import com.complyt.v1.model.AddressDto;
+import com.complyt.v1.validators.DataConflictChecksProvider;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class DataConflictChecksProviderTest {
+
+    DataConflictChecksProvider<AddressDto> dataConflictChecksProvider;
+
+    @BeforeEach
+    void setup() {
+        Map<String, BiFunction<AddressDto, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap();
+        dataConflictChecksProvider = new DataConflictChecksProvider<>(null, Map.of());
+    }
+
+    @Test
+    void getCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+        // Given + When
+        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("externalId").flatMap(check -> check.apply(null, null));
+
+        // Then
+        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+    }
+
+    @Test
+    void getCheck_Null_Variable_ReturnsNullPointerException() {
+        // When
+        Exception nullPointerException = assertThrows(NullPointerException.class, () -> {
+            dataConflictChecksProvider.getPathVariableCheck(null);
+        });
+
+        // Then
+        assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void getBodyConflictCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+        // Given + When
+        Mono<Boolean> booleanMono = dataConflictChecksProvider.getBodyConflictCheck().flatMap(check -> check.apply(null));
+
+        // Then
+        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+    }
+
+}

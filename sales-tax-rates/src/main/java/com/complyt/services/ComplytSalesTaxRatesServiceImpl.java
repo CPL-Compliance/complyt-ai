@@ -33,7 +33,7 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
-        String collection = StatesMap.statesToCollections.getOrDefault(address.state(), "default");
+        String collection = StatesMap.statesToCollections.get(address.state());
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
                 .switchIfEmpty(salesTaxWebClientWrapper.findByAddress(address)

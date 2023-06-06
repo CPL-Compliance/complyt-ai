@@ -20,10 +20,7 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapp
 
     public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, boolean isPartial) {
         return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip, isPartial)
-                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates).
-                    doOnError(error -> {
-                    throw new ObjectNotFoundApiException();
-                });
+                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates);
     }
 
     public Mono<ComplytSalesTaxRates> findByAddress(Address address) {

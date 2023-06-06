@@ -9,7 +9,6 @@ import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.validators.ValidationHandler;
-import com.complyt.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -42,7 +41,7 @@ public class ComplytSalesTaxRatesHandler {
                 .then(addressDtoValidationHandler.validate(serverRequest))
                 .map(AddressMapper.INSTANCE::addressDtoToAddress)
                 .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
-                .map(c ->ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesToComplytSalesTaxRates(c))
+                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
                 .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info).thenReturn(complytSalesTaxRates))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
