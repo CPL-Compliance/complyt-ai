@@ -3,10 +3,12 @@ package com.complyt.v1.validators.query_params;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.model.AddressDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@Component
 public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<AddressDto> {
 
     public Mono<AddressDto> extract(ServerRequest serverRequest) {
