@@ -2,7 +2,7 @@ package com.complyt.business.mapper;
 
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.mappers.sales_tax.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.SalesTaxDataToSalesTaxRateMapper;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

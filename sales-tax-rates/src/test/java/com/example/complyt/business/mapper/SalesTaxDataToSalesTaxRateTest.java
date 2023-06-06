@@ -3,7 +3,7 @@ package com.example.complyt.business.mapper;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.mappers.sales_tax.SalesTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.SalesTaxDataToSalesTaxRateMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
