@@ -15,6 +15,7 @@ import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
+import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
 import com.example.complyt.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,9 @@ import static org.mockito.Mockito.when;
         ValidatorConfig.class,
         GlobalExceptionHandler.class,
         GlobalErrorAttributes.class,
-        SecurityConfig.class})
+        SecurityConfig.class,
+        AddressDtoQueryParamsExtractor.class
+})
 public class ComplytSalesTaxRatesRouterTest {
 
     @Autowired
