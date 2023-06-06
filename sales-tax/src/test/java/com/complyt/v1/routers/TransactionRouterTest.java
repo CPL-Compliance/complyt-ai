@@ -1746,6 +1746,62 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
+    public void upsert_PartialAddressWithNullState_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+                .withState(null)
+                .withPartial(true);
+
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
+//                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_PartialAddressWithNullZip_Returns400ValidationError() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress()
+                .withZip(null)
+                .withPartial(true);
+
+        HashSet<String> expectedErrors = new HashSet<>(List.of(
+                "Address.zip " + StringErrorMessages.MINMAX_100_ERROR));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(transactionDto.withShippingAddress(givenShippingAddress))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
+//                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void upsert_NullTransactionType_Returns400ValidationError() {
         // Given
         String externalId = transactionDto.externalId();

@@ -1,5 +1,7 @@
 package com.complyt.v1.routers;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 import testUtils.unit_test.templates.endpoints.*;
 import testUtils.unit_test.templates.validations.ExternalTimestampsValidationTestTemplate;
 import testUtils.unit_test.templates.validations.InternalTimestampsValidationTestTemplate;
@@ -76,6 +78,14 @@ public interface TransactionRouterTestTemplate extends
     void upsert_LengthGreaterThen100StateInBillingAddress_Returns400ValidationError();
 
     void upsert_LengthGreaterThen200StreetInBillingAddress_Returns400ValidationError();
+
+    @Test
+    @WithMockUser
+    void upsert_PartialAddressWithNullState_Returns400ValidationError();
+
+    @Test
+    @WithMockUser
+    void upsert_PartialAddressWithNullZip_Returns400ValidationError();
 
     // Validation::TransactionType
     void upsert_NullTransactionType_Returns400ValidationError();
