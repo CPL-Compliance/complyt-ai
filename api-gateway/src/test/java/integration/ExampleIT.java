@@ -9,9 +9,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -30,17 +28,17 @@ public class ExampleIT extends TestContainersInitializerIT {
     @Order(-1)
     @Test
     public void checkConnection() {
-        while (!isSalesTaxRegistered) {
+        while (!IS_SALES_TAX_REGISTERED) {
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/v1/customers")
                             .build())
                     .headers(headers -> headers
-                            .setBearerAuth(token))
+                            .setBearerAuth(TOKEN))
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
-                    .expectStatus().value(status -> isSalesTaxRegistered = status != 503);
+                    .expectStatus().value(status -> IS_SALES_TAX_REGISTERED = status != 503);
         }
     }
 
@@ -53,12 +51,28 @@ public class ExampleIT extends TestContainersInitializerIT {
                         .path("/v1/customers")
                         .build())
                 .headers(headers -> headers
-                        .setBearerAuth(token))
+                        .setBearerAuth(TOKEN))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
                 .value(string -> System.out.println(string.toString()));
+
+    }
+
+    @Order(1)
+    @Test
+    public void test2() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1/customers")
+                        .build())
+                .headers(headers -> headers
+                        .setBearerAuth(TOKEN_NO_SCOPES))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
 
     }
 

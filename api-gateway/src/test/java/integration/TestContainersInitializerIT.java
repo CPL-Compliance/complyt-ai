@@ -26,8 +26,9 @@ public abstract class TestContainersInitializerIT {
     protected static GenericContainer DISCOVERY_CONTAINER;
     protected static GenericContainer SALES_TAX_CONTAINER;
     protected static KeycloakContainer KEYCLOAK_CONTAINER;
-    protected static boolean isSalesTaxRegistered;
-    protected static String token;
+    protected static boolean IS_SALES_TAX_REGISTERED;
+    protected static String TOKEN;
+    protected static String TOKEN_NO_SCOPES;
 
     static {
         // OAuth Server
@@ -35,7 +36,7 @@ public abstract class TestContainersInitializerIT {
                 .withExposedPorts(8080)
                 .withCreateContainerCmdModifier(cmd -> cmd
                         .withPortBindings(new PortBinding(Ports.Binding.bindPort(8080), new ExposedPort(8080))))
-                .withRealmImportFile("realm-export-try.json");
+                .withRealmImportFile("realm-export.json");
         KEYCLOAK_CONTAINER.start();
 
         //Discovery Container
@@ -99,7 +100,25 @@ public abstract class TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.access_token").value(receivedToken ->
-                        token = receivedToken.toString());
+                        TOKEN = receivedToken.toString());
+
+        // Retrieve Token With No Scopes
+        getTokenClient
+                .post()
+                .uri(uriBuilder ->
+                        uriBuilder.path("/realms/test-realm/protocol/openid-connect/token")
+                                .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters
+                        .fromFormData("grant_type", "password")
+                        .with("client_id", "test-client-no-scope")
+                        .with("username", "test-user")
+                        .with("password", "password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.access_token").value(receivedToken ->
+                        TOKEN_NO_SCOPES = receivedToken.toString());
     }
 
     @DynamicPropertySource
