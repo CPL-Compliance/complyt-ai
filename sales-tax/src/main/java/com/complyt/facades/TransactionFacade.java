@@ -50,15 +50,15 @@ public class TransactionFacade {
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
-            return originalTransaction.equals(newTransaction) ?
-                    Mono.just(newTransaction) : update(externalId, source, newTransaction, originalTransaction);
-        }
+        return originalTransaction.equals(newTransaction) ?
+                Mono.just(newTransaction) : update(externalId, source, newTransaction, originalTransaction);
+    }
 
-        public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
-            return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
-                    .flatMap(checkedModifiedTransaction -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
-                            .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
-                                    .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
+    public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
+        return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
+                .flatMap(checkedModifiedTransaction -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
+                        .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
+                                .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                         handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo) :
                                         updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction))));
     }
