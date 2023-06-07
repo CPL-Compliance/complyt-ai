@@ -571,6 +571,12 @@
                 <activeEnv>test</activeEnv>
             </properties>
         </profile>
+        <profile>
+            <id>load-test</id>
+            <properties>
+                <activeEnv>load-test</activeEnv>
+            </properties>
+        </profile>
         <!-- Environment Profiles -->
     </profiles>
 </project>
