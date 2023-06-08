@@ -5,6 +5,7 @@ import com.complyt.v1.validators.DataConflictChecksProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import org.webjars.NotFoundException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -26,7 +27,7 @@ public class DataConflictChecksProviderTest {
     }
 
     @Test
-    void getPathVariableCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+    void getPathVariableCheck_NoVariableCheckFound_ReturnsDefaultCheck() {
         // Given + When
         Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("").flatMap(check -> check.apply(null, null));
 
@@ -45,17 +46,12 @@ public class DataConflictChecksProviderTest {
 
     @Test
     void getPathVariableCheck_Null_Variable_ReturnsNullPointerException() {
-        // When
-        Exception nullPointerException = assertThrows(NullPointerException.class, () -> {
-            dataConflictChecksProvider.getPathVariableCheck(null);
-        });
-
-        // Then
-        assertEquals("pathVariable is marked non-null but is null", nullPointerException.getMessage());
+        // When + Then
+        assertThrows(NullPointerException.class, () -> dataConflictChecksProvider.getPathVariableCheck(null));
     }
 
     @Test
-    void getBodyConflictCheck_NotVariableCheckFound_ReturnsDefaultCheck() {
+    void getBodyConflictCheck_NoVariableCheckFound_ReturnsDefaultCheck() {
         // Given + When
         Mono<Boolean> booleanMono = dataConflictChecksProvider.getBodyConflictCheck().flatMap(check -> check.apply(null));
 

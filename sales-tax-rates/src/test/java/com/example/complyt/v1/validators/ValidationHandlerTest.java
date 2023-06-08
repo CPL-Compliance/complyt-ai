@@ -79,7 +79,7 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void validate_ValidAndconflictedDtoBecauseOfNullCountry_ReturnsDto() {
+    void validate_ValidAndConflictedDtoBecauseOfNullCountry_ReturnsDto() {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withCountry(null);
 
