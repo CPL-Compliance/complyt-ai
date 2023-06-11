@@ -1,0 +1,27 @@
+server.port: 8762
+spring:
+  application.name: discovery-service-clustered
+
+eureka:
+  client:
+    # We set these two parameters to prevent from the Discovery Service to look for a discovery service
+    # (because this is who he is) and fetch its registry
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://complyt-peer-1:8761/eureka/, http://complyt-peer-3:8763/eureka/
+  server:
+    expected-client-renewal-interval-seconds: 30
+    eviction-interval-timer-in-ms: 60000
+    renewal-percent-threshold: 0.85
+    renewal-threshold-update-interval-ms: 900000
+    enable-self-preservation: true
+  instance:
+    lease-expiration-duration-in-seconds: 90
+    prefer-ip-address: true
+    hostname: complyt-peer-2
+
+
+# Observability
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.tracing.sampling.probability: 1.0
