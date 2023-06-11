@@ -54,6 +54,7 @@ public class ValidationHandler<T, U extends Validator> {
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
+                        .concatWith(dataConflictChecksProvider.getBodyConflictCheck().flatMap(check -> check.apply(body)))
                         .all(valid -> valid)
                         .flatMap(allValid -> allValid ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException())));

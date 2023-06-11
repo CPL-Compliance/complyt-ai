@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-
 @WebFluxTest
 @ContextConfiguration(classes = {CustomerRouter.class, CustomerHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
@@ -446,13 +445,6 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403() {
-        // ???
-    }
-
-    @Override
-    @Test
-    @WithMockUser
     public void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403() {
         /// Given
         String source = customerDto.source();
@@ -569,7 +561,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MINMAX_100_ERROR));
 
         // When + Then
@@ -593,7 +585,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21));
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
 
         // When + Then
@@ -617,7 +609,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         /// Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MINMAX_50_ERROR));
 
         // When + Then
@@ -641,7 +633,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MINMAX_100_ERROR));
 
         // When + Then
@@ -665,7 +657,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MINMAX_100_ERROR));
         // When + Then
         webTestClient
@@ -688,7 +680,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         // Given
         String externalId = customerDto.externalId();
         String source = customerDto.source();
-        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip");
+        OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip", false);
         Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.MINMAX_200_ERROR));
 
         // When + Then

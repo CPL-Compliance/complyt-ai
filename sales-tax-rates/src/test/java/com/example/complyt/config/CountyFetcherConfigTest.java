@@ -23,7 +23,7 @@ public class CountyFetcherConfigTest {
         FastTaxCountyFetcher expectedFastTaxCountyFetcher = new FastTaxCountyFetcher();
 
         // When
-        FastTaxCountyFetcher actualFastTaxCountyFetcher = countyFetcherConfig.FastTaxCountyFetcher();
+        FastTaxCountyFetcher actualFastTaxCountyFetcher = countyFetcherConfig.fastTaxAddressFetcher();
 
         // Then
         assertEquals(expectedFastTaxCountyFetcher, actualFastTaxCountyFetcher);
@@ -35,7 +35,7 @@ public class CountyFetcherConfigTest {
         ZipTaxCountyFetcher expectedZipTaxCountyFetcher = new ZipTaxCountyFetcher();
 
         // When
-        ZipTaxCountyFetcher actualZipTaxCountyFetcher = countyFetcherConfig.ZipTaxCountyFetcher();
+        ZipTaxCountyFetcher actualZipTaxCountyFetcher = countyFetcherConfig.zipTaxAddressFetcher();
 
         // Then
         assertEquals(expectedZipTaxCountyFetcher, actualZipTaxCountyFetcher);

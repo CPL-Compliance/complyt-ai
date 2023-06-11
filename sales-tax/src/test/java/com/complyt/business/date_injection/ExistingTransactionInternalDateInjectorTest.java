@@ -37,8 +37,8 @@ class ExistingTransactionInternalDateInjectorTest {
         String tenantId = UUID.randomUUID().toString();
         LocalDateTime localDateTime_now = LocalDateTime.now();
         Timestamps internalTimeStamps = new Timestamps(localDateTime_now, localDateTime_now);
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
