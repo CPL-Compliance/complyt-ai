@@ -17,9 +17,9 @@ import java.util.function.Function;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataConflictChecksProvider<T> {
 
-    Map<String, BiFunction<T, ServerRequest, Mono<Boolean>>> pathVariablesChecksMap;
-
     Function<T, Mono<Boolean>> bodyConflictCheckFunction;
+
+    Map<String, BiFunction<T, ServerRequest, Mono<Boolean>>> pathVariablesChecksMap;
 
     public Mono<BiFunction<T, ServerRequest, Mono<Boolean>>> getPathVariableCheck(@NonNull String pathVariable) {
         BiFunction<T, ServerRequest, Mono<Boolean>> check = pathVariablesChecksMap.get(pathVariable);

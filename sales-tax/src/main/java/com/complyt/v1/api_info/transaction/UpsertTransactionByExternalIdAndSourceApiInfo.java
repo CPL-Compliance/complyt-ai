@@ -123,7 +123,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                    "county": null,
                    "state": "CA",
                    "street": "3098 N Remington Ave",
-                   "zip": "93711-5508"
+                   "zip": "93711-5508",
+                   "isPartial": false
                },
                "shippingAddress": {
                    "city":"fresno",
@@ -131,7 +132,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                    "county": null,
                    "state": "CA",
                    "street": "3098 N Remington Ave",
-                   "zip": "93711-5508"
+                   "zip": "93711-5508",
+                   "isPartial": false
                },
                "customerId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
                "externalTimestamps": {
@@ -187,7 +189,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                     "county": "string",
                     "state": "string",
                     "street": "string",
-                    "zip": "string"
+                    "zip": "string",
+                    "isPartial": false
                 },
                 "shippingAddress": {
                     "city": "string",
@@ -195,7 +198,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                     "county": "string",
                     "state": "string",
                     "street": "string",
-                    "zip": "string"
+                    "zip": "string",
+                    "isPartial": false
                 },
                 "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                 "customer": {
@@ -209,7 +213,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                         "county": "string",
                         "state": "string",
                         "street": "string",
-                        "zip": "string"
+                        "zip": "string",
+                        "isPartial": false
                     },
                     "customerType": "RETAIL",
                     "internalTimestamps": {

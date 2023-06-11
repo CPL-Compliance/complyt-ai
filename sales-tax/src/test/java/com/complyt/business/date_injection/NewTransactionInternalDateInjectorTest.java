@@ -36,8 +36,8 @@ class NewTransactionInternalDateInjectorTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",

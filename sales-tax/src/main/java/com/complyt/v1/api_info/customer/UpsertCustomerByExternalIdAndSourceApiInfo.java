@@ -111,7 +111,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             "        \"county\": null,\n" +
             "        \"state\": \"CA\",\n" +
             "        \"street\": \"944 W. Wintergreen St.\",\n" +
-            "        \"zip\": \"95823\"\n" +
+            "        \"zip\": \"95823,\"\n" +
+            "        \"isPartial\": false\n" +
             "    },\n" +
             "    \"customerType\": \"RETAIL\",\n" +
             "    \"externalTimestamps\": {\n" +
@@ -132,7 +133,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
             "        \"county\": null,\n" +
             "        \"state\": \"CA\",\n" +
             "        \"street\": \"944 W. Wintergreen St.\",\n" +
-            "        \"zip\": \"95823\"\n" +
+            "        \"zip\": \"95823,\"\n" +
+            "        \"isPartial\": false\n" +
             "    },\n" +
             "    \"customerType\": \"RETAIL\",\n" +
             "    \"internalTimestamps\": {\n" +

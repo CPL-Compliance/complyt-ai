@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class StubComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapper<ComplytSalesTaxRates> {
 
     @Override
-    public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip) {
+    public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, boolean isPartial) {
         return null;
     }
 

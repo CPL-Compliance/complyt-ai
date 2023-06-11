@@ -52,7 +52,7 @@ public class EconomicNexusByPreviousCalenderYearIT extends TestContainersInitial
 
     //Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Miami", "US", null, "FL", "2100 NW 42nd Ave", "33142", false);
     private final UUID customerId = UUID.fromString("59e5b878-3f3d-42f9-a639-e3bbe5665148"); // complytId of an existing customer in the database
     private final UUID customerIdOfReseller = UUID.fromString("b351f97d-d605-4eaa-bf69-b246865b0ca3"); // complytId of an existing customer in the database
     private final String source = "1";

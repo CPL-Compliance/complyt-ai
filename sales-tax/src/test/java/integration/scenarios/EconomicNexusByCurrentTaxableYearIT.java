@@ -53,7 +53,7 @@ public class EconomicNexusByCurrentTaxableYearIT extends TestContainersInitializ
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
     private final UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false);
     private final String source = "1";
 
     @DynamicPropertySource

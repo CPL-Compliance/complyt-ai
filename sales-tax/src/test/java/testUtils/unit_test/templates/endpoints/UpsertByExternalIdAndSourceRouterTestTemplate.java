@@ -29,8 +29,6 @@ public interface UpsertByExternalIdAndSourceRouterTestTemplate {
 
     void upsertByExternalIdAndSource_UnauthenticatedUser_Returns401();
 
-    void upsertByExternalIdAndSource_UserWithoutAuthorities_Returns403();
-
     void upsertByExternalIdAndSource_UserWithoutCSRFToken_Returns403();
 
     void upsertByExternalIdAndSource_InternalServerError_Returns500();

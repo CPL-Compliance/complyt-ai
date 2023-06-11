@@ -27,7 +27,7 @@ public interface TestUtilities {
     String LOMBOK_NON_NULL_ANNOTATION_MESSAGE = "is marked non-null but is null";
 
     static Address createAddressInNewYork() {
-        return new Address("New York", "US", null, "NY", "160 Broadway", "10038");
+        return new Address("New York", "US", null, "NY", "160 Broadway", "10038", false);
     }
 
     static SalesTaxRates createNewYorkSalesTaxRates() {
@@ -42,11 +42,11 @@ public interface TestUtilities {
     }
 
     static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static AddressDto createAddressDtoInCalifornia() {
-        return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
@@ -79,7 +79,7 @@ public interface TestUtilities {
     }
 
     static AddressDto createStubFastTaxAddressDto() {
-        return new AddressDto("Englewood", "US", null, "CO", "street", "80112");
+        return new AddressDto("Englewood", "US", null, "CO", "street", "80112", false);
     }
 
     static Result createResult() {
