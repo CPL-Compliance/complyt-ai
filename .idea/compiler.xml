@@ -25,6 +25,8 @@
         </processorPath>
         <module name="api-gateway" />
         <module name="test-service" />
+        <module name="files" />
+        <module name="sales-tax-rates" />
         <module name="discovery-service" />
         <module name="sales-tax" />
       </profile>
