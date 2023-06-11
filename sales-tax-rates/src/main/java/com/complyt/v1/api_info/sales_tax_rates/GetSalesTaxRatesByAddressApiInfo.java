@@ -106,7 +106,8 @@ public @interface GetSalesTaxRatesByAddressApiInfo {
                     "county": "New York",
                     "state": "NY",
                     "street": "160 Broadway",
-                    "zip": "10038"
+                    "zip": "10038",
+                    "isPartial": false
                 },
                 "salesTaxRates": {
                     "cityDistrictRate": 0.0,
