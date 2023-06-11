@@ -17,8 +17,8 @@ class AddressTest {
 
     @BeforeEach
     void setUp() {
-        address = new Address("City", "Country", "County", "State", "Street", "ZIP");
-        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP");
+        address = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
+        referenceAddress = new Address("City", "Country", "County", "State", "Street", "ZIP", false);
     }
 
     @Test
@@ -68,12 +68,14 @@ class AddressTest {
 
     @Test
     void toString_SameStrings_Equal() {
+        boolean isPartial = false;
         String referenceString = "Address[city=" + city +
                 ", country=" + country +
                 ", county=" + county +
                 ", state=" + state +
                 ", street=" + street +
-                ", zip=" + zip + "]";
+                ", zip=" + zip +
+                ", isPartial=" + isPartial + "]";
 
         assertEquals(referenceString, address.toString());
     }

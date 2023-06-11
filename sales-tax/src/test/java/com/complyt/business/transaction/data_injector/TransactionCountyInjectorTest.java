@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TransactionCountyInjectorTest {
 
-    TransactionCountyInjector transactionCountyInjector;
+    TransactionCountyInjector transactionAddressInjector;
 
     Transaction transaction;
 
     @BeforeEach
     void setUp() {
         transaction = createTransaction();
-        transactionCountyInjector = new TransactionCountyInjector(transaction);
+        transactionAddressInjector = new TransactionCountyInjector(transaction);
     }
 
     private Transaction createTransaction() {
@@ -36,8 +36,8 @@ class TransactionCountyInjectorTest {
         String externalId = UUID.randomUUID().toString();
         ObjectId customerId = new ObjectId();
         String tenantId = UUID.randomUUID().toString();
-        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip");
-        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip");
+        Address billingAddress = new Address("City", "Country", "County", "State", "Street", "Zip", false);
+        Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<Item>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
@@ -63,16 +63,17 @@ class TransactionCountyInjectorTest {
         TransactionCountyInjector injector = new TransactionCountyInjector(transaction);
 
         // Then
-        assertEquals(transaction, injector.getTransaction());
+        assertEquals(transaction, injector.transaction());
     }
 
     @Test
     void inject_DifferentCounty_TransitionModified() {
         // Given
-        Transaction expectedTransition = transaction.withShippingAddress(transaction.getShippingAddress().withCounty("New County"));
+        Address address = transaction.getShippingAddress().withCounty("New County");
+        Transaction expectedTransition = transaction.withShippingAddress(address);
 
         // When
-        Mono<Transaction> transactionMono = transactionCountyInjector.inject("New County");
+        Mono<Transaction> transactionMono = transactionAddressInjector.inject(address.county());
 
         // Then
         StepVerifier.create(transactionMono).expectNext(expectedTransition).verifyComplete();

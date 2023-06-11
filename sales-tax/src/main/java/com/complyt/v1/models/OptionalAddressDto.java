@@ -13,6 +13,7 @@ public record OptionalAddressDto(
         @Size(max = 100, message = "Address.county " + StringErrorMessages.MINMAX_100_ERROR) String county,
         @Size(max = 100, message = "Address.state " + StringErrorMessages.MINMAX_100_ERROR) String state,
         @Size(max = 200, message = "Address.street" + StringErrorMessages.MINMAX_200_ERROR) String street,
-        @Size(max = 20, message = "Address.zip " + StringErrorMessages.MINMAX_20_ERROR) String zip) {
+        @Size(max = 20, message = "Address.zip " + StringErrorMessages.MINMAX_20_ERROR) String zip,
+        boolean isPartial) {
 
 }

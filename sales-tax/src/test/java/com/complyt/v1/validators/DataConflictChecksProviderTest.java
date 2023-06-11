@@ -22,7 +22,7 @@ class DataConflictChecksProviderTest {
     void setup() {
         Map<String, BiFunction<SourceCheckable, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap();
         variableConflictChecksMap.put("source", SourceCheckable.SOURCE_CONFLICT_CHECK);
-        dataConflictChecksProvider = new DataConflictChecksProvider<>(variableConflictChecksMap);
+        dataConflictChecksProvider = new DataConflictChecksProvider<>(variableConflictChecksMap, null);
     }
 
     @Test

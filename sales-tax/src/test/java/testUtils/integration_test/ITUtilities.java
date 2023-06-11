@@ -24,7 +24,7 @@ public interface ITUtilities {
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
         return new TransactionDto(null, externalId, "1",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
-                null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220"), customerId,
+                null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
                 TransactionTypeDto.INVOICE, null, null, 0, 0, 0);
     }
@@ -134,22 +134,22 @@ public interface ITUtilities {
     }
 
     public static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+        return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
-     static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508");
+    static MandatoryAddressDto createAddressDtoInCalifornia() {
+        return new MandatoryAddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
-     static SalesTaxRates createCaliforniaSalesTaxRates() {
+    static SalesTaxRates createCaliforniaSalesTaxRates() {
         return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
     }
 
-     static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+    static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
         return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
     }
 
-     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+    static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
         Address address = createAddressInCalifornia();
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();

@@ -3,6 +3,7 @@ package com.complyt.business.sales_tax.sales_tax_web_clients;
 import com.complyt.domain.Address;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,13 +18,13 @@ public class ComplytSalesTaxRatesClientWrapper implements SalesTaxWebClientWrapp
 
     SalesTaxRatesServiceProxy salesTaxRatesServiceProxy;
 
-    public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip) {
-        return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip)
+    public Mono<ComplytSalesTaxRates> findByAddress(String state, String country, String county, String city, String street, String zip, boolean isPartial) {
+        return salesTaxRatesServiceProxy.findByAddress(state, country, county, city, street, zip, isPartial)
                 .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesDtoToComplytSalesTaxRates);
     }
 
     public Mono<ComplytSalesTaxRates> findByAddress(Address address) {
-        return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip());
+        return findByAddress(address.state(), address.country(), address.county(), address.city(), address.street(), address.zip(), address.isPartial());
     }
 
 }

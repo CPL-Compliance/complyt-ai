@@ -114,7 +114,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                 "county": "string",
                                 "state": "string",
                                 "street": "string",
-                                "zip": "string"
+                                "zip": "string",
+                                "isPartial": false
                             },
                             "shippingAddress": {
                                 "city": "string",
@@ -122,7 +123,8 @@ public @interface GetAllTransactionsBySourceApiInfo {
                                 "county": "string",
                                 "state": "string",
                                 "street": "string",
-                                "zip": "string"
+                                "zip": "string",
+                                "isPartial": false
                             },
                             "customerId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                             "customer": {
