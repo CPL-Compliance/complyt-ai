@@ -170,6 +170,19 @@
       "attributes": {
         "tenant_id": "it_tenant"
       }
+    },
+    {
+      "username": "test-user-different-tenant",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ],
+      "attributes": {
+        "tenant_id": "different_tenant"
+      }
     }
   ]
 }

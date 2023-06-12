@@ -1,6 +1,7 @@
 package integration;
 
 
+import integration.test_utils.TestUtilities;
 import io.complyt.apigateway.ApiGatewayApplication;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -10,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @SpringBootTest(classes = ApiGatewayApplication.class
         , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
@@ -74,6 +78,28 @@ public class ExampleIT extends TestContainersInitializerIT {
                 .exchange()
                 .expectStatus().isForbidden();
 
+    }
+
+    @Test
+    @WithMockUser
+    @Order(1)
+    public void upsertByExternalIdAndSource_DoesntExistsAndCustomerDoesntExists_Returns404() {
+        String externalId = "10001";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + "1" + "/externalId/" + externalId)
+                        .build())
+                .headers(headers -> {
+                            headers.setBearerAuth(TOKEN);
+                            headers.setContentType(MediaType.APPLICATION_JSON);
+                        })
+                .bodyValue(TestUtilities.transactionJsonExample("10001", TestUtilities.NON_EXISTING_COMPLYT_ID))
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     @Test

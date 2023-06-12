@@ -25,10 +25,12 @@ public abstract class TestContainersInitializerIT {
     protected static final MongoDBContainer MONGO_CONTAINER;
     protected static GenericContainer DISCOVERY_CONTAINER;
     protected static GenericContainer SALES_TAX_CONTAINER;
+    protected static GenericContainer SALES_TAX_RATES_CONTAINER;
     protected static KeycloakContainer KEYCLOAK_CONTAINER;
     protected static boolean IS_SALES_TAX_REGISTERED;
     protected static String TOKEN;
     protected static String TOKEN_NO_SCOPES;
+    protected static String TOKEN_DIFFERENT_TENANT;
 
     static {
         // OAuth Server
@@ -76,9 +78,29 @@ public abstract class TestContainersInitializerIT {
                 );
         SALES_TAX_CONTAINER.start();
 
+        //Sales Tax Rates Container
+        SALES_TAX_RATES_CONTAINER = new GenericContainer<>(
+                new ImageFromDockerfile()
+                        .withFileFromPath(".", Path.of("../sales-tax-rates/target"))
+                        .withDockerfileFromBuilder(builder -> builder
+                                .from("amazoncorretto:17-al2023-jdk")
+                                .add("sales-tax-rates-0.0.2-SNAPSHOT.jar", "app.jar")
+                                .run("sh -c 'touch app.jar'")
+                                .entryPoint("java", "-Dspring.profiles.active=integration-test, stubFastTax",
+                                        "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" + MONGO_CONTAINER.getMappedPort(27017),
+                                        "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
+                                        "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar")
+                        )).withExposedPorts(9870)
+                .withAccessToHost(true)
+                .withCreateContainerCmdModifier(cmd -> cmd
+                        .withPortBindings(new PortBinding(Ports.Binding.bindPort(9870), new ExposedPort(9870)))
+                );
+        SALES_TAX_RATES_CONTAINER.start();
+
         // Restore Dump
         try {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax.dump");
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax_rates.dump");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -119,6 +141,24 @@ public abstract class TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.access_token").value(receivedToken ->
                         TOKEN_NO_SCOPES = receivedToken.toString());
+
+        // Retrieve Token With Different Tenant
+        getTokenClient
+                .post()
+                .uri(uriBuilder ->
+                        uriBuilder.path("/realms/test-realm/protocol/openid-connect/token")
+                                .build())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters
+                        .fromFormData("grant_type", "password")
+                        .with("client_id", "test-client")
+                        .with("username", "test-user-different-tenant")
+                        .with("password", "password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.access_token").value(receivedToken ->
+                        TOKEN_DIFFERENT_TENANT = receivedToken.toString());
     }
 
     @DynamicPropertySource
