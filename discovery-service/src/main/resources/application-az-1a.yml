@@ -1,6 +1,6 @@
 server.port: 8761
 spring:
-  application.name: discovery-service
+  application.name: discovery-service-clustered
   cloud:
     vault:
       enabled: true
@@ -31,8 +31,8 @@ eureka:
   client:
     # We set these two parameters to prevent from the Discovery Service to look for a discovery service
     # (because this is who he is) and fetch its registry
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
     serviceUrl:
       defaultZone: ${service-url-default-zone}
   server:
@@ -43,6 +43,7 @@ eureka:
     enable-self-preservation: true
   instance:
     lease-expiration-duration-in-seconds: 90
+    prefer-ip-address: true
 
 
 # Observability
