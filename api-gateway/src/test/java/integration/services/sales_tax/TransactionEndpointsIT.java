@@ -34,6 +34,44 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private final String source = "1";
     private final String customerId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
 
+    String dope = """
+            {
+                "externalId": "10002",
+                "source": "1",
+                "items": [
+                    {
+                        "unitPrice": 0,
+                        "quantity": 0,
+                        "totalPrice": 0,
+                        "description": "string",
+                        "name": "string",
+                        "taxCode": "C1S1",
+                        "manualSalesTax": true,
+                        "manualSalesTaxRate": 0
+                    }
+                ],
+                "shippingAddress": {
+                    "city": "Los Angeles",
+                    "country": "US",
+                    "state": "CA",
+                    "street": "10 5th Ave",
+                    "zip": "90210"
+                },
+                "customerId": "1111111-1111-1111-1111-111111111111",
+                "transactionStatus": "ACTIVE",
+                "externalTimestamps": {
+                    "createdDate": "2023-02-05T12:24:43.193Z",
+                    "updatedDate": "2023-02-05T12:24:43.193Z"
+                },
+                "transactionType": "INVOICE",
+                "shippingFee": {
+                    "manualSalesTax": true,
+                    "manualSalesTaxRate": 0,
+                    "totalPrice": 0,
+                    "taxCode": "C6S1"
+                }
+            }""";
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -74,7 +112,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -98,7 +136,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExample(externalId, TestUtilities.NON_EXISTING_COMPLYT_ID))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -122,7 +160,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState))
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -147,7 +185,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.transactionJsonExample(externalId, customerId))
+                .bodyValue(TestUtilities.transactionJsonExampleWithState(externalId, customerId, nonExistingState))
                 .exchange()
                 .expectStatus().is5xxServerError();
 

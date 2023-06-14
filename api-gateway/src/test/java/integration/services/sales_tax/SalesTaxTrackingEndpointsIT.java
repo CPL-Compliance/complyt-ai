@@ -253,7 +253,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("California", "CA", null))
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
                 .exchange()
                 .expectStatus().isCreated();
     }
@@ -335,7 +335,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("California", "CA", null))
+                .bodyValue(TestUtilities.unvalidatedSalesTaxTrackingJsonExample("California", "CA"))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(LinkedHashMap.class)
