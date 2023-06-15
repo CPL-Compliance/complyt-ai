@@ -44,6 +44,7 @@ eureka:
   instance:
     lease-expiration-duration-in-seconds: 90
     prefer-ip-address: false
+    hostname: internal-test-discovery-srv-az-1b-lb-1948490039.us-east-1.elb.amazonaws.com
 
 
 # Observability

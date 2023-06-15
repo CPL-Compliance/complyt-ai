@@ -71,6 +71,13 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <!-- Logging -->
+        <!-- Other -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Other -->
     </dependencies>
     <build>
         <plugins>
