@@ -20,11 +20,11 @@ public class EurekaConfig {
     Environment environment;
 
     @Bean
-    @Profile("production, az-1a, az-1b")
+    @Profile({"az-1a", "az-1b"})
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
         EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
         AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
-        bean.setDataCenterInfo(info);
+//        bean.setDataCenterInfo(info);
 
         String ip = InetAddress.getLocalHost().getHostAddress();
         String port = environment.getProperty("server.port");
