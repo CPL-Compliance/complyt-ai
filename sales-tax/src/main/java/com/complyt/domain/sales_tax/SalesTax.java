@@ -2,12 +2,6 @@ package com.complyt.domain.sales_tax;
 
 import lombok.*;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @With
-public class SalesTax {
-    private float amount;
-    private SalesTaxRates salesTaxRates;
+public record SalesTax(float amount, SalesTaxRates salesTaxRates) {
 }

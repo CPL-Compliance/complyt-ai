@@ -1,17 +1,10 @@
 package com.complyt.business.transaction.data_injector;
 
 import com.complyt.domain.Transaction;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 
-@Getter
-@AllArgsConstructor
-public class TransactionCountyInjector implements TransactionDataInjector<String> {
-
-    @NonNull
-    private final Transaction transaction;
+public record TransactionCountyInjector(@NonNull Transaction transaction) implements TransactionDataInjector<String> {
 
     @Override
     public Mono<Transaction> inject(String county) {

@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -18,8 +19,15 @@ public class DataConflictChecksProvider<T> {
 
     Map<String, BiFunction<T, ServerRequest, Mono<Boolean>>> pathVariablesChecksMap;
 
+    Function<T, Mono<Boolean>> bodyConflictCheckFunction;
+
     public Mono<BiFunction<T, ServerRequest, Mono<Boolean>>> getPathVariableCheck(@NonNull String pathVariable) {
         BiFunction<T, ServerRequest, Mono<Boolean>> check = pathVariablesChecksMap.get(pathVariable);
         return Mono.just(check == null ? (body, request) -> Mono.just(true) : check);
     }
+
+    public Mono<Function<T, Mono<Boolean>>> getBodyConflictCheck() {
+        return Mono.just(bodyConflictCheckFunction == null ? (body) -> Mono.just(true) : bodyConflictCheckFunction);
+    }
+
 }

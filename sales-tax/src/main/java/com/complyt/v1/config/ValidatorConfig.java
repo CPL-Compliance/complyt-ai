@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @Configuration
 public class ValidatorConfig {
@@ -29,17 +30,18 @@ public class ValidatorConfig {
         map.put("source", CustomerDto.SOURCE_CONFLICT_CHECK);
         map.put("externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK);
 
-        return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter, new DataConflictChecksProvider(map));
+        return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter, new DataConflictChecksProvider(map, null));
     }
 
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
 
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = Map.of(
-        "source", TransactionDto.SOURCE_CONFLICT_CHECK,
-        "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK);
+                "source", TransactionDto.SOURCE_CONFLICT_CHECK,
+                "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK
+        );
 
-        return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
+        return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, BodyCheckConfig.TRANSACTION_BODY_CHECK));
     }
 
     @Bean
@@ -48,7 +50,7 @@ public class ValidatorConfig {
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
         variableConflictChecksMap.put("complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK);
 
-        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
+        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, null));
     }
 
     @Bean
@@ -57,6 +59,6 @@ public class ValidatorConfig {
         Map<String, BiFunction<?, ServerRequest, Mono<Boolean>>> variableConflictChecksMap = new HashMap<>();
         variableConflictChecksMap.put("state", StateCheckable.STATE_CONFLICT_CHECK);
 
-        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap));
+        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, null));
     }
 }

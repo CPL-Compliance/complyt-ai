@@ -50,7 +50,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
     @Autowired
     private WebTestClient webTestClient;
 
-    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202");
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Indianapolis", "US", null, "IN", "705 Riley Hospital Dr", "46202", false);
     private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
     private final String source = "1";
 

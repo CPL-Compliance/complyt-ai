@@ -13,13 +13,13 @@ public class CountyFetcherConfig {
 
     @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("countyFetcher")
-    public FastTaxCountyFetcher FastTaxCountyFetcher() {
+    public FastTaxCountyFetcher fastTaxAddressFetcher() {
         return new FastTaxCountyFetcher();
     }
 
     @Profile({"zipTax"})
     @Bean("countyFetcher")
-    public ZipTaxCountyFetcher ZipTaxCountyFetcher() {
+    public ZipTaxCountyFetcher zipTaxAddressFetcher() {
         return new ZipTaxCountyFetcher();
     }
 }

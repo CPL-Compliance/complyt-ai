@@ -34,7 +34,7 @@ class TransactionCountyFetcherTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
     }
-    
+
     @Test
     void inject_InjectsCounty_ReturnsTransaction() {
         // Given

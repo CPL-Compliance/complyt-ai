@@ -59,27 +59,29 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface GetAllCustomersApiInfo {
-    String customerExample = "[{\n" +
-            "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-            "    \"externalId\": \"999444\",\n" +
-            "    \"source\": \"1\",\n" +
-            "    \"name\": \"Complyt\",\n" +
-            "    \"address\": {\n" +
-            "        \"city\": \"Sacramento\",\n" +
-            "        \"country\": \"US\",\n" +
-            "        \"county\": null,\n" +
-            "        \"state\": \"CA\",\n" +
-            "        \"street\": \"944 W. Wintergreen St.\",\n" +
-            "        \"zip\": \"95823\"\n" +
-            "    },\n" +
-            "    \"customerType\": \"RETAIL\",\n" +
-            "    \"internalTimestamps\": {\n" +
-            "        \"createdDate\": \"2023-01-10T17:40:44.357\",\n" +
-            "        \"updatedDate\": \"2023-01-11T17:10:21.275\"\n" +
-            "    },\n" +
-            "    \"externalTimestamps\": {\n" +
-            "        \"createdDate\": \"2022-10-19T07:00:00\",\n" +
-            "        \"updatedDate\": \"2022-10-19T09:07:54.585\"\n" +
-            "    }\n" +
-            "}]";
+    String customerExample = """
+            [{
+                "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
+                "externalId": "999444",
+                "source": "1",
+                "name": "Complyt",
+                "address": {
+                    "city": "Sacramento",
+                    "country": "US",
+                    "county": null,
+                    "state": "CA",
+                    "street": "944 W. Wintergreen St.",
+                    "zip": "95823",
+                    "isPartial": false
+                },
+                "customerType": "RETAIL",
+                "internalTimestamps": {
+                    "createdDate": "2023-01-10T17:40:44.357",
+                    "updatedDate": "2023-01-11T17:10:21.275"
+                },
+                "externalTimestamps": {
+                    "createdDate": "2022-10-19T07:00:00",
+                    "updatedDate": "2022-10-19T09:07:54.585"
+                }
+            }]""";
 }
