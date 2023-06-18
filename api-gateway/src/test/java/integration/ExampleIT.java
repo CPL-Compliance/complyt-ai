@@ -15,8 +15,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
-
 @SpringBootTest(classes = ApiGatewayApplication.class
         , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
         , properties = {"server.port=8765", "management.server.port=8765"}
