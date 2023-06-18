@@ -34,4 +34,10 @@ public class WebClientWrapperPropertiesConfig {
     public WebClientWrapperProperties stubFastTaxWebClientWrapperProperties() {
         return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
     }
+
+    @Profile({"taxJar"})
+    @Bean("taxJarWebClientWrapperProperties")
+    public WebClientWrapperProperties taxJarWebClientWrapperProperties() {
+        return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
+    }
 }
