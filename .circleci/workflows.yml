@@ -37,6 +37,36 @@ parameters:
     default: false
 
 jobs:
+  verify-gateway:
+    parameters:
+      service_directory:
+        type: string
+        defualt: ""
+    working_directory: ~/complyt_work_directory/api-gateway
+    executor: ubuntu-vm
+    steps:
+      - checkout:
+            path: ~/complyt_work_directory
+      - run:
+          name: Package Discovery Service
+          command: cd ../discovery-service ; ./mvnw clean package
+      - run:
+          name: Package Sales Tax
+          command: cd ../sales-tax ; ./mvnw clean package
+      - run:
+          name: Package Sales Tax Rates
+          command: cd ../sales-tax-rates ; ./mvnw clean package
+      - run:
+          name: Executeg
+          command: cd ../api-gateway ; ./mvnw clean verify
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-reports
+            - failsafe-reports
+            - surefire-reports
+            - site
+
   verify:
     parameters:
       service_directory:
@@ -190,7 +220,7 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - verify:
+      - verify-gateway:
           filters:
             branches:
               only:
@@ -206,7 +236,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+            - verify-gateway
             - deploy
           service_directory: "api-gateway"
 
