@@ -114,11 +114,6 @@ public abstract class TestContainersInitializerIT {
                 receivedToken -> TOKEN_DIFFERENT_TENANT = receivedToken);
     }
 
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("eureka.client.serviceUrl.defaultZone", () -> "http://localhost:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka");
-    }
-
     private static void fetchJarFile(String service) {
         try {
             Files.newDirectoryStream(Paths.get(targetPath(service)), "*.jar")
@@ -168,5 +163,10 @@ public abstract class TestContainersInitializerIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.access_token").value(tokenConsumer);
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("eureka.client.serviceUrl.defaultZone", () -> "http://localhost:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka");
     }
 }
