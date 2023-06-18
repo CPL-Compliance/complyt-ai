@@ -225,7 +225,6 @@ workflows:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
-          service_directory: "api-gateway"
 
       - deploy:
           filters:
