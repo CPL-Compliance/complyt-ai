@@ -53,7 +53,7 @@ jobs:
           name: Package Sales Tax Rates
           command: cd ../sales-tax-rates ; ./mvnw clean package
       - run:
-          name: Executeg
+          name: Execute
           command: cd ../api-gateway ; ./mvnw clean verify
       - persist_to_workspace:
           root: target
