@@ -264,7 +264,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify-gateway
+            - verify
             - deploy
           service_directory: "api-gateway"
 
