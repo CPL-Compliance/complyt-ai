@@ -84,16 +84,17 @@ public abstract class TestContainersInitializerIT {
         //Sales Tax Container
         SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX, 9898,
                 "java", "-Dspring.profiles.active=integration-test, complytStubTax",
-                "-Dspring.data.mongodb.uri=mongodb://172.17.0.1:" + 27017, //MONGO_CONTAINER.getMappedPort(27017),
-                "-Deureka.client.serviceUrl.defaultZone=http://172.17.0.1:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
+                "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" + MONGO_CONTAINER.getMappedPort(27017),
+                "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
+                //"-Dadd-host", "host.docker.internal=host-gateway",
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_CONTAINER.start();
 
         //Sales Tax Rates Container
         SALES_TAX_RATES_CONTAINER = initializeServiceContainer(SALES_TAX_RATES, 9870,
                 "java", "-Dspring.profiles.active=integration-test, stubFastTax",
-                "-Dspring.data.mongodb.uri=mongodb://172.17.0.1:" + 27017, //MONGO_CONTAINER.getMappedPort(27017),
-                "-Deureka.client.serviceUrl.defaultZone=http://172.17.0.1:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
+                "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" + MONGO_CONTAINER.getMappedPort(27017),
+                "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_RATES_CONTAINER.start();
 
@@ -146,6 +147,7 @@ public abstract class TestContainersInitializerIT {
                                 .run("sh -c 'touch app.jar'")
                                 .entryPoint(entryPoint)
                         )).withExposedPorts(port)
+                .withExtraHost("host.docker.internal","host-gateway")
                 .withAccessToHost(true)
                 .withCreateContainerCmdModifier(cmd -> cmd
                         .withPortBindings(new PortBinding(Ports.Binding.bindPort(port), new ExposedPort(port)))
