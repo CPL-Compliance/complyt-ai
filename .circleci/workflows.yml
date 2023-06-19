@@ -235,13 +235,13 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - package-skip-test-1:
+      - package-skip-test:
           service_directory: "sales-tax"
-      - package-skip-test-2:
+      - package-skip-test:
           service_directory: "sales-tax-rates"
-      - package-skip-test-3:
+      - package-skip-test:
           service_directory: "discovery-service"
-      - package-skip-test-4:
+      - package-skip-test:
           service_directory: "files"
 #      - verify-gateway:
 #          filters:
@@ -254,10 +254,7 @@ workflows:
               only:
                 - /^(main.+|(?!main).*)$/
           requires:
-            - package-skip-test1
-            - package-skip-test2
-            - package-skip-test3
-            - package-skip-test4
+            - package-skip-test
           service_directory: "api-gateway"
 
       - deploy:
@@ -266,10 +263,7 @@ workflows:
               only:
                 - main
           requires:
-            - package-skip-test1
-            - package-skip-test2
-            - package-skip-test3
-            - package-skip-test4
+            - package-skip-test
           service_directory: "api-gateway"
 
       - send-test-coverage-reports:
