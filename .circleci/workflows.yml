@@ -54,7 +54,7 @@ jobs:
       - persist_to_workspace:
           root: target
           paths:
-            - "*.jar"
+            - .
 
 #  verify-gateway:
 #    working_directory: ~/complyt_work_directory/api-gateway
