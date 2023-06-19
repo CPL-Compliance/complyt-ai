@@ -35,12 +35,14 @@ public abstract class TestContainersInitializerIT {
     protected static final String DISCOVERY_SERVICE = "discovery-service";
     protected static final String SALES_TAX = "sales-tax";
     protected static final String SALES_TAX_RATES = "sales-tax-rates";
+    protected static final String FILES = "files";
 
     // Containers
     protected static final MongoDBContainer MONGO_CONTAINER;
     protected static GenericContainer DISCOVERY_CONTAINER;
     protected static GenericContainer SALES_TAX_CONTAINER;
     protected static GenericContainer SALES_TAX_RATES_CONTAINER;
+    protected static GenericContainer FILES_CONTAINER;
     protected static KeycloakContainer KEYCLOAK_CONTAINER;
 
     // Tokens
@@ -52,6 +54,7 @@ public abstract class TestContainersInitializerIT {
     // Miscellaneous
     protected static boolean IS_SALES_TAX_REGISTERED;
     protected static boolean IS_SALES_TAX_RATES_REGISTERED;
+    protected static boolean IS_FILES_REGISTERED;
     protected static WebTestClient getTokenClient;
     protected static Map<String, String> jarFileMap = new HashMap<>();
 
@@ -61,6 +64,7 @@ public abstract class TestContainersInitializerIT {
         fetchJarFile(DISCOVERY_SERVICE);
         fetchJarFile(SALES_TAX);
         fetchJarFile(SALES_TAX_RATES);
+        fetchJarFile(FILES);
 
         // OAuth Server
         KEYCLOAK_CONTAINER = new KeycloakContainer(KEYCLOAK_IMAGE)
@@ -79,7 +83,8 @@ public abstract class TestContainersInitializerIT {
         MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
                 .withExposedPorts(27017)
                 .withClasspathResourceMapping(dumpPath(SALES_TAX), dumpPath(SALES_TAX), BindMode.READ_ONLY)
-                .withClasspathResourceMapping(dumpPath(SALES_TAX_RATES), dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
+                .withClasspathResourceMapping(dumpPath(SALES_TAX_RATES), dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY)
+                .withClasspathResourceMapping(dumpPath(FILES), dumpPath(FILES), BindMode.READ_ONLY);
         MONGO_CONTAINER.start();
 
         //Sales Tax Container
@@ -99,9 +104,18 @@ public abstract class TestContainersInitializerIT {
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_RATES_CONTAINER.start();
 
+        //Files Container
+        FILES_CONTAINER = initializeServiceContainer(FILES, 9880,
+                "java", "-Dspring.profiles.active=integration-test",
+                "-Dspring.data.mongodb.uri=mongodb://host.docker.internal:" + MONGO_CONTAINER.getMappedPort(27017),
+                "-Deureka.client.serviceUrl.defaultZone=http://host.docker.internal:" + DISCOVERY_CONTAINER.getMappedPort(8761) + "/eureka/",
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
+        FILES_CONTAINER.start();
+
         // Restore Dump
         try {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX));
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(FILES));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX_RATES));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -148,7 +162,7 @@ public abstract class TestContainersInitializerIT {
                                 .run("sh -c 'touch app.jar'")
                                 .entryPoint(entryPoint)
                         )).withExposedPorts(port)
-                .withExtraHost("host.docker.internal","host-gateway")
+                .withExtraHost("host.docker.internal", "host-gateway")
                 .withAccessToHost(true)
                 .withCreateContainerCmdModifier(cmd -> cmd
                         .withPortBindings(new PortBinding(Ports.Binding.bindPort(port), new ExposedPort(port)))
@@ -172,4 +186,6 @@ public abstract class TestContainersInitializerIT {
                 .expectBody()
                 .jsonPath("$.access_token").value(tokenConsumer);
     }
+
+    public abstract void checkConnection();
 }

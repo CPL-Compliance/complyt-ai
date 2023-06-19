@@ -6,6 +6,7 @@ public class TestUtilities {
     public static final String CUSTOMER_BASE_URL = "/v1/customers";
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
+    public static final String FILES_BASE_URL = "/v1/files";
     public static final String NON_EXISTING_COMPLYT_ID = "11111111-1111-1111-1111-111111111111";
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {

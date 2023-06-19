@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface UpsertByExternalIdAndSourceITTemplate {
+import integration.test_utils.templates.methods.PutITTemplate;
+
+public interface UpsertByExternalIdAndSourceITTemplate extends PutITTemplate {
 
     void upsertByExternalIdAndSource_Exists_Returns200();
 

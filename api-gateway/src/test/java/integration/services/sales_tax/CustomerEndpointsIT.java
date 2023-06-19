@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -19,7 +18,6 @@ import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @SpringBootTest(classes = ApiGatewayApplication.class
         , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
@@ -38,6 +36,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
     @Order(-1)
     @Test
+    @Override
     public void checkConnection() {
         while (!IS_SALES_TAX_REGISTERED) {
             webTestClient
@@ -56,7 +55,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getAllBySource_Exists_Returns200() {
         // Given
         String differentSource = "2";
@@ -81,7 +79,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
         // Given
         String differentSource = "9";
@@ -105,7 +102,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getAll_Exists_Returns200() {
         // Then
         webTestClient
@@ -127,7 +123,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         webTestClient
                 .get()
@@ -147,7 +142,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"; //complytId of existing customer
@@ -171,7 +165,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -190,7 +183,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_complytIdDoesntParse_Returns500() {
         // Given
         String invalidComplytId = "gg";
@@ -212,7 +204,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1586";
@@ -234,7 +225,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
         // Given
         String externalId = "nonExisting";
@@ -256,7 +246,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByName_Exists_Returns200() {
         // Given
         String name = "best";
@@ -280,7 +269,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByName_DoesntExists_Returns200EmptyList() {
         // Given
         String name = "nonExisting";
@@ -304,14 +292,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(3)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_Exists_Returns200() {
         // Given
         String externalId = "1001";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -328,14 +314,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExists_Returns201() {
         // Given
         String externalId = "1001";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -352,14 +336,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntExistsWithComplytId_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -376,7 +358,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingSource_Returns400ConflictedData() {
         // Given
         String externalId = "1002";
@@ -384,7 +365,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
@@ -401,7 +381,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_ConflictingExternalId_Returns400ConflictedData() {
         // Given
         String externalId = "someId";
@@ -409,7 +388,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
@@ -426,14 +404,12 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void upsertByExternalIdAndSource_DoesntPassValidation_Returns400CValidationError() {
         // Given
         String externalId = "1003";
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -454,6 +430,8 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 });
     }
 
+    @Order(1)
+    @Test
     @Override
     public void upsertByExternalIdAndSource_NoBody_Returns400() {
         // Given
@@ -461,7 +439,6 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.CUSTOMER_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -474,5 +451,66 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.message").exists();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void get_NoAccessToken_Returns401() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .build())
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void get_InsufficientScopes_Returns403() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_NO_SCOPES);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void put_NoAccessToken_Returns401() {
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void put_InsufficientScopes_Returns403() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.CUSTOMER_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_NO_SCOPES);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
     }
 }

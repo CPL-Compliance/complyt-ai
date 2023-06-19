@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface GetByExternalIdAndSourceITTemplate {
+import integration.test_utils.templates.methods.GetITTemplate;
+
+public interface GetByExternalIdAndSourceITTemplate extends GetITTemplate {
 
     void getByExternalIdAndSource_Exists_Returns200();
 

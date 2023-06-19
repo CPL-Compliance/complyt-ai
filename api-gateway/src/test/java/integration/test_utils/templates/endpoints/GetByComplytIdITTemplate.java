@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface GetByComplytIdITTemplate {
+import integration.test_utils.templates.methods.GetITTemplate;
+
+public interface GetByComplytIdITTemplate extends GetITTemplate {
 
     void getByComplytId_Exists_Returns200();
 

@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface UpsertByStateITTemplate {
+import integration.test_utils.templates.methods.PutITTemplate;
+
+public interface UpsertByStateITTemplate extends PutITTemplate {
 
     void upsertByState_Exists_Returns200();
 

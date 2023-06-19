@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -22,13 +21,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
-public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT {
+public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT implements SalesTaxRatesEndpointsITTemplate {
 
     @Autowired
     WebTestClient webTestClient;
 
     @Order(-1)
     @Test
+    @Override
     public void checkConnection() {
         while (!IS_SALES_TAX_RATES_REGISTERED) {
             webTestClient
@@ -47,7 +47,7 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT {
 
     @Order(1)
     @Test
-    @WithMockUser
+    @Override
     public void findByAddress_FirstAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         webTestClient
                 .get()
@@ -72,7 +72,7 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT {
 
     @Order(2)
     @Test
-    @WithMockUser
+    @Override
     public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         webTestClient
                 .get()

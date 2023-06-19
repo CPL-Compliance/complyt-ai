@@ -11,16 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.LinkedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @SpringBootTest(classes = ApiGatewayApplication.class
         , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
@@ -36,6 +33,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
     @Order(-1)
     @Test
+    @Override
     public void checkConnection() {
         while (!IS_SALES_TAX_REGISTERED) {
             webTestClient
@@ -54,7 +52,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getAll_Exists_Returns200() {
         webTestClient
                 .get()
@@ -74,7 +71,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByAll_DoesntExists_Returns200EmptyList() {
         // Then
         webTestClient
@@ -89,13 +85,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(LinkedHashMap.class)
-                .value(list -> assertEquals(0,list.size()));
+                .value(list -> assertEquals(0, list.size()));
     }
 
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_Exists_Returns200() {
         // Given
         String complytId = "cba95b8d-ef9b-4f4d-831d-377621556b50";
@@ -119,7 +114,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
         webTestClient
@@ -138,7 +132,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByComplytId_complytIdDoesntParse_Returns500() {
         webTestClient
                 .get()
@@ -156,7 +149,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByStateName_Exists_Returns200() {
         // Given
         String existingStateName = "California";
@@ -180,7 +172,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByStateAbbreviation_Exists_Returns200() {
         // Given
         String existingStateAbbreviation = "CA";
@@ -204,7 +195,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByStateAbbreviation_DoesntExists_Returns404() {
         webTestClient
                 .get()
@@ -222,7 +212,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(2)
     @Test
     @Override
-    @WithMockUser
     public void getByStateName_DoesntExists_Returns404() {
         webTestClient
                 .get()
@@ -240,11 +229,9 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(3)
     @Test
     @Override
-    @WithMockUser
     public void upsertByState_DoesntExists_Returns201() {
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/NLF")
@@ -261,10 +248,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(4)
     @Test
     @Override
-    @WithMockUser
     public void upsertByState_Exists_Returns200() {
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
@@ -283,10 +268,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void upsertByState_DoesntExistsWithComplytId_Returns400ConflictedData() {
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
@@ -303,10 +286,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void upsertByState_ConflictingState_Returns400ConflictedData() {
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/dope")
@@ -323,10 +304,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @Order(1)
     @Test
     @Override
-    @WithMockUser
     public void upsertByState_DoesntPassValidation_Returns400CValidationError() {
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
@@ -347,6 +326,8 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         ;
     }
 
+    @Order(1)
+    @Test
     @Override
     public void upsertByState_NoBody_Returns400() {
         // Given
@@ -354,7 +335,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
 
         // Then
         webTestClient
-                .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/" + state)
@@ -367,5 +347,66 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.message").exists();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void get_NoAccessToken_Returns401() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .build())
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void get_InsufficientScopes_Returns403() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_NO_SCOPES);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void put_NoAccessToken_Returns401() {
+        webTestClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Order(1)
+    @Test
+    @Override
+    public void put_InsufficientScopes_Returns403() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
+                        .build())
+                .headers(headers -> {
+                    headers.setBearerAuth(TOKEN_NO_SCOPES);
+                })
+                .exchange()
+                .expectStatus().isForbidden();
     }
 }

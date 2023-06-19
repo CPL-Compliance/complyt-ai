@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface GetAllBySourceTTemplate {
+import integration.test_utils.templates.methods.GetITTemplate;
+
+public interface GetAllBySourceTTemplate extends GetITTemplate {
 
     void getAllBySource_Exists_Returns200();
 

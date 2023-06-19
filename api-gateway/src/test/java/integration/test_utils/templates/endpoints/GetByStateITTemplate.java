@@ -1,6 +1,8 @@
 package integration.test_utils.templates.endpoints;
 
-public interface GetByStateITTemplate {
+import integration.test_utils.templates.methods.GetITTemplate;
+
+public interface GetByStateITTemplate extends GetITTemplate {
 
     void getByStateName_Exists_Returns200();
 
