@@ -41,7 +41,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/v1/customers")
+                            .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL)
                             .build())
                     .headers(headers -> headers
                             .setBearerAuth(TOKEN))

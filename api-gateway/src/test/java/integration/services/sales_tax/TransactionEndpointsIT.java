@@ -45,13 +45,26 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/v1/customers")
+                            .path(TestUtilities.TRANSACTION_BASE_URL)
                             .build())
                     .headers(headers -> headers
                             .setBearerAuth(TOKEN))
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().value(status -> IS_SALES_TAX_REGISTERED = status != 503);
+        }
+
+        while (!IS_SALES_TAX_RATES_REGISTERED) {
+            webTestClient
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(TestUtilities.SALES_TAX_RATES_BASE_URL)
+                            .build())
+                    .headers(headers -> headers
+                            .setBearerAuth(TOKEN))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().value(status -> IS_SALES_TAX_RATES_REGISTERED = status != 503);
         }
     }
 

@@ -30,7 +30,7 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT {
     @Order(-1)
     @Test
     public void checkConnection() {
-        while (!IS_SALES_TAX_REGISTERED) {
+        while (!IS_SALES_TAX_RATES_REGISTERED) {
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
@@ -41,7 +41,7 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT {
                         headers.setContentType(MediaType.APPLICATION_JSON);
                     })
                     .exchange()
-                    .expectStatus().value(status -> IS_SALES_TAX_REGISTERED = status != 503);
+                    .expectStatus().value(status -> IS_SALES_TAX_RATES_REGISTERED = status != 503);
         }
     }
 

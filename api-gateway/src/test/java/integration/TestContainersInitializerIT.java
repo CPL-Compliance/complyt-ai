@@ -51,6 +51,7 @@ public abstract class TestContainersInitializerIT {
 
     // Miscellaneous
     protected static boolean IS_SALES_TAX_REGISTERED;
+    protected static boolean IS_SALES_TAX_RATES_REGISTERED;
     protected static WebTestClient getTokenClient;
     protected static Map<String, String> jarFileMap = new HashMap<>();
 

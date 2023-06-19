@@ -37,31 +37,50 @@ parameters:
     default: false
 
 jobs:
-  verify-gateway:
-    working_directory: ~/complyt_work_directory/api-gateway
+  package-skip-test:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
       - checkout:
-            path: ~/complyt_work_directory
-      - run:
-          name: Package Discovery Service
-          command: cd ../discovery-service ; ./mvnw clean package -Dmaven.test.skip
-      - run:
-          name: Package Sales Tax
-          command: cd ../sales-tax ; ./mvnw clean package -Dmaven.test.skip
-      - run:
-          name: Package Sales Tax Rates
-          command: cd ../sales-tax-rates ; ./mvnw clean package -Dmaven.test.skip
+          path: ~/complyt_work_directory
       - run:
           name: Execute
-          command: cd ../api-gateway ; ./mvnw clean verify
+          command: ./mvnw clean package -Dmaven.test.skip
       - persist_to_workspace:
           root: target
           paths:
-            - coverage-reports
-            - failsafe-reports
-            - surefire-reports
-            - site
+            - *
+
+#  verify-gateway:
+#    working_directory: ~/complyt_work_directory/api-gateway
+#    executor: ubuntu-vm
+#    steps:
+#      - checkout:
+#            path: ~/complyt_work_directory
+#      - run:
+#          name: Package Discovery Service
+#          command: cd ../discovery-service ; ./mvnw clean package -Dmaven.test.skip
+#      - run:
+#          name: Package Sales Tax
+#          command: cd ../sales-tax ; ./mvnw clean package -Dmaven.test.skip
+#      - run:
+#          name: Package Sales Tax Rates
+#          command: cd ../sales-tax-rates ; ./mvnw clean package -Dmaven.test.skip
+#      - run:
+#          name: Execute
+#          command: cd ../api-gateway ; ./mvnw clean verify
+#      - persist_to_workspace:
+#          root: target
+#          paths:
+#            - coverage-reports
+#            - failsafe-reports
+#            - surefire-reports
+#            - site
 
   verify:
     parameters:
@@ -216,11 +235,25 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - verify-gateway:
+      - package-skip-test:
+          service_directory: "sales-tax"
+      - package-skip-test:
+          service_directory: "sales-tax-rates"
+      - package-skip-test:
+          service_directory: "discovery-service"
+      - package-skip-test:
+          service_directory: "files"
+#      - verify-gateway:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+      - verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
+          service_directory: "api-gateway"
 
       - deploy:
           filters:

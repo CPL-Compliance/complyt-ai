@@ -43,7 +43,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/v1/customers")
+                            .path(TestUtilities.CUSTOMER_BASE_URL)
                             .build())
                     .headers(headers -> headers
                             .setBearerAuth(TOKEN))
