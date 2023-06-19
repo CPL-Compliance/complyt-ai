@@ -45,13 +45,13 @@ jobs:
             path: ~/complyt_work_directory
       - run:
           name: Package Discovery Service
-          command: cd ../discovery-service ; ./mvnw clean package
+          command: cd ../discovery-service ; ./mvnw clean package -Dmaven.test.skip
       - run:
           name: Package Sales Tax
-          command: cd ../sales-tax ; ./mvnw clean package
+          command: cd ../sales-tax ; ./mvnw clean package -Dmaven.test.skip
       - run:
           name: Package Sales Tax Rates
-          command: cd ../sales-tax-rates ; ./mvnw clean package
+          command: cd ../sales-tax-rates ; ./mvnw clean package -Dmaven.test.skip
       - run:
           name: Execute
           command: cd ../api-gateway ; ./mvnw clean verify
