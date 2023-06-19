@@ -39,9 +39,9 @@ public class ComplytSalesTaxRatesHandler {
 
         Mono<ComplytSalesTaxRatesDto> complytSalesTaxRatesDto = ContextLogger.observeCtx(logStr, log::info)
                 .then(addressDtoValidationHandler.validate(serverRequest))
-                .map(AddressMapper.INSTANCE::addressDtoToAddress)
-                .flatMap(complytSalesTaxRatesFacadeFacade::findByAddress)
-                .map(ComplytSalesTaxRatesMapper.INSTANCE::complytSalesTaxRatesToComplytSalesTaxRates)
+                .map(x->AddressMapper.INSTANCE.addressDtoToAddress(x))
+                .flatMap(y->complytSalesTaxRatesFacadeFacade.findByAddress(y))
+                .map(z->ComplytSalesTaxRatesMapper.INSTANCE.complytSalesTaxRatesToComplytSalesTaxRates(z))
                 .flatMap(complytSalesTaxRates -> ContextLogger.observeCtx("<-- Returned Body: " + complytSalesTaxRates, log::info).thenReturn(complytSalesTaxRates))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
