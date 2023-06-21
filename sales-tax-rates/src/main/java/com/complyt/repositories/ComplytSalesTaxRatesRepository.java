@@ -28,8 +28,7 @@ public class ComplytSalesTaxRatesRepository {
         );
 
         return ContextLogger.observeCtx("Searching for rates in " + collection + ", by address: " + query, log::info)
-                .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection))
-                .map(x ->x);
+                .then(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, collection));
     }
 
     public Mono<ComplytSalesTaxRates> save(@NonNull ComplytSalesTaxRates complytSalesTaxRates, @NonNull String collection) {
