@@ -30,7 +30,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
     @Test
     @Override
     public void checkConnection() {
-        while (!IS_SALES_TAX_REGISTERED) {
+        while (!IS_FILES_REGISTERED) {
             webTestClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
@@ -40,7 +40,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                             .setBearerAuth(TOKEN))
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
-                    .expectStatus().value(status -> IS_SALES_TAX_REGISTERED = status != 503);
+                    .expectStatus().value(status -> IS_FILES_REGISTERED = status != 503);
         }
     }
 
