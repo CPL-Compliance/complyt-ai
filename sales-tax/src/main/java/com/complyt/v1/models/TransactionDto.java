@@ -10,10 +10,7 @@ import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.With;
 
 import java.util.List;
@@ -24,6 +21,7 @@ import java.util.UUID;
 public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + "transaction") UUID complytId,
                              @Schema(description = FieldsDescriptions.EXTERNAL_ID) @NotNull(message = "externalId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "externalId " + StringErrorMessages.MINMAX_256_ERROR) String externalId,
                              @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "[1-9]", message = "source " + StringErrorMessages.SINGLE_DIGIT_ERROR) String source,
+                             @Schema(description = FieldsDescriptions.DOCUMENT_NAME) @Size(min = 1, max = 50, message = "documentName " + StringErrorMessages.MINMAX_50_ERROR) String documentName,
                              @ArraySchema(schema = @Schema(description = FieldsDescriptions.ITEM)) @NotEmpty(message = "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR) @NotNull(message = "items " + DtoErrorMessages.NOT_NULL_ERROR) List<@Valid ItemDto> items,
                              @Schema(ref = "billingAddress") @Valid OptionalAddressDto billingAddress,
                              @Schema(ref = "shippingAddress") @Valid @NotNull(message = "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR) MandatoryAddressDto shippingAddress,

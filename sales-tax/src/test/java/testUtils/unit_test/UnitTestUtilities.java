@@ -102,22 +102,24 @@ public class UnitTestUtilities {
 
 
     public Transaction createTransaction(String id) {
+        String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
+        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
     }
 
     public TransactionDto createTransactionDto(String id) {
+        String documentName = "INVUS1000";
         OptionalAddressDto billingAddress = new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
         MandatoryAddressDto shippingAddress = new MandatoryAddressDto("City", "Country", "County", "CA", "Street", "Zip", false);
         List<ItemDto> items = createItemDtos(true, false);
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
 
-        return new TransactionDto(UUID.randomUUID(), id, source, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName,  items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {

@@ -109,4 +109,12 @@ public interface TransactionRouterTestTemplate extends
     // Validation::Customer
     void upsert_InvalidCustomer_Returns400();
 
+    void upsert_nullDocumentName_Returns200Ok();
+
+    void upsert_blankDocumentName_Returns400();
+
+    void upsert_moreThan50ChartsDocumentName_Returns400();
+
+    void upsert_50ChartsDocumentName_Returns200Ok();
+
 }
