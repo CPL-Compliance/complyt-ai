@@ -39,8 +39,4 @@ public final class TaxJarWebClientWrapper extends SalesTaxWebClientWrapperBase {
         return findByAddress(address.zip(), address.street(), address.city(), address.country());
     }
 
-    public Taxjar client() {
-        return client;
-    }
-
 }
