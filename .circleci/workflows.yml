@@ -37,7 +37,7 @@ parameters:
     default: false
 
 jobs:
-  package-skip-test:
+  package-dependency:
     parameters:
       service_directory:
         type: string
@@ -212,16 +212,16 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - package-skip-test:
+      - package-dependency:
           name: package-sales-tax
           service_directory: "sales-tax"
-      - package-skip-test:
+      - package-dependency:
           name: package-sales-tax-rates
           service_directory: "sales-tax-rates"
-      - package-skip-test:
+      - package-dependency:
           name: package-discovery-service
           service_directory: "discovery-service"
-      - package-skip-test:
+      - package-dependency:
           name: package-files
           service_directory: "files"
       - verify:
