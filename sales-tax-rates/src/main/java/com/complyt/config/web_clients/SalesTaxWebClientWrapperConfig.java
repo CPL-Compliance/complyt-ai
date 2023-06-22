@@ -6,6 +6,7 @@ import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
 import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import com.taxjar.Taxjar;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -54,8 +55,8 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Profile({"taxJar"})
     @Bean("salesTaxWebClientWrapper")
-    public TaxJarWebClientWrapper taxJarWebClientWrapper(WebClient webClient) {
-        Taxjar client = new Taxjar("83a5737778e1a1510eb5ad76003bb40c");
+    public TaxJarWebClientWrapper taxJarWebClientWrapper(@Value("${tax-jar-api-token}") String apiToken) {
+        Taxjar client = new Taxjar(apiToken);
         return new TaxJarWebClientWrapper(client);
     }
 
