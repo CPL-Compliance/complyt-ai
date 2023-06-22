@@ -3,6 +3,7 @@ package io.complyt.namingserver.config;
 import com.netflix.appinfo.AmazonInfo;
 import io.complyt.namingserver.annotations.Generated;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import java.net.UnknownHostException;
 
 @Generated
 @Configuration
+@RequiredArgsConstructor
 public class EurekaConfig {
     @NonNull
     Environment environment;
@@ -24,7 +26,7 @@ public class EurekaConfig {
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
         EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
         AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
-//        bean.setDataCenterInfo(info);
+        bean.setDataCenterInfo(info);
 
         String ip = InetAddress.getLocalHost().getHostAddress();
         String port = environment.getProperty("server.port");
