@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class ZipTaxCountyFetcherTest {
 
@@ -61,7 +59,7 @@ class ZipTaxCountyFetcherTest {
     }
 
     @Test
-    void equals_SameTransactionZipTaxCountyFetcher_ReturnsTrue() {
+    void equals_SameZipTaxCountyFetcher_ReturnsTrue() {
         // Given
         ZipTaxCountyFetcher givenZipTaxCountyFetcher = new ZipTaxCountyFetcher();
 

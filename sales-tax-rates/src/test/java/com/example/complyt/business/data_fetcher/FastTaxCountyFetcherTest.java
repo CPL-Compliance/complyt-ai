@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FastTaxCountyFetcherTest {
@@ -68,7 +66,7 @@ class FastTaxCountyFetcherTest {
     }
 
     @Test
-    void equals_SameFetcherFastTaxCountyFetcher_ReturnsTrue() {
+    void equals_SameFastTaxCountyFetcher_ReturnsTrue() {
         // Given
         FastTaxCountyFetcher givenFastTaxCountyFetcher = new FastTaxCountyFetcher();
 
