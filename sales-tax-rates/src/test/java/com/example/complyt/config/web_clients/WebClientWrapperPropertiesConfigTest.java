@@ -43,6 +43,18 @@ class WebClientWrapperPropertiesConfigTest {
     }
 
     @Test
+    void taxJarWebClientWrapperProperties_createTaxJarWebClientWrapperProperties_getTaxJarWebClientWrapperProperties() {
+        // Given
+        WebClientWrapperProperties expectedTaxJarWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
+
+        // When
+        WebClientWrapperProperties actualTaxJarWebClientWrapper = webClientWrapperPropertiesConfig.taxJarWebClientWrapperProperties();
+
+        // Then
+        assertEquals(expectedTaxJarWebClientWrapper, actualTaxJarWebClientWrapper);
+    }
+
+    @Test
     void stubFastTaxWebClientWrapperProperties_createStubFastTaxWebClientWrapperProperties_getStubFastTaxWebClientWrapperProperties() {
         // Given
         WebClientWrapperProperties expectedFastTaxWebClientWrapper = WebClientWrapperProperties.WebClientWrapperPropertiesStub();
