@@ -21,19 +21,19 @@ public class EurekaConfig {
     @NonNull
     Environment environment;
 
-    @Bean
-    @Profile({"az-1a", "az-1b"})
-    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
-        EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
-        AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
-        bean.setDataCenterInfo(info);
-
-        String ip = InetAddress.getLocalHost().getHostAddress();
-        String port = environment.getProperty("server.port");
-        bean.setNonSecurePort(Integer.parseInt(port));
-        bean.setIpAddress(ip);
-        bean.setPreferIpAddress(true);
-
-        return bean;
-    }
+//    @Bean
+//    @Profile({"az-1a", "az-1b"})
+//    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) throws UnknownHostException {
+//        EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
+//        AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
+//        bean.setDataCenterInfo(info);
+//
+//        String ip = InetAddress.getLocalHost().getHostAddress();
+//        String port = environment.getProperty("server.port");
+//        bean.setNonSecurePort(Integer.parseInt(port));
+//        bean.setIpAddress(ip);
+//        bean.setPreferIpAddress(true);
+//
+//        return bean;
+//    }
 }
