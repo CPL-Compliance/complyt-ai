@@ -1,4 +1,4 @@
-server.port: 8761
+server.port: 8762
 spring:
   application.name: discovery-service-clustered
   cloud:
@@ -43,7 +43,7 @@ eureka:
     enable-self-preservation: true
   instance:
     lease-expiration-duration-in-seconds: 90
-    prefer-ip-address: true
+#    prefer-ip-address: true
     hostname: internal-test-discovery-srv-az-1b-lb-1948490039.us-east-1.elb.amazonaws.com
 
 
