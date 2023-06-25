@@ -73,6 +73,16 @@ public class SalesTaxWebClientWrapperConfigTest {
     }
 
     @Test
+    void taxJarWebClientWrapper_SetInstance_ReturnInstance() {
+        String apiToken = "api-token";
+
+        TaxJarWebClientWrapper taxJarWebClientWrapper =
+                salesTaxWebClientWrapperConfig.taxJarWebClientWrapper(apiToken);
+
+        assertEquals(taxJarWebClientWrapper.getClass(), TaxJarWebClientWrapper.class);
+    }
+
+    @Test
     void stubFastTaxWebClientWrapper_SetInstance_ReturnInstance() {
         StubFastTaxWebClientWrapper expectedStubFastTaxWebClientWrapper = new StubFastTaxWebClientWrapper();
 

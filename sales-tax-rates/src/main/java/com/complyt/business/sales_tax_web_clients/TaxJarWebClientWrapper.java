@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.Map;
 
-@Generated
 public final class TaxJarWebClientWrapper extends SalesTaxWebClientWrapperBase {
     private final Taxjar client;
 
