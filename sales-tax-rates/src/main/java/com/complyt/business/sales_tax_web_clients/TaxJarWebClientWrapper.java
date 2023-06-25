@@ -1,16 +1,20 @@
 package com.complyt.business.sales_tax_web_clients;
 
+import com.complyt.annotations.Generated;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.taxjar.TaxJarData;
 import com.taxjar.Taxjar;
 import com.taxjar.exception.TaxjarException;
 import com.taxjar.model.rates.RateResponse;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Generated
 public final class TaxJarWebClientWrapper extends SalesTaxWebClientWrapperBase {
     private final Taxjar client;
 

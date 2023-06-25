@@ -2,9 +2,11 @@ package com.example.complyt.config.web_clients;
 
 import com.complyt.business.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
 import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
 import com.complyt.config.web_clients.SalesTaxWebClientWrapperConfig;
 import com.complyt.config.web_clients.WebClientWrapperProperties;
+import com.taxjar.Taxjar;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,8 +74,6 @@ public class SalesTaxWebClientWrapperConfigTest {
 
     @Test
     void stubFastTaxWebClientWrapper_SetInstance_ReturnInstance() {
-
-
         StubFastTaxWebClientWrapper expectedStubFastTaxWebClientWrapper = new StubFastTaxWebClientWrapper();
 
         StubFastTaxWebClientWrapper actualStubFastTaxWebClientWrapper =
