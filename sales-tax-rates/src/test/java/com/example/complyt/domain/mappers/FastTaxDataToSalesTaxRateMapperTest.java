@@ -15,7 +15,6 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class FastTaxDataToSalesTaxRateMapperTest {
     private FastTaxData fastTaxData;

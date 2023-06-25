@@ -2,6 +2,7 @@ package com.complyt.v1.validators.query_params;
 
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.model.AddressDto;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<AddressDto> {
 
-    public Mono<AddressDto> extract(ServerRequest serverRequest) {
+    public Mono<AddressDto> extract(@NonNull ServerRequest serverRequest) {
         String state = serverRequest.queryParam("state").orElse(null);
         String country = serverRequest.queryParam("country").orElse(null);
         String city = serverRequest.queryParam("city").orElse(null);
