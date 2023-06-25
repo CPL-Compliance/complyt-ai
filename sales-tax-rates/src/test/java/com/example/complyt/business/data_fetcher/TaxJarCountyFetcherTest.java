@@ -23,9 +23,7 @@ public class TaxJarCountyFetcherTest {
         SalesTaxData nullSalesTaxData = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            taxJarCountyFetcher.fetch(nullSalesTaxData);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> taxJarCountyFetcher.fetch(nullSalesTaxData));
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }
