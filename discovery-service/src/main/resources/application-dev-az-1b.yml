@@ -18,7 +18,6 @@ eureka:
     enable-self-preservation: true
   instance:
     lease-expiration-duration-in-seconds: 90
-    prefer-ip-address: false
     hostname: complyt-peer-2
 
 
