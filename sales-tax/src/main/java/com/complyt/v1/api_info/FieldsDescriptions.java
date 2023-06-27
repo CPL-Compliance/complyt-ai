@@ -1,5 +1,7 @@
 package com.complyt.v1.api_info;
 
+import java.security.SecureRandom;
+
 public interface FieldsDescriptions {
 
     /**
@@ -36,6 +38,8 @@ public interface FieldsDescriptions {
             "(with a valid time zone offset).";
 
     // In Transaction
+
+    String DOCUMENT_NAME = "The name of the document, as shown in the ERP systems";
     String ITEM = "An item included in the transaction";
 
     String BILLING_ADDRESS = "The billing address for the transaction";

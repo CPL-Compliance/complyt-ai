@@ -132,7 +132,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionInfo ->
                 new Transaction(
                         transactionInfo.getComplytId(), transactionInfo.getId(),
-                        transaction.getExternalId(), transaction.getSource(),
+                        transaction.getExternalId(), transaction.getSource(), transaction.getDocumentName(),
                         transaction.getItems(), transaction.getBillingAddress(), transaction.getShippingAddress(),
                         transaction.getCustomerId(), null, transaction.getSalesTax(),
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),

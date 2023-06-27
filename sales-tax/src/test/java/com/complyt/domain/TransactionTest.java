@@ -22,7 +22,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(20, fields.length);
+        Assertions.assertEquals(21, fields.length);
     }
 
     @BeforeEach
@@ -40,6 +40,7 @@ public class TransactionTest {
                 ", id=" + transaction.getId() +
                 ", externalId=" + transaction.getExternalId() +
                 ", source=" + transaction.getSource() +
+                ", documentName=" + transaction.getDocumentName() +
                 ", items=" + transaction.getItems() +
                 ", billingAddress=" + transaction.getBillingAddress() +
                 ", shippingAddress=" + transaction.getShippingAddress() +
@@ -90,6 +91,7 @@ public class TransactionTest {
                 .id(transactionId)
                 .externalId(transaction.getExternalId())
                 .source(transaction.getSource())
+                .documentName(transaction.getDocumentName())
                 .items(transaction.getItems())
                 .billingAddress(transaction.getBillingAddress())
                 .shippingAddress(transaction.getShippingAddress())
