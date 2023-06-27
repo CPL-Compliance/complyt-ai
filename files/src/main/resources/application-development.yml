@@ -1,7 +1,7 @@
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://complyt-peer-2:8762/eureka/, http://complyt-peer-1:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
     should-unregister-on-shutdown: true
   instance:
     prefer-ip-address: true
