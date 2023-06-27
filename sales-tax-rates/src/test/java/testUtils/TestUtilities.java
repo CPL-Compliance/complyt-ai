@@ -7,6 +7,7 @@ import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
+import com.complyt.v1.model.RatesMetaDataDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -79,7 +80,10 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.04f, 0.029f, null);
+        float cityDistrictRate = 0f;
+        float countyDistrictRate = 0.029f;
+        RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
+        return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.04f, cityDistrictRate + countyDistrictRate, ratesMetaDataDto);
     }
 
     static String stringWithLength(int length) {
