@@ -22,7 +22,7 @@ public interface ITUtilities {
 
     // if no items provided, puts a default stub
     static TransactionDto stubTransactionDto(String externalId, UUID customerId, ItemDto... items) {
-        return new TransactionDto(null, externalId, "1",
+        return new TransactionDto(null, externalId, "1", "INVUS1000",
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
