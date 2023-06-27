@@ -26,8 +26,8 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
 
             return zeroCitySalesTaxRate;
         }
-        float taxRate = originalSalesTaxRate.cityRate() + originalSalesTaxRate.cityDistrictRate() + originalSalesTaxRate.countyDistrictRate()
-                + originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
+        float taxRate = originalSalesTaxRate.cityRate() + originalSalesTaxRate.combinedDistrictRate() +
+                originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
         log.debug("None special treatment for city rule - returning original sales tax rate");
 
         return originalSalesTaxRate.withTaxRate(taxRate);

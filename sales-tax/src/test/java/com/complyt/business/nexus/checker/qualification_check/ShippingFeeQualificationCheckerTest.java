@@ -37,7 +37,7 @@ public class ShippingFeeQualificationCheckerTest {
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
         return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
-                new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
+                new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {

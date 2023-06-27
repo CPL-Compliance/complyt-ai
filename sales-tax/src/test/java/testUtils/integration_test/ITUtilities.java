@@ -9,6 +9,7 @@ import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -142,11 +143,11 @@ public interface ITUtilities {
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, null);
     }
 
     static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, 0.0835f);
+        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {

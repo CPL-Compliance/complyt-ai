@@ -20,6 +20,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.time.LocalDateTime;
@@ -160,11 +161,11 @@ public class UnitTestUtilities {
     }
 
     public SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        return new SalesTaxRates(0.1f, 0.1f, 0.1f, 0.4f, 0.1f, null);
     }
 
     public SalesTaxRatesDto createSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.5f);
+        return new SalesTaxRatesDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, null);
     }
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -306,11 +307,11 @@ public class UnitTestUtilities {
     }
 
     public static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
+        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
     }
 
     public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, 0.0775f);
+        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
     }
 
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {

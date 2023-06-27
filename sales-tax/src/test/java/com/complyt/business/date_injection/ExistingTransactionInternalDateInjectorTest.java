@@ -42,7 +42,7 @@ class ExistingTransactionInternalDateInjectorTest {
         List<Item> items = new ArrayList<>() {
             {
                 add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0
+                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0
                         , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
             }
         };

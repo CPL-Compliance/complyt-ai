@@ -11,11 +11,11 @@ public interface ComplytSalesTaxRatesToSalesTaxRatesMapper {
 
     ComplytSalesTaxRatesToSalesTaxRatesMapper INSTANCE = Mappers.getMapper(ComplytSalesTaxRatesToSalesTaxRatesMapper.class);
 
-    @Mapping(target = "cityDistrictRate", source = "salesTaxRates.cityDistrictRate")
+    @Mapping(target = "combinedDistrictRate", source = "salesTaxRates.combinedDistrictRate")
     @Mapping(target = "cityRate", source = "salesTaxRates.cityRate")
     @Mapping(target = "taxRate", source = "salesTaxRates.taxRate")
     @Mapping(target = "countyRate", source = "salesTaxRates.countyRate")
-    @Mapping(target = "countyDistrictRate", source = "salesTaxRates.countyDistrictRate")
     @Mapping(target = "stateRate", source = "salesTaxRates.stateRate")
+    @Mapping(target = "ratesMetaData", source = "salesTaxRates.ratesMetaData")
     SalesTaxRates map(ComplytSalesTaxRates complytSalesTaxRates);
 }

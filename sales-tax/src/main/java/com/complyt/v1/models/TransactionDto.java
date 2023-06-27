@@ -6,6 +6,7 @@ import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -13,11 +13,10 @@ import org.mapstruct.factory.Mappers;
 public interface TaxJarDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     TaxJarDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(TaxJarDataToSalesTaxRateMapper.class);
 
-    @Mapping(target = "cityDistrictRate", source = "combinedDistrictRate")
     @Mapping(target = "cityRate", source = "cityRate")
     @Mapping(target = "taxRate", source = "combinedRate")
     @Mapping(target = "countyRate", source = "countyRate")
-    @Mapping(target = "countyDistrictRate", source = "combinedDistrictRate")
+    @Mapping(target = "combinedDistrictRate", source = "combinedDistrictRate")
     @Mapping(target = "stateRate", source = "stateRate")
     SalesTaxRates map(Rate rate);
 
