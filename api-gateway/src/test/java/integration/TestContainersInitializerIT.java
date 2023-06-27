@@ -98,6 +98,13 @@ public abstract class TestContainersInitializerIT {
         getToken("test-client", "test-user-different-tenant",
                 receivedToken -> TOKEN_DIFFERENT_TENANT = receivedToken);
 
+        //Sales Tax Container
+        SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
+                "java", "-Dspring.profiles.active=integration-test, complytTaxEngine",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
+        SALES_TAX_CONTAINER.start();
+
         //Sales Tax Rates Container
         SALES_TAX_RATES_CONTAINER = initializeServiceContainer(SALES_TAX_RATES,
                 "java", "-Dspring.profiles.active=integration-test, stubFastTax",
@@ -111,13 +118,6 @@ public abstract class TestContainersInitializerIT {
                 mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         FILES_CONTAINER.start();
-
-        //Sales Tax Container
-        SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
-                "java", "-Dspring.profiles.active=integration-test, complytTaxEngine",
-                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
-        SALES_TAX_CONTAINER.start();
 
         // Restore Dump
         try {
@@ -139,10 +139,10 @@ public abstract class TestContainersInitializerIT {
                                 .forHttp(TestUtilities.TRANSACTION_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.FILES_BASE_URL)
+                                .forHttp(TestUtilities.SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
-                                .forHttp(TestUtilities.SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
+                                .forHttp(TestUtilities.FILES_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStartupTimeout(Duration.ofSeconds(100)));
         API_GATEWAY_CONTAINER.start();
