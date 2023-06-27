@@ -2,70 +2,24 @@ package integration.services.sales_tax;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
-import io.complyt.apigateway.ApiGatewayApplication;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-@SpringBootTest(classes = ApiGatewayApplication.class
-        , webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
-        , properties = {"server.port=8765", "management.server.port=8765"}
-)
-@AutoConfigureWebTestClient
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(profiles = {"integration-test", "stubFastTax"})
 public class TransactionEndpointsIT extends TestContainersInitializerIT implements TransactionEndpointsITTemplate {
 
     private final String source = "1";
     private final String customerId = "4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5";
-
-    @Autowired
-    private WebTestClient webTestClient;
-
-    @Order(-1)
-    @Test
-    @Override
-    public void checkConnection() {
-        while (!IS_SALES_TAX_REGISTERED) {
-            webTestClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(TestUtilities.TRANSACTION_BASE_URL)
-                            .build())
-                    .headers(headers -> headers
-                            .setBearerAuth(TOKEN))
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().value(status -> IS_SALES_TAX_REGISTERED = status != 503);
-        }
-
-        while (!IS_SALES_TAX_RATES_REGISTERED) {
-            webTestClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(TestUtilities.SALES_TAX_RATES_BASE_URL)
-                            .build())
-                    .headers(headers -> headers
-                            .setBearerAuth(TOKEN))
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().value(status -> IS_SALES_TAX_RATES_REGISTERED = status != 503);
-        }
-    }
 
 
     @Order(2)
@@ -75,7 +29,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10001";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -97,7 +51,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10002";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/10002")
@@ -114,13 +68,13 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Order(2)
     @Test
     @Override
-    
+
     public void upsertByExternalIdAndSource_DoesntExistsAndSaleTaxTrackingDoesntExists_Returns500() {
         // Given
         String externalId = "10003";
         String nonExistingState = "Nilfgaard";
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -143,7 +97,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String nonExistingState = "Nilfgaard";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -156,7 +110,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().is5xxServerError();
 
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -169,7 +123,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void put_NoAccessToken_Returns401() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -183,7 +137,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void get_NoAccessToken_Returns401() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -194,7 +148,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void delete_NoAccessToken_Returns401() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -205,7 +159,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void put_InsufficientScopes_Returns403() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -220,7 +174,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void get_InsufficientScopes_Returns403() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -234,7 +188,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
 
     @Override
     public void delete_InsufficientScopes_Returns403() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -250,7 +204,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void getAllBySource_Exists_Returns200() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/2")
@@ -267,7 +221,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void getAllBySource_DoesntExists_Returns200EmptyList() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/9")
@@ -284,7 +238,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void getAll_Exists_Returns200() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -303,7 +257,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     public void getByAll_DoesntExists_Returns200EmptyList() {
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL)
@@ -325,7 +279,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         UUID complytId = UUID.fromString("a6469aaf-e838-41df-8106-6a8927917985"); // complytId of existing transaction
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -343,7 +297,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void getByExternalIdAndSource_DoesntExists_Returns404() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/notExisting")
@@ -362,7 +316,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10004";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -384,7 +338,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10004";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -406,7 +360,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10005";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -429,7 +383,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String differentSource = "2";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + differentSource + "/externalId/" + externalId)
@@ -452,7 +406,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String differentExternalId = "differentId";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + differentExternalId)
@@ -475,7 +429,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String differentExternalId = "differentId";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -503,7 +457,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "0";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -524,7 +478,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10004";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -543,7 +497,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String externalId = "10004";
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -561,7 +515,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void deleteByExternalIdAndSource_DoesntExists_Returns404() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/source/" + source + "/externalId/notExisting")
@@ -580,7 +534,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String complytId = "88d951b8-4804-4bef-929a-cfd3670a82fa"; // complytId of existing transaction
 
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/" + complytId)
@@ -596,7 +550,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Override
     public void getByComplytId_DoesntExists_Returns404() {
         // Then
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/" + TestUtilities.NON_EXISTING_COMPLYT_ID)
@@ -611,7 +565,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @Test
     @Override
     public void getByComplytId_complytIdDoesntParse_Returns500() {
-        webTestClient
+        WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TRANSACTION_BASE_URL + "/complytId/notExisting")

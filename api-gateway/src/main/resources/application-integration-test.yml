@@ -1,21 +1,18 @@
 auth0.audience: null
 
-spring:
-  security.oauth2.resourceserver.jwt.issuer-uri: null
-  cloud:
-    vault:
-      enabled: false
-
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://discovery:8761/eureka/
     should-unregister-on-shutdown: true
     register-with-eureka: true
   instance:
+    prefer-ip-address: false
     lease-renewal-interval-in-seconds: 30
-    prefer-ip-address: true
 
 logging:
   level:
     root: info
+
+spring:
+  cloud:
+    vault:
+      enabled: false
