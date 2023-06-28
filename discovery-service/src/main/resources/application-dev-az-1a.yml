@@ -19,6 +19,7 @@ eureka:
   instance:
     lease-expiration-duration-in-seconds: 90
     hostname: complyt-peer-1
+    #
 
 
 # Observability

@@ -16,7 +16,6 @@ eureka:
   instance:
     lease-expiration-duration-in-seconds: 90
 
-
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true
 management.tracing.sampling.probability: 1.0
