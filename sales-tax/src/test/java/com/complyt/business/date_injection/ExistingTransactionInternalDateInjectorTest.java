@@ -72,5 +72,4 @@ class ExistingTransactionInternalDateInjectorTest {
         assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isAfter(beforeActionTime));
         assertTrue(actualTransaction.getInternalTimestamps().getUpdatedDate().isBefore(afterActionTime));
     }
-
 }
