@@ -13,13 +13,18 @@ import org.mapstruct.factory.Mappers;
 public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     ZipTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(ZipTaxDataToSalesTaxRateMapper.class);
 
-//    @Mapping(target = "cityDistrictRate", source = "districtSalesTax")
+    @Mapping(target = "ratesMetaData.cityDistrictRate", source = "districtSalesTax")
+    @Mapping(target = "ratesMetaData.countyDistrictRate", source = "district5SalesTax")
     @Mapping(target = "cityRate", source = "citySalesTax")
     @Mapping(target = "taxRate", source = "taxSales")
     @Mapping(target = "countyRate", source = "countySalesTax")
-    @Mapping(target = "combinedDistrictRate", source = "district5SalesTax")
     @Mapping(target = "stateRate", source = "stateSalesTax")
+    @Mapping(expression = "java(toCombinedDistrictRate(result))", target = "combinedDistrictRate")
     SalesTaxRates map(Result result);
+
+    default float toCombinedDistrictRate(Result result) {
+        return (float) (result.districtSalesTax() + result.district5SalesTax());
+    }
 
     @Override
     default SalesTaxRates map(SalesTaxData salesTaxData) {

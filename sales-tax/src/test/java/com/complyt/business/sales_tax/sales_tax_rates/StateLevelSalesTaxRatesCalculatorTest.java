@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
+import com.complyt.domain.sales_tax.RatesMetaData;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
@@ -91,7 +92,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     @Test
     void getRateByRules_NotTaxable_ReturnsZeroRate() {
         // Given
-        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(0, 0, 0, 0, 0, null);
+        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(0, 0, 0, 0, 0, new RatesMetaData(0, 0));
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
