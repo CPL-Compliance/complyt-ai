@@ -40,8 +40,9 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
             return modifiedRateByFixedTreatment;
         }
 
-        return modifyRatesByPercentageTreatment(citySalesTaxRules.getCalculationValue(), originalSalesTaxRate);
-
+        // This means there is a special treatment which is calculation by percentage
+        SalesTaxRates modifiedRateByPercentageTreatment = modifyRatesByPercentageTreatment(citySalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+        return modifiedRateByPercentageTreatment;
     }
 
     private SalesTaxRates modifyRatesByFixedTreatment(float cityLevelRate, SalesTaxRates originalSalesTaxRate) {
