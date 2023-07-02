@@ -196,7 +196,7 @@ public class UnitTestUtilities {
 
     public CitySalesTaxRules createCitySalesTaxRules() {
         return new CitySalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0.5f);
+                false, CalculationType.FIXED, "description", 0.05f);
     }
 
     public Exemption createExemption(String id) {
