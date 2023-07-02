@@ -1,9 +1,6 @@
 eureka:
   client:
-<<<<<<< HEAD
     enabled: true
-=======
->>>>>>> dcbb979fd6a6909dcc620918dbf494c69f29db53
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
     should-unregister-on-shutdown: true

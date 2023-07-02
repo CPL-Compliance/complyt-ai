@@ -219,17 +219,17 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
         WEB_TEST_CLIENT
                 .put()
                 .uri(uriBuilder -> uriBuilder
-                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/CA")
+                        .path(TestUtilities.SALES_TAX_TRACKING_BASE_URL + "/state/Nilfgaard")
                         .build())
                 .headers(headers -> {
                     headers.setBearerAuth(TOKEN);
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
-                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("California", "CA", null))
+                .bodyValue(TestUtilities.salesTaxTrackingJsonExample("Nilfgaard", "NLF", null))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.state.name").isEqualTo("California");
+                .jsonPath("$.state.name").isEqualTo("Nilfgaard");
     }
 
     @Order(1)

@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 
 public abstract class TestContainersInitializerIT {
 
+
     protected static final String HOSTNAME = "test-host";
 
     // Image versions
@@ -84,10 +85,10 @@ public abstract class TestContainersInitializerIT {
         // Mongo Container
         MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
                 .withNetwork(NETWORK)
-                .withNetworkAliases(HOSTNAME)
-                .withClasspathResourceMapping(dumpPath(SALES_TAX), dumpPath(SALES_TAX), BindMode.READ_ONLY)
-                .withClasspathResourceMapping(dumpPath(SALES_TAX_RATES), dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY)
-                .withClasspathResourceMapping(dumpPath(FILES), dumpPath(FILES), BindMode.READ_ONLY);
+                .withNetworkAliases(HOSTNAME);
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX), "/" + dumpPath(SALES_TAX), BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
         MONGO_CONTAINER.start();
 
         // Retrieve Tokens
