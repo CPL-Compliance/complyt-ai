@@ -64,8 +64,12 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
         float taxRate = salesTaxRates.cityRate() + salesTaxRates.countyDistrictRate() + salesTaxRates.cityDistrictRate() +
                 salesTaxRates.stateRate() + salesTaxRates.countyRate();
 
-        return new SalesTaxRates(salesTaxRates.cityDistrictRate(), salesTaxRates.cityRate(),
-                salesTaxRates.countyDistrictRate(), salesTaxRates.countyRate(), salesTaxRates.stateRate(),
+        return new SalesTaxRates(
+                salesTaxRates.cityDistrictRate(),
+                salesTaxRates.cityRate(),
+                salesTaxRates.countyDistrictRate(),
+                salesTaxRates.countyRate(),
+                salesTaxRates.stateRate(),
                 taxRate);
     }
 }
