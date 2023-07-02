@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = SalesTaxDataToSalesTaxRateMapper.class)
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
 

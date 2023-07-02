@@ -30,6 +30,7 @@ public class SalesTaxDataToSalesTaxRate {
                     .then(Mono.just(handleUnincorporatedAddress(salesTaxRates)));
         }
         return Mono.just(salesTaxRates);
+
     }
 
     private SalesTaxRates handleUnincorporatedAddress(SalesTaxRates salesTaxRates) {
@@ -48,19 +49,5 @@ public class SalesTaxDataToSalesTaxRate {
                 .withCityRate(0)
                 .withRatesMetaData(modifiedRatesMetaData);
     }
-
-//    private SalesTaxRates handleUnincorporatedAddress(SalesTaxRates salesTaxRates) {
-//        if (salesTaxRates.ratesMetaData() != null) {
-//            float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
-//            RatesMetaData modifiedRatesMetaData = salesTaxRates.ratesMetaData().withCityDistrictRate(0);
-//
-//            return salesTaxRates
-//                    .withTaxRate(modifiedTaxRate)
-//                    .withCityRate(0)
-//                    .withRatesMetaData(modifiedRatesMetaData);
-//        }
-//
-//        return salesTaxRates;
-//    }
 
 }
