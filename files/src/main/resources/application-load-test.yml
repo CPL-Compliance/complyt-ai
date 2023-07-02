@@ -44,6 +44,7 @@ auth0.audience: ${audience}
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
 
+
 spring:
   data:
     mongodb:

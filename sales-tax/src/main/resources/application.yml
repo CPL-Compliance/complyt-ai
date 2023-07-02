@@ -1,5 +1,4 @@
 spring.application.name: sales-tax
-
 server.port: ${PORT:9898}
 
 spring.profiles.active:

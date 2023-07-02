@@ -27,7 +27,7 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
-    @Profile({"development", "demo", "test", "default", "production"})
+    @Profile({"development", "demo", "test", "load-test", "default", "production"})
     @Bean
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);

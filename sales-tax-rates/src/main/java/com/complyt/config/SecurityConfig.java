@@ -28,7 +28,7 @@ public class SecurityConfig {
     private String issuer;
 
     @Bean
-    @Profile({"production", "development", "demo", "test", "default"})
+    @Profile({"production", "development", "demo", "test", "load-test", "default"})
     JwtDecoder jwtDecoder() {
         /*
         By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
