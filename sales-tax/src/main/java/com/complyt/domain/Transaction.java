@@ -26,6 +26,7 @@ public class Transaction implements ComplytIdProperty {
     String id;
     String externalId;
     String source;
+    String documentName;
     List<Item> items;
     Address billingAddress;
     Address shippingAddress;

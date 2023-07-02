@@ -37,7 +37,7 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
 
         return new Transaction(
                 transaction.getComplytId(), transaction.getId(),
-                transaction.getExternalId(), transaction.getSource(),
+                transaction.getExternalId(), transaction.getSource(), transaction.getDocumentName(),
                 transaction.getItems(), transaction.getBillingAddress(),
                 transaction.getShippingAddress(), transaction.getCustomerId(), transaction.getCustomer(),
                 transaction.getSalesTax(), transaction.getTransactionStatus(),

@@ -34,6 +34,7 @@ class TransactionDtoTest {
         String expectedString = "TransactionDto[complytId=" + transactionDto.complytId() +
                 ", externalId=" + transactionDto.externalId() +
                 ", source=" + transactionDto.source() +
+                ", documentName=" + transactionDto.documentName() +
                 ", items=" + transactionDto.items() +
                 ", billingAddress=" + transactionDto.billingAddress() +
                 ", shippingAddress=" + transactionDto.shippingAddress() +
