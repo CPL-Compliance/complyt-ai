@@ -1,6 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRates;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,45 @@ public class CityLevelSalesTaxRatesCalculatorTest {
 
         // When
         SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, zeroSalesTaxRateWithCityRate);
+
+        // Then
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void calculate_SpecialTreatmentByFixed_ReturnsFixedCityRate() {
+        // Given
+        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true).withSpecialTreatment(true);
+        float newCityRate = taxableCityRule.getCalculationValue();
+        SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates()
+                .withCityRate(newCityRate);
+        float taxRate = newCityRate + salesTaxRates.cityDistrictRate() + salesTaxRates.countyDistrictRate() +
+                salesTaxRates.countyRate() + salesTaxRates.stateRate();
+
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(taxRate).withCityRate(newCityRate);
+
+        // When
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, salesTaxRates);
+
+        // Then
+        assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
+    }
+
+    @Test
+    void calculate_SpecialTreatmentByPercentage_ReturnsPercentageCityRate() {
+        // Given
+        CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true)
+                .withSpecialTreatment(true)
+                .withCalculationType(CalculationType.PERCENTAGE);
+        SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(0.05f);
+        float newCityTaxRate = originalSalesTaxRate.cityRate() * taxableCityRule.getCalculationValue();
+        float taxRate = newCityTaxRate + originalSalesTaxRate.cityDistrictRate() + originalSalesTaxRate.countyDistrictRate() +
+                originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
+
+        SalesTaxRates expectedSalesTaxRate = originalSalesTaxRate.withTaxRate(taxRate).withCityRate(newCityTaxRate);
+
+        // When
+        SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(taxableCityRule, originalSalesTaxRate);
 
         // Then
         assertEquals(expectedSalesTaxRate, actualSalesTaxRate);
