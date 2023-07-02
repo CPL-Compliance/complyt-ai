@@ -1,6 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
 import com.complyt.domain.sales_tax.SalesTaxRates;
+import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,50 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
 
             return zeroCitySalesTaxRate;
         }
-        float taxRate = originalSalesTaxRate.cityRate() + originalSalesTaxRate.cityDistrictRate() + originalSalesTaxRate.countyDistrictRate()
-                + originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
-        log.debug("None special treatment for city rule - returning original sales tax rate");
 
-        return originalSalesTaxRate.withTaxRate(taxRate);
+        if (!citySalesTaxRules.isSpecialTreatment()) {
+            SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate);
+            log.debug("None special treatment for city rule - returning original sales tax rate");
+
+            return calculatedRates;
+        }
+
+        if (citySalesTaxRules.getCalculationType().equals(CalculationType.FIXED)) {
+            SalesTaxRates modifiedRateByFixedTreatment = modifyRatesByFixedTreatment(citySalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+            return modifiedRateByFixedTreatment;
+        }
+
+        // This means there is a special treatment which is calculation by percentage
+        SalesTaxRates modifiedRateByPercentageTreatment = modifyRatesByPercentageTreatment(citySalesTaxRules.getCalculationValue(), originalSalesTaxRate);
+        return modifiedRateByPercentageTreatment;
     }
 
+    private SalesTaxRates modifyRatesByFixedTreatment(float cityLevelRate, SalesTaxRates originalSalesTaxRate) {
+        SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate.withCityRate(cityLevelRate));
+        log.debug("City sales tax rate after fixed modification: " + cityLevelRate);
+
+        return calculatedRates;
+    }
+
+    private SalesTaxRates modifyRatesByPercentageTreatment(float percentageToCut, SalesTaxRates originalSalesTaxRate) {
+        float newCityTaxRate = originalSalesTaxRate.cityRate() * percentageToCut;
+        SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate.withCityRate(newCityTaxRate));
+
+        log.debug("State Sales tax rate after percentage modification: " + calculatedRates);
+
+        return calculatedRates;
+    }
+
+    private SalesTaxRates modifyRates(SalesTaxRates salesTaxRates) {
+        float taxRate = salesTaxRates.cityRate() + salesTaxRates.countyDistrictRate() + salesTaxRates.cityDistrictRate() +
+                salesTaxRates.stateRate() + salesTaxRates.countyRate();
+
+        return new SalesTaxRates(
+                salesTaxRates.cityDistrictRate(),
+                salesTaxRates.cityRate(),
+                salesTaxRates.countyDistrictRate(),
+                salesTaxRates.countyRate(),
+                salesTaxRates.stateRate(),
+                taxRate);
+    }
 }
