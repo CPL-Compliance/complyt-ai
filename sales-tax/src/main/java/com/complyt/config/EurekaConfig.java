@@ -36,41 +36,4 @@ public class EurekaConfig {
 
         return config;
     }
-
-//    @Profile({"integration-test"})
-//    @Bean
-//    public ServiceInstanceChooser serviceInstanceChooser(ReactiveDiscoveryClient discoveryClient) {
-//        return new CustomServiceInstanceChooser(discoveryClient);
-//    }
-//
-//    private record CustomServiceInstanceChooser(ReactiveDiscoveryClient discoveryClient) implements ServiceInstanceChooser {
-//
-//        @Override
-//            public ServiceInstance choose(String serviceId) {
-//                return discoveryClient.getInstances(serviceId)
-//                        .map(serviceInstance ->
-//                                !serviceInstance.getHost().equals("localhost") ? serviceInstance :
-//                                        new DefaultServiceInstance(
-//                                                serviceInstance.getInstanceId(),
-//                                                serviceInstance.getServiceId(),
-//                                                "host.docker.internal",
-//                                                serviceInstance.getPort(),
-//                                                serviceInstance.isSecure()))
-//                        .next().block();
-//            }
-//
-//            @Override
-//            public <T> ServiceInstance choose(String serviceId, Request<T> request) {
-//                return discoveryClient.getInstances(serviceId)
-//                        .map(serviceInstance ->
-//                                !serviceInstance.getHost().equals("localhost") ? serviceInstance :
-//                                        new DefaultServiceInstance(
-//                                                serviceInstance.getInstanceId(),
-//                                                serviceInstance.getServiceId(),
-//                                                "host.docker.internal",
-//                                                serviceInstance.getPort(),
-//                                                serviceInstance.isSecure()))
-//                        .next().block();
-//            }
-//        }
 }

@@ -41,12 +41,12 @@ public abstract class TestContainersInitializerIT {
 
     // Containers
     protected static final MongoDBContainer MONGO_CONTAINER;
-    protected static GenericContainer DISCOVERY_CONTAINER;
-    protected static GenericContainer SALES_TAX_CONTAINER;
-    protected static GenericContainer SALES_TAX_RATES_CONTAINER;
-    protected static GenericContainer FILES_CONTAINER;
-    protected static GenericContainer API_GATEWAY_CONTAINER;
-    protected static KeycloakContainer KEYCLOAK_CONTAINER;
+    protected static final GenericContainer DISCOVERY_CONTAINER;
+    protected static final GenericContainer SALES_TAX_CONTAINER;
+    protected static final GenericContainer SALES_TAX_RATES_CONTAINER;
+    protected static final GenericContainer FILES_CONTAINER;
+    protected static final GenericContainer API_GATEWAY_CONTAINER;
+    protected static final KeycloakContainer KEYCLOAK_CONTAINER;
 
     // Tokens
     protected static String TOKEN;
@@ -54,10 +54,10 @@ public abstract class TestContainersInitializerIT {
     protected static String TOKEN_DIFFERENT_TENANT;
 
     // Miscellaneous
-    protected static WebTestClient ACCESS_TOKEN_CLIENT;
-    protected static WebTestClient WEB_TEST_CLIENT;
-    protected static Map<String, String> JAR_FILE_MAP = new HashMap<>();
-    protected static Network NETWORK;
+    protected static final WebTestClient ACCESS_TOKEN_CLIENT;
+    protected static final WebTestClient WEB_TEST_CLIENT;
+    protected static final Map<String, String> JAR_FILE_MAP = new HashMap<>();
+    protected static final Network NETWORK;
 
     static {
 

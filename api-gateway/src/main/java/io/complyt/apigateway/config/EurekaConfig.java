@@ -27,7 +27,7 @@ public class EurekaConfig {
         String port = environment.getProperty("server.port");
         config.setNonSecurePort(Integer.parseInt(port));
         config.setIpAddress(ip);
-        config.setPreferIpAddress(false);
+        config.setPreferIpAddress(true);
 
         return config;
     }
