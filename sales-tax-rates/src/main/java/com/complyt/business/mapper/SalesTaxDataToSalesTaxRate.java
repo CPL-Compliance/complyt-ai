@@ -29,8 +29,8 @@ public class SalesTaxDataToSalesTaxRate {
             return ContextLogger.observeCtx("Unincorporated Address - Setting City and City District Rates to 0 ", log::debug)
                     .then(Mono.just(handleUnincorporatedAddress(salesTaxRates)));
         }
+        
         return Mono.just(salesTaxRates);
-
     }
 
     private SalesTaxRates handleUnincorporatedAddress(SalesTaxRates salesTaxRates) {
