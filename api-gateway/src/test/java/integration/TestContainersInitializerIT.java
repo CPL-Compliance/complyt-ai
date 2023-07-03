@@ -79,7 +79,7 @@ public abstract class TestContainersInitializerIT {
 
         //Discovery Container
         DISCOVERY_CONTAINER = initializeServiceContainer(DISCOVERY_SERVICE,
-                "java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
+                "java", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=single-server", "-jar", "app.jar");
         DISCOVERY_CONTAINER.start();
 
         // Mongo Container
