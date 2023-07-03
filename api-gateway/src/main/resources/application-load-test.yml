@@ -1,9 +1,41 @@
+auth0.audience: ${audience}
+
 eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
   instance:
     prefer-ip-address: true
+
+spring:
+  security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
+  config.import: vault://
+  cloud:
+    # Spring Cloud Vault configuration
+    # To understand what every field stands for visit
+    # https://cloud.spring.io/spring-cloud-vault/reference/html/
+    vault:
+      enabled: true
+      application-name: api-gateway-service
+      host: ${VAULT_HOST}
+      port: 8200
+      scheme: https
+      namespace: admin
+      fail-fast: true
+      config:
+        lifecycle:
+          enabled: true
+          min-renewal: 10s
+          expiry-threshold: 1m
+      authentication: APPROLE
+      app-role:
+        role-id: ${VAULT_ROLE_ID}
+        secret-id: ${VAULT_SECRET_ID}
+        role: ${VAULT_ROLE}
+        app-role-path: approle
+      kv:
+        enabled: true
+        default-context:
 
 springdoc:
   swagger-ui:

@@ -27,6 +27,7 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
 
+    @Profile({"development", "demo", "test", "load-test", "default", "production"})
     @Bean
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
@@ -82,6 +83,21 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui*/**"
                 ).permitAll()
+                .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
+                .anyExchange().authenticated();
+
+        // OAuth2
+        http.oauth2ResourceServer().jwt();
+
+        return http.build();
+    }
+
+    @Profile({"integration-test"})
+    @Bean
+    public SecurityWebFilterChain integrationTestFilterChain(ServerHttpSecurity http) {
+        // Authentication and Authorization
+        http.authorizeExchange()
+                .pathMatchers("/actuator/health").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 

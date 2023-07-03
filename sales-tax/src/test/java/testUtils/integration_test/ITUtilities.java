@@ -130,7 +130,13 @@ public interface ITUtilities {
     static Jwt.Builder stubJwt() {
         return Jwt.withTokenValue("token")
                 .header("typ", "JWT")
-                .claim("tenant_id", "it_tenant");
+                .issuer("https://localhost")
+                .claim("tenant_id", "it_tenant")
+                .claim("scope", "create:customer delete:customer read:customer " +
+                        "update:customer create:transaction read:transaction " +
+                        "update:transaction delete:transaction read:state " +
+                        "create:exemption update:exemption delete:exemption " +
+                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
     public static Address createAddressInCalifornia() {
