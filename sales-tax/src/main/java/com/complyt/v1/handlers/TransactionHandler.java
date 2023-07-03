@@ -4,6 +4,7 @@ import com.complyt.facades.TransactionFacade;
 import com.complyt.security.permissions.transaction.TransactionCreatePermission;
 import com.complyt.security.permissions.transaction.TransactionDeletePermission;
 import com.complyt.security.permissions.transaction.TransactionReadPermission;
+import com.complyt.security.permissions.transaction.TransactionUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;

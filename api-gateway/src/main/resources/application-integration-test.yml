@@ -1,0 +1,18 @@
+auth0.audience: null
+
+eureka:
+  client:
+    should-unregister-on-shutdown: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 30
+
+logging:
+  level:
+    root: info
+
+spring:
+  cloud:
+    vault:
+      enabled: false

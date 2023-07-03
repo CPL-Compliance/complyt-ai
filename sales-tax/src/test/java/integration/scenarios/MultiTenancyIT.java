@@ -40,12 +40,10 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
     private final JwtMutator differentTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().claim("tenant_id", "other_it_tenant").build());
     private final JwtMutator defaultTenantMutator = mockJwt().jwt(ITUtilities.stubJwt().build());
     private final String source = "1";
-
-    @Autowired
-    private WebTestClient webTestClient;
-
     @Mock
     ComplytSalesTaxRatesClientWrapper complytSalesTaxRatesClientWrapper;
+    @Autowired
+    private WebTestClient webTestClient;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

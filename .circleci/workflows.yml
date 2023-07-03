@@ -37,6 +37,24 @@ parameters:
     default: false
 
 jobs:
+  package-dependency:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - run:
+          name: Execute
+          command: ./mvnw clean package -Dmaven.test.skip
+      - persist_to_workspace:
+          root: ~/complyt_work_directory
+          paths:
+            - <<parameters.service_directory>>/target/*.jar
   verify:
     parameters:
       service_directory:
@@ -48,6 +66,8 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - run:
           name: Execute
           command: ./mvnw clean verify
@@ -70,6 +90,8 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
 
       - run:
           name: Release a Production Version
@@ -190,11 +212,28 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
+      - package-dependency:
+          name: package-sales-tax
+          service_directory: "sales-tax"
+      - package-dependency:
+          name: package-sales-tax-rates
+          service_directory: "sales-tax-rates"
+      - package-dependency:
+          name: package-discovery-service
+          service_directory: "discovery-service"
+      - package-dependency:
+          name: package-files
+          service_directory: "files"
       - verify:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
           service_directory: "api-gateway"
 
       - deploy:
@@ -202,6 +241,11 @@ workflows:
             branches:
               only:
                 - main
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
           service_directory: "api-gateway"
 
       - send-test-coverage-reports:
