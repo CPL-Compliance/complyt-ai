@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class EurekaConfig {
     @Bean
-    @Profile({"production", "prod-az-1a", "prod-az-1b"})
+    @Profile({"prod-az-1a", "prod-az-1b"})
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) {
         EurekaInstanceConfigBean bean = new EurekaInstanceConfigBean(inetUtils);
         AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
