@@ -19,9 +19,9 @@
 
     <modules>
         <module>sales-tax</module>
+        <module>api-gateway</module>
         <module>test-service</module>
         <module>discovery-service</module>
-        <module>api-gateway</module>
         <module>files</module>
         <module>sales-tax-rates</module>
     </modules>
