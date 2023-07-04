@@ -2,6 +2,7 @@ package com.example.complyt.v1.routers;
 
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
+import com.complyt.domain.RatesMetaData;
 import com.complyt.facade.ComplytSalesTaxRatesFacade;
 import com.complyt.v1.config.ApiExceptionConfig;
 import com.complyt.v1.config.ValidatorConfig;
@@ -14,6 +15,8 @@ import com.complyt.v1.mappers.AddressMapper;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.ComplytSalesTaxRatesDto;
+import com.complyt.v1.model.RatesMetaDataDto;
+import com.complyt.v1.model.SalesTaxRatesDto;
 import com.complyt.v1.router.ComplytSalesTaxRatesRouter;
 import com.complyt.v1.validators.query_params.AddressDtoQueryParamsExtractor;
 import com.example.complyt.config.SecurityConfig;
@@ -63,6 +66,39 @@ public class ComplytSalesTaxRatesRouterTest {
         // Given
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
         ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
+        Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
+
+        // When
+        when(addressWithSalesTaxRatesFacade.findByAddress(address)).thenReturn(Mono.just(addressWithSalesTaxRates));
+        ComplytSalesTaxRatesDto addressWithSalesTaxRatesDto = ComplytSalesTaxRatesMapper.INSTANCE
+                .complytSalesTaxRatesToComplytSalesTaxRates(addressWithSalesTaxRates);
+
+        // Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(ComplytSalesTaxRatesRouter.BASE_URL)
+                        .queryParam("country", addressDto.country())
+                        .queryParam("state", addressDto.state())
+                        .queryParam("city", addressDto.city())
+                        .queryParam("street", addressDto.street())
+                        .queryParam("zip", addressDto.zip())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ComplytSalesTaxRatesDto.class)
+                .value(addressWithSalesTaxRatesItem -> addressWithSalesTaxRatesItem, equalTo(addressWithSalesTaxRatesDto));
+    }
+
+    @Test
+    @WithMockUser
+    public void findByAddress_AddressWithSalesTaxRatesWithRatesMetaDataFound_Returns200() {
+        // Given
+        RatesMetaData ratesMetaData = new RatesMetaData(0.01f, 0.01f);
+        AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
+        ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates()
+                .withSalesTaxRates(TestUtilities.createCaliforniaSalesTaxRates().withRatesMetaData(ratesMetaData));
         Address address = AddressMapper.INSTANCE.addressDtoToAddress(addressDto);
 
         // When

@@ -34,7 +34,7 @@ public interface TestUtilities {
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.07625f, 0.06f, null);
+        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.071f, 0.06f, null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
