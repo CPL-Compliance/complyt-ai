@@ -2,6 +2,9 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.sales_tax.RatesMetaData;
+import com.complyt.domain.sales_tax.SalesTax;
+import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
@@ -83,6 +86,31 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionItem -> transactionItem, equalTo(transactionDto));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByExternalIdAndSource_ExistsWithSalesTax_Returns200() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        SalesTax salesTax = new SalesTax(0f, new SalesTaxRates(0f, 0f, 0f, 0f,
+                0f, new RatesMetaData(0f, 0f)));
+        Transaction transactionWithSalesTax = transaction.withSalesTax(salesTax);
         when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
 
         // When + Then
@@ -301,8 +329,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
         // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
 
         // When

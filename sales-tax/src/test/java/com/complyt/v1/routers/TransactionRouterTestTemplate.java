@@ -24,6 +24,10 @@ public interface TransactionRouterTestTemplate extends
         ItemValidationTestTemplate,
         // Validation::ShippingFee
         ShippingFeeValidationTestTemplate {
+    @Test
+    @WithMockUser
+    void getByExternalIdAndSource_ExistsWithSalesTax_Returns200();
+
     void getAny_InvalidUrl_Returns404();
 
     void putAny_InvalidUrl_Returns404();
