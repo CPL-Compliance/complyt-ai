@@ -285,7 +285,12 @@ workflows:
       - update-ecs-service:
           requires:
             - deploy
-          service_name: "discovery-service"
+          service_name: "discovery-service-az-1a-service"
+          
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "discovery-service-az-1b-service"
 
   sales-tax-rates-workflow:
     when: << pipeline.parameters.run-sales-tax-rates-workflow >>
