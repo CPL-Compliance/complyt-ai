@@ -28,6 +28,7 @@ public class SecurityConfig {
     private String issuer;
 
     @Bean
+    @Profile({"production", "development", "demo", "test", "load-test", "default"})
     JwtDecoder jwtDecoder() {
         /*
         By default, Spring Security does not validate the "aud" claim of the token, to ensure that this token is
@@ -83,6 +84,21 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui*/**"
                 ).permitAll()
+                .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
+                .anyExchange().authenticated();
+
+        // OAuth2
+        http.oauth2ResourceServer().jwt();
+
+        return http.build();
+    }
+
+    @Profile({"integration-test"})
+    @Bean
+    public SecurityWebFilterChain integrationTestFilterChain(ServerHttpSecurity http) {
+        // Authentication and Authorization
+        http.authorizeExchange()
+                .pathMatchers("/actuator/health").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 

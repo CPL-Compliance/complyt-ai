@@ -1,0 +1,188 @@
+{
+  "realm": "test-realm",
+  "keycloakVersion": "21.1.1",
+  "defaultSignatureAlgorithm": "RS256",
+  "enabled": true,
+  "sslRequired": "external",
+  "requiredCredentials": [
+    "password"
+  ],
+  "clients": [
+    {
+      "clientId": "test-client",
+      "name": "test-client",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "tenant_id",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "create:customer",
+        "update:customer",
+        "read:customer",
+        "delete:customer",
+        "create:nexus",
+        "update:nexus",
+        "read:nexus",
+        "delete:nexus",
+        "create:transaction",
+        "update:transaction",
+        "read:transaction",
+        "delete:transaction",
+        "create:exemption",
+        "update:exemption",
+        "read:exemption",
+        "delete:exemption",
+        "read:sales_tax_rates",
+        "read:link",
+        "read:state"
+      ]
+    },
+    {
+      "clientId": "test-client-no-scope",
+      "name": "test-client-no-scope",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "tenant_id",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "dummy:dummy"
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "create:customer",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:customer",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:customer",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "delete:customer",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "create:transaction",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:transaction",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:transaction",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "delete:transaction",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "create:exemption",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:exemption",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:exemption",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "delete:exemption",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "create:nexus",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:nexus",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "update:nexus",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "delete:nexus",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:sales_tax_rates",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:link",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "read:state",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "dummy:dummy",
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "test-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ],
+      "attributes": {
+        "tenant_id": "it_tenant"
+      }
+    },
+    {
+      "username": "test-user-different-tenant",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ],
+      "attributes": {
+        "tenant_id": "different_tenant"
+      }
+    }
+  ]
+}

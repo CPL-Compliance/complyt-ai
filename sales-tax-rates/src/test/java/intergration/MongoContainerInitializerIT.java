@@ -15,14 +15,14 @@ public abstract class MongoContainerInitializerIT {
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
 
     protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
-            .withExposedPorts(27017)
-            .withClasspathResourceMapping("sales_tax_rates.dump", "sales_tax_rates.dump", BindMode.READ_ONLY);
+            .withExposedPorts(27017);
 
     static {
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/sales-tax-rates.dump", "/sales-tax-rates.dump", BindMode.READ_ONLY);
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
         try {
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales_tax_rates.dump");
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=sales-tax-rates.dump");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -15,10 +15,10 @@ public abstract class TestContainersInitializerIT {
     protected static final String MONGO_IMAGE = "mongo:5.0.15";
 
     protected static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(DockerImageName.parse(MONGO_IMAGE))
-            .withExposedPorts(27017)
-            .withClasspathResourceMapping("files.dump", "files.dump", BindMode.READ_ONLY);
+            .withExposedPorts(27017);
 
     static {
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/files.dump", "/files.dump", BindMode.READ_ONLY);
         MONGO_CONTAINER.start();
         MONGO_CONTAINER.followOutput(new Slf4jLogConsumer(log));
         try {

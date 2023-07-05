@@ -54,6 +54,7 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <taxjar.version>5.0.3</taxjar.version>
 
+        <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
         <!-- Dependencies -->
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
@@ -181,6 +182,11 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>mongodb</artifactId>
                 <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.dasniko</groupId>
+                <artifactId>testcontainers-keycloak</artifactId>
+                <version>${testcontainers-keycloak.version}</version>
             </dependency>
             <!-- Testcontainers -->
             <!-- Other -->
@@ -582,6 +588,12 @@
             <id>load-test</id>
             <properties>
                 <activeEnv>load-test</activeEnv>
+            </properties>
+        </profile>
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <activeEnv>integration-test</activeEnv>
             </properties>
         </profile>
         <!-- Environment Profiles -->
