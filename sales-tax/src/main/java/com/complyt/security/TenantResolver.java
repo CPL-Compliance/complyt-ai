@@ -15,10 +15,8 @@ public class TenantResolver {
     public Mono<String> resolve() {
         return ReactiveSecurityContextHolder.getContext()
                 .map(securityContext -> {
-                    log.info(securityContext.toString());
                     if (securityContext.getAuthentication() instanceof AbstractAuthenticationToken) {
                         AbstractOAuth2TokenAuthenticationToken token = (AbstractOAuth2TokenAuthenticationToken) securityContext.getAuthentication();
-                        log.info(token.toString());
                         return (String) token.getTokenAttributes().get("tenant_id");
                     }
 
