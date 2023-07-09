@@ -17,6 +17,7 @@
     <version>0.1.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
+    <!--    Don't change modules order! It's necessary for system tests-->
     <modules>
         <module>discovery-service</module>
         <module>sales-tax-rates</module>
