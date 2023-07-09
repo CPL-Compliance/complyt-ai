@@ -30,7 +30,7 @@ public class FileRepository {
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
-                    return ContextLogger.observeCtx("Searching for files with tenant ID: " + tenantId, log::info)
+                    return ContextLogger.observeCtx("Searching for files with tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate.findOne(query, File.class));
                 });
     }
