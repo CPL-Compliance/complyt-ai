@@ -180,6 +180,7 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax"
+          image_tag: $(mvn help:evaluate -f sales-tax/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
