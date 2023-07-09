@@ -1,5 +1,6 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +14,7 @@ class ItemDtoTest {
     @BeforeEach
     void setup() {
         itemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
     }
 
@@ -21,7 +22,7 @@ class ItemDtoTest {
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
         ItemDto givenItemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
 
         // When

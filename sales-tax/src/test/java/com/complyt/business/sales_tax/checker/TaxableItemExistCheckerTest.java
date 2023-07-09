@@ -30,13 +30,13 @@ public class TaxableItemExistCheckerTest {
 
     private Item createTaxableItem() {
         return new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
         );
     }
 
     private Item createNotTaxableItem() {
         return new Item(1000, 5, 5000, "description", "name", "C2S1",
-                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
+                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
         );
     }
 

@@ -1,6 +1,7 @@
 package com.complyt.config;
 
 import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.TaxJarDataToSalesTaxRateMapper;
 import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,5 +20,11 @@ public class MappersConfig {
     @Bean("salesTaxDataToSalesTaxRateMapper")
     public ZipTaxDataToSalesTaxRateMapper zipTaxDataToSalesTaxRateMapper() {
         return ZipTaxDataToSalesTaxRateMapper.INSTANCE;
+    }
+
+    @Profile({"taxJar"})
+    @Bean("salesTaxDataToSalesTaxRateMapper")
+    public TaxJarDataToSalesTaxRateMapper taxJarDataToSalesTaxRateMapper() {
+        return TaxJarDataToSalesTaxRateMapper.INSTANCE;
     }
 }

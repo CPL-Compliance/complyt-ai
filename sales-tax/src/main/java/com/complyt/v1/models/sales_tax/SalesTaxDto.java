@@ -1,4 +1,4 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.sales_tax;
 
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.NumericErrorMessages;

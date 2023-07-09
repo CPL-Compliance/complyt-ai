@@ -2,8 +2,11 @@ package com.complyt.config.web_clients;
 
 import com.complyt.business.sales_tax_web_clients.FastTaxWebClientWrapper;
 import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
 import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.taxjar.Taxjar;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -20,6 +23,9 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Autowired
     private WebClientWrapperProperties stubFastTaxWebClientWrapperProperties;
+
+    @Autowired
+    private WebClientWrapperProperties taxJarWebClientWrapperProperties;
 
     @Profile({"fastTax"})
     @Bean("salesTaxWebClientWrapper")
@@ -46,4 +52,12 @@ public class SalesTaxWebClientWrapperConfig {
     public StubFastTaxWebClientWrapper stubFastTaxWebClientWrapper(WebClient webClient) {
         return new StubFastTaxWebClientWrapper();
     }
+
+    @Profile({"taxJar"})
+    @Bean("salesTaxWebClientWrapper")
+    public TaxJarWebClientWrapper taxJarWebClientWrapper(@Value("${tax-jar-api-token}") String apiToken) {
+        Taxjar client = new Taxjar(apiToken);
+        return new TaxJarWebClientWrapper(client);
+    }
+
 }

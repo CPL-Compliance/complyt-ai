@@ -10,7 +10,7 @@ public class SalesTaxTest {
     private SalesTax salesTax;
 
     private SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        return new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null);
     }
 
     @BeforeEach

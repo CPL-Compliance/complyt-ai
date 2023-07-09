@@ -1,5 +1,6 @@
 package com.example.complyt.domain.mappers;
 
+import com.complyt.domain.RatesMetaData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.fast_tax.FastTaxData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
@@ -8,14 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class FastTaxDataToSalesTaxRateMapperTest {
     private FastTaxData fastTaxData;
@@ -33,7 +32,9 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_TaxInfoItem_ReturnSalesTaxRate() {
         // Given
-        SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates();
+        RatesMetaData ratesMetaData = new RatesMetaData(Float.parseFloat(taxInfoItem.cityDistrictRate()), Float.parseFloat(taxInfoItem.cityDistrictRate()));
+        SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
+                .withRatesMetaData(ratesMetaData);
 
         // When
         SalesTaxRates actualSalesTaxRates = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(taxInfoItem);
@@ -45,7 +46,9 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_FastTaxData_ReturnSalesTaxRate() {
         // Given + When
-        SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates();
+        RatesMetaData ratesMetaData = new RatesMetaData(Float.parseFloat(taxInfoItem.cityDistrictRate()), Float.parseFloat(taxInfoItem.cityDistrictRate()));
+        SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
+                .withRatesMetaData(ratesMetaData);
 
         // When
         SalesTaxRates actualSalesTaxRates = FastTaxDataToSalesTaxRateMapper.INSTANCE.map(fastTaxData);

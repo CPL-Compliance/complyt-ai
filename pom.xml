@@ -17,13 +17,14 @@
     <version>0.1.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
+    <!--    Don't change modules order! It's necessary for system tests-->
     <modules>
-        <module>sales-tax</module>
-        <module>test-service</module>
         <module>discovery-service</module>
-        <module>api-gateway</module>
-        <module>files</module>
         <module>sales-tax-rates</module>
+        <module>sales-tax</module>
+        <module>files</module>
+        <module>test-service</module>
+        <module>api-gateway</module>
     </modules>
 
     <name>Complyt</name>
@@ -52,6 +53,8 @@
         <jackson-databind.version>2.14.1</jackson-databind.version>
         <spring-cloud-dependencies.version>2022.0.1</spring-cloud-dependencies.version>
         <testcontainers.version>1.17.6</testcontainers.version>
+        <taxjar.version>5.0.3</taxjar.version>
+
         <testcontainers-keycloak.version>2.5.0</testcontainers-keycloak.version>
         <!-- Dependencies -->
         <!-- Plugins -->
@@ -214,6 +217,11 @@
                 <artifactId>netty-resolver-dns-native-macos</artifactId>
                 <version>${netty-resolver-dns-native-macos.version}</version>
                 <classifier>osx-aarch_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>com.taxjar</groupId>
+                <artifactId>taxjar-java</artifactId>
+                <version>${taxjar.version}</version>
             </dependency>
         </dependencies>
         <!-- Other -->

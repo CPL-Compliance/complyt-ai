@@ -29,9 +29,16 @@ public class WebClientWrapperPropertiesConfig {
                 .key(new Pair<>("key", licenseKey)).build();
     }
 
+    @Profile({"taxJar"})
+    @Bean("taxJarWebClientWrapperProperties")
+    public WebClientWrapperProperties taxJarWebClientWrapperProperties() {
+        return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
+    }
+
     @Profile({"stubFastTax", "default"})
     @Bean("stubFastTaxWebClientWrapperProperties")
     public WebClientWrapperProperties stubFastTaxWebClientWrapperProperties() {
         return WebClientWrapperProperties.WebClientWrapperPropertiesStub();
     }
+
 }

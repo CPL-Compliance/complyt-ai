@@ -12,7 +12,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax-rates</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>sales-tax-rates</name>
@@ -199,6 +199,15 @@
         </dependency>
         <!-- Spring Cloud Eureka -->
 
+        <dependency>
+            <groupId>com.taxjar</groupId>
+            <artifactId>taxjar-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -216,6 +225,12 @@
             <id>zipTax</id>
             <properties>
                 <activeTaxClient>zipTax</activeTaxClient>
+            </properties>
+        </profile>
+        <profile>
+            <id>taxJar</id>
+            <properties>
+                <activeTaxClient>taxJar</activeTaxClient>
             </properties>
         </profile>
         <profile>

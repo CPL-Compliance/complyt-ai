@@ -327,7 +327,7 @@ public class TransactionFacadeTest {
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
-        SalesTax salesTax = new SalesTax(100, new SalesTaxRates(0, 0, 0, 0, 0, 0));
+        SalesTax salesTax = new SalesTax(100, new SalesTaxRates(0, 0, 0, 0, 0, null));
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())

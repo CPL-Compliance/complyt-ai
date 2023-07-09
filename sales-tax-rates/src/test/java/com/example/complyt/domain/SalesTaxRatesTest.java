@@ -13,7 +13,7 @@ class SalesTaxRatesTest {
     private SalesTaxRates salesTaxRates;
 
     private SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(rate, rate, rate, rate, rate, rate);
+        return new SalesTaxRates(rate, rate, rate, rate, rate, null);
     }
 
     @BeforeEach
@@ -24,12 +24,12 @@ class SalesTaxRatesTest {
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "SalesTaxRates[cityDistrictRate=" + rate +
-                ", cityRate=" + rate +
-                ", countyDistrictRate=" + rate +
+        String expectedString = "SalesTaxRates[cityRate=" + rate +
                 ", countyRate=" + rate +
                 ", stateRate=" + rate +
-                ", taxRate=" + rate + "]";
+                ", taxRate=" + rate +
+                ", combinedDistrictRate=" + rate +
+                ", ratesMetaData=" + salesTaxRates.ratesMetaData() +"]";
 
         // When
         String actualString = salesTaxRates.toString();
@@ -59,9 +59,8 @@ class SalesTaxRatesTest {
         assertEquals(0, givenSalesTaxRate.taxRate());
         assertEquals(0, givenSalesTaxRate.stateRate());
         assertEquals(0, givenSalesTaxRate.cityRate());
-        assertEquals(0, givenSalesTaxRate.cityDistrictRate());
+        assertEquals(0, givenSalesTaxRate.combinedDistrictRate());
         assertEquals(0, givenSalesTaxRate.countyRate());
-        assertEquals(0, givenSalesTaxRate.countyDistrictRate());
     }
 
 }

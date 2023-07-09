@@ -62,15 +62,15 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
     }
 
     private SalesTaxRates modifyRates(SalesTaxRates salesTaxRates) {
-        float taxRate = salesTaxRates.cityRate() + salesTaxRates.countyDistrictRate() + salesTaxRates.cityDistrictRate() +
+        float taxRate = salesTaxRates.cityRate() + salesTaxRates.combinedDistrictRate() +
                 salesTaxRates.stateRate() + salesTaxRates.countyRate();
 
         return new SalesTaxRates(
-                salesTaxRates.cityDistrictRate(),
                 salesTaxRates.cityRate(),
-                salesTaxRates.countyDistrictRate(),
                 salesTaxRates.countyRate(),
                 salesTaxRates.stateRate(),
-                taxRate);
+                taxRate,
+                salesTaxRates.combinedDistrictRate(),
+                salesTaxRates.ratesMetaData());
     }
 }

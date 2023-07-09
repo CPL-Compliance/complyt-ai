@@ -6,14 +6,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = StringToLocalDateTimeMapper.class)
 public interface TimestampsMapper {
     TimestampsMapper INSTANCE = Mappers.getMapper(TimestampsMapper.class);
-    Logger log = LoggerFactory.getLogger(TimestampsMapper.class);
-
 
     @Mapping(target = "createdDate", source = "createdDate", qualifiedByName = "parseLocalDateTimeToString")
     @Mapping(target = "updatedDate", source = "updatedDate", qualifiedByName = "parseLocalDateTimeToString")

@@ -17,6 +17,9 @@ import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
+import com.complyt.v1.models.sales_tax.SalesTaxDto;
+import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -95,6 +98,32 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
                 .value(transactionItem -> transactionItem, equalTo(transactionDto));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void getByExternalIdAndSource_ExistsWithSalesTax_Returns200() {
+        // Given
+        String externalId = transactionDto.externalId();
+        String source = transactionDto.source();
+        SalesTaxDto salesTaxDto = new SalesTaxDto(0f, new SalesTaxRatesDto(0f, 0f, 0f, 0f,
+                0f, new RatesMetaDataDto(0f, 0f)));
+        TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
+        Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
+
+        // When + Then
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .value(transactionItem -> transactionItem, equalTo(transactionDtoWithSalesTax));
     }
 
     @Test
@@ -300,8 +329,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @WithMockUser
     public void getAllBySource_EmptyCollection_Returns200WithEmptyList() {
         // Given
-        String firstId = UUID.randomUUID().toString();
-        String secondId = UUID.randomUUID().toString();
         List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
 
         // When

@@ -17,7 +17,7 @@ class ItemTest {
 
     @BeforeEach
     void setUp() {
-        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, null);
         JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", 0.07f, null);
@@ -57,7 +57,7 @@ class ItemTest {
     @Test
     void Equals_sameItem_ReturnsTrue() {
         // Given
-        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.05f);
+        SalesTaxRates salesTaxRates = new SalesTaxRates(0.01f, 0.01f, 0.01f, 0.01f, 0.01f, null);
         JurisdictionalSalesTaxRules rule = new JurisdictionalSalesTaxRules(
                 "California", "CA", true, true, CalculationType.FIXED,
                 "description", 0.07f, null);

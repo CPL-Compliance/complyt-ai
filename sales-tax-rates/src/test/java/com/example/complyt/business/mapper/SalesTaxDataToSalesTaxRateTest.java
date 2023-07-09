@@ -1,6 +1,7 @@
 package com.example.complyt.business.mapper;
 
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
+import com.complyt.domain.RatesMetaData;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.mappers.SalesTaxDataToSalesTaxRateMapper;
@@ -47,11 +48,33 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        SalesTaxRates salesTaxRate = TestUtilities.createCaliforniaSalesTaxRates();
-        SalesTaxRates expectedSalesTaxRate = salesTaxRate.withCityRate(0).withCityDistrictRate(0);
+        SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates();
+        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
+        SalesTaxRates expectedSalesTaxRate =
+                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0);
 
         // When
-        when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRate);
+        when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRates);
+        when(salesTaxData.isUnincorporated()).thenReturn(true);
+
+        Mono<SalesTaxRates> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);
+
+        // Then
+        StepVerifier.create(actualSalesTaxRate).expectNext(expectedSalesTaxRate).verifyComplete();
+    }
+
+    @Test
+    void map_MapsUnincorporatedAddressWithRatesMetaData_ReturnsSalesTaxRateWithCityRatesAsZeros() {
+        // Given
+        RatesMetaData ratesMetaData = new RatesMetaData(0.01f, 0.01f);
+        SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates().withRatesMetaData(ratesMetaData);
+        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
+        RatesMetaData expectedRatesMetaData = ratesMetaData.withCityDistrictRate(0);
+        SalesTaxRates expectedSalesTaxRate =
+                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0).withRatesMetaData(expectedRatesMetaData);
+
+        // When
+        when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRates);
         when(salesTaxData.isUnincorporated()).thenReturn(true);
 
         Mono<SalesTaxRates> actualSalesTaxRate = salesTaxDataToSalesTaxRate.map(salesTaxData);

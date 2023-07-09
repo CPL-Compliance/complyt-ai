@@ -13,13 +13,18 @@ import org.mapstruct.factory.Mappers;
 public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
 
-    @Mapping(target = "cityDistrictRate", source = "cityDistrictRate")
+    @Mapping(target = "ratesMetaData.cityDistrictRate", source = "cityDistrictRate")
+    @Mapping(target = "ratesMetaData.countyDistrictRate", source = "countyDistrictRate")
     @Mapping(target = "cityRate", source = "cityRate")
     @Mapping(target = "taxRate", source = "taxRate")
     @Mapping(target = "countyRate", source = "countyRate")
-    @Mapping(target = "countyDistrictRate", source = "countyDistrictRate")
     @Mapping(target = "stateRate", source = "stateRate")
+    @Mapping(expression = "java(toCombinedDistrictRate(taxInfoItem))", target = "combinedDistrictRate")
     SalesTaxRates map(TaxInfoItem taxInfoItem);
+
+    default float toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
+        return Float.parseFloat(taxInfoItem.cityDistrictRate()) + Float.parseFloat(taxInfoItem.countyDistrictRate());
+    }
 
     @Override
     default SalesTaxRates map(SalesTaxData salesTaxData) {
