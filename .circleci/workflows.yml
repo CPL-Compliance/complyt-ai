@@ -148,7 +148,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: 'production'
-          container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
+          container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=<<parameters.image_tag>>'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'
 
@@ -208,6 +208,7 @@ workflows:
           requires:
             - deploy
           service_name: "files"
+          image_tag: $(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
