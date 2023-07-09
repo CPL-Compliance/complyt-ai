@@ -2,9 +2,6 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.sales_tax.RatesMetaData;
-import com.complyt.domain.sales_tax.SalesTax;
-import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
@@ -20,7 +17,9 @@ import com.complyt.v1.handlers.TransactionHandler;
 import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
+import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,10 +107,11 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        SalesTax salesTax = new SalesTax(0f, new SalesTaxRates(0f, 0f, 0f, 0f,
-                0f, new RatesMetaData(0f, 0f)));
-        Transaction transactionWithSalesTax = transaction.withSalesTax(salesTax);
-        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        SalesTaxDto salesTaxDto = new SalesTaxDto(0f, new SalesTaxRatesDto(0f, 0f, 0f, 0f,
+                0f, new RatesMetaDataDto(0f, 0f)));
+        TransactionDto transactionDtoWithSalesTax = transactionDto.withSalesTax(salesTaxDto);
+        Transaction returnedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDtoWithSalesTax);
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(returnedTransaction));
 
         // When + Then
         webTestClient
@@ -123,7 +123,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TransactionDto.class)
-                .value(transactionItem -> transactionItem, equalTo(transactionDto));
+                .value(transactionItem -> transactionItem, equalTo(transactionDtoWithSalesTax));
     }
 
     @Test
