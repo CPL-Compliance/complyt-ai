@@ -61,10 +61,9 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT implem
                 .jsonPath("$.salesTaxRates.taxRate").isEqualTo(0.04f);
     }
 
-    @Order(2)
+    @Order(3)
     @Test
-    @Override
-    public void findByAddress_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
+    public void findByAddres_SecondAddressToInsert_InsertsNewComplytSalesTaxRatesAndReturnsIt() {
         WEB_TEST_CLIENT
                 .get()
                 .uri(uriBuilder -> uriBuilder
