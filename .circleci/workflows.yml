@@ -168,7 +168,7 @@ jobs:
             # Set the environment variable
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
             # echo $image_tag
-            source $BASH_ENV
+            source $BASH_ENV 
       - run:
           name: test
           command: echo 'container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}'
