@@ -183,7 +183,7 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax"
-          image_tag: "$(mvn help:evaluate -f sales-tax/pom.xml -Dexpression=project.version -q -DforceStdout)"
+          image_tag: $(mvn help:evaluate -f sales-tax/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
@@ -212,7 +212,7 @@ workflows:
           requires:
             - verify
           service_name: "files"
-          image_tag: "$(./mvnw help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)"
+          image_tag: echo $(mvn help:evaluate -f sales-tax/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
