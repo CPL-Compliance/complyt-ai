@@ -76,7 +76,7 @@ jobs:
           name: Set up environment
           command: |
             # Capture the output of the command into a variable
-            image_tag=$(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
+            image_tag=$(mvn help:evaluate -f <<parameters.service_directory>>/pom.xml -Dexpression=project.version -q -DforceStdout)
 
             # Set the environment variable
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
