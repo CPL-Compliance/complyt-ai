@@ -144,14 +144,14 @@ jobs:
     steps:
       - run:
           name: test
-          command: echo 'container=<<parameters.service_name>>-container, tag=latest'
+          command: echo 'container=<<parameters.service_name>>-container, tag=<<parameters.image_tag>>'
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: "production"
-          container-image-name-updates: "container=<<parameters.service_name>>-container, tag=0.12.0-SNAPSHOT"
+          container-image-name-updates: "container=<<parameters.service_name>>-container, tag=<<parameters.image_tag>>"
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
