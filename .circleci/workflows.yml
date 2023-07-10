@@ -17,7 +17,9 @@ executors:
 
   python-image:
     docker:
-      - image: "cimg/python:3.9.1"
+      - image: "cimg/python:3.10.12-browsers"
+
+
 
 parameters:
   run-sales-tax-workflow:
