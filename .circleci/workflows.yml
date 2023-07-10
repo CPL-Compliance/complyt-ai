@@ -146,6 +146,7 @@ jobs:
           flags: <<parameters.service_directory>>
 
   update-ecs-service:
+    working_directory: ~/complyt_work_directory/files
     parameters:
       service_name:
         type: string
