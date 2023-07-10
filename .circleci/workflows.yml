@@ -294,7 +294,7 @@ workflows:
           service_name: "discovery-service-az-1b"
 
   sales-tax-rates-workflow:
-    when: true
+    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
     jobs:
       - verify:
           filters:
