@@ -169,7 +169,8 @@ jobs:
             # Capture the output of the command into a variable ########
             image_tag= echo $(./mvnw help:evaluate -f ./pom.xml -Dexpression=project.version -q -DforceStdout)
             # Set the environment variable
-            echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
+#            echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
+            echo "export IMAGE_TAG=$(echo $image_tag)" >> "$BASH_ENV"
             echo $image_tag
             source $BASH_ENV
             env
