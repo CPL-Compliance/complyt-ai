@@ -210,7 +210,7 @@ workflows:
 
       - update-ecs-service:
           requires:
-            - deploy
+            - verify
           service_name: "files"
           image_tag: $(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
 
