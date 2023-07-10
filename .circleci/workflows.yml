@@ -17,7 +17,7 @@ executors:
 
   python-image:
     docker:
-      - image: "cimg/python:3.10.12-browsers"
+      - image: cimg/python:3.10.12-browsers
 
 
 
@@ -172,11 +172,11 @@ jobs:
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
             echo $image_tag
             source $BASH_ENV
-            pwd
-            ls -la
+            env
       - run:
           name: test
-          command: echo 'container=<<parameters.service_name>>-container, tag=$IMAGE_TAG'
+#          command: echo 'container=<<parameters.service_name>>-container, tag=$IMAGE_TAG'
+          command: echo $IMAGE_TAG
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
