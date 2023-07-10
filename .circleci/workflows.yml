@@ -192,7 +192,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - /^(eyal/com-234-api-micro-services-versioning-management.+|(?!eyal/com-234-api-micro-services-versioning-management).*)$/
           service_directory: "files"
 
       - deploy:
