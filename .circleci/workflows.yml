@@ -169,6 +169,8 @@ jobs:
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
             echo $image_tag
             source $BASH_ENV
+            pwd
+            ls -la
       - run:
           name: test
           command: echo 'container=<<parameters.service_name>>-container, tag=$IMAGE_TAG'
@@ -183,6 +185,14 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
 workflows:
+  eyal-testing:
+    jobs:
+      - update-ecs-service:
+          requires:
+            - verify
+          service_name: "files"
+          image_tag: $(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
+
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
