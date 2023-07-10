@@ -170,7 +170,7 @@ jobs:
             image_tag= echo $(grep -m1 '<version>' ./pom.xml | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p')
             # Set the environment variable
             # echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
-            echo "export IMAGE_TAG=$image_tag" >> "$BASH_ENV"
+            echo "export IMAGE_TAG= $($image_tag)" >> "$BASH_ENV"
             echo $image_tag
             source $BASH_ENV
             env
