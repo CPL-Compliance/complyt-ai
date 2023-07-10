@@ -232,6 +232,6 @@ spring:
             series: SERVER_ERROR
             methods: GET,PUT,DELETE
             backoff:
-              firstBackoff: 20ms
+              firstBackoff: 30ms
               factor: 2
               basedOnPreviousValue: false
