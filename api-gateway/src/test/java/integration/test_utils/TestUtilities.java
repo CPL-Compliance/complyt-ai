@@ -127,7 +127,8 @@ public class TestUtilities {
                                 "country": "US",
                                 "state": "%s",
                                 "street": "10 5th Ave",
-                                "zip": "90210"
+                                "zip": "90210",
+                                "isPartial": "false"
                             },
                             "customerId": "%s",
                             "transactionStatus": "ACTIVE",
