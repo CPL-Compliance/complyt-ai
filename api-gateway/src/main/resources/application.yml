@@ -225,13 +225,3 @@ spring:
             - SetPath=/v1/sales_tax_rates
         # ---- SalesTaxRates ----
         # ==== Sales Tax Rates Service ====
-      default-filters:
-        - name: Retry
-          args:
-            retries: 5
-            series: SERVER_ERROR
-            methods: GET,PUT,DELETE
-            backoff:
-              firstBackoff: 20ms
-              factor: 2
-              basedOnPreviousValue: false
