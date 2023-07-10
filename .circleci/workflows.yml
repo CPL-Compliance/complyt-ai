@@ -154,7 +154,7 @@ jobs:
 
 workflows:
   sales-tax-workflow:
-    when: << pipeline.parameters.run-sales-tax-workflow >>
+    when: true
     jobs:
       - verify:
           filters:
