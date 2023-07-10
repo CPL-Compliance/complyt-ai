@@ -136,6 +136,9 @@ jobs:
       service_name:
         type: string
         default: ""
+      image_tag:
+        type: string
+        default: ""
 
     executor: python-image
     steps:
