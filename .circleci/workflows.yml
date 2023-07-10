@@ -68,6 +68,10 @@ jobs:
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - run:
           name: Set up environment
           command: |
@@ -77,10 +81,6 @@ jobs:
             # Set the environment variable
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
             source $BASH_ENV
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: ~/complyt_work_directory
       - run:
           name: Execute
           command: ./mvnw clean verify
