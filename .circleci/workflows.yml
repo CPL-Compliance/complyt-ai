@@ -81,8 +81,8 @@ jobs:
             # Set the environment variable
             echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
             echo $image_tag
-            echo $IMAGE_TAG
             source $BASH_ENV
+            echo $IMAGE_TAG
       - run:
           name: Execute
           command: ./mvnw clean verify
