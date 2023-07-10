@@ -68,6 +68,15 @@ jobs:
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
     steps:
+      - run:
+          name: Set up environment
+          command: |
+            # Capture the output of the command into a variable
+            image_tag=$(./mvnw help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
+
+            # Set the environment variable
+            echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
+            source $BASH_ENV
       - checkout:
           path: ~/complyt_work_directory
       - attach_workspace:
@@ -146,15 +155,6 @@ jobs:
 
     executor: python-image
     steps:
-      - run:
-          name: Set up environment
-          command: |
-            # Capture the output of the command into a variable
-            image_tag=$(./mvnw help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)
-
-            # Set the environment variable
-            echo "IMAGE_TAG=$image_tag" >> $BASH_ENV
-            source $BASH_ENV
       - run:
           name: test
           command: echo 'container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}'
