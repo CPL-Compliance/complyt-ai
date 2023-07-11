@@ -149,7 +149,7 @@ jobs:
 
 
   update-ecs-service:
-    working_directory: ~/complyt_work_directory/files
+    working_directory: ~/complyt_work_directory
     parameters:
       service_name:
         type: string
@@ -165,6 +165,8 @@ jobs:
       - run:
           name: Set up image tag
           command: |
+            pwd
+            ls
             image_tag=$(grep -m2 '<version>' <<parameters.service_name>>/pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             echo "export IMAGE_TAG=$(echo "$image_tag")" >> "$BASH_ENV"
             source $BASH_ENV
