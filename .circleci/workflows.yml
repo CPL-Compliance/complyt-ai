@@ -164,7 +164,7 @@ jobs:
       - image: circleci/openjdk:11-jdk
     steps:
       - checkout
-      - maven/setup
+      - maven/install
       - run:
           name: Extract Property
           command: |
