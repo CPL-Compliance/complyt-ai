@@ -159,13 +159,11 @@ jobs:
 #        default: ""
 #
   set-up-image-tag:
+    docker:
+      - image: maven:3.8.1-jdk-11
     working_directory: ~/complyt_work_directory
-    executor: maven/default
     steps:
       - checkout
-      - maven/build-and-test:
-          version: '3.8.1'  # Specify a specific Maven version
-          goals: 'clean install'  # Specify Maven goals to run
       - run:
           name: Extract Property
           command: |
