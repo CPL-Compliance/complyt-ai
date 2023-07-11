@@ -169,9 +169,9 @@ jobs:
           command: install
       - run:
           name: Extract Property
-        command: |
-          PROPERTY_VALUE=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "Property Value: $PROPERTY_VALUE"
+          command: |
+            PROPERTY_VALUE=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            echo "Property Value: $PROPERTY_VALUE"
 
 #    executor: python-image
 #    steps:
