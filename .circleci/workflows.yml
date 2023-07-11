@@ -166,9 +166,7 @@ jobs:
       - checkout
       - run:
           name: Extract Property
-          command: |
-            PROPERTY_VALUE=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-            echo "Property Value: $PROPERTY_VALUE"
+          command: mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec
 
 #    executor: python-image
 #    steps:
