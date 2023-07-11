@@ -159,7 +159,7 @@ jobs:
 #            source $BASH_ENV
       - run:
           name: test
-          command: echo "container=<<parameters.service_name>>-container, tag=${image_tag}"
+          command: echo "container=<<parameters.service_name>>-container, tag=<<parameters.image_tag>>"
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
