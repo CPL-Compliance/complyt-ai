@@ -233,7 +233,7 @@ workflows:
           requires:
             - verify
           service_name: "files"
-          image_tag: "$(grep -m2 '<version>' files/pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')"
+          image_tag: "$(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
