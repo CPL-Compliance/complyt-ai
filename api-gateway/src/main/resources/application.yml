@@ -230,8 +230,7 @@ spring:
           args:
             retries: 5
             series: SERVER_ERROR
-            methods: GET,PUT,DELETE
             backoff:
-              firstBackoff: 20ms
+              firstBackoff: 40ms
               factor: 2
               basedOnPreviousValue: false
