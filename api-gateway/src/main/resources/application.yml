@@ -231,6 +231,6 @@ spring:
             retries: 5
             series: SERVER_ERROR
             backoff:
-              firstBackoff: 40ms
+              firstBackoff: 20ms
               factor: 2
               basedOnPreviousValue: false
