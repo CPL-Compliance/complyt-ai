@@ -164,12 +164,14 @@ jobs:
       - image: circleci/openjdk:11-jdk
     steps:
       - checkout
-      - maven/install
+      - maven/run:
+          name: Install Maven
+          command: install
       - run:
           name: Extract Property
-          command: |
-            PROPERTY_VALUE=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-            echo "Property Value: $PROPERTY_VALUE"
+        command: |
+          PROPERTY_VALUE=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Property Value: $PROPERTY_VALUE"
 
 #    executor: python-image
 #    steps:
