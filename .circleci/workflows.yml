@@ -158,10 +158,10 @@ jobs:
 
     executor: python-image
     steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: ~/complyt_work_directory
+      #- checkout:
+      #    path: ~/complyt_work_directory
+      #- attach_workspace:
+      #    at: ~/complyt_work_directory
       - run:
           name: Set up environment
           command: |
