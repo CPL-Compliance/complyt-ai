@@ -16,7 +16,6 @@
     <version>0.12.0-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
-
     <name>files</name>
     <description>This is the Files Service of Complyt</description>
 
