@@ -167,7 +167,7 @@ jobs:
           command: |
             pwd
             ls
-            image_tag=$(grep -m1 '<project.version>' ./pom.xml | sed -n 's/.*<project.version>\([^<]*\)<\/project.version>.*/\1/p')
+            image_tag=$(grep -m1 '<version>' ./pom.xml | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p')
             echo "export IMAGE_TAG=$(echo "$image_tag")" >> "$BASH_ENV"
             echo $image_tag
             source $BASH_ENV

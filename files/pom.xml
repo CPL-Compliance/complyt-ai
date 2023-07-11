@@ -5,16 +5,16 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Maven Coordinates -->
+    <artifactId>files</artifactId>
+    <version>0.12.0-SNAPSHOT</version>
+    <!-- Maven Coordinates -->
+
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
         <version>0.1.1-SNAPSHOT</version>
     </parent>
-
-    <!-- Maven Coordinates -->
-    <artifactId>files</artifactId>
-    <version>0.12.0-SNAPSHOT</version>
-    <!-- Maven Coordinates -->
 
     <name>files</name>
     <description>This is the Files Service of Complyt</description>
