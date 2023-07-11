@@ -23,7 +23,6 @@ executors:
   maven-image:
 
 
-
 parameters:
   run-sales-tax-workflow:
     type: boolean
@@ -271,7 +270,7 @@ workflows:
       - set-up-image-tag:
           requires:
             - verify
-            
+
       - update-ecs-service:
           requires:
             - verify
