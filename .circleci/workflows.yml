@@ -168,7 +168,6 @@ jobs:
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             echo "export IMAGE_TAG=$(echo "$image_tag")" >> "$BASH_ENV"
             source $BASH_ENV
-            env
       - run:
           name: test
           command: echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
@@ -179,7 +178,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: "production"
-          container-image-name-updates: "container=<<parameters.service_name>>-container, tag=latest"
+          container-image-name-updates: "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
