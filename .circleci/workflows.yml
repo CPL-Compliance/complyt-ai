@@ -172,7 +172,7 @@ jobs:
             env
       - run:
           name: test
-          command: echo 'container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}'
+          command: echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
 #          command: echo $IMAGE_TAG
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
