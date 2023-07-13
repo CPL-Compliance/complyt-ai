@@ -142,9 +142,6 @@ jobs:
       service_name:
         type: string
         default: ""
-      image_tag:
-        type: string
-        default: ""
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
 
     executor: python-image
@@ -171,11 +168,6 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
 workflows:
-  eyal-testing:
-    jobs:
-      - update-ecs-service:
-          service_name: "files"
-          image_tag: $(grep -m1 '<version>' files/pom.xml | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p')
 
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
@@ -204,7 +196,6 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax"
-          image_tag: $(mvn help:evaluate -f sales-tax/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
@@ -233,7 +224,6 @@ workflows:
           requires:
             - verify
           service_name: "files"
-          image_tag: "$(mvn help:evaluate -f files/pom.xml -Dexpression=project.version -q -DforceStdout)"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
@@ -284,7 +274,6 @@ workflows:
           requires:
             - deploy
           service_name: "api-gateway"
-          image_tag: $(mvn help:evaluate -f api-gateway/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   discovery-service-workflow:
     when: << pipeline.parameters.run-discovery-service-workflow >>
@@ -314,13 +303,11 @@ workflows:
           requires:
             - deploy
           service_name: "discovery-service-az-1a"
-          image_tag: $(mvn help:evaluate -f discovery-service-az-1a/pom.xml -Dexpression=project.version -q -DforceStdout)
 
       - update-ecs-service:
           requires:
             - deploy
           service_name: "discovery-service-az-1b"
-          image_tag: $(mvn help:evaluate -f discovery-service-az-1b/pom.xml -Dexpression=project.version -q -DforceStdout)
 
   sales-tax-rates-workflow:
     when: << pipeline.parameters.run-sales-tax-rates-workflow >>
@@ -349,4 +336,3 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax-rates"
-          image_tag: $(mvn help:evaluate -f sales-tax-rates/pom.xml -Dexpression=project.version -q -DforceStdout)
