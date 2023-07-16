@@ -144,21 +144,15 @@ jobs:
 
   some-job:
     parameters:
-      executor:
-        type: executor
-        default: maven-executor
-      mvn-deploy-command:
+      service_name:
         type: string
-        default: echo "mvn-deploy-command not provided" 1>&2 && exit 1
-    executor: <<parameters.executor>>
+        default: ""
+    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
-      - deploy-project:
-          internal_versioncommand: >-
-            mvn build-helper:parse-version versions:set
-            -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0
-            versions:commit
-          mvn-deploy-command: << parameters.mvn-deploy-command >>
-
+      - checkout:
+            path: ~/complyt_work_directory
+      - github-maven-deploy/deploy-minor-version:
+          executor: maven-executor
 
 
 
@@ -253,6 +247,7 @@ workflows:
       - some-job:
           requires:
             - verify
+          service_name: "files"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
