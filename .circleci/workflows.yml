@@ -19,7 +19,7 @@ executors:
   python-image:
     docker:
       - image: cimg/python:3.10.12-browsers
-        
+
   maven-executor:
     docker:
       - image: circleci/openjdk:8u232-jdk
@@ -253,7 +253,6 @@ workflows:
       - some-job:
           requires:
             - verify
-          service_name: "files"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
