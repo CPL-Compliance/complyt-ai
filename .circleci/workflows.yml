@@ -236,11 +236,6 @@ workflows:
             - deploy
           service_directory: "files"
 
-      - build:
-          requires:
-            - verify
-          service_name: "files"
-
       - update-ecs-service:
           requires:
             - verify
