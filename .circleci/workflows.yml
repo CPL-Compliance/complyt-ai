@@ -150,7 +150,7 @@ jobs:
       - checkout:
             path: ~/complyt_work_directory
       - github-maven-deploy/deploy-minor-version:
-          executor: maven-executor
+          executor: openjdk-image
 
 
 
