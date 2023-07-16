@@ -140,17 +140,21 @@ jobs:
 
   some-job:
     parameters:
-      service_name:
+      executor:
+        type: executor
+        default: maven-executor
+      mvn-deploy-command:
         type: string
-        default: ""
-    docker:
-      - image: circleci/openjdk:8u232-jdk
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
+        default: echo "mvn-deploy-command not provided" 1>&2 && exit 1
+    executor: <<parameters.executor>>
     steps:
-      - checkout:
-            path: ~/complyt_work_directory
-      - github-maven-deploy/deploy-minor-version:
-          executor: openjdk-image
+      - deploy-project:
+          internal_versioncommand: >-
+            mvn build-helper:parse-version versions:set
+            -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0
+            versions:commit
+          mvn-deploy-command: << parameters.mvn-deploy-command >>
+  
 
 
 
