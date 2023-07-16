@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Extract and increment version
           command: |
-            bash <<EOF 
+            bash -c '
             # Extract the current version from pom.xml
             VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
             
@@ -70,8 +70,8 @@ jobs:
             
             # Update the pom.xml file with the new version
             xmlstarlet ed -L -u "//project/version" -v "$NEW_VERSION" pom.xml
-            EOF
-            
+            '
+
       - run:
           name: Print updated pom.xml
           command: cat pom.xml
