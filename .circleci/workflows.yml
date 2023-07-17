@@ -227,7 +227,7 @@ workflows:
             - deploy
           service_directory: "files"
 
-      - github-maven-deploydeploy-minor-version:
+      - github-maven-deploy/deploy-minor-version:
           requires:
             - verify
 
