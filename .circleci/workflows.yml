@@ -248,11 +248,9 @@ workflows:
           requires:
             - verify
 
-      - deploy-minor-version: 
+      - deploy-minor-version:
         requires:
           - verify
-
-      - deploy-minor-version:
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
