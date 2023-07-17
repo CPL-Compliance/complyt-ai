@@ -176,7 +176,8 @@ jobs:
 
   release:
     steps:
-      - checkout
+      - checkout:
+          path: ~/complyt_work_directory
       - run:
         name: Cut new release
         command: |
