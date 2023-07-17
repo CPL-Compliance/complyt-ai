@@ -43,6 +43,24 @@ parameters:
     default: false
 
 jobs:
+
+  deploy-minor-version:
+    parameters:
+      executor:
+        type: executor
+        default: maven-executor
+      mvn-deploy-command:
+        type: string
+        default: echo "mvn-deploy-command not provided" 1>&2 && exit 1
+    executor: <<parameters.executor>>
+    steps:
+      - deploy-project:
+          internal_versioncommand: >-
+            mvn build-helper:parse-version versions:set
+            -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.nextMinorVersion}.0
+            versions:commit
+          mvn-deploy-command: << parameters.mvn-deploy-command >>
+
   package-dependency:
     parameters:
       service_directory:
@@ -229,10 +247,12 @@ workflows:
       - update-ecs-service:
           requires:
             - verify
-          service_name: "files"
 
-      - github-maven-deploy/deploy-minor-version:
-          type: approval
+      - deploy-minor-version: 
+        requires:
+          - verify
+
+      - deploy-minor-version:
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
