@@ -196,7 +196,7 @@ jobs:
             DEV_VERSION="$MAJ_VERSION.$NEW_MINOR.0-SNAPSHOT"
             
             # Update the version in the pom.xml
-            mvn versions:set -DnewVersion=$NEW_VERSION
+            mvn versions:set -DnewVersion=$DEV_VERSION
             
             git config --global user.email "eyaltams@gmail.com.com"
             git config --global user.name "eyalTams"
