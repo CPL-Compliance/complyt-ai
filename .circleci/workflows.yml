@@ -202,14 +202,14 @@ jobs:
             git commit -am "Increase minor version to $NEW_VERSION"
 
 workflows:
-  build-and-deploy:
-    jobs:
-      - build:
-          service_name: "files"
-          filters:
-            branches:
-              only:
-                - eyal/com-235-api-micro-services-versioning-management
+#  build-and-deploy:
+#    jobs:
+#      - build:
+#          service_name: "files"
+#          filters:
+#            branches:
+#              only:
+#                - eyal/com-235-api-micro-services-versioning-management
 
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
@@ -265,6 +265,12 @@ workflows:
       - update-ecs-service:
           requires:
             - verify
+      - build:
+          service_name: "files"
+          filters:
+            branches:
+              only:
+                - eyal/com-235-api-micro-services-versioning-management
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
