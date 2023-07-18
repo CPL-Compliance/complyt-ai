@@ -143,7 +143,6 @@ jobs:
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
-
   update-ecs-service:
     parameters:
       service_name:
@@ -185,7 +184,7 @@ jobs:
             OLD_VERSION=$(mvn -s .circleci/settings.xml -q \
               -Dexec.executable="echo" -Dexec.args='${project.version}' \
               --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec)
-            NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"
+            NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"`
             echo "Releasing $OLD_VERSION as $NEW_VERSION"
   
             # ensure dependencies use release versions
@@ -241,39 +240,33 @@ jobs:
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: mvn clean install
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-      - persist_to_workspace:
-          root: ~/complyt_work_directory
-          paths:
-            - <<parameters.service_directory>>/target/*.jar
+      - run:
+          name: Increase Minor Version
+          command: |
+            # Extract the current version from the pom.xml
+            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            NEW_VERSION="${CURRENT_VERSION/-SNAPSHOT/}"`
+            
+            # Increase the minor version
+            MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
+            MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
+            NEW_MINOR=$(($MIN_VERSION + 1))
+            DEV_VERSION="$MAJ_VERSION.$NEW_MINOR.0-SNAPSHOT"
+            
+            # Update the version in the pom.xml
+            mvn versions:set -DnewVersion=$NEW_VERSION
+            
+            # Commit the updated pom.xml
+            git commit -am "Increase minor version to $NEW_VERSION"
+
 workflows:
   build-and-deploy:
     jobs:
       - build:
           service_name: "files"
-      - deployy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - eyal/com-235-api-micro-services-versioning-management
-      - release:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - eyal/com-235-api-micro-services-versioning-management
+          branches:
+            only:
+              - eyal/com-235-api-micro-services-versioning-management
 
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
@@ -329,7 +322,6 @@ workflows:
       - update-ecs-service:
           requires:
             - verify
-
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
