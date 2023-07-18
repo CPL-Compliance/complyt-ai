@@ -204,7 +204,7 @@ jobs:
             git config --global user.name "eyalTams"
             
             # Commit the updated pom.xml
-            git commit -am "Increase minor version to $NEW_VERSION"
+            git commit -am "Increase minor version to $DEV_VERSION"
 
 workflows:
 #  build-and-deploy:
