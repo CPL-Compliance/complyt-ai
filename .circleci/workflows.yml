@@ -201,7 +201,8 @@ jobs:
             mvn versions:set -DnewVersion=$DEV_VERSION
             
             git config --global user.email "eyaltams@gmail.com.com"
-            git config --global user.name "eyalTams"
+            git config --global user.name $GITHUB_USERNAME_CIRCLECI
+            git config --global user.password $GITHUB_API_TOKEN_CIRCLECI
             
             # Commit the updated pom.xml
             git commit -am "Increase minor version to $DEV_VERSION"
