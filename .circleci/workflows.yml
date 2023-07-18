@@ -181,7 +181,8 @@ jobs:
         default: ""
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
-      - checkout
+      - checkout:
+        path: ~/complyt_work_directory
       - run:
           name: Increase Minor Version
           command: |
