@@ -173,65 +173,6 @@ jobs:
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
-#  release:
-#    steps:
-#      - checkout:
-#          path: ~/complyt_work_directory
-#      - run:
-#          name: Cut new release
-#          command: |
-#            # assemble current and new version numbers
-#            OLD_VERSION=$(mvn -s .circleci/settings.xml -q \
-#              -Dexec.executable="echo" -Dexec.args='${project.version}' \
-#              --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec)
-#            NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"`
-#            echo "Releasing $OLD_VERSION as $NEW_VERSION"
-#
-#            # ensure dependencies use release versions
-#            mvn -s .circleci/settings.xml versions:use-releases
-#
-#            # write release version to POM
-#            mvn -s .circleci/settings.xml versions:set -DnewVersion="$NEW_VERSION"
-#
-#            # setup git
-#            git config user.name "eyalTams"
-#            git config user.email "eyaltams@Gmail.com"
-#
-#            # commit and tag
-#            git add pom.xml
-#            git commit -m "release: $NEW_VERSION"
-#            git tag "$NEW_VERSION"
-#
-#            # land on master and publish
-#  #            git checkout master
-#  #            git merge --no-edit release
-#  #            git push origin master --tags
-#
-#            # increment minor version number
-#            MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
-#            MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
-#            NEW_MINOR=$(($MIN_VERSION + 1))
-#            DEV_VERSION="$MAJ_VERSION.$NEW_MINOR-SNAPSHOT"
-#            echo "DEV VERSION " $DEV_VERSION
-#            # ready development branch
-#            git checkout verify
-#            git merge --no-edit release
-#            mvn -s ../.circleci/settings.xml versions:set -DnewVersion="$DEV_VERSION"
-#            git add pom.xml
-#            git commit -m "ready for development: $DEV_VERSION"
-#            git push origin verify
-#
-#            # clean up release branch
-#            git push origin :release
-
-  deployy:
-    steps:
-      - attach_workspace:
-          at: ~/complyt_work_directory
-      - run:
-          name: Deploy to Artifactory
-          command: mvn deploy
-
   build:
     parameters:
       service_name:
