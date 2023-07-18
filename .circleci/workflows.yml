@@ -198,6 +198,9 @@ jobs:
             # Update the version in the pom.xml
             mvn versions:set -DnewVersion=$NEW_VERSION
             
+            git config --global user.email "eyaltams@gmail.com.com"
+            git config --global user.name "eyalTams"
+            
             # Commit the updated pom.xml
             git commit -am "Increase minor version to $NEW_VERSION"
 
