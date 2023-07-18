@@ -182,7 +182,7 @@ jobs:
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
       - checkout:
-        path: ~/complyt_work_directory
+          path: ~/complyt_work_directory
       - run:
           name: Increase Minor Version
           command: |
