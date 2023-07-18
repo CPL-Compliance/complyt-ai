@@ -205,7 +205,7 @@ jobs:
             
             # Commit the updated pom.xml
             git commit -am "Increase minor version to $DEV_VERSION"
-            git push
+            git push --set-upstream origin eyal/com-235-api-services-versioning-management
 
 workflows:
 #  build-and-deploy:
