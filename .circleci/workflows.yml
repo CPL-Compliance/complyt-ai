@@ -267,10 +267,7 @@ workflows:
             - verify
       - build:
           service_name: "files"
-          filters:
-            branches:
-              only:
-                - eyal/com-235-api-micro-services-versioning-management
+
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
