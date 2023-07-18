@@ -23,6 +23,7 @@
         <module>sales-tax-rates</module>
         <module>sales-tax</module>
         <module>files</module>
+        <module>authentication</module>
         <module>test-service</module>
         <module>api-gateway</module>
     </modules>
