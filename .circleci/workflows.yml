@@ -174,7 +174,7 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
   build:
-#    executor: maven-executor
+    executor: maven-executor
     parameters:
       service_name:
         type: string
