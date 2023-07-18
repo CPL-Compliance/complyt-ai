@@ -187,6 +187,7 @@ jobs:
           command: |
             # Extract the current version from the pom.xml
             CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            echo "CURRENT_VERSION " $CURRENT_VERSION
             NEW_VERSION="${CURRENT_VERSION/-SNAPSHOT/}"
             
             # Increase the minor version
