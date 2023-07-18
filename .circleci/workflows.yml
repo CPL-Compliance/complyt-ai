@@ -206,9 +206,10 @@ workflows:
     jobs:
       - build:
           service_name: "files"
-          branches:
-            only:
-              - eyal/com-235-api-micro-services-versioning-management
+          filters:
+            branches:
+              only:
+                - eyal/com-235-api-micro-services-versioning-management
 
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
