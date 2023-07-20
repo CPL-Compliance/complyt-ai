@@ -4,6 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <relativePath>../pom.xml</relativePath>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
         <version>0.1.1-SNAPSHOT</version>
