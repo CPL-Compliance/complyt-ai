@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @With
 @Document(collection = "file")
-public class File implements ComplytIdProperty {
+public class ApiKey implements ComplytIdProperty {
 
     @NonNull
     UUID complytId;

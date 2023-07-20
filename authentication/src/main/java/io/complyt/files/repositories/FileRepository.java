@@ -1,6 +1,6 @@
 package io.complyt.files.repositories;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.security.TenantResolver;
 import io.complyt.files.utils.observability.ContextLogger;
 import lombok.AccessLevel;
@@ -25,13 +25,13 @@ public class FileRepository {
     @NonNull
     TenantResolver tenantResolver;
 
-    public Mono<File> find() {
+    public Mono<ApiKey> find() {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for files with tenant ID " + tenantId, log::info)
-                            .then(reactiveMongoTemplate.findOne(query, File.class));
+                            .then(reactiveMongoTemplate.findOne(query, ApiKey.class));
                 });
     }
 }

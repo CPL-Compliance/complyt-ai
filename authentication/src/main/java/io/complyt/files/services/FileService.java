@@ -1,6 +1,6 @@
 package io.complyt.files.services;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.repositories.FileRepository;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -16,7 +16,7 @@ public class FileService {
     @NonNull
     FileRepository fileRepository;
 
-    public Mono<File> find() {
+    public Mono<ApiKey> find() {
         return fileRepository.find();
     }
 }

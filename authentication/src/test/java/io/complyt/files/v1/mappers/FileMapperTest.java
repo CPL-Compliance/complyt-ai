@@ -1,6 +1,6 @@
 package io.complyt.files.v1.mappers;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.v1.models.FileDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class FileMapperTest {
-    private File file;
+    private ApiKey file;
     private FileDto fileDto;
 
     @BeforeEach
