@@ -69,24 +69,6 @@
             <artifactId>spring-cloud-vault-config-databases</artifactId>
         </dependency>
         <!-- Spring Cloud Vault -->
-        <!-- Spring Cloud Feign -->
-        <dependency>
-            <groupId>com.playtika.reactivefeign</groupId>
-            <artifactId>feign-reactor-webclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.playtika.reactivefeign</groupId>
-            <artifactId>feign-reactor-cloud</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.playtika.reactivefeign</groupId>
-            <artifactId>feign-reactor-spring-configuration</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-slf4j</artifactId>
-        </dependency>
-        <!-- Spring Cloud Feign -->
         <!-- Observability -->
         <dependency>
             <groupId>io.projectreactor</groupId>
