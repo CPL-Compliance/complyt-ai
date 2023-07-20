@@ -19,9 +19,11 @@ public class ApiKey implements ComplytIdProperty {
 
     @NonNull
     UUID complytId;
+
     @Id
     @NonNull
     String id;
+
     @NonNull
     String tenantId;
 

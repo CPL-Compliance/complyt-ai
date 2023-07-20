@@ -1,8 +1,8 @@
 package integration;
 
-import io.complyt.files.FilesApplication;
+import io.complyt.files.AuthenticationApplication;
 import io.complyt.files.v1.models.FileDto;
-import io.complyt.files.v1.routers.FileRouter;
+import io.complyt.files.v1.routers.ApiKeyRouter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(classes = FilesApplication.class)
+@SpringBootTest(classes = AuthenticationApplication.class)
 @AutoConfigureWebTestClient
 public class FilesEndpointsIT extends TestContainersInitializerIT implements FilesEndpointsITTemplate {
 
@@ -44,7 +44,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(FileRouter.BASE_URL)
+                        .path(ApiKeyRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -61,7 +61,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .mutateWith(differentTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(FileRouter.BASE_URL)
+                        .path(ApiKeyRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

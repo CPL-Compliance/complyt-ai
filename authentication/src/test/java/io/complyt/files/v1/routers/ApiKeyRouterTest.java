@@ -3,7 +3,7 @@ package io.complyt.files.v1.routers;
 import io.complyt.files.config.ApiExceptionConfig;
 import io.complyt.files.config.SecurityConfig;
 import io.complyt.files.domain.ApiKey;
-import io.complyt.files.services.FileService;
+import io.complyt.files.services.ApiKeyService;
 import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.files.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.files.v1.handlers.FileHandler;
@@ -27,15 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@ContextConfiguration(classes = {FileRouter.class, FileHandler.class, ApiExceptionConfig.class,
+@ContextConfiguration(classes = {ApiKeyRouter.class, FileHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class,
         GlobalErrorAttributes.class,
         GlobalExceptionHandler.class,
         SecurityConfig.class})
 @WebFluxTest
-public class FileRouterTest implements FileRouterTestTemplate {
+public class ApiKeyRouterTest implements ApiKeyRouterTestTemplate {
     @MockBean
-    FileService fileService;
+    ApiKeyService apiKeyService;
     @Autowired
     private ApplicationContext context;
 
@@ -51,11 +51,11 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @Override
     public void get_NullHandler_ThrowsNullPointerException() {
         // Given
-        FileRouter fileRouter = new FileRouter();
+        ApiKeyRouter apiKeyRouter = new ApiKeyRouter();
         FileHandler nullFileHandler = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> fileRouter.getfileLinkRouterFunction(nullFileHandler));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> apiKeyRouter.getfileLinkRouterFunction(nullFileHandler));
 
         // Then
         assertEquals("fileHandler is marked non-null but is null", nullPointerException.getMessage());
@@ -70,12 +70,12 @@ public class FileRouterTest implements FileRouterTestTemplate {
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
 
         // When
-        when(fileService.find()).thenReturn(Mono.just(file));
+        when(apiKeyService.find()).thenReturn(Mono.just(file));
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL).build())
+                .uri(uriBuilder -> uriBuilder.path(ApiKeyRouter.BASE_URL).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -91,12 +91,12 @@ public class FileRouterTest implements FileRouterTestTemplate {
         ApiKey file = TestUtilities.createFile();
 
         // When
-        when(fileService.find()).thenReturn(Mono.just(file));
+        when(apiKeyService.find()).thenReturn(Mono.just(file));
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL + "/resource_not_found").build())
+                .uri(uriBuilder -> uriBuilder.path(ApiKeyRouter.BASE_URL + "/resource_not_found").build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
@@ -107,12 +107,12 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void get_DoesntExist_Returns404() {
         // When
-        when(fileService.find()).thenReturn(Mono.empty());
+        when(apiKeyService.find()).thenReturn(Mono.empty());
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL).build())
+                .uri(uriBuilder -> uriBuilder.path(ApiKeyRouter.BASE_URL).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
@@ -124,7 +124,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL).build())
+                .uri(uriBuilder -> uriBuilder.path(ApiKeyRouter.BASE_URL).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isUnauthorized();
@@ -140,12 +140,12 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void get_InternalServerError_Returns500() {
         // When
-        when(fileService.find()).thenThrow(RuntimeException.class);
+        when(apiKeyService.find()).thenThrow(RuntimeException.class);
 
         // Then
         webTestClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path(FileRouter.BASE_URL).build())
+                .uri(uriBuilder -> uriBuilder.path(ApiKeyRouter.BASE_URL).build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();

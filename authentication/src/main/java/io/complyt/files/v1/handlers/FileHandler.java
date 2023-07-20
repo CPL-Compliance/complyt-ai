@@ -1,7 +1,7 @@
 package io.complyt.files.v1.handlers;
 
 import io.complyt.files.security.permissions.LinkReadPermission;
-import io.complyt.files.services.FileService;
+import io.complyt.files.services.ApiKeyService;
 import io.complyt.files.utils.observability.ContextLogger;
 import io.complyt.files.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.files.v1.mappers.FileMapper;
@@ -22,13 +22,13 @@ import reactor.core.publisher.Mono;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileHandler {
     @NonNull
-    FileService fileService;
+    ApiKeyService apiKeyService;
 
     @LinkReadPermission
     public Mono<ServerResponse> get(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<FileDto> value = ContextLogger.observeCtx(logStr, log::info).then(fileService.find())
+        Mono<FileDto> value = ContextLogger.observeCtx(logStr, log::info).then(apiKeyService.find())
                 .map(FileMapper.INSTANCE::fileToFileDto)
                 .flatMap(fileDto -> ContextLogger.observeCtx("<-- Returned Body: " + fileDto.toString(), log::info).thenReturn(fileDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

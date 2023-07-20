@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.*;
 
 
 @Configuration
-public class FileRouter {
+public class ApiKeyRouter {
     public static final String BASE_URL = "/v1/files";
 
     @Bean
