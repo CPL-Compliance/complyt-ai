@@ -27,8 +27,8 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI openAPIConfiguration() {
         return new OpenAPI()
-                .info(new Info().title("Files API")
-                        .description("Files API")
+                .info(new Info().title("Authentication API")
+                        .description("Authentication API")
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")
