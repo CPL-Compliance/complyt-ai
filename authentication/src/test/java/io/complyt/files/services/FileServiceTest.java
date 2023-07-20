@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
     @InjectMocks
-    FileService fileService;
+    ApiKeyService apiKeyService;
 
     @Mock
     FileRepository fileRepository;
@@ -40,7 +40,7 @@ class FileServiceTest {
         when(fileRepository.find()).thenReturn(Mono.just(file));
 
         // Then
-        Mono<ApiKey> linkMono = fileService.find();
+        Mono<ApiKey> linkMono = apiKeyService.find();
         StepVerifier.create(linkMono).expectNext(file).verifyComplete();
     }
 
@@ -50,7 +50,7 @@ class FileServiceTest {
         when(fileRepository.find()).thenReturn(Mono.empty());
 
         // Then
-        Mono<ApiKey> linkMono = fileService.find();
+        Mono<ApiKey> linkMono = apiKeyService.find();
         StepVerifier.create(linkMono).verifyComplete();
     }
 }
