@@ -12,7 +12,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
       </profile>
-      <profile name="Annotation profile for Complyt" enabled="true">
+      <profile name="Annotation profile for files" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -32,6 +32,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="config-server" target="17" />
+      <module name="files" target="17" />
       <module name="naming-server" target="17" />
       <module name="salestax" target="17" />
       <module name="temp" target="17" />
@@ -45,7 +46,7 @@
       <module name="complyt" options="" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
-      <module name="files" options="-parameters" />
+      <module name="files" options="parameters" />
       <module name="naming-server" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
       <module name="sales-tax-rates" options="-parameters" />
