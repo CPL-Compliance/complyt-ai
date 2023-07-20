@@ -2,7 +2,7 @@ package io.complyt.files.v1.routers;
 
 import io.complyt.files.config.ApiExceptionConfig;
 import io.complyt.files.config.SecurityConfig;
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.services.FileService;
 import io.complyt.files.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.files.v1.exceptions.GlobalExceptionHandler;
@@ -66,7 +66,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void get_Exists_Returns200() {
         // Given
-        File file = TestUtilities.createFile();
+        ApiKey file = TestUtilities.createFile();
         FileDto fileDto = FileMapper.INSTANCE.fileToFileDto(file);
 
         // When
@@ -88,7 +88,7 @@ public class FileRouterTest implements FileRouterTestTemplate {
     @WithMockUser
     public void getAny_InvalidUrl_Returns404() {
         // Given
-        File file = TestUtilities.createFile();
+        ApiKey file = TestUtilities.createFile();
 
         // When
         when(fileService.find()).thenReturn(Mono.just(file));

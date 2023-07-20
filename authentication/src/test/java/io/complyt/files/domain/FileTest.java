@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class FileTest {
-    private File file;
+    private ApiKey file;
 
     @BeforeEach
     public void setUp() {
@@ -22,7 +22,7 @@ class FileTest {
     @Test
     public void equals_IdenticalLinks_Equal() {
         // Given + When
-        File referenceFile = TestUtilities.createFile(file.getComplytId(), file.getId());
+        ApiKey referenceFile = TestUtilities.createFile(file.getComplytId(), file.getId());
 
         // Then
         assertEquals(file, referenceFile);

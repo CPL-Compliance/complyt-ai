@@ -1,6 +1,6 @@
 package io.complyt.files.repositories;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class FileRepositoryTest {
     TenantResolver tenantResolver;
 
 
-    File file;
+    ApiKey file;
 
     String tenantId;
 
@@ -50,10 +50,10 @@ class FileRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query, File.class)).thenReturn(Mono.just(file));
+        when(reactiveMongoTemplate.findOne(query, ApiKey.class)).thenReturn(Mono.just(file));
 
         // Then
-        Mono<File> linkMono = fileRepository.find();
+        Mono<ApiKey> linkMono = fileRepository.find();
         StepVerifier.create(linkMono).expectNext(file).verifyComplete();
     }
 
@@ -64,10 +64,10 @@ class FileRepositoryTest {
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(tenantId));
-        when(reactiveMongoTemplate.findOne(query, File.class)).thenReturn(Mono.empty());
+        when(reactiveMongoTemplate.findOne(query, ApiKey.class)).thenReturn(Mono.empty());
 
         // Then
-        Mono<File> linkMono = fileRepository.find();
+        Mono<ApiKey> linkMono = fileRepository.find();
         StepVerifier.create(linkMono).verifyComplete();
     }
 }

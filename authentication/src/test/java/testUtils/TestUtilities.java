@@ -1,6 +1,6 @@
 package testUtils;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.v1.models.FileDto;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,12 +17,12 @@ public interface TestUtilities {
                 .claim("tenant_id", "it_tenant");
     }
 
-    static File createFile() {
-        return new File(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr);
+    static ApiKey createFile() {
+        return new ApiKey(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr);
     }
 
-    static File createFile(UUID complytId, String id) {
-        return new File(complytId, id, tenantId, linkStr);
+    static ApiKey createFile(UUID complytId, String id) {
+        return new ApiKey(complytId, id, tenantId, linkStr);
     }
 
     static FileDto createFileDto() {

@@ -1,6 +1,6 @@
 package io.complyt.files.services;
 
-import io.complyt.files.domain.File;
+import io.complyt.files.domain.ApiKey;
 import io.complyt.files.repositories.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,13 +34,13 @@ class FileServiceTest {
     @Test
     void find_tenantIdExistsInCollection_ReturnsLink() {
         // Given
-        File file = TestUtilities.createFile();
+        ApiKey file = TestUtilities.createFile();
 
         // When
         when(fileRepository.find()).thenReturn(Mono.just(file));
 
         // Then
-        Mono<File> linkMono = fileService.find();
+        Mono<ApiKey> linkMono = fileService.find();
         StepVerifier.create(linkMono).expectNext(file).verifyComplete();
     }
 
@@ -50,7 +50,7 @@ class FileServiceTest {
         when(fileRepository.find()).thenReturn(Mono.empty());
 
         // Then
-        Mono<File> linkMono = fileService.find();
+        Mono<ApiKey> linkMono = fileService.find();
         StepVerifier.create(linkMono).verifyComplete();
     }
 }
