@@ -12,7 +12,6 @@
     <scm>
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-    <tag>HEAD</tag>
   </scm>
 
     <!-- Maven Coordinates -->
@@ -183,10 +182,6 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
         <!-- Other -->
     </dependencies>
