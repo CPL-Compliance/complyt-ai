@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
 
     <scm>
@@ -16,7 +16,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
-    <version>0.15.6-SNAPSHOT</version>
+    <version>0.15.5-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>files</name>
