@@ -6,12 +6,12 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
 
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
-    <version>0.11.0</version>
+    <version>0.11.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>api-gateway</name>
