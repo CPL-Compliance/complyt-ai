@@ -14,7 +14,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <!-- Maven Coordinates -->
 
     <!--    Don't change modules order! It's necessary for system tests-->
@@ -32,6 +32,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <revision>0.1.1-SNAPSHOT</revision>
         <java.version>17</java.version>
         <!-- Dependencies -->
         <mapstruct.version>1.5.1.Final</mapstruct.version>
@@ -532,7 +533,7 @@
                 <configuration>
                     <releaseProfiles>release</releaseProfiles>
                     <checkModificationExcludes>true</checkModificationExcludes>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <autoVersionSubmodules>false</autoVersionSubmodules>
                     <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
                     <pushChanges>true</pushChanges>
                     <autoVersionSubmodules>false</autoVersionSubmodules>
