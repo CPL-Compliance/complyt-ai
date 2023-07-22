@@ -557,21 +557,6 @@
         </repository>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>internal-repo</id>
-            <name>Complyt</name>
-            <url>https://github.com/Complyt/complyt</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <profiles>
         <!-- Environment Profiles -->
         <profile>
