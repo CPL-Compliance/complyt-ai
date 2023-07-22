@@ -226,8 +226,4 @@
         </plugins>
     </build>
 
-
-  <scm>
-    <tag>files-0.12.0</tag>
-  </scm>
 </project>
