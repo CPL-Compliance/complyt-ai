@@ -173,50 +173,8 @@ jobs:
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
-  build:
-    executor: maven-executor
-    parameters:
-      service_name:
-        type: string
-        default: ""
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - run:
-          name: Increase Minor Version
-          command: |
-            # Extract the current version from the pom.xml
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-            echo "CURRENT_VERSION " $CURRENT_VERSION
-            NEW_VERSION="${CURRENT_VERSION/-SNAPSHOT/}"
-            
-            # Increase the minor version
-            MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
-            MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
-            NEW_MINOR=$(($MIN_VERSION + 1))
-            DEV_VERSION="$MAJ_VERSION.$NEW_MINOR.0-SNAPSHOT"
-            
-            # Update the version in the pom.xml
-            mvn versions:set -DnewVersion=$DEV_VERSION
-            
-            git config --global user.email "eyaltams@gmail.com.com"
-            git config --global user.name $GITHUB_USERNAME_CIRCLECI
-            git config --global user.password $GITHUB_API_TOKEN_CIRCLECI
-            
-            # Commit the updated pom.xml
-            git commit -am "Increase minor version to $DEV_VERSION"
-            git push --set-upstream origin eyal/com-235-api-services-versioning-management
 
 workflows:
-#  build-and-deploy:
-#    jobs:
-#      - build:
-#          service_name: "files"
-#          filters:
-#            branches:
-#              only:
-#                - eyal/com-235-api-micro-services-versioning-management
 
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
@@ -272,8 +230,6 @@ workflows:
       - update-ecs-service:
           requires:
             - verify
-      - build:
-          service_name: "files"
 
 
   api-gateway-workflow:
