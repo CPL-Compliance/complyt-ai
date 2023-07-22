@@ -11,7 +11,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
       </profile>
       <profile name="Annotation profile for sales-tax-rates" enabled="true">
         <sourceOutputDir name="../target/generated-sources/annotations" />
@@ -30,6 +29,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
         <module name="test-service" />
+        <module name="api-gateway" />
         <module name="files" />
         <module name="discovery-service" />
         <module name="sales-tax" />
@@ -46,7 +46,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="api-gateway" options="" />
+      <module name="api-gateway" options="-parameters" />
       <module name="complyt" options="" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
