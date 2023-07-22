@@ -14,7 +14,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>${revision}</version>
+    <version>0.1.1-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <!--    Don't change modules order! It's necessary for system tests-->
@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>0.1.1-SNAPSHOT</revision>
+<!--        <revision>0.1.1-SNAPSHOT</revision>-->
         <java.version>17</java.version>
         <!-- Dependencies -->
         <mapstruct.version>1.5.1.Final</mapstruct.version>
