@@ -273,8 +273,8 @@
                                 <build>
                                     <buildOptions>
                                         <platforms>
-                                            <platform>linux/amd64</platform>
-                                            <platform>linux/arm64</platform>
+                                            linux/amd64,
+                                            linux/arm64
                                         </platforms>
                                     </buildOptions>
                                     <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
