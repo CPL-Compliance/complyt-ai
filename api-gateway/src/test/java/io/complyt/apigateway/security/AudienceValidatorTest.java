@@ -39,7 +39,7 @@ class AudienceValidatorTest {
                 .stream()
                 .filter(error ->
                         error.getErrorCode().equals("invalid_token") &&
-                                error.getDescription().equals("The required audience is missing")).count();
+                        error.getDescription().equals("The required audience is missing")).count();
 
         Assertions.assertEquals(1, count);
     }
