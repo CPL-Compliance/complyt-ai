@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Service
-public class ApiKeyService {
+public class TokenService {
     @NonNull
     FileRepository fileRepository;
 

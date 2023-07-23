@@ -1,11 +1,10 @@
 package io.complyt.authentication.v1.handlers;
 
-import io.complyt.authentication.services.ApiKeyService;
-import io.complyt.authentication.v1.mappers.FileMapper;
-import io.complyt.authentication.v1.models.ApiKeyDto;
-import io.complyt.authentication.security.permissions.LinkReadPermission;
+import io.complyt.authentication.services.TokenService;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
+import io.complyt.authentication.v1.mappers.TokenMapper;
+import io.complyt.authentication.v1.models.TokenDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,19 +19,18 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class FileHandler {
+public class TokenHandler {
     @NonNull
-    ApiKeyService apiKeyService;
+    TokenService tokenService;
 
-    @LinkReadPermission
-    public Mono<ServerResponse> get(ServerRequest serverRequest) {
+    public Mono<ServerResponse> post(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Mono<ApiKeyDto> value = ContextLogger.observeCtx(logStr, log::info).then(apiKeyService.find())
-                .map(FileMapper.INSTANCE::fileToFileDto)
-                .flatMap(fileDto -> ContextLogger.observeCtx("<-- Returned Body: " + fileDto.toString(), log::info).thenReturn(fileDto))
+        Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info).then(tokenService.find())
+                .map(TokenMapper.INSTANCE::tokentoTokenDto)
+                .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().body(value, ApiKeyDto.class);
+        return ServerResponse.ok().body(value, TokenDto.class);
     }
 }

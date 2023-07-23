@@ -12,3 +12,5 @@ spring:
   data:
     mongodb:
       uuid-representation: standard
+
+cryption.secret-key: ${secret-key}

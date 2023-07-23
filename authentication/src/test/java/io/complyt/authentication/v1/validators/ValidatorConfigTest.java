@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.validators;
 
-import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.models.TokenDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +27,8 @@ class ValidatorConfigTest {
 
     @Test
     void fileDtoValidationHandler() {
-        ValidationHandler<ApiKeyDto, SpringValidatorAdapter> actualCustomerDtoValidationHandler = new ValidationHandler<>(ApiKeyDto.class, springValidatorAdapter);
-        ValidationHandler<ApiKeyDto, SpringValidatorAdapter> expectedCustomerDtoValidationHandler = validatorConfig.fileDtoValidationHandler(springValidatorAdapter);
+        ValidationHandler<TokenDto, SpringValidatorAdapter> actualCustomerDtoValidationHandler = new ValidationHandler<>(TokenDto.class, springValidatorAdapter);
+        ValidationHandler<TokenDto, SpringValidatorAdapter> expectedCustomerDtoValidationHandler = validatorConfig.fileDtoValidationHandler(springValidatorAdapter);
 
         assertEquals(expectedCustomerDtoValidationHandler, actualCustomerDtoValidationHandler);
     }

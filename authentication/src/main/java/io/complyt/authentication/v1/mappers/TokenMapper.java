@@ -1,14 +1,14 @@
 package io.complyt.authentication.v1.mappers;
 
 import io.complyt.authentication.domain.ApiKey;
-import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.models.TokenDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface FileMapper {
-    FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
+public interface TokenMapper {
+    TokenMapper INSTANCE = Mappers.getMapper(TokenMapper.class);
 
-    ApiKeyDto fileToFileDto(ApiKey file);
+    TokenDto tokentoTokenDto(ApiKey apiKey);
 }

@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.api_info;
 
-import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.models.TokenDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -35,9 +35,9 @@ import java.lang.annotation.Target;
                                         content = {
                                                 @Content(
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                                        schema = @Schema(implementation = ApiKeyDto.class),
+                                                        schema = @Schema(implementation = TokenDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetLinkApiInfo.fileExample)
+                                                                @ExampleObject(value = PostApiKeyApiInfo.fileExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -62,7 +62,7 @@ import java.lang.annotation.Target;
                                 )
                         }))
 })
-public @interface GetLinkApiInfo {
+public @interface PostApiKeyApiInfo {
     String fileExample = "{\n" +
             "   \"link\": \"https://example.example.com/files/example.csv\"\n" +
             "}";

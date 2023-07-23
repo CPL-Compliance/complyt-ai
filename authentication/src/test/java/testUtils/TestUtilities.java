@@ -1,7 +1,7 @@
 package testUtils;
 
 import io.complyt.authentication.domain.ApiKey;
-import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.models.TokenDto;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -25,7 +25,7 @@ public interface TestUtilities {
         return new ApiKey(complytId, id, tenantId, linkStr);
     }
 
-    static ApiKeyDto createApiKeyDto() {
-        return new ApiKeyDto(UUID.randomUUID(), linkStr);
+    static TokenDto createApiKeyDto() {
+        return new TokenDto(UUID.randomUUID(), linkStr);
     }
 }
