@@ -16,7 +16,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
-    <version>0.15.11-SNAPSHOT</version>
+    <version>0.15.10-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>files</name>
