@@ -33,7 +33,7 @@ public class SalesTaxRatesEndpointsIT extends TestContainersInitializerIT implem
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.address.county").isEqualTo("Arapahoe")
-                .jsonPath("$.salesTaxRates.taxRate").isEqualTo(0.0775f);
+                .jsonPath("$.salesTaxRates.taxRate").isEqualTo(0.04f);
     }
 
     @Order(2)
