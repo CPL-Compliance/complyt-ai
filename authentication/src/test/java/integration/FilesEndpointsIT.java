@@ -1,8 +1,8 @@
 package integration;
 
 import io.complyt.authentication.AuthenticationApplication;
-import io.complyt.authentication.v1.models.ApiKeyDto;
-import io.complyt.authentication.v1.routers.ApiKeyRouter;
+import io.complyt.authentication.v1.models.TokenDto;
+import io.complyt.authentication.v1.routers.TokenRouter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,12 +44,12 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .mutateWith(defaultTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ApiKeyRouter.BASE_URL)
+                        .path(TokenRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(ApiKeyDto.class)
+                .expectBody(TokenDto.class)
                 .value(fileDto -> assertEquals(fileDto.link(), TestUtilities.linkStr));
     }
 
@@ -61,7 +61,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .mutateWith(differentTenantMutator)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(ApiKeyRouter.BASE_URL)
+                        .path(TokenRouter.BASE_URL)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()

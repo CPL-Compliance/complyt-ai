@@ -39,6 +39,12 @@ spring:
             - Path=/sales-tax-rates/**
           filters:
             - RewritePath=/sales-tax-rates/(?<path>.*), /$\{path}
+        - id: authentication-service
+          uri: lb://authentication-service
+          predicates:
+            - Path=/authentication/**
+          filters:
+            - RewritePath=/authentication/(?<path>.*), /$\{path}
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
@@ -225,6 +231,17 @@ spring:
             - SetPath=/v1/sales_tax_rates
         # ---- SalesTaxRates ----
         # ==== Sales Tax Rates Service ====
+        # ==== Authentication Service ====
+        # ---- ApiKey ----
+        - id: authentication-post-api-key
+          uri: lb://authentication
+          predicates:
+            - Method=POST
+            - Path=/v1/api_key
+          filters:
+            - SetPath=/v1/api_key
+        # ---- ApiKey ----
+        # ==== Authentication Service ====
       default-filters:
         - name: Retry
           args:

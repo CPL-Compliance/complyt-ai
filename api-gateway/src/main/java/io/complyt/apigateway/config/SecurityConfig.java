@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -52,8 +53,12 @@ public class SecurityConfig {
                 .matches(serverWebExchange));
 
         // Authentication and Authorization
+        // We allow traffic to POST /v1/api_key to grant an access token to the user base on his scope.
+        // This is part of our authentication process. We can't block this route because the user doesn't have
+        // a token yet.
         http.authorizeExchange()
                 .pathMatchers("/actuator/health", "/actuator/info").permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 
@@ -83,6 +88,7 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui*/**"
                 ).permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/api_key").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 

@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.validators;
 
-import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.models.TokenDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,25 +20,25 @@ class ValidationHandlerTest {
     SpringValidatorAdapter springValidatorAdapter;
 
     @Autowired
-    ValidationHandler<ApiKeyDto, SpringValidatorAdapter> fileDtoValidationHandler;
+    ValidationHandler<TokenDto, SpringValidatorAdapter> fileDtoValidationHandler;
 
     @MockBean
     ServerRequest serverRequest;
 
     @Test
     void validate_validCustomer_returnsCustomerDto() {
-        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
-        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
-        Mono<ApiKeyDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
+        TokenDto tokenDto = TestUtilities.createApiKeyDto();
+        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
+        Mono<TokenDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
 
-        StepVerifier.create(validationMono).expectNext(apiKeyDto).verifyComplete();
+        StepVerifier.create(validationMono).expectNext(tokenDto).verifyComplete();
     }
 
     @Test
     void validate_invalidCustomerDto_returnsError() {
-        ApiKeyDto customerDto = TestUtilities.createApiKeyDto().withLink("");
-        when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(customerDto));
-        Mono<ApiKeyDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
+        TokenDto customerDto = TestUtilities.createApiKeyDto().withLink("");
+        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(customerDto));
+        Mono<TokenDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
 
         StepVerifier.create(validationMono).expectError().verify();
     }
