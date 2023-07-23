@@ -1,8 +1,8 @@
 package integration;
 
-import io.complyt.files.AuthenticationApplication;
-import io.complyt.files.v1.models.FileDto;
-import io.complyt.files.v1.routers.ApiKeyRouter;
+import io.complyt.authentication.AuthenticationApplication;
+import io.complyt.authentication.v1.models.ApiKeyDto;
+import io.complyt.authentication.v1.routers.ApiKeyRouter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,7 +49,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(FileDto.class)
+                .expectBody(ApiKeyDto.class)
                 .value(fileDto -> assertEquals(fileDto.link(), TestUtilities.linkStr));
     }
 

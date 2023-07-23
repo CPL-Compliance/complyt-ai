@@ -1,7 +1,7 @@
 package testUtils;
 
-import io.complyt.files.domain.ApiKey;
-import io.complyt.files.v1.models.FileDto;
+import io.complyt.authentication.domain.ApiKey;
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -25,11 +25,7 @@ public interface TestUtilities {
         return new ApiKey(complytId, id, tenantId, linkStr);
     }
 
-    static FileDto createFileDto() {
-        return new FileDto(UUID.randomUUID(), linkStr);
-    }
-
-    static FileDto createFileDto(UUID complytId) {
-        return new FileDto(complytId, linkStr);
+    static ApiKeyDto createApiKeyDto() {
+        return new ApiKeyDto(UUID.randomUUID(), linkStr);
     }
 }
