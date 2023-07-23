@@ -1,5 +1,5 @@
 spring.application.name: authentication
-server.port: ${PORT:9880}
+server.port: ${PORT:9860}
 
 spring.profiles.active:
   - @activeEnv@
