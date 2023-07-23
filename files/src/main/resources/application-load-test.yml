@@ -35,7 +35,6 @@ spring.cloud.vault:
     role: ${VAULT_DB_ROLE}
     backend: database
 
-
 spring.config.import: vault://
 
 auth0.audience: ${audience}

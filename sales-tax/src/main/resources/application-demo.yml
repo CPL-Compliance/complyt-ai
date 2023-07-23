@@ -1,8 +1,9 @@
-spring:
-  data:
-    mongodb:
-      uri: ${mongo-uri}
-      database: ${db-name}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${discovery-service-uri}
+  instance:
+    prefer-ip-address: true
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
@@ -42,12 +43,11 @@ auth0.audience: ${audience}
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${discovery-service-uri}
-  instance:
-    prefer-ip-address: true
+spring:
+  data:
+    mongodb:
+      uri: ${mongo-uri}
+      database: ${db-name}
 
 logging:
   level:

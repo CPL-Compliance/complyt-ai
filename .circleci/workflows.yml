@@ -151,6 +151,26 @@ jobs:
           container-image-name-updates: 'container=<<parameters.service_name>>-container, tag=latest'
           family: '<<parameters.service_name>>-task-definition'
           service-name: '<<parameters.service_name>>-service'
+#  update-ecs-service-demo:
+#    parameters:
+#      service_name:
+#        type: string
+#        default: ""
+#
+#    executor: python-image
+#    steps:
+#      - run:
+#          name: test
+#          command: echo 'container=demo-<<parameters.service_name>>-container, tag=latest'
+#      - aws-cli/setup:
+#          aws-access-key-id: AWS_ACCESS_KEY_ID
+#          aws-region: AWS_DEFAULT_REGION
+#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+#      - aws-ecs/update-service:
+#          cluster-name: 'demo'
+#          container-image-name-updates: 'container=demo-<<parameters.service_name>>-container, tag=latest'
+#          family: 'demo-<<parameters.service_name>>-task-definition'
+#          service-name: 'demo-<<parameters.service_name>>-service'
 
 workflows:
   sales-tax-workflow:

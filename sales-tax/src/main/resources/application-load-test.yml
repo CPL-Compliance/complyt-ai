@@ -2,6 +2,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 5
   instance:
     prefer-ip-address: true
 
