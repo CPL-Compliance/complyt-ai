@@ -1,5 +1,15 @@
 auth0.audience: ${audience}
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    should-unregister-on-shutdown: true
+    registry-fetch-interval-seconds: 15
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
 spring:
   security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
   config.import: vault://
@@ -29,15 +39,6 @@ spring:
       kv:
         enabled: true
         default-context:
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
-    should-unregister-on-shutdown: true
-  instance:
-    prefer-ip-address: true
-    lease-renewal-interval-in-seconds: 30
 
 springdoc:
   swagger-ui:

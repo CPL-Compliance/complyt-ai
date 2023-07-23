@@ -1,15 +1,13 @@
-spring:
-  data:
-    mongodb:
-      uri: ${mongo-uri}
-      database: ${db-name}
-
 eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 5
+    registry-fetch-interval-seconds: 15
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
@@ -48,6 +46,12 @@ auth0.audience: ${audience}
 # This property sets the issuer URI
 # for the application to interact with the Resource Server for authentication and authorization purposes
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${issuer-uri}
+
+spring:
+  data:
+    mongodb:
+      uri: ${mongo-uri}
+      database: ${db-name}
 
 logging:
   level:
