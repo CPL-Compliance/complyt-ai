@@ -272,7 +272,10 @@
                                 <alias>complyt</alias>
                                 <build>
                                     <buildOptions>
-                                        <platforms>linux/arm64,linux/amd64</platforms>
+                                        <platforms>
+                                            <platform>linux/amd64</platform>
+                                            <platform>linux/arm64</platform>
+                                        </platforms>
                                     </buildOptions>
                                     <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
                                     <!--copies artifact to docker build directory in target-->
