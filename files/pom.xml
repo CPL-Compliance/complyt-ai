@@ -11,7 +11,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-    <tag>files-0.15.46</tag>
+    <tag>files-0.15.46-SNAPSHOT</tag>
   </scm>
 
     <!-- Maven Coordinates -->
