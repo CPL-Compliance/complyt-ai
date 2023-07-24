@@ -64,6 +64,7 @@
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <docker.platforms>${docker.platforms}</docker.platforms>
         <!-- Plugins -->
     </properties>
 
@@ -271,6 +272,11 @@
                                 <name>${docker.image.prefix}/${docker.image.name}</name>
                                 <alias>complyt</alias>
                                 <build>
+                                    <buildx>
+                                        <platforms>
+                                            <platform>${docker.platforms}</platform>
+                                        </platforms>
+                                    </buildx>
                                     <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
                                     <!--copies artifact to docker build directory in target-->
                                     <assembly>
