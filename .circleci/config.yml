@@ -14,4 +14,5 @@ workflows:
             api-gateway/.* run-api-gateway-workflow true
             discovery-service/.* run-discovery-service-workflow true
             sales-tax-rates/.* run-sales-tax-rates-workflow true
+            authentication/.* run-authentication-workflow true
           config-path: .circleci/workflows.yml

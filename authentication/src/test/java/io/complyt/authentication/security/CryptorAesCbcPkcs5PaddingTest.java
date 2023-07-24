@@ -20,7 +20,7 @@ class CryptorAesCbcPkcs5PaddingTest {
     Cryptor cryptorAesCbcPkcs5Padding;
 
     @BeforeEach
-    void setUp() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    void setUp() {
         String secretKeyStr = "cWrkCbX1JKCiWYFDx9DsHKqdn38QK5o3";
         cryptorAesCbcPkcs5Padding = (new CryptorConfig()).cryptorAesCbcPkcs5Padding(secretKeyStr);
     }

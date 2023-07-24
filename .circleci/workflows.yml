@@ -35,6 +35,9 @@ parameters:
   run-sales-tax-rates-workflow:
     type: boolean
     default: false
+  run-authentication-workflow:
+    type: boolean
+    default: false
 
 jobs:
   package-dependency:
@@ -320,3 +323,31 @@ workflows:
           requires:
             - deploy
           service_name: "sales-tax-rates"
+
+  authentication-workflow:
+    when: << pipeline.parameters.run-authentication-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "authentication"
+
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "authentication"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "authentication"
+
+      - update-ecs-service:
+          requires:
+            - deploy
+          service_name: "authentication"
