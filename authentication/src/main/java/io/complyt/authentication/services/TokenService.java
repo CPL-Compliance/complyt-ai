@@ -1,7 +1,7 @@
 package io.complyt.authentication.services;
 
-import io.complyt.authentication.domain.ApiKey;
-import io.complyt.authentication.repositories.FileRepository;
+import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.repositories.TokenRepository;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 @Service
 public class TokenService {
     @NonNull
-    FileRepository fileRepository;
+    TokenRepository tokenRepository;
 
-    public Mono<ApiKey> find() {
-        return fileRepository.find();
+    public Mono<Token> getByEncodedApiKey(final @NonNull String encodedApiKey) {
+        return tokenRepository.findByApiKey(encodedApiKey);
     }
 }

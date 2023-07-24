@@ -1,6 +1,6 @@
 package testUtils;
 
-import io.complyt.authentication.domain.ApiKey;
+import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.v1.models.TokenDto;
 import org.bson.types.ObjectId;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.UUID;
 
 public interface TestUtilities {
-    String linkStr = "https://youtu.be/dQw4w9WgXcQ";
+    String apiKey = "929f1749-cfa7-46c0-8b6f-ee9602c7819c";
     String tenantId = UUID.randomUUID().toString();
 
     static Jwt.Builder stubJwt() {
@@ -17,15 +17,15 @@ public interface TestUtilities {
                 .claim("tenant_id", "it_tenant");
     }
 
-    static ApiKey createFile() {
-        return new ApiKey(UUID.randomUUID(), ObjectId.get().toString(), tenantId, linkStr);
+    static Token createToken() {
+        return new Token("", "", "", "", apiKey);
     }
 
-    static ApiKey createFile(UUID complytId, String id) {
-        return new ApiKey(complytId, id, tenantId, linkStr);
+    static Token createToken(UUID complytId, String id) {
+        return new Token("", "", "", "", apiKey);
     }
 
-    static TokenDto createApiKeyDto() {
-        return new TokenDto(UUID.randomUUID(), linkStr);
+    static TokenDto createTokenDto() {
+        return new TokenDto(apiKey);
     }
 }

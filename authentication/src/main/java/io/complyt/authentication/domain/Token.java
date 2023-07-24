@@ -1,12 +1,9 @@
 package io.complyt.authentication.domain;
 
-import io.complyt.authentication.domain.properties.ComplytIdProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.UUID;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -14,19 +11,22 @@ import java.util.UUID;
 @EqualsAndHashCode
 @ToString
 @With
-@Document(collection = "file")
-public class ApiKey implements ComplytIdProperty {
-
-    @NonNull
-    UUID complytId;
+@Document(collection = "token")
+public class Token {
 
     @Id
     @NonNull
-    String id;
+    String apiKey;
 
     @NonNull
-    String tenantId;
+    String accessToken;
 
     @NonNull
-    String link;
+    String scope;
+
+    @NonNull
+    String expiresIn;
+
+    @NonNull
+    String tokenType;
 }

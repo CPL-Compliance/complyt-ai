@@ -11,11 +11,11 @@ import java.security.NoSuchAlgorithmException;
 
 public interface Cryptor {
 
-    String encrypt(final @NonNull String input) throws NoSuchPaddingException,
+    EncryptedData encrypt(final @NonNull String input) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException;
 
-    String decrypt(final @NonNull String iv, final @NonNull String cipherText) throws IllegalBlockSizeException,
+    String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
             BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchPaddingException,
             NoSuchAlgorithmException;
 }

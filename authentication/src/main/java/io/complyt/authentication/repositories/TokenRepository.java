@@ -1,7 +1,6 @@
 package io.complyt.authentication.repositories;
 
-import io.complyt.authentication.security.TenantResolver;
-import io.complyt.authentication.domain.ApiKey;
+import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -18,20 +17,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FileRepository {
+public class TokenRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @NonNull
-    TenantResolver tenantResolver;
+    public Mono<Token> findByApiKey(final @NonNull String encodedApiKey) {
+        Query query = Query.query(Criteria.where("apiKey").is(encodedApiKey));
 
-    public Mono<ApiKey> find() {
-        return tenantResolver.resolve()
-                .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("tenantId").is(tenantId));
-
-                    return ContextLogger.observeCtx("Searching for files with tenant ID " + tenantId, log::info)
-                            .then(reactiveMongoTemplate.findOne(query, ApiKey.class));
-                });
+        return ContextLogger.observeCtx("Searching for a token by encodedApiKey " + encodedApiKey, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Token.class));
     }
 }

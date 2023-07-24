@@ -33,7 +33,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("files"));
+        registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("authentiucation"));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class FilesEndpointsIT extends TestContainersInitializerIT implements Fil
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TokenDto.class)
-                .value(fileDto -> assertEquals(fileDto.link(), TestUtilities.linkStr));
+                .value(tokenDto -> assertEquals(tokenDto.apiKey(), TestUtilities.apiKey));
     }
 
     @Test

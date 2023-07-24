@@ -20,25 +20,25 @@ class ValidationHandlerTest {
     SpringValidatorAdapter springValidatorAdapter;
 
     @Autowired
-    ValidationHandler<TokenDto, SpringValidatorAdapter> fileDtoValidationHandler;
+    ValidationHandler<TokenDto, SpringValidatorAdapter> tokenDtoValidationHandler;
 
     @MockBean
     ServerRequest serverRequest;
 
     @Test
-    void validate_validCustomer_returnsCustomerDto() {
-        TokenDto tokenDto = TestUtilities.createApiKeyDto();
+    void validate_validToken_returnsTokenDto() {
+        TokenDto tokenDto = TestUtilities.createTokenDto();
         when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
-        Mono<TokenDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
+        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
 
         StepVerifier.create(validationMono).expectNext(tokenDto).verifyComplete();
     }
 
     @Test
-    void validate_invalidCustomerDto_returnsError() {
-        TokenDto customerDto = TestUtilities.createApiKeyDto().withLink("");
+    void validate_invalidTokenDto_returnsError() {
+        TokenDto customerDto = TestUtilities.createTokenDto().withApiKey("");
         when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(customerDto));
-        Mono<TokenDto> validationMono = fileDtoValidationHandler.validate(serverRequest);
+        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
 
         StepVerifier.create(validationMono).expectError().verify();
     }
