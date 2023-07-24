@@ -2,7 +2,6 @@ auth0.audience: ${audience}
 
 eureka:
   client:
-    registry-fetch-interval-seconds: 15
     serviceUrl:
       defaultZone: ${discovery-service-uri}
     should-unregister-on-shutdown: true
