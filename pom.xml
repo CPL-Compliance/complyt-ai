@@ -282,10 +282,10 @@
                                         <descriptorRef>artifact</descriptorRef>
                                     </assembly>
                                     <tags>
-                                        <tag>latest</tag>
                                         <tag>
                                             ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
                                         </tag>
+                                        <tag>latest</tag>
                                     </tags>
                                 </build>
                             </image>
