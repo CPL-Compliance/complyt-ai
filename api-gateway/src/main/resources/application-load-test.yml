@@ -5,6 +5,7 @@ eureka:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
     should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 1
     registry-fetch-interval-seconds: 15 # GET /eureka/apps/delta
   instance:
     prefer-ip-address: true

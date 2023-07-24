@@ -2,6 +2,7 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    initial-instance-info-replication-interval-seconds: 1
     should-unregister-on-shutdown: true
     registry-fetch-interval-seconds: 15
   instance:
