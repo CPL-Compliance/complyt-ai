@@ -1,16 +1,12 @@
 package io.complyt.authentication.v1.models;
 
-import io.complyt.authentication.v1.models.properties.ComplytIdPropertyDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
-import java.util.UUID;
-
 @With
-@Schema(name = "File")
-public record TokenDto(UUID complytId,
-                       @Size(min = 1, max = 2048, message = "Link should be 2048 characters maximum") @NotNull(message = "Link shouldn't be blank") String link)
-        implements ComplytIdPropertyDto {
+@Schema(name = "Token")
+public record TokenDto(
+        @Size(min = 30, max = 128, message = "apiKey should be between 30 and 129 characters.") @NotNull(message = "apiKeyLink shouldn't be blank") String apiKey) {
 }

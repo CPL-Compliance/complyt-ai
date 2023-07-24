@@ -22,8 +22,8 @@ class OpenApiConfigTest {
         // Given
         OpenAPI expectedOpenApi = new OpenAPI()
                 .info(new Info()
-                        .title("Files API")
-                        .description("Files API")
+                        .title("Authentication API")
+                        .description("Authentication API")
                         .version("v0.0.1")
                         .license(new License()
                                 .name("Apache 2.0")

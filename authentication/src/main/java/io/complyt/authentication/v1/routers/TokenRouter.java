@@ -15,7 +15,7 @@ public class TokenRouter {
 
     @Bean
     @PostApiKeyApiInfo
-    public RouterFunction<ServerResponse> postApiKeyRouterFunction(@NonNull final TokenHandler tokenHandler) {
+    public RouterFunction<ServerResponse> postTokenRouterFunction(@NonNull final TokenHandler tokenHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .POST(BASE_URL)
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));

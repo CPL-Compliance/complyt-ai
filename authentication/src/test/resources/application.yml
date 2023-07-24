@@ -5,3 +5,7 @@ spring:
   data:
     mongodb:
       uuid-representation: standard
+
+
+cryption:
+  secret-key: cWrkCbX1JKCiWYFDx9DsHKqdn38QK5o3

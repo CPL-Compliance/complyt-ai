@@ -23,7 +23,7 @@ public class CryptorAesCbcPkcs5Padding implements Cryptor {
     @NonNull
     SecretKey secretKey;
 
-    public String encrypt(final @NonNull String input) throws InvalidAlgorithmParameterException, InvalidKeyException,
+    public EncryptedData encrypt(final @NonNull String input) throws InvalidAlgorithmParameterException, InvalidKeyException,
             BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
         IvParameterSpec ivParameterSpec = generateIv();
 
@@ -32,20 +32,22 @@ public class CryptorAesCbcPkcs5Padding implements Cryptor {
 
         byte[] cipherText = cipher.doFinal(input.getBytes());
 
-        return Base64.getEncoder().encodeToString(cipherText);
+        String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
+
+        return new EncryptedData(input, Base64.getEncoder().encodeToString(ivParameterSpec.getIV()), cipherTextStr);
     }
 
-    public String decrypt(final @NonNull String iv, final @NonNull String cipherText) throws IllegalBlockSizeException,
+    public String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
             BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException,
             NoSuchPaddingException, NoSuchAlgorithmException {
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(Base64.getDecoder().decode(iv));
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(Base64.getDecoder().decode(encryptedData.iv()));
 
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
 
-        byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(cipherText));
+        byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(encryptedData.cipherText()));
 
-        return Base64.getEncoder().encodeToString(plainText);
+        return new String(plainText);
     }
 
     private IvParameterSpec generateIv() {
