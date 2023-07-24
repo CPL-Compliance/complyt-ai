@@ -11,7 +11,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-    <tag>files-16.0.2</tag>
+    <tag>files-16.0.3</tag>
   </scm>
 
     <!-- Maven Coordinates -->
