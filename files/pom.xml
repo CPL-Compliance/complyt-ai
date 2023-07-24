@@ -11,12 +11,12 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-    <tag>files-16.0.4</tag>
+    <tag>HEAD</tag>
   </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
-    <version>16.0.4</version>
+    <version>16.0.5-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>files</name>
