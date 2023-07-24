@@ -271,6 +271,9 @@
                                 <name>${docker.image.prefix}/${docker.image.name}</name>
                                 <alias>complyt</alias>
                                 <build>
+                                    <buildx>
+                                            <platform>linux/amd64,linux/arm64</platform>
+                                    </buildx>
                                     <dockerFileDir>${project.basedir}/target/dockerfile/</dockerFileDir>
                                     <!--copies artifact to docker build directory in target-->
                                     <assembly>
