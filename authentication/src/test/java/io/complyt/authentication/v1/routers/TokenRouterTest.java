@@ -6,6 +6,7 @@ import io.complyt.authentication.facades.TokenFacade;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.TokenHandler;
+import io.complyt.authentication.v1.mappers.TokenMapper;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +21,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -34,9 +32,11 @@ class TokenRouterTest implements TokenRouterTestTemplate {
     @Autowired
     private TokenRouter tokenRouter;
 
-    private Token token;
+    private Token outputToken;
+    private Token inputToken;
 
-    private TokenDto tokenDto;
+    private TokenDto inputTokenDto;
+    private TokenDto outputTokenDto;
 
     @MockBean
     private TokenFacade tokenFacade;
@@ -46,19 +46,18 @@ class TokenRouterTest implements TokenRouterTestTemplate {
 
     @BeforeEach
     void setUp() {
-        tokenDto = TestUtilities.createTokenDto();
-        token = TestUtilities.createToken();
+        inputTokenDto = TestUtilities.createTokenDto();
+        outputTokenDto = TestUtilities.createOutputTokenDto(inputTokenDto.apiKey());
+        outputToken = TokenMapper.INSTANCE.tokenDtoToToken(outputTokenDto);
+        inputToken = TokenMapper.INSTANCE.tokenDtoToToken(inputTokenDto);
     }
 
     @Test
     @Override
     @WithMockUser
     public void post_Exists_Returns200() {
-        // Given
-
-
         // When
-        when(tokenFacade.get(token)).thenReturn(Mono.just(token));
+        when(tokenFacade.get(inputToken)).thenReturn(Mono.just(outputToken));
 
         // Then
         webTestClient
@@ -67,17 +66,30 @@ class TokenRouterTest implements TokenRouterTestTemplate {
                 .uri(uriBuilder -> uriBuilder
                         .path(TokenRouter.BASE_URL)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(tokenDto)
+                .bodyValue(inputTokenDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .equals(tokenDto);
+                .equals(outputTokenDto);
     }
 
     @Test
     @Override
     public void post_DoesntExist_Returns404() {
+        // When
+        when(tokenFacade.get(inputToken)).thenReturn(Mono.empty());
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(inputTokenDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test
