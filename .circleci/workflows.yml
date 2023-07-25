@@ -62,6 +62,7 @@ jobs:
       - run:
           name: Prepare Maven Release
           command: |
+            docker --version
             MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             
