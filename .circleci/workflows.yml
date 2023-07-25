@@ -46,7 +46,7 @@ jobs:
 
   maven_release_prepare_perform:
     docker:
-      - image: circleci/openjdk:8-jdk # Choose an appropriate JDK version
+      - image: cimg/openjdk:17.0.6-browsers # Choose an appropriate JDK version
 
     parameters:
       service_directory:
