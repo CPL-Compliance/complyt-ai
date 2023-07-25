@@ -44,6 +44,26 @@ parameters:
 
 jobs:
 
+  maven_release_prepare:
+    docker:
+      - image: circleci/openjdk:8-jdk # Choose an appropriate JDK version
+
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+
+      - run:
+          name: Prepare Maven Release
+          command: |
+            ./mvnw clean release:prepare -U -B
+
   package-dependency:
     parameters:
       service_directory:
