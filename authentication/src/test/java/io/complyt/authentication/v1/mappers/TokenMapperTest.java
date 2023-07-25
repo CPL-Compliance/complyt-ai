@@ -14,36 +14,40 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class TokenMapperTest {
-    private Token token;
-    private TokenDto tokenDto;
+    private Token inputToken;
+    private TokenDto inputTokenDto;
+    private Token outputToken;
+    private TokenDto outputTokenDto;
 
     @BeforeEach
     void setUp() {
-        tokenDto = TestUtilities.createTokenDto();
-        token = TestUtilities.createToken(tokenDto.apiKey());
+        inputTokenDto = TestUtilities.createTokenDto();
+        outputTokenDto = TestUtilities.createOutputTokenDto(inputTokenDto.apiKey());
+        outputToken = TestUtilities.createOutputToken(inputTokenDto.apiKey());
+        inputToken = TestUtilities.createInputToken(inputTokenDto.apiKey());
     }
 
     @Test
     void tokenToTokenDto_Token_returnTokenDto() {
         // Given
-        TokenDto givenTokenDto = tokenDto;
+        TokenDto expectedTokenDto = outputTokenDto;
 
         // When
-        TokenDto actualTokenDto = TokenMapper.INSTANCE.tokentoTokenDto(token);
+        TokenDto actualTokenDto = TokenMapper.INSTANCE.tokentoTokenDto(outputToken);
 
         // Then
-        assertEquals(givenTokenDto, actualTokenDto);
+        assertEquals(expectedTokenDto, actualTokenDto);
     }
 
     @Test
     void tokenDtoToToken_TokenDto_returnToken() {
         // Given
-        Token givenToken = token;
+        Token expectedToken = inputToken;
 
         // When
-        Token actualToken = TokenMapper.INSTANCE.tokenDtoToToken(tokenDto);
+        Token actualToken = TokenMapper.INSTANCE.tokenDtoToToken(inputTokenDto);
 
         // Then
-        assertEquals(givenToken, actualToken);
+        assertEquals(expectedToken, actualToken);
     }
 }

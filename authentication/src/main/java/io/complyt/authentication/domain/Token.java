@@ -25,7 +25,7 @@ public class Token {
     String scope;
 
     @NonNull
-    String expiresIn;
+    int expiresIn;
 
     @NonNull
     String tokenType;

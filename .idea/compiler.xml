@@ -23,8 +23,8 @@
         <module name="files" />
         <module name="sales-tax-rates" />
         <module name="discovery-service" />
-        <module name="sales-tax" />
         <module name="authentication" />
+        <module name="sales-tax" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
