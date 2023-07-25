@@ -46,8 +46,7 @@ parameters:
 jobs:
 
   maven_release_prepare_perform:
-    docker:
-      - image: cimg/openjdk:17.0.6-browsers # Choose an appropriate JDK version
+    executor: openjdk-image
 
     parameters:
       service_directory:
