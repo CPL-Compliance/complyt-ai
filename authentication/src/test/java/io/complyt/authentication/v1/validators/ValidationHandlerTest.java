@@ -36,8 +36,8 @@ class ValidationHandlerTest {
 
     @Test
     void validate_invalidTokenDto_returnsError() {
-        TokenDto customerDto = TestUtilities.createTokenDto().withApiKey("");
-        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(customerDto));
+        TokenDto tokenDto = TestUtilities.createTokenDto().withApiKey("");
+        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
         Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
 
         StepVerifier.create(validationMono).expectError().verify();
