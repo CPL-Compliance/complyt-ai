@@ -9,6 +9,10 @@
 		<version>0.1.1-SNAPSHOT</version>
 	</parent>
 
+	<scm>
+		<developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+	</scm>
+
 	<!-- Maven Coordinates -->
 	<artifactId>test-service</artifactId>
 	<version>0.0.2-SNAPSHOT</version>

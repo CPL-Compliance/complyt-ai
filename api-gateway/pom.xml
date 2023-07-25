@@ -9,6 +9,10 @@
         <version>0.1.1</version>
     </parent>
 
+    <scm>
+        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+    </scm>
+
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
     <version>0.11.0</version>
