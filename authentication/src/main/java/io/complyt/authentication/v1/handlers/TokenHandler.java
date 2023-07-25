@@ -37,7 +37,7 @@ public class TokenHandler {
                 .map(TokenMapper.INSTANCE::tokenDtoToToken)
                 .flatMap(tokenFacade::get)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
-                .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
+                .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(), log::info).thenReturn(tokenDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().body(value, TokenDto.class);
