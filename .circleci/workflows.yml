@@ -60,11 +60,6 @@ jobs:
       - checkout:
           path: ~/complyt_work_directory
 
-      - persist_to_workspace:
-          root: ~/complyt_work_directory
-          paths:
-            - <<parameters.service_directory>>/target/*.jar
-
       - run:
           name: Execute
           command: |
