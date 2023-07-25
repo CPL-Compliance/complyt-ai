@@ -46,7 +46,7 @@ parameters:
 jobs:
 
   maven_release_prepare_perform:
-    executor: openjdk-image
+    executor: maven-executor
 
     parameters:
       service_directory:
