@@ -545,7 +545,15 @@
                     <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
                     <pushChanges>true</pushChanges>
                     <autoVersionSubmodules>false</autoVersionSubmodules>
-                    <developmentVersion>${parsedVersion.majorVersion}.${parsedVersion.nextMinorVersion}.0-SNAPSHOT</developmentVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                    <autoIncrement>true</autoIncrement>
+                    <incrementMinorVersion>true</incrementMinorVersion>
                 </configuration>
             </plugin>
         </plugins>
