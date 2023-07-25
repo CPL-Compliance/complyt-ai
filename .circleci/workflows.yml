@@ -46,30 +46,47 @@ parameters:
 jobs:
 
   maven_release_prepare_perform:
-    docker:
-      - image: cimg/openjdk:20.0.1
-
+#    docker:
+#      - image: cimg/openjdk:20.0.1
     parameters:
       service_directory:
         type: string
         default: ""
 
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
 
     steps:
       - checkout:
           path: ~/complyt_work_directory
 
+      - persist_to_workspace:
+          root: ~/complyt_work_directory
+          paths:
+            - <<parameters.service_directory>>/target/*.jar
+
       - run:
-          name: Prepare Maven Release
+          name: Execute
           command: |
-            java -version
-            docker --version
             MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            
             ./mvnw clean release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
             ./mvnw release:perform -X
+
+      - run:
+          name: ECHO
+          command: echo $IMAGE_TAG
+
+#      - run:
+#          name: Prepare Maven Release
+#          command: |
+#            java -version
+#            docker --version
+#            MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+#            NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
+#
+#            ./mvnw clean release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
+#            ./mvnw release:perform -X
 
   package-dependency:
     parameters:
