@@ -552,8 +552,8 @@
 
     <scm>
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
-        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
+        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

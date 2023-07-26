@@ -9,8 +9,10 @@
         </server>
         <server>
             <id>github.com</id>
-            <password>git</password>
-            <username>git</username>
+            <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
+            <username>${GITHUB_USERNAME_CIRCLECI}</username>
+            <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
+            <url>git@github.com:idhub-io/idhub-api.git</url>
         </server>
     </servers>
 </settings>
