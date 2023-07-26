@@ -1,7 +1,6 @@
 package io.complyt.authentication.v1.handlers;
 
 import io.complyt.authentication.facades.TokenFacade;
-import io.complyt.authentication.services.TokenService;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.TokenMapper;
@@ -35,7 +34,7 @@ public class TokenHandler {
         Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info).then(tokenDtoValidationHandler.validate(serverRequest))
                 .flatMap(tokenDto -> ContextLogger.observeCtx(tokenDto.toString(), log::info).thenReturn(tokenDto))
                 .map(TokenMapper.INSTANCE::tokenDtoToToken)
-                .flatMap(tokenFacade::get)
+                .flatMap(tokenFacade::post)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(), log::info).thenReturn(tokenDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

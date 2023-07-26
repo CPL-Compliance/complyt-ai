@@ -39,8 +39,4 @@ class CryptorAesCbcPkcs5PaddingTest {
         // Then
         assertEquals(input, decrypted);
     }
-
-    @Test
-    void decrypt() {
-    }
 }

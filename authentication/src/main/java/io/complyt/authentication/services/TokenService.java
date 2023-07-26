@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -21,8 +20,12 @@ public class TokenService {
     @NonNull
     private PasswordEncoder passwordEncoder;
 
-    public Mono<Token> getByEncodedApiKey(Token token) {
+    public Mono<Token> getToken(Token token) {
         return Mono.just(passwordEncoder.encode(token.getApiKey()))
                 .flatMap(tokenRepository::findByApiKey);
+    }
+
+    public Mono<Token> saveToken(Token token) {
+        return tokenRepository.save(token);
     }
 }

@@ -1,6 +1,6 @@
 package io.complyt.authentication.repositories;
 
-import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -17,19 +17,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TokenRepository {
+public class CredentialsRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Token> findByApiKey(final @NonNull String encodedApiKey) {
+
+    public Mono<Credentials> findByApiKey(final @NonNull String encodedApiKey){
         Query query = Query.query(Criteria.where("apiKey").is(encodedApiKey));
 
-        return ContextLogger.observeCtx("Searching for token by Api Key " + encodedApiKey, log::info)
-                .then(reactiveMongoTemplate.findOne(query, Token.class));
-    }
-
-    public Mono<Token> save(final @NonNull Token token) {
-        return ContextLogger.observeCtx("Saving token: " + token, log::info)
-                .then(reactiveMongoTemplate.save(token));
+        return ContextLogger.observeCtx("Searching for credentials by apiKey " + encodedApiKey, log::info)
+                .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 }

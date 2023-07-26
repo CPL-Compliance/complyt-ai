@@ -11,17 +11,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 @ToString
 @With
-@Document(collection = "token")
-public class Token {
-
+@Document(collection = "credentials")
+public class Credentials {
     @Id
     String apiKey;
-
-    String accessToken;
-
-    String scope;
-
-    int expiresIn;
-
-    String tokenType;
+    String clientId;
+    String ClientSecret;
+    String audience;
+    String grantType;
+    String ivClientId;
+    String ivClientSecret;
 }

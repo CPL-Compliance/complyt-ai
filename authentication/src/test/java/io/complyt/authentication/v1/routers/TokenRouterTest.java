@@ -3,6 +3,7 @@ package io.complyt.authentication.v1.routers;
 import io.complyt.authentication.config.ApiExceptionConfig;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.facades.TokenFacade;
+import io.complyt.authentication.repositories.exceptions.OperationFailedException;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.TokenHandler;
@@ -21,6 +22,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -57,7 +60,7 @@ class TokenRouterTest implements TokenRouterTestTemplate {
     @WithMockUser
     public void post_Exists_Returns200() {
         // When
-        when(tokenFacade.get(inputToken)).thenReturn(Mono.just(outputToken));
+        when(tokenFacade.post(inputToken)).thenReturn(Mono.just(outputToken));
 
         // Then
         webTestClient
@@ -75,9 +78,10 @@ class TokenRouterTest implements TokenRouterTestTemplate {
 
     @Test
     @Override
+    @WithMockUser
     public void post_DoesntExist_Returns404() {
         // When
-        when(tokenFacade.get(inputToken)).thenReturn(Mono.empty());
+        when(tokenFacade.post(inputToken)).thenReturn(Mono.empty());
 
         // Then
         webTestClient
@@ -94,13 +98,37 @@ class TokenRouterTest implements TokenRouterTestTemplate {
 
     @Test
     @Override
+    @WithMockUser
     public void post_InternalServerError_Returns500() {
+        // When
+        when(tokenFacade.post(inputToken)).thenThrow(OperationFailedException.class);
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(inputTokenDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
     @Override
     public void post_NullHandler_ThrowsNullPointerException() {
+        // Given
+        TokenHandler nullTokenHandler = null;
+        TokenRouter tokenRouter = new TokenRouter();
 
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            tokenRouter.postTokenRouterFunction(nullTokenHandler);
+        });
+
+        // Then
+        assertEquals("tokenHandler is marked non-null but is null", exception.getMessage());
     }
 }
