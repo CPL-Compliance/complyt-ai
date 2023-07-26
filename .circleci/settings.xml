@@ -8,7 +8,7 @@
             <password>${DOCKER_HUB_PASSWORD}</password>
         </server>
         <server>
-            <id>github</id>
+            <id>github.com</id>
             <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
             <username>${GITHUB_USERNAME_CIRCLECI}</username>
         </server>
