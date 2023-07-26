@@ -3,6 +3,8 @@ auth0.audience: null
 eureka:
   client:
     should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 1
+    registry-fetch-interval-seconds: 15
     register-with-eureka: true
   instance:
     prefer-ip-address: false
