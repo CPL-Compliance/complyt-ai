@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -17,17 +18,17 @@ import java.util.function.Function;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataConflictChecksProvider<T> {
 
-    Map<String, BiFunction<T, ServerRequest, Mono<Boolean>>> pathVariablesChecksMap;
+    Map<String, BiFunction<T, ServerRequest, Mono<String>>> pathVariablesChecksMap;
 
-    Function<T, Mono<Boolean>> bodyConflictCheckFunction;
+    Function<T, Flux<String>> bodyConflictCheckFunction;
 
-    public Mono<BiFunction<T, ServerRequest, Mono<Boolean>>> getPathVariableCheck(@NonNull String pathVariable) {
-        BiFunction<T, ServerRequest, Mono<Boolean>> check = pathVariablesChecksMap.get(pathVariable);
-        return Mono.just(check == null ? (body, request) -> Mono.just(true) : check);
+    public Mono<BiFunction<T, ServerRequest, Mono<String>>> getPathVariableCheck(@NonNull String pathVariable) {
+        BiFunction<T, ServerRequest, Mono<String>> check = pathVariablesChecksMap.get(pathVariable);
+        return Mono.just(check == null ? (body, request) -> Mono.empty() : check);
     }
 
-    public Mono<Function<T, Mono<Boolean>>> getBodyConflictCheck() {
-        return Mono.just(bodyConflictCheckFunction == null ? (body) -> Mono.just(true) : bodyConflictCheckFunction);
+    public Mono<Function<T, Flux<String>>> getBodyConflictCheck() {
+        return Mono.just(bodyConflictCheckFunction == null ? (body) -> Flux.empty() : bodyConflictCheckFunction);
     }
 
 }

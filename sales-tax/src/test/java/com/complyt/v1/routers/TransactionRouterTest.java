@@ -557,7 +557,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message")));
+                .value(map -> testUtilities.checkErrorMessages(map,
+                        Set.of("source " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR)));
     }
 
     @Test
@@ -580,7 +581,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message")));
+                .value(map -> testUtilities.checkErrorMessages(map,
+                        Set.of("externalId " + DtoErrorMessages.CONFLICTED_WITH_URL_ERROR)));
     }
 
     @Test
@@ -776,43 +778,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"complytId\": \"" + invalidComplytId + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"complytId\": \"" + invalidComplytId + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -1953,42 +1955,42 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"" + invalidCustomerId + "\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"" + invalidCustomerId + "\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2053,7 +2055,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         TransactionDto givenTransactionDto = transactionDto.withDocumentName(
-               null
+                null
         );
 
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
@@ -2097,44 +2099,44 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"documentName\": \"" + documentName + "\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                                "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                                "       \"updatedDate\": \"2023-01-24T08:00:00.000Z\"\n" +
-                                "   }\n" +
-                        "   \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"documentName\": \"" + documentName + "\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\": \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n" +
+                           "   \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2160,44 +2162,44 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"documentName\": \"" + documentName + "\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\": \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n" +
-                        "   \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"documentName\": \"" + documentName + "\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\": \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n" +
+                           "   \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2255,39 +2257,39 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"\n" +
-                        "   \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"\n" +
+                           "   \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2313,41 +2315,41 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2372,41 +2374,41 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2430,42 +2432,42 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2489,42 +2491,42 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"createdDate\":  \"\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2549,43 +2551,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-29T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-29T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2610,43 +2612,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-29T02:00:00\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-29T02:00:00\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -2772,43 +2774,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3037,43 +3039,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3098,43 +3100,43 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3193,45 +3195,45 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3256,45 +3258,45 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3318,46 +3320,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3381,46 +3383,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"createdDate\":  \"\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"createdDate\":  \"\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3445,46 +3447,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-02-29T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-29T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-02-29T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-29T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3509,46 +3511,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-02-29T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3641,46 +3643,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.9999999999\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.9999999999\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3705,46 +3707,46 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\",\n" +
-                        "    \"externalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
-                        "   },\n" +
-                        "    \"internalTimestamps\":  {\n" +
-                        "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                        "       \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\"\n" +
-                        "   }\n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\",\n" +
+                           "    \"externalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.000Z\"\n" +
+                           "   },\n" +
+                           "    \"internalTimestamps\":  {\n" +
+                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
+                           "       \"updatedDate\":  \"2023-01-24T08:00:00.0000000000Z\"\n" +
+                           "   }\n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -3973,47 +3975,47 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"internalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"internalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00+18:01\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    },\n" +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -4038,47 +4040,47 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                        "   \"source\": \"" + source + "\",\n" +
-                        "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                        "   \"items\": [\n" +
-                        "        {\n" +
-                        "            \"unitPrice\": 25,\n" +
-                        "            \"totalPrice\": 5000,\n" +
-                        "            \"name\": \"HW Installation Services\",\n" +
-                        "            \"quantity\": 200,\n" +
-                        "            \"description\": \"wd\",\n" +
-                        "            \"taxCode\": \"C1S1\",\n" +
-                        "            \"manualSalesTax\": false,\n" +
-                        "            \"manualSalesTaxRate\": 0\n" +
-                        "        }\n" +
-                        "    ],\n" +
-                        "    \"shippingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"billingAddress\": {\n" +
-                        "        \"city\": \"City\",\n" +
-                        "        \"country\": \"Country\",\n" +
-                        "        \"county\": \"County\",\n" +
-                        "        \"state\": \"CA\",\n" +
-                        "        \"street\": \"Street\",\n" +
-                        "        \"zip\": \"Zip\"\n" +
-                        "    },\n" +
-                        "    \"transactionType\": \"INVOICE\",\n" +
-                        "    \"transactionStatus\": \"ACTIVE\"," +
-                        "    \"internalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
-                        "    },\n" +
-                        "    \"externalTimestamps\": {\n" +
-                        "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
-                        "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    }\n" +
-                        " \n}")
+                           "   \"source\": \"" + source + "\",\n" +
+                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
+                           "   \"items\": [\n" +
+                           "        {\n" +
+                           "            \"unitPrice\": 25,\n" +
+                           "            \"totalPrice\": 5000,\n" +
+                           "            \"name\": \"HW Installation Services\",\n" +
+                           "            \"quantity\": 200,\n" +
+                           "            \"description\": \"wd\",\n" +
+                           "            \"taxCode\": \"C1S1\",\n" +
+                           "            \"manualSalesTax\": false,\n" +
+                           "            \"manualSalesTaxRate\": 0\n" +
+                           "        }\n" +
+                           "    ],\n" +
+                           "    \"shippingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"billingAddress\": {\n" +
+                           "        \"city\": \"City\",\n" +
+                           "        \"country\": \"Country\",\n" +
+                           "        \"county\": \"County\",\n" +
+                           "        \"state\": \"CA\",\n" +
+                           "        \"street\": \"Street\",\n" +
+                           "        \"zip\": \"Zip\"\n" +
+                           "    },\n" +
+                           "    \"transactionType\": \"INVOICE\",\n" +
+                           "    \"transactionStatus\": \"ACTIVE\"," +
+                           "    \"internalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00+18:01\"\n" +
+                           "    },\n" +
+                           "    \"externalTimestamps\": {\n" +
+                           "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
+                           "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    }\n" +
+                           " \n}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)

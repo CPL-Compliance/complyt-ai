@@ -324,9 +324,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    assertEquals(GenericErrorMessages.DATA_CONFLICT_ERROR, map.get("message"));
-                });
+                .value(map -> testUtilities.checkErrorMessages(map,
+                        Set.of("state " + DtoErrorMessages.STATE_CONFLICTED_WITH_URL_ERROR)));
     }
 
     @Test

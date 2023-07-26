@@ -15,4 +15,6 @@ public interface StringErrorMessages {
     String MINMAX_100_ERROR = "should be 1-100 characters maximum";
 
     String MINMAX_50_ERROR = "should be 1-50 characters maximum";
+
+    String NON_PARTIAL_ERROR = "in a non partial address";
 }
