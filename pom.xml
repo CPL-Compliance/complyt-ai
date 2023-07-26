@@ -539,7 +539,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven-release-plugin.version}</version>
                 <configuration>
-                    <connectionType>ssh</connectionType>
                     <releaseProfiles>release</releaseProfiles>
                     <checkModificationExcludes>true</checkModificationExcludes>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
