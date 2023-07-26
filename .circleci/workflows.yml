@@ -60,9 +60,9 @@ jobs:
       - checkout:
           path: ~/complyt_work_directory
 
-#      - add_ssh_keys:
-#          fingerprints:
-#            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
+      - add_ssh_keys:
+          fingerprints:
+            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
 
       - run:
           name: Execute
@@ -70,7 +70,6 @@ jobs:
             docker info
             MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            git remote -v
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 #            ./mvnw clean release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
