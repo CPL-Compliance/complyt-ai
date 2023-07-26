@@ -8,13 +8,9 @@
             <password>${DOCKER_HUB_PASSWORD}</password>
         </server>
         <server>
-            <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
-            <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-            <url>git@github.com:idhub-io/idhub-api.git</url>
-            <tag>HEAD</tag>
             <id>github</id>
-            <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
-            <username>${GITHUB_USERNAME_CIRCLECI}</username>
+            <password>advassraf95</password>
+            <username>eyalTam</username>
         </server>
     </servers>
 </settings>
