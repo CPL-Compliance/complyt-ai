@@ -60,9 +60,9 @@ jobs:
       - checkout:
           path: ~/complyt_work_directory
 
-#      - add_ssh_keys:
-#          fingerprints:
-#            - "7f:28:78:67:0b:ff:ff:c9:f3:87:8c:4c:6a:3e:d0:81"
+      - add_ssh_keys:
+          fingerprints:
+            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
 
 
       - run:

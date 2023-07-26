@@ -11,8 +11,6 @@
             <id>github.com</id>
             <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
             <username>${GITHUB_USERNAME_CIRCLECI}</username>
-<!--            <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>-->
-<!--            <url>git@github.com:idhub-io/idhub-api.git</url>-->
         </server>
     </servers>
 </settings>
