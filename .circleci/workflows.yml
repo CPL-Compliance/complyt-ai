@@ -65,7 +65,7 @@ jobs:
           command: |
             MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
+            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 #            ./mvnw clean release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
 #            ./mvnw release:perform -X
