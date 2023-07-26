@@ -15,9 +15,3 @@ workflows:
             discovery-service/.* run-discovery-service-workflow true
             sales-tax-rates/.* run-sales-tax-rates-workflow true
           config-path: .circleci/workflows.yml
-
-      - deploy-job:
-          steps:
-            - add_ssh_keys:
-                fingerprints:
-                  - "7f:28:78:67:0b:ff:ff:c9:f3:87:8c:4c:6a:3e:d0:81"
