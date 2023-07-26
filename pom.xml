@@ -545,6 +545,7 @@
                     <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
                     <pushChanges>true</pushChanges>
                     <autoVersionSubmodules>false</autoVersionSubmodules>
+                    <connectionUrl>scm:git:git@github.com:Complyt/complyt.git</connectionUrl>
                 </configuration>
             </plugin>
         </plugins>
