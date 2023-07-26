@@ -9,7 +9,7 @@
         </server>
         <server>
             <id>github.com</id>
-            <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
+            <password>git</password>
             <username>git</username>
         </server>
     </servers>
