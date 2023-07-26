@@ -240,13 +240,13 @@ spring:
         # ==== Sales Tax Rates Service ====
         # ==== Authentication Service ====
         # ---- ApiKey ----
-        - id: authentication-post-api-key
+        - id: authentication-post-token
           uri: lb://authentication
           predicates:
             - Method=POST
-            - Path=/v1/api_key
+            - Path=/v1/token
           filters:
-            - SetPath=/v1/api_key
+            - SetPath=/v1/token
         # ---- ApiKey ----
         # ==== Authentication Service ====
       default-filters:

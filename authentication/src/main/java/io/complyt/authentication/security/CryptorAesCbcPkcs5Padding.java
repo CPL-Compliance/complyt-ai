@@ -34,7 +34,7 @@ public class CryptorAesCbcPkcs5Padding implements Cryptor {
 
         String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
 
-        return new EncryptedData(input, Base64.getEncoder().encodeToString(ivParameterSpec.getIV()), cipherTextStr);
+        return new EncryptedData(Base64.getEncoder().encodeToString(ivParameterSpec.getIV()), cipherTextStr);
     }
 
     public String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,

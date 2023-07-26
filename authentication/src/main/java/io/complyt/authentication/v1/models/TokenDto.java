@@ -9,7 +9,7 @@ import lombok.With;
 @With
 @Schema(name = "Token", description = FieldsDescriptions.TOKEN)
 public record TokenDto(
-        @Size(min = 30, max = 128, message = "apiKey should be between 30 and 129 characters.") @NotNull(message = "apiKeyLink shouldn't be blank") String apiKey,
+        @Size(min = 30, max = 128, message = "apiKey should be between 30 and 129 characters.") @NotNull(message = "apiKey shouldn't be blank") String apiKey,
         String accessToken,
         String scope,
         int expiresIn,
