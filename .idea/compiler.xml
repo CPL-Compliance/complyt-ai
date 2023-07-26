@@ -11,7 +11,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="test-service" />
         <module name="sales-tax-rates" />
         <module name="discovery-service" />
         <module name="sales-tax" />
@@ -35,6 +34,7 @@
       <module name="naming-server" target="17" />
       <module name="salestax" target="17" />
       <module name="temp" target="17" />
+      <module name="test-service" target="17" />
       <module name="testService" target="17" />
       <module name="testToRemove" target="17" />
     </bytecodeTargetLevel>

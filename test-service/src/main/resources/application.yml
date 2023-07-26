@@ -1,9 +1,0 @@
-spring:
-  application:
-    name: test-application
-  profiles:
-    active:
-      - @activeEnv@
-
-server:
-  port: 9876
