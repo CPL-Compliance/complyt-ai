@@ -9,8 +9,8 @@
         </server>
         <server>
             <id>github</id>
-            <password>advassraf95</password>
-            <username>eyalTam</username>
+            <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
+            <username>${GITHUB_USERNAME_CIRCLECI}</username>
         </server>
     </servers>
 </settings>
