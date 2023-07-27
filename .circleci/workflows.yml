@@ -59,9 +59,9 @@ jobs:
       - run:
           command: |
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
-            echo "HELLOWORLD=HELLO" >> $BASH_ENV
+            export IMAGE_TAG=$image_tag
             # echo "export IMAGE_TAG=$image_tag" >> $BASH_ENV
-            printenv HELLOWORLD
+            env
             cp $BASH_ENV bash.env
 
       - run:
