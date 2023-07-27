@@ -13,12 +13,12 @@ public interface BodyCheckConfig {
     Function<TransactionDto, Flux<String>> TRANSACTION_BODY_CHECK = transactionDto ->
             transactionDto.shippingAddress().isPartial() ? Flux.empty() :
                     Flux.just(transactionDto.shippingAddress()).flatMap(address ->
-                            Flux.concat(checkVariableNotNull(address.street(), addressErrorBuilder("street")),
-                                    checkVariableNotNull(address.city(), addressErrorBuilder("city")),
-                                    checkVariableNotNull(address.country(), addressErrorBuilder("country"))));
+                            Flux.concat(checkVariableNotNull(address.street(), addressErrorBuilder("Address.street")),
+                                    checkVariableNotNull(address.city(), addressErrorBuilder("Address.city")),
+                                    checkVariableNotNull(address.country(), addressErrorBuilder("Address.country"))));
 
-    private static Mono<String> checkVariableNotNull(String variable, String error) {
-        return variable != null ? Mono.empty() : Mono.just(error);
+    private static Mono<String> checkVariableNotNull(String variable, String errorMessage) {
+        return variable != null ? Mono.empty() : Mono.just(errorMessage);
     }
 
     private static String addressErrorBuilder(String field) {
