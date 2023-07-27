@@ -13,7 +13,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.2</version>
     <!-- Maven Coordinates -->
 
     <!--    Don't change modules order! It's necessary for system tests-->
@@ -22,7 +22,6 @@
         <module>sales-tax-rates</module>
         <module>sales-tax</module>
         <module>files</module>
-        <module>test-service</module>
         <module>api-gateway</module>
     </modules>
 
