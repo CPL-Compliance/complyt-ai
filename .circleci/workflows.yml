@@ -198,6 +198,7 @@ jobs:
           name: eyal
           command: |
             cat bash.env
+            echo  "__----------_"
             env
 
 #      - run:
@@ -254,29 +255,8 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "files"
-
-      - deploy:
-          filters:
-            branches:
-              only:
-                - eyal/com-235-api-micro-services-versioning-management
-          service_directory: "files"
-
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - deploy
-          service_directory: "files"
 
       - maven_release_prepare_perform:
-          requires:
-            - verify
           service_directory: "files"
 
       - update-ecs-service:
