@@ -193,9 +193,9 @@ jobs:
       - run:
           name: eyal
           command: |
-            cat bash.env >> $BASH_ENV
-            echo $BASH_ENV
-            echo $IMAGE_TAG
+            cat bash.env
+            env
+
       - checkout:
           path: ~/complyt_work_directory
 #      - run:
