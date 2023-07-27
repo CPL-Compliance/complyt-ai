@@ -62,7 +62,7 @@ jobs:
 
       - add_ssh_keys:
           fingerprints:
-            - GITHUB_FINGER_PRINT
+            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
 
       - run:
           name: Execute
