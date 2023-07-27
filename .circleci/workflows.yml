@@ -251,15 +251,15 @@ workflows:
             - deploy
           service_directory: "files"
 
-      - maven_release_prepare_perform:
-          requires:
-            - verify
-          service_directory: "files"
-
       - update-ecs-service:
           requires:
             - verify
           service_name: "files"
+
+      - maven_release_prepare_perform:
+          requires:
+            - update-ecs-service
+          service_directory: "files"
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
