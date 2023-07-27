@@ -6,16 +6,17 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
+        <version>0.1.1</version>
     </parent>
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
-    <version>1.19.2-SNAPSHOT</version>
+    <version>1.19.3-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>files</name>
