@@ -11,8 +11,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
-        <module name="files" />
       </profile>
       <profile name="Annotation profile for Complyt" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -24,8 +22,10 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
-        <module name="discovery-service" />
+        <module name="api-gateway" />
+        <module name="files" />
         <module name="sales-tax-rates" />
+        <module name="discovery-service" />
         <module name="sales-tax" />
       </profile>
     </annotationProcessing>
@@ -41,11 +41,11 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="api-gateway" options="" />
+      <module name="api-gateway" options="-parameters" />
       <module name="complyt" options="" />
       <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
-      <module name="files" options="" />
+      <module name="files" options="-parameters" />
       <module name="naming-server" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
       <module name="sales-tax-rates" options="-parameters" />
