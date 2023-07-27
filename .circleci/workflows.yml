@@ -187,7 +187,11 @@ jobs:
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
 
     executor: python-image
+
     steps:
+      - checkout:
+          path: ~/complyt_work_directory
+
       - attach_workspace:
           at: .
       - run:
@@ -196,8 +200,6 @@ jobs:
             cat bash.env
             env
 
-      - checkout:
-          path: ~/complyt_work_directory
 #      - run:
 #          name: Set up image tag
 #          command: |
