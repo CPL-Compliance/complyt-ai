@@ -11,7 +11,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-    </scm>
+  </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>files</artifactId>
