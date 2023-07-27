@@ -250,9 +250,6 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
     @Test
     @Override
     public void getAll_UnauthenticatedUser_Returns401() {
-        // Given
-        List<TransactionDto> allTransactionsWithNoId = new ArrayList<>();
-
         // When
         when(transactionFacade.getAll()).thenReturn(Flux.empty());
 
@@ -519,10 +516,10 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
 
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR,
                 "Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR,
-                "source " + DtoErrorMessages.NOT_NULL_ERROR));
+                "source " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -648,8 +645,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String blankSource = "";
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "source " + StringErrorMessages.SINGLE_DIGIT_ERROR);
 
         // When + Then
         webTestClient
@@ -721,8 +718,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String blankExternalId = "";
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "externalId " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "externalId " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -1192,8 +1189,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "shippingAddress " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1217,8 +1214,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient
@@ -1242,8 +1239,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient
@@ -1267,8 +1264,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1292,8 +1289,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient
@@ -1317,8 +1314,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1342,8 +1339,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -1367,8 +1364,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1392,8 +1389,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1417,8 +1414,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.street " + StringErrorMessages.MINMAX_200_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.street " + StringErrorMessages.MINMAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -1442,8 +1439,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -1468,8 +1465,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCounty(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.county " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.county " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1493,8 +1490,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -1518,8 +1515,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCountry(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -1543,8 +1540,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCity(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1568,8 +1565,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withState(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1593,8 +1590,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withStreet(testUtilities.stringWithLength(201));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.street" + StringErrorMessages.MINMAX_200_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.street" + StringErrorMessages.MINMAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -1618,8 +1615,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.county " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.county " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1643,8 +1640,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -1668,8 +1665,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -1693,8 +1690,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1718,8 +1715,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1743,8 +1740,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.street " + StringErrorMessages.MINMAX_200_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.street " + StringErrorMessages.MINMAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -1771,8 +1768,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withState(null)
                 .withPartial(true);
 
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1799,8 +1796,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withZip(null)
                 .withPartial(true);
 
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1823,8 +1820,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "transactionType " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "transactionType " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1847,9 +1844,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "items " + DtoErrorMessages.NOT_NULL_ERROR,
-                "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR));
+                "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR);
 
         // When + Then
         webTestClient
@@ -1872,8 +1869,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "items" + DtoErrorMessages.LIST_NOT_EMPTY_ERROR);
 
         // When + Then
         webTestClient
@@ -1897,8 +1894,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         SalesTaxDto salesTax = new SalesTaxDto(-0.1f, testUtilities.createSalesTaxRatesDto());
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -1922,8 +1919,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String lengthOf257CreatedFrom = testUtilities.stringWithLength(257);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "createdFrom " + StringErrorMessages.MAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "createdFrom " + StringErrorMessages.MAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -2031,9 +2028,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withAddress(new OptionalAddressDto(lengthOf101City, "country", null, "state", "street", "zip", false));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -2089,8 +2086,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String documentName = "";
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "documentName " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "documentName " + StringErrorMessages.MINMAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -2152,8 +2149,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String documentName = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "documentName " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "documentName " + StringErrorMessages.MINMAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -2247,8 +2244,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -2304,9 +2301,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -2364,9 +2360,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2423,8 +2418,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2482,8 +2477,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -2541,8 +2536,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -2602,8 +2597,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -2764,8 +2759,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3029,8 +3024,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3090,8 +3085,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -3185,9 +3180,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.NOT_NULL_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3248,9 +3242,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR,
-                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.NOT_NULL_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3311,8 +3304,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3374,8 +3367,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3437,9 +3430,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR
-        ));
+        );
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3501,9 +3494,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR
-        ));
+        );
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3633,9 +3626,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR
-        ));
+        );
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3697,9 +3690,9 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR
-        ));
+        );
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -3965,8 +3958,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.createdDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -4030,8 +4023,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         // Given
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "Timestamps.updatedDate " + DtoErrorMessages.DATE_FORMAT_ERROR);
 
         // When + Then
         webTestClient
@@ -4097,8 +4090,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
                 new TimestampsDto(
                         transactionDto.internalTimestamps().createdDate(),
-                        "2023-03-27"
-                ));
+                        "2023-03-27"));
 
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
@@ -4128,8 +4120,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         TransactionDto givenTransactionDto = transactionDto.withInternalTimestamps(
                 new TimestampsDto("2023-03-27",
-                        transactionDto.internalTimestamps().updatedDate()
-                ));
+                        transactionDto.internalTimestamps().updatedDate()));
 
         Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(givenTransactionDto);
         TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
@@ -4193,7 +4184,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(-25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        Set<String> expectedErrors = new HashSet<>(List.of("Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
+        Set<String> expectedErrors = Set.of("Item.unitPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4218,7 +4209,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, -200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        Set<String> expectedErrors = new HashSet<>(List.of("Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
+        Set<String> expectedErrors = Set.of("Item.quantity " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4243,7 +4234,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, -5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        Set<String> expectedErrors = new HashSet<>(List.of("Item.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
+        Set<String> expectedErrors = Set.of("Item.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4268,9 +4259,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", null, "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.name " + DtoErrorMessages.NOT_NULL_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.name " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -4283,9 +4273,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4297,9 +4285,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", "", "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.name " + StringErrorMessages.MINMAX_256_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.name " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -4312,9 +4299,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4326,9 +4311,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", testUtilities.stringWithLength(257), "C1S1", null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.name " + StringErrorMessages.MINMAX_256_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.name " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -4341,9 +4325,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4355,9 +4337,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", null, null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.taxCode " + DtoErrorMessages.NOT_NULL_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.taxCode " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -4370,9 +4351,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4384,9 +4363,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", testUtilities.stringWithLength(257), null, null, false, 0, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.taxCode " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -4399,9 +4377,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4413,9 +4389,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, -0.5f, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4428,9 +4403,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4442,9 +4415,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         itemList.add(new ItemDto(25, 200, 5000, "desc", "HW Installation Services", "C1S1", null, null, false, 0.5f, null, null));
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "Item.manualSalesTaxRate" + NumericErrorMessages.DECIMAL_MAX_02_ERROR);
 
         // When + Then
         webTestClient
@@ -4468,9 +4440,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, -0.5f, 5000, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4494,9 +4465,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, -5000, null, testUtilities.createSalesTaxRatesDto(), "C1S1", null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "ShippingFee.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR);
 
         // When + Then
         webTestClient
@@ -4509,9 +4479,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4522,9 +4490,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), null, null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + DtoErrorMessages.NOT_NULL_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "ShippingFee.taxCode " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -4537,9 +4504,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> {
-                    testUtilities.checkErrorMessages(map, expectedErrors);
-                });
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -4550,9 +4515,8 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         ShippingFeeDto givenShippingFee = new ShippingFeeDto(false, 0.1f, 5000, null, testUtilities.createSalesTaxRatesDto(), testUtilities.stringWithLength(257), null, null);
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "ShippingFee.taxCode " + StringErrorMessages.MAX_256_ERROR));
-
+        Set<String> expectedErrors = Set.of(
+                "ShippingFee.taxCode " + StringErrorMessages.MAX_256_ERROR);
 
         // When + Then
         webTestClient
