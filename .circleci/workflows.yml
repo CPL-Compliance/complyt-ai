@@ -59,8 +59,12 @@ jobs:
       - run:
           name: Execute
           command: |
+            image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
+            echo "IMAGE_TAG=image_tag" >> $BASH_ENV
+            echo $IMAGE_TAG
             MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
+            
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 
@@ -178,12 +182,12 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
-      - run:
-          name: Set up image tag
-          command: |
-            image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
-            echo "export IMAGE_TAG=$(echo "$image_tag")" >> "$BASH_ENV"
-            source $BASH_ENV
+#      - run:
+#          name: Set up image tag
+#          command: |
+#            image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
+#            echo "export IMAGE_TAG=$(echo "$image_tag")" >> "$BASH_ENV"
+#            source $BASH_ENV
       - run:
           name: test
           command: echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
@@ -251,15 +255,17 @@ workflows:
             - deploy
           service_directory: "files"
 
-      - update-ecs-service:
-          requires:
-            - verify
-          service_name: "files"
-
       - maven_release_prepare_perform:
           requires:
-            - update-ecs-service
+            - verify
           service_directory: "files"
+
+      - update-ecs-service:
+          requires:
+            - maven_release_prepare_perform
+          service_name: "files"
+
+
 
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
