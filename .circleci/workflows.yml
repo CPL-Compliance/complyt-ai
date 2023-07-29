@@ -200,6 +200,7 @@ jobs:
           command: |
             image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
             export IMAGE_TAG=$image_tag
+            env
             echo "container=<<parameters.service_name>>-container, tag=${image_tag}"
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
@@ -207,7 +208,7 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: "production"
-          container-image-name-updates: "container=<<parameters.service_name>>-container, tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)"
+          container-image-name-updates: "container=<<parameters.service_name>>-container, tag= ${IMAGE_TAG}"
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
