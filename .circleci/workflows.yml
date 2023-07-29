@@ -194,21 +194,21 @@ jobs:
 
       - attach_workspace:
           at: .
-      - run:
-          name: eyal
-          command: |
-            cat bash.env
-            echo  "__----------_"
-            env
-            
-            echo "--------------"
-            
-            my_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
-            echo $my_tag
-            export IMAGE_TAG=$my_tag
-            
-            echo "--------------"
-            echo $IMAGE_TAG
+#      - run:
+#          name: eyal
+#          command: |
+#            cat bash.env
+#            echo  "__----------_"
+#            env
+#
+#            echo "--------------"
+#
+#            my_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
+#            echo $my_tag
+#            export IMAGE_TAG=$my_tag
+#
+#            echo "--------------"
+#            echo $IMAGE_TAG
 
 #      - run:
 #          name: Set up image tag
@@ -219,7 +219,9 @@ jobs:
 
       - run:
           name: test
-          command: echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
+          command: |
+            image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
+            echo "container=<<parameters.service_name>>-container, tag=${image_tag}"
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
