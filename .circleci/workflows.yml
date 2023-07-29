@@ -200,16 +200,16 @@ jobs:
           command: |
             image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
             env
-            X="container=<<parameters.service_name>>-container, tag=${image_tag}"
-            echo $X
-            echo "export TASK_DEFINITION_ARN='${X}'" >> $BASH_ENV
+            task_definition_image="container=<<parameters.service_name>>-container, tag=${image_tag}"
+            echo "task definitions image: ${task_definition_image}"
+            echo "export TASK_DEFINITION_IMAGE='${task_definition_image}'" >> $BASH_ENV
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - aws-ecs/update-service:
           cluster-name: "production"
-          container-image-name-updates: ${TASK_DEFINITION_ARN}
+          container-image-name-updates: ${TASK_DEFINITION_IMAGE}
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
