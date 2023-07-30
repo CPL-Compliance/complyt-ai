@@ -4,7 +4,7 @@ import com.complyt.v1.config.BodyCheckConfig;
 import com.complyt.v1.model.AddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
@@ -23,9 +23,9 @@ public class BodyCheckConfigTest {
         AddressDto addressToCheck = addressDto.withPartial(true);
 
         // When + Then
-        Mono<Boolean> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
+        Flux<String> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
 
-        StepVerifier.create(isValid).expectNext(true).verifyComplete();
+        StepVerifier.create(isValid).expectNextCount(0).verifyComplete();
     }
 
     @Test
@@ -34,9 +34,9 @@ public class BodyCheckConfigTest {
         AddressDto addressToCheck = addressDto.withStreet(null);
 
         // When + Then
-        Mono<Boolean> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
+        Flux<String> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
 
-        StepVerifier.create(isValid).expectNext(false).verifyComplete();
+        StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -45,9 +45,9 @@ public class BodyCheckConfigTest {
         AddressDto addressToCheck = addressDto.withCity(null);
 
         // When + Then
-        Mono<Boolean> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
+        Flux<String> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
 
-        StepVerifier.create(isValid).expectNext(false).verifyComplete();
+        StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -56,9 +56,9 @@ public class BodyCheckConfigTest {
         AddressDto addressToCheck = addressDto.withCountry(null);
 
         // When + Then
-        Mono<Boolean> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
+        Flux<String> isValid = BodyCheckConfig.ADDRESS_BODY_CHECK.apply(addressToCheck);
 
-        StepVerifier.create(isValid).expectNext(false).verifyComplete();
+        StepVerifier.create(isValid).expectNextCount(1).verifyComplete();
     }
 
 }

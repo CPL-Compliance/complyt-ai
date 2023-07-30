@@ -2,6 +2,7 @@ package integration.scenarios;
 
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
+import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
@@ -169,7 +170,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .exchange()
                                 .expectStatus().isBadRequest()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), GenericErrorMessages.DATA_CONFLICT_ERROR)));
+                                .value(map -> assertEquals(map.get("message"), "[" + DtoErrorMessages.COMPLYT_ID_IN_A_NEW_RECORD_ERROR + "]")));
     }
 
     @Order(1)
@@ -204,7 +205,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .exchange()
                                 .expectStatus().isBadRequest()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), GenericErrorMessages.DATA_CONFLICT_ERROR)));
+                                .value(map -> assertEquals(map.get("message"), "[" + DtoErrorMessages.COMPLYT_ID_IN_A_NEW_RECORD_ERROR + "]")));
 
     }
 
@@ -240,7 +241,7 @@ public class MultiTenancyIT extends TestContainersInitializerIT implements Multi
                                 .exchange()
                                 .expectStatus().isBadRequest()
                                 .expectBody(LinkedHashMap.class)
-                                .value(map -> assertEquals(map.get("message"), GenericErrorMessages.DATA_CONFLICT_ERROR)));
+                                .value(map -> assertEquals(map.get("message"), "[" + DtoErrorMessages.COMPLYT_ID_IN_A_NEW_RECORD_ERROR + "]")));
 
     }
 
