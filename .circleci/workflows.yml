@@ -144,10 +144,6 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
-      - persist_to_workspace:
-          root: .
-          paths:
-            - bash.env
       - add_ssh_keys:
           fingerprints:
             - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
@@ -167,6 +163,10 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bash.env
 
   update-ecs-service:
     parameters:
