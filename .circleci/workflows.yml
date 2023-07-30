@@ -259,7 +259,7 @@ workflows:
 
       - update-ecs-service:
           requires:
-            - maven_release_prepare_perform
+            - maven_release
           service_name: "files"
 
 
