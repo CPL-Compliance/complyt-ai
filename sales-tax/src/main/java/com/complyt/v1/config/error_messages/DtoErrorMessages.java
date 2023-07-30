@@ -16,9 +16,9 @@ public interface DtoErrorMessages {
 
     String COMPLYT_ID_IN_A_NEW_RECORD_ERROR = "new record cannot have a complytId field";
 
-    String NON_PARTIAL_ERROR = "in a non partial address";
+    String NON_PARTIAL_ERROR_SUFFIX = "in a non partial address"; // Appended to other errors messages
 
     String DATE_FORMAT_ERROR = "is in an illegal format - " +
-            "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
+                               "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;
 
 }
