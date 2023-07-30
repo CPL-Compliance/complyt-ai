@@ -38,43 +38,6 @@ parameters:
 
 jobs:
 
-  maven_release:
-    parameters:
-      service_directory:
-        type: string
-        default: ""
-
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-    executor: ubuntu-vm
-
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-
-      - add_ssh_keys:
-          fingerprints:
-            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
-
-      - run:
-          name: Export image tag
-          command: |
-            image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
-            export IMAGE_TAG=$image_tag
-            env >> bash.env
-
-      - run:
-          name: Release
-          command: |
-            PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-            NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
-            ./mvnw --settings ../.circleci/settings.xml release:perform -X
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - bash.env
-
   package-dependency:
     parameters:
       service_directory:
@@ -170,6 +133,41 @@ jobs:
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
+  maven_release:
+    parameters:
+      service_directory:
+        type: string
+        default: ""
+    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
+    executor: ubuntu-vm
+
+    steps:
+      - checkout:
+          path: ~/complyt_work_directory
+      - add_ssh_keys:
+          fingerprints:
+            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
+
+      - run:
+          name: Export image tag
+          command: |
+            image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
+            export IMAGE_TAG=$image_tag
+            env >> bash.env
+
+      - run:
+          name: Release
+          command: |
+            PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+            NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
+            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
+            ./mvnw --settings ../.circleci/settings.xml release:perform -X
+
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - bash.env
+
   update-ecs-service:
     parameters:
       service_name:
@@ -234,34 +232,34 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "files"
-
-      - deploy:
-          filters:
-            branches:
-              only:
-                - main
-          service_directory: "files"
-
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - deploy
-          service_directory: "files"
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "files"
+#
+#      - deploy:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          service_directory: "files"
+#
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#            - deploy
+#          service_directory: "files"
 
       - maven_release:
           service_directory: "files"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - send-test-coverage-reports
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          requires:
+#            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
@@ -312,6 +310,15 @@ workflows:
             - verify
             - deploy
           service_directory: "api-gateway"
+
+      - maven_release:
+          service_directory: "api-gateway"
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
