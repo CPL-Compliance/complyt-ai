@@ -12,53 +12,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @Configuration
 public class ValidatorConfig {
 
     @Bean
     ValidationHandler<CustomerDto, SpringValidatorAdapter> customerDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-
-        Map<String, BiFunction<?, ServerRequest, Mono<String>>> map = new HashMap<>();
-        map.put("source", CustomerDto.SOURCE_CONFLICT_CHECK);
-        map.put("externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK);
-
-        return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter, new DataConflictChecksProvider(map, null));
+        return new ValidationHandler<>(CustomerDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "source", CustomerDto.SOURCE_CONFLICT_CHECK,
+                        "externalId", CustomerDto.EXTERNAL_ID_CONFLICT_CHECK),
+                        null));
     }
 
     @Bean
     ValidationHandler<TransactionDto, SpringValidatorAdapter> transactionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-
-        Map<String, BiFunction<?, ServerRequest, Mono<String>>> variableConflictChecksMap = Map.of(
-                "source", TransactionDto.SOURCE_CONFLICT_CHECK,
-                "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK
-        );
-
-        return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, BodyCheckConfig.TRANSACTION_BODY_CHECK));
+        return new ValidationHandler<>(TransactionDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "source", TransactionDto.SOURCE_CONFLICT_CHECK,
+                        "externalId", TransactionDto.EXTERNAL_ID_CONFLICT_CHECK),
+                        BodyCheckConfig.TRANSACTION_BODY_CHECK));
     }
 
     @Bean
     ValidationHandler<ExemptionDto, SpringValidatorAdapter> exemptionDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-
-        Map<String, BiFunction<?, ServerRequest, Mono<String>>> variableConflictChecksMap = new HashMap<>();
-        variableConflictChecksMap.put("complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK);
-
-        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, null));
+        return new ValidationHandler<>(ExemptionDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "complytId", ComplytIdCheckable.COMPLYT_ID_CONFLICT_CHECK),
+                        null));
     }
 
     @Bean
     ValidationHandler<SalesTaxTrackingDto, SpringValidatorAdapter> salesTaxTrackingDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
-
-        Map<String, BiFunction<?, ServerRequest, Mono<String>>> variableConflictChecksMap = new HashMap<>();
-        variableConflictChecksMap.put("state", StateCheckable.STATE_CONFLICT_CHECK);
-
-        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter, new DataConflictChecksProvider(variableConflictChecksMap, null));
+        return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(
+                        "state", StateCheckable.STATE_CONFLICT_CHECK),
+                        null));
     }
 }
