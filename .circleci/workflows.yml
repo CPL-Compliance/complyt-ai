@@ -248,20 +248,20 @@ workflows:
                 - main
           service_directory: "files"
 
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - deploy
-#          service_directory: "files"
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "files"
 
       - maven_release:
           service_directory: "files"
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - send-test-coverage-reports
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
