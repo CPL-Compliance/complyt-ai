@@ -39,7 +39,7 @@ parameters:
 
 jobs:
 
-  maven_release_prepare_perform:
+  maven_release:
     parameters:
       service_directory:
         type: string
@@ -57,18 +57,18 @@ jobs:
             - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
 
       - run:
+          name: Export image tag
           command: |
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
-            # echo "export IMAGE_TAG=$image_tag" >> $BASH_ENV
             env >> bash.env
 
       - run:
           name: Release
           command: |
-            MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-            NEW_MVN_VERSION=$(echo "$MVN_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEW_MVN_VERSION
+            PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+            NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
+            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 
       - persist_to_workspace:
@@ -200,9 +200,7 @@ jobs:
           command: |
             image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
             echo "export IMAGE_TAG='${image_tag}'" >> $BASH_ENV
-#            task_definition_image="container=<<parameters.service_name>>-container, tag=${image_tag}"
-#            echo "task definitions image: ${task_definition_image}"
-#            echo "export TASK_DEFINITION_IMAGE='${task_definition_image}'" >> $BASH_ENV
+            echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
@@ -264,8 +262,27 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "files"
 
-      - maven_release_prepare_perform:
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "files"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - deploy
+          service_directory: "files"
+
+      - maven_release:
           service_directory: "files"
 
       - update-ecs-service:
