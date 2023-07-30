@@ -256,10 +256,10 @@ workflows:
 
       - maven_release:
           service_directory: "files"
-          filters:
-            branches:
-              only:
-                - main
+#          filters:
+#            branches:
+#              only:
+#                - main
           requires:
             - send-test-coverage-reports
 
