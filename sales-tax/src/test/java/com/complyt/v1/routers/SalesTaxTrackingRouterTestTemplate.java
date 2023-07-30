@@ -28,4 +28,8 @@ public interface SalesTaxTrackingRouterTestTemplate extends
     void upsert_NullEconomicNexusTrackerDto_Returns400ValidationError();
 
     void upsert_NullEstablishedDateEconomicNexusTrackerDto_Returns400ValidationError();
+
+    // Validation: Comment
+    void upsert_LengthGreaterThen200Comment_Returns400ValidationError();
+    void upsert_NewWithBlankComment_Returns201();
 }
