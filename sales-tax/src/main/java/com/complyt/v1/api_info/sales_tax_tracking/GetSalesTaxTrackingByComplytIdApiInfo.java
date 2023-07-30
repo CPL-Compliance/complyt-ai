@@ -78,6 +78,7 @@ public @interface GetSalesTaxTrackingByComplytIdApiInfo {
     String salesTaxTrackingExample = """
             {
                  "complytId": "679cab51-7d88-41a6-b587-3eceecdd9524",
+                 "comment": "this is a nexus tracking",
                  "state": {
                      "abbreviation": "CA",
                      "code": "06",
