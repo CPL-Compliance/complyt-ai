@@ -17,17 +17,17 @@ import java.util.function.Function;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataConflictChecksProvider<T> {
 
-    Function<T, Mono<Boolean>> bodyConflictCheckFunction;
+    Function<T, Mono<String>> bodyConflictCheckFunction;
 
-    Map<String, BiFunction<T, ServerRequest, Mono<Boolean>>> pathVariablesChecksMap;
+    Map<String, BiFunction<T, ServerRequest, Mono<String>>> pathVariablesChecksMap;
 
-    public Mono<BiFunction<T, ServerRequest, Mono<Boolean>>> getPathVariableCheck(@NonNull String pathVariable) {
-        BiFunction<T, ServerRequest, Mono<Boolean>> check = pathVariablesChecksMap.get(pathVariable);
-        return Mono.just(check == null ? (body, request) -> Mono.just(true) : check);
+    public Mono<BiFunction<T, ServerRequest, Mono<String>>> getPathVariableCheck(@NonNull String pathVariable) {
+        BiFunction<T, ServerRequest, Mono<String>> check = pathVariablesChecksMap.get(pathVariable);
+        return Mono.just(check == null ? (body, request) -> Mono.empty() : check);
     }
 
-    public Mono<Function<T, Mono<Boolean>>> getBodyConflictCheck() {
-        return Mono.just(bodyConflictCheckFunction == null ? (body) -> Mono.just(true) : bodyConflictCheckFunction);
+    public Mono<Function<T, Mono<String>>> getBodyConflictCheck() {
+        return Mono.just(bodyConflictCheckFunction == null ? (body) -> Mono.empty(): bodyConflictCheckFunction);
     }
 
 }

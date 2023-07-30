@@ -1215,7 +1215,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
         Set<String> expectedErrors = Set.of(
-                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
+                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient
@@ -1240,7 +1240,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
         Set<String> expectedErrors = Set.of(
-                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
+                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient
@@ -1290,7 +1290,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
         Set<String> expectedErrors = Set.of(
-                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR + " " + StringErrorMessages.NON_PARTIAL_ERROR);
+                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR);
 
         // When + Then
         webTestClient

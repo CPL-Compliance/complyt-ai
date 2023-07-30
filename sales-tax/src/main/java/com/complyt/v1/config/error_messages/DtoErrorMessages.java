@@ -15,7 +15,8 @@ public interface DtoErrorMessages {
     String COMPLYT_ID_CANNOT_BE_UPDATED_ERROR = "complytId cannot be changed in an update";
 
     String COMPLYT_ID_IN_A_NEW_RECORD_ERROR = "new record cannot have a complytId field";
-    
+
+    String NON_PARTIAL_ERROR = "in a non partial address";
 
     String DATE_FORMAT_ERROR = "is in an illegal format - " +
             "For date/time fields please provide a " + FieldsDescriptions.TIMESTAMP_FORMAT;

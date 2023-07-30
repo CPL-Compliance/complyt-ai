@@ -24,7 +24,7 @@ public interface BodyCheckConfig {
     private static String addressErrorBuilder(String field) {
         return new StringBuilder().append(field).append(" ")
                 .append(DtoErrorMessages.NOT_NULL_ERROR).append(" ")
-                .append(StringErrorMessages.NON_PARTIAL_ERROR).toString();
+                .append(DtoErrorMessages.NON_PARTIAL_ERROR).toString();
     }
 
 }

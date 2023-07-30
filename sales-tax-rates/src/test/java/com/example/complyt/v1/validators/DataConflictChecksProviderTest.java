@@ -18,25 +18,25 @@ public class DataConflictChecksProviderTest {
     @BeforeEach
     void setup() {
         dataConflictChecksProvider = new DataConflictChecksProvider<>(null, Map.of(
-                "specialVariable", (x, y) -> Mono.just(true)));
+                "specialVariable", (x, y) -> Mono.empty()));
     }
 
     @Test
     void getPathVariableCheck_NoVariableCheckFound_ReturnsDefaultCheck() {
         // Given + When
-        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("").flatMap(check -> check.apply(null, null));
+        Mono<String> stringMono = dataConflictChecksProvider.getPathVariableCheck("").flatMap(check -> check.apply(null, null));
 
         // Then
-        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+        StepVerifier.create(stringMono).verifyComplete();
     }
 
     @Test
     void getPathVariableCheck_VariableCheckFound_ReturnsSpecificCheck() {
         // Given + When
-        Mono<Boolean> booleanMono = dataConflictChecksProvider.getPathVariableCheck("specialVariable").flatMap(check -> check.apply(null, null));
+        Mono<String> stringMono = dataConflictChecksProvider.getPathVariableCheck("specialVariable").flatMap(check -> check.apply(null, null));
 
         // Then
-        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+        StepVerifier.create(stringMono).verifyComplete();
     }
 
     @Test
@@ -48,10 +48,10 @@ public class DataConflictChecksProviderTest {
     @Test
     void getBodyConflictCheck_NoVariableCheckFound_ReturnsDefaultCheck() {
         // Given + When
-        Mono<Boolean> booleanMono = dataConflictChecksProvider.getBodyConflictCheck().flatMap(check -> check.apply(null));
+        Mono<String> stringMono = dataConflictChecksProvider.getBodyConflictCheck().flatMap(check -> check.apply(null));
 
         // Then
-        StepVerifier.create(booleanMono).expectNext(true).verifyComplete();
+        StepVerifier.create(stringMono).verifyComplete();
     }
 
 }
