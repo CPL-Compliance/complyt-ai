@@ -19,7 +19,6 @@ executors:
     docker:
       - image: 'cimg/python:3.9.1'
 
-
 parameters:
   run-sales-tax-workflow:
     type: boolean
@@ -76,10 +75,6 @@ jobs:
           paths:
             - bash.env
 
-      - run:
-          name: ECHO
-          command: echo $IMAGE_TAG
-
   package-dependency:
     parameters:
       service_directory:
@@ -98,9 +93,6 @@ jobs:
           root: ~/complyt_work_directory
           paths:
             - <<parameters.service_directory>>/target/*.jar
-      - run:
-          name: ECHO
-          command: echo $IMAGE_TAG
 
   verify:
     parameters:
@@ -115,7 +107,6 @@ jobs:
           path: ~/complyt_work_directory
       - attach_workspace:
           at: ~/complyt_work_directory
-
       - run:
           name: Execute
           command: ./mvnw clean verify
@@ -184,10 +175,9 @@ jobs:
       service_name:
         type: string
         default: ""
+
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
-
     executor: python-image
-
     steps:
       - checkout:
           path: ~/complyt_work_directory
@@ -196,7 +186,7 @@ jobs:
           at: .
 
       - run:
-          name: extract image tag
+          name: Extract image tag
           command: |
             image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
             echo "export IMAGE_TAG='${image_tag}'" >> $BASH_ENV
@@ -210,24 +200,6 @@ jobs:
           container-image-name-updates: "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
-
-#      - run:
-#          name: extract image tag
-#          command: |
-#            image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
-#            export IMAGE_TAG=$image_tag
-#            env
-#            echo "container=<<parameters.service_name>>-container, tag=${image_tag}"
-#      - aws-cli/setup:
-#          aws-access-key-id: AWS_ACCESS_KEY_ID
-#          aws-region: AWS_DEFAULT_REGION
-#          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-#      - aws-ecs/update-service:
-#          cluster-name: "production"
-#          container-image-name-updates: "container=<<parameters.service_name>>-container, tag='${IMAGE_TAG}'"
-#          family: "<<parameters.service_name>>-task-definition"
-#          service-name: "<<parameters.service_name>>-service"
-
 
 workflows:
 
