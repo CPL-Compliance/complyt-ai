@@ -146,7 +146,7 @@ jobs:
           path: ~/complyt_work_directory
       - add_ssh_keys:
           fingerprints:
-            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
+            - FINGER_PRINT
 
       - run:
           name: Export image tag
@@ -232,34 +232,34 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "files"
-#
-#      - deploy:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          service_directory: "files"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - deploy
-#          service_directory: "files"
+      #      - verify:
+      #          filters:
+      #            branches:
+      #              only:
+      #                - /^(main.+|(?!main).*)$/
+      #          service_directory: "files"
+      #
+      #      - deploy:
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          service_directory: "files"
+      #
+      #      - send-test-coverage-reports:
+      #          requires:
+      #            - verify
+      #            - deploy
+      #          service_directory: "files"
 
       - maven_release:
           service_directory: "files"
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - send-test-coverage-reports
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          requires:
+      #            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
