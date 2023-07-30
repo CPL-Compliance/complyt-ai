@@ -133,7 +133,7 @@ jobs:
           token: CODECOV_TOKEN
           flags: <<parameters.service_directory>>
 
-  maven_release:
+  release:
     parameters:
       service_directory:
         type: string
@@ -252,7 +252,7 @@ workflows:
       #            - deploy
       #          service_directory: "files"
 
-      - maven_release:
+      - release:
           service_directory: "files"
       #          filters:
       #            branches:
@@ -263,7 +263,7 @@ workflows:
 
       - update-ecs-service:
           requires:
-            - maven_release
+            - release
           service_name: "files"
 
   api-gateway-workflow:
@@ -311,7 +311,7 @@ workflows:
             - deploy
           service_directory: "api-gateway"
 
-      - maven_release:
+      - release:
           service_directory: "api-gateway"
           filters:
             branches:
