@@ -144,6 +144,10 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
+      - persist_to_workspace:
+          root: ~/complyt_work_directory
+          paths:
+            - bash.env
       - add_ssh_keys:
           fingerprints:
             - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
@@ -163,10 +167,6 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform -X
 
-#      - persist_to_workspace:
-#          root: .
-#          paths:
-#            - bash.env
 
   update-ecs-service:
     parameters:
@@ -181,7 +181,7 @@ jobs:
           path: ~/complyt_work_directory
 
       - attach_workspace:
-          at: .
+          at: ~/complyt_work_directory
 
       - run:
           name: Extract image tag and set it as env variable
@@ -232,34 +232,34 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "files"
-#
-#      - deploy:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          service_directory: "files"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - deploy
-#          service_directory: "files"
+      #      - verify:
+      #          filters:
+      #            branches:
+      #              only:
+      #                - /^(main.+|(?!main).*)$/
+      #          service_directory: "files"
+      #
+      #      - deploy:
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          service_directory: "files"
+      #
+      #      - send-test-coverage-reports:
+      #          requires:
+      #            - verify
+      #            - deploy
+      #          service_directory: "files"
 
       - maven_release:
           service_directory: "files"
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          requires:
-#            - send-test-coverage-reports
+      #          filters:
+      #            branches:
+      #              only:
+      #                - main
+      #          requires:
+      #            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
