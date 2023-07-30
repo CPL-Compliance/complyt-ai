@@ -190,7 +190,7 @@ jobs:
           command: |
             image_tag=$(grep "IMAGE_TAG" bash.env | cut -d'=' -f2)
             echo "export IMAGE_TAG='${image_tag}'" >> $BASH_ENV
-            echo "container=<<parameters.service_name>>-container, tag=${IMAGE_TAG}"
+            echo "container=<<parameters.service_name>>-container, tag='${IMAGE_TAG}'"
       - aws-cli/setup:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-region: AWS_DEFAULT_REGION
