@@ -1,7 +1,6 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
-import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.model.AddressDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,7 +22,7 @@ public interface BodyCheckConfig {
     private static String addressErrorBuilder(String field) {
         return new StringBuilder().append(field).append(" ")
                 .append(DtoErrorMessages.NOT_NULL_ERROR).append(" ")
-                .append(DtoErrorMessages.NON_PARTIAL_ERROR).toString();
+                .append(DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX).toString();
     }
 
 
