@@ -36,6 +36,7 @@ public class TestUtilities {
                                  "established": true,
                                  "establishedDate": "2022-08-02T16:12:00"
                              },
+                             "comment": "a comment",
                              "appliedDate": "2015-08-02T16:12:00",
                              "approvalDate": "2015-06-22T13:57:00",
                              "approved": true
