@@ -287,9 +287,9 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "", "name"))
                 .withEconomicNexusTracker(new EconomicNexusTrackerDto(true, null));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
+        Set<String> expectedErrors = Set.of(
                 "State.code " + StringErrorMessages.MINMAX_256_ERROR,
-                "EconomicNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+                "EconomicNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -400,25 +400,25 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
                         .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\n" +
-                        "    \"approved\": \"true\",\n" +
-                        "    \"complytId\": \"1111-boohoo\",\n" +
-                        "    \"enforcesSalesTax\": \"true\",\n" +
-                        "    \"state\": {\n" +
-                        "        \"abbreviation\": \"CA\",\n" +
-                        "        \"code\": \"02\",\n" +
-                        "        \"name\": \"\"\n" +
-                        "    },\n" +
-                        "    \"physicalNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "    \"economicNexusTracker\": {\n" +
-                        "        \"established\": \"true\",\n" +
-                        "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
-                        "    },\n" +
-                        "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
-                        "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
-                        "}")
+                           "    \"approved\": \"true\",\n" +
+                           "    \"complytId\": \"1111-boohoo\",\n" +
+                           "    \"enforcesSalesTax\": \"true\",\n" +
+                           "    \"state\": {\n" +
+                           "        \"abbreviation\": \"CA\",\n" +
+                           "        \"code\": \"02\",\n" +
+                           "        \"name\": \"\"\n" +
+                           "    },\n" +
+                           "    \"physicalNexusTracker\": {\n" +
+                           "        \"established\": \"true\",\n" +
+                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    },\n" +
+                           "    \"economicNexusTracker\": {\n" +
+                           "        \"established\": \"true\",\n" +
+                           "        \"establishedDate\": \"2023-02-28T02:00:00\"\n" +
+                           "    },\n" +
+                           "\"appliedDate\":  \"2023-02-28T02:00:00\"," +
+                           "\"approvalDate\":  \"2023-02-28T02:00:00\"" +
+                           "}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
@@ -757,8 +757,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullPhysicalNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -782,8 +782,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withPhysicalNexusTracker(new PhysicalNexusTrackerDto(false, null));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "PhysicalNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "PhysicalNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -805,8 +805,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     public void upsert_NullEconomicNexusTrackerDto_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -830,8 +830,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withEconomicNexusTracker(new EconomicNexusTrackerDto(false, null));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "EconomicNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "EconomicNexusTracker.establishedDate " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -850,13 +850,65 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @Test
     @Override
     @WithMockUser
+    public void upsert_LengthGreaterThen200Comment_Returns400ValidationError() {
+        // Given
+        String commentOfLength201 = " This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! |$";
+        String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment(commentOfLength201);
+        Set<String> expectedErrors = Set.of(
+                "comment " + StringErrorMessages.MAX_200_ERROR);
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenSalesTaxTrackingDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsert_NewWithBlankComment_Returns201() {
+        // Given
+        String stateName = salesTaxTrackingDto.state().name();
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment("");
+        SalesTaxTracking mappedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(givenSalesTaxTrackingDto);
+
+        // When
+        when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.empty());
+        when(salesTaxTrackingFacade.save(mappedSalesTaxTracking)).thenReturn(Mono.just(mappedSalesTaxTracking));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/state/" + stateName)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenSalesTaxTrackingDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated().expectBody(SalesTaxTrackingDto.class)
+                .isEqualTo(givenSalesTaxTrackingDto);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
     public void upsert_NullState_Returns400ValidationError() {
         // Given
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(null);
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "state " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "state " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -880,8 +932,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("", "code", "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -905,8 +957,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "", "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.code " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -930,8 +982,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", ""));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.name " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -955,8 +1007,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto(testUtilities.stringWithLength(257), "code", "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.abbreviation " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -980,8 +1032,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", testUtilities.stringWithLength(257), "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.code " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -1005,8 +1057,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", testUtilities.stringWithLength(257)));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name " + StringErrorMessages.MINMAX_256_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.name " + StringErrorMessages.MINMAX_256_ERROR);
 
         // When + Then
         webTestClient
@@ -1030,8 +1082,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto(null, "code", "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.abbreviation " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1055,8 +1107,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", null, "name"));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.code " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.code " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient
@@ -1080,8 +1132,8 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
         String stateName = salesTaxTrackingDto.state().name();
         SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto
                 .withState(new StateDto("CA", "code", null));
-        HashSet<String> expectedErrors = new HashSet<>(List.of(
-                "State.name " + DtoErrorMessages.NOT_NULL_ERROR));
+        Set<String> expectedErrors = Set.of(
+                "State.name " + DtoErrorMessages.NOT_NULL_ERROR);
 
         // When + Then
         webTestClient

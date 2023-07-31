@@ -84,7 +84,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingInfo ->
                 new SalesTaxTracking(
                         salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTracking.getState(),
-                        salesTaxTrackingInfo.getTenantId(), salesTaxTracking.isEnforcesSalesTax(),
+                        salesTaxTrackingInfo.getTenantId(), salesTaxTracking.getComment(),
+                        salesTaxTracking.isEnforcesSalesTax(),
                         salesTaxTracking.getPhysicalNexusTracker(), salesTaxTracking.getEconomicNexusTracker(),
                         salesTaxTracking.getAppliedDate(), salesTaxTracking.isApproved(),
                         salesTaxTracking.getApprovalDate()

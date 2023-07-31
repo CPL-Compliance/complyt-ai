@@ -560,7 +560,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", testUtilities.stringWithLength(101), "state", "street", "zip", false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.county " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
         webTestClient
@@ -584,7 +584,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", "street", testUtilities.stringWithLength(21), false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MAX_20_ERROR));
 
         // When + Then
         webTestClient
@@ -608,7 +608,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", testUtilities.stringWithLength(51), "county", "state", "street", "zip", false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MAX_50_ERROR));
 
         // When + Then
         webTestClient
@@ -632,7 +632,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto(testUtilities.stringWithLength(101), "country", "county", "state", "street", "zip", false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MAX_100_ERROR));
 
         // When + Then
         webTestClient
@@ -656,7 +656,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", testUtilities.stringWithLength(101), "street", "zip", false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MAX_100_ERROR));
         // When + Then
         webTestClient
                 .mutateWith(csrf())
@@ -679,7 +679,7 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
         String externalId = customerDto.externalId();
         String source = customerDto.source();
         OptionalAddressDto givenAddress = new OptionalAddressDto("city", "country", "county", "state", testUtilities.stringWithLength(201), "zip", false);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.MINMAX_200_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.street" + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
         webTestClient

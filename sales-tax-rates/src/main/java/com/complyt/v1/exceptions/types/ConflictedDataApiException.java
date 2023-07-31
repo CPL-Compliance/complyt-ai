@@ -8,10 +8,6 @@ import java.util.List;
 @Generated
 public class ConflictedDataApiException extends ComplytApiException {
 
-    public ConflictedDataApiException() {
-        super(GenericErrorMessages.DATA_CONFLICT_ERROR);
-    }
-
     public ConflictedDataApiException(List<String> list) {
         super(list.toString());
     }
