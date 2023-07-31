@@ -31,7 +31,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <!--        <project.scm.id>github.com</project.scm.id>-->
         <!-- Dependencies -->
         <mapstruct.version>1.5.1.Final</mapstruct.version>
         <lombok.version>1.18.24</lombok.version>
@@ -306,9 +305,6 @@
                             <goals>
                                 <goal>parse-version</goal>
                             </goals>
-                            <configuration>
-                                <propertyPrefix>parsedVersion</propertyPrefix>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>

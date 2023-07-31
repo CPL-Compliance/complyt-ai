@@ -16,7 +16,7 @@
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax</artifactId>
-    <version>0.15.3-SNAPSHOT</version>
+    <version>0.15.2-SNAPSHOT</version>
     <!-- Maven Coordinates -->
 
     <name>sales-tax</name>
