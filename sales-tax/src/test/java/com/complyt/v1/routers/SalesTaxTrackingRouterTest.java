@@ -852,8 +852,9 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
     @WithMockUser
     public void upsert_LengthGreaterThen200Comment_Returns400ValidationError() {
         // Given
+        String commentOfLength201 = " This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! | This sentence is absolutely 50 characters long! |$";
         String stateName = salesTaxTrackingDto.state().name();
-        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment("11122233341112223334111222333411122233341112223334111222333411122233341112223334111222333411122233341112223334111222333411122233341112223334111222333411122233341112223334111222333411122233341112223334$");
+        SalesTaxTrackingDto givenSalesTaxTrackingDto = salesTaxTrackingDto.withComment(commentOfLength201);
         Set<String> expectedErrors = Set.of(
                 "comment " + StringErrorMessages.MAX_200_ERROR);
 
