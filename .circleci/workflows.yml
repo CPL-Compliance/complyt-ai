@@ -78,7 +78,7 @@ jobs:
             - failsafe-reports
             - surefire-reports
             - site
-            
+
   deploy:
     parameters:
       service_directory:
@@ -165,7 +165,7 @@ jobs:
           root: .
           paths:
             - bash.env
-            -
+
   update-ecs-service:
     parameters:
       service_name:
