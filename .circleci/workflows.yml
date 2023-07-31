@@ -55,7 +55,6 @@ jobs:
           root: ~/complyt_work_directory
           paths:
             - <<parameters.service_directory>>/target/*.jar
-
   verify:
     parameters:
       service_directory:
@@ -79,7 +78,7 @@ jobs:
             - failsafe-reports
             - surefire-reports
             - site
-
+            
   deploy:
     parameters:
       service_directory:
