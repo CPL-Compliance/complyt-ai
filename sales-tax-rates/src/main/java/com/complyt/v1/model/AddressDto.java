@@ -17,6 +17,6 @@ public record AddressDto(
         @NotBlank(message = "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 100, message = "Address.state " + StringErrorMessages.MAX_100_ERROR) String state,
         @Size(max = 200, message = "Address.street " + StringErrorMessages.MAX_200_ERROR) String street,
         @NotBlank(message = "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR) @Size(max = 20, message = "Address.zip " + StringErrorMessages.MAX_20_ERROR) String zip,
-        boolean isPartial) {
+        @Schema(description = "whether country, city or street are necessary") boolean isPartial) {
 
 }
