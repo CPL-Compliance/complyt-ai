@@ -18,7 +18,7 @@ import java.util.UUID;
 public record SalesTaxTrackingDto(
         @Schema(description = FieldsDescriptions.COMPLYT_ID + "salesTaxTracking") UUID complytId,
         @Valid @NotNull(message = "state " + DtoErrorMessages.NOT_NULL_ERROR) StateDto state,
-        @Size(max = 200, message = "comment " + StringErrorMessages.MINMAX_200_ERROR) String comment,
+        @Size(max = 200, message = "comment " + StringErrorMessages.MAX_200_ERROR) String comment,
         boolean enforcesSalesTax,
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
         @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,

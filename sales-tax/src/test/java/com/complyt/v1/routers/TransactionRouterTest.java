@@ -1215,7 +1215,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(null);
         Set<String> expectedErrors = Set.of(
-                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1240,7 +1240,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(null);
         Set<String> expectedErrors = Set.of(
-                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1265,7 +1265,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(null);
         Set<String> expectedErrors = Set.of(
-                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1290,7 +1290,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(null);
         Set<String> expectedErrors = Set.of(
-                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1315,7 +1315,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip(null);
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1340,7 +1340,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry("");
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1365,7 +1365,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity("");
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1390,7 +1390,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState("");
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1415,7 +1415,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet("");
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.MINMAX_200_ERROR);
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX);
 
         // When + Then
         webTestClient
@@ -1440,7 +1440,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1466,7 +1466,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCounty(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.county " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.county " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1491,7 +1491,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withZip("baaabbaaabbaaabbaaab1");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
+                "Address.zip " + StringErrorMessages.MAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -1516,7 +1516,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCountry(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
+                "Address.country " + StringErrorMessages.MAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -1541,7 +1541,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withCity(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1566,7 +1566,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withState(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.state " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1591,7 +1591,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         OptionalAddressDto givenBillingAddress = transactionDto.billingAddress().withStreet(testUtilities.stringWithLength(201));
         Set<String> expectedErrors = Set.of(
-                "Address.street" + StringErrorMessages.MINMAX_200_ERROR);
+                "Address.street" + StringErrorMessages.MAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -1616,7 +1616,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCounty(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.county " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.county " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1641,7 +1641,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withZip("baaabbaaabbaaabbaaab1");
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR);
+                "Address.zip " + StringErrorMessages.MAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -1666,7 +1666,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCountry(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR);
+                "Address.country " + StringErrorMessages.MAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -1691,7 +1691,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withCity(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1716,7 +1716,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withState(testUtilities.stringWithLength(101));
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.state " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -1741,7 +1741,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         MandatoryAddressDto givenShippingAddress = transactionDto.shippingAddress().withStreet(testUtilities.stringWithLength(201));
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.MINMAX_200_ERROR);
+                "Address.street " + StringErrorMessages.MAX_200_ERROR);
 
         // When + Then
         webTestClient
@@ -1769,7 +1769,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR);
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -1797,7 +1797,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
                 .withPartial(true);
 
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR);
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR);
 
         // When + Then
         webTestClient
@@ -2030,7 +2030,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         Set<String> expectedErrors = Set.of(
                 "source " + StringErrorMessages.SINGLE_DIGIT_ERROR,
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR);
+                "Address.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -2086,59 +2086,29 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String externalId = transactionDto.externalId();
         String source = transactionDto.source();
         String documentName = "";
-        Set<String> expectedErrors = Set.of(
-                "documentName " + StringErrorMessages.MINMAX_50_ERROR);
 
-        // When + Then
+        // When
+        Transaction receivedTransaction = TransactionMapper.INSTANCE.transactionDtoToTransaction(transactionDto.withDocumentName(documentName));
+        TransactionDto expectedTransaction = TransactionMapper.INSTANCE.transactionToTransactionDto(receivedTransaction);
+
+        when(transactionFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transaction));
+        when(transactionFacade.saveTransaction(receivedTransaction)).thenReturn(Mono.empty());
+        when(transactionFacade.updateIfModified(externalId, source, receivedTransaction, transaction)).thenReturn(Mono.just(receivedTransaction));
+
+
+        // Then
         webTestClient
                 .mutateWith(csrf())
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\n   \"externalId\": \"" + externalId + "\",\n" +
-                           "   \"source\": \"" + source + "\",\n" +
-                           "   \"customerId\": \"0d3e260d-3555-4fb6-bcdd-926beb4bad51\",\n" +
-                           "   \"documentName\": \"" + documentName + "\",\n" +
-                           "   \"items\": [\n" +
-                           "        {\n" +
-                           "            \"unitPrice\": 25,\n" +
-                           "            \"totalPrice\": 5000,\n" +
-                           "            \"name\": \"HW Installation Services\",\n" +
-                           "            \"quantity\": 200,\n" +
-                           "            \"description\": \"wd\",\n" +
-                           "            \"taxCode\": \"C1S1\",\n" +
-                           "            \"manualSalesTax\": false,\n" +
-                           "            \"manualSalesTaxRate\": 0\n" +
-                           "        }\n" +
-                           "    ],\n" +
-                           "    \"shippingAddress\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"billingAddress\": {\n" +
-                           "        \"city\": \"City\",\n" +
-                           "        \"country\": \"Country\",\n" +
-                           "        \"county\": \"County\",\n" +
-                           "        \"state\": \"CA\",\n" +
-                           "        \"street\": \"Street\",\n" +
-                           "        \"zip\": \"Zip\"\n" +
-                           "    },\n" +
-                           "    \"transactionType\": \"INVOICE\",\n" +
-                           "    \"transactionStatus\": \"ACTIVE\",\n" +
-                           "    \"externalTimestamps\":  {\n" +
-                           "       \"createdDate\":  \"2023-01-24T08:00:00.000Z\",\n" +
-                           "       \"updatedDate\": \"2023-01-24T08:00:00.000Z\"\n" +
-                           "   }\n" +
-                           "   \n}")
+                .bodyValue(transactionDto.withDocumentName(documentName))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
-                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isOk()
+                .expectBody(TransactionDto.class)
+                .isEqualTo(expectedTransaction);
     }
 
     @Test
@@ -2150,7 +2120,7 @@ public class TransactionRouterTest implements TransactionRouterTestTemplate {
         String source = transactionDto.source();
         String documentName = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
         Set<String> expectedErrors = Set.of(
-                "documentName " + StringErrorMessages.MINMAX_50_ERROR);
+                "documentName " + StringErrorMessages.MAX_50_ERROR);
 
         // When + Then
         webTestClient
