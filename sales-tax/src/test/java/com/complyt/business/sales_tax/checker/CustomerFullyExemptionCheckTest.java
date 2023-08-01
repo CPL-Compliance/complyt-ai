@@ -101,4 +101,17 @@ public class CustomerFullyExemptionCheckTest {
         assertFalse(isExempted);
     }
 
+    @Test
+    void check_TransactionInTimeframeAndExemptionWithoutEndDate_ReturnsFalse() {
+        // Given
+        Exemption expectedExemption = exemption.withValidationDates(new ValidationDates(
+                LocalDateTime.now().minusYears(2), null));
+
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(expectedExemption);
+
+        // Then
+        assertTrue(isExempted);
+    }
+
 }
