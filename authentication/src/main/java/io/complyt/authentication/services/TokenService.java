@@ -2,6 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.repositories.TokenRepository;
+import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +21,9 @@ public class TokenService {
     @NonNull
     private PasswordEncoder passwordEncoder;
 
-    public Mono<Token> getToken(Token token) {
-        return Mono.just(passwordEncoder.encode(token.getApiKey()))
-                .flatMap(tokenRepository::findByApiKey);
+    public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
+        return tokenRepository.findByComplytClientId(apiKey.getClientId())
+                .filter(token -> passwordEncoder.matches(apiKey.getClientSecret(), token.getComplytClientSecret()));
     }
 
     public Mono<Token> saveToken(Token token) {

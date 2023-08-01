@@ -5,23 +5,29 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Value
+@Builder
 @With
+@AllArgsConstructor
 @Document(collection = "token")
 public class Token {
-
     @Id
-    String apiKey;
+    String id;
 
+    @NonNull
+    String complytClientId;
+
+    @NonNull
+    String complytClientSecret;
+
+    @NonNull
     String accessToken;
 
+    @NonNull
     String scope;
 
     int expiresIn;
 
+    @NonNull
     String tokenType;
 }

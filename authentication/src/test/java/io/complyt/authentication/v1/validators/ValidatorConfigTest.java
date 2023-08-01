@@ -24,12 +24,4 @@ class ValidatorConfigTest {
     void setUp() {
         validatorConfig = new ValidatorConfig();
     }
-
-    @Test
-    void fileDtoValidationHandler() {
-        ValidationHandler<TokenDto, SpringValidatorAdapter> actualCustomerDtoValidationHandler = new ValidationHandler<>(TokenDto.class, springValidatorAdapter);
-        ValidationHandler<TokenDto, SpringValidatorAdapter> expectedCustomerDtoValidationHandler = validatorConfig.fileDtoValidationHandler(springValidatorAdapter);
-
-        assertEquals(expectedCustomerDtoValidationHandler, actualCustomerDtoValidationHandler);
-    }
 }

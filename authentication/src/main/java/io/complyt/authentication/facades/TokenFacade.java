@@ -4,6 +4,7 @@ import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
+import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,9 @@ public class TokenFacade {
     @NonNull
     AuthorizationService authorizationService;
 
-    public Mono<Token> post(final @NonNull Token token) {
-        return tokenService.getToken(token)
-                .switchIfEmpty(credentialsService.getCredentialsByApiKey(token)
+    public Mono<Token> post(final @NonNull ApiKey apiKey) {
+        return tokenService.findByApiKey(apiKey)
+                .switchIfEmpty(credentialsService.getCredentialsByApiKey(apiKey)
                         .flatMap(credentials -> authorizationService.getToken(credentials))
                         .flatMap(tokenService::saveToken));
     }

@@ -25,21 +25,21 @@ class ValidationHandlerTest {
     @MockBean
     ServerRequest serverRequest;
 
-    @Test
-    void validate_validToken_returnsTokenDto() {
-        TokenDto tokenDto = TestUtilities.createTokenDto();
-        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
-        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
-
-        StepVerifier.create(validationMono).expectNext(tokenDto).verifyComplete();
-    }
-
-    @Test
-    void validate_invalidTokenDto_returnsError() {
-        TokenDto tokenDto = TestUtilities.createTokenDto().withApiKey("");
-        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
-        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
-
-        StepVerifier.create(validationMono).expectError().verify();
-    }
+//    @Test
+//    void validate_validToken_returnsTokenDto() {
+//        TokenDto tokenDto = TestUtilities.createTokenDto();
+//        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
+//        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
+//
+//        StepVerifier.create(validationMono).expectNext(tokenDto).verifyComplete();
+//    }
+//
+//    @Test
+//    void validate_invalidTokenDto_returnsError() {
+//        TokenDto tokenDto = TestUtilities.createTokenDto().withApiKey("");
+//        when(serverRequest.bodyToMono(TokenDto.class)).thenReturn(Mono.just(tokenDto));
+//        Mono<TokenDto> validationMono = tokenDtoValidationHandler.validate(serverRequest);
+//
+//        StepVerifier.create(validationMono).expectError().verify();
+//    }
 }

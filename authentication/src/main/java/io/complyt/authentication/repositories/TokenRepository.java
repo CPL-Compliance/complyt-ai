@@ -21,10 +21,10 @@ public class TokenRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Mono<Token> findByApiKey(final @NonNull String encodedApiKey) {
-        Query query = Query.query(Criteria.where("apiKey").is(encodedApiKey));
+    public Mono<Token> findByComplytClientId(final @NonNull String complytClientId) {
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
-        return ContextLogger.observeCtx("Searching for token by Api Key " + encodedApiKey, log::info)
+        return ContextLogger.observeCtx("Searching for token by ComplytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Token.class));
     }
 

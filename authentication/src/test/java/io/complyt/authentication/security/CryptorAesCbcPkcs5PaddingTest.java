@@ -26,7 +26,7 @@ class CryptorAesCbcPkcs5PaddingTest {
     }
 
     @Test
-    void encrypt__decrypt_someString_decryptedTextEqualsOriginalText() throws InvalidAlgorithmParameterException,
+    void encrypt_decrypt_someString_decryptedTextEqualsOriginalText() throws InvalidAlgorithmParameterException,
             NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
             InvalidKeyException {
         // Given
