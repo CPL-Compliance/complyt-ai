@@ -4,6 +4,7 @@ import io.complyt.authentication.facades.TokenFacade;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.TokenMapper;
+import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
@@ -17,6 +18,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Component
 @Slf4j
 @AllArgsConstructor
@@ -25,15 +28,15 @@ public class TokenHandler {
     @NonNull
     TokenFacade tokenFacade;
 
-    @NonNull
-    ValidationHandler<TokenDto, SpringValidatorAdapter> tokenDtoValidationHandler;
-
     public Mono<ServerResponse> post(ServerRequest serverRequest) {
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+        Optional<String> apiKeyParam = serverRequest.queryParam("api_key");
+        String apiKeyStr = apiKeyParam.get();
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s, Query Params -> %s", serverRequest.method(),
+                serverRequest.path(),
+                serverRequest.queryParams());
 
-        Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info).then(tokenDtoValidationHandler.validate(serverRequest))
-                .flatMap(tokenDto -> ContextLogger.observeCtx(tokenDto.toString(), log::info).thenReturn(tokenDto))
-                .map(TokenMapper.INSTANCE::tokenDtoToToken)
+        Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info)
+                .then(Mono.just(new ApiKey(apiKeyStr)))
                 .flatMap(tokenFacade::post)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(), log::info).thenReturn(tokenDto))

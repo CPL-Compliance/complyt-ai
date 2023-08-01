@@ -1,10 +1,10 @@
 package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.Credentials;
-import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.repositories.CredentialsRepository;
 import io.complyt.authentication.security.Cryptor;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +33,15 @@ public class CredentialsService {
     @NonNull
     private Cryptor cryptorAesCbcPkcs5Padding;
 
-    public Mono<Credentials> getCredentialsByApiKey(final @NonNull Token token) {
-        return Mono.just(passwordEncoder.encode(token.getApiKey()))
-                .flatMap(credentialsRepository::findByApiKey)
+    public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
+        return credentialsRepository.findByComplytClientId(apiKey.getClientId())
+                .filter(credentials -> passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
                 .flatMap(this::decrypt);
     }
 
     private Mono<Credentials> decrypt(Credentials credentials) {
-        EncryptedData encryptedClientId = new EncryptedData(credentials.getIvClientId(), credentials.getClientId());
-        EncryptedData encryptedClientSecret = new EncryptedData(credentials.getIvClientSecret(), credentials.getClientSecret());
+        EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
+        EncryptedData encryptedClientSecret = new EncryptedData(credentials.getClientSecretIv(), credentials.getClientSecret());
 
         String clientId;
         String clientSecret;
@@ -56,5 +56,33 @@ public class CredentialsService {
         Credentials decryptedCreds = credentials.withClientId(clientId).withClientSecret(clientSecret);
 
         return Mono.just(decryptedCreds);
+    }
+
+    public Mono<Credentials> saveCredentials(Credentials credentials, ApiKey apiKey) {
+        EncryptedData clientIdEncryptedData;
+        EncryptedData clientSecretEncryptedData;
+
+        try {
+            clientIdEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(credentials.getClientId());
+            clientSecretEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        }
+
+        String clientSecret = apiKey.getClientSecret();
+        String clientSecretEncoded = passwordEncoder.encode(clientSecret);
+        Credentials credentialsToSave = Credentials.builder()
+                .clientId(clientIdEncryptedData.cipherText())
+                .clientIdIv(clientIdEncryptedData.iv())
+                .clientSecret(clientSecretEncryptedData.cipherText())
+                .clientSecretIv(clientSecretEncryptedData.iv())
+                .audience("https://sales-tax-service/")
+                .grantType("client_credentials")
+                .complytClientId(apiKey.getClientId())
+                .complytClientSecret(clientSecretEncoded)
+                .build();
+
+        return credentialsRepository.save(credentialsToSave);
     }
 }

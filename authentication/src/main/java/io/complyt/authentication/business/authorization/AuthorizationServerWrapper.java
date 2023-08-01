@@ -1,4 +1,4 @@
-package io.complyt.authentication.domain.authorization;
+package io.complyt.authentication.business.authorization;
 
 import lombok.NonNull;
 import reactor.core.publisher.Mono;

@@ -209,4 +209,24 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Authorization Server Profiles -->
+        <profile>
+            <id>auth0</id>
+            <properties>
+                <activeAuthorizationServer>auth0</activeAuthorizationServer>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>stubAuth0</id>
+            <properties>
+                <activeAuthorizationServer>stubAuth0</activeAuthorizationServer>
+            </properties>
+        </profile>
+        <!-- Authorization Server Profiles -->
+    </profiles>
 </project>

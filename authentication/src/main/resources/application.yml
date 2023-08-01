@@ -3,6 +3,7 @@ server.port: ${PORT:9860}
 
 spring.profiles.active:
   - @activeEnv@
+  - @activeAuthorizationServer@
 
 # Observability
 management.metrics.distribution.percentiles-histogram.http.server.requests: true
@@ -14,3 +15,4 @@ spring:
       uuid-representation: standard
 
 cryption.secret-key: ${secret-key}
+authorization.authorization-server-url: ${authorization-server-url}

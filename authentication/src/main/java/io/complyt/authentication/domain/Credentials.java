@@ -8,17 +8,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Builder
 @EqualsAndHashCode
 @ToString
 @With
 @Document(collection = "credentials")
 public class Credentials {
     @Id
-    String apiKey;
+    String id;
+    String complytClientId;
+    String complytClientSecret;
     String clientId;
-    String ClientSecret;
+    String clientSecret;
+    String clientIdIv;
+    String clientSecretIv;
     String audience;
     String grantType;
-    String ivClientId;
-    String ivClientSecret;
 }

@@ -52,7 +52,7 @@ public class CryptorAesCbcPkcs5Padding implements Cryptor {
 
     private IvParameterSpec generateIv() {
         byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
+        (new SecureRandom()).nextBytes(iv);
 
         return new IvParameterSpec(iv);
     }

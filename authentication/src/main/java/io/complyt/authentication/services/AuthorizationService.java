@@ -1,9 +1,9 @@
 package io.complyt.authentication.services;
 
+import io.complyt.authentication.business.authorization.AccessToken;
+import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
-import io.complyt.authentication.domain.authorization.AccessToken;
-import io.complyt.authentication.domain.authorization.AuthorizationServerWrapper;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +16,27 @@ import reactor.core.publisher.Mono;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthorizationService {
     @NonNull
-    AuthorizationServerWrapper auth0AuthorizationServerWrapper;
+    AuthorizationServerWrapper authorizationServerWrapper;
 
     public Mono<Token> getToken(Credentials credentials) {
-        return auth0AuthorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
-                credentials.getAudience(), credentials.getGrantType()).map(accessToken -> createToken(credentials, accessToken));
+        return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
+                        credentials.getAudience(), credentials.getGrantType())
+                .mapNotNull(accessToken -> createToken(credentials, accessToken))
+                .flatMap(this::decrypt);
+    }
+
+    private Mono<Token> decrypt(Token token) {
+
     }
 
     private Token createToken(Credentials credentials, AccessToken accessToken) {
-        return new Token(credentials.getApiKey(), accessToken.accessToken(), accessToken.scope(),
-                Integer.parseInt(accessToken.expires_in()), accessToken.token_type());
+        return Token.builder()
+                .complytClientId(credentials.getComplytClientId())
+                .complytClientSecret(credentials.getComplytClientSecret())
+                .accessToken(accessToken.getAccessToken())
+                .scope(accessToken.getScope())
+                .expiresIn(accessToken.getExpiresIn())
+                .tokenType(accessToken.getTokenType())
+                .build();
     }
 }

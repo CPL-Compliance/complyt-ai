@@ -21,11 +21,15 @@ public class CredentialsRepository {
     @NonNull
     ReactiveMongoTemplate reactiveMongoTemplate;
 
+    public Mono<Credentials> findByComplytClientId(final @NonNull String complytClientId) {
+        Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
-    public Mono<Credentials> findByApiKey(final @NonNull String encodedApiKey){
-        Query query = Query.query(Criteria.where("apiKey").is(encodedApiKey));
-
-        return ContextLogger.observeCtx("Searching for credentials by apiKey " + encodedApiKey, log::info)
+        return ContextLogger.observeCtx("Searching for credentials by complytClientId " + complytClientId, log::info)
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
+    }
+
+    public Mono<Credentials> save(Credentials credentials) {
+        return ContextLogger.observeCtx("Saving Credentials", log::info)
+                .then(reactiveMongoTemplate.save(credentials));
     }
 }

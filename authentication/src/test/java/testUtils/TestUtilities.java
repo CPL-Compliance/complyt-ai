@@ -1,8 +1,9 @@
 package testUtils;
 
+import io.complyt.authentication.business.authorization.AccessToken;
+import io.complyt.authentication.business.authorization.Auth0AccessToken;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.v1.models.TokenDto;
-
 
 public class TestUtilities {
     static String apiKey = "929f1749-cfa7-46c0-8b6f-ee9602c7819c";
@@ -20,11 +21,11 @@ public class TestUtilities {
     }
 
     public static Token createOutputToken(String apiKey) {
-        return new Token(apiKey, accessToken, scope, expiresIn, tokenType);
+        return new Token("", "", "", "", "", 0, "");
     }
 
     public static Token createInputToken(String apiKey) {
-        return new Token(apiKey, "", "", 0, "");
+        return new Token(apiKey, "", "", "", "", 0, "");
     }
 
     public static TokenDto createTokenDto() {
@@ -32,10 +33,14 @@ public class TestUtilities {
     }
 
     public static TokenDto createTokenDto(String apiKey) {
-        return new TokenDto(apiKey, "" , "", 0, "");
+        return new TokenDto( "", "", 0, "");
     }
 
-    public static TokenDto createOutputTokenDto(String apiKey) {
-        return new TokenDto(apiKey, accessToken , scope, expiresIn, tokenType);
+    public static TokenDto createOutputTokenDto() {
+        return new TokenDto(accessToken, scope, expiresIn, tokenType);
+    }
+
+    public static AccessToken createAccessToken() {
+        return new AccessToken("Access Token", "Scope", 0, "Token Type");
     }
 }
