@@ -153,6 +153,8 @@ jobs:
             export IMAGE_TAG=$image_tag
             env >> bash.env
 
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - run:
           name: Release
           command: |
