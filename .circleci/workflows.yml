@@ -11,7 +11,6 @@ executors:
       image: ubuntu-2204:2022.07.1
       docker_layer_caching: true
 
-
   openjdk-image:
     docker:
       - image: cimg/openjdk:11.0
@@ -214,24 +213,22 @@ workflows:
                 - main
           service_directory: "sales-tax"
 
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - deploy
-          service_directory: "sales-tax"
-
       - release:
           service_directory: "sales-tax"
           filters:
             branches:
               only:
                 - main
+
+      - send-test-coverage-reports:
           requires:
-            - send-test-coverage-reports
+            - verify
+            - release
+          service_directory: "sales-tax"
 
       - update-ecs-service:
           requires:
-            - deploy
+            - release
           service_name: "sales-tax"
 
   files-workflow:
@@ -262,8 +259,6 @@ workflows:
             branches:
               only:
                 - eyal/com-235-api-services-versioning-management
-          requires:
-            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
@@ -285,6 +280,7 @@ workflows:
       - package-dependency:
           name: package-files
           service_directory: "files"
+
       - verify:
           filters:
             branches:
@@ -297,36 +293,27 @@ workflows:
             - package-files
           service_directory: "api-gateway"
 
-      - deploy:
+      - release:
           filters:
             branches:
               only:
-                - main
-          requires:
-            - package-sales-tax
-            - package-sales-tax-rates
-            - package-discovery-service
-            - package-files
+                - eyal/com-235-api-services-versioning-management
+            requires:
+              - package-sales-tax
+              - package-sales-tax-rates
+              - package-discovery-service
+              - package-files
           service_directory: "api-gateway"
 
       - send-test-coverage-reports:
           requires:
             - verify
-            - deploy
+            - release
           service_directory: "api-gateway"
-
-      - release:
-          service_directory: "api-gateway"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
-            - deploy
+            - release
           service_name: "api-gateway"
 
   discovery-service-workflow:
@@ -339,7 +326,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
           service_directory: "discovery-service"
 
-      - deploy:
+      - release:
           filters:
             branches:
               only:
@@ -349,17 +336,8 @@ workflows:
       - send-test-coverage-reports:
           requires:
             - verify
-            - deploy
+            - release
           service_directory: "discovery-service"
-
-      - release:
-          service_directory: "discovery-service"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - send-test-coverage-reports
 
       # We update all the services that run Discovery Services
       - update-ecs-service:
@@ -369,7 +347,7 @@ workflows:
 
       - update-ecs-service:
           requires:
-            - deploy
+            - release
           service_name: "discovery-service-az-1b"
 
   sales-tax-rates-workflow:
@@ -382,7 +360,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
           service_directory: "sales-tax-rates"
 
-      - deploy:
+      - release:
           filters:
             branches:
               only:
@@ -392,19 +370,10 @@ workflows:
       - send-test-coverage-reports:
           requires:
             - verify
-            - deploy
+            - release
           service_directory: "sales-tax-rates"
-
-      - release:
-          service_directory: "sales-tax-rates"
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - send-test-coverage-reports
 
       - update-ecs-service:
           requires:
-            - deploy
+            - release
           service_name: "sales-tax-rates"
