@@ -247,7 +247,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - eyal/com-235-api-services-versioning-management
           service_directory: "files"
 
       - send-test-coverage-reports:
@@ -261,7 +261,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - eyal/com-235-api-services-versioning-management
           requires:
             - send-test-coverage-reports
 
