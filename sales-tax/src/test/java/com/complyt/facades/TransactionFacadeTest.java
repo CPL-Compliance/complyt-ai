@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -192,11 +193,12 @@ public class TransactionFacadeTest {
         Transaction transactionToSearchFor = transaction.withExternalId(externalId);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
         Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -210,6 +212,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll()).thenReturn(Flux.fromIterable(allTransactions));
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> returnedCustomers = transactionFacade.getAll();
 
         // Then
@@ -338,7 +341,8 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
         Transaction newTransactionWithSalesTax = modifiedTransaction.withSalesTax(salesTax);
 
         // When
@@ -365,7 +369,8 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
 
         // When
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
@@ -392,7 +397,8 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
 
         // When
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
@@ -415,11 +421,12 @@ public class TransactionFacadeTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
         Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
 
         // Then
-        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction).verifyComplete();
+        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -434,10 +441,11 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll()).thenReturn(Flux.fromIterable(transactions));
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> transactionFlux = transactionFacade.getAll();
 
         // Then
-        StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), anotherTransactionWithSameClientId.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -452,6 +460,7 @@ public class TransactionFacadeTest {
         allTransactionsInSource.add(secondTransaction);
 
         // When
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         when(transactionService.findAllBySource(source)).thenReturn(Flux.fromIterable(allTransactionsInSource));
         Flux<Transaction> returnedTransactions = transactionFacade.getAllBySource(source);
 
@@ -465,11 +474,12 @@ public class TransactionFacadeTest {
         UUID complytId = transaction.getComplytId();
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = transactionFacade.findByComplytId(complytId);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();
     }
 
     @Test

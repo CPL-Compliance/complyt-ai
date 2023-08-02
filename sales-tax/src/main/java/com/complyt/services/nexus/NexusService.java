@@ -8,6 +8,7 @@ import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
+import com.complyt.services.CustomerService;
 import com.complyt.services.CustomerServiceImpl;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
@@ -38,7 +39,7 @@ public class NexusService {
 
     @Qualifier("customerServiceImpl")
     @NonNull
-    private CustomerServiceImpl customerService;
+    private CustomerService customerService;
 
     @Qualifier("transactionServiceImpl")
     @NonNull

@@ -183,7 +183,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewInRangeOfEconomicNexus_Returns201WithSalesTax() {
         // Given
         String externalId = "10042";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId)
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, retailCustomerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
 
@@ -204,11 +204,36 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
 
     @Order(5)
     @Test
+    @WithMockUser
+    public void upsertTransaction_NewInRangeOfEconomicNexusButMarketplaceCustomer_Returns201WithSalesTax() {
+        // Given
+        String externalId = "10043";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId)
+                .withShippingAddress(referenceAddress)
+                .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(receivedTransaction -> assertNull(receivedTransaction.salesTax()));
+    }
+
+    @Order(5)
+    @Test
     @Override
     @WithMockUser
     public void upsertTransaction_NewOutOfRangeOfEconomicNexus_Returns201() {
         // Given
-        String externalId = "10043";
+        String externalId = "10044";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.minusMonths(1).toString(), LocalDateTime.now().toString()));
@@ -266,7 +291,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     @WithMockUser
     public void upsertTransaction_NewAndPassedNexusByCount_Returns201() {
         // Given
-        String externalId = "10045";
+        String externalId = "10046";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId,
                         ITUtilities.stubItemDto().withQuantity(2).withUnitPrice(100).withTotalPrice(200))
                 .withShippingAddress(referenceAddress)
