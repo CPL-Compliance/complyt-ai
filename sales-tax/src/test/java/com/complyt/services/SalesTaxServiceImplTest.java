@@ -8,6 +8,7 @@ import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxR
 import com.complyt.domain.Item;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -58,6 +59,7 @@ public class SalesTaxServiceImplTest {
     TaxableCollectionBuilder taxableCollectionBuilder;
 
     Transaction transaction;
+    Customer customer;
 
     String salesTaxTrackingId;
     UnitTestUtilities testUtilities;
@@ -67,6 +69,7 @@ public class SalesTaxServiceImplTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
     }
 
     @Test
@@ -76,7 +79,7 @@ public class SalesTaxServiceImplTest {
                 .withEnforcesSalesTax(false);
 
         // When
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -89,7 +92,7 @@ public class SalesTaxServiceImplTest {
                 .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking,customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -118,7 +121,7 @@ public class SalesTaxServiceImplTest {
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking,customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
@@ -149,7 +152,7 @@ public class SalesTaxServiceImplTest {
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
@@ -162,7 +165,7 @@ public class SalesTaxServiceImplTest {
 
         // When
         when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -175,7 +178,7 @@ public class SalesTaxServiceImplTest {
         Transaction nullTransaction = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(nullTransaction, tracking));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(nullTransaction, tracking, customer));
         assertEquals(nullPointerException.getMessage(), "transactionWithOutSalesTax is marked non-null but is null");
     }
 
@@ -196,7 +199,7 @@ public class SalesTaxServiceImplTest {
 
         // When + Then
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxService.handleSalesTaxCalculation(transaction, nullTracking);
+            salesTaxService.handleSalesTaxCalculation(transaction, nullTracking, customer);
         });
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
     }

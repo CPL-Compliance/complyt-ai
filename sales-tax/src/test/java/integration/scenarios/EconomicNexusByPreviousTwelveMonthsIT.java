@@ -54,7 +54,8 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     // Given
     private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
     private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "Minnesota", "4401 York Ave S", "55410", false);
-    private final UUID customerId = UUID.fromString("9ff0912a-2d60-4e8a-a6ba-1a9e7385338e"); // complytId of an existing customer in the database
+    private final UUID marketplaceCustomerId = UUID.fromString("e10cd4a2-6a4e-4621-bdad-4860bfa91ecb"); // complytId of an existing customer in the database
+    private final UUID retailCustomerId = UUID.fromString("0b5d4d10-a5f1-411b-b11b-6c751441d256"); // complytId of an existing customer in the database
     private final String source = "1";
 
     @DynamicPropertySource
@@ -74,7 +75,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewAndDoesntPassedEconomicNexus_Returns201() {
         // Given
         String externalId = "10048";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId,
                         ITUtilities.stubItemDto().withQuantity(1).withUnitPrice(10).withTotalPrice(10))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
@@ -121,7 +122,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewAndPassedEconomicNexus_Returns201() {
         // Given
         String externalId = "10041";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId,
                         ITUtilities.stubItemDto().withQuantity(6).withUnitPrice(10000).withTotalPrice(60000))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
@@ -182,7 +183,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewInRangeOfEconomicNexus_Returns201WithSalesTax() {
         // Given
         String externalId = "10042";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.plusMonths(1).toString(), LocalDateTime.now().toString()));
 
@@ -208,7 +209,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewOutOfRangeOfEconomicNexus_Returns201() {
         // Given
         String externalId = "10043";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId)
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.minusMonths(1).toString(), LocalDateTime.now().toString()));
 
@@ -266,7 +267,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     public void upsertTransaction_NewAndPassedNexusByCount_Returns201() {
         // Given
         String externalId = "10045";
-        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, marketplaceCustomerId,
                         ITUtilities.stubItemDto().withQuantity(2).withUnitPrice(100).withTotalPrice(200))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
