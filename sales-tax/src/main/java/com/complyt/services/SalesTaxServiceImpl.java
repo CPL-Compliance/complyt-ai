@@ -8,6 +8,7 @@ import com.complyt.business.sales_tax.sales_tax_rates.TransactionSalesTaxRatesHa
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -51,7 +52,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
         boolean isApplied = salesTaxApplyCheck.check(salesTaxTracking);
 
         return isApplied ? exemptionService.isFullyExempted(transactionWithOutSalesTax)
-                .flatMap(isFullyExempted -> isFullyExempted ? Mono.just(transactionWithOutSalesTax) :
+                .flatMap(isFullyExempted -> isFullyExempted || isCustomerTypeMarketplace(transactionWithOutSalesTax) ? Mono.just(transactionWithOutSalesTax) :
                         calculate(transactionWithOutSalesTax)) :
                 Mono.just(transactionWithOutSalesTax);
     }
@@ -72,5 +73,9 @@ public class SalesTaxServiceImpl implements SalesTaxService {
 
                             return transactionWithRates.withSalesTax(salesTax);
                         }));
+    }
+
+    private boolean isCustomerTypeMarketplace(Transaction transaction) {
+        return transaction.getCustomer().getCustomerType() == CustomerType.MARKETPLACE;
     }
 }
