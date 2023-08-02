@@ -25,6 +25,8 @@ import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -325,6 +327,11 @@ public class UnitTestUtilities {
 
     public ValidationDatesDto createValidationDatesDto() {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
+    }
+
+    public static boolean stringPassedRegex(String input, Pattern pattern) {
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
     }
 
 }
