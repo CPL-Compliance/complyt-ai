@@ -253,7 +253,6 @@ workflows:
       - send-test-coverage-reports:
           requires:
             - verify
-            - deploy
           service_directory: "files"
 
       - release:
