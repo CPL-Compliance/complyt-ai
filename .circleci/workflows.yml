@@ -241,13 +241,6 @@ workflows:
                 - /^(main.+|(?!main).*)$/
           service_directory: "files"
 
-#      - deploy:
-#          filters:
-#            branches:
-#              only:
-#                - eyal/com-235-api-services-versioning-management
-#          service_directory: "files"
-
       - send-test-coverage-reports:
           requires:
             - verify
