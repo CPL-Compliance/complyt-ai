@@ -21,12 +21,7 @@ public class AuthorizationService {
     public Mono<Token> getToken(Credentials credentials) {
         return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
                         credentials.getAudience(), credentials.getGrantType())
-                .mapNotNull(accessToken -> createToken(credentials, accessToken))
-                .flatMap(this::decrypt);
-    }
-
-    private Mono<Token> decrypt(Token token) {
-
+                .mapNotNull(accessToken -> createToken(credentials, accessToken));
     }
 
     private Token createToken(Credentials credentials, AccessToken accessToken) {

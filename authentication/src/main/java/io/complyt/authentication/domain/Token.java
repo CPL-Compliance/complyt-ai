@@ -5,6 +5,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Value
 @Builder
 @With
@@ -23,11 +25,18 @@ public class Token {
     @NonNull
     String accessToken;
 
+    String accessTokenIv;
+
     @NonNull
     String scope;
+
+    String scopeIv;
 
     int expiresIn;
 
     @NonNull
     String tokenType;
+
+    LocalDateTime createdAt;
+    LocalDateTime expireAt;
 }

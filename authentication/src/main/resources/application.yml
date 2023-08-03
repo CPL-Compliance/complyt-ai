@@ -15,4 +15,8 @@ spring:
       uuid-representation: standard
 
 cryption.secret-key: ${secret-key}
-authorization.authorization-server-url: ${authorization-server-url}
+token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-sec}
+authorization:
+  issuer-uri: ${issuer-uri}
+  grant-type: ${grant-type}
+  authorization-server-url: ${authorization-server-url}
