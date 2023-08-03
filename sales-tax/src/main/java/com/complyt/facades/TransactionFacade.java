@@ -38,7 +38,7 @@ public class TransactionFacade {
 
     public Mono<Transaction> saveTransaction(Transaction transaction) {
         return transactionService.checkTransactionNotHavingComplytId(transaction)
-                .flatMap(checkedTransaction -> getTransactionCustomer(transaction)
+                .flatMap(checkedTransaction -> getCustomerByTransaction(transaction)
                         .flatMap(customer -> transactionService.injectDataToNewTransaction(checkedTransaction)
                                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
@@ -65,7 +65,7 @@ public class TransactionFacade {
 
     public Mono<Transaction> update(@NonNull String externalId, @NonNull String source, @NonNull Transaction modifiedTransaction, @NonNull Transaction originalTransaction) {
         return transactionService.checkComplytIdOfModifiedEqualsToOriginal(modifiedTransaction, originalTransaction)
-                .flatMap(checkedModifiedTransaction -> getTransactionCustomer(modifiedTransaction)
+                .flatMap(checkedModifiedTransaction -> getCustomerByTransaction(modifiedTransaction)
                         .flatMap(customer -> transactionService.injectDataToModifiedTransaction(checkedModifiedTransaction, originalTransaction)
                                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
@@ -87,36 +87,36 @@ public class TransactionFacade {
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {
         return transactionService.findByExternalIdAndSource(externalId, source)
-                .flatMap(transaction -> getTransactionCustomer(transaction)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(customer -> transaction.withCustomer(customer)));
     }
 
     public Mono<Transaction> findByComplytId(@NonNull UUID complytId) {
         return transactionService.findByComplytId(complytId)
-                .flatMap(transaction -> getTransactionCustomer(transaction)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(customer -> transaction.withCustomer(customer)));
     }
 
     public Flux<Transaction> getAll() {
         return transactionService.findAll()
-                .flatMap(transaction -> getTransactionCustomer(transaction)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(customer -> transaction.withCustomer(customer)));
     }
 
     public Flux<Transaction> getAllBySource(String source) {
 
         return transactionService.findAllBySource(source)
-                .flatMap(transaction -> getTransactionCustomer(transaction)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(customer -> transaction.withCustomer(customer)));
     }
 
     public Mono<Transaction> markAsCancelled(String externalId, String source) {
         return transactionService.markAsCancelled(externalId, source)
-                .flatMap(transaction -> getTransactionCustomer(transaction)
+                .flatMap(transaction -> getCustomerByTransaction(transaction)
                         .map(customer -> transaction.withCustomer(customer)));
     }
 
-    public Mono<Customer> getTransactionCustomer(Transaction transaction) {
+    public Mono<Customer> getCustomerByTransaction(Transaction transaction) {
         return customerService.findByComplytId(transaction.getCustomerId())
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
