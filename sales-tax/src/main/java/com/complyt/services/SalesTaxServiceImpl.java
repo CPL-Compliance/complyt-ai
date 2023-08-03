@@ -75,8 +75,4 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                             return transactionWithRates.withSalesTax(salesTax);
                         }));
     }
-
-    private boolean isCustomerTypeMarketplace(Transaction transaction) {
-        return transaction.getCustomer().getCustomerType() == CustomerType.MARKETPLACE;
-    }
 }
