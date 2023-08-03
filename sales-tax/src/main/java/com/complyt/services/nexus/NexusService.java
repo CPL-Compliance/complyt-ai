@@ -8,6 +8,8 @@ import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
+import com.complyt.services.CustomerService;
+import com.complyt.services.CustomerServiceImpl;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
@@ -34,6 +36,10 @@ public class NexusService {
     @Qualifier("nexusStateRuleServiceImpl")
     @NonNull
     private NexusStateRuleService nexusStateRuleService;
+
+    @Qualifier("customerServiceImpl")
+    @NonNull
+    private CustomerService customerService;
 
     @Qualifier("transactionServiceImpl")
     @NonNull
@@ -86,6 +92,8 @@ public class NexusService {
                         .flatMap(stateRule -> {
                             Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, stateRule, referenceDate);
                             return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
+                                    .flatMap(singleTransaction -> customerService.findByComplytId(singleTransaction.getCustomerId())
+                                            .map(customer -> singleTransaction.withCustomer(customer)))
                                     .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state));
                         }))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
