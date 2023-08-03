@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -22,16 +23,21 @@ import java.security.NoSuchAlgorithmException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@Service
 public class CredentialsService {
     @NonNull
     CredentialsRepository credentialsRepository;
 
     @NonNull
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @NonNull
-    private Cryptor cryptorAesCbcPkcs5Padding;
+    Cryptor cryptorAesCbcPkcs5Padding;
+
+    @NonNull
+    String grantType;
+
+    @NonNull
+    String issuerUri;
 
     public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
         return credentialsRepository.findByComplytClientId(apiKey.getClientId())
