@@ -94,6 +94,7 @@ public class SalesTaxServiceImplTest {
         Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
 
         // When
+        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, marketPlaceCustomer);
 
         // Then
@@ -107,7 +108,7 @@ public class SalesTaxServiceImplTest {
                 .withAppliedDate(transaction.getExternalTimestamps().getCreatedDate().plusYears(1));
 
         // When
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking,customer);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -136,7 +137,7 @@ public class SalesTaxServiceImplTest {
                 .thenReturn(Mono.just(transactionWithRates));
         when(taxableCollectionBuilder.build(transactionWithRates)).thenReturn(taxAbles);
         when(salesTaxAggregator.aggregate(taxAbles)).thenReturn(salesTax.amount());
-        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking,customer);
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transactionWithSalesTax).verifyComplete();
@@ -224,7 +225,7 @@ public class SalesTaxServiceImplTest {
         Customer nullCustomer = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->  salesTaxService.handleSalesTaxCalculation(transaction, tracking, nullCustomer));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(transaction, tracking, nullCustomer));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
