@@ -89,12 +89,11 @@ public class SalesTaxServiceImplTest {
     @Test
     void handleSalesTaxCalculation_CustomerIsOfMarketPlaceType_ReturnsSameTransaction() {
         // Given
-        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId)
-                .withEnforcesSalesTax(false);
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
 
         // When
-        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(true));
+        when(exemptionService.isFullyExempted(transaction)).thenReturn(Mono.just(false));
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, marketPlaceCustomer);
 
         // Then
