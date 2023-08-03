@@ -9,6 +9,7 @@ import com.complyt.domain.Item;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
+import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTax;
@@ -80,6 +81,20 @@ public class SalesTaxServiceImplTest {
 
         // When
         Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, customer);
+
+        // Then
+        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+    }
+
+    @Test
+    void handleSalesTaxCalculation_CustomerIsOfMarketPlaceType_ReturnsSameTransaction() {
+        // Given
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId)
+                .withEnforcesSalesTax(false);
+        Customer marketPlaceCustomer = customer.withCustomerType(CustomerType.MARKETPLACE);
+
+        // When
+        Mono<Transaction> transactionMono = salesTaxService.handleSalesTaxCalculation(transaction, tracking, marketPlaceCustomer);
 
         // Then
         StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
@@ -198,9 +213,20 @@ public class SalesTaxServiceImplTest {
         SalesTaxTracking nullTracking = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxService.handleSalesTaxCalculation(transaction, nullTracking, customer);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxService.handleSalesTaxCalculation(transaction, nullTracking, customer));
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void handleSalesTaxCalculation_NullCustomerPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking tracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
+        Customer nullCustomer = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () ->  salesTaxService.handleSalesTaxCalculation(transaction, tracking, nullCustomer));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "customer is marked non-null but is null");
     }
 }
