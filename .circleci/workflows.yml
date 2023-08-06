@@ -149,6 +149,11 @@ jobs:
       - run:
           name: Export image tag
           command: |
+            pwd
+            cd ..
+            pwd
+            ls files
+            ls sales-tax
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
