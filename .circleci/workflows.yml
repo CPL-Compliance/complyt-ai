@@ -290,28 +290,28 @@ workflows:
             - package-files
           service_directory: "api-gateway"
 
-#      - release:
-#          filters:
-#            branches:
-#              only:
-#                - eyal/com-235-api-services-versioning-management
-#          requires:
-#            - package-sales-tax
-#            - package-sales-tax-rates
-#            - package-discovery-service
-#            - package-files
-#          service_directory: "api-gateway"
+      - release:
+          filters:
+            branches:
+              only:
+                - eyal/com-235-api-services-versioning-management
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
+          service_directory: "api-gateway"
 
       - send-test-coverage-reports:
           requires:
             - verify
-#            - release
+            - release
           service_directory: "api-gateway"
 
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "api-gateway"
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "api-gateway"
 
   discovery-service-workflow:
     when: << pipeline.parameters.run-discovery-service-workflow >>
