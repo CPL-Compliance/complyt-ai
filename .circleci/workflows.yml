@@ -199,12 +199,12 @@ workflows:
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "sales-tax"
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "sales-tax"
 
       - deploy:
           filters:
@@ -222,7 +222,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-#            - verify
+            - verify
             - release
           service_directory: "sales-tax"
 
@@ -274,17 +274,17 @@ workflows:
           name: package-files
           service_directory: "files"
 
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          requires:
-            - package-sales-tax
-            - package-sales-tax-rates
-            - package-discovery-service
-            - package-files
-          service_directory: "api-gateway"
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          requires:
+#            - package-sales-tax
+#            - package-sales-tax-rates
+#            - package-discovery-service
+#            - package-files
+#          service_directory: "api-gateway"
 
       - release:
           filters:
