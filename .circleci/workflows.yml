@@ -300,7 +300,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "api-gateway"
 
