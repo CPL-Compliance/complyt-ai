@@ -142,6 +142,8 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
+      - attach_workspace:
+          at: ~/complyt_work_directory
       - add_ssh_keys:
           fingerprints:
             - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
