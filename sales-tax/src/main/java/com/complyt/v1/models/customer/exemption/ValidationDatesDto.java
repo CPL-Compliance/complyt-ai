@@ -12,7 +12,7 @@ import lombok.With;
 @With
 @Schema(name = "validationDates", description = FieldsDescriptions.VALIDATION_DATES)
 public record ValidationDatesDto(
-        @Schema(ref = "timestamp") @Valid @NotNull(message = "ValidationDates.fromDate " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = ISO8601Regex.expression, message = "ValidationDates.fromDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String fromDate,
-        @Schema(ref = "timestamp") @Valid @NotNull(message = "ValidationDates.toDate " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = ISO8601Regex.expression, message = "ValidationDates.toDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String toDate) {
+        @Schema(ref = "timestamp") @NotNull(message = "ValidationDates.fromDate " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = ISO8601Regex.expression, message = "ValidationDates.fromDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String fromDate,
+        @Schema(ref = "timestamp") @Pattern(regexp = ISO8601Regex.expression, message = "ValidationDates.toDate " + DtoErrorMessages.DATE_FORMAT_ERROR) String toDate) {
 
 }

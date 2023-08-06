@@ -34,6 +34,7 @@ class SalesTaxTrackingTest {
                 ", id=" + salesTaxTracking.getId() +
                 ", state=" + salesTaxTracking.getState() +
                 ", tenantId=" + salesTaxTracking.getTenantId() +
+                ", comment=" + salesTaxTracking.getComment() +
                 ", enforcesSalesTax=" + salesTaxTracking.isEnforcesSalesTax() +
                 ", physicalNexusTracker=" + salesTaxTracking.getPhysicalNexusTracker() +
                 ", economicNexusTracker=" + salesTaxTracking.getEconomicNexusTracker() +

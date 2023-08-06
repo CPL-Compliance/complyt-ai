@@ -8,13 +8,13 @@ Short explanation:
 the FIRST part checks for the format yyyy-mm-dd:
 # the year must be 4 digits, and month and days must be 2 digits (with 0 in the begging if one digit)
 
-(((20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\d|2[0-8])
+(((19[7-9][0-9]|20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\d|2[0-8])
 # checks up to the 28th of each month (every month have at least 28 days)
 
-(20([0-9]{2})|2100)-(((0[13578]|1[02])-31)|((0[13-9]|1[0-2])-(29|30)))
+(19[7-9][0-9]|20([0-9]{2})|2100)-(((0[13578]|1[02])-31)|((0[13-9]|1[0-2])-(29|30)))
 # checks for months with 29,30 and 31 days
 
-(20(00|04|[2468][048]|[13579][26])|2100)-02-29)
+(19(8[048]|[79][26])|20(00|04|[2468][048]|[13579][26])|2100)-02-29)
 # checks for leap years - years where february has 29 days
 
 the SECOND part is OPTIONAL, and checks for the time and the offset:
@@ -32,7 +32,7 @@ Extended explanation:
 (                                      # Start of the pattern
   (                                    # Start of the first group
     (                                  # Start of the first nested group
-      20([0-9]{2})|2100                # Matches years between 2000 and 2100
+      19[7-9][0-9]|20([0-9]{2})|2100   # Matches years between 2000 and 2100
     )-                                 # Matches a dash
     (                                  # Start of the second nested group
       (0[1-9])|(1[0-2])                # Matches months between 01 and 12
@@ -43,7 +43,7 @@ Extended explanation:
   )                                    # End of the first nested group
   |                                    # Matches the alternation operator
   (                                    # Start of the second group
-    20([0-9]{2})|2100-                # Matches years between 2000 and 2100
+    19[7-9][0-9]|20([0-9]{2})|2100-    # Matches years between 2000 and 2100
     (                                  # Start of the third nested group
       (0[13578]|1[02])-31              # Matches months with 31 days
       |                                # Matches the alternation operator
@@ -52,8 +52,8 @@ Extended explanation:
   )                                    # End of the second group
   |                                    # Matches the alternation operator
   (                                    # Start of the third group
-    20(00|04|[2468][048]|[13579][26])  # Matches leap years between 2000 and 2100
-    |2100-                            # Matches the year 2100
+    19(8[048]|[79][26])|               # Matches leap years between 1972 and 1996
+    20(00|04|[2468][048]|[13579][26])  # Matches leap years between 2000 and 2096
     02-29                              # Matches February 29th
   )                                    # End of the third group
 )                                      # End of the pattern
@@ -90,9 +90,9 @@ yyyy-mm-ddThh:mm.-hh:mm
  */
 public interface ISO8601Regex {
     String expression =
-            "^(((20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\\d|2[0-8])" +
-                    "|(20([0-9]{2})|2100)-(((0[13578]|1[02])-31)|((0[13-9]|1[0-2])-(29|30)))" +
-                    "|(20(00|04|[2468][048]|[13579][26])|2100)-02-29)" +
+            "^(((19[7-9][0-9]|20([0-9]{2})|2100)-((0[1-9])|(1[0-2]))-(0[1-9]|1\\d|2[0-8])" +
+                    "|(19[7-9][0-9]|20([0-9]{2})|2100)-(((0[13578]|1[02])-31)|((0[13-9]|1[0-2])-(29|30)))" +
+                    "|(19(8[048]|[79][26])|20([2468][048]|[13579][26]))-02-29)" +
                     "(T([0-1]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d((\\.\\d{0,9})?))?" +
                     "([zZ]|((-|\\+)(((0\\d|1[0-7])(:[0-5]\\d)?)|18(:00)?))?))?)$";
 

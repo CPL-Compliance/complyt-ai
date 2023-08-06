@@ -6,12 +6,14 @@ import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.TransactionType;
+import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.ClientTrackingService;
+import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -58,6 +61,9 @@ class NexusServiceTest {
     private TransactionService transactionService;
 
     @Mock
+    private CustomerService customerService;
+
+    @Mock
     private SalesTaxTrackingService salesTaxTrackingService;
 
     @Mock
@@ -67,6 +73,7 @@ class NexusServiceTest {
     private NexusChecker nexusChecker;
 
     private Transaction transaction;
+    private Customer customer;
     UnitTestUtilities testUtilities;
 
     String salesTaxTrackingId;
@@ -77,6 +84,7 @@ class NexusServiceTest {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
+        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
     }
 
     private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished(String id) {
@@ -106,7 +114,7 @@ class NexusServiceTest {
                 .gte(LocalDateTime.now().minusYears(1)).lte(LocalDateTime.now())).addCriteria(Criteria.where("shippingAddress.state")
                 .is(nexusStateRule.getState().getAbbreviation()));
         List<Transaction> transactionList = new ArrayList<>() {{
-            add(transaction);
+            add(transaction.withCustomer(customer));
         }};
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
@@ -122,6 +130,7 @@ class NexusServiceTest {
         when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(false);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
@@ -142,7 +151,7 @@ class NexusServiceTest {
                 .addCriteria(Criteria.where("shippingAddress.state")
                         .is(nexusStateRule.getState().getAbbreviation()));
         List<Transaction> transactionList = new ArrayList<Transaction>() {{
-            add(transaction);
+            add(transaction.withCustomer(customer));
         }};
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
@@ -160,6 +169,7 @@ class NexusServiceTest {
         when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         when(nexusCalculator.calculate(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(true);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));

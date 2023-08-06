@@ -244,7 +244,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
     @WithMockUser
     public void upsertByState_Exists_Returns200() {
         // Given
-        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState);
+        SalesTaxTrackingDto salesTaxTrackingDto = ITUtilities.stubSalesTaxTrackingDto(newState).withComment("a new comment");
 
         // Then
         webTestClient
@@ -259,7 +259,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(resultSalesTaxTrackingDto -> assertEquals(
-                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()),
+                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()).withComment("a new comment"),
                         resultSalesTaxTrackingDto)
                 );
     }

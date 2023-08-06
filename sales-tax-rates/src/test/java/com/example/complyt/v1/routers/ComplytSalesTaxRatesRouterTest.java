@@ -157,7 +157,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withCity("");
 
         Set<String> expectedErrors = Set.of(
-                "Address.city " + StringErrorMessages.MINMAX_100_ERROR
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -174,8 +174,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
 
     }
 
@@ -186,7 +186,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
 
         Set<String> expectedErrors = Set.of(
-                "Address.city " + DtoErrorMessages.NOT_NULL_ERROR
+                "Address.city " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -201,8 +201,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
 
     }
 
@@ -213,7 +213,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withState("");
 
         Set<String> expectedErrors = Set.of(
-                "Address.state " + StringErrorMessages.MINMAX_100_ERROR
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then
@@ -241,7 +241,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
 
         Set<String> expectedErrors = Set.of(
-                "Address.state " + DtoErrorMessages.NOT_NULL_ERROR
+                "Address.state " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then
@@ -267,7 +267,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withStreet("");
 
         Set<String> expectedErrors = Set.of(
-                "Address.street " + StringErrorMessages.MINMAX_200_ERROR
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -283,8 +283,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
 
     }
 
@@ -295,7 +295,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
 
         Set<String> expectedErrors = Set.of(
-                "Address.street " + DtoErrorMessages.NOT_NULL_ERROR
+                "Address.street " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -310,8 +310,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -321,7 +321,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withZip("");
 
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + StringErrorMessages.MINMAX_20_ERROR
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then
@@ -349,7 +349,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
 
         Set<String> expectedErrors = Set.of(
-                "Address.zip " + DtoErrorMessages.NOT_NULL_ERROR
+                "Address.zip " + StringErrorMessages.NOT_BE_BLANK_ERROR
         );
 
         // Then
@@ -375,7 +375,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia().withCountry("");
 
         Set<String> expectedErrors = Set.of(
-                "Address.country " + StringErrorMessages.MINMAX_50_ERROR
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -391,8 +391,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -402,7 +402,7 @@ public class ComplytSalesTaxRatesRouterTest {
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
 
         Set<String> expectedErrors = Set.of(
-                "Address.country " + DtoErrorMessages.NOT_NULL_ERROR
+                "Address.country " + StringErrorMessages.NOT_BE_BLANK_ERROR + " " + DtoErrorMessages.NON_PARTIAL_ERROR_SUFFIX
         );
 
         // Then
@@ -417,8 +417,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -478,7 +478,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withCountry(countryWithLength51);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.country " + StringErrorMessages.MINMAX_50_ERROR));
+        Set<String> expectedErrors = Set.of("Address.country " + StringErrorMessages.MAX_50_ERROR);
 
         // When + Then
         webTestClient
@@ -506,7 +506,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withCity(cityWithLength51);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.city " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of("Address.city " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -533,7 +533,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withState(stateWithLength101);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.state " + StringErrorMessages.MINMAX_100_ERROR));
+        Set<String> expectedErrors = Set.of("Address.state " + StringErrorMessages.MAX_100_ERROR);
 
         // When + Then
         webTestClient
@@ -549,8 +549,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -578,8 +578,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -590,7 +590,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withStreet(streetWithLength101);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.street " + StringErrorMessages.MINMAX_200_ERROR));
+        Set<String> expectedErrors = new HashSet<>(List.of("Address.street " + StringErrorMessages.MAX_200_ERROR));
 
         // When + Then
         webTestClient
@@ -606,8 +606,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Test
@@ -618,7 +618,7 @@ public class ComplytSalesTaxRatesRouterTest {
 
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia()
                 .withZip(zipWithLength101);
-        Set<String> expectedErrors = new HashSet<>(List.of("Address.zip " + StringErrorMessages.MINMAX_20_ERROR));
+        Set<String> expectedErrors = Set.of("Address.zip " + StringErrorMessages.MAX_20_ERROR);
 
         // When + Then
         webTestClient
@@ -634,8 +634,8 @@ public class ComplytSalesTaxRatesRouterTest {
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class);
-//                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> TestUtilities.checkErrorMessages(map, expectedErrors));
     }
 
 
