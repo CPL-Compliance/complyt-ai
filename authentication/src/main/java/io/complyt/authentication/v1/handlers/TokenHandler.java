@@ -6,14 +6,12 @@ import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.TokenMapper;
 import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.TokenDto;
-import io.complyt.authentication.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -37,7 +35,7 @@ public class TokenHandler {
 
         Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info)
                 .then(Mono.just(new ApiKey(apiKeyStr)))
-                .flatMap(tokenFacade::post)
+                .flatMap(tokenFacade::getToken)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(), log::info).thenReturn(tokenDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

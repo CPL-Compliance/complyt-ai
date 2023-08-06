@@ -6,11 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
+import java.time.LocalDateTime;
+
 @With
 @Schema(name = "Token", description = FieldsDescriptions.TOKEN)
 public record TokenDto(
         String accessToken,
         String scope,
         int expiresIn,
-        String tokenType) {
+        String tokenType,
+        LocalDateTime expireAt) {
 }

@@ -25,7 +25,7 @@ public class TokenFacade {
     @NonNull
     AuthorizationService authorizationService;
 
-    public Mono<Token> post(final @NonNull ApiKey apiKey) {
+    public Mono<Token> getToken(final @NonNull ApiKey apiKey) {
         return tokenService.findByApiKey(apiKey)
                 .switchIfEmpty(credentialsService.getCredentialsByApiKey(apiKey)
                         .flatMap(credentials -> authorizationService.getToken(credentials))
