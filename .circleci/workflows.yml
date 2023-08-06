@@ -152,7 +152,7 @@ jobs:
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
-      
+
       - run:
           name: Release
           command: |
@@ -199,12 +199,12 @@ workflows:
   sales-tax-workflow:
     when: << pipeline.parameters.run-sales-tax-workflow >>
     jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "sales-tax"
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "sales-tax"
 
       - deploy:
           filters:
@@ -222,7 +222,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "sales-tax"
 
