@@ -305,13 +305,13 @@ workflows:
       - send-test-coverage-reports:
           requires:
             - verify
-            - release
+#            - release
           service_directory: "api-gateway"
 
-      - update-ecs-service:
-          requires:
-            - release
-          service_name: "api-gateway"
+#      - update-ecs-service:
+#          requires:
+#            - release
+#          service_name: "api-gateway"
 
   discovery-service-workflow:
     when: << pipeline.parameters.run-discovery-service-workflow >>
