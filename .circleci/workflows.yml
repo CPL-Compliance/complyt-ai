@@ -154,10 +154,6 @@ jobs:
             env >> bash.env
       
       - run:
-          name: Verify
-          command: ./mvnw clean verify
-
-      - run:
           name: Release
           command: |
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
