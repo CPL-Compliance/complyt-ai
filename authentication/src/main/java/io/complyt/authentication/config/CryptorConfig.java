@@ -21,9 +21,9 @@ public class CryptorConfig {
     }
 
     private SecretKey convertStringToSecretKey(String secretKeyStr) {
-        byte[] decodedSecretKey = Base64.getDecoder().decode(secretKeyStr);
-        SecretKey secretKey = new SecretKeySpec(decodedSecretKey, 0, decodedSecretKey.length, "AES");
 
-        return secretKey;
+        byte[] decodedSecretKey = Base64.getDecoder().decode(secretKeyStr);
+
+        return new SecretKeySpec(decodedSecretKey, 0, decodedSecretKey.length, "AES");
     }
 }

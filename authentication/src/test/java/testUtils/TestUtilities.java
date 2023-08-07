@@ -36,11 +36,11 @@ public class TestUtilities {
     }
 
     public static TokenDto createTokenDto(String apiKey) {
-        return new TokenDto("", "", 0, "");
+        return new TokenDto("", "", 0, "", LocalDateTime.now());
     }
 
     public static TokenDto createOutputTokenDto() {
-        return new TokenDto(accessToken, scope, expiresIn, tokenType);
+        return new TokenDto(accessToken, scope, expiresIn, tokenType, LocalDateTime.now());
     }
 
     public static AccessToken createAccessToken() {
