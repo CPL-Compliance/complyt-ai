@@ -184,22 +184,22 @@ public abstract class TestContainersInitializerIT {
     private static String targetPath(String service) throws IOException {
         String directoryPath = "/home/circleci/complyt_work_directory/api-gateway/target/checkout/api-gateway";
 
-        File directory = new File(directoryPath);
-
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
-
-            if (files != null) {
-                System.out.println("Files in the directory: " + directoryPath);
-                for (File file : files) {
-                    if (file.isFile()) {
-                        System.out.println(file.getName());
-                    }
-                }
-            } else {
-                System.out.println("No files found in the directory.");
-            }
-        }
+//        File directory = new File(directoryPath);
+//
+//        if (directory.exists() && directory.isDirectory()) {
+//            File[] files = directory.listFiles();
+//
+//            if (files != null) {
+//                System.out.println("Files in the directory: " + directoryPath);
+//                for (File file : files) {
+//                    if (file.isFile()) {
+//                        System.out.println(file.getName());
+//                    }
+//                }
+//            } else {
+//                System.out.println("No files found in the directory.");
+//            }
+//        }
         return "/home/circleci/complyt_work_directory/" + service;
     }
 
