@@ -118,12 +118,13 @@ jobs:
             echo "------------------------------- FINISHED PREPARE -------------------------------"
             echo "------------------------------- STARTING PERFORM -------------------------------"
             pwd
-            ls..
+            ls ..
             ls
             ls ../sales-tax
             ls ../sales-tax-rates
             ls ../files
             ls ../discovery-service
+            ls ../discovery-service/target
             ./mvnw --settings ../.circleci/settings.xml release:perform 
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
