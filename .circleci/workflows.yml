@@ -55,6 +55,7 @@ jobs:
           root: ~/complyt_work_directory
           paths:
             - <<parameters.service_directory>>/target/*.jar
+            -
   verify:
     parameters:
       service_directory:
@@ -115,33 +116,6 @@ jobs:
           root: .
           paths:
             - bash.env
-
-      - persist_to_workspace:
-          root: target
-          paths:
-            - coverage-test-service
-            - failsafe-test-service
-            - surefire-test-service
-            - site
-
-
-  deploy:
-    parameters:
-      service_directory:
-        type: string
-        default: ""
-
-    working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-    executor: ubuntu-vm
-    steps:
-      - checkout:
-          path: ~/complyt_work_directory
-      - attach_workspace:
-          at: ~/complyt_work_directory
-
-      - run:
-          name: Release a Production Version
-          command: ./mvnw --settings ../.circleci/settings.xml clean deploy
 
       - persist_to_workspace:
           root: target
@@ -245,24 +219,25 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "files"
-
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#          service_directory: "files"
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "files"
 
       - release:
           service_directory: "files"
           filters:
             branches:
               only:
-                - eyal/com-235-api-services-versioning-management
+                - main
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "files"
 
       - update-ecs-service:
           requires:
@@ -285,23 +260,23 @@ workflows:
           name: package-files
           service_directory: "files"
 
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          requires:
-#            - package-sales-tax
-#            - package-sales-tax-rates
-#            - package-discovery-service
-#            - package-files
-#          service_directory: "api-gateway"
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
+          service_directory: "api-gateway"
 
       - release:
           filters:
             branches:
               only:
-                - eyal/com-235-api-services-versioning-management
+                - main
           requires:
             - package-sales-tax
             - package-sales-tax-rates
@@ -311,7 +286,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            #            - verify
+            - verify
             - release
           service_directory: "api-gateway"
 
