@@ -94,7 +94,7 @@ jobs:
           at: ~/complyt_work_directory
       - add_ssh_keys:
           fingerprints:
-            - "cd:4c:76:02:2b:fa:0d:2f:66:c6:e5:b8:cd:72:9a:0a"
+            - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
 
       - run:
           name: Export image tag
