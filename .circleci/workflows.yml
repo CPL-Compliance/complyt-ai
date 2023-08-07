@@ -191,13 +191,6 @@ workflows:
                 - /^(main.+|(?!main).*)$/
           service_directory: "sales-tax"
 
-      - deploy:
-          filters:
-            branches:
-              only:
-                - main
-          service_directory: "sales-tax"
-
       - release:
           service_directory: "sales-tax"
           filters:
