@@ -2,7 +2,6 @@ package io.complyt.authentication.v1.validators;
 
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
-import io.complyt.authentication.v1.models.TokenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

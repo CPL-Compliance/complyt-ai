@@ -12,9 +12,16 @@ import java.util.Base64;
 
 public class SecretKeyUtils {
 
+    /* Generating Secret key */
+
     // Generating Secret Key using KeyGenerator class with 256
-    public static SecretKey generateKey(int n) throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+    public static SecretKey generateKey(int n) {
+        KeyGenerator keyGenerator;
+        try {
+            keyGenerator = KeyGenerator.getInstance("AES");
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
         keyGenerator.init(n);
         SecretKey originalKey = keyGenerator.generateKey();
 
@@ -32,13 +39,12 @@ public class SecretKeyUtils {
     }
 
     /* Converting Secret key into String */
-    public static String convertSecretKeyToString(SecretKey secretKey) throws NoSuchAlgorithmException {
+    public static String convertSecretKeyToString(SecretKey secretKey) {
         // Converting the Secret Key into byte array
         byte[] rawData = secretKey.getEncoded();
         // Getting String - Base64 encoded version of the Secret Key
-        String encodedKey = Base64.getEncoder().encodeToString(rawData);
 
-        return encodedKey;
+        return Base64.getEncoder().encodeToString(rawData);
     }
 
     /* Converting String into Secret key into */

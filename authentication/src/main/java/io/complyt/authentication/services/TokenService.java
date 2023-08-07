@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
 
@@ -48,14 +47,12 @@ public class TokenService {
                 .map(token::withExpireAt)
                 .map(this::encryptToken)
                 .flatMap(tokenRepository::save)
-                .thenReturn(token);
+                .map(this::decryptToken);
     }
 
     @NonNull
     private Token decryptToken(@NonNull final Token token) {
-        EncryptedData accessTokenEncryptedData = new EncryptedData(token.getAccessTokenIv(),
-                token.getAccessToken());
-
+        EncryptedData accessTokenEncryptedData = new EncryptedData(token.getAccessTokenIv(), token.getAccessToken());
         EncryptedData scopeEncryptedData = new EncryptedData(token.getScopeIv(), token.getScope());
 
         String scope;
