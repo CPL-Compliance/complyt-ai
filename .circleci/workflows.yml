@@ -117,6 +117,15 @@ jobs:
           paths:
             - bash.env
 
+      - persist_to_workspace:
+          root: target
+          paths:
+            - coverage-test-service
+            - failsafe-test-service
+            - surefire-test-service
+            - site
+
+
   deploy:
     parameters:
       service_directory:
