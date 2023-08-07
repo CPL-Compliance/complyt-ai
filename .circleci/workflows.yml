@@ -109,23 +109,9 @@ jobs:
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             echo "------------------------------- STARTING PREPARE -------------------------------"
-            ls
-            ls ../sales-tax
-            ls ../sales-tax-rates
-            ls ../files
-            ls ../discovery-service
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             echo "------------------------------- FINISHED PREPARE -------------------------------"
             echo "------------------------------- STARTING PERFORM -------------------------------"
-            pwd
-            ls ..
-            ls
-            ls target
-            ls ../sales-tax
-            ls ../sales-tax-rates
-            ls ../files
-            ls ../discovery-service
-            ls ../discovery-service/target
             ./mvnw --settings ../.circleci/settings.xml release:perform 
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
