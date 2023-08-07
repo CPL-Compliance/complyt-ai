@@ -181,19 +181,22 @@ public abstract class TestContainersInitializerIT {
     }
 
     private static String targetPath(String service) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder("pwd");
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-
-        // Read the output of the command
-        java.io.InputStream inputStream = process.getInputStream();
-        java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
-        String result = scanner.hasNext() ? scanner.next() : "";
-        scanner.close();
-
-        System.out.println("Current Directory: " + result.trim());
-        String x = result.trim();
-        
+//        ProcessBuilder processBuilder = new ProcessBuilder("pwd");
+//        processBuilder.redirectErrorStream(true);
+//        Process process = processBuilder.start();
+//
+//        // Read the output of the command
+//        java.io.InputStream inputStream = process.getInputStream();
+//        java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
+//        String result = scanner.hasNext() ? scanner.next() : "";
+//        scanner.close();
+//
+//        System.out.println("Current Directory: " + result.trim());
+//        String x = result.trim();
+//
+        String currentDir = Paths.get("").toAbsolutePath().toString();
+        System.out.println("currentDir: " + currentDir);
+        String x = currentDir.trim();
         if(x.contains("checkout")) {
             return "../../../../" + service + "/target";
         }
