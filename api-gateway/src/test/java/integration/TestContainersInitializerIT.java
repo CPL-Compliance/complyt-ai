@@ -14,6 +14,7 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -181,29 +182,25 @@ public abstract class TestContainersInitializerIT {
     }
 
     private static String targetPath(String service) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder("pwd");
-//        ProcessBuilder processBuilder2 = new ProcessBuilder("ls");
+        String directoryPath = "/home/circleci/complyt_work_directory/api-gateway/target/checkout/api-gateway";
 
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-//        processBuilder2.redirectErrorStream(true);
-//        Process process2 = processBuilder2.start();
+        File directory = new File(directoryPath);
 
-        // Read the output of the command
-        java.io.InputStream inputStream = process.getInputStream();
-//        java.io.InputStream inputStream2 = process2.getInputStream();
-        java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
-//        java.util.Scanner scanner2 = new java.util.Scanner(inputStream2).useDelimiter("\\A");
-        String result = scanner.hasNext() ? scanner.next() : "";
-//        String result2 = scanner2.hasNext() ? scanner.next() : "";
-        scanner.close();
-//        scanner2.close();
-        System.out.println("Current Directory: " + result.trim());
-//        System.out.println("ll " + result2.trim());
-        System.out.println("&&&&&&&&&&&&&&&");
-        System.out.println("../" + service + "/target");
-        System.out.println("&&&&&&&&&&&&&&&");
-        return "../" + service + "/target";
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+
+            if (files != null) {
+                System.out.println("Files in the directory: " + directoryPath);
+                for (File file : files) {
+                    if (file.isFile()) {
+                        System.out.println(file.getName());
+                    }
+                }
+            } else {
+                System.out.println("No files found in the directory.");
+            }
+        }
+        return "/home/circleci/complyt_work_directory/" + service;
     }
 
     private static String dumpPath(String service) {
