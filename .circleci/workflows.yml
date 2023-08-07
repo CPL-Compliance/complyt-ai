@@ -121,6 +121,7 @@ jobs:
             pwd
             ls ..
             ls
+            ls target
             ls ../sales-tax
             ls ../sales-tax-rates
             ls ../files
