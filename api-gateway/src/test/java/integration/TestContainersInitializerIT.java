@@ -183,6 +183,7 @@ public abstract class TestContainersInitializerIT {
     private static String targetPath(String service) throws IOException {
         return service + "/target";
     }
+    
 
     private static String dumpPath(String service) {
         return service + ".dump";
