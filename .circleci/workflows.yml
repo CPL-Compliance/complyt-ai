@@ -91,7 +91,6 @@ jobs:
       - run: echo "This job will not overlap"
 
   release:
-    name: release
     parameters:
       service_directory:
         type: string
@@ -240,7 +239,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
 
       - release:
-          name: release
+          name: release2
           service_directory: "files"
           requires:
             - wait
@@ -300,7 +299,7 @@ workflows:
             - package-files
 
       - release:
-          name: release
+          name: release8
           filters:
             branches:
               only:
