@@ -127,7 +127,7 @@ jobs:
             ls ../files
             ls ../discovery-service
             ls ../discovery-service/target
-            ./mvnw --settings ../.circleci/settings.xml release:perform 
+            ./mvnw --settings ../.circleci/settings.xml clean release:perform 
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
       - persist_to_workspace:
