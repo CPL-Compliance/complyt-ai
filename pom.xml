@@ -265,7 +265,6 @@
                         <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
                         <pushChanges>true</pushChanges>
                         <autoVersionSubmodules>false</autoVersionSubmodules>
-                        <workingDirectory>/home/circleci/complyt_work_directory</workingDirectory>
                     </configuration>
                 </plugin>
                 <plugin>
