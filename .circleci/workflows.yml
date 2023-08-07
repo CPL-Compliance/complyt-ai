@@ -239,7 +239,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
 
       - release:
-          name: release2
+          name: release8
           service_directory: "files"
           requires:
             - wait
@@ -251,12 +251,12 @@ workflows:
       - send-test-coverage-reports:
           requires:
 #            - verify
-            - release2
+            - release8
           service_directory: "files"
 
       - update-ecs-service:
           requires:
-            - release2
+            - release8
           service_name: "files"
 
   api-gateway-workflow:
