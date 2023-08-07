@@ -81,6 +81,15 @@ jobs:
             - surefire-reports
             - site
 
+  wait:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - queue/until_front_of_line:
+          only-on-branch: eyal/com-235-api-services-versioning-management
+          time: '10'
+      - run: echo "This job will not overlap"
+
   release:
     parameters:
       service_directory:
@@ -90,11 +99,6 @@ jobs:
     executor: ubuntu-vm
 
     steps:
-      - queue/until_front_of_line:
-          only-on-branch: eyal/com-235-api-services-versioning-management
-          time: '10'
-          circleci-api-key: CIRCLECI_API_KEY
-      - run: echo "This job will not overlap"
       - checkout:
           path: ~/complyt_work_directory
       - attach_workspace:
@@ -188,33 +192,33 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
 workflows:
-  sales-tax-workflow:
-    when: << pipeline.parameters.run-sales-tax-workflow >>
-    jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "sales-tax"
-
-      - release:
-          service_directory: "sales-tax"
-          filters:
-            branches:
-              only:
-                - main
-
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - release
-          service_directory: "sales-tax"
-
-      - update-ecs-service:
-          requires:
-            - release
-          service_name: "sales-tax"
+#  sales-tax-workflow:
+#    when: << pipeline.parameters.run-sales-tax-workflow >>
+#    jobs:
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "sales-tax"
+#
+#      - release:
+#          service_directory: "sales-tax"
+#          filters:
+#            branches:
+#              only:
+#                - main
+#
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#            - release
+#          service_directory: "sales-tax"
+#
+#      - update-ecs-service:
+#          requires:
+#            - release
+#          service_name: "sales-tax"
 
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
@@ -226,8 +230,16 @@ workflows:
 #                - /^(main.+|(?!main).*)$/
 #          service_directory: "files"
 
+      - wait:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+
       - release:
           service_directory: "files"
+          requires:
+            - wait
           filters:
             branches:
               only:
@@ -272,6 +284,12 @@ workflows:
 #            - package-files
 #          service_directory: "api-gateway"
 
+      - wait:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+
       - release:
           filters:
             branches:
@@ -282,7 +300,9 @@ workflows:
             - package-sales-tax-rates
             - package-discovery-service
             - package-files
+            - wait
           service_directory: "api-gateway"
+
 
       - send-test-coverage-reports:
           requires:
@@ -295,64 +315,64 @@ workflows:
             - release
           service_name: "api-gateway"
 
-  discovery-service-workflow:
-    when: << pipeline.parameters.run-discovery-service-workflow >>
-    jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "discovery-service"
-
-      - release:
-          filters:
-            branches:
-              only:
-                - main
-          service_directory: "discovery-service"
-
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - release
-          service_directory: "discovery-service"
-
-      # We update all the services that run Discovery Services
-      - update-ecs-service:
-          requires:
-            - release
-          service_name: "discovery-service-az-1a"
-
-      - update-ecs-service:
-          requires:
-            - release
-          service_name: "discovery-service-az-1b"
-
-  sales-tax-rates-workflow:
-    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
-    jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "sales-tax-rates"
-
-      - release:
-          filters:
-            branches:
-              only:
-                - main
-          service_directory: "sales-tax-rates"
-
-      - send-test-coverage-reports:
-          requires:
-            - verify
-            - release
-          service_directory: "sales-tax-rates"
-
-      - update-ecs-service:
-          requires:
-            - release
-          service_name: "sales-tax-rates"
+#  discovery-service-workflow:
+#    when: << pipeline.parameters.run-discovery-service-workflow >>
+#    jobs:
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "discovery-service"
+#
+#      - release:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          service_directory: "discovery-service"
+#
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#            - release
+#          service_directory: "discovery-service"
+#
+#      # We update all the services that run Discovery Services
+#      - update-ecs-service:
+#          requires:
+#            - release
+#          service_name: "discovery-service-az-1a"
+#
+#      - update-ecs-service:
+#          requires:
+#            - release
+#          service_name: "discovery-service-az-1b"
+#
+#  sales-tax-rates-workflow:
+#    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
+#    jobs:
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "sales-tax-rates"
+#
+#      - release:
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          service_directory: "sales-tax-rates"
+#
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#            - release
+#          service_directory: "sales-tax-rates"
+#
+#      - update-ecs-service:
+#          requires:
+#            - release
+#          service_name: "sales-tax-rates"
