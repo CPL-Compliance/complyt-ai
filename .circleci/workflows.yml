@@ -112,7 +112,7 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             echo "------------------------------- FINISHED PREPARE -------------------------------"
             echo "------------------------------- STARTING PERFORM -------------------------------"
-            ./mvnw --settings ../.circleci/settings.xml release:perform -X
+            ./mvnw --settings ../.circleci/settings.xml release:perform -Darguments=-DskipTests -X
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
       - persist_to_workspace:
