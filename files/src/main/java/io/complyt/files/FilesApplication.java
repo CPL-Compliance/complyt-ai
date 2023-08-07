@@ -4,8 +4,6 @@ import io.complyt.files.annotations.Generated;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Optional;
-
 @SpringBootApplication
 @Generated
 public class FilesApplication {
