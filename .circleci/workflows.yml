@@ -239,6 +239,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
 
       - release:
+          name: release
           service_directory: "files"
           requires:
             - wait
@@ -298,6 +299,7 @@ workflows:
             - package-files
 
       - release:
+          name: release
           filters:
             branches:
               only:
