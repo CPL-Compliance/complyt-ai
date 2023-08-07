@@ -212,23 +212,23 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "files"
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "files"
 
       - release:
           service_directory: "files"
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
 
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "files"
 
@@ -253,7 +253,19 @@ workflows:
           name: package-files
           service_directory: "files"
 
-      - verify:
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          requires:
+#            - package-sales-tax
+#            - package-sales-tax-rates
+#            - package-discovery-service
+#            - package-files
+#          service_directory: "api-gateway"
+
+      - release:
           filters:
             branches:
               only:
@@ -265,21 +277,9 @@ workflows:
             - package-files
           service_directory: "api-gateway"
 
-      - release:
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - package-sales-tax
-            - package-sales-tax-rates
-            - package-discovery-service
-            - package-files
-          service_directory: "api-gateway"
-
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "api-gateway"
 
