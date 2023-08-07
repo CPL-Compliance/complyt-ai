@@ -102,6 +102,7 @@ jobs:
           fingerprints:
             - "8d:a9:53:20:ea:7a:b2:1d:e5:d8:af:d4:fc:e0:81:16"
 
+
       - run:
           name: Export image tag
           command: |
