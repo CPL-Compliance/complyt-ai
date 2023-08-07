@@ -108,12 +108,8 @@ jobs:
           command: |
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            echo "------------------------------- STARTING PREPARE -------------------------------"
-            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
-            echo "------------------------------- FINISHED PREPARE -------------------------------"
-            echo "------------------------------- STARTING PERFORM -------------------------------"
+            ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform 
-            echo "------------------------------- FINISHED PERFORM -------------------------------"
 
       - persist_to_workspace:
           root: .
