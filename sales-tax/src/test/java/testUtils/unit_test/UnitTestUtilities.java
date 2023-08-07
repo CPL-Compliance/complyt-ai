@@ -25,6 +25,8 @@ import com.complyt.v1.models.timestamps.TimestampsDto;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,6 +48,34 @@ public class UnitTestUtilities {
         customerIdOtherDomains = UUID.randomUUID();
         certificateId = UUID.randomUUID().toString();
         source = "1";
+    }
+
+    public static Address createAddressInCalifornia() {
+        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
+    }
+
+    public static MandatoryAddressDto createAddressDtoInCalifornia() {
+        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
+    }
+
+    public static SalesTaxRates createCaliforniaSalesTaxRates() {
+        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
+    }
+
+    public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
+        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
+    }
+
+    public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
+        Address address = createAddressInCalifornia();
+        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
+        return new ComplytSalesTaxRates(address, salesTaxRates);
+    }
+
+    public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
+        MandatoryAddressDto address = createAddressDtoInCalifornia();
+        SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
+        return new ComplytSalesTaxRatesDto(address, salesTaxRates);
     }
 
     public void checkErrorMessages(LinkedHashMap map, Set<String> expectedErrors) {
@@ -101,7 +131,6 @@ public class UnitTestUtilities {
         );
     }
 
-
     public Transaction createTransaction(String id) {
         String documentName = "INVUS1000";
         Address billingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
@@ -120,7 +149,7 @@ public class UnitTestUtilities {
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
 
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName,  items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
@@ -255,7 +284,7 @@ public class UnitTestUtilities {
     public SalesTaxTracking createSalesTaxTracking(String id) {
         State state = new State("CA", "02", "California");
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
-                tenantId, true,
+                tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
                 new EconomicNexusTracker(false, localDateTime), localDateTime,
                 true, localDateTime);
@@ -264,7 +293,7 @@ public class UnitTestUtilities {
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
         StateDto state = new StateDto("CA", "02", "California");
         SalesTaxTrackingDto salesTaxTrackingDto = new SalesTaxTrackingDto(UUID.randomUUID(), state,
-                true,
+                "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
                 true, localDateTime);
@@ -300,32 +329,9 @@ public class UnitTestUtilities {
         return new ValidationDatesDto(localDateTime.minusYears(1).toString(), localDateTime.toString());
     }
 
-    public static Address createAddressInCalifornia() {
-        return new Address("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
-    }
-
-    public static MandatoryAddressDto createAddressDtoInCalifornia() {
-        return new MandatoryAddressDto("Fresno", "US", "county", "CA", "7498 N Remington Ave", "93711-5508", false);
-    }
-
-    public static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
-    }
-
-    public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
-    }
-
-    public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
-        Address address = createAddressInCalifornia();
-        SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
-        return new ComplytSalesTaxRates(address, salesTaxRates);
-    }
-
-    public static ComplytSalesTaxRatesDto createCaliforniaComplytSalesTaxRatesDto() {
-        MandatoryAddressDto address = createAddressDtoInCalifornia();
-        SalesTaxRatesDto salesTaxRates = createCaliforniaSalesTaxRatesDto();
-        return new ComplytSalesTaxRatesDto(address, salesTaxRates);
+    public static boolean stringPassedRegex(String input, Pattern pattern) {
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
     }
 
 }

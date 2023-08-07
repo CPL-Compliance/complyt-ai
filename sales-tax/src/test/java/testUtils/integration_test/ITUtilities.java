@@ -37,7 +37,7 @@ public interface ITUtilities {
     }
 
     static SalesTaxTrackingDto stubSalesTaxTrackingDto(StateDto state) {
-        return new SalesTaxTrackingDto(null, state, true,
+        return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
                 LocalDateTime.now(), false, LocalDateTime.now());
@@ -134,10 +134,10 @@ public interface ITUtilities {
                 .issuer("https://localhost")
                 .claim("tenant_id", "it_tenant")
                 .claim("scope", "create:customer delete:customer read:customer " +
-                        "update:customer create:transaction read:transaction " +
-                        "update:transaction delete:transaction read:state " +
-                        "create:exemption update:exemption delete:exemption " +
-                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+                                "update:customer create:transaction read:transaction " +
+                                "update:transaction delete:transaction read:state " +
+                                "create:exemption update:exemption delete:exemption " +
+                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
     public static Address createAddressInCalifornia() {

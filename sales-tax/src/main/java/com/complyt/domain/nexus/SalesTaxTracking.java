@@ -24,6 +24,7 @@ public class SalesTaxTracking implements ComplytIdProperty {
     String id;
     State state;
     String tenantId;
+    String comment;
     boolean enforcesSalesTax;
     PhysicalNexusTracker physicalNexusTracker;
     EconomicNexusTracker economicNexusTracker;

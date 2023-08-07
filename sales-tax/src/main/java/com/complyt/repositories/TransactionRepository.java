@@ -1,10 +1,8 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +30,19 @@ public class TransactionRepository {
 
     public Mono<Transaction> save(@NonNull Transaction transaction) {
         return tenantResolver.resolve()
-                .flatMap(tenantId -> getCustomerByTransaction(transaction, tenantId)
-                        .flatMap(customer -> {
-                            Transaction transactionWithTenantId = transaction.withTenantId(tenantId);
+                .flatMap(tenantId -> {
+                    Transaction transactionWithTenantId = transaction.withTenantId(tenantId);
 
-                            return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
-                                    .then(reactiveMongoTemplate.save(transactionWithTenantId)
-                                            .map(savedTransaction -> savedTransaction.withCustomer(customer)));
-                        }));
+                    return ContextLogger.observeCtx("Saving transaction: " + transactionWithTenantId.toString(), log::info)
+                            .then(reactiveMongoTemplate.save(transactionWithTenantId));
+                });
     }
 
     public Flux<Transaction> saveAll(@NonNull List<Transaction> transactions) {
         return tenantResolver.resolve()
                 .map(tenantId -> transactions.stream().map(transaction -> transaction.withTenantId(tenantId)).collect(Collectors.toList()))
                 .flatMapMany(transactionsWithTenantId -> ContextLogger.observeCtx("Saving transactions: " + transactionsWithTenantId.toString(), log::info)
-                        .thenMany(reactiveMongoTemplate.insertAll(transactionsWithTenantId)
-                                .flatMap(transaction -> getCustomerByTransaction(transaction, transaction.getTenantId())
-                                        .map(transaction::withCustomer))));
+                        .thenMany(reactiveMongoTemplate.insertAll(transactionsWithTenantId)));
     }
 
     @Deprecated
@@ -60,9 +54,7 @@ public class TransactionRepository {
 
                     return ContextLogger.observeCtx("Searching for transaction with ID " + transactionId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
-                                    .findOne(query, Transaction.class)
-                                    .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
-                                            .map(transaction::withCustomer)));
+                                    .findOne(query, Transaction.class));
                 });
     }
 
@@ -75,9 +67,7 @@ public class TransactionRepository {
 
                     return ContextLogger.observeCtx("Searching for transaction with external ID " + externalId + ", source" + source + ", and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
-                                    .findOne(query, Transaction.class)
-                                    .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
-                                            .map(transaction::withCustomer)));
+                                    .findOne(query, Transaction.class));
                 });
     }
 
@@ -89,12 +79,7 @@ public class TransactionRepository {
 
                     return ContextLogger.observeCtx("Searching for transaction with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
                             .then(reactiveMongoTemplate
-                                    .findOne(query, Transaction.class)
-                                    .flatMap(transaction -> reactiveMongoTemplate
-                                            .findOne(Query.query(Criteria
-                                                    .where("complytId").is(transaction.getCustomerId())
-                                                    .and("tenantId").is(tenantId)), Customer.class)
-                                            .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))));
+                                    .findOne(query, Transaction.class));
                 });
     }
 
@@ -104,9 +89,7 @@ public class TransactionRepository {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId, log::info)
-                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class)
-                                    .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
-                                            .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))));
+                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }
 
@@ -117,9 +100,7 @@ public class TransactionRepository {
                             .and("source").is(source));
 
                     return ContextLogger.observeCtx("Searching for transactions by tenant ID " + tenantId + " and source " + source, log::info)
-                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class)
-                                    .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
-                                            .map(transaction::withCustomer).switchIfEmpty(Mono.just(transaction))));
+                            .thenMany(reactiveMongoTemplate.find(query, Transaction.class));
                 });
     }
 
@@ -129,18 +110,7 @@ public class TransactionRepository {
                     Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
 
                     return ContextLogger.observeCtx("Searching for transactions by query: " + updatedQuery, log::info)
-                            .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class)
-                                    .flatMap(transaction -> getCustomerByTransaction(transaction, tenantId)
-                                            .map(transaction::withCustomer)));
+                            .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class));
                 });
-    }
-
-    private Mono<Customer> getCustomerByTransaction(Transaction transaction, String tenantId) {
-        Query query = Query.query(Criteria.where("complytId").is(transaction.getCustomerId())
-                .and("tenantId").is(tenantId));
-
-        return ContextLogger.observeCtx("Searching for customer by query: " + query, log::info)
-                .then(reactiveMongoTemplate.findOne(query, Customer.class))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 }

@@ -247,6 +247,12 @@ spring:
           args:
             retries: 5
             series: SERVER_ERROR
+            methods: GET,PUT,DELETE,POST
+            # For more details on these exceptions go to ticket <tomer/com-248-gateway-retry-improvement>
+            exceptions:
+              - java.io.IOException
+              - org.springframework.cloud.gateway.support.TimeoutException
+              - java.lang.RuntimeException
             backoff:
               firstBackoff: 20ms
               factor: 2

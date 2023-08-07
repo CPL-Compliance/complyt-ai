@@ -14,6 +14,7 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTax;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.services.CustomerServiceImpl;
 import com.complyt.services.SalesTaxService;
 import com.complyt.services.TransactionServiceImpl;
 import com.complyt.services.nexus.NexusService;
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -48,6 +50,9 @@ public class TransactionFacadeTest {
 
     @Mock
     TransactionServiceImpl transactionService;
+
+    @Mock
+    CustomerServiceImpl customerService;
 
     @Mock
     SalesTaxService salesTaxService;
@@ -118,6 +123,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
         when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -141,6 +147,7 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, false);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
         when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
@@ -165,10 +172,11 @@ public class TransactionFacadeTest {
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkTransactionNotHavingComplytId(transactionNoId)).thenReturn(Mono.just(transactionNoId));
         when(transactionService.injectDataToNewTransaction(transactionNoId)).thenReturn(Mono.just(transactionWithCustomer));
         when(nexusService.hasNexus(transactionWithCustomer)).thenReturn(Mono.just(salesTaxTrackingDecorator));
-        when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking)).thenReturn(Mono.just(transactionWithInjectedDataAndSalesTax));
+        when(salesTaxService.handleSalesTaxCalculation(transactionWithCustomer, salesTaxTracking, customer)).thenReturn(Mono.just(transactionWithInjectedDataAndSalesTax));
         when(transactionService.save(transactionWithInjectedDataAndSalesTax)).thenReturn(Mono.just(transactionWithInjectedDataAndSalesTaxAndId));
 
         Mono<Transaction> transactionMono = transactionFacade.saveTransaction(transactionNoId);
@@ -185,11 +193,12 @@ public class TransactionFacadeTest {
         Transaction transactionToSearchFor = transaction.withExternalId(externalId);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.just(transactionToSearchFor));
         Mono<Transaction> transactionMono = transactionFacade.findByExternalIdAndSource(externalId, source);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transactionToSearchFor.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -203,6 +212,7 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll()).thenReturn(Flux.fromIterable(allTransactions));
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> returnedCustomers = transactionFacade.getAll();
 
         // Then
@@ -331,15 +341,17 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
         Transaction newTransactionWithSalesTax = modifiedTransaction.withSalesTax(salesTax);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
         when(transactionService.injectDataToModifiedTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
         when(nexusService.hasNexus(modifiedTransaction)).thenReturn(Mono.just(salesTaxTrackingDecorator));
-        when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(newTransactionWithSalesTax));
+        when(salesTaxService.handleSalesTaxCalculation(modifiedTransaction, salesTaxTracking, customer)).thenReturn(Mono.just(newTransactionWithSalesTax));
         when(transactionService.update(newTransactionWithSalesTax.getExternalId(), source, newTransactionWithSalesTax)).thenReturn(Mono.just(newTransactionWithSalesTax));
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
@@ -357,9 +369,11 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
         when(transactionService.injectDataToModifiedTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
@@ -383,9 +397,11 @@ public class TransactionFacadeTest {
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())
-                .withComplytId(transaction.getComplytId());
+                .withComplytId(transaction.getComplytId())
+                .withCustomer(customer);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.checkComplytIdOfModifiedEqualsToOriginal(transactionWithNewAddress, transaction)).thenReturn(Mono.just(transactionWithNewAddress));
         when(transactionService.injectDataToModifiedTransaction(transactionWithNewAddress, transaction))
                 .thenReturn(Mono.just(modifiedTransaction));
@@ -405,11 +421,12 @@ public class TransactionFacadeTest {
         Transaction cancelledTransaction = transaction.withTransactionStatus(TransactionStatus.CANCELLED);
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.markAsCancelled(externalId, source)).thenReturn(Mono.just(cancelledTransaction));
         Mono<Transaction> transactionWithCancelledStatus = transactionFacade.markAsCancelled(externalId, source);
 
         // Then
-        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction).verifyComplete();
+        StepVerifier.create(transactionWithCancelledStatus).expectNext(cancelledTransaction.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -424,10 +441,11 @@ public class TransactionFacadeTest {
 
         // When
         when(transactionService.findAll()).thenReturn(Flux.fromIterable(transactions));
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         Flux<Transaction> transactionFlux = transactionFacade.getAll();
 
         // Then
-        StepVerifier.create(transactionFlux).expectNext(transaction, anotherTransactionWithSameClientId).verifyComplete();
+        StepVerifier.create(transactionFlux).expectNext(transaction.withCustomer(customer), anotherTransactionWithSameClientId.withCustomer(customer)).verifyComplete();
     }
 
     @Test
@@ -442,6 +460,7 @@ public class TransactionFacadeTest {
         allTransactionsInSource.add(secondTransaction);
 
         // When
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
         when(transactionService.findAllBySource(source)).thenReturn(Flux.fromIterable(allTransactionsInSource));
         Flux<Transaction> returnedTransactions = transactionFacade.getAllBySource(source);
 
@@ -455,11 +474,12 @@ public class TransactionFacadeTest {
         UUID complytId = transaction.getComplytId();
 
         // When
+        when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(transactionService.findByComplytId(complytId)).thenReturn(Mono.just(transaction));
         Mono<Transaction> transactionMono = transactionFacade.findByComplytId(complytId);
 
         // Then
-        StepVerifier.create(transactionMono).expectNext(transaction).verifyComplete();
+        StepVerifier.create(transactionMono).expectNext(transaction.withCustomer(customer)).verifyComplete();
     }
 
     @Test

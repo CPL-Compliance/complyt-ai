@@ -2,8 +2,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 1
+    registry-fetch-interval-seconds: 15
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
@@ -34,7 +38,6 @@ spring.cloud.vault:
     enabled: true
     role: ${VAULT_DB_ROLE}
     backend: database
-
 
 spring.config.import: vault://
 
