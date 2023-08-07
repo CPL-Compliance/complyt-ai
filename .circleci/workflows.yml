@@ -91,6 +91,7 @@ jobs:
       - run: echo "This job will not overlap"
 
   release:
+    name: release
     parameters:
       service_directory:
         type: string
