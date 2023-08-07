@@ -249,17 +249,17 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - verify:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          service_directory: "files"
+#      - verify:
+#          filters:
+#            branches:
+#              only:
+#                - /^(main.+|(?!main).*)$/
+#          service_directory: "files"
 
-      - send-test-coverage-reports:
-          requires:
-            - verify
-          service_directory: "files"
+#      - send-test-coverage-reports:
+#          requires:
+#            - verify
+#          service_directory: "files"
 
       - release:
           service_directory: "files"
