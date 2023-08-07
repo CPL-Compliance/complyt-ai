@@ -193,6 +193,7 @@ public abstract class TestContainersInitializerIT {
 
         System.out.println("Current Directory: " + result.trim());
         String x = result.trim();
+        
         if(x.contains("checkout")) {
             return "../../../../" + service + "/target";
         }
