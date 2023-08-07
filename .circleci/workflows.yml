@@ -96,9 +96,14 @@ jobs:
         type: string
         default: ""
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-    executor: ubuntu-vm
+    docker:
+      - image: circleci/node:10
 
     steps:
+      - queue/until_front_of_line:
+          only-on-branch: master
+          time: '10'
+      - run: echo "This job will not overlap"
       - checkout:
           path: ~/complyt_work_directory
       - attach_workspace:
@@ -288,6 +293,11 @@ workflows:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
 
       - release:
           filters:
@@ -295,10 +305,6 @@ workflows:
               only:
                 - /^(main.+|(?!main).*)$/
           requires:
-            - package-sales-tax
-            - package-sales-tax-rates
-            - package-discovery-service
-            - package-files
             - wait
           service_directory: "api-gateway"
 
