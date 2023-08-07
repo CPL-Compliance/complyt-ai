@@ -161,6 +161,9 @@ public abstract class TestContainersInitializerIT {
     }
 
     private static String targetPath(String service) {
+        System.out.println("&&&&&&&&&&&&&&&");
+        System.out.println("../" + service + "/target");
+        System.out.println("&&&&&&&&&&&&&&&");
         return "../" + service + "/target";
     }
 
@@ -170,6 +173,7 @@ public abstract class TestContainersInitializerIT {
 
     private static GenericContainer initializeServiceContainer(String service, String... entrypoint) {
         fetchJarFile(service);
+
         return new GenericContainer<>(
                 new ImageFromDockerfile()
                         .withFileFromPath(".", Path.of(targetPath(service)))
