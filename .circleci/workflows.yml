@@ -109,11 +109,11 @@ jobs:
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
             echo "------------------------------- STARTING PREPARE -------------------------------"
-            cat target/dockerfile/Dockerfile
+            ls target
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             echo "------------------------------- FINISHED PREPARE -------------------------------"
             echo "------------------------------- STARTING PERFORM -------------------------------"
-            cat target/dockerfile/Dockerfile
+            ls target
             ./mvnw --settings ../.circleci/settings.xml release:perform -Darguments=-DskipTests -X
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
