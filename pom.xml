@@ -255,6 +255,19 @@
                     </dependencies>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <releaseProfiles>release</releaseProfiles>
+                        <checkModificationExcludes>true</checkModificationExcludes>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
+                        <pushChanges>true</pushChanges>
+                        <autoVersionSubmodules>false</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>0.40.1</version>
@@ -522,19 +535,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <releaseProfiles>release</releaseProfiles>
-                    <checkModificationExcludes>true</checkModificationExcludes>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
-                    <pushChanges>true</pushChanges>
-                    <autoVersionSubmodules>false</autoVersionSubmodules>
-                </configuration>
             </plugin>
         </plugins>
     </build>

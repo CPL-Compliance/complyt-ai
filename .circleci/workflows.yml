@@ -106,11 +106,10 @@ jobs:
       - run:
           name: Release
           command: |
-            ./mvnw clean package -Dmaven.test.skip
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
-            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
-            ./mvnw --settings ../.circleci/settings.xml release:perform -X
+            ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION release:perform -X
+#            ./mvnw --settings ../.circleci/settings.xml release:perform -X
 
       - persist_to_workspace:
           root: .
