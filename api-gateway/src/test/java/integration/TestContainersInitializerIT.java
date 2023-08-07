@@ -183,6 +183,7 @@ public abstract class TestContainersInitializerIT {
     private static String targetPath(String service) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder("pwd");
         ProcessBuilder processBuilder2 = new ProcessBuilder("ls");
+        
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
         processBuilder2.redirectErrorStream(true);
