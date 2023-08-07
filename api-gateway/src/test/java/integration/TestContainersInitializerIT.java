@@ -182,16 +182,23 @@ public abstract class TestContainersInitializerIT {
 
     private static String targetPath(String service) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder("pwd");
+        ProcessBuilder processBuilder2 = new ProcessBuilder("ls -la");
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
+        processBuilder2.redirectErrorStream(true);
+        Process process2 = processBuilder2.start();
 
         // Read the output of the command
         java.io.InputStream inputStream = process.getInputStream();
+        java.io.InputStream inputStream2 = process2.getInputStream();
         java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
+        java.util.Scanner scanner2 = new java.util.Scanner(inputStream2).useDelimiter("\\A");
         String result = scanner.hasNext() ? scanner.next() : "";
+        String result2 = scanner2.hasNext() ? scanner.next() : "";
         scanner.close();
-
+        scanner2.close();
         System.out.println("Current Directory: " + result.trim());
+        System.out.println("ls -la " + result2.trim());
         System.out.println("&&&&&&&&&&&&&&&");
         System.out.println("../" + service + "/target");
         System.out.println("&&&&&&&&&&&&&&&");
