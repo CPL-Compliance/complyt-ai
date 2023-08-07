@@ -173,15 +173,15 @@ public abstract class TestContainersInitializerIT {
 
     private static void fetchJarFile(String service) {
         try {
-            Files.newDirectoryStream(Paths.get(targetPath()), "*.jar")
+            Files.newDirectoryStream(Paths.get(targetPath(service)), "*.jar")
                     .forEach(path -> JAR_FILE_MAP.put(service, path.getFileName().toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static String targetPath() throws IOException {
-        return "/target";
+    private static String targetPath(String service) throws IOException {
+        return "" + service + "/target";
     }
 
     private static String dumpPath(String service) {
@@ -193,7 +193,7 @@ public abstract class TestContainersInitializerIT {
 
         return new GenericContainer<>(
                 new ImageFromDockerfile()
-                        .withFileFromPath(".", Path.of(targetPath()))
+                        .withFileFromPath(".", Path.of(targetPath(service)))
                         .withDockerfileFromBuilder(builder -> builder
                                 .from("amazoncorretto:17-al2023-jdk")
                                 .add(JAR_FILE_MAP.get(service), "app.jar")
