@@ -14,7 +14,6 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,25 +181,7 @@ public abstract class TestContainersInitializerIT {
     }
 
     private static String targetPath(String service) throws IOException {
-        String directoryPath = "/home/circleci/complyt_work_directory/api-gateway/target/checkout/api-gateway";
-
-//        File directory = new File(directoryPath);
-//
-//        if (directory.exists() && directory.isDirectory()) {
-//            File[] files = directory.listFiles();
-//
-//            if (files != null) {
-//                System.out.println("Files in the directory: " + directoryPath);
-//                for (File file : files) {
-//                    if (file.isFile()) {
-//                        System.out.println(file.getName());
-//                    }
-//                }
-//            } else {
-//                System.out.println("No files found in the directory.");
-//            }
-//        }
-        return "/home/circleci/complyt_work_directory/" + service;
+        return "../" + service + "/target";
     }
 
     private static String dumpPath(String service) {
