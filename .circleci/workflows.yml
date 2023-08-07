@@ -81,14 +81,14 @@ jobs:
             - surefire-reports
             - site
 
-#  wait:
-#    docker:
-#      - image: circleci/node:10
-#    steps:
-#      - queue/until_front_of_line:
-#          only-on-branch: "*"
-#          time: '10'
-#      - run: echo "This job will not overlap"
+  wait:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - queue/until_front_of_line:
+          only-on-branch: "*"
+          time: '10'
+      - run: echo "This job will not overlap"
 
   release:
     parameters:
@@ -96,16 +96,11 @@ jobs:
         type: string
         default: ""
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
-    docker:
-      - image: circleci/node:10
+    executor: ubuntu-vm
 
     steps:
       - checkout:
           path: ~/complyt_work_directory
-      - queue/until_front_of_line:
-          only-on-branch: master
-          time: '10'
-      - run: echo "This job will not overlap"
       - attach_workspace:
           at: ~/complyt_work_directory
       - add_ssh_keys:
@@ -118,6 +113,11 @@ jobs:
             image_tag=$(grep -m2 '<version>' pom.xml | tail -n1 | sed -n 's/.*<version>\([0-9.]*\).*<\/version>.*/\1/p')
             export IMAGE_TAG=$image_tag
             env >> bash.env
+
+      - queue/until_front_of_line:
+          only-on-branch: "*"
+          time: '10'
+      - run: echo "This job will not overlap"
 
       - run:
           name: Release
@@ -234,16 +234,16 @@ workflows:
 #                - /^(main.+|(?!main).*)$/
 #          service_directory: "files"
 
-#      - wait:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
+      - wait:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
 
       - release:
           service_directory: "files"
-#          requires:
-#            - wait
+          requires:
+            - wait
           filters:
             branches:
               only:
@@ -288,24 +288,24 @@ workflows:
 #            - package-files
 #          service_directory: "api-gateway"
 
-#      - wait:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          requires:
-#            - package-sales-tax
-#            - package-sales-tax-rates
-#            - package-discovery-service
-#            - package-files
+      - wait:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
 
       - release:
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
-#          requires:
-#            - wait
+          requires:
+            - wait
           service_directory: "api-gateway"
 
 
