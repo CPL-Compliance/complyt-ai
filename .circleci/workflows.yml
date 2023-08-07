@@ -251,12 +251,12 @@ workflows:
       - send-test-coverage-reports:
           requires:
 #            - verify
-            - release
+            - release2
           service_directory: "files"
 
       - update-ecs-service:
           requires:
-            - release
+            - release2
           service_name: "files"
 
   api-gateway-workflow:
@@ -312,12 +312,12 @@ workflows:
       - send-test-coverage-reports:
           requires:
 #            - verify
-            - release
+            - release8
           service_directory: "api-gateway"
 
       - update-ecs-service:
           requires:
-            - release
+            - release8
           service_name: "api-gateway"
 
 #  discovery-service-workflow:
