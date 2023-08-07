@@ -93,6 +93,7 @@ jobs:
       - queue/until_front_of_line:
           only-on-branch: eyal/com-235-api-services-versioning-management
           time: '10'
+          circleci-api-key: CIRCLECI_API_KEY
       - run: echo "This job will not overlap"
       - checkout:
           path: ~/complyt_work_directory
