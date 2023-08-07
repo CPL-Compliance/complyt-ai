@@ -117,12 +117,14 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             echo "------------------------------- FINISHED PREPARE -------------------------------"
             echo "------------------------------- STARTING PERFORM -------------------------------"
+            pwd
+            ls..
             ls
             ls ../sales-tax
             ls ../sales-tax-rates
             ls ../files
             ls ../discovery-service
-            ./mvnw --settings ../.circleci/settings.xml release:perform -Dmaven.test.failure.ignore=true
+            ./mvnw --settings ../.circleci/settings.xml release:perform 
             echo "------------------------------- FINISHED PERFORM -------------------------------"
 
       - persist_to_workspace:
