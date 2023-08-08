@@ -196,6 +196,8 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
   block:
+    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
+    steps:
     - queue/until_front_of_line:
         block-workflow: true
 
