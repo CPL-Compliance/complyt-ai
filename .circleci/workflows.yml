@@ -99,6 +99,10 @@ jobs:
     executor: ubuntu-vm
 
     steps:
+      - queue/until_front_of_line:
+          job-regex: ^release-[0-9]$
+          only-on-branch: eyal/com-235-api-services-versioning-management
+          time: '10'
       - checkout:
           path: ~/complyt_work_directory
       - attach_workspace:
@@ -114,9 +118,6 @@ jobs:
             export IMAGE_TAG=$image_tag
             env >> bash.env
 
-      - queue/until_front_of_line:
-          only-on-branch: eyal/com-235-api-services-versioning-management
-          time: '10'
       - run:
           name: Release
           command: |
@@ -239,7 +240,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
 
       - release:
-          name: release8
+          name: release
           service_directory: "files"
           requires:
             - wait
@@ -251,12 +252,12 @@ workflows:
       - send-test-coverage-reports:
           requires:
 #            - verify
-            - release8
+            - release
           service_directory: "files"
 
       - update-ecs-service:
           requires:
-            - release8
+            - release
           service_name: "files"
 
   api-gateway-workflow:
@@ -299,7 +300,7 @@ workflows:
             - package-files
 
       - release:
-          name: release8
+          name: release
           filters:
             branches:
               only:
@@ -312,12 +313,12 @@ workflows:
       - send-test-coverage-reports:
           requires:
 #            - verify
-            - release8
+            - release
           service_directory: "api-gateway"
 
       - update-ecs-service:
           requires:
-            - release8
+            - release
           service_name: "api-gateway"
 
 #  discovery-service-workflow:
