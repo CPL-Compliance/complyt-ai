@@ -2,6 +2,7 @@ package io.complyt.authentication.business.authorization;
 
 import io.complyt.authentication.domain.mappers.Auth0AccessTokenToAccessToken;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapper {
     @NonNull
