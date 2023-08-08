@@ -128,7 +128,7 @@ jobs:
             ./mvnw --settings ../.circleci/settings.xml release:perform
             git checkout eyal/com-235-api-services-versioning-management
             git pull origin eyal/com-235-api-services-versioning-management
-            git merge "<<parameters.branch_name>>-$PROJECT_VERSION"
+            git merge --no-edit "<<parameters.branch_name>>-$PROJECT_VERSION"
             git push --set-upstream origin eyal/com-235-api-services-versioning-management
             git push --delete origin "<<parameters.branch_name>>-$PROJECT_VERSION"
 
