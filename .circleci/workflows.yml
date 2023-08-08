@@ -195,6 +195,10 @@ jobs:
           family: "<<parameters.service_name>>-task-definition"
           service-name: "<<parameters.service_name>>-service"
 
+  block:
+    - queue/until_front_of_line:
+        block-workflow: true
+
 workflows:
 #  sales-tax-workflow:
 #    when: << pipeline.parameters.run-sales-tax-workflow >>
@@ -227,8 +231,7 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - queue/until_front_of_line:
-          block-workflow: true
+      - block:
 #      - verify:
 #          filters:
 #            branches:
@@ -257,8 +260,7 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - queue/until_front_of_line:
-          block-workflow: true
+      - block:
       - package-dependency:
           name: package-sales-tax
           service_directory: "sales-tax"
