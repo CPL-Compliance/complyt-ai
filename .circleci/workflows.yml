@@ -202,7 +202,6 @@ jobs:
       to_block:
         type: boolean
         default: true
-    working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
     - queue/until_front_of_line:
         block-workflow: <<parameters.to_block>>
