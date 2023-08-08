@@ -240,6 +240,15 @@ spring:
         # ==== Sales Tax Rates Service ====
         # ==== Authentication Service ====
         # ---- ApiKey ----
+        - id: authentication-get-token
+          uri: lb://authentication
+          predicates:
+            - Method=POST
+            - Path=/v1/api_key
+          filters:
+            - SetPath=/v1/api_key
+        # ---- ApiKey ----
+        # ---- Token ----
         - id: authentication-post-token
           uri: lb://authentication
           predicates:
@@ -247,7 +256,7 @@ spring:
             - Path=/v1/token
           filters:
             - SetPath=/v1/token
-        # ---- ApiKey ----
+        # ---- Token ----
         # ==== Authentication Service ====
       default-filters:
         - name: Retry

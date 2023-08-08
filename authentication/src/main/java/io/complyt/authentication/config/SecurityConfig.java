@@ -93,8 +93,7 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui*/**"
                 ).permitAll()
-                .pathMatchers(HttpMethod.POST, "/v1/token", "/v1/api_key").permitAll()
-                .pathMatchers(HttpMethod.GET, "/v1/secret_key").permitAll()
+                .pathMatchers(HttpMethod.POST, "/v1/token").permitAll()
                 .pathMatchers("/actuator/**").hasAuthority("SCOPE_read:actuator")
                 .anyExchange().authenticated();
 

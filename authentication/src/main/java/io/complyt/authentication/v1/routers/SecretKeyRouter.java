@@ -1,5 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
+import io.complyt.authentication.security.permissions.api_key.SecretKeyCreatePermission;
 import io.complyt.authentication.v1.api_info.PostApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.SecretKeyHandler;
 import io.complyt.authentication.v1.handlers.TokenHandler;
@@ -15,7 +16,6 @@ public class SecretKeyRouter {
     public static final String BASE_URL = "/v1/secret_key";
 
     @Bean
-    @PostApiKeyApiInfo
     public RouterFunction<ServerResponse> getSecretKeyRouterFunction(@NonNull final SecretKeyHandler secretKeyHandler) {
         RequestPredicate getSecretKeyRoute = RequestPredicates
                 .GET(BASE_URL)

@@ -2,6 +2,7 @@ package io.complyt.authentication.v1.handlers;
 
 
 import io.complyt.authentication.security.SecretKeyUtils;
+import io.complyt.authentication.security.permissions.api_key.SecretKeyCreatePermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.models.SecretKeyDto;
@@ -23,6 +24,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecretKeyHandler {
+
+    @SecretKeyCreatePermission
     public Mono<ServerResponse> get(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
                 serverRequest.path());
