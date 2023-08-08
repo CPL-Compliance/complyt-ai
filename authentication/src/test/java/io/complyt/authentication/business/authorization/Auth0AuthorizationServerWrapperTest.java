@@ -11,14 +11,11 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
-import java.net.URI;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class Auth0AuthorizationServerWrapperTest {
-//    @InjectMocks
+    //    @InjectMocks
     Auth0AuthorizationServerWrapper auth0AuthorizationServerWrapper;
 
     @Mock
@@ -42,28 +39,34 @@ public class Auth0AuthorizationServerWrapperTest {
         auth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient);
     }
 
-//    @Test
-//    void getAccessToken_validCredentials_ReturnsAccessToken() {
-//        // Given
-//        AccessToken accessToken = TestUtilities.createAccessToken();
-//
-//        // When
-//        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
-//
-//        when(requestBodyUriSpecMock.uri("server-url")).thenReturn(requestBodyUriSpecMock);
-//        when(requestBodySpecMock.header(any(),any())).thenReturn(requestBodySpecMock);
-//        when(requestHeadersUriSpecMock.header(any(),any())).thenReturn(requestHeadersUriSpecMock);
-//
-//        when(requestBodySpecMock.accept(any())).thenReturn(requestBodySpecMock);
-//        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<AccessToken>>notNull()))
-//                .thenReturn(Mono.just(accessToken));
-//
-//        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-//
-//        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken("client ID",
-//                "Client Secret", "Audience", "Grant Type");
-//
-//        // Then
-//        StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
-//    }
+    @Test
+    void getAccessToken_validCredentials_ReturnsAccessToken() {
+        // Given
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Auth0AccessToken auth0AccessToken = TestUtilities.createAuth0AccessToken();
+        String clientId = "client ID";
+        String clientSecret = "Client Secret";
+        String audience = "Audience";
+        String grantType = "Grant Type";
+        String headerName = "Content-Type";
+        String headerValue = "application/x-www-form-urlencoded";
+
+        // When
+        when(webClient.post()).thenReturn(requestBodyUriSpecMock);
+        when(requestBodyUriSpecMock.header(headerName, headerValue)).thenReturn(requestBodySpecMock);
+        when(requestBodySpecMock.bodyValue("client_id=" + clientId +
+                "&client_secret=" + clientSecret +
+                "&audience=" + audience +
+                "&grant_type=" + grantType)).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(ArgumentMatchers.<Class<Auth0AccessToken>>notNull()))
+                .thenReturn(Mono.just(auth0AccessToken));
+
+
+        Mono<AccessToken> accessTokenMono = auth0AuthorizationServerWrapper.getAccessToken("client ID",
+                "Client Secret", "Audience", "Grant Type");
+
+        // Then
+        StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
 }

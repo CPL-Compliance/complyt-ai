@@ -1,10 +1,9 @@
 package io.complyt.authentication.v1.handlers;
 
 
-import io.complyt.authentication.security.SecretKeyUtils;
-import io.complyt.authentication.security.permissions.api_key.SecretKeyCreatePermission;
+import io.complyt.authentication.security.AesSecretKeyUtils;
+import io.complyt.authentication.security.permissions.secret_key.SecretKeyCreatePermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
-import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.models.SecretKeyDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 @Component
@@ -31,8 +29,8 @@ public class SecretKeyHandler {
                 serverRequest.path());
 
         Mono<SecretKeyDto> value = ContextLogger.observeCtx(logStr, log::info)
-                .thenReturn(Objects.requireNonNull(SecretKeyUtils.generateKey(256)))
-                .map(SecretKeyUtils::convertSecretKeyToString)
+                .thenReturn(Objects.requireNonNull(AesSecretKeyUtils.generateKey(256)))
+                .map(AesSecretKeyUtils::convertSecretKeyToString)
                 .map(SecretKeyDto::new);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(value, SecretKeyDto.class);

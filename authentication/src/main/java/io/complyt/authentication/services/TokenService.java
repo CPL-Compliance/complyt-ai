@@ -2,7 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.repositories.TokenRepository;
-import io.complyt.authentication.security.Cryptor;
+import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
@@ -32,7 +32,7 @@ public class TokenService {
     PasswordEncoder passwordEncoder;
 
     @NonNull
-    Cryptor cryptorAesCbcPkcs5Padding;
+    Crypto cryptoAesCbcPkcs5Padding;
 
     int tokenExpirationSafeWindowSec;
 
@@ -58,8 +58,8 @@ public class TokenService {
         String scope;
         String accessToken;
         try {
-            scope = cryptorAesCbcPkcs5Padding.decrypt(scopeEncryptedData);
-            accessToken = cryptorAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData);
+            scope = cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData);
+            accessToken = cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -85,8 +85,8 @@ public class TokenService {
         EncryptedData scopeEncryptedData;
 
         try {
-            accessTokenEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(token.getAccessToken());
-            scopeEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(token.getScope());
+            accessTokenEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken());
+            scopeEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getScope());
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);

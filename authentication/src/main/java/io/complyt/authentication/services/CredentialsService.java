@@ -2,7 +2,7 @@ package io.complyt.authentication.services;
 
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.repositories.CredentialsRepository;
-import io.complyt.authentication.security.Cryptor;
+import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
@@ -31,7 +31,7 @@ public class CredentialsService {
     PasswordEncoder passwordEncoder;
 
     @NonNull
-    Cryptor cryptorAesCbcPkcs5Padding;
+    Crypto cryptoAesCbcPkcs5Padding;
 
     @NonNull
     String grantType;
@@ -52,8 +52,8 @@ public class CredentialsService {
         String clientId;
         String clientSecret;
         try {
-            clientId = cryptorAesCbcPkcs5Padding.decrypt(encryptedClientId);
-            clientSecret = cryptorAesCbcPkcs5Padding.decrypt(encryptedClientSecret);
+            clientId = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientId);
+            clientSecret = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientSecret);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to decrypt credentials.");
@@ -69,8 +69,8 @@ public class CredentialsService {
         EncryptedData clientSecretEncryptedData;
 
         try {
-            clientIdEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(credentials.getClientId());
-            clientSecretEncryptedData = cryptorAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
+            clientIdEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId());
+            clientSecretEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
                  InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             throw new RuntimeException(e);

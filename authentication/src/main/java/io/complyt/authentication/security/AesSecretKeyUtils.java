@@ -10,7 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-public class SecretKeyUtils {
+public class AesSecretKeyUtils {
 
     /* Generating Secret key */
 

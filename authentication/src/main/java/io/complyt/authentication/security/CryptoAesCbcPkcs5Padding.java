@@ -16,28 +16,26 @@ import java.util.Base64;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CryptorAesCbcPkcs5Padding implements Cryptor {
-
-    final String algorithm = "AES/CBC/PKCS5Padding";
+public class CryptoAesCbcPkcs5Padding implements Crypto {
+    String algorithm = "AES/CBC/PKCS5Padding";
 
     @NonNull
     SecretKey secretKey;
 
-    public EncryptedData encrypt(final @NonNull String input) throws InvalidAlgorithmParameterException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException {
+    public @NonNull EncryptedData encrypt(final @NonNull String plainText) throws InvalidAlgorithmParameterException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException,
+            NoSuchAlgorithmException {
         IvParameterSpec ivParameterSpec = generateIv();
 
         Cipher cipher = Cipher.getInstance(algorithm);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-
-        byte[] cipherText = cipher.doFinal(input.getBytes());
-
+        byte[] cipherText = cipher.doFinal(plainText.getBytes());
         String cipherTextStr = Base64.getEncoder().encodeToString(cipherText);
 
         return new EncryptedData(Base64.getEncoder().encodeToString(ivParameterSpec.getIV()), cipherTextStr);
     }
 
-    public String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
+    public @NonNull String decrypt(final @NonNull EncryptedData encryptedData) throws IllegalBlockSizeException,
             BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException,
             NoSuchPaddingException, NoSuchAlgorithmException {
         IvParameterSpec ivParameterSpec = new IvParameterSpec(Base64.getDecoder().decode(encryptedData.iv()));

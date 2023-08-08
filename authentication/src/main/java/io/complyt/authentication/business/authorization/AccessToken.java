@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class AccessToken {
     String accessToken; String scope; int expiresIn; String tokenType;
 }

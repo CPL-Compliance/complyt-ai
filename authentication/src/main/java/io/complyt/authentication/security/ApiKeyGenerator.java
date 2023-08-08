@@ -5,11 +5,10 @@ import java.util.UUID;
 public class ApiKeyGenerator {
 
     public static String generate() {
-        UUID partOne = UUID.randomUUID();
-        UUID partTwo = UUID.randomUUID();
+        UUID clientId = UUID.randomUUID();
+        UUID clientSecret = UUID.randomUUID();
         String delimiter = "-";
-        String apiKey = partOne + delimiter + partTwo;
 
-        return apiKey;
+        return clientId + delimiter + clientSecret;
     }
 }
