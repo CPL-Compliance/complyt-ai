@@ -102,7 +102,7 @@ jobs:
       - checkout:
           path: ~/complyt_work_directory
       - queue/until_front_of_line:
-          job-regex: '^release*'
+          tag-pattern: '^release*'
           only-on-branch: eyal/com-235-api-services-versioning-management
           time: '10'
 
