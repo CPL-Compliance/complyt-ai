@@ -103,6 +103,7 @@ jobs:
           path: ~/complyt_work_directory
       - queue/until_front_of_line:
           only-on-branch: eyal/com-235-api-services-versioning-management
+          job-regex: ^release.*
           time: '10'
       - run: echo "This job will not overlap"
 #      - queue/until_front_of_line:
