@@ -91,7 +91,7 @@ jobs:
       - run: echo "This job will not overlap"
 
   release:
-    parallelism: 1
+    parallelism: 3
     parameters:
       service_directory:
         type: string
