@@ -263,8 +263,6 @@
                         <checkModificationExcludes>true</checkModificationExcludes>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
-                        <preparationGoals>git fetch origin</preparationGoals>
-                        <preparationGoals>git rebase origin/main</preparationGoals>
                         <pushChanges>true</pushChanges>
                         <autoVersionSubmodules>false</autoVersionSubmodules>
                     </configuration>
