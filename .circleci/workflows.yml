@@ -101,10 +101,12 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
+
       - queue/until_front_of_line:
-          job-regex: ^release-[0-9]$
+          job-regex: ^release
           only-on-branch: eyal/com-235-api-services-versioning-management
           time: '10'
+
       - attach_workspace:
           at: ~/complyt_work_directory
       - add_ssh_keys:
