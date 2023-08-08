@@ -1,6 +1,7 @@
 package io.complyt.authentication.v1.handlers;
 
 import io.complyt.authentication.facades.ApiKeyFacade;
+import io.complyt.authentication.security.permissions.api_key.ApiKeyCreatePermission;
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.CredentialsMapper;
@@ -31,6 +32,7 @@ public class ApiKeyHandler {
     @NonNull
     ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler;
 
+    @ApiKeyCreatePermission
     public Mono<ServerResponse> post(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
                 serverRequest.path());
@@ -39,7 +41,7 @@ public class ApiKeyHandler {
                 .then(credentialsDtoValidationHandler.validate(serverRequest))
                 .map(CredentialsMapper.INSTANCE::credentialsDtoTocredentials)
                 .flatMap(apiKeyFacade::saveCredentials)
-                .map(apiKeyStr -> new ApiKeyDto(apiKeyStr))
+                .map(ApiKeyDto::new)
                 .flatMap(apiKeyDto -> ContextLogger.observeCtx("<-- Returned Body: " + apiKeyDto.toString(), log::info).thenReturn(apiKeyDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 

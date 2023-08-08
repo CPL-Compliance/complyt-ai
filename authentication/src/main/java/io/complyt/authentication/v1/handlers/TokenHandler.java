@@ -29,7 +29,8 @@ public class TokenHandler {
     public Mono<ServerResponse> post(ServerRequest serverRequest) {
         Optional<String> apiKeyParam = serverRequest.queryParam("api_key");
         String apiKeyStr = apiKeyParam.get();
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s, Query Params -> %s", serverRequest.method(),
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s, Query Params -> %s",
+                serverRequest.method(),
                 serverRequest.path(),
                 serverRequest.queryParams());
 
@@ -37,7 +38,8 @@ public class TokenHandler {
                 .then(Mono.just(new ApiKey(apiKeyStr)))
                 .flatMap(tokenFacade::getToken)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
-                .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(), log::info).thenReturn(tokenDto))
+                .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(),
+                        log::info).thenReturn(tokenDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
         return ServerResponse.ok().body(value, TokenDto.class);
