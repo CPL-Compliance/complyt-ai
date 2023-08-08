@@ -103,10 +103,10 @@ jobs:
       - checkout:
           path: ~/complyt_work_directory
 
-      - queue/until_front_of_line:
-          job-regex: ^release.*
-          only-on-branch: eyal/com-235-api-services-versioning-management
-          time: '10'
+#      - queue/until_front_of_line:
+#          job-regex: ^release.*
+#          only-on-branch: eyal/com-235-api-services-versioning-management
+#          time: '10'
 
       - attach_workspace:
           at: ~/complyt_work_directory
@@ -237,7 +237,6 @@ workflows:
 #          service_directory: "files"
 
       - release:
-          name: release
           service_directory: "files"
           filters:
             branches:
@@ -284,7 +283,11 @@ workflows:
 #          service_directory: "api-gateway"
 
       - release:
-          name: release
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
           filters:
             branches:
               only:
