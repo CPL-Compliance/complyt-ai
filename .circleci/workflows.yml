@@ -126,6 +126,9 @@ jobs:
             git checkout -b "<<parameters.branch_name>>-$PROJECT_VERSION"
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform
+            git checkout eyal/com-235-api-services-versioning-management
+            git merge "<<parameters.branch_name>>-$PROJECT_VERSION"
+            git push
 
       - persist_to_workspace:
           root: .
