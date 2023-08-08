@@ -196,6 +196,8 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
   block:
+    docker:
+      - image: circleci/node:10
     parameters:
       to_block:
         type: boolean
