@@ -196,10 +196,14 @@ jobs:
           service-name: "<<parameters.service_name>>-service"
 
   block:
+    parameters:
+      to_block:
+        type: boolean
+        default: true
     working_directory: ~/complyt_work_directory/<<parameters.service_name>>
     steps:
     - queue/until_front_of_line:
-        block-workflow: true
+        block-workflow: <<parameters.to_block>>
 
 workflows:
 #  sales-tax-workflow:
@@ -234,6 +238,7 @@ workflows:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
       - block:
+          to_block: true
 #      - verify:
 #          filters:
 #            branches:
@@ -263,6 +268,7 @@ workflows:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
       - block:
+          to_block: true
       - package-dependency:
           name: package-sales-tax
           service_directory: "sales-tax"
