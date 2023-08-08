@@ -96,14 +96,15 @@ jobs:
       service_directory:
         type: string
         default: ""
+      branch_name:
+        type: string
+        default: ""
     working_directory: ~/complyt_work_directory/<<parameters.service_directory>>
     executor: ubuntu-vm
 
     steps:
       - checkout:
           path: ~/complyt_work_directory
-#      - queue/queue_workflow:
-#          minutes_to_wait: 10
       - attach_workspace:
           at: ~/complyt_work_directory
       - add_ssh_keys:
@@ -122,8 +123,9 @@ jobs:
           command: |
             PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
             NEXT_DEVELOPMENT_VERSION=$(echo "$PROJECT_VERSION" | awk -F'[-.]' '{print $1"."($2+1)".0-SNAPSHOT"}')
+            git checkout -b "<<parameters.branch_name>>-$PROJECT_VERSION"
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
-            ./mvnw --settings ../.circleci/settings.xml release:perform 
+            ./mvnw --settings ../.circleci/settings.xml release:perform
 
       - persist_to_workspace:
           root: .
@@ -236,9 +238,6 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - queue/block_workflow:
-          only-on-branch: eyal/com-235-api-services-versioning-management
-          time: "10"
 #      - verify:
 #          filters:
 #            branches:
@@ -247,9 +246,8 @@ workflows:
 #          service_directory: "files"
 
       - release:
-          requires:
-            - queue/block_workflow
           service_directory: "files"
+          branch_name: "files-workflow-release"
           filters:
             branches:
               only:
@@ -269,10 +267,6 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - queue/block_workflow:
-          only-on-branch: eyal/com-235-api-services-versioning-management
-          time: "10"
-          
       - package-dependency:
           name: package-sales-tax
           service_directory: "sales-tax"
@@ -304,12 +298,12 @@ workflows:
             - package-sales-tax-rates
             - package-discovery-service
             - package-files
-            - queue/block_workflow
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
           service_directory: "api-gateway"
+          branch_name: "api-gateway-workflow-release"
 
 
       - send-test-coverage-reports:
