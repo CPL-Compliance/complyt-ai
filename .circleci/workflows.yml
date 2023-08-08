@@ -91,6 +91,7 @@ jobs:
       - run: echo "This job will not overlap"
 
   release:
+    parallelism: 1
     parameters:
       service_directory:
         type: string
@@ -235,17 +236,9 @@ workflows:
 #                - /^(main.+|(?!main).*)$/
 #          service_directory: "files"
 
-      - wait:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-
       - release:
           name: release
           service_directory: "files"
-          requires:
-            - wait
           filters:
             branches:
               only:
@@ -290,25 +283,12 @@ workflows:
 #            - package-files
 #          service_directory: "api-gateway"
 
-      - wait:
-          filters:
-            branches:
-              only:
-                - /^(main.+|(?!main).*)$/
-          requires:
-            - package-sales-tax
-            - package-sales-tax-rates
-            - package-discovery-service
-            - package-files
-
       - release:
           name: release
           filters:
             branches:
               only:
                 - /^(main.+|(?!main).*)$/
-          requires:
-            - wait
           service_directory: "api-gateway"
 
 
