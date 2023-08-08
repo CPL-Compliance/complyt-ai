@@ -236,7 +236,13 @@ workflows:
 #          service_name: "sales-tax"
 
   files-workflow:
-    when: << pipeline.parameters.run-files-workflow >>
+    when:
+      or:
+        - << pipeline.parameters.run-api-gateway-workflow >>
+        - << pipeline.parameters.run-sales-tax-workflow >>
+        - << pipeline.parameters.run-sales-tax-rates-workflow >>
+        - << pipeline.parameters.run-files-workflow >>
+        - << pipeline.parameters.run-discovery-service-workflow >>
     jobs:
       - block:
           to_block: true
@@ -266,7 +272,13 @@ workflows:
           service_name: "files"
 
   api-gateway-workflow:
-    when: << pipeline.parameters.run-api-gateway-workflow >>
+    when:
+      or:
+        - << pipeline.parameters.run-api-gateway-workflow >>
+        - << pipeline.parameters.run-sales-tax-workflow >>
+        - << pipeline.parameters.run-sales-tax-rates-workflow >>
+        - << pipeline.parameters.run-files-workflow >>
+        - << pipeline.parameters.run-discovery-service-workflow >>
     jobs:
       - block:
           to_block: true
