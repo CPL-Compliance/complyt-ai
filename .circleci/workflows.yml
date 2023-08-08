@@ -101,7 +101,7 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
-      - queue.queue_workflow:
+      - queue/queue_workflow:
           minutes_to_wait: 10
       - attach_workspace:
           at: ~/complyt_work_directory
