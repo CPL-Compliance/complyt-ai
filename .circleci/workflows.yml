@@ -101,8 +101,8 @@ jobs:
     steps:
       - checkout:
           path: ~/complyt_work_directory
-      - queue/queue_workflow:
-          minutes_to_wait: 10
+#      - queue/queue_workflow:
+#          minutes_to_wait: 10
       - attach_workspace:
           at: ~/complyt_work_directory
       - add_ssh_keys:
@@ -235,8 +235,6 @@ workflows:
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
     jobs:
-      - block:
-          to_block: true
 #      - verify:
 #          filters:
 #            branches:
@@ -265,8 +263,6 @@ workflows:
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
-      - block:
-          to_block: true
       - package-dependency:
           name: package-sales-tax
           service_directory: "sales-tax"
