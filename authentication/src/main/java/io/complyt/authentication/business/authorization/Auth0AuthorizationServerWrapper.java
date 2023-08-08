@@ -11,11 +11,10 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Auth0AuthorizationServerWrapper implements AuthorizationServerWrapper {
-
-
     @NonNull
     WebClient webClient;
 
+    @Override
     public Mono<AccessToken> getAccessToken(final @NonNull String clientId, final @NonNull String clientSecret,
                                             final @NonNull String audience, final @NonNull String grantType) {
         return webClient.post()

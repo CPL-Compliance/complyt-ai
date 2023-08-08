@@ -1,6 +1,5 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.security.permissions.api_key.ApiKeyCreatePermission;
 import io.complyt.authentication.v1.api_info.PostApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
 import lombok.NonNull;

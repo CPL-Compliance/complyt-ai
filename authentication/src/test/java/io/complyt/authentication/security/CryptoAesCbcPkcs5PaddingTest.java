@@ -1,6 +1,6 @@
 package io.complyt.authentication.security;
 
-import io.complyt.authentication.config.CryptorConfig;
+import io.complyt.authentication.config.CryptoConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,13 +16,13 @@ import java.security.NoSuchAlgorithmException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class CryptorAesCbcPkcs5PaddingTest {
-    Cryptor cryptorAesCbcPkcs5Padding;
+class CryptoAesCbcPkcs5PaddingTest {
+    Crypto cryptoAesCbcPkcs5Padding;
 
     @BeforeEach
     void setUp() {
         String secretKeyStr = "cWrkCbX1JKCiWYFDx9DsHKqdn38QK5o3";
-        cryptorAesCbcPkcs5Padding = (new CryptorConfig()).cryptorAesCbcPkcs5Padding(secretKeyStr);
+        cryptoAesCbcPkcs5Padding = (new CryptoConfig()).cryptoAesCbcPkcs5Padding(secretKeyStr);
     }
 
     @Test
@@ -33,8 +33,8 @@ class CryptorAesCbcPkcs5PaddingTest {
         String input = "This is an input text";
 
         // When
-        EncryptedData encryptedData = cryptorAesCbcPkcs5Padding.encrypt(input);
-        String decrypted = cryptorAesCbcPkcs5Padding.decrypt(encryptedData);
+        EncryptedData encryptedData = cryptoAesCbcPkcs5Padding.encrypt(input);
+        String decrypted = cryptoAesCbcPkcs5Padding.decrypt(encryptedData);
 
         // Then
         assertEquals(input, decrypted);

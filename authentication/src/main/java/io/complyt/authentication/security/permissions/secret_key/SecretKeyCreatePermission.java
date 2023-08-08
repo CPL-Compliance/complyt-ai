@@ -1,4 +1,4 @@
-package io.complyt.authentication.security.permissions.api_key;
+package io.complyt.authentication.security.permissions.secret_key;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 

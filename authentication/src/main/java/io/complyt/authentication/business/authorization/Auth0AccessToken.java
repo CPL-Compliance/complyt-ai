@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Auth0AccessToken {
     String access_token; String scope; int expires_in; String token_type;
 }
