@@ -7,6 +7,7 @@ import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Slf4j
+@EqualsAndHashCode
 public class TokenService {
     @NonNull
     TokenRepository tokenRepository;

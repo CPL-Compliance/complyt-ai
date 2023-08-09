@@ -6,6 +6,7 @@ import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
+@EqualsAndHashCode
 public class CredentialsService {
     @NonNull
     CredentialsRepository credentialsRepository;

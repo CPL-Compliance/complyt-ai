@@ -2,6 +2,7 @@ package testUtils;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
+import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.v1.models.TokenDto;
 
@@ -58,5 +59,11 @@ public class TestUtilities {
 
     public static Auth0AccessToken createAuth0AccessToken() {
         return new Auth0AccessToken("Access Token", "Scope", 0, "Token Type");
+    }
+
+    public static Credentials createCredentials() {
+        return new Credentials("id", "complytClientId", "complytClientSecret",
+                "ClientID", "ClientSecret", "Audience", "GrantType",
+                "audience", "Grant Type");
     }
 }
