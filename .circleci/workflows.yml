@@ -193,34 +193,34 @@ jobs:
 
 
 workflows:
-#  sales-tax-workflow:
-#    when: << pipeline.parameters.run-sales-tax-workflow >>
-#    jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "sales-tax"
-#
-#      - release:
-#          service_directory: "sales-tax"
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          branch_name: "sales-tax-workflow-release"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - release
-#          service_directory: "sales-tax"
-#
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "sales-tax"
+  sales-tax-workflow:
+    when: << pipeline.parameters.run-sales-tax-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "sales-tax"
+
+      - release:
+          service_directory: "sales-tax"
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          branch_name: "sales-tax-workflow-release"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "sales-tax"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "sales-tax"
 
   files-workflow:
     when: << pipeline.parameters.run-files-workflow >>
@@ -229,7 +229,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           service_directory: "files"
 
       - release:
@@ -251,118 +251,118 @@ workflows:
             - release
           service_name: "files"
 
-#  api-gateway-workflow:
-#    when: << pipeline.parameters.run-api-gateway-workflow >>
-#    jobs:
-#      - package-dependency:
-#          name: package-sales-tax
-#          service_directory: "sales-tax"
-#      - package-dependency:
-#          name: package-sales-tax-rates
-#          service_directory: "sales-tax-rates"
-#      - package-dependency:
-#          name: package-discovery-service
-#          service_directory: "discovery-service"
-#      - package-dependency:
-#          name: package-files
-#          service_directory: "files"
-#
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          requires:
-#            - package-sales-tax
-#            - package-sales-tax-rates
-#            - package-discovery-service
-#            - package-files
-#          service_directory: "api-gateway"
-#
-#      - release:
-#          requires:
-#            - package-sales-tax
-#            - package-sales-tax-rates
-#            - package-discovery-service
-#            - package-files
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "api-gateway"
-#          branch_name: "api-gateway-workflow-release"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - release
-#          service_directory: "api-gateway"
-#
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "api-gateway"
-#
-#  discovery-service-workflow:
-#    when: << pipeline.parameters.run-discovery-service-workflow >>
-#    jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "discovery-service"
-#
-#      - release:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          service_directory: "discovery-service"
-#          branch_name: "discovery-service-workflow-release"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - release
-#          service_directory: "discovery-service"
-#
-#      # We update all the services that run Discovery Services
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "discovery-service-az-1a"
-#
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "discovery-service-az-1b"
-#
-#  sales-tax-rates-workflow:
-#    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
-#    jobs:
-#      - verify:
-#          filters:
-#            branches:
-#              only:
-#                - /^(main.+|(?!main).*)$/
-#          service_directory: "sales-tax-rates"
-#
-#      - release:
-#          filters:
-#            branches:
-#              only:
-#                - main
-#          service_directory: "sales-tax-rates"
-#          branch_name: "sales-tax-rates-workflow-release"
-#
-#      - send-test-coverage-reports:
-#          requires:
-#            - verify
-#            - release
-#          service_directory: "sales-tax-rates"
-#
-#      - update-ecs-service:
-#          requires:
-#            - release
-#          service_name: "sales-tax-rates"
+  api-gateway-workflow:
+    when: << pipeline.parameters.run-api-gateway-workflow >>
+    jobs:
+      - package-dependency:
+          name: package-sales-tax
+          service_directory: "sales-tax"
+      - package-dependency:
+          name: package-sales-tax-rates
+          service_directory: "sales-tax-rates"
+      - package-dependency:
+          name: package-discovery-service
+          service_directory: "discovery-service"
+      - package-dependency:
+          name: package-files
+          service_directory: "files"
+
+      - verify:
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
+          service_directory: "api-gateway"
+
+      - release:
+          requires:
+            - package-sales-tax
+            - package-sales-tax-rates
+            - package-discovery-service
+            - package-files
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "api-gateway"
+          branch_name: "api-gateway-workflow-release"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "api-gateway"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "api-gateway"
+
+  discovery-service-workflow:
+    when: << pipeline.parameters.run-discovery-service-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "discovery-service"
+
+      - release:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "discovery-service"
+          branch_name: "discovery-service-workflow-release"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "discovery-service"
+
+      # We update all the services that run Discovery Services
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "discovery-service-az-1a"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "discovery-service-az-1b"
+
+  sales-tax-rates-workflow:
+    when: << pipeline.parameters.run-sales-tax-rates-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - main
+          service_directory: "sales-tax-rates"
+
+      - release:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "sales-tax-rates"
+          branch_name: "sales-tax-rates-workflow-release"
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "sales-tax-rates"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "sales-tax-rates"
