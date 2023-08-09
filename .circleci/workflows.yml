@@ -195,7 +195,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
           service_directory: "sales-tax"
 
       - release:
@@ -203,7 +203,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           branch_name: "sales-tax-workflow-release"
 
       - send-test-coverage-reports:
@@ -224,7 +224,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
           service_directory: "files"
 
       - release:
@@ -232,7 +232,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           branch_name: "files-workflow-release"
 
       - send-test-coverage-reports:
@@ -266,7 +266,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
           requires:
             - package-sales-tax
             - package-sales-tax-rates
@@ -283,7 +283,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           service_directory: "api-gateway"
           branch_name: "api-gateway-workflow-release"
 
@@ -305,14 +305,14 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
           service_directory: "discovery-service"
 
       - release:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           service_directory: "discovery-service"
           branch_name: "discovery-service-workflow-release"
 
@@ -340,14 +340,14 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - /^(main.+|(?!main).*)$/
           service_directory: "sales-tax-rates"
 
       - release:
           filters:
             branches:
               only:
-                - /^(main.+|(?!main).*)$/
+                - main
           service_directory: "sales-tax-rates"
           branch_name: "sales-tax-rates-workflow-release"
 
