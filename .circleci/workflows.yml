@@ -232,7 +232,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "files"
 
@@ -283,7 +283,7 @@ workflows:
 
       - send-test-coverage-reports:
           requires:
-            - verify
+#            - verify
             - release
           service_directory: "api-gateway"
 
