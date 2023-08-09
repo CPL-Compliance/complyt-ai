@@ -116,13 +116,13 @@ jobs:
             git checkout -b "<<parameters.branch_name>>-$PROJECT_VERSION"
             ./mvnw --settings ../.circleci/settings.xml clean release:prepare -X -DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION
             ./mvnw --settings ../.circleci/settings.xml release:perform
-            bash ../.circleci/git_commands.sh <<parameters.branch_name>> "$PROJECT_VERSION"
-#            git checkout eyal/com-235-api-services-versioning-management
-#            git pull origin eyal/com-235-api-services-versioning-management
-#            git merge --no-edit "<<parameters.branch_name>>-$PROJECT_VERSION"
-#            git commit --amend -m "[skip ci]"
-#            git push --set-upstream origin eyal/com-235-api-services-versioning-management
-#            git push --delete origin "<<parameters.branch_name>>-$PROJECT_VERSION"
+#            bash ../.circleci/git_commands.sh <<parameters.branch_name>> "$PROJECT_VERSION"
+            git checkout eyal/com-235-api-services-versioning-management
+            git pull origin eyal/com-235-api-services-versioning-management
+            git merge --no-edit "<<parameters.branch_name>>-$PROJECT_VERSION"
+            git commit --amend -m "[skip ci]"
+            git push --set-upstream origin eyal/com-235-api-services-versioning-management
+            git push --delete origin "<<parameters.branch_name>>-$PROJECT_VERSION"
 
       - persist_to_workspace:
           root: .

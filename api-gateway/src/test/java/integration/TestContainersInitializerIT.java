@@ -78,12 +78,8 @@ public abstract class TestContainersInitializerIT {
         String jwkUriEntrypoint = "-Dspring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://" + HOSTNAME + ":8080/realms/test-realm/protocol/openid-connect/certs";
 
         //Discovery Container
-        try {
-            DISCOVERY_CONTAINER = initializeServiceContainer(DISCOVERY_SERVICE,
-                    "java", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=single-server", "-jar", "app.jar");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        DISCOVERY_CONTAINER = initializeServiceContainer(DISCOVERY_SERVICE,
+                "java", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=single-server", "-jar", "app.jar");
         DISCOVERY_CONTAINER.start();
 
         // Mongo Container
@@ -104,36 +100,24 @@ public abstract class TestContainersInitializerIT {
                 receivedToken -> TOKEN_DIFFERENT_TENANT = receivedToken);
 
         //Sales Tax Container
-        try {
-            SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
-                    "java", "-Dspring.profiles.active=integration-test, complytTaxEngine",
-                    mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                    "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
+                "java", "-Dspring.profiles.active=integration-test, complytTaxEngine",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_CONTAINER.start();
 
         //Sales Tax Rates Container
-        try {
-            SALES_TAX_RATES_CONTAINER = initializeServiceContainer(SALES_TAX_RATES,
-                    "java", "-Dspring.profiles.active=integration-test, stubFastTax",
-                    mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                    "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        SALES_TAX_RATES_CONTAINER = initializeServiceContainer(SALES_TAX_RATES,
+                "java", "-Dspring.profiles.active=integration-test, stubFastTax",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         SALES_TAX_RATES_CONTAINER.start();
 
         //Files Container
-        try {
-            FILES_CONTAINER = initializeServiceContainer(FILES,
-                    "java", "-Dspring.profiles.active=integration-test",
-                    mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                    "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FILES_CONTAINER = initializeServiceContainer(FILES,
+                "java", "-Dspring.profiles.active=integration-test",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         FILES_CONTAINER.start();
 
         // Restore Dump
@@ -146,26 +130,22 @@ public abstract class TestContainersInitializerIT {
         }
 
         //API Gateway Container
-        try {
-            API_GATEWAY_CONTAINER = initializeServiceContainer(API_GATEWAY,
-                    "java", "-Dspring.profiles.active=integration-test",
-                    discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                    "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar")
-                    .withExposedPorts(8765)
-                    .waitingFor(new WaitAllStrategy()
-                            .withStrategy(Wait
-                                    .forHttp(TestUtilities.TRANSACTION_BASE_URL)
-                                    .withHeader("Authorization", "Bearer " + TOKEN))
-                            .withStrategy(Wait
-                                    .forHttp(TestUtilities.SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
-                                    .withHeader("Authorization", "Bearer " + TOKEN))
-                            .withStrategy(Wait
-                                    .forHttp(TestUtilities.FILES_BASE_URL)
-                                    .withHeader("Authorization", "Bearer " + TOKEN))
-                            .withStartupTimeout(Duration.ofSeconds(60)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        API_GATEWAY_CONTAINER = initializeServiceContainer(API_GATEWAY,
+                "java", "-Dspring.profiles.active=integration-test",
+                discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar")
+                .withExposedPorts(8765)
+                .waitingFor(new WaitAllStrategy()
+                        .withStrategy(Wait
+                                .forHttp(TestUtilities.TRANSACTION_BASE_URL)
+                                .withHeader("Authorization", "Bearer " + TOKEN))
+                        .withStrategy(Wait
+                                .forHttp(TestUtilities.SALES_TAX_RATES_BASE_URL + "?state=CA&zip=90210&isPartial=true")
+                                .withHeader("Authorization", "Bearer " + TOKEN))
+                        .withStrategy(Wait
+                                .forHttp(TestUtilities.FILES_BASE_URL)
+                                .withHeader("Authorization", "Bearer " + TOKEN))
+                        .withStartupTimeout(Duration.ofSeconds(60)));
         API_GATEWAY_CONTAINER.start();
 
         WEB_TEST_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + API_GATEWAY_CONTAINER.getMappedPort(8765) + "/").build();
@@ -180,24 +160,11 @@ public abstract class TestContainersInitializerIT {
         }
     }
 
-    private static String targetPath(String service) throws IOException {
-//        ProcessBuilder processBuilder = new ProcessBuilder("pwd");
-//        processBuilder.redirectErrorStream(true);
-//        Process process = processBuilder.start();
-//
-//        // Read the output of the command
-//        java.io.InputStream inputStream = process.getInputStream();
-//        java.util.Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
-//        String result = scanner.hasNext() ? scanner.next() : "";
-//        scanner.close();
-//
-//        System.out.println("Current Directory: " + result.trim());
-//        String x = result.trim();
-//
+    private static String targetPath(String service) {
         String currentDir = Paths.get("").toAbsolutePath().toString();
         System.out.println("currentDir: " + currentDir);
         String x = currentDir.trim();
-        if(x.contains("checkout")) {
+        if (x.contains("checkout")) {
             return "../../../../" + service + "/target";
         }
         return "../" + service + "/target";
@@ -207,7 +174,7 @@ public abstract class TestContainersInitializerIT {
         return service + ".dump";
     }
 
-    private static GenericContainer initializeServiceContainer(String service, String... entrypoint) throws IOException {
+    private static GenericContainer initializeServiceContainer(String service, String... entrypoint) {
         fetchJarFile(service);
 
         return new GenericContainer<>(
