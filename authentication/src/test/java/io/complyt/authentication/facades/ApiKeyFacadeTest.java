@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -53,5 +55,15 @@ class ApiKeyFacadeTest {
         StepVerifier.create(actualApiKey)
                 .expectNext(expectedApiKeyStr)
                 .verifyComplete();
+    }
+
+    @Test
+    void saveCredentials_credentialsIsNull_throwNullException() {
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            apiKeyFacade.saveCredentials(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
     }
 }

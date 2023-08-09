@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 @With
 @AllArgsConstructor
+@EqualsAndHashCode
+@ToString
 @Document(collection = "token")
 public class Token {
     @Id
