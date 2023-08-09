@@ -16,7 +16,11 @@
 
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
+<<<<<<< Updated upstream
     <version>0.71.0-SNAPSHOT</version>
+=======
+    <version>0.72.0-SNAPSHOT</version>
+>>>>>>> Stashed changes
     <!-- Maven Coordinates -->
 
     <name>api-gateway</name>
