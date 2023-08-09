@@ -163,8 +163,8 @@ public abstract class TestContainersInitializerIT {
     private static String targetPath(String service) {
         String currentDir = Paths.get("").toAbsolutePath().toString();
         System.out.println("currentDir: " + currentDir);
-        String x = currentDir.trim();
-        if (x.contains("checkout")) {
+        String directory = currentDir.trim();
+        if (directory.contains("checkout")) {
             return "../../../../" + service + "/target";
         }
         return "../" + service + "/target";
