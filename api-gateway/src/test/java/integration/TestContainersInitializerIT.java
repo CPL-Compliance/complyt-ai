@@ -162,11 +162,13 @@ public abstract class TestContainersInitializerIT {
     private static String targetPath(String service) {
         String currentDir = Paths.get("").toAbsolutePath().toString();
         String directory = currentDir.trim();
+
         /*
         In case that the integration tests are running as part of release:peform command,
         It will try reaching target directory from /home/circleci/complyt_work_directory/service/target/checkout/service
         Therefore will need to move 4 directories back
         */
+
         if (directory.contains("target/checkout")) {
             return "../../../../" + service + "/target";
         }
