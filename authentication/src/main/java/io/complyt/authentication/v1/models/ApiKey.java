@@ -3,6 +3,7 @@ package io.complyt.authentication.v1.models;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Data
+@EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ApiKey {
     @NonNull
