@@ -12,6 +12,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class AudienceValidatorTest {
@@ -41,7 +44,7 @@ class AudienceValidatorTest {
                         error.getErrorCode().equals("invalid_token") &&
                                 error.getDescription().equals("The required audience is missing")).count();
 
-        Assertions.assertEquals(1, count);
+        assertEquals(1, count);
     }
 
     @Test
@@ -55,6 +58,6 @@ class AudienceValidatorTest {
         OAuth2TokenValidatorResult oAuth2TokenValidatorResult = audienceValidator.validate(jwt);
 
         // Then
-        Assertions.assertTrue(oAuth2TokenValidatorResult.getErrors().isEmpty());
+        assertTrue(oAuth2TokenValidatorResult.getErrors().isEmpty());
     }
 }

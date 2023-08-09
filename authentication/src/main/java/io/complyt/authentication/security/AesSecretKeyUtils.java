@@ -1,5 +1,7 @@
 package io.complyt.authentication.security;
 
+import lombok.NonNull;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -14,8 +16,8 @@ public class AesSecretKeyUtils {
 
     /* Generating Secret key */
 
-    // Generating Secret Key using KeyGenerator class with 256
-    public static SecretKey generateKey(int n) {
+    // Generating Secret Key using KeyGenerator class
+    public static SecretKey generateAesKey(int n) {
         KeyGenerator keyGenerator;
         try {
             keyGenerator = KeyGenerator.getInstance("AES");
@@ -29,7 +31,7 @@ public class AesSecretKeyUtils {
     }
 
     // Generating Secret Key using password and salt
-    public static SecretKey getKeyFromPassword(String password, String salt)
+    public static SecretKey getKeyFromPassword(@NonNull String password, @NonNull String salt)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
@@ -39,7 +41,7 @@ public class AesSecretKeyUtils {
     }
 
     /* Converting Secret key into String */
-    public static String convertSecretKeyToString(SecretKey secretKey) {
+    public static String convertSecretKeyToString(@NonNull SecretKey secretKey) {
         // Converting the Secret Key into byte array
         byte[] rawData = secretKey.getEncoded();
         // Getting String - Base64 encoded version of the Secret Key
@@ -48,7 +50,7 @@ public class AesSecretKeyUtils {
     }
 
     /* Converting String into Secret key into */
-    public static SecretKey convertStringToSecretKey(String encodedKey) {
+    public static SecretKey convertStringToSecretKey(@NonNull String encodedKey) {
         // Decoding the Base64 encoded string into byte array
         byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
         // Rebuilding the Secret Key using SecretKeySpec Class

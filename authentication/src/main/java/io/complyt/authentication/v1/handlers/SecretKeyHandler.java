@@ -29,7 +29,7 @@ public class SecretKeyHandler {
                 serverRequest.path());
 
         Mono<SecretKeyDto> value = ContextLogger.observeCtx(logStr, log::info)
-                .thenReturn(Objects.requireNonNull(AesSecretKeyUtils.generateKey(256)))
+                .thenReturn(Objects.requireNonNull(AesSecretKeyUtils.generateAesKey(256)))
                 .map(AesSecretKeyUtils::convertSecretKeyToString)
                 .map(SecretKeyDto::new);
 
