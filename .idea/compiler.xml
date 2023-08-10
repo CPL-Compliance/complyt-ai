@@ -11,6 +11,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="test-service" />
       </profile>
       <profile name="Annotation profile for Complyt" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -23,7 +24,6 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
         <module name="api-gateway" />
-        <module name="test-service" />
         <module name="files" />
         <module name="sales-tax-rates" />
         <module name="discovery-service" />
@@ -56,7 +56,7 @@
       <module name="sales-tax-rates" options="-parameters" />
       <module name="salestax" options="-parameters" />
       <module name="temp" options="-parameters" />
-      <module name="test-service" options="-parameters" />
+      <module name="test-service" options="" />
       <module name="testService" options="-parameters" />
       <module name="testToRemove" options="-parameters" />
     </option>

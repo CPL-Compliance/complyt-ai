@@ -10,7 +10,7 @@
         <server>
             <id>github</id>
             <password>${GITHUB_API_TOKEN_CIRCLECI}</password>
-            <username>${GITHUB_USERNAME_CIRCLECI}}</username>
+            <username>${GITHUB_USERNAME_CIRCLECI}</username>
         </server>
     </servers>
 </settings>

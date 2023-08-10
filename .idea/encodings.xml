@@ -3,12 +3,16 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/abc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
+      <file url="file://$PROJECT_DIR$/api-gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/authentication/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/config-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/config-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/discovery-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/discovery-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/files/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/files/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sales-tax-rates/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/sales-tax-rates/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sales-tax/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sales-tax/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
