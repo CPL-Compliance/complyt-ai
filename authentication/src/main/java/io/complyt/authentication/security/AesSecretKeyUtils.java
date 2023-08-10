@@ -1,6 +1,8 @@
 package io.complyt.authentication.security;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -12,7 +14,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AesSecretKeyUtils {
+    static String keyGeneratorAlgorithm = "AES";
 
     /* Generating Secret key */
 
@@ -20,10 +24,11 @@ public class AesSecretKeyUtils {
     public static SecretKey generateAesKey(int n) {
         KeyGenerator keyGenerator;
         try {
-            keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator = KeyGenerator.getInstance(keyGeneratorAlgorithm);
         } catch (NoSuchAlgorithmException e) {
             return null;
         }
+
         keyGenerator.init(n);
         SecretKey originalKey = keyGenerator.generateKey();
 
