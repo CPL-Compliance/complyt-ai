@@ -13,18 +13,18 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthorizationService {
     @NonNull
     AuthorizationServerWrapper authorizationServerWrapper;
 
-    public Mono<Token> getToken(Credentials credentials) {
+    public Mono<Token> getToken(@NonNull Credentials credentials) {
         return authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
                         credentials.getAudience(), credentials.getGrantType())
                 .mapNotNull(accessToken -> createToken(credentials, accessToken));
     }
 
-    private Token createToken(Credentials credentials, AccessToken accessToken) {
+    private Token createToken(@NonNull Credentials credentials, @NonNull AccessToken accessToken) {
         return Token.builder()
                 .complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret())
