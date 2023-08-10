@@ -63,8 +63,7 @@ public class TestUtilities {
     }
 
     public static AccessToken createAccessToken() {
-        return new AccessToken("Access Token", "Scope",
-                0, "Token Type");
+        return new AccessToken("Access Token", "Scope", 0, "Token Type");
     }
 
     public static Auth0AccessToken createAuth0AccessToken() {
@@ -79,5 +78,16 @@ public class TestUtilities {
 
     public static ApiKey createApiKey() {
         return new ApiKey(apiKeyStr);
+    }
+
+    public static Token createToken(Credentials credentials, AccessToken accessToken) {
+        return Token.builder()
+                .complytClientId(credentials.getComplytClientId())
+                .complytClientSecret(credentials.getComplytClientSecret())
+                .accessToken(accessToken.getAccessToken())
+                .scope(accessToken.getScope())
+                .expiresIn(accessToken.getExpiresIn())
+                .tokenType(accessToken.getTokenType())
+                .build();
     }
 }

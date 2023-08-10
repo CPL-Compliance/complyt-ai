@@ -1,0 +1,46 @@
+package io.complyt.authentication.services;
+
+import io.complyt.authentication.business.authorization.AccessToken;
+import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
+import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.domain.Token;
+import lombok.experimental.FieldDefaults;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import testUtils.TestUtilities;
+
+import static org.mockito.Mockito.when;
+
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+class AuthorizationServiceTest {
+    @InjectMocks
+    AuthorizationService authorizationService;
+
+    @Mock
+    AuthorizationServerWrapper authorizationServerWrapper;
+
+    @Test
+    void getToken_validCredentials_returnToken() {
+        // Given
+        Credentials credentials = TestUtilities.createCredentials();
+        AccessToken accessToken = TestUtilities.createAccessToken();
+        Token expectedToken = TestUtilities.createToken(credentials, accessToken);
+
+        // When
+        when(authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
+                credentials.getAudience(), credentials.getGrantType())).thenReturn(Mono.just(accessToken));
+
+        Mono<Token> actualToken = authorizationService.getToken(credentials);
+
+        // Then
+        StepVerifier.create(actualToken).expectNext(expectedToken).verifyComplete();
+    }
+}
