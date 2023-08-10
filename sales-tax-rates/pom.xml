@@ -7,8 +7,12 @@
     <parent>
         <groupId>io.complyt</groupId>
         <artifactId>complyt</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
+        <version>0.1.1</version>
     </parent>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
+    </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax-rates</artifactId>

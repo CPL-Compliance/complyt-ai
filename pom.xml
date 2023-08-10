@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +13,7 @@
     <!-- Maven Coordinates -->
     <groupId>io.complyt</groupId>
     <artifactId>complyt</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <!-- Maven Coordinates -->
 
     <!--    Don't change modules order! It's necessary for system tests-->
@@ -23,7 +22,6 @@
         <module>sales-tax-rates</module>
         <module>sales-tax</module>
         <module>files</module>
-        <module>test-service</module>
         <module>api-gateway</module>
     </modules>
 
@@ -232,7 +230,7 @@
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
-                    <version>1.5</version>
+                    <version>2.1.0</version>
                     <executions>
                         <execution>
                             <phase>prepare-package</phase>
@@ -257,6 +255,19 @@
                     </dependencies>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <releaseProfiles>release</releaseProfiles>
+                        <checkModificationExcludes>true</checkModificationExcludes>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
+                        <pushChanges>true</pushChanges>
+                        <autoVersionSubmodules>false</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>0.40.1</version>
@@ -277,10 +288,10 @@
                                         <descriptorRef>artifact</descriptorRef>
                                     </assembly>
                                     <tags>
-                                        <tag>latest</tag>
                                         <tag>
                                             ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
                                         </tag>
+                                        <tag>latest</tag>
                                     </tags>
                                 </build>
                             </image>
@@ -525,26 +536,13 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin.version}</version>
-                <configuration>
-                    <releaseProfiles>release</releaseProfiles>
-                    <checkModificationExcludes>true</checkModificationExcludes>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
-                    <pushChanges>true</pushChanges>
-                    <autoVersionSubmodules>false</autoVersionSubmodules>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <scm>
         <connection>scm:git:git@github.com:Complyt/complyt.git</connection>
-        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <url>git@github.com:idhub-io/idhub-api.git</url>
+        <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
