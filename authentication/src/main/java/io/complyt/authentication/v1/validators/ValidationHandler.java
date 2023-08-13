@@ -37,17 +37,20 @@ public class ValidationHandler<T, U extends Validator> {
     }
 
     public Mono<T> validateRequest(final ServerRequest serverRequest) {
-        return queryParamsExtractor.extract(serverRequest)
-                .flatMap(object -> {
-                    Errors errors = new BeanPropertyBindingResult(object, validationClass.getName());
-                    validator.validate(object, errors);
+        return queryParamsExtractor.extract(serverRequest).flatMap(this::test)
+                .switchIfEmpty(serverRequest.bodyToMono(validationClass).flatMap(this::test));
+    }
 
-                    if (errors.getAllErrors().isEmpty()) {
-                        return Mono.just(object);
-                    } else {
-                        return onValidationErrors(errors);
-                    }
-                });
+    @NonNull
+    private Mono<T> test(T body) {
+        Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
+        validator.validate(body, errors);
+
+        if (errors.getAllErrors().isEmpty()) {
+            return Mono.just(body);
+        } else {
+            return onValidationErrors(errors);
+        }
     }
 
     public final Mono<T> validate(final ServerRequest serverRequest) {
@@ -61,5 +64,4 @@ public class ValidationHandler<T, U extends Validator> {
                         .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException(errorList))));
     }
-
 }

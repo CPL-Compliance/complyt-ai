@@ -1,7 +1,6 @@
 package io.complyt.authentication.v1.validators;
 
 import io.complyt.authentication.v1.models.ApiKey;
-import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
