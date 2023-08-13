@@ -1,7 +1,6 @@
 package io.complyt.authentication.repositories;
 
 import io.complyt.authentication.domain.Credentials;
-import io.complyt.authentication.domain.Token;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,55 +21,55 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-class TokenRepositoryTest {
+class CredentialsRepositoryTest {
     @InjectMocks
-    TokenRepository tokenRepository;
+    CredentialsRepository credentialsRepository;
 
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    Token token;
+    Credentials credentials;
 
     @BeforeEach
-    void setUp() {
-        token = TestUtilities.createToken();
+    void setup(){
+        credentials = TestUtilities.createCredentials();
     }
 
     @Test
-    public void findByComplytClientId_tokenExists_returnsToken() {
+    void findByComplytClientId_credentialsWithComplytClientIdExists_returnsCredentials() {
         // Given
         String complytClientId = "complytClientId";
         Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
         // When
-        when(reactiveMongoTemplate.findOne(query, Token.class)).thenReturn(Mono.just(token));
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.just(credentials));
 
         // Then
-        Mono<Token> tokenMono = tokenRepository.findByComplytClientId(complytClientId);
-        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+        Mono<Credentials> credentialsMono = credentialsRepository.findByComplytClientId(complytClientId);
+        StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
     }
 
     @Test
-    public void findByComplytClientId_tokenNotExists_returnEmpty() {
+    void findByComplytClientId_credentialsWithComplytClientIdNotExists_returnsMonoEmpty() {
         // Given
         String complytClientId = "complytClientId";
         Query query = Query.query(Criteria.where("complytClientId").is(complytClientId));
 
         // When
-        when(reactiveMongoTemplate.findOne(query, Token.class)).thenReturn(Mono.empty());
+        when(reactiveMongoTemplate.findOne(query, Credentials.class)).thenReturn(Mono.empty());
 
         // Then
-        Mono<Token> tokenMono = tokenRepository.findByComplytClientId(complytClientId);
-        StepVerifier.create(tokenMono).verifyComplete();
+        Mono<Credentials> credentialsMono = credentialsRepository.findByComplytClientId(complytClientId);
+        StepVerifier.create(credentialsMono).verifyComplete();
     }
 
     @Test
-    public void save() {
+    void save_validCredentials_returnSavedCredentials() {
         // When
-        when(reactiveMongoTemplate.save(token)).thenReturn(Mono.just(token));
+        when(reactiveMongoTemplate.save(credentials)).thenReturn(Mono.just(credentials));
 
         // Then
-        Mono<Token> tokenMono = tokenRepository.save(token);
-        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+        Mono<Credentials> credentialsMono = credentialsRepository.save(credentials);
+        StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
     }
 }

@@ -28,7 +28,7 @@ public class CredentialsRepository {
                 .then(reactiveMongoTemplate.findOne(query, Credentials.class));
     }
 
-    public Mono<Credentials> save(Credentials credentials) {
+    public Mono<Credentials> save(final @NonNull Credentials credentials) {
         return ContextLogger.observeCtx("Saving Credentials", log::info)
                 .then(reactiveMongoTemplate.save(credentials));
     }

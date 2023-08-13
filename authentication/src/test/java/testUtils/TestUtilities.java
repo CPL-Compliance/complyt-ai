@@ -80,6 +80,10 @@ public class TestUtilities {
         return new ApiKey(apiKeyStr);
     }
 
+    public static Token createToken() {
+        return createToken(createCredentials(), createAccessToken());
+    }
+
     public static Token createToken(Credentials credentials, AccessToken accessToken) {
         return Token.builder()
                 .complytClientId(credentials.getComplytClientId())
