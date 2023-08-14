@@ -11,6 +11,4 @@ public interface CredentialsMapper {
     CredentialsMapper INSTANCE = Mappers.getMapper(CredentialsMapper.class);
 
     Credentials credentialsDtoTocredentials(CredentialsDto credentialsDto);
-
-    CredentialsDto credentialstoCredentialsDto(Credentials credentials);
 }

@@ -5,6 +5,7 @@ import io.complyt.authentication.business.authorization.Auth0AccessToken;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.v1.models.ApiKey;
+import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
 
 import java.time.LocalDateTime;
@@ -46,12 +47,7 @@ public class TestUtilities {
     }
 
     public static TokenDto createTokenDto() {
-        return createTokenDto(apiKeyStr);
-    }
-
-    public static TokenDto createTokenDto(String apiKey) {
-        return new TokenDto("", "", 0,
-                "", LocalDateTime.now());
+        return new TokenDto("", "", 0, "", LocalDateTime.now());
     }
 
     public static TokenDto createOutputTokenDto() {
@@ -93,5 +89,13 @@ public class TestUtilities {
                 .expiresIn(accessToken.getExpiresIn())
                 .tokenType(accessToken.getTokenType())
                 .build();
+    }
+
+    public static CredentialsDto createCredentialsDto() {
+        return new CredentialsDto("clientId", "clientSecret", apiKeyStr);
+    }
+
+    public static Credentials createCredentials(String clientId, String clientSecret) {
+        return Credentials.builder().clientId(clientId).clientSecret(clientSecret).build();
     }
 }
