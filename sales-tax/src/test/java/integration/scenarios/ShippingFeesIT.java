@@ -275,7 +275,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         String externalId = "10076";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
                         ITUtilities.stubItemDto().withUnitPrice(10).withTotalPrice(10))
-                .withShippingFee(new ShippingFeeDto(true, 0.15f,
+                .withShippingFee(new ShippingFeeDto(true, 0.15,
                         10000, null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
@@ -294,7 +294,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.shippingFee().salesTaxRates());
-                    assertEquals(1500.7750244140625, transactionDto.salesTax().amount());
+                    assertEquals(1500.775, transactionDto.salesTax().amount());
                 });
     }
 }
