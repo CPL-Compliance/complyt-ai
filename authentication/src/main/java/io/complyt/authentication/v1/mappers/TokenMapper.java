@@ -10,7 +10,5 @@ import org.mapstruct.factory.Mappers;
 public interface TokenMapper {
     TokenMapper INSTANCE = Mappers.getMapper(TokenMapper.class);
 
-    Token tokenDtoToToken(TokenDto tokenDto);
-
     TokenDto tokentoTokenDto(Token token);
 }

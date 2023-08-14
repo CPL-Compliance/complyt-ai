@@ -11,6 +11,8 @@ import io.complyt.authentication.v1.mappers.TokenMapper;
 import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
+import io.complyt.authentication.v1.validators.query_params.ApiKeyQueryParamsExtractor;
+import io.complyt.authentication.v1.validators.query_params.CredentialsDtoQueryParamsExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 @WebFluxTest
 @ContextConfiguration(classes = {TokenRouter.class, TokenHandler.class, ApiExceptionConfig.class,
-        ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class})
+        ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
+        CredentialsDtoQueryParamsExtractor.class})
 class TokenRouterTest implements TokenRouterTestTemplate {
 
     @Autowired
