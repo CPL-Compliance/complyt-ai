@@ -32,29 +32,12 @@ public class ValidationHandler<T, U extends Validator> {
     @NonNull
     QueryParamsExtractor<T> queryParamsExtractor;
 
-    private Mono<T> onValidationErrors(Errors errors) {
-        return Mono.error(new ObjectNotValidApiException(errors));
-    }
-
-    public Mono<T> validateRequest(final ServerRequest serverRequest) {
-        return queryParamsExtractor.extract(serverRequest).flatMap(this::test)
-                .switchIfEmpty(serverRequest.bodyToMono(validationClass).flatMap(this::test));
-    }
-
-    @NonNull
-    private Mono<T> test(T body) {
-        Errors errors = new BeanPropertyBindingResult(body, validationClass.getName());
-        validator.validate(body, errors);
-
-        if (errors.getAllErrors().isEmpty()) {
-            return Mono.just(body);
-        } else {
-            return onValidationErrors(errors);
-        }
-    }
-
-    public final Mono<T> validate(final ServerRequest serverRequest) {
-        return this.validateRequest(serverRequest)
+    /**
+     * @param serverRequest
+     * @return
+     */
+    public final @NonNull Mono<T> handle(final ServerRequest serverRequest) {
+        return validateRequest(serverRequest)
                 .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
                         .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
                                 .flatMap(check -> check.apply(body, serverRequest)))
@@ -63,5 +46,34 @@ public class ValidationHandler<T, U extends Validator> {
                         .collectList()
                         .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
                                 Mono.error(new ConflictedDataApiException(errorList))));
+    }
+
+    /**
+     * This method employs query parameter validation by converting them into an object and subsequently
+     * validating the object. If no query parameters are present in the request, it then examines the request
+     * body for validation purposes.
+     *
+     * @param serverRequest - The request to validate
+     * @return - Mono of valid object or Mono error
+     */
+    private @NonNull Mono<T> validateRequest(final ServerRequest serverRequest) {
+        return queryParamsExtractor.extract(serverRequest).flatMap(this::validateObject)
+                .switchIfEmpty(serverRequest.bodyToMono(validationClass).flatMap(this::validateObject));
+    }
+
+    @NonNull
+    private Mono<T> validateObject(T objectToValidate) {
+        Errors errors = new BeanPropertyBindingResult(objectToValidate, validationClass.getName());
+        validator.validate(objectToValidate, errors);
+
+        if (errors.getAllErrors().isEmpty()) {
+            return Mono.just(objectToValidate);
+        } else {
+            return onValidationErrors(errors);
+        }
+    }
+
+    private @NonNull Mono<T> onValidationErrors(Errors errors) {
+        return Mono.error(new ObjectNotValidApiException(errors));
     }
 }

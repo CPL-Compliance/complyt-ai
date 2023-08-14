@@ -34,7 +34,7 @@ public class TokenHandler {
                 serverRequest.path());
 
         Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info)
-                .then(apiKeyValidationHandler.validate(serverRequest))
+                .then(apiKeyValidationHandler.handle(serverRequest))
                 .flatMap(tokenFacade::getToken)
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(),
