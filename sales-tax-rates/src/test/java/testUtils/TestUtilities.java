@@ -34,7 +34,7 @@ public interface TestUtilities {
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.071f, 0.06f, null);
+        return new SalesTaxRates(0.00375, 0.0, 0.00725, 0.071, 0.06, null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
@@ -63,9 +63,9 @@ public interface TestUtilities {
     }
 
     static Result createResult() {
-        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
-                0f, 0f, 0f, 0f, "", 0f, 0, "",
-                0f, 0f, "", 0, 0, "", 0,
+        return new Result("", "", "injectedCounty", "", 0f, 0, "", "",
+                0, 0, 0, 0, "", 0, 0, "",
+                0, 0, "", 0, 0, "", 0,
                 0, "", 0, 0, "", 0, 0, "",
                 0, 0, "");
     }
@@ -80,10 +80,10 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        double cityDistrictRate = 0f;
-        double countyDistrictRate = 0.029f;
+        double cityDistrictRate = 0;
+        double countyDistrictRate = 0.029;
         RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
-        return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.04f, cityDistrictRate + countyDistrictRate, ratesMetaDataDto);
+        return new SalesTaxRatesDto(0, 0, 0.011, 0.04, cityDistrictRate + countyDistrictRate, ratesMetaDataDto);
     }
 
     static String stringWithLength(int length) {
