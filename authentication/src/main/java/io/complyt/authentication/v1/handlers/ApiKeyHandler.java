@@ -38,7 +38,7 @@ public class ApiKeyHandler {
                 serverRequest.path());
 
         Mono<ApiKeyDto> value = ContextLogger.observeCtx(logStr, log::info)
-                .then(credentialsDtoValidationHandler.validate(serverRequest))
+                .then(credentialsDtoValidationHandler.handle(serverRequest))
                 .map(CredentialsMapper.INSTANCE::credentialsDtoTocredentials)
                 .flatMap(apiKeyFacade::saveCredentials)
                 .map(ApiKeyDto::new)
