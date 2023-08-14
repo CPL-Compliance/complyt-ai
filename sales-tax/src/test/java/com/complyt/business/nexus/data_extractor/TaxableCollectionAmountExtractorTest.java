@@ -62,7 +62,7 @@ public class TaxableCollectionAmountExtractorTest {
         // When
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
-        float expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
+        double expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
         float amount = taxableCollectionAmountExtractor.extract();
 
         // Then
@@ -77,8 +77,8 @@ public class TaxableCollectionAmountExtractorTest {
         when(qualificationChecker.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
         when(qualificationChecker.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
-        float amount = taxableCollectionAmountExtractor.extract();
-        float expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getTotalPrice();
+        double amount = taxableCollectionAmountExtractor.extract();
+        double expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getTotalPrice();
 
         // Then
         assertEquals(amount, expectedAmount);

@@ -34,10 +34,10 @@ public class ShippingFeeTest {
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
         ShippingFee shippingFeeWithManualRate = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
-        float expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getTotalPrice();
+        double expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getTotalPrice();
 
         // When + Then
-        float actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
+        double actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -46,16 +46,16 @@ public class ShippingFeeTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = shippingFee.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate() * rulesByPercentage.getCalculationValue();
+        double rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate() * rulesByPercentage.getCalculationValue();
         SalesTaxRates salesTaxRates = shippingFee.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage)
                 .withSalesTaxRates(salesTaxRates);
 
-        float expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
+        double expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
                 shippingFeeWithRuleByPercentage.getSalesTaxRates().taxRate();
 
         // When + Then
-        float actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
+        double actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 

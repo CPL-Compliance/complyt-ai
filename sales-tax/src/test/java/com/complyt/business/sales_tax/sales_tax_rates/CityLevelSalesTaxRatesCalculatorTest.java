@@ -89,7 +89,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
         float newCityRate = taxableCityRule.getCalculationValue();
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates()
                 .withCityRate(newCityRate);
-        float taxRate = newCityRate + salesTaxRates.combinedDistrictRate() +
+        double taxRate = newCityRate + salesTaxRates.combinedDistrictRate() +
                 salesTaxRates.countyRate() + salesTaxRates.stateRate();
 
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(taxRate).withCityRate(newCityRate);
@@ -108,8 +108,8 @@ public class CityLevelSalesTaxRatesCalculatorTest {
                 .withSpecialTreatment(true)
                 .withCalculationType(CalculationType.PERCENTAGE);
         SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(0.05f);
-        float newCityTaxRate = originalSalesTaxRate.cityRate() * taxableCityRule.getCalculationValue();
-        float taxRate = newCityTaxRate + originalSalesTaxRate.combinedDistrictRate() +
+        double newCityTaxRate = originalSalesTaxRate.cityRate() * taxableCityRule.getCalculationValue();
+        double taxRate = newCityTaxRate + originalSalesTaxRate.combinedDistrictRate() +
                 originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
 
         SalesTaxRates expectedSalesTaxRate = originalSalesTaxRate.withTaxRate(taxRate).withCityRate(newCityTaxRate);

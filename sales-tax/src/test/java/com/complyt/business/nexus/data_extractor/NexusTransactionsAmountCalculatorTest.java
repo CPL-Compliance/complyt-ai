@@ -79,7 +79,7 @@ public class NexusTransactionsAmountCalculatorTest {
     @Test
     void extract_ExtractsAmountOfInvoices_ReturnsAmount() {
         // Given
-        float expectedTotalAmount = transactions.get(0).getItems().get(0).getTotalPrice() +
+        double expectedTotalAmount = transactions.get(0).getItems().get(0).getTotalPrice() +
                 transactions.get(0).getItems().get(1).getTotalPrice() +
                 transactions.get(1).getItems().get(0).getTotalPrice();
         List<Taxable> firstTransactionTaxables = new ArrayList<>(transactions.get(0).getItems());
@@ -93,7 +93,7 @@ public class NexusTransactionsAmountCalculatorTest {
         when(qualificationChecker.isQualified(transactions.get(0).getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactions.get(0).getItems().get(1), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
-        Mono<Float> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
+        Mono<Double> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
 
         // Then
         StepVerifier.create(actualTotalAmount).expectNext(expectedTotalAmount).verifyComplete();
@@ -104,7 +104,7 @@ public class NexusTransactionsAmountCalculatorTest {
         // Given
         Transaction refundTransaction = createRefundTransaction();
         transactions.add(refundTransaction);
-        float expectedTotalAmount = transactions.get(0).getItems().get(0).getTotalPrice() +
+        double expectedTotalAmount = transactions.get(0).getItems().get(0).getTotalPrice() +
                 transactions.get(0).getItems().get(1).getTotalPrice() +
                 transactions.get(1).getItems().get(0).getTotalPrice() - refundTransaction.getItems().get(0).getTotalPrice();
         List<Taxable> firstTransactionTaxables = new ArrayList<>(transactions.get(0).getItems());
@@ -123,7 +123,7 @@ public class NexusTransactionsAmountCalculatorTest {
         when(qualificationChecker.isQualified(transactions.get(0).getItems().get(1), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactions.get(1).getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactions.get(2).getItems().get(0), nexusStateRule)).thenReturn(true);
-        Mono<Float> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
+        Mono<Double> actualTotalAmount = nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule);
 
         // Then
         StepVerifier.create(actualTotalAmount).expectNext(expectedTotalAmount).verifyComplete();

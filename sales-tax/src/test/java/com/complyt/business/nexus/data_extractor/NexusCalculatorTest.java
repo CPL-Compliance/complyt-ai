@@ -86,7 +86,7 @@ public class NexusCalculatorTest {
         List<Transaction> transactions = createTransactionsList();
 
         int count = transactions.size();
-        float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
+        double amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
 
@@ -106,7 +106,7 @@ public class NexusCalculatorTest {
         // Given
         List<Transaction> transactions = createTransactionsList();
         int count = 0;
-        float amount = 0;
+        double amount = 0;
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
             add(CustomerType.RESELLER);

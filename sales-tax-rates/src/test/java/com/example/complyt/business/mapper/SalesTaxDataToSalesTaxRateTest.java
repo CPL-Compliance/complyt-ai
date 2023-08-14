@@ -49,7 +49,7 @@ public class SalesTaxDataToSalesTaxRateTest {
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
         SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates();
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
+        double modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
         SalesTaxRates expectedSalesTaxRate =
                 salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0);
 
@@ -68,7 +68,7 @@ public class SalesTaxDataToSalesTaxRateTest {
         // Given
         RatesMetaData ratesMetaData = new RatesMetaData(0.01f, 0.01f);
         SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates().withRatesMetaData(ratesMetaData);
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
+        double modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
         RatesMetaData expectedRatesMetaData = ratesMetaData.withCityDistrictRate(0);
         SalesTaxRates expectedSalesTaxRate =
                 salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0).withRatesMetaData(expectedRatesMetaData);

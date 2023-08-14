@@ -69,7 +69,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .flatMap(salesTaxRates -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
-                            float salesTaxAmount = salesTaxAggregator.aggregate(taxables);
+                            double salesTaxAmount = salesTaxAggregator.aggregate(taxables);
                             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRates);
 
                             return transactionWithRates.withSalesTax(salesTax);

@@ -9,6 +9,6 @@ import lombok.With;
 @With
 @Schema(name = "SalesTax", description = FieldsDescriptions.SALES_TAX)
 public record SalesTaxDto(
-        @PositiveOrZero(message = "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) float amount,
+        @PositiveOrZero(message = "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) double amount,
         SalesTaxRatesDto salesTaxRates) {
 }

@@ -3,6 +3,6 @@ package com.complyt.v1.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "SalesTaxRates")
-public record SalesTaxRatesDto(float cityRate,float countyRate, float stateRate, float taxRate, float combinedDistrictRate,
+public record SalesTaxRatesDto(double cityRate,double countyRate, double stateRate, double taxRate, double combinedDistrictRate,
                                RatesMetaDataDto ratesMetaData) {
 }

@@ -36,7 +36,7 @@ public class SalesTaxDtoTest {
     @Test
     void equals_NotIdenticalCustomers_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.amount() - 1;
+        double newAmount = salesTaxDto.amount() - 1;
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then
@@ -51,7 +51,7 @@ public class SalesTaxDtoTest {
     @Test
     void hashCode_NotIdenticalSalesTax_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.amount() - 1;
+        double newAmount = salesTaxDto.amount() - 1;
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then

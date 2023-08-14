@@ -22,8 +22,8 @@ public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxR
     @Mapping(expression = "java(toCombinedDistrictRate(taxInfoItem))", target = "combinedDistrictRate")
     SalesTaxRates map(TaxInfoItem taxInfoItem);
 
-    default float toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
-        return Float.parseFloat(taxInfoItem.cityDistrictRate()) + Float.parseFloat(taxInfoItem.countyDistrictRate());
+    default double toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
+        return Double.parseDouble(taxInfoItem.cityDistrictRate()) + Double.parseDouble(taxInfoItem.countyDistrictRate());
     }
 
     @Override

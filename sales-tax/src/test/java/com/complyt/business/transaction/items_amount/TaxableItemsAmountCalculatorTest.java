@@ -46,7 +46,7 @@ public class TaxableItemsAmountCalculatorTest {
     @Test
     void calculate_TwoItemsAreTaxable_ReturnsAmountOfTwoItems() {
         // Before
-        float expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice();
+        double expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice();
 
         // When + Then
         float actualAmount = taxableItemsAmountCalculator.calculate(items);
@@ -57,7 +57,7 @@ public class TaxableItemsAmountCalculatorTest {
     void calculate_OneItemIsTaxable_ReturnsAmountOfOneItem() {
         // Before
         items.set(0, items.get(0).withTaxableCategory(TaxableCategory.NOT_TAXABLE));
-        float expectedAmount = items.get(1).getTotalPrice();
+        double expectedAmount = items.get(1).getTotalPrice();
 
         // When + Then
         float actualAmount = taxableItemsAmountCalculator.calculate(items);

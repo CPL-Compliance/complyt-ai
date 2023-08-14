@@ -9,5 +9,5 @@ import lombok.*;
 @ToString
 public class NexusCalculationSummary {
     private long count;
-    private float amount;
+    private double amount;
 }

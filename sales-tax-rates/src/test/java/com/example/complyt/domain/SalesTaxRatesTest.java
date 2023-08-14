@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRatesTest {
 
-    private final float rate = 0.5f;
+    private final double rate = 0.5f;
     private SalesTaxRates salesTaxRates;
 
     private SalesTaxRates createSalesTaxRates() {

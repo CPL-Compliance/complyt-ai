@@ -59,7 +59,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
         // Given
         float fixedStateRateValue = 0.1f;
-        float calculatedTaxRateValue = salesTaxRates.taxRate() - salesTaxRates.stateRate() + fixedStateRateValue;
+        double calculatedTaxRateValue = salesTaxRates.taxRate() - salesTaxRates.stateRate() + fixedStateRateValue;
         SalesTaxRates expectedSalesTaxRate = salesTaxRates
                 .withStateRate(fixedStateRateValue)
                 .withTaxRate(calculatedTaxRateValue);
@@ -81,7 +81,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.PERCENTAGE)
                 .withSpecialTreatment(true);
-        float calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRates.taxRate();
+        double calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRates.taxRate();
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(calculatedRate);
 
         // When + Then

@@ -35,13 +35,13 @@ public class SalesTaxDataToSalesTaxRate {
 
     private SalesTaxRates handleUnincorporatedAddress(SalesTaxRates salesTaxRates) {
         if (salesTaxRates.ratesMetaData() == null) {
-            float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
+            double modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
 
             return salesTaxRates
                     .withTaxRate(modifiedTaxRate)
                     .withCityRate(0);
         }
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
+        double modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
         RatesMetaData modifiedRatesMetaData = salesTaxRates.ratesMetaData().withCityDistrictRate(0);
 
         return salesTaxRates

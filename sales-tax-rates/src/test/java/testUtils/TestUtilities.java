@@ -80,8 +80,8 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        float cityDistrictRate = 0f;
-        float countyDistrictRate = 0.029f;
+        double cityDistrictRate = 0f;
+        double countyDistrictRate = 0.029f;
         RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
         return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.04f, cityDistrictRate + countyDistrictRate, ratesMetaDataDto);
     }

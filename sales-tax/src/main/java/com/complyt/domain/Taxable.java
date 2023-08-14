@@ -16,19 +16,19 @@ public interface Taxable {
 
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
-    float getTotalPrice();
+    double getTotalPrice();
 
     boolean isManualSalesTax();
 
     SalesTaxRates getSalesTaxRates();
 
-    float getManualSalesTaxRate();
+    double getManualSalesTaxRate();
 
-    default float getManualSalesTaxAmount() {
+    default double getManualSalesTaxAmount() {
         return getManualSalesTaxRate() * getTotalPrice();
     }
 
-    default float calculateSalesTaxAmount() {
+    default double calculateSalesTaxAmount() {
         if (isManualSalesTax()) {
             return getManualSalesTaxAmount();
         }

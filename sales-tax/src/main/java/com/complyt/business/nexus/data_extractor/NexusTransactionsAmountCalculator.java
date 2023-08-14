@@ -13,15 +13,15 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsAmountCalculator implements NexusDataExtractor<Float, List<Transaction>> {
+public class NexusTransactionsAmountCalculator implements NexusDataExtractor<Double, List<Transaction>> {
 
     @NonNull
     private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Override
-    public Mono<Float> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
+    public Mono<Double> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
         return Mono.fromCallable(() -> {
-            float totalAmount = 0;
+            double totalAmount = 0;
             for (Transaction transaction : transactions) {
                 TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
                 float amount = amountExtractor.extract();

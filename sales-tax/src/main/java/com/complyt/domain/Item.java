@@ -12,16 +12,16 @@ import lombok.*;
 @With
 @AllArgsConstructor
 public class Item implements Taxable {
-    private float unitPrice;
-    private float quantity;
-    private float totalPrice;
+    private double unitPrice;
+    private double quantity;
+    private double totalPrice;
     private String description;
     private String name;
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRates salesTaxRates;
     private boolean manualSalesTax;
-    private float manualSalesTaxRate;
+    private double manualSalesTaxRate;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 

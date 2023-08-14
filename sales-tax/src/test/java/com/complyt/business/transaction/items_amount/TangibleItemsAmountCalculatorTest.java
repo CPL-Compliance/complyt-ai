@@ -46,7 +46,7 @@ public class TangibleItemsAmountCalculatorTest {
     @Test
     void calculate_TwoItemsAreTangible_ReturnsAmountOfTwoItems() {
         // Before
-        float expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice();
+        double expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice();
 
         // When + Then
         float actualAmount = tangibleItemsAmountCalculator.calculate(items);
@@ -57,7 +57,7 @@ public class TangibleItemsAmountCalculatorTest {
     void calculate_OneItemIsTangible_ReturnsAmountOfOneItem() {
         // Before
         items.set(0, items.get(0).withTangibleCategory(TangibleCategory.INTANGIBLE));
-        float expectedAmount = items.get(1).getTotalPrice();
+        double expectedAmount = items.get(1).getTotalPrice();
 
         // When + Then
         float actualAmount = tangibleItemsAmountCalculator.calculate(items);

@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ShippingFee implements Taxable {
     private final boolean manualSalesTax;
-    private final float manualSalesTaxRate;
-    private final float totalPrice;
+    private final double manualSalesTaxRate;
+    private final double totalPrice;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRates salesTaxRates;
     private final String taxCode;

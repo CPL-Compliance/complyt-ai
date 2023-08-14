@@ -28,10 +28,10 @@ class ItemTest {
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
         Item itemWithManualRate = item.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
-        float expectedAmount = itemWithManualRate.getManualSalesTaxRate() * itemWithManualRate.getTotalPrice();
+        double expectedAmount = itemWithManualRate.getManualSalesTaxRate() * itemWithManualRate.getTotalPrice();
 
         // When + Then
-        float actualAmount = itemWithManualRate.calculateSalesTaxAmount();
+        double actualAmount = itemWithManualRate.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -40,17 +40,17 @@ class ItemTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = item.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRates().taxRate();
+        double rateAfterPercentageCut = rulesByPercentage.getCalculationValue() * item.getSalesTaxRates().taxRate();
         SalesTaxRates salesTaxRates = item.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
 
         Item itemWithRuleByPercentage = item.withJurisdictionalSalesTaxRules(rulesByPercentage)
                 .withSalesTaxRates(salesTaxRates);
 
-        float expectedAmount = itemWithRuleByPercentage.getTotalPrice()
+        double expectedAmount = itemWithRuleByPercentage.getTotalPrice()
                 * itemWithRuleByPercentage.getSalesTaxRates().taxRate();
 
         // When + Then
-        float actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
+        double actualAmount = itemWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 

@@ -22,8 +22,8 @@ public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRa
     @Mapping(expression = "java(toCombinedDistrictRate(result))", target = "combinedDistrictRate")
     SalesTaxRates map(Result result);
 
-    default float toCombinedDistrictRate(Result result) {
-        return (float) (result.districtSalesTax() + result.district5SalesTax());
+    default double toCombinedDistrictRate(Result result) {
+        return (double) (result.districtSalesTax() + result.district5SalesTax());
     }
 
     @Override

@@ -32,7 +32,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_TaxInfoItem_ReturnSalesTaxRate() {
         // Given
-        RatesMetaData ratesMetaData = new RatesMetaData(Float.parseFloat(taxInfoItem.cityDistrictRate()), Float.parseFloat(taxInfoItem.cityDistrictRate()));
+        RatesMetaData ratesMetaData = new RatesMetaData(Double.parseDouble(taxInfoItem.cityDistrictRate()), Double.parseDouble(taxInfoItem.cityDistrictRate()));
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
                 .withRatesMetaData(ratesMetaData);
 
@@ -46,7 +46,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_FastTaxData_ReturnSalesTaxRate() {
         // Given + When
-        RatesMetaData ratesMetaData = new RatesMetaData(Float.parseFloat(taxInfoItem.cityDistrictRate()), Float.parseFloat(taxInfoItem.cityDistrictRate()));
+        RatesMetaData ratesMetaData = new RatesMetaData(Double.parseDouble(taxInfoItem.cityDistrictRate()), Double.parseDouble(taxInfoItem.cityDistrictRate()));
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
                 .withRatesMetaData(ratesMetaData);
 

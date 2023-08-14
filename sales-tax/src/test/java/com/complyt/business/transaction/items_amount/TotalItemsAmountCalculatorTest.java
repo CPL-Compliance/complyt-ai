@@ -46,7 +46,7 @@ public class TotalItemsAmountCalculatorTest {
     @Test
     void calculate_CalculatesTotalItemsAmount_ReturnsTotalAmount() {
         // Given
-        float expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice() + items.get(2).getTotalPrice();
+        double expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice() + items.get(2).getTotalPrice();
 
         // When + Then
         float actualAmount = totalItemsAmountCalculator.calculate(items);

@@ -42,13 +42,13 @@ public class SalesTaxAggregatorTest {
     @Test
     void aggregate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
         // Given
-        float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate() * item.getTotalPrice()).reduce(Float::sum).get();
-        float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate() * transaction.getShippingFee().getTotalPrice();
-        float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
+        double expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate() * item.getTotalPrice()).reduce(Double::sum).get();
+        double expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate() * transaction.getShippingFee().getTotalPrice();
+        double expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
         List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 
         // When
-        float actualAmount = salesTaxAggregator.aggregate(taxAbles);
+        double actualAmount = salesTaxAggregator.aggregate(taxAbles);
 
         // Then
         assertEquals(expectedAmount, actualAmount);

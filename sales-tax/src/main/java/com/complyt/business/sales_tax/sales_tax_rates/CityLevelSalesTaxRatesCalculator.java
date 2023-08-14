@@ -53,7 +53,7 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
     }
 
     private SalesTaxRates modifyRatesByPercentageTreatment(float percentageToCut, SalesTaxRates originalSalesTaxRate) {
-        float newCityTaxRate = originalSalesTaxRate.cityRate() * percentageToCut;
+        double newCityTaxRate = originalSalesTaxRate.cityRate() * percentageToCut;
         SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate.withCityRate(newCityTaxRate));
 
         log.debug("State Sales tax rate after percentage modification: " + calculatedRates);
@@ -62,7 +62,7 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
     }
 
     private SalesTaxRates modifyRates(SalesTaxRates salesTaxRates) {
-        float taxRate = salesTaxRates.cityRate() + salesTaxRates.combinedDistrictRate() +
+        double taxRate = salesTaxRates.cityRate() + salesTaxRates.combinedDistrictRate() +
                 salesTaxRates.stateRate() + salesTaxRates.countyRate();
 
         return new SalesTaxRates(

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AjcSettings">
-    <option name="ajcPath" value="$MAVEN_REPOSITORY$/org/aspectj/aspectjtools/1.9.8.RC1/aspectjtools-1.9.8.RC1.jar" />
-    <option name="delegateToJavac" value="true" />
-  </component>
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -30,30 +25,21 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="config-server" target="17" />
-      <module name="naming-server" target="17" />
-      <module name="salestax" target="17" />
-      <module name="temp" target="17" />
-      <module name="test-service" target="17" />
-      <module name="testService" target="17" />
-      <module name="testToRemove" target="17" />
+      <module name="api-gateway" target="17" />
+      <module name="complyt" target="17" />
+      <module name="discovery-service" target="17" />
+      <module name="files" target="17" />
+      <module name="sales-tax" target="17" />
+      <module name="sales-tax-rates" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
-      <module name="complyt" options="" />
-      <module name="config-server" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="files" options="-parameters" />
-      <module name="naming-server" options="-parameters" />
       <module name="sales-tax" options="-parameters" />
       <module name="sales-tax-rates" options="-parameters" />
-      <module name="salestax" options="-parameters" />
-      <module name="temp" options="-parameters" />
-      <module name="test-service" options="" />
-      <module name="testService" options="-parameters" />
-      <module name="testToRemove" options="-parameters" />
     </option>
   </component>
 </project>

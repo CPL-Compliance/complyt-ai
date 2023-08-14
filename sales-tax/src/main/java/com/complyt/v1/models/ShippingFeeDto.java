@@ -12,8 +12,8 @@ import jakarta.validation.constraints.Size;
 
 @Schema(name = "ShippingFee", description = FieldsDescriptions.SHIPPING_FEE)
 public record ShippingFeeDto(boolean manualSalesTax,
-                             @PositiveOrZero(message = "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) float manualSalesTaxRate,
-                             @PositiveOrZero(message = "ShippingFee.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) float totalPrice,
+                             @PositiveOrZero(message = "ShippingFee.manualSalesTaxRate " + NumericErrorMessages.NOT_NEGATIVE_ERROR) double manualSalesTaxRate,
+                             @PositiveOrZero(message = "ShippingFee.totalPrice " + NumericErrorMessages.NOT_NEGATIVE_ERROR) double totalPrice,
                              JurisdictionalSalesTaxRulesDto jurisdictionalSalesTaxRules, SalesTaxRatesDto salesTaxRates,
                              @NotNull(message = "ShippingFee.taxCode " + DtoErrorMessages.NOT_NULL_ERROR) @Size(max = 256, message = "ShippingFee.taxCode " + StringErrorMessages.MAX_256_ERROR) String taxCode,
                              TaxableCategoryDto taxableCategory, TangibleCategoryDto tangibleCategory) {
