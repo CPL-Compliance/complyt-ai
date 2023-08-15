@@ -4,9 +4,11 @@ import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
+import lombok.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -97,5 +99,23 @@ public class TestUtilities {
 
     public static Credentials createCredentials(String clientId, String clientSecret) {
         return Credentials.builder().clientId(clientId).clientSecret(clientSecret).build();
+    }
+
+    public static Credentials createDecryptedCreds(Credentials credentials) {
+        return Credentials.builder().clientId(credentials.getClientId()).clientSecret(credentials.getClientSecret())
+                .audience(credentials.getAudience())
+                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
+                .complytClientSecret(credentials.getComplytClientSecret()).build();
+    }
+
+    public static Credentials createEncryptedCredentials(@NonNull ApiKey apiKey, @NonNull EncryptedData clientIdEncryptedData,
+                                                   @NonNull EncryptedData clientSecretEncryptedData,
+                                                   String clientSecretEncoded) {
+        return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
+                .clientIdIv(clientIdEncryptedData.iv())
+                .clientSecret(clientSecretEncryptedData.cipherText())
+                .clientSecretIv(clientSecretEncryptedData.iv()).audience("audience").grantType("grantType")
+                .complytClientId(apiKey.getClientId())
+                .complytClientSecret(clientSecretEncoded).build();
     }
 }

@@ -18,9 +18,9 @@ public class ServicesConfig {
                                           @NonNull PasswordEncoder passwordEncoder,
                                           @NonNull Crypto cryptoAesCbcPkcs5Padding,
                                           @NonNull @Value("${authorization.grant-type}") String grantType,
-                                          @NonNull @Value("${authorization.issuer-uri}") String issuerUri) {
+                                          @NonNull @Value("${authorization.audience}") String audience) {
         return new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, grantType,
-                issuerUri);
+                audience);
     }
 
     @Bean

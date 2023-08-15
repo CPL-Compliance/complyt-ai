@@ -39,17 +39,39 @@ public class CredentialsService {
     String grantType;
 
     @NonNull
-    String issuerUri;
+    String audience;
 
     public Mono<Credentials> getCredentialsByApiKey(final @NonNull ApiKey apiKey) {
         return credentialsRepository.findByComplytClientId(apiKey.getClientId())
-                .filter(credentials -> passwordEncoder.matches(apiKey.getClientSecret(), credentials.getComplytClientSecret()))
-                .flatMap(this::decrypt);
+                .filter(credentials -> passwordEncoder.matches(apiKey.getClientSecret(),
+                        credentials.getComplytClientSecret()))
+                .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
     }
 
-    private Mono<Credentials> decrypt(Credentials credentials) {
+    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, ApiKey apiKey) {
+        EncryptedData clientIdEncryptedData;
+        EncryptedData clientSecretEncryptedData;
+
+        try {
+            clientIdEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId());
+            clientSecretEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new RuntimeException("Failed to encrypt credentials.");
+        }
+
+        String clientSecret = apiKey.getClientSecret();
+        String clientSecretEncoded = passwordEncoder.encode(clientSecret);
+        Credentials credentialsToSave = createEncryptedCredentials(apiKey, clientIdEncryptedData,
+                clientSecretEncryptedData, clientSecretEncoded);
+
+        return credentialsRepository.save(credentialsToSave);
+    }
+
+    private @NonNull Mono<Credentials> decrypt(@NonNull Credentials credentials) {
         EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
-        EncryptedData encryptedClientSecret = new EncryptedData(credentials.getClientSecretIv(), credentials.getClientSecret());
+        EncryptedData encryptedClientSecret = new EncryptedData(credentials.getClientSecretIv(),
+                credentials.getClientSecret());
 
         String clientId;
         String clientSecret;
@@ -61,36 +83,26 @@ public class CredentialsService {
             throw new RuntimeException("Failed to decrypt credentials.");
         }
 
-        Credentials decryptedCreds = credentials.withClientId(clientId).withClientSecret(clientSecret);
+        Credentials decryptedCreds = createDecryptedCredentials(credentials, clientId, clientSecret);
 
         return Mono.just(decryptedCreds);
     }
 
-    public Mono<Credentials> saveCredentials(Credentials credentials, ApiKey apiKey) {
-        EncryptedData clientIdEncryptedData;
-        EncryptedData clientSecretEncryptedData;
+    private static Credentials createDecryptedCredentials(@NonNull Credentials credentials, String clientId,
+                                                          String clientSecret) {
+        return Credentials.builder().clientId(clientId).clientSecret(clientSecret).audience(credentials.getAudience())
+                .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
+                .complytClientSecret(credentials.getComplytClientSecret()).build();
+    }
 
-        try {
-            clientIdEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId());
-            clientSecretEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientSecret());
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
-                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-            throw new RuntimeException(e);
-        }
-
-        String clientSecret = apiKey.getClientSecret();
-        String clientSecretEncoded = passwordEncoder.encode(clientSecret);
-        Credentials credentialsToSave = Credentials.builder()
-                .clientId(clientIdEncryptedData.cipherText())
+    private Credentials createEncryptedCredentials(@NonNull ApiKey apiKey, @NonNull EncryptedData clientIdEncryptedData,
+                                                   @NonNull EncryptedData clientSecretEncryptedData,
+                                                   String clientSecretEncoded) {
+        return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
-                .clientSecretIv(clientSecretEncryptedData.iv())
-                .audience("https://sales-tax-service/")
-                .grantType("client_credentials")
+                .clientSecretIv(clientSecretEncryptedData.iv()).audience(audience).grantType(grantType)
                 .complytClientId(apiKey.getClientId())
-                .complytClientSecret(clientSecretEncoded)
-                .build();
-
-        return credentialsRepository.save(credentialsToSave);
+                .complytClientSecret(clientSecretEncoded).build();
     }
 }
