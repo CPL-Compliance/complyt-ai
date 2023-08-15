@@ -45,13 +45,16 @@ public class TokenService {
     }
 
     public Mono<Token> saveToken(@NonNull Token token) {
-        return Mono.just(LocalDateTime.now()
-                        .plusSeconds(token.getExpiresIn())
-                        .minusSeconds(tokenExpirationSafeWindowSec))
+        return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
                 .map(token::withExpireAt)
                 .map(this::encryptToken)
                 .flatMap(tokenRepository::save)
                 .map(this::decryptToken);
+    }
+
+    @NonNull
+    private LocalDateTime createDocumentExpirationDateTime(int expiresIn) {
+        return LocalDateTime.now().plusSeconds(expiresIn).minusSeconds(tokenExpirationSafeWindowSec);
     }
 
     @NonNull
@@ -66,21 +69,10 @@ public class TokenService {
             accessToken = cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
                  InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to decrypt data");
         }
 
-        return Token.builder()
-                .accessToken(accessToken)
-                .accessTokenIv(token.getAccessTokenIv())
-                .tokenType(token.getTokenType())
-                .complytClientSecret(token.getComplytClientSecret())
-                .complytClientId(token.getComplytClientId())
-                .expiresIn(token.getExpiresIn())
-                .scope(scope)
-                .scopeIv(scopeEncryptedData.iv())
-                .expireAt(token.getExpireAt())
-                .createdAt(token.getCreatedAt())
-                .build();
+        return createDecryptedToken(token, accessToken, scope, scopeEncryptedData);
     }
 
     @NonNull
@@ -96,6 +88,26 @@ public class TokenService {
             throw new RuntimeException(e);
         }
 
+        return createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+    }
+
+    private Token createDecryptedToken(@NonNull Token token, String accessToken, String scope, EncryptedData scopeEncryptedData) {
+        return Token.builder()
+                .accessToken(accessToken)
+                .accessTokenIv(token.getAccessTokenIv())
+                .tokenType(token.getTokenType())
+                .complytClientSecret(token.getComplytClientSecret())
+                .complytClientId(token.getComplytClientId())
+                .expiresIn(token.getExpiresIn())
+                .scope(scope)
+                .scopeIv(scopeEncryptedData.iv())
+                .expireAt(token.getExpireAt())
+                .createdAt(token.getCreatedAt())
+                .build();
+    }
+
+    private Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,
+                                       @NonNull EncryptedData scopeEncryptedData) {
         return Token.builder()
                 .accessToken(accessTokenEncryptedData.cipherText())
                 .accessTokenIv(accessTokenEncryptedData.iv())

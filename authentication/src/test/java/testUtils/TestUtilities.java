@@ -65,7 +65,7 @@ public class TestUtilities {
     }
 
     public static Auth0AccessToken createAuth0AccessToken() {
-        return new Auth0AccessToken("Access Token", "Scope", 0, "Token Type");
+        return new Auth0AccessToken("Access Token", "Scope", 86400, "Token Type");
     }
 
     public static Credentials createCredentials() {
@@ -90,6 +90,7 @@ public class TestUtilities {
                 .scope(accessToken.getScope())
                 .expiresIn(accessToken.getExpiresIn())
                 .tokenType(accessToken.getTokenType())
+                .accessToken("")
                 .build();
     }
 
@@ -108,14 +109,31 @@ public class TestUtilities {
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
-    public static Credentials createEncryptedCredentials(@NonNull ApiKey apiKey, @NonNull EncryptedData clientIdEncryptedData,
-                                                   @NonNull EncryptedData clientSecretEncryptedData,
-                                                   String clientSecretEncoded) {
+    public static Credentials createEncryptedCredentials(@NonNull ApiKey apiKey,
+                                                         @NonNull EncryptedData clientIdEncryptedData,
+                                                         @NonNull EncryptedData clientSecretEncryptedData,
+                                                         String clientSecretEncoded) {
         return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
                 .clientIdIv(clientIdEncryptedData.iv())
                 .clientSecret(clientSecretEncryptedData.cipherText())
                 .clientSecretIv(clientSecretEncryptedData.iv()).audience("audience").grantType("grantType")
                 .complytClientId(apiKey.getClientId())
                 .complytClientSecret(clientSecretEncoded).build();
+    }
+
+    public static Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,
+                                             @NonNull EncryptedData scopeEncryptedData) {
+        return Token.builder()
+                .accessToken(accessTokenEncryptedData.cipherText())
+                .accessTokenIv(accessTokenEncryptedData.iv())
+                .tokenType(token.getTokenType())
+                .complytClientSecret(token.getComplytClientSecret())
+                .complytClientId(token.getComplytClientId())
+                .expiresIn(token.getExpiresIn())
+                .scope(scopeEncryptedData.cipherText())
+                .scopeIv(scopeEncryptedData.iv())
+                .expireAt(token.getExpireAt())
+                .createdAt(token.getCreatedAt())
+                .build();
     }
 }
