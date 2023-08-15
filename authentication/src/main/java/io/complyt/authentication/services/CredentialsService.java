@@ -49,6 +49,11 @@ public class CredentialsService {
     }
 
     public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, ApiKey apiKey) {
+        return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey))
+                .flatMap(credentialsRepository::save);
+    }
+
+    private Credentials prepareCredentialsForSave(@NonNull Credentials credentials, ApiKey apiKey) {
         EncryptedData clientIdEncryptedData;
         EncryptedData clientSecretEncryptedData;
 
@@ -62,10 +67,9 @@ public class CredentialsService {
 
         String clientSecret = apiKey.getClientSecret();
         String clientSecretEncoded = passwordEncoder.encode(clientSecret);
-        Credentials credentialsToSave = createEncryptedCredentials(apiKey, clientIdEncryptedData,
-                clientSecretEncryptedData, clientSecretEncoded);
 
-        return credentialsRepository.save(credentialsToSave);
+        return createEncryptedCredentials(apiKey, clientIdEncryptedData, clientSecretEncryptedData,
+                clientSecretEncoded);
     }
 
     private @NonNull Mono<Credentials> decrypt(@NonNull Credentials credentials) {
@@ -75,6 +79,7 @@ public class CredentialsService {
 
         String clientId;
         String clientSecret;
+
         try {
             clientId = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientId);
             clientSecret = cryptoAesCbcPkcs5Padding.decrypt(encryptedClientSecret);

@@ -44,8 +44,10 @@ public class TokenService {
                 .map(this::decryptToken);
     }
 
-    public Mono<Token> saveToken(Token token) {
-        return Mono.just(LocalDateTime.now().plusSeconds(token.getExpiresIn()).minusSeconds(tokenExpirationSafeWindowSec))
+    public Mono<Token> saveToken(@NonNull Token token) {
+        return Mono.just(LocalDateTime.now()
+                        .plusSeconds(token.getExpiresIn())
+                        .minusSeconds(tokenExpirationSafeWindowSec))
                 .map(token::withExpireAt)
                 .map(this::encryptToken)
                 .flatMap(tokenRepository::save)

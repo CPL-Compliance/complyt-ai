@@ -268,4 +268,94 @@ class CredentialsServiceTest {
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
     }
+
+    @Test
+    void saveCredentials_encryptionThrowsNoSuchAlgorithmException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId()))
+                .thenThrow(new NoSuchAlgorithmException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveCredentials_encryptionThrowsInvalidAlgorithmParameterException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId()))
+                .thenThrow(new InvalidAlgorithmParameterException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveCredentials_encryptionThrowsInvalidKeyException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId()))
+                .thenThrow(new InvalidKeyException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveCredentials_encryptionThrowsBadPaddingException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId()))
+                .thenThrow(new BadPaddingException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void saveCredentials_encryptionThrowsIllegalBlockSizeException_throwsRuntimeException()
+            throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException,
+            NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Credentials credentials = TestUtilities.createCredentials();
+
+        // When
+        when(cryptoAesCbcPkcs5Padding.encrypt(credentials.getClientId()))
+                .thenThrow(new IllegalBlockSizeException("Error"));
+
+        // Then
+        Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
+
+        StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
 }
