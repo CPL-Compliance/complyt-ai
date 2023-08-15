@@ -19,4 +19,5 @@ token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-s
 authorization:
   issuer-uri: ${issuer-uri}
   grant-type: ${grant-type}
+  audience: ${audience}
   authorization-server-url: ${authorization-server-url}
