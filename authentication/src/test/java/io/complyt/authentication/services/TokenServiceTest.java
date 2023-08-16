@@ -4,6 +4,7 @@ import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.repositories.TokenRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
+import io.complyt.authentication.v1.models.ApiKey;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -356,6 +357,77 @@ class TokenServiceTest {
     }
 
     @Test
-    void findByApiKey() {
+    void findByApiKey_apiKeyExists_returnsMonoToken() throws InvalidAlgorithmParameterException,
+            IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException,
+            InvalidKeyException {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Token token = TestUtilities.createToken();
+
+        token = token.withAccessToken("accessTokenPlainText").withScope("scopePlainText")
+                .withAccessTokenIv("accessTokenIv").withScopeIv("scopeIv");
+
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+        String accessTokenPlainText = "accessTokenPlainText";
+        String scopePlainText = "scopePlainText";
+
+        Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+
+        // When
+        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(encryptedToken));
+        when(passwordEncoder.matches(apiKey.getClientSecret(), encryptedToken.getComplytClientSecret()))
+                .thenReturn(true);
+
+        when(cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData)).thenReturn(accessTokenPlainText);
+        when(cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData)).thenReturn(scopePlainText);
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+
+        StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void findByApiKey_apiKeyDoesntExist_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.empty());
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+
+        StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
+    void findByApiKey_authenticationFails_returnsMonoEmpty() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+        Token token = TestUtilities.createToken();
+
+        token = token.withAccessToken("accessTokenPlainText").withScope("scopePlainText")
+                .withAccessTokenIv("accessTokenIv").withScopeIv("scopeIv");
+
+        EncryptedData accessTokenEncryptedData = new EncryptedData("accessTokenIv",
+                "accessTokenCipherText");
+
+        EncryptedData scopeEncryptedData = new EncryptedData("scopeIv", "scopeCipherText");
+
+        Token encryptedToken = TestUtilities.createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+
+        // When
+        when(tokenRepository.findByComplytClientId(apiKey.getClientId())).thenReturn(Mono.just(encryptedToken));
+        when(passwordEncoder.matches(apiKey.getClientSecret(), encryptedToken.getComplytClientSecret()))
+                .thenReturn(false);
+
+        // Then
+        Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
+
+        StepVerifier.create(tokenMono).verifyComplete();
     }
 }

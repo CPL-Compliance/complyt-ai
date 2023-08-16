@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CredentialsMapperTest {
     Credentials credentials;
     CredentialsDto credentialsDto;
+
     @BeforeEach
     void setUp() {
         credentials = TestUtilities.createCredentials();
