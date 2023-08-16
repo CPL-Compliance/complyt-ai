@@ -33,6 +33,7 @@ class AuthorizationServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
         AccessToken accessToken = TestUtilities.createAccessToken();
         Token expectedToken = TestUtilities.createToken(credentials, accessToken);
+        expectedToken = expectedToken.withAccessToken("Access Token");
 
         // When
         when(authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
