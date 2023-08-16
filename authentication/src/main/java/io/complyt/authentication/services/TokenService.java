@@ -91,7 +91,8 @@ public class TokenService {
         return createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
     }
 
-    private Token createDecryptedToken(@NonNull Token token, String accessToken, String scope, EncryptedData scopeEncryptedData) {
+    private Token createDecryptedToken(@NonNull Token token, String accessToken, String scope,
+                                       @NonNull EncryptedData scopeEncryptedData) {
         return Token.builder()
                 .accessToken(accessToken)
                 .accessTokenIv(token.getAccessTokenIv())
