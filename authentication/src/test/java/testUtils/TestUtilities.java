@@ -31,7 +31,7 @@ public class TestUtilities {
             "read:transaction update:transaction delete:transaction read:state create:exemption update:exemption " +
             "delete:exemption read:exemption create:nexus read:nexus delete:nexus update:nexus read:link " +
             "read:sales_tax_rates";
-    static int expiresIn = 86400;
+    public static int expiresIn = 86400;
     static String tokenType = "Bearer";
 
     public static Token createOutputToken() {
@@ -61,11 +61,11 @@ public class TestUtilities {
     }
 
     public static AccessToken createAccessToken() {
-        return new AccessToken("Access Token", "Scope", 0, "Token Type");
+        return new AccessToken("Access Token", "Scope", expiresIn, "Token Type");
     }
 
     public static Auth0AccessToken createAuth0AccessToken() {
-        return new Auth0AccessToken("Access Token", "Scope", 86400, "Token Type");
+        return new Auth0AccessToken("Access Token", "Scope", expiresIn, "Token Type");
     }
 
     public static Credentials createCredentials() {
