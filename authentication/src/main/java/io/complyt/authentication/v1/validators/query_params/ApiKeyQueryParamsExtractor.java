@@ -2,6 +2,7 @@ package io.complyt.authentication.v1.validators.query_params;
 
 import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.models.ApiKey;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class ApiKeyQueryParamsExtractor implements QueryParamsExtractor<ApiKey> {
 
-    public Mono<ApiKey> extract(ServerRequest serverRequest) {
+    public Mono<ApiKey> extract(@NonNull ServerRequest serverRequest) {
         String apiKeyStr = serverRequest.queryParam("api_key").orElse(null);
 
         ApiKey apiKey = new ApiKey(apiKeyStr);
