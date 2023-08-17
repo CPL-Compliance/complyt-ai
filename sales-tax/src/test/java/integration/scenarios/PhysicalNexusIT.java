@@ -26,6 +26,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -154,7 +155,7 @@ public class PhysicalNexusIT extends TestContainersInitializerIT implements Phys
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(775, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(new BigDecimal("775.0000"), transactionDto.salesTax().amount()));
     }
 
     @Order(4)

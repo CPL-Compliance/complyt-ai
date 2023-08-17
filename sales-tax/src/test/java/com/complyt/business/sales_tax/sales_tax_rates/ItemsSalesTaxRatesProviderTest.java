@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,8 @@ public class ItemsSalesTaxRatesProviderTest {
 
     private List<Item> createItems() {
         return new ArrayList<>() {{
-            add(new Item(1000, 2, 2000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE));
-            add(new Item(3000, 3, 9000, "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
+            add(new Item(new BigDecimal(1000), new BigDecimal(2), new BigDecimal(2000), "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(3000),new BigDecimal( 3),new BigDecimal( 9000), "description", "name", "taxCode", jurisdictionalSalesTaxRules, null, false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE));
         }};
     }
 

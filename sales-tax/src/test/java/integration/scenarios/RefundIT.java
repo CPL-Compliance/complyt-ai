@@ -22,6 +22,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -73,7 +75,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         // Given
         String externalId = "10081";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(30000).withQuantity(2).withUnitPrice(15000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal(30000)).withQuantity(new BigDecimal(2)).withUnitPrice(new BigDecimal(15000)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -139,7 +141,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         // Given
         String externalId = "10083";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(80000).withQuantity(2).withUnitPrice(40000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal(80000)).withQuantity(new BigDecimal(2)).withUnitPrice(new BigDecimal(40000)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -223,7 +225,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
         // Given
         String externalId = "10084";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(80000).withQuantity(2).withUnitPrice(40000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal(80000)).withQuantity(new BigDecimal(2)).withUnitPrice(new BigDecimal(40000)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -239,7 +241,7 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(6200, receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal("6200.0000"), receivedTransaction.salesTax().amount()));
     }
 
     @Order(7)
@@ -273,13 +275,13 @@ public class RefundIT extends TestContainersInitializerIT implements RefundITTem
                                         .withExternalId(externalIdOfRefund)
                                         .withTransactionType(TransactionTypeDto.REFUND)
                                         .withCreatedFrom(externalIdOfOriginal)
-                                        .withItems(List.of(ITUtilities.stubItemDto().withTotalPrice(40000).withUnitPrice(40000)))
-                                        .withSalesTax(transactionDto.salesTax().withAmount(transactionDto.salesTax().amount() / 2))
+                                        .withItems(List.of(ITUtilities.stubItemDto().withTotalPrice(new BigDecimal(40000)).withUnitPrice(new BigDecimal(40000))))
+                                        .withSalesTax(transactionDto.salesTax().withAmount(transactionDto.salesTax().amount().divide(new BigDecimal(2), RoundingMode.DOWN)))
                                 )
                                 .accept(MediaType.APPLICATION_JSON)
                                 .exchange()
                                 .expectStatus().isCreated()
                                 .expectBody(TransactionDto.class)
-                                .value(receivedTransaction -> assertEquals(3100, receivedTransaction.salesTax().amount())));
+                                .value(receivedTransaction -> assertEquals(new BigDecimal("3100.0000"), receivedTransaction.salesTax().amount())));
     }
 }

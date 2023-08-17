@@ -7,6 +7,8 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -15,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ShippingFee implements Taxable {
     private final boolean manualSalesTax;
-    private final double manualSalesTaxRate;
-    private final double totalPrice;
+    private final BigDecimal manualSalesTaxRate;
+    private final BigDecimal totalPrice;
     private final JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private final SalesTaxRates salesTaxRates;
     private final String taxCode;

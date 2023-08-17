@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.With;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,8 +36,8 @@ public record TransactionDto(@Schema(description = FieldsDescriptions.COMPLYT_ID
                              @NotNull(message = "transactionType " + DtoErrorMessages.NOT_NULL_ERROR) TransactionTypeDto transactionType,
                              @Valid ShippingFeeDto shippingFee,
                              @Schema(description = FieldsDescriptions.CREATED_FROM) @Size(max = 256, message = "createdFrom " + StringErrorMessages.MAX_256_ERROR) String createdFrom,
-                             @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) float taxableItemsAmount,
-                             @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) float tangibleItemsAmount,
-                             float totalItemsAmount)
+                             @Schema(description = FieldsDescriptions.TAXABLE_ITEMS_AMOUNT) BigDecimal taxableItemsAmount,
+                             @Schema(description = FieldsDescriptions.TANGIBLE_ITEMS_AMOUNT) BigDecimal tangibleItemsAmount,
+                             BigDecimal totalItemsAmount)
         implements SourceCheckable, ExternalIdCheckable {
 }

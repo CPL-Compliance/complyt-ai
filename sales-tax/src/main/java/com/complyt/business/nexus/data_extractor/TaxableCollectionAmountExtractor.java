@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,12 +24,12 @@ public class TaxableCollectionAmountExtractor implements AmountExtractor {
     @NonNull
     private NexusStateRule nexusStateRule;
 
-    public float extract() {
+    public BigDecimal extract() {
         List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationChecker.isQualified(item, nexusStateRule)).toList();
-        float amount = 0;
+        BigDecimal amount = BigDecimal.ZERO;
 
         for (Taxable taxable : qualifiedTaxables)
-            amount += taxable.getTotalPrice();
+            amount = amount.add(taxable.getTotalPrice());
 
         return amount;
     }

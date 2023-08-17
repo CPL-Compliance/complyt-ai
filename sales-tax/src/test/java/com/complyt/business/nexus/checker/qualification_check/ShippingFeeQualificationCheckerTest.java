@@ -15,6 +15,7 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,13 +37,13 @@ public class ShippingFeeQualificationCheckerTest {
 
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, jurisdictionalSalesTaxRules,
-                new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), jurisdictionalSalesTaxRules,
+                new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.TANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
+                CalculationType.FIXED, "description", new BigDecimal("0.5"), null);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -59,7 +60,7 @@ public class ShippingFeeQualificationCheckerTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);

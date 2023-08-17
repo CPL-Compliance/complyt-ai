@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +120,7 @@ class NexusServiceTest {
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() - 1,
-                nexusStateRule.getNexusThreshold().getAmount() - 1);
+                nexusStateRule.getNexusThreshold().getAmount().subtract(BigDecimal.ONE));
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
@@ -156,7 +157,7 @@ class NexusServiceTest {
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() + 1,
-                nexusStateRule.getNexusThreshold().getAmount() + 1);
+                nexusStateRule.getNexusThreshold().getAmount().add(BigDecimal.ONE));
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = testUtilities.createSalesTaxTracking(salesTaxTrackingId);

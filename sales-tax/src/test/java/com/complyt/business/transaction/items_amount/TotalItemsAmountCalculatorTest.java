@@ -9,6 +9,7 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,14 +31,14 @@ public class TotalItemsAmountCalculatorTest {
     private List<Taxable> createItems() {
         return new ArrayList<>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "C1S1",
-                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
+                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
                 ));
-                add(new Item(5000, 4, 20000, "description", "name", "C1S3",
-                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S3",
+                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
                 ));
-                add(new Item(5000, 4, 20000, "description", "name", "C1S2",
-                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
+                add(new Item(new BigDecimal(5000), new BigDecimal(4), new BigDecimal(20000), "description", "name", "C1S2",
+                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.INTANGIBLE, TaxableCategory.NOT_TAXABLE
                 ));
             }
         };
@@ -46,10 +47,10 @@ public class TotalItemsAmountCalculatorTest {
     @Test
     void calculate_CalculatesTotalItemsAmount_ReturnsTotalAmount() {
         // Given
-        double expectedAmount = items.get(0).getTotalPrice() + items.get(1).getTotalPrice() + items.get(2).getTotalPrice();
+        BigDecimal expectedAmount = items.get(0).getTotalPrice().add(items.get(1).getTotalPrice()).add(items.get(2).getTotalPrice());
 
         // When + Then
-        float actualAmount = totalItemsAmountCalculator.calculate(items);
+        BigDecimal actualAmount = totalItemsAmountCalculator.calculate(items);
         assertEquals(expectedAmount, actualAmount);
     }
 

@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,8 +48,8 @@ public class TransactionProductClassificationDataInjectionManagerTest {
         Address shippingAddress = new Address("City", "Country", "County", "CA", "Street", "Zip", false);
         List<Item> items = new ArrayList<Item>() {
             {
-                add(new Item(2000, 4, 8000, "description", "name", "taxCode",
-                        null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0
+                add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "taxCode",
+                        null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO
                         , TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE));
             }
         };
@@ -65,10 +66,10 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     }
 
     private List<Item> createItemsNoRules() {
-        Item item1NoRule = new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE);
-        Item item2NoRule = new Item(2000, 4, 8000, "description", "name", "C2S2",
-                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+        Item item1NoRule = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
+                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE);
+        Item item2NoRule = new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C2S2",
+                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
         return new ArrayList<>() {{
             add(item1NoRule);
             add(item2NoRule);
@@ -104,9 +105,9 @@ public class TransactionProductClassificationDataInjectionManagerTest {
     void inject_InjectsDataToTransaction_ReturnsTransaction() {
         List<Item> itemsNoRules = createItemsNoRules();
         JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
-                CalculationType.FIXED, "rule1", 0, null);
+                CalculationType.FIXED, "rule1", BigDecimal.ZERO, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
-                CalculationType.FIXED, "rule2", 0, null);
+                CalculationType.FIXED, "rule2", BigDecimal.ZERO, null);
 
         Map<String, ProductClassification> productClassifications = createClassificationsMap(firstRule, secondRule);
 
@@ -127,9 +128,9 @@ public class TransactionProductClassificationDataInjectionManagerTest {
         TransactionProductClassificationDataInjectionManager injector = new TransactionProductClassificationDataInjectionManager(transaction);
 
         JurisdictionalSalesTaxRules firstRule = new JurisdictionalSalesTaxRules("rule1", "CA", false, false,
-                CalculationType.FIXED, "rule1", 0, null);
+                CalculationType.FIXED, "rule1", BigDecimal.ZERO, null);
         JurisdictionalSalesTaxRules secondRule = new JurisdictionalSalesTaxRules("rule2", "CA", true, false,
-                CalculationType.FIXED, "rule2", 0, null);
+                CalculationType.FIXED, "rule2", BigDecimal.ZERO, null);
         Map<String, ProductClassification> mapTaxCodesToClassifications = createClassificationsMap(firstRule, secondRule);
 
         boolean shouldInject = injector.shouldInject(mapTaxCodesToClassifications);

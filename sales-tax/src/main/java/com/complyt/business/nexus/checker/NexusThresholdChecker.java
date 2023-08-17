@@ -55,7 +55,7 @@ class ThresholdStrategy {
     }
 
     public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
-        return nexusCalculationSummary.getAmount() >= nexusStateRule.getNexusThreshold().getAmount();
+        return nexusCalculationSummary.getAmount().compareTo(nexusStateRule.getNexusThreshold().getAmount()) >= 0;
     }
 
     public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {

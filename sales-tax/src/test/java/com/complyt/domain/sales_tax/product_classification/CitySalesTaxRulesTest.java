@@ -3,6 +3,8 @@ package com.complyt.domain.sales_tax.product_classification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,7 +18,7 @@ class CitySalesTaxRulesTest {
     }
 
     private CitySalesTaxRules createCitySalesTaxRulesRates() {
-        return new CitySalesTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", 1000f);
+        return new CitySalesTaxRules("California", "Ca", false, false, CalculationType.FIXED, "", new BigDecimal("1000"));
     }
 
     @Test

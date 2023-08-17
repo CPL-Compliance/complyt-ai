@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -59,14 +60,14 @@ public class NexusCheckerTest {
     }
 
     private NexusStateRule createNexusStateRule() {
-        NexusThreshold nexusThreshold = new NexusThreshold(10, 10000, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(10), 10000, Definition.AMOUNT_OR_COUNT);
         State state = new State("CA", "02", "California");
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
                 null, nexusThreshold);
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(10, 10000);
+        return new NexusCalculationSummary(10, new BigDecimal(10000));
     }
 
     @Test

@@ -7,6 +7,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Component
 public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator<JurisdictionalSalesTaxRules> {
@@ -49,16 +51,16 @@ public class StateLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculato
         return modifiedRateByPercentageTreatment;
     }
 
-    private SalesTaxRates modifyRateByFixedTreatment(double jurisdictionalRuleStateRate, SalesTaxRates salesTaxRates) {
-        double newTaxRate = salesTaxRates.taxRate() - salesTaxRates.stateRate() + jurisdictionalRuleStateRate;
+    private SalesTaxRates modifyRateByFixedTreatment(BigDecimal jurisdictionalRuleStateRate, SalesTaxRates salesTaxRates) {
+        BigDecimal newTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.stateRate()).add(jurisdictionalRuleStateRate);
         SalesTaxRates calculatedRate = salesTaxRates.withStateRate(jurisdictionalRuleStateRate).withTaxRate(newTaxRate);
         log.debug("State sales tax rate after fixed modification: " + calculatedRate);
 
         return calculatedRate;
     }
 
-    private SalesTaxRates modifyRateByPercentageTreatment(double percentageToCut, SalesTaxRates salesTaxRates) {
-        double newTaxRate = salesTaxRates.taxRate() * percentageToCut;
+    private SalesTaxRates modifyRateByPercentageTreatment(BigDecimal percentageToCut, SalesTaxRates salesTaxRates) {
+        BigDecimal newTaxRate = salesTaxRates.taxRate().multiply(percentageToCut);
         SalesTaxRates calculatedRate = salesTaxRates.withTaxRate(newTaxRate);
         log.debug("State Sales tax rate after percentage modification: " + calculatedRate);
 

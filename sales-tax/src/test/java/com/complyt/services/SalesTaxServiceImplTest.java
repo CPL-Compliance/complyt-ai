@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +119,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(10, salesTaxRates);
+        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));
@@ -147,7 +148,7 @@ public class SalesTaxServiceImplTest {
         // Given
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates();
         ComplytSalesTaxRates complytSalesTaxRates = UnitTestUtilities.createCaliforniaComplytSalesTaxRates();
-        SalesTax salesTax = new SalesTax(10, salesTaxRates);
+        SalesTax salesTax = new SalesTax(new BigDecimal(10), salesTaxRates);
 
         List<Item> itemsWithRates = new ArrayList<>() {{
             add(transaction.getItems().get(0).withSalesTaxRates(salesTaxRates));

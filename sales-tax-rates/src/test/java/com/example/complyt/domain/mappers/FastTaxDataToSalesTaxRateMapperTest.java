@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +33,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_TaxInfoItem_ReturnSalesTaxRate() {
         // Given
-        RatesMetaData ratesMetaData = new RatesMetaData(Double.parseDouble(taxInfoItem.cityDistrictRate()), Double.parseDouble(taxInfoItem.cityDistrictRate()));
+        RatesMetaData ratesMetaData = new RatesMetaData(new BigDecimal(taxInfoItem.cityDistrictRate()), new BigDecimal(taxInfoItem.cityDistrictRate()));
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
                 .withRatesMetaData(ratesMetaData);
 
@@ -46,7 +47,7 @@ class FastTaxDataToSalesTaxRateMapperTest {
     @Test
     void map_FastTaxData_ReturnSalesTaxRate() {
         // Given + When
-        RatesMetaData ratesMetaData = new RatesMetaData(Double.parseDouble(taxInfoItem.cityDistrictRate()), Double.parseDouble(taxInfoItem.cityDistrictRate()));
+        RatesMetaData ratesMetaData = new RatesMetaData(new BigDecimal(taxInfoItem.cityDistrictRate()), new BigDecimal(taxInfoItem.cityDistrictRate()));
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates()
                 .withRatesMetaData(ratesMetaData);
 

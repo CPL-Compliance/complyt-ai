@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -62,8 +63,8 @@ public class TaxableCollectionAmountExtractorTest {
         // When
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
-        double expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
-        float amount = taxableCollectionAmountExtractor.extract();
+        BigDecimal expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
+        BigDecimal amount = taxableCollectionAmountExtractor.extract();
 
         // Then
         assertEquals(expectedAmount, amount);
@@ -77,8 +78,8 @@ public class TaxableCollectionAmountExtractorTest {
         when(qualificationChecker.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
         when(qualificationChecker.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
-        double amount = taxableCollectionAmountExtractor.extract();
-        double expectedAmount = transaction.getItems().get(0).getTotalPrice() + transaction.getShippingFee().getTotalPrice();
+        BigDecimal amount = taxableCollectionAmountExtractor.extract();
+        BigDecimal expectedAmount = transaction.getItems().get(0).getTotalPrice().add(transaction.getShippingFee().getTotalPrice());
 
         // Then
         assertEquals(amount, expectedAmount);

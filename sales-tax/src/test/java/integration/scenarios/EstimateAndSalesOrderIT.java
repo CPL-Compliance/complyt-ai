@@ -21,6 +21,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -68,7 +70,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         //Given
         String externalId = "10091";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(120000).withQuantity(2).withUnitPrice(60000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("120000")).withQuantity(new BigDecimal("2")).withUnitPrice(new BigDecimal("60000")))
                 .withTransactionType(TransactionTypeDto.SALES_ORDER)
                 .withShippingAddress(referenceAddress);
 
@@ -95,7 +97,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         //Given
         String externalId = "10092";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(120000).withQuantity(2).withUnitPrice(60000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("120000")).withQuantity(new BigDecimal("2")).withUnitPrice(new BigDecimal("60000")))
                 .withTransactionType(TransactionTypeDto.ESTIMATE)
                 .withShippingAddress(referenceAddress);
 
@@ -177,7 +179,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         //Given
         String externalId = "10093";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(120000).withQuantity(2).withUnitPrice(60000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("120000")).withQuantity(new BigDecimal("2")).withUnitPrice(new BigDecimal("60000")))
                 .withTransactionType(TransactionTypeDto.ESTIMATE)
                 .withShippingAddress(referenceAddress);
 
@@ -193,7 +195,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(9300, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(new BigDecimal("9300.0000"), transactionDto.salesTax().amount()));
     }
 
     @Order(4)
@@ -204,7 +206,7 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
         //Given
         String externalId = "10094";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withTotalPrice(120000).withQuantity(2).withUnitPrice(60000))
+                        ITUtilities.stubItemDto().withTotalPrice(new BigDecimal("120000")).withQuantity(new BigDecimal("2")).withUnitPrice(new BigDecimal("60000")))
                 .withTransactionType(TransactionTypeDto.SALES_ORDER)
                 .withShippingAddress(referenceAddress);
 
@@ -220,6 +222,6 @@ public class EstimateAndSalesOrderIT extends TestContainersInitializerIT impleme
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(transactionDto -> assertEquals(9300, transactionDto.salesTax().amount()));
+                .value(transactionDto -> assertEquals(new BigDecimal("9300.0000"), transactionDto.salesTax().amount()));
     }
 }

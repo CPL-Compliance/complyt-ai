@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -58,8 +59,8 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     @Test
     void calculateSalesTaxRate_FixedCalculation_ReturnsModifiedTaxRate() {
         // Given
-        float fixedStateRateValue = 0.1f;
-        double calculatedTaxRateValue = salesTaxRates.taxRate() - salesTaxRates.stateRate() + fixedStateRateValue;
+        BigDecimal fixedStateRateValue = new BigDecimal("0.1");
+        BigDecimal calculatedTaxRateValue = salesTaxRates.taxRate().subtract(salesTaxRates.stateRate()).add(fixedStateRateValue);
         SalesTaxRates expectedSalesTaxRate = salesTaxRates
                 .withStateRate(fixedStateRateValue)
                 .withTaxRate(calculatedTaxRateValue);
@@ -81,7 +82,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules percentageCalculationTypeRule = jurisdictionalSalesTaxRules
                 .withCalculationType(CalculationType.PERCENTAGE)
                 .withSpecialTreatment(true);
-        double calculatedRate = percentageCalculationTypeRule.getCalculationValue() * salesTaxRates.taxRate();
+        BigDecimal calculatedRate = percentageCalculationTypeRule.getCalculationValue().multiply(salesTaxRates.taxRate());
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(calculatedRate);
 
         // When + Then
@@ -92,7 +93,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
     @Test
     void getRateByRules_NotTaxable_ReturnsZeroRate() {
         // Given
-        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(0, 0, 0, 0, 0, new RatesMetaData(0, 0));
+        SalesTaxRates zeroSalesTaxRate = new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, new RatesMetaData(BigDecimal.ZERO, BigDecimal.ZERO));
         JurisdictionalSalesTaxRules notTaxableRule = jurisdictionalSalesTaxRules.withTaxable(false);
 
         // When + Then
@@ -106,9 +107,7 @@ public class StateLevelSalesTaxRatesCalculatorTest {
         JurisdictionalSalesTaxRules nullJurisdictionalSalesTaxRules = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            stateLevelSalesTaxRatesCalculator.calculate(nullJurisdictionalSalesTaxRules, salesTaxRates);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> stateLevelSalesTaxRatesCalculator.calculate(nullJurisdictionalSalesTaxRules, salesTaxRates));
 
         assertEquals(nullPointerException.getMessage(), "jurisdictionalSalesTaxRules is marked non-null but is null");
     }

@@ -13,6 +13,7 @@ import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,7 @@ public interface ITUtilities {
                 List.of(items.length < 1 ? new ItemDto[]{stubItemDto()} : items),
                 null, new MandatoryAddressDto("Acampo", "US", null, "CA", "1525 R Jahant Rd", "95220", false), customerId,
                 null, null, TransactionStatusDto.ACTIVE, null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()),
-                TransactionTypeDto.INVOICE, null, null, 0, 0, 0);
+                TransactionTypeDto.INVOICE, null, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     static CustomerDto stubCustomerDto(String externalId) {
@@ -44,8 +45,8 @@ public interface ITUtilities {
     }
 
     static ItemDto stubItemDto() {
-        return new ItemDto(10000, 1, 10000, "some description", "Hardware", "C1S1",
-                null, null, false, 0, null, null);
+        return new ItemDto(new BigDecimal(10000), new BigDecimal(1), new BigDecimal(10000), "some description", "Hardware", "C1S1",
+                null, null, false, BigDecimal.ZERO, null, null);
     }
 
     static FastTaxData stubFastTaxFlorida() {
@@ -134,10 +135,10 @@ public interface ITUtilities {
                 .issuer("https://localhost")
                 .claim("tenant_id", "it_tenant")
                 .claim("scope", "create:customer delete:customer read:customer " +
-                                "update:customer create:transaction read:transaction " +
-                                "update:transaction delete:transaction read:state " +
-                                "create:exemption update:exemption delete:exemption " +
-                                "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
+                        "update:customer create:transaction read:transaction " +
+                        "update:transaction delete:transaction read:state " +
+                        "create:exemption update:exemption delete:exemption " +
+                        "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
     public static Address createAddressInCalifornia() {
@@ -149,11 +150,11 @@ public interface ITUtilities {
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, null);
+        return new SalesTaxRates(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
 
     static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0.00375f, 0.0f, 0.00725f, 0.0125f, 0.06f, null);
+        return new SalesTaxRatesDto(new BigDecimal("0.00375"), new BigDecimal("0.0"), new BigDecimal("0.00725"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {

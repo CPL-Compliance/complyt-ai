@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.With;
 
+import java.math.BigDecimal;
+
 @With
 @Schema(name = "SalesTax", description = FieldsDescriptions.SALES_TAX)
 public record SalesTaxDto(
-        @PositiveOrZero(message = "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) double amount,
+        @PositiveOrZero(message = "SalesTax.amount " + NumericErrorMessages.NOT_NEGATIVE_ERROR) BigDecimal amount,
         SalesTaxRatesDto salesTaxRates) {
 }

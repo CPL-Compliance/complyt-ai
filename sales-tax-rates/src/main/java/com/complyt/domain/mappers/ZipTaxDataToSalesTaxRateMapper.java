@@ -9,21 +9,27 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import java.math.BigDecimal;
+
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface ZipTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     ZipTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(ZipTaxDataToSalesTaxRateMapper.class);
 
-    @Mapping(target = "ratesMetaData.cityDistrictRate", source = "districtSalesTax")
-    @Mapping(target = "ratesMetaData.countyDistrictRate", source = "district5SalesTax")
-    @Mapping(target = "cityRate", source = "citySalesTax")
-    @Mapping(target = "taxRate", source = "taxSales")
-    @Mapping(target = "countyRate", source = "countySalesTax")
-    @Mapping(target = "stateRate", source = "stateSalesTax")
+    @Mapping(expression = "java(toBigDecimal(result.districtSalesTax()))",target = "ratesMetaData.cityDistrictRate")
+    @Mapping(expression = "java(toBigDecimal(result.district5SalesTax()))",target = "ratesMetaData.countyDistrictRate")
+    @Mapping(expression = "java(toBigDecimal(result.citySalesTax()))",target = "cityRate")
+    @Mapping(expression = "java(toBigDecimal(result.taxSales()))",target = "taxRate")
+    @Mapping(expression = "java(toBigDecimal(result.countySalesTax()))",target = "countyRate")
+    @Mapping(expression = "java(toBigDecimal(result.stateSalesTax()))",target = "stateRate")
     @Mapping(expression = "java(toCombinedDistrictRate(result))", target = "combinedDistrictRate")
     SalesTaxRates map(Result result);
 
-    default double toCombinedDistrictRate(Result result) {
-        return (double) (result.districtSalesTax() + result.district5SalesTax());
+    default BigDecimal toBigDecimal(double rate) {
+        return new BigDecimal(rate);
+    }
+
+    default BigDecimal toCombinedDistrictRate(Result result) {
+        return new BigDecimal(result.districtSalesTax()).add(new BigDecimal(result.district5SalesTax()));
     }
 
     @Override

@@ -25,6 +25,8 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTaxableItemsITTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -75,7 +77,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
         // Given
         String externalId = "10058";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withUnitPrice(4).withQuantity(15000).withTotalPrice(60000))
+                        ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(4)).withQuantity(new BigDecimal(15000)).withTotalPrice(new BigDecimal(60000)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -102,7 +104,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
         // Given
         String externalId = "10059";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withQuantity(6).withUnitPrice(10000).withTotalPrice(60000).withTaxCode("C?S1")) // A tax code which in CT is not taxable
+                        ITUtilities.stubItemDto().withQuantity(new BigDecimal(6)).withUnitPrice(new BigDecimal(10000)).withTotalPrice(new BigDecimal(60000)).withTaxCode("C?S1")) // A tax code which in CT is not taxable
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -153,7 +155,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
         // Given
         String externalId = "10052";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withUnitPrice(10000).withQuantity(12).withTotalPrice(120000))
+                        ITUtilities.stubItemDto().withUnitPrice(new BigDecimal((10000))).withQuantity(new BigDecimal(12)).withTotalPrice(new BigDecimal(120000)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -232,7 +234,7 @@ public class EconomicNexusByYearFromSeptemberToSeptemberIT extends TestContainer
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(775, receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal(775), receivedTransaction.salesTax().amount().stripTrailingZeros()));
     }
 
     @Order(5)

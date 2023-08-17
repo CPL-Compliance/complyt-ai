@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Function;
 
@@ -69,7 +70,7 @@ public class SalesTaxServiceImpl implements SalesTaxService {
                 .flatMap(salesTaxRates -> transactionSalesTaxRatesHandler.setRates(transaction, salesTaxRates)
                         .map(transactionWithRates -> {
                             List<Taxable> taxables = (List<Taxable>) taxableCollectionBuilder.build(transactionWithRates);
-                            double salesTaxAmount = salesTaxAggregator.aggregate(taxables);
+                            BigDecimal salesTaxAmount = salesTaxAggregator.aggregate(taxables);
                             SalesTax salesTax = new SalesTax(salesTaxAmount, salesTaxRates);
 
                             return transactionWithRates.withSalesTax(salesTax);

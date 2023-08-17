@@ -7,6 +7,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Slf4j
 @Component
 public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator<CitySalesTaxRules> {
@@ -23,7 +25,7 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
     public SalesTaxRates calculate(@NonNull CitySalesTaxRules citySalesTaxRules, @NonNull SalesTaxRates originalSalesTaxRate) {
         if (!citySalesTaxRules.isTaxable()) {
             log.debug("None taxable rule for city - returning 0 City rate");
-            SalesTaxRates zeroCitySalesTaxRate = originalSalesTaxRate.withCityRate(0);
+            SalesTaxRates zeroCitySalesTaxRate = originalSalesTaxRate.withCityRate(BigDecimal.ZERO);
 
             return zeroCitySalesTaxRate;
         }
@@ -45,15 +47,15 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
         return modifiedRateByPercentageTreatment;
     }
 
-    private SalesTaxRates modifyRatesByFixedTreatment(float cityLevelRate, SalesTaxRates originalSalesTaxRate) {
+    private SalesTaxRates modifyRatesByFixedTreatment(BigDecimal cityLevelRate, SalesTaxRates originalSalesTaxRate) {
         SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate.withCityRate(cityLevelRate));
         log.debug("City sales tax rate after fixed modification: " + cityLevelRate);
 
         return calculatedRates;
     }
 
-    private SalesTaxRates modifyRatesByPercentageTreatment(float percentageToCut, SalesTaxRates originalSalesTaxRate) {
-        double newCityTaxRate = originalSalesTaxRate.cityRate() * percentageToCut;
+    private SalesTaxRates modifyRatesByPercentageTreatment(BigDecimal percentageToCut, SalesTaxRates originalSalesTaxRate) {
+        BigDecimal newCityTaxRate = originalSalesTaxRate.cityRate().multiply(percentageToCut);
         SalesTaxRates calculatedRates = modifyRates(originalSalesTaxRate.withCityRate(newCityTaxRate));
 
         log.debug("State Sales tax rate after percentage modification: " + calculatedRates);
@@ -62,8 +64,8 @@ public class CityLevelSalesTaxRatesCalculator implements SalesTaxRatesCalculator
     }
 
     private SalesTaxRates modifyRates(SalesTaxRates salesTaxRates) {
-        double taxRate = salesTaxRates.cityRate() + salesTaxRates.combinedDistrictRate() +
-                salesTaxRates.stateRate() + salesTaxRates.countyRate();
+        BigDecimal taxRate = salesTaxRates.cityRate().add(salesTaxRates.combinedDistrictRate())
+                .add(salesTaxRates.stateRate()).add(salesTaxRates.countyRate());
 
         return new SalesTaxRates(
                 salesTaxRates.cityRate(),

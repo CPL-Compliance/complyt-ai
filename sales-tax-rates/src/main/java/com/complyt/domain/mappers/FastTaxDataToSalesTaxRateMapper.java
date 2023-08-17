@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import java.math.BigDecimal;
+
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
 public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
     FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
@@ -22,8 +24,8 @@ public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxR
     @Mapping(expression = "java(toCombinedDistrictRate(taxInfoItem))", target = "combinedDistrictRate")
     SalesTaxRates map(TaxInfoItem taxInfoItem);
 
-    default double toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
-        return Double.parseDouble(taxInfoItem.cityDistrictRate()) + Double.parseDouble(taxInfoItem.countyDistrictRate());
+    default BigDecimal toCombinedDistrictRate(TaxInfoItem taxInfoItem) {
+        return new BigDecimal(taxInfoItem.cityDistrictRate()).add(new BigDecimal(taxInfoItem.countyDistrictRate()));
     }
 
     @Override

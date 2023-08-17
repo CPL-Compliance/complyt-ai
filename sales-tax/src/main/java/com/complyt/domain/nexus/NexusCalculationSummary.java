@@ -2,6 +2,8 @@ package com.complyt.domain.nexus;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -9,5 +11,5 @@ import lombok.*;
 @ToString
 public class NexusCalculationSummary {
     private long count;
-    private double amount;
+    private BigDecimal amount;
 }

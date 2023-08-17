@@ -6,6 +6,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -17,7 +19,7 @@ public class JurisdictionalSalesTaxRulesTest {
     @BeforeEach
     void setUp() {
         jurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name", "abbreviation",
-                true, true, CalculationType.PERCENTAGE, "description", 0f, null);
+                true, true, CalculationType.PERCENTAGE, "description", BigDecimal.ZERO, null);
     }
 
     @Test
@@ -90,7 +92,7 @@ public class JurisdictionalSalesTaxRulesTest {
     void Equals_SameJurisdictionalSalesTaxRules_ReturnTrue() {
         // Given
         JurisdictionalSalesTaxRules givenJurisdictionalSalesTaxRules = new JurisdictionalSalesTaxRules("name", "abbreviation",
-                true, true, CalculationType.PERCENTAGE, "description", 0f, null);
+                true, true, CalculationType.PERCENTAGE, "description", BigDecimal.ZERO, null);
 
         // When
         boolean isEquals = jurisdictionalSalesTaxRules.equals(givenJurisdictionalSalesTaxRules);

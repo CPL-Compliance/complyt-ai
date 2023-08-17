@@ -25,6 +25,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,8 +74,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C?S1 Tangible)
         String externalId = "10071";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingFee(new ShippingFeeDto(false, 0,
-                        2000, null, null,
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(2000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -102,8 +103,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C6S1 Intangible)
         String externalId = "10072";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingFee(new ShippingFeeDto(false, 0,
-                        85000, null, null,
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(85000), null, null,
                         "C6S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -149,8 +150,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C?S1 Tangible)
         String externalId = "10073";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingFee(new ShippingFeeDto(false, 0,
-                        85000, null, null,
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(85000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -212,8 +213,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C?S1 Tangible)
         String externalId = "10074";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingFee(new ShippingFeeDto(false, 0,
-                        10000, null, null,
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(10000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -231,7 +232,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.shippingFee().salesTaxRates());
-                    assertEquals(1550, transactionDto.salesTax().amount());
+                    assertEquals(new BigDecimal("1550.0000"), transactionDto.salesTax().amount());
                 });
     }
 
@@ -243,8 +244,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C7S1 Nontaxable)
         String externalId = "10075";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
-                .withShippingFee(new ShippingFeeDto(false, 0,
-                        10000, null, null,
+                .withShippingFee(new ShippingFeeDto(false, BigDecimal.ZERO,
+                        new BigDecimal(10000), null, null,
                         "C7S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -261,8 +262,8 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
-                    assertEquals(transactionDto.shippingFee().salesTaxRates().taxRate(), 0);
-                    assertEquals(775, transactionDto.salesTax().amount());
+                    assertEquals( BigDecimal.ZERO,transactionDto.shippingFee().salesTaxRates().taxRate());
+                    assertEquals(new BigDecimal("775.0000"), transactionDto.salesTax().amount());
                 });
     }
 
@@ -274,9 +275,9 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
         //Given (C?S1 Tangible)
         String externalId = "10076";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withUnitPrice(10).withTotalPrice(10))
-                .withShippingFee(new ShippingFeeDto(true, 0.15,
-                        10000, null, null,
+                        ITUtilities.stubItemDto().withUnitPrice(new BigDecimal(10)).withTotalPrice(new BigDecimal(10)))
+                .withShippingFee(new ShippingFeeDto(true, new BigDecimal("0.15"),
+                        new BigDecimal(10000), null, null,
                         "C?S1", null, null))
                 .withShippingAddress(referenceAddress);
 
@@ -294,7 +295,7 @@ public class ShippingFeesIT extends TestContainersInitializerIT implements Shipp
                 .expectBody(TransactionDto.class)
                 .value(transactionDto -> {
                     assertNotNull(transactionDto.shippingFee().salesTaxRates());
-                    assertEquals(1500.775, transactionDto.salesTax().amount());
+                    assertEquals(new BigDecimal("1500.7750"), transactionDto.salesTax().amount());
                 });
     }
 }
