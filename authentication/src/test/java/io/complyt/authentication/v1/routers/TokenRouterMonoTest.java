@@ -12,7 +12,6 @@ import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
 import io.complyt.authentication.v1.validators.query_params.ApiKeyQueryParamsExtractor;
-import io.complyt.authentication.v1.validators.query_params.CredentialsDtoQueryParamsExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +23,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
+import testUtils.unitTests.templates.endpoints.PostRouterMonoTest;
+import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -36,10 +36,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {TokenRouter.class, TokenHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
         ApiKeyQueryParamsExtractor.class})
-class TokenRouterTest implements TokenRouterTestTemplate {
+class TokenRouterMonoTest implements PostRouterMonoTest, PostRouterTestSecurityTemplate {
 
     @Autowired
-    private TokenRouter tokenRouter;
+    TokenRouter tokenRouter;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -141,5 +141,35 @@ class TokenRouterTest implements TokenRouterTestTemplate {
 
         // Then
         assertEquals("tokenHandler is marked non-null but is null", exception.getMessage());
+    }
+
+    @Test
+    @Override
+    public void post_UnauthenticatedUser_Returns401() {
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
+    @WithMockUser
+    @Override
+    public void post_missingCsrfToken_return403() {
+        // Then
+        webTestClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .queryParam("api_key", TestUtilities.apiKeyStr)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isForbidden();
     }
 }

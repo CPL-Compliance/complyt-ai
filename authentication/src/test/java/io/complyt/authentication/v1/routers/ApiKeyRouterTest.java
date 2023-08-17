@@ -14,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import testUtils.unitTests.templates.endpoints.PostRouterMonoTest;
+import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
         SecurityConfig.class,
         ApiKeyQueryParamsExtractor.class
 })
-class ApiKeyRouterTest {
+class ApiKeyRouterTest implements PostRouterMonoTest, PostRouterTestSecurityTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
 
@@ -37,5 +39,35 @@ class ApiKeyRouterTest {
 
     @Test
     void postCredentialsRouterFunction() {
+    }
+
+    @Override
+    public void post_Exists_Returns200() {
+
+    }
+
+    @Override
+    public void post_DoesntExist_Returns404() {
+
+    }
+
+    @Override
+    public void post_InternalServerError_Returns500() {
+
+    }
+
+    @Override
+    public void post_NullHandler_ThrowsNullPointerException() {
+
+    }
+
+    @Override
+    public void post_UnauthenticatedUser_Returns401() {
+
+    }
+
+    @Override
+    public void post_missingCsrfToken_return403() {
+
     }
 }

@@ -33,7 +33,7 @@ public class ApiKeyHandler {
     ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler;
 
     @ApiKeyCreatePermission
-    public Mono<ServerResponse> post(ServerRequest serverRequest) {
+    public Mono<ServerResponse> post(@NonNull ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
                 serverRequest.path());
 
