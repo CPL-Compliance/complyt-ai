@@ -29,13 +29,13 @@ public class TokenHandler {
     @NonNull
     ValidationHandler<ApiKey, SpringValidatorAdapter> apiKeyValidationHandler;
 
-    public Mono<ServerResponse> post(ServerRequest serverRequest) {
+    public Mono<ServerResponse> post(@NonNull ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(),
                 serverRequest.path());
 
         Mono<TokenDto> value = ContextLogger.observeCtx(logStr, log::info)
                 .then(apiKeyValidationHandler.handle(serverRequest))
-                .flatMap(tokenFacade::getToken)
+                .flatMap(apiKey -> tokenFacade.getToken(apiKey))
                 .map(TokenMapper.INSTANCE::tokentoTokenDto)
                 .flatMap(tokenDto -> ContextLogger.observeCtx("<-- Returned Body: " + tokenDto.toString(),
                         log::info).thenReturn(tokenDto))

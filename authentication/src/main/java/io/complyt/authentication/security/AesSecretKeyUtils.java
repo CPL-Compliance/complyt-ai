@@ -3,6 +3,7 @@ package io.complyt.authentication.security;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -18,8 +19,6 @@ import java.util.Base64;
 public class AesSecretKeyUtils {
     static String keyGeneratorAlgorithm = "AES";
 
-    /* Generating Secret key */
-
     // Generating Secret Key using KeyGenerator class
     public static SecretKey generateAesKey(int n) {
         KeyGenerator keyGenerator;
@@ -30,9 +29,8 @@ public class AesSecretKeyUtils {
         }
 
         keyGenerator.init(n);
-        SecretKey originalKey = keyGenerator.generateKey();
 
-        return originalKey;
+        return keyGenerator.generateKey();
     }
 
     // Generating Secret Key using password and salt
@@ -40,9 +38,8 @@ public class AesSecretKeyUtils {
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
-        SecretKey originalKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
-        return originalKey;
+        return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
     }
 
     /* Converting Secret key into String */
@@ -59,8 +56,7 @@ public class AesSecretKeyUtils {
         // Decoding the Base64 encoded string into byte array
         byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
         // Rebuilding the Secret Key using SecretKeySpec Class
-        SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
 
-        return originalKey;
+        return new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
     }
 }
