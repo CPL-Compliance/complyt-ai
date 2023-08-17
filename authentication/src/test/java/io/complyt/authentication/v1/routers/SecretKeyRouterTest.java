@@ -27,6 +27,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import testUtils.TestUtilities;
+import testUtils.unitTests.templates.endpoints.GetRouterTestMonoTemplate;
+import testUtils.unitTests.templates.endpoints.GetRouterTestSecurityTemplate;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -41,12 +43,11 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {SecretKeyRouter.class, SecretKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
-        ApiKeyQueryParamsExtractor.class, AesSecretKeyUtils.class})
-class SecretKeyRouterTest implements SecretKeyRouterTestTemplate {
+        ApiKeyQueryParamsExtractor.class})
+class SecretKeyRouterTest implements GetRouterTestMonoTemplate, GetRouterTestSecurityTemplate {
 
     @Autowired
-    private SecretKeyRouter secretKeyRouter;
-
+    SecretKeyRouter secretKeyRouter;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -55,13 +56,9 @@ class SecretKeyRouterTest implements SecretKeyRouterTestTemplate {
     AesSecretKeyService aesSecretKeyService;
 
     @Test
-    void getSecretKeyRouterFunction() {
-    }
-
-    @Test
     @WithMockUser
     @Override
-    public void get_Exists_Returns200WithList() {
+    public void get_Exists_Returns200() {
         // Given
         SecretKey expectedSecretKey = AesSecretKeyUtils.generateAesKey(256);
         String expectedSecretKeyStr = AesSecretKeyUtils.convertSecretKeyToString(expectedSecretKey);
@@ -85,28 +82,51 @@ class SecretKeyRouterTest implements SecretKeyRouterTestTemplate {
                 .isEqualTo(secretKeyDto);
     }
 
-    @Override
-    public void get_EmptyCollection_Returns200WithEmptyList() {
-
-    }
-
+    @Test
     @Override
     public void get_UnauthenticatedUser_Returns401() {
-
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SecretKeyRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
-    @Override
-    public void get_UserWithoutAuthorities_Returns403() {
-
-    }
-
+    @Test
+    @WithMockUser
     @Override
     public void get_InternalServerError_Returns500() {
+        // When
+        when(aesSecretKeyService.generate256AesKey()).thenThrow(new RuntimeException());
 
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SecretKeyRouter.BASE_URL)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
+    @Test
     @Override
     public void get_NullHandler_ThrowsNullPointerException() {
+        // Given
+        SecretKeyRouter secretKeyRouter = new SecretKeyRouter();
 
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            secretKeyRouter.getSecretKeyRouterFunction(null);
+        });
+
+        // Then
+        assertEquals("secretKeyHandler is marked non-null but is null", exception.getMessage());
     }
 }

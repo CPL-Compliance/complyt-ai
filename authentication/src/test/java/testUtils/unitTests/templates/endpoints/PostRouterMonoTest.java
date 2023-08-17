@@ -2,7 +2,7 @@ package testUtils.unitTests.templates.endpoints;
 
 import org.junit.jupiter.api.Test;
 
-public interface PostRouterTest {
+public interface PostRouterMonoTest {
 
     @Test
     void post_Exists_Returns200();
