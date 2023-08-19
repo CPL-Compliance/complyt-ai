@@ -23,7 +23,7 @@ class ItemDtoTest {
     @Test
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
-        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal(" 8000"), "description", "name", "taxCode",
+        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode",
                 null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
 
