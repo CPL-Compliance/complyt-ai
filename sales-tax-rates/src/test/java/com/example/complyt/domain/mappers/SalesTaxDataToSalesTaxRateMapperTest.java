@@ -28,18 +28,6 @@ public class SalesTaxDataToSalesTaxRateMapperTest {
         salesTaxData = new FastTaxData("street", Collections.singletonList(taxInfoItem), "1");
     }
 
-//    @Test
-//    void map_SalesTaxData_ReturnSalesTaxRate() {
-//        // Given
-//        SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates().withRatesMetaData(null);
-//
-//        // When
-//        SalesTaxRates actualSalesTaxRates = SalesTaxDataToSalesTaxRateMapper.INSTANCE.map(salesTaxData);
-//
-//        // Then
-//        assertEquals(expectedSalesTaxRates, actualSalesTaxRates);
-//    }
-
     @Test
     void map_nullSalesTaxData_ReturnNull() {
         // Given+ When

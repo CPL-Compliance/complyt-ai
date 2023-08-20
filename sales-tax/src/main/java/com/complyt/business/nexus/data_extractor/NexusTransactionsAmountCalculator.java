@@ -27,6 +27,8 @@ public class NexusTransactionsAmountCalculator implements NexusDataExtractor<Big
             for (Transaction transaction : transactions) {
                 TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
                 BigDecimal amount = amountExtractor.extract();
+
+                // In case of a refund, the amount will be subtracted instead of added
                 BigDecimal currentAmount = transaction.getTransactionType() == TransactionType.REFUND ? amount.multiply(BigDecimal.valueOf(-1)) : amount;
                 totalAmount = totalAmount.add(currentAmount);
             }

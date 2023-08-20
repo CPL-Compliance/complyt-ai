@@ -3,7 +3,6 @@ package integration.scenarios;
 import com.complyt.SalesTaxApplication;
 import com.complyt.business.sales_tax.sales_tax_web_clients.ComplytSalesTaxRatesClientWrapper;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
-import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.TransactionDto;

@@ -1,6 +1,6 @@
 package com.complyt.domain.sales_tax;
 
-import lombok.*;
+import lombok.With;
 
 import java.math.BigDecimal;
 
