@@ -1,5 +1,6 @@
 package com.complyt.domain.mappers;
 
+import com.complyt.annotations.Generated;
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
 import com.complyt.domain.taxjar.TaxJarData;
@@ -22,6 +23,7 @@ public interface TaxJarDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRa
     @Mapping(expression = "java(toBigDecimal(rate.getStateRate()))", target = "stateRate")
     SalesTaxRates map(Rate rate);
 
+    @Generated
     default BigDecimal toBigDecimal(Float rate) {
         if (rate == null) {
             return BigDecimal.ZERO;
