@@ -11,12 +11,12 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>api-gateway-0.12.0</tag>
     </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>api-gateway</artifactId>
-    <version>0.12.0-SNAPSHOT</version>
+    <version>0.12.0</version>
     <!-- Maven Coordinates -->
 
     <name>api-gateway</name>
