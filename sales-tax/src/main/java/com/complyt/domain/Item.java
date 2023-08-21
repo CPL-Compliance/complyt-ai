@@ -6,22 +6,24 @@ import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @EqualsAndHashCode
 @ToString
 @With
 @AllArgsConstructor
 public class Item implements Taxable {
-    private float unitPrice;
-    private float quantity;
-    private float totalPrice;
+    private BigDecimal unitPrice;
+    private BigDecimal quantity;
+    private BigDecimal totalPrice;
     private String description;
     private String name;
     private String taxCode;
     private JurisdictionalSalesTaxRules jurisdictionalSalesTaxRules;
     private SalesTaxRates salesTaxRates;
     private boolean manualSalesTax;
-    private float manualSalesTaxRate;
+    private BigDecimal manualSalesTaxRate;
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 

@@ -12,6 +12,7 @@ import com.complyt.v1.model.SalesTaxRatesDto;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ public interface TestUtilities {
     }
 
     static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0.00375f, 0.0f, 0.00725f, 0.071f, 0.06f, null);
+        return new SalesTaxRates(new BigDecimal("0.00375"), BigDecimal.ZERO, new BigDecimal("0.00725"), new BigDecimal("0.071"), new BigDecimal("0.06"), null);
     }
 
     static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
@@ -63,9 +64,9 @@ public interface TestUtilities {
     }
 
     static Result createResult() {
-        return new Result("", "", "injectedCounty", "", 0f, 0f, "", "",
-                0f, 0f, 0f, 0f, "", 0f, 0, "",
-                0f, 0f, "", 0, 0, "", 0,
+        return new Result("", "", "injectedCounty", "", 0f, 0, "", "",
+                0, 0, 0, 0, "", 0, 0, "",
+                0, 0, "", 0, 0, "", 0,
                 0, "", 0, 0, "", 0, 0, "",
                 0, 0, "");
     }
@@ -80,10 +81,10 @@ public interface TestUtilities {
     }
 
     static SalesTaxRatesDto createStubFastTaxSalesTaxRatesDto() {
-        float cityDistrictRate = 0f;
-        float countyDistrictRate = 0.029f;
+        BigDecimal cityDistrictRate = BigDecimal.ZERO;
+        BigDecimal countyDistrictRate = new BigDecimal("0.029");
         RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
-        return new SalesTaxRatesDto(0f, 0f, 0.011f, 0.04f, cityDistrictRate + countyDistrictRate, ratesMetaDataDto);
+        return new SalesTaxRatesDto(new BigDecimal("0.0"),new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
     }
 
     static String stringWithLength(int length) {

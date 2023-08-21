@@ -4,6 +4,8 @@ import com.complyt.domain.sales_tax.product_classification.CalculationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,12 +19,12 @@ class ShippingFeeDtoTest {
 
     private ShippingFeeDto createShippingFeeDto() {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFeeDto(false, 0, 1000, rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal("1000"), rules, null, "C6S1", TaxableCategoryDto.TAXABLE, TangibleCategoryDto.INTANGIBLE);
     }
 
     private JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRulesDto("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
     }
 
     @Test

@@ -5,6 +5,8 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 
+import java.math.BigDecimal;
+
 public interface Taxable {
     TaxableCategory getTaxableCategory();
 
@@ -16,24 +18,24 @@ public interface Taxable {
 
     Taxable withSalesTaxRates(SalesTaxRates salesTaxRates);
 
-    float getTotalPrice();
+    BigDecimal getTotalPrice();
 
     boolean isManualSalesTax();
 
     SalesTaxRates getSalesTaxRates();
 
-    float getManualSalesTaxRate();
+    BigDecimal getManualSalesTaxRate();
 
-    default float getManualSalesTaxAmount() {
-        return getManualSalesTaxRate() * getTotalPrice();
+    default BigDecimal getManualSalesTaxAmount() {
+        return getManualSalesTaxRate().multiply(getTotalPrice());
     }
 
-    default float calculateSalesTaxAmount() {
+    default BigDecimal calculateSalesTaxAmount() {
         if (isManualSalesTax()) {
             return getManualSalesTaxAmount();
         }
 
-        return getTotalPrice() * getSalesTaxRates().taxRate();
+        return getTotalPrice().multiply(getSalesTaxRates().taxRate());
     }
 
     Taxable withTangibleCategory(TangibleCategory intangible);

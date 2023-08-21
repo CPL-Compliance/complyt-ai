@@ -1,7 +1,6 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.Transaction;
-import com.complyt.domain.customer.Customer;
 import com.complyt.security.TenantResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

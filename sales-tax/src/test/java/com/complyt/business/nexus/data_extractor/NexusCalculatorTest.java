@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class NexusCalculatorTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
@@ -86,7 +87,7 @@ public class NexusCalculatorTest {
         List<Transaction> transactions = createTransactionsList();
 
         int count = transactions.size();
-        float amount = transactions.get(0).getItems().get(0).getTotalPrice() + transactions.get(1).getItems().get(0).getTotalPrice();
+        BigDecimal amount = transactions.get(0).getItems().get(0).getTotalPrice().add(transactions.get(1).getItems().get(0).getTotalPrice());
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         NexusStateRule nexusStateRule = createNexusStateRule();
 
@@ -106,7 +107,7 @@ public class NexusCalculatorTest {
         // Given
         List<Transaction> transactions = createTransactionsList();
         int count = 0;
-        float amount = 0;
+        BigDecimal amount = BigDecimal.ZERO;
         NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
         List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
             add(CustomerType.RESELLER);

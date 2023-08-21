@@ -2,6 +2,8 @@ package com.complyt.domain.sales_tax.product_classification;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @With
 @ToString
 @Getter
@@ -14,6 +16,6 @@ public final class CitySalesTaxRules implements SalesTaxRules {
     private final boolean specialTreatment;
     private final CalculationType calculationType;
     private final String description;
-    private final float calculationValue;
+    private final BigDecimal calculationValue;
 
 }

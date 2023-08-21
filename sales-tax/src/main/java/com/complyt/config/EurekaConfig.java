@@ -2,11 +2,6 @@ package com.complyt.config;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.Request;
-import org.springframework.cloud.client.loadbalancer.ServiceInstanceChooser;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;

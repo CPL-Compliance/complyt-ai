@@ -4,12 +4,14 @@ import com.complyt.domain.SalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRatesTest {
 
-    private final float rate = 0.5f;
+    private final BigDecimal rate = new BigDecimal("0.5");
     private SalesTaxRates salesTaxRates;
 
     private SalesTaxRates createSalesTaxRates() {
@@ -29,7 +31,7 @@ class SalesTaxRatesTest {
                 ", stateRate=" + rate +
                 ", taxRate=" + rate +
                 ", combinedDistrictRate=" + rate +
-                ", ratesMetaData=" + salesTaxRates.ratesMetaData() +"]";
+                ", ratesMetaData=" + salesTaxRates.ratesMetaData() + "]";
 
         // When
         String actualString = salesTaxRates.toString();
@@ -56,11 +58,11 @@ class SalesTaxRatesTest {
         SalesTaxRates givenSalesTaxRate = SalesTaxRates.zeroSalesTaxRates();
 
         // Then
-        assertEquals(0, givenSalesTaxRate.taxRate());
-        assertEquals(0, givenSalesTaxRate.stateRate());
-        assertEquals(0, givenSalesTaxRate.cityRate());
-        assertEquals(0, givenSalesTaxRate.combinedDistrictRate());
-        assertEquals(0, givenSalesTaxRate.countyRate());
+        assertEquals(BigDecimal.ZERO, givenSalesTaxRate.taxRate());
+        assertEquals(BigDecimal.ZERO, givenSalesTaxRate.stateRate());
+        assertEquals(BigDecimal.ZERO, givenSalesTaxRate.cityRate());
+        assertEquals(BigDecimal.ZERO, givenSalesTaxRate.combinedDistrictRate());
+        assertEquals(BigDecimal.ZERO, givenSalesTaxRate.countyRate());
     }
 
 }

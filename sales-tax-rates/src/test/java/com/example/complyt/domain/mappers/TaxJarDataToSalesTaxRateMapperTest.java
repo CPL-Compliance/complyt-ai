@@ -34,7 +34,7 @@ public class TaxJarDataToSalesTaxRateMapperTest {
     }
 
     @Test
-    void map_FastTaxData_ReturnSalesTaxRate() {
+    void map_TaxJarData_ReturnSalesTaxRate() {
         // Given + When
         SalesTaxRates expectedSalesTaxRates = SalesTaxRates.zeroSalesTaxRates().withRatesMetaData(null);
 

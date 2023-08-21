@@ -54,19 +54,23 @@ class ThresholdStrategy {
         }
     }
 
+    // Method that checks if passed nexus threshold by amount
     public boolean exceededAmount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
-        return nexusCalculationSummary.getAmount() >= nexusStateRule.getNexusThreshold().getAmount();
+        return nexusCalculationSummary.getAmount().compareTo(nexusStateRule.getNexusThreshold().getAmount()) >= 0;
     }
 
+    // Method that checks if passed nexus threshold by count
     public boolean exceededCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return nexusCalculationSummary.getCount() >= nexusStateRule.getNexusThreshold().getCount();
     }
 
+    // Method that checks if passed nexus threshold by amount and count
     public boolean exceededAmountAndCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return exceededAmount(nexusCalculationSummary, nexusStateRule) &&
                 exceededCount(nexusCalculationSummary, nexusStateRule);
     }
 
+    // Method that checks if passed nexus threshold by amount or count
     public boolean exceededAmountOrCount(NexusCalculationSummary nexusCalculationSummary, NexusStateRule nexusStateRule) {
         return exceededAmount(nexusCalculationSummary, nexusStateRule) ||
                 exceededCount(nexusCalculationSummary, nexusStateRule);

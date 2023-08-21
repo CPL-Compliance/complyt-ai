@@ -3,6 +3,8 @@ package com.complyt.domain.sales_tax;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RatesMetaDataTest {
@@ -11,7 +13,7 @@ public class RatesMetaDataTest {
 
     @BeforeEach
     void setUp() {
-        ratesMetaData = new RatesMetaData(0.01f, 0.01f);
+        ratesMetaData = new RatesMetaData(new BigDecimal("0.01"), new BigDecimal("0.01"));
     }
 
     @Test

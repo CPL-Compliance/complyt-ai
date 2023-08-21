@@ -4,6 +4,8 @@ import com.complyt.domain.nexus.enums.Definition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,7 +19,7 @@ class NexusThresholdTest {
 
     private NexusThreshold createNexusThreshold() {
 
-        return new NexusThreshold(0, 0, Definition.COUNT);
+        return new NexusThreshold(BigDecimal.ZERO, 0, Definition.COUNT);
     }
 
     @Test

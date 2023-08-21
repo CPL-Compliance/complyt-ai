@@ -3,6 +3,8 @@ package com.complyt.domain.nexus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,7 +18,7 @@ class NexusCalculationSummaryTest {
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(0L, 0f);
+        return new NexusCalculationSummary(0L, BigDecimal.ZERO);
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.complyt.domain.nexus.enums.TimeFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,8 @@ public class ItemQualificationCheckerTest {
     }
 
     private Item createItem() {
-        return new Item(1000, 5, 5000, "description", "item", "C1S1",
-                null, null, false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
+        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), "description", "item", "C1S1",
+                null, null, false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE);
     }
 
     private NexusStateRule createNexusStateRule() {
@@ -51,7 +52,7 @@ public class ItemQualificationCheckerTest {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);

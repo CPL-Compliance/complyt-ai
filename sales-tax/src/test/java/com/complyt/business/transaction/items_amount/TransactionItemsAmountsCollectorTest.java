@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,15 +60,15 @@ public class TransactionItemsAmountsCollectorTest {
         // Before + When
 
         when(taxableCollectionBuilder.build(transaction)).thenReturn(items);
-        when(taxableItemsAmountCalculator.calculate(items)).thenReturn(10.0f);
-        when(tangibleItemsAmountCalculator.calculate(items)).thenReturn(17.0f);
-        when(totalItemsAmountCalculator.calculate(items)).thenReturn(18.0f);
+        when(taxableItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("10.0"));
+        when(tangibleItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("17.0"));
+        when(totalItemsAmountCalculator.calculate(items)).thenReturn(new BigDecimal("18.0"));
 
         // Then
         Transaction outputTransaction = transactionItemsAmountsCollector.collect(transaction);
-        assertEquals(10.0f, outputTransaction.getTaxableItemsAmount());
-        assertEquals(17.0f, outputTransaction.getTangibleItemsAmount());
-        assertEquals(18.0f, outputTransaction.getTotalItemsAmount());
+        assertEquals(new BigDecimal("10.0"), outputTransaction.getTaxableItemsAmount());
+        assertEquals(new BigDecimal("17.0"), outputTransaction.getTangibleItemsAmount());
+        assertEquals(new BigDecimal("18.0"), outputTransaction.getTotalItemsAmount());
     }
 
     @Test

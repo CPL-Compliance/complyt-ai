@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ class TransactionDtoTest {
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
     }
 
     @Test

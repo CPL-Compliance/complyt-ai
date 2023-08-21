@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -31,9 +32,9 @@ public class TransactionItemsAmountsCollector implements TransactionAmountsColle
     public Transaction collect(@NonNull Transaction transaction) {
         List<Taxable> items = (List<Taxable>) taxableCollectionBuilder.build(transaction);
 
-        float taxableItemsAmount = taxableItemsAmountCalculator.calculate(items);
-        float tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(items);
-        float totalItemsAmount = totalItemsAmountCalculator.calculate(items);
+        BigDecimal taxableItemsAmount = taxableItemsAmountCalculator.calculate(items);
+        BigDecimal tangibleItemsAmount = tangibleItemsAmountCalculator.calculate(items);
+        BigDecimal totalItemsAmount = totalItemsAmountCalculator.calculate(items);
 
         return new Transaction(
                 transaction.getComplytId(), transaction.getId(),

@@ -31,6 +31,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -95,7 +96,7 @@ public class ComplytSalesTaxRatesRouterTest {
     @WithMockUser
     public void findByAddress_AddressWithSalesTaxRatesWithRatesMetaDataFound_Returns200() {
         // Given
-        RatesMetaData ratesMetaData = new RatesMetaData(0.01f, 0.01f);
+        RatesMetaData ratesMetaData = new RatesMetaData(new BigDecimal("0.01"), new BigDecimal("0.01"));
         AddressDto addressDto = TestUtilities.createAddressDtoInCalifornia();
         ComplytSalesTaxRates addressWithSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates()
                 .withSalesTaxRates(TestUtilities.createCaliforniaSalesTaxRates().withRatesMetaData(ratesMetaData));
