@@ -142,7 +142,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                },
                "transactionStatus": "ACTIVE",
                "transactionType": "INVOICE",
-               "createdFrom": "string"
+               "createdFrom": "string",
+               "transactionFilingStatus": "NOT_FILED"
             }
             """;
 
@@ -276,7 +277,8 @@ public @interface UpsertTransactionByExternalIdAndSourceApiInfo {
                 "createdFrom": "string",
                 "taxableItemsAmount": 0,
                 "tangibleItemsAmount": 0,
-                "totalItemsAmount": 0
+                "totalItemsAmount": 0,
+                "transactionFilingStatus": "NOT_FILED"
             }
             """;
 }
