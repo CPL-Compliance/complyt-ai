@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
-                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount()
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getTransactionFilingStatus()
                 );
     }
 

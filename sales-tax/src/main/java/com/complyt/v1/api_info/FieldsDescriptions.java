@@ -50,9 +50,17 @@ public interface FieldsDescriptions {
 
     String TRANSACTION_TYPE = "The type of the transaction. Only invoices are considered for nexus tracking and for actual tax calculation";
 
+    String TRANSACTION_FILING_STATUS = "Indicates the status of the transaction in relation to its submission to a specific state. Possible values include:     \n" +
+            "\n" +
+            "    - `NotFiled`: The transaction has not been submitted to the state.      \n" +
+            "\n" +
+            "    - `Filed`: The transaction has been successfully submitted to the state.";
+
     String CREATED_FROM = "The external ID of the document that preceded this transaction creation (e.g., when creating an invoice, you can pass the ID of the sales order that it originated from here)";
 
     String TAXABLE_ITEMS_AMOUNT = "The amount of taxable items in the transaction";
+
+    String TOTAL_ITEMS_AMOUNT = "The total amount of items in the transaction";
 
     String TANGIBLE_ITEMS_AMOUNT = "The amount of tangible items in the transaction";
 
@@ -68,9 +76,9 @@ public interface FieldsDescriptions {
 
     // In exemption
 
-    String VALIDATION_DATES = "Determains the timeframe that the exemption is valid for";
+    String VALIDATION_DATES = "Determines the timeframe that the exemption is valid for";
 
 
-    String CLASSIFICATION = "Indicates on which product classifications the the customer exepmt for";
+    String CLASSIFICATION = "Indicates on which product classifications the the customer exempt for";
 
 }
