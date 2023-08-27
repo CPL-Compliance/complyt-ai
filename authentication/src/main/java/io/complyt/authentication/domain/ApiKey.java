@@ -1,6 +1,5 @@
 package io.complyt.authentication.v1.models;
 
-import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +27,7 @@ public class ApiKey {
         Matcher matcher = pattern.matcher(apiKey);
 
         if (!matcher.matches()) {
-            throw new ObjectNotValidApiException("Invalid API key format");
+            throw new IllegalArgumentException("Invalid API key format");
         }
 
         clientId = matcher.group(1);
