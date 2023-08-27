@@ -377,10 +377,10 @@ workflows:
       - send-test-coverage-reports:
           requires:
             - verify
-            - deploy
+            - release
           service_directory: "authentication"
 
       - update-ecs-service:
           requires:
-            - deploy
+            - release
           service_name: "authentication"
