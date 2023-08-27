@@ -367,7 +367,7 @@ workflows:
                 - /^(main.+|(?!main).*)$/
           service_directory: "authentication"
 
-      - deploy:
+      - release:
           filters:
             branches:
               only:
