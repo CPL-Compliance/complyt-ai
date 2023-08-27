@@ -2,39 +2,26 @@ package io.complyt.authentication.v1.routers;
 
 import io.complyt.authentication.config.ApiExceptionConfig;
 import io.complyt.authentication.security.AesSecretKeyUtils;
-import io.complyt.authentication.security.ApiKeyGenerator;
 import io.complyt.authentication.services.AesSecretKeyService;
 import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.SecretKeyHandler;
-import io.complyt.authentication.v1.handlers.TokenHandler;
 import io.complyt.authentication.v1.models.SecretKeyDto;
-import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
-import io.complyt.authentication.v1.validators.query_params.ApiKeyQueryParamsExtractor;
+import io.complyt.authentication.v1.validators.query_params.ApiKeyDtoQueryParamsExtractor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import testUtils.TestUtilities;
 import testUtils.unitTests.templates.endpoints.GetRouterTestMonoTemplate;
 import testUtils.unitTests.templates.endpoints.GetRouterTestSecurityTemplate;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -43,7 +30,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {SecretKeyRouter.class, SecretKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
-        ApiKeyQueryParamsExtractor.class})
+        ApiKeyDtoQueryParamsExtractor.class})
 class SecretKeyRouterTest implements GetRouterTestMonoTemplate, GetRouterTestSecurityTemplate {
 
     @Autowired

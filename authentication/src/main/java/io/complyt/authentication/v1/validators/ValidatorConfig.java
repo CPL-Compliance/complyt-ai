@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.validators;
 
-import io.complyt.authentication.v1.models.ApiKey;
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +21,11 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ValidationHandler<ApiKey, SpringValidatorAdapter> apiKeyValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                     @Autowired QueryParamsExtractor apiKeyQueryParamsExtractor) {
-        return new ValidationHandler<>(ApiKey.class,
+    public ValidationHandler<ApiKeyDto, SpringValidatorAdapter> apiKeyDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
+                                                                                           @Autowired QueryParamsExtractor apiKeyDtoQueryParamsExtractor) {
+        return new ValidationHandler<>(ApiKeyDto.class,
                 springValidatorAdapter,
                 new DataConflictChecksProvider(null, Map.of()),
-                apiKeyQueryParamsExtractor);
+                apiKeyDtoQueryParamsExtractor);
     }
 }
