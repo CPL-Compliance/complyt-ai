@@ -1,14 +1,15 @@
 package com.complyt.v1.models.sales_tax;
 
-import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesTaxRatesDtoTest {
-    private final float rate = 0.5f;
+    private final BigDecimal rate = new BigDecimal("0.5");
     private SalesTaxRatesDto salesTaxRatesDto;
 
     private SalesTaxRatesDto createSalesTaxRateDto() {

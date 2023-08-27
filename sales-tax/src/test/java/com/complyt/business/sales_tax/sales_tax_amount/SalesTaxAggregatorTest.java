@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,13 +43,13 @@ public class SalesTaxAggregatorTest {
     @Test
     void aggregate_SalesTaxCalculatedForBothItemsAndShippingFee_SalesTaxAmountReturned() {
         // Given
-        float expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate() * item.getTotalPrice()).reduce(Float::sum).get();
-        float expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate() * transaction.getShippingFee().getTotalPrice();
-        float expectedAmount = expectedItemsSalesTaxAmount + expectedShippingFeeSalesTaxAmount;
+        BigDecimal expectedItemsSalesTaxAmount = transaction.getItems().stream().map(item -> item.getSalesTaxRates().taxRate().multiply(item.getTotalPrice())).reduce(BigDecimal::add).get();
+        BigDecimal expectedShippingFeeSalesTaxAmount = transaction.getShippingFee().getSalesTaxRates().taxRate().multiply(transaction.getShippingFee().getTotalPrice());
+        BigDecimal expectedAmount = expectedItemsSalesTaxAmount.add(expectedShippingFeeSalesTaxAmount);
         List<Taxable> taxAbles = testUtilities.createTaxables(transaction);
 
         // When
-        float actualAmount = salesTaxAggregator.aggregate(taxAbles);
+        BigDecimal actualAmount = salesTaxAggregator.aggregate(taxAbles);
 
         // Then
         assertEquals(expectedAmount, actualAmount);

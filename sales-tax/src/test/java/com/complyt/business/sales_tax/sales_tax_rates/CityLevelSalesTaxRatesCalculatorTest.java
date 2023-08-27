@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void calculate_CityRuleIsNotTaxable_ReturnsZeroCityRate() {
         // Given
         CitySalesTaxRules nonTaxableCityRule = citySalesTaxRules.withTaxable(false);
-        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0);
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(BigDecimal.ZERO);
 
         // When
         SalesTaxRates actualSalesTaxRate = cityLevelSalesTaxRatesCalculator.calculate(nonTaxableCityRule, salesTaxRates);
@@ -86,11 +87,11 @@ public class CityLevelSalesTaxRatesCalculatorTest {
     void calculate_SpecialTreatmentByFixed_ReturnsFixedCityRate() {
         // Given
         CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true).withSpecialTreatment(true);
-        float newCityRate = taxableCityRule.getCalculationValue();
+        BigDecimal newCityRate = taxableCityRule.getCalculationValue();
         SalesTaxRates salesTaxRates = UnitTestUtilities.createCaliforniaSalesTaxRates()
                 .withCityRate(newCityRate);
-        float taxRate = newCityRate + salesTaxRates.combinedDistrictRate() +
-                salesTaxRates.countyRate() + salesTaxRates.stateRate();
+        BigDecimal taxRate = newCityRate.add(salesTaxRates.combinedDistrictRate())
+                .add(salesTaxRates.countyRate()).add(salesTaxRates.stateRate());
 
         SalesTaxRates expectedSalesTaxRate = salesTaxRates.withTaxRate(taxRate).withCityRate(newCityRate);
 
@@ -107,10 +108,10 @@ public class CityLevelSalesTaxRatesCalculatorTest {
         CitySalesTaxRules taxableCityRule = citySalesTaxRules.withTaxable(true)
                 .withSpecialTreatment(true)
                 .withCalculationType(CalculationType.PERCENTAGE);
-        SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(0.05f);
-        float newCityTaxRate = originalSalesTaxRate.cityRate() * taxableCityRule.getCalculationValue();
-        float taxRate = newCityTaxRate + originalSalesTaxRate.combinedDistrictRate() +
-                originalSalesTaxRate.countyRate() + originalSalesTaxRate.stateRate();
+        SalesTaxRates originalSalesTaxRate = UnitTestUtilities.createCaliforniaSalesTaxRates().withCityRate(new BigDecimal("0.05"));
+        BigDecimal newCityTaxRate = originalSalesTaxRate.cityRate().multiply(taxableCityRule.getCalculationValue());
+        BigDecimal taxRate = newCityTaxRate.add(originalSalesTaxRate.combinedDistrictRate())
+                .add(originalSalesTaxRate.countyRate()).add(originalSalesTaxRate.stateRate());
 
         SalesTaxRates expectedSalesTaxRate = originalSalesTaxRate.withTaxRate(taxRate).withCityRate(newCityTaxRate);
 

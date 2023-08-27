@@ -4,6 +4,8 @@ import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -13,16 +15,16 @@ class ItemDtoTest {
 
     @BeforeEach
     void setup() {
-        itemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+        itemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode",
+                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
     }
 
     @Test
     void Equals_sameItemDto_ReturnsTrue() {
         // Given
-        ItemDto givenItemDto = new ItemDto(2000, 4, 8000, "description", "name", "taxCode",
-                null, new SalesTaxRatesDto(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
+        ItemDto givenItemDto = new ItemDto(new BigDecimal("2000"), new BigDecimal("4"), new BigDecimal("8000"), "description", "name", "taxCode",
+                null, new SalesTaxRatesDto(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategoryDto.INTANGIBLE, TaxableCategoryDto.NOT_TAXABLE
         );
 
         // When

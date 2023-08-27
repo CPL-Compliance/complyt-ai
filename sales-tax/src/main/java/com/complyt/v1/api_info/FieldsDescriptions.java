@@ -1,7 +1,5 @@
 package com.complyt.v1.api_info;
 
-import java.security.SecureRandom;
-
 public interface FieldsDescriptions {
 
     /**

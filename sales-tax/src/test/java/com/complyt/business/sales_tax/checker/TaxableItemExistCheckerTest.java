@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +30,14 @@ public class TaxableItemExistCheckerTest {
     }
 
     private Item createTaxableItem() {
-        return new Item(2000, 4, 8000, "description", "name", "C1S1",
-                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
+        return new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1",
+                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.TAXABLE
         );
     }
 
     private Item createNotTaxableItem() {
-        return new Item(1000, 5, 5000, "description", "name", "C2S1",
-                null, new SalesTaxRates(0.5f, 0.5f, 0.5f, 0.5f, 0.5f, null), false, 0, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
+        return new Item(new BigDecimal(1000), new BigDecimal(5), new BigDecimal(5000), "description", "name", "C2S1",
+                null, new SalesTaxRates(new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), new BigDecimal("0.5"), null), false, BigDecimal.ZERO, TangibleCategory.TANGIBLE, TaxableCategory.NOT_TAXABLE
         );
     }
 

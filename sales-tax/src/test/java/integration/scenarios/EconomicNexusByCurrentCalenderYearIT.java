@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusOnlyTangibleItemsITTemplate;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -74,7 +75,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         // Given
         String externalId = "10038";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withQuantity(1).withUnitPrice(10).withTotalPrice(10))
+                        ITUtilities.stubItemDto().withQuantity(new BigDecimal(1)).withUnitPrice(new BigDecimal(10)).withTotalPrice(new BigDecimal(10)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -117,7 +118,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         // Given
         String externalId = "10039";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withQuantity(5).withUnitPrice(900).withTotalPrice(4500).withTaxCode("C2S1"))
+                        ITUtilities.stubItemDto().withQuantity(new BigDecimal(5)).withUnitPrice(new BigDecimal(900)).withTotalPrice(new BigDecimal(4500)).withTaxCode("C2S1"))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -179,7 +180,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
         // Given
         String externalId = "10032";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId,
-                        ITUtilities.stubItemDto().withQuantity(5).withUnitPrice(900).withTotalPrice(4500))
+                        ITUtilities.stubItemDto().withQuantity(new BigDecimal(5)).withUnitPrice(new BigDecimal(900)).withTotalPrice(new BigDecimal(4500)))
                 .withShippingAddress(referenceAddress)
                 .withExternalTimestamps(new TimestampsDto(referenceDate.toString(), LocalDateTime.now().toString()));
 
@@ -258,7 +259,7 @@ public class EconomicNexusByCurrentCalenderYearIT extends TestContainersInitiali
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(TransactionDto.class)
-                .value(receivedTransaction -> assertEquals(775, receivedTransaction.salesTax().amount()));
+                .value(receivedTransaction -> assertEquals(new BigDecimal("775.0000"), receivedTransaction.salesTax().amount()));
     }
 
     @Order(5)

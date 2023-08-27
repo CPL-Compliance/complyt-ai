@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -49,9 +51,9 @@ public class SalesTaxDataToSalesTaxRateTest {
     void map_MapsUnincorporatedAddress_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
         SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates();
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
+        BigDecimal modifiedTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.cityRate());
         SalesTaxRates expectedSalesTaxRate =
-                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0);
+                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(BigDecimal.ZERO);
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRates);
@@ -66,12 +68,12 @@ public class SalesTaxDataToSalesTaxRateTest {
     @Test
     void map_MapsUnincorporatedAddressWithRatesMetaData_ReturnsSalesTaxRateWithCityRatesAsZeros() {
         // Given
-        RatesMetaData ratesMetaData = new RatesMetaData(0.01f, 0.01f);
+        RatesMetaData ratesMetaData = new RatesMetaData(new BigDecimal("0.01"), new BigDecimal("0.01"));
         SalesTaxRates salesTaxRates = TestUtilities.createCaliforniaSalesTaxRates().withRatesMetaData(ratesMetaData);
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
-        RatesMetaData expectedRatesMetaData = ratesMetaData.withCityDistrictRate(0);
+        BigDecimal modifiedTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.cityRate()).subtract(salesTaxRates.ratesMetaData().cityDistrictRate());
+        RatesMetaData expectedRatesMetaData = ratesMetaData.withCityDistrictRate(BigDecimal.ZERO);
         SalesTaxRates expectedSalesTaxRate =
-                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(0).withRatesMetaData(expectedRatesMetaData);
+                salesTaxRates.withTaxRate(modifiedTaxRate).withCityRate(BigDecimal.ZERO).withRatesMetaData(expectedRatesMetaData);
 
         // When
         when(salesTaxDataToSalesTaxRateMapper.map(salesTaxData)).thenReturn(salesTaxRates);
@@ -89,9 +91,7 @@ public class SalesTaxDataToSalesTaxRateTest {
         SalesTaxData nullSalesTaxData = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxDataToSalesTaxRate.map(nullSalesTaxData);
-        });
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxDataToSalesTaxRate.map(nullSalesTaxData));
 
         assertEquals(nullPointerException.getMessage(), "salesTaxData " + TestUtilities.LOMBOK_NON_NULL_ANNOTATION_MESSAGE);
     }

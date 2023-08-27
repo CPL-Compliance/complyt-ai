@@ -9,23 +9,28 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsAmountCalculator implements NexusDataExtractor<Float, List<Transaction>> {
+public class NexusTransactionsAmountCalculator implements NexusDataExtractor<BigDecimal, List<Transaction>> {
 
     @NonNull
     private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Override
-    public Mono<Float> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
+    public Mono<BigDecimal> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
         return Mono.fromCallable(() -> {
-            float totalAmount = 0;
+            BigDecimal totalAmount = BigDecimal.ZERO;
+
             for (Transaction transaction : transactions) {
                 TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
-                float amount = amountExtractor.extract();
-                totalAmount += transaction.getTransactionType() == TransactionType.REFUND ? -1 * amount : amount;
+                BigDecimal amount = amountExtractor.extract();
+
+                // In case of a refund, the amount will be subtracted instead of added
+                BigDecimal currentAmount = transaction.getTransactionType() == TransactionType.REFUND ? amount.multiply(BigDecimal.valueOf(-1)) : amount;
+                totalAmount = totalAmount.add(currentAmount);
             }
 
             return totalAmount;

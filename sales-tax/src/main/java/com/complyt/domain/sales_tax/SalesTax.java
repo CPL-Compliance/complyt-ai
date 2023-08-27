@@ -1,7 +1,9 @@
 package com.complyt.domain.sales_tax;
 
-import lombok.*;
+import lombok.With;
+
+import java.math.BigDecimal;
 
 @With
-public record SalesTax(float amount, SalesTaxRates salesTaxRates) {
+public record SalesTax(BigDecimal amount, SalesTaxRates salesTaxRates) {
 }

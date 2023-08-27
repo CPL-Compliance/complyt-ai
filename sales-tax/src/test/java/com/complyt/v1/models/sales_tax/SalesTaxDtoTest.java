@@ -1,12 +1,13 @@
 package com.complyt.v1.models.sales_tax;
 
-import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -22,7 +23,7 @@ public class SalesTaxDtoTest {
     @BeforeEach
     void setUp() {
         // Given
-        salesTaxDto = new SalesTaxDto(5000, null);
+        salesTaxDto = new SalesTaxDto(new BigDecimal("5000"), null);
 
         // Then
         anotherSalesTaxDto = new SalesTaxDto(salesTaxDto.amount(), null);
@@ -36,7 +37,7 @@ public class SalesTaxDtoTest {
     @Test
     void equals_NotIdenticalCustomers_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.amount() - 1;
+        BigDecimal newAmount = salesTaxDto.amount().subtract(BigDecimal.ONE);
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then
@@ -51,7 +52,7 @@ public class SalesTaxDtoTest {
     @Test
     void hashCode_NotIdenticalSalesTax_NotEqual() {
         // Given
-        float newAmount = salesTaxDto.amount() - 1;
+        BigDecimal newAmount = salesTaxDto.amount().subtract(BigDecimal.ONE);
         anotherSalesTaxDto = salesTaxDto.withAmount(newAmount);
 
         // Then

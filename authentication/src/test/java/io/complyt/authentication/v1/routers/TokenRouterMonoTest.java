@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
-import testUtils.unitTests.templates.endpoints.PostRouterMonoTest;
+import testUtils.unitTests.templates.endpoints.PostOkRouterMonoTest;
 import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -36,7 +36,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @ContextConfiguration(classes = {TokenRouter.class, TokenHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
         ApiKeyQueryParamsExtractor.class})
-class TokenRouterMonoTest implements PostRouterMonoTest, PostRouterTestSecurityTemplate {
+class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurityTemplate {
 
     @Autowired
     TokenRouter tokenRouter;

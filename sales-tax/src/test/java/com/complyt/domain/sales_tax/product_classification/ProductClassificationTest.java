@@ -4,6 +4,7 @@ import com.complyt.domain.nexus.enums.TangibleCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,7 @@ class ProductClassificationTest {
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true, true,
-                CalculationType.FIXED, "description", 0.5f, null);
+                CalculationType.FIXED, "description", new BigDecimal("0.5"), null);
     }
 
     @Test

@@ -31,6 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +111,7 @@ public class TransactionFacadeTest {
 
     private SalesTax createSalesTax() {
         SalesTaxRates salesTaxRates = testUtilities.createSalesTaxRates();
-        return new SalesTax(1000, salesTaxRates);
+        return new SalesTax(new BigDecimal(1000), salesTaxRates);
     }
 
     @Test
@@ -337,7 +338,7 @@ public class TransactionFacadeTest {
         Transaction transactionWithNewAddress = transaction.withShippingAddress(newShippingAddress);
         SalesTaxTracking salesTaxTracking = createSalesTaxTrackingWithNexusEstablished(UUID.randomUUID().toString());
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
-        SalesTax salesTax = new SalesTax(100, new SalesTaxRates(0, 0, 0, 0, 0, null));
+        SalesTax salesTax = new SalesTax(new BigDecimal(100), new SalesTaxRates(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null));
         Transaction modifiedTransaction = createTransactionWithProductClassificationAndComplytId()
                 .withShippingAddress(newShippingAddress)
                 .withId(transaction.getId())

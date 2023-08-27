@@ -1,4 +1,6 @@
 package com.complyt.domain.sales_tax;
 
-public record RatesMetaData(float cityDistrictRate, float countyDistrictRate) {
+import java.math.BigDecimal;
+
+public record RatesMetaData(BigDecimal cityDistrictRate, BigDecimal countyDistrictRate) {
 }

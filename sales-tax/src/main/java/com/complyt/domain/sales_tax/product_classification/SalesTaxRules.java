@@ -1,5 +1,7 @@
 package com.complyt.domain.sales_tax.product_classification;
 
+import java.math.BigDecimal;
+
 public interface SalesTaxRules {
 
     boolean isTaxable();
@@ -8,6 +10,6 @@ public interface SalesTaxRules {
 
     CalculationType getCalculationType();
 
-    float getCalculationValue();
+    BigDecimal getCalculationValue();
 
 }

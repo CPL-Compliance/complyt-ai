@@ -23,6 +23,7 @@ import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.timestamps.TimestampsDto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -59,11 +60,11 @@ public class UnitTestUtilities {
     }
 
     public static SalesTaxRates createCaliforniaSalesTaxRates() {
-        return new SalesTaxRates(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
+        return new SalesTaxRates(new BigDecimal(0), new BigDecimal(0), new BigDecimal("0.005"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
 
     public static SalesTaxRatesDto createCaliforniaSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0f, 0.0f, 0.005f, 0.0125f, 0.06f, null);
+        return new SalesTaxRatesDto(new BigDecimal(0), new BigDecimal(0), new BigDecimal("0.005"), new BigDecimal("0.0125"), new BigDecimal("0.06"), null);
     }
 
     public static ComplytSalesTaxRates createCaliforniaComplytSalesTaxRates() {
@@ -138,7 +139,7 @@ public class UnitTestUtilities {
         List<Item> items = createItems(true, false);
         Timestamps timeStamps = new Timestamps(localDateTime, localDateTime);
         ShippingFee shippingFee = createShippingFee(true, false);
-        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, 0, 0, 0);
+        return new Transaction(UUID.randomUUID(), id, id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomer(customerIdOtherDomains.toString()), null, TransactionStatus.ACTIVE, tenantId, timeStamps, timeStamps, TransactionType.INVOICE, shippingFee, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     public TransactionDto createTransactionDto(String id) {
@@ -149,84 +150,84 @@ public class UnitTestUtilities {
         TimestampsDto timeStamps = new TimestampsDto(localDateTime.toString(), localDateTime.toString());
         ShippingFeeDto shippingFeeDto = createShippingFeeDto(true, false);
 
-        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, 0, 0, 0);
+        return new TransactionDto(UUID.randomUUID(), id, source, documentName, items, billingAddress, shippingAddress, customerIdOtherDomains, createCustomerDto(customerIdOtherDomains.toString()), null, TransactionStatusDto.ACTIVE, timeStamps, timeStamps, TransactionTypeDto.INVOICE, shippingFeeDto, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     public List<Item> createItems(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new Item(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    null, false, 0, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
-            add(new Item(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    null, false, 0, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
     }
 
     public List<Item> createItemsWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new Item(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    createSalesTaxRates(), false, 0, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
-            add(new Item(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
-                    createSalesTaxRates(), false, 0, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    createSalesTaxRates(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
+            add(new Item(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRules() : null,
+                    createSalesTaxRates(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategory.TANGIBLE : null, TaxableCategory.TAXABLE));
 
         }};
     }
 
     public List<ItemDto> createItemDtosWithSalesTaxRate(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    createSalesTaxRatesDto(), false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    createSalesTaxRatesDto(), false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
         }};
     }
 
     public List<ItemDto> createItemDtos(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         return new ArrayList<>() {{
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
-            add(new ItemDto(2000, 4, 8000, "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
-                    null, false, 0, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C1S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
+            add(new ItemDto(new BigDecimal(2000), new BigDecimal(4), new BigDecimal(8000), "description", "name", "C3S1", withJurisdictionalRules ? createJurisdictionalSalesTaxRulesDto() : null,
+                    null, false, BigDecimal.ZERO, withTangibleCategory ? TangibleCategoryDto.TANGIBLE : null, TaxableCategoryDto.TAXABLE));
 
         }};
     }
 
     public SalesTaxRates createSalesTaxRates() {
-        return new SalesTaxRates(0.1f, 0.1f, 0.1f, 0.4f, 0.1f, null);
+        return new SalesTaxRates(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.4"), new BigDecimal("0.1"), null);
     }
 
     public SalesTaxRatesDto createSalesTaxRatesDto() {
-        return new SalesTaxRatesDto(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, null);
+        return new SalesTaxRatesDto(new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.1"), new BigDecimal("0.4"), new BigDecimal("0.1"), null);
     }
 
     public ShippingFee createShippingFee(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
     public ShippingFee createShippingFeeWithSalesTaxRates(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, createSalesTaxRates(), "C6S1", TaxableCategory.TAXABLE, withTangibleCategory ? TangibleCategory.INTANGIBLE : null);
     }
 
     public ShippingFeeDto createShippingFeeDto(boolean withJurisdictionalRules, boolean withTangibleCategory) {
         JurisdictionalSalesTaxRulesDto rules = createJurisdictionalSalesTaxRulesDto();
-        return new ShippingFeeDto(false, 0, 1000, withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
+        return new ShippingFeeDto(false, BigDecimal.ZERO, new BigDecimal(1000), withJurisdictionalRules ? rules : null, null, "C6S1", TaxableCategoryDto.TAXABLE, withTangibleCategory ? TangibleCategoryDto.INTANGIBLE : null);
     }
 
     public JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0.5f, null);
+                false, CalculationType.FIXED, "description", new BigDecimal("0.5"), null);
     }
 
     public JurisdictionalSalesTaxRulesDto createJurisdictionalSalesTaxRulesDto() {
         return new JurisdictionalSalesTaxRulesDto("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0.5f, null);
+                false, CalculationType.FIXED, "description", new BigDecimal("0.5"), null);
     }
 
     public CitySalesTaxRules createCitySalesTaxRules() {
         return new CitySalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0.05f);
+                false, CalculationType.FIXED, "description", new BigDecimal("0.5"));
     }
 
     public Exemption createExemption(String id) {
@@ -269,7 +270,7 @@ public class UnitTestUtilities {
             add(CustomerType.RETAIL);
         }};
 
-        NexusThreshold nexusThreshold = new NexusThreshold(1000, 2, Definition.AMOUNT_OR_COUNT);
+        NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);

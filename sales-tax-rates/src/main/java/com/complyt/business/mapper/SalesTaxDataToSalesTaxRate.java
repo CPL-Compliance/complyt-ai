@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+
 @Component
 @Slf4j
 @AllArgsConstructor
@@ -35,18 +37,18 @@ public class SalesTaxDataToSalesTaxRate {
 
     private SalesTaxRates handleUnincorporatedAddress(SalesTaxRates salesTaxRates) {
         if (salesTaxRates.ratesMetaData() == null) {
-            float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate();
+            BigDecimal modifiedTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.cityRate());
 
             return salesTaxRates
                     .withTaxRate(modifiedTaxRate)
-                    .withCityRate(0);
+                    .withCityRate(BigDecimal.ZERO);
         }
-        float modifiedTaxRate = salesTaxRates.taxRate() - salesTaxRates.cityRate() - salesTaxRates.ratesMetaData().cityDistrictRate();
-        RatesMetaData modifiedRatesMetaData = salesTaxRates.ratesMetaData().withCityDistrictRate(0);
+        BigDecimal modifiedTaxRate = salesTaxRates.taxRate().subtract(salesTaxRates.cityRate()).subtract(salesTaxRates.ratesMetaData().cityDistrictRate());
+        RatesMetaData modifiedRatesMetaData = salesTaxRates.ratesMetaData().withCityDistrictRate(BigDecimal.ZERO);
 
         return salesTaxRates
                 .withTaxRate(modifiedTaxRate)
-                .withCityRate(0)
+                .withCityRate(BigDecimal.ZERO)
                 .withRatesMetaData(modifiedRatesMetaData);
     }
 

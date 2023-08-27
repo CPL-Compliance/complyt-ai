@@ -6,6 +6,7 @@ import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.EncryptedData;
 import io.complyt.authentication.v1.models.ApiKey;
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import lombok.NonNull;
@@ -78,6 +79,10 @@ public class TestUtilities {
         return new ApiKey(apiKeyStr);
     }
 
+    public static ApiKeyDto createApiKeyDto() {
+        return new ApiKeyDto(apiKeyStr);
+    }
+
     public static Token createToken() {
         return createToken(createCredentials(), createAccessToken());
     }
@@ -95,7 +100,7 @@ public class TestUtilities {
     }
 
     public static CredentialsDto createCredentialsDto() {
-        return new CredentialsDto("clientId", "clientSecret", apiKeyStr);
+        return new CredentialsDto("clientId", "clientSecret");
     }
 
     public static Credentials createCredentials(String clientId, String clientSecret) {

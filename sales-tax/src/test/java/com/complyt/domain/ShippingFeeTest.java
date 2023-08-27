@@ -8,6 +8,8 @@ import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTa
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,22 +24,22 @@ public class ShippingFeeTest {
 
     private ShippingFee createShippingFee() {
         JurisdictionalSalesTaxRules rules = createJurisdictionalSalesTaxRules();
-        return new ShippingFee(false, 0, 1000, rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
+        return new ShippingFee(false, BigDecimal.ZERO, new BigDecimal(1000), rules, SalesTaxRates.zeroSalesTaxRate(), "C6S1", TaxableCategory.TAXABLE, TangibleCategory.INTANGIBLE);
     }
 
     private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
         return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", 0, null);
+                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
     }
 
     @Test
     void calculateSalesTaxAmount_SalesTaxIsSetManually_ReturnsAmount() {
         // Given
-        ShippingFee shippingFeeWithManualRate = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(0.5f);
-        float expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate() * shippingFeeWithManualRate.getTotalPrice();
+        ShippingFee shippingFeeWithManualRate = shippingFee.withManualSalesTax(true).withManualSalesTaxRate(new BigDecimal("0.5"));
+        BigDecimal expectedAmount = shippingFeeWithManualRate.getManualSalesTaxRate().multiply(shippingFeeWithManualRate.getTotalPrice());
 
         // When + Then
-        float actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
+        BigDecimal actualAmount = shippingFeeWithManualRate.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 
@@ -46,16 +48,16 @@ public class ShippingFeeTest {
         // Given
         JurisdictionalSalesTaxRules rulesByPercentage = shippingFee.getJurisdictionalSalesTaxRules()
                 .withTaxable(true).withSpecialTreatment(true).withCalculationType(CalculationType.PERCENTAGE);
-        float rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate() * rulesByPercentage.getCalculationValue();
+        BigDecimal rateAfterPercentageCut = shippingFee.getSalesTaxRates().taxRate().multiply(rulesByPercentage.getCalculationValue());
         SalesTaxRates salesTaxRates = shippingFee.getSalesTaxRates().withTaxRate(rateAfterPercentageCut);
         ShippingFee shippingFeeWithRuleByPercentage = shippingFee.withJurisdictionalSalesTaxRules(rulesByPercentage)
                 .withSalesTaxRates(salesTaxRates);
 
-        float expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice() *
-                shippingFeeWithRuleByPercentage.getSalesTaxRates().taxRate();
+        BigDecimal expectedAmount = shippingFeeWithRuleByPercentage.getTotalPrice()
+                .multiply(shippingFeeWithRuleByPercentage.getSalesTaxRates().taxRate());
 
         // When + Then
-        float actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
+        BigDecimal actualAmount = shippingFeeWithRuleByPercentage.calculateSalesTaxAmount();
         assertEquals(expectedAmount, actualAmount);
     }
 

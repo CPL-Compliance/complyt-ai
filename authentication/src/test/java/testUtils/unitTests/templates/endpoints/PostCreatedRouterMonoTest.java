@@ -2,10 +2,10 @@ package testUtils.unitTests.templates.endpoints;
 
 import org.junit.jupiter.api.Test;
 
-public interface PostRouterMonoTest {
+public interface PostCreatedRouterMonoTest {
 
     @Test
-    void post_Exists_Returns200();
+    void post_Exists_Returns201();
 
     @Test
     void post_DoesntExist_Returns404();

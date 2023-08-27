@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import testUtils.unit_test.UnitTestUtilities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.UUID;
@@ -69,7 +70,7 @@ class SalesTaxRatesProviderTest {
                     put(address.city() + "UNEQUAL_SUFFIX", citySalesTaxRules);
                 }}
         );
-        SalesTaxRates expectedSalesTaxRates = salesTaxRates.withStateRate(0.5f);
+        SalesTaxRates expectedSalesTaxRates = salesTaxRates.withStateRate(new BigDecimal("0.05"));
 
         // When
         when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRates)).thenReturn(expectedSalesTaxRates);
@@ -88,11 +89,11 @@ class SalesTaxRatesProviderTest {
                     put(address.city(), citySalesTaxRules);
                 }}
         );
-        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(0);
+        SalesTaxRates expectedSalesTaxRate = salesTaxRates.withCityRate(BigDecimal.ZERO);
 
         // When
         when(stateLevelSalesTaxRatesCalculator.calculate(jurisdictionalSalesTaxRulesWithCity, salesTaxRates)).thenReturn(salesTaxRates);
-        when(cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, salesTaxRates)).thenReturn(salesTaxRates.withCityRate(0));
+        when(cityLevelSalesTaxRatesCalculator.calculate(citySalesTaxRules, salesTaxRates)).thenReturn(salesTaxRates.withCityRate(BigDecimal.ZERO));
 
         SalesTaxRates actualSalesTaxRate = salesTaxRatesProvider.provide(jurisdictionalSalesTaxRulesWithCity, salesTaxRates, address);
 

@@ -103,7 +103,10 @@ public class TransactionTest {
                 .internalTimestamps(transaction.getInternalTimestamps())
                 .externalTimestamps(transaction.getExternalTimestamps())
                 .transactionType(transaction.getTransactionType())
-                .shippingFee(transaction.getShippingFee()).build();
+                .shippingFee(transaction.getShippingFee())
+                .tangibleItemsAmount(transaction.getTangibleItemsAmount())
+                .taxableItemsAmount(transaction.getTaxableItemsAmount())
+                .totalItemsAmount(transaction.getTotalItemsAmount()).build();
 
         // Then
         assertEquals(transaction, actualTransaction);
