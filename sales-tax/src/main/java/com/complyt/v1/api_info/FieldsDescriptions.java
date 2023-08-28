@@ -50,11 +50,10 @@ public interface FieldsDescriptions {
 
     String TRANSACTION_TYPE = "The type of the transaction. Only invoices are considered for nexus tracking and for actual tax calculation";
 
-    String TRANSACTION_FILING_STATUS = "Indicates the status of the transaction in relation to its submission to a specific state. Possible values include:     \n" +
-            "\n" +
-            "    - `NotFiled`: The transaction has not been submitted to the state.      \n" +
-            "\n" +
-            "    - `Filed`: The transaction has been successfully submitted to the state.";
+    String TRANSACTION_FILING_STATUS = """
+            Indicates the status of the transaction in relation to its submission to a specific state. Possible values include:    \s
+                - NOT_FILED: The transaction has not been submitted to the state.     \s
+                - FILED: The transaction has been successfully submitted to the state.""";
 
     String CREATED_FROM = "The external ID of the document that preceded this transaction creation (e.g., when creating an invoice, you can pass the ID of the sales order that it originated from here)";
 
