@@ -24,11 +24,6 @@ class TransactionDtoTest {
         transactionDto = testUtilities.createTransactionDto(transactionId);
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
-    }
-
     @Test
     void toString_ReturnString() {
         // Given
