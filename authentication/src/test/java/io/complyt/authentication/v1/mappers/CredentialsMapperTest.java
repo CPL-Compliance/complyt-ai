@@ -32,4 +32,13 @@ class CredentialsMapperTest {
         // Then
         assertEquals(credentials, actualCredentials);
     }
+
+    @Test
+    void credentialsDtoTocredentials_credentialsIsNull_returnNull() {
+        // When
+        Credentials actualCredentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(null);
+
+        // Then
+        assertNull(actualCredentials);
+    }
 }
