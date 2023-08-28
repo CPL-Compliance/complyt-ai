@@ -8,15 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
-import java.util.Map;
-
 @Configuration
 public class ValidatorConfig {
     @Bean
     ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
                                                                                               @Autowired QueryParamsExtractor credentialsDtoQueryParamsExtractor) {
         return new ValidationHandler<>(CredentialsDto.class, springValidatorAdapter,
-                new DataConflictChecksProvider(null, Map.of()),
                 credentialsDtoQueryParamsExtractor);
     }
 
@@ -25,7 +22,6 @@ public class ValidatorConfig {
                                                                                            @Autowired QueryParamsExtractor apiKeyDtoQueryParamsExtractor) {
         return new ValidationHandler<>(ApiKeyDto.class,
                 springValidatorAdapter,
-                new DataConflictChecksProvider(null, Map.of()),
                 apiKeyDtoQueryParamsExtractor);
     }
 }

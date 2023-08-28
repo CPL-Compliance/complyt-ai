@@ -1,6 +1,5 @@
 package io.complyt.authentication.v1.validators;
 
-import io.complyt.authentication.v1.exceptions.types.ConflictedDataApiException;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotValidApiException;
 import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractor;
 import lombok.AccessLevel;
@@ -12,7 +11,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.reactive.function.server.ServerRequest;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
@@ -27,9 +25,6 @@ public class ValidationHandler<T, U extends Validator> {
     U validator;
 
     @NonNull
-    DataConflictChecksProvider<T> dataConflictChecksProvider;
-
-    @NonNull
     QueryParamsExtractor<T> queryParamsExtractor;
 
     /**
@@ -37,15 +32,7 @@ public class ValidationHandler<T, U extends Validator> {
      * @return
      */
     public final @NonNull Mono<T> handle(final ServerRequest serverRequest) {
-        return validateRequest(serverRequest)
-                .flatMap(body -> Flux.fromIterable(serverRequest.pathVariables().keySet())
-                        .flatMap(variable -> dataConflictChecksProvider.getPathVariableCheck(variable)
-                                .flatMap(check -> check.apply(body, serverRequest)))
-                        .concatWith(dataConflictChecksProvider.getBodyConflictCheck()
-                                .flatMapMany(check -> check.apply(body)))
-                        .collectList()
-                        .flatMap(errorList -> errorList.isEmpty() ? Mono.just(body) :
-                                Mono.error(new ConflictedDataApiException(errorList))));
+        return validateRequest(serverRequest);
     }
 
     /**
