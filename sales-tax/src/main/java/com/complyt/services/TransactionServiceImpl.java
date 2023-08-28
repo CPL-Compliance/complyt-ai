@@ -109,8 +109,8 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> markAsCancelled(@NonNull String externalId, @NonNull String source) {
         return transactionRepository
                 .findByExternalIdAndSource(externalId, source)
-                .map(transaction -> transaction.
-                        withTransactionStatus(TransactionStatus.CANCELLED)
+                .map(transaction -> transaction
+                        .withTransactionStatus(TransactionStatus.CANCELLED)
                         .withCustomer(null))
                 .flatMap(transactionRepository::save);
     }
@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.getTransactionStatus(), transactionInfo.getTenantId(), transaction.getInternalTimestamps(),
                         transaction.getExternalTimestamps(), transaction.getTransactionType(), transaction.getShippingFee(),
                         transaction.getCreatedFrom(), transaction.getTaxableItemsAmount(),
-                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount()
+                        transaction.getTangibleItemsAmount(), transaction.getTotalItemsAmount(), transaction.getTransactionFilingStatus()
                 );
     }
 

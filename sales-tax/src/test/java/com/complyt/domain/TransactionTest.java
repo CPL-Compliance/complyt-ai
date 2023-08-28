@@ -22,7 +22,7 @@ public class TransactionTest {
     void testingAmountOfPropertiesInTransaction() {
         /* In case there is a new property added, If its of type Taxable - handle rates and amount calculation for it */
         Field[] fields = Transaction.class.getDeclaredFields();
-        Assertions.assertEquals(21, fields.length);
+        Assertions.assertEquals(22, fields.length);
     }
 
     @BeforeEach
@@ -56,7 +56,8 @@ public class TransactionTest {
                 ", createdFrom=" + transaction.getCreatedFrom() +
                 ", taxableItemsAmount=" + transaction.getTaxableItemsAmount() +
                 ", tangibleItemsAmount=" + transaction.getTangibleItemsAmount() +
-                ", totalItemsAmount=" + transaction.getTotalItemsAmount() + ")";
+                ", totalItemsAmount=" + transaction.getTotalItemsAmount() +
+                ", transactionFilingStatus=" + transaction.getTransactionFilingStatus() + ")";
 
         // When
         String actualString = transaction.toString();
@@ -106,7 +107,8 @@ public class TransactionTest {
                 .shippingFee(transaction.getShippingFee())
                 .tangibleItemsAmount(transaction.getTangibleItemsAmount())
                 .taxableItemsAmount(transaction.getTaxableItemsAmount())
-                .totalItemsAmount(transaction.getTotalItemsAmount()).build();
+                .totalItemsAmount(transaction.getTotalItemsAmount())
+                .transactionFilingStatus(transaction.getTransactionFilingStatus()).build();
 
         // Then
         assertEquals(transaction, actualTransaction);
