@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -171,5 +172,21 @@ class TokenRouterMonoTest implements PostRouterMonoTest, PostRouterTestSecurityT
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isForbidden();
+    }
+
+    @Test
+    @WithMockUser
+    public void post_invalidApiKeyFormat_return400() {
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .queryParam("api_key", TestUtilities.invalidApiKeyStr)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatusCode.valueOf(400));
     }
 }
