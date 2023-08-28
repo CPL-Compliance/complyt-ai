@@ -12,6 +12,7 @@ import testUtils.TestUtilities;
 import javax.swing.text.Utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -28,5 +29,15 @@ class TokenMapperTest {
 
         // Then
         assertEquals(tokenDto, actualTokenDto);
+    }
+
+    @Test
+    void tokenToTokenDto_TokenIsNull_returnNull() {
+
+        // When
+        TokenDto actualTokenDto = TokenMapper.INSTANCE.tokentoTokenDto(null);
+
+        // Then
+        assertNull(actualTokenDto);
     }
 }

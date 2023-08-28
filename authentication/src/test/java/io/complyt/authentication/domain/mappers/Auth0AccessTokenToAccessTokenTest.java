@@ -36,4 +36,13 @@ class Auth0AccessTokenToAccessTokenTest {
         // Then
         assertEquals(accessToken, actualAccessToken);
     }
+
+    @Test
+    void map_auth0AccessTokenIsNull_returnNull() {
+        // When
+        AccessToken actualAccessToken = Auth0AccessTokenToAccessToken.INSTANCE.map(null);
+
+        // Then
+        assertNull(actualAccessToken);
+    }
 }
