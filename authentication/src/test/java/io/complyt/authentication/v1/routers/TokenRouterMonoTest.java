@@ -107,6 +107,28 @@ class TokenRouterMonoTest implements PostRouterMonoTest, PostRouterTestSecurityT
     }
 
     @Test
+    @WithMockUser
+    public void post_ResourceDoesntExist_Returns404() {
+        // Given
+        ApiKey apiKey = TestUtilities.createApiKey();
+
+        // When
+        when(tokenFacade.getToken(apiKey)).thenReturn(Mono.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL + "_test")
+                        .queryParam("api_key", TestUtilities.apiKeyStr)
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     @Override
     @WithMockUser
     public void post_InternalServerError_Returns500() {
