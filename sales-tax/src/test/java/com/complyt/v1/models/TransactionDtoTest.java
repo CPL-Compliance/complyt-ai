@@ -24,11 +24,6 @@ class TransactionDtoTest {
         transactionDto = testUtilities.createTransactionDto(transactionId);
     }
 
-    private JurisdictionalSalesTaxRules createJurisdictionalSalesTaxRules() {
-        return new JurisdictionalSalesTaxRules("California", "CA", true,
-                false, CalculationType.FIXED, "description", BigDecimal.ZERO, null);
-    }
-
     @Test
     void toString_ReturnString() {
         // Given
@@ -50,7 +45,8 @@ class TransactionDtoTest {
                 ", createdFrom=" + transactionDto.createdFrom() +
                 ", taxableItemsAmount=" + transactionDto.taxableItemsAmount() +
                 ", tangibleItemsAmount=" + transactionDto.tangibleItemsAmount() +
-                ", totalItemsAmount=" + transactionDto.totalItemsAmount() + "]";
+                ", totalItemsAmount=" + transactionDto.totalItemsAmount() +
+                ", transactionFilingStatus=" + transactionDto.transactionFilingStatus() + "]";
 
         // When
         String actualString = transactionDto.toString();

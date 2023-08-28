@@ -204,7 +204,8 @@ public @interface GetTransactionByComplytIdApiInfo {
                 "createdFrom": "string",
                 "taxableItemsAmount": 0,
                 "tangibleItemsAmount": 0,
-                "totalItemsAmount": 0
+                "totalItemsAmount": 0,
+                "transactionFilingStatus": "NOT_FILED"
             }
             """;
 }
