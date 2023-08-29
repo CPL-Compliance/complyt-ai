@@ -27,4 +27,9 @@ public class Item implements Taxable {
     private TangibleCategory tangibleCategory;
     private TaxableCategory taxableCategory;
 
+    @Override
+    public BigDecimal getTotalPrice() {
+        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+    }
+
 }

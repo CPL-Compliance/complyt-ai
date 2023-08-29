@@ -25,4 +25,9 @@ public class ShippingFee implements Taxable {
     private final TaxableCategory taxableCategory;
     private final TangibleCategory tangibleCategory;
 
+    @Override
+    public BigDecimal getTotalPrice() {
+        return totalPrice != null ? totalPrice : BigDecimal.ZERO;
+    }
+
 }
