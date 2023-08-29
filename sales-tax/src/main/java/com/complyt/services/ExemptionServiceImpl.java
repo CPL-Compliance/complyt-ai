@@ -1,9 +1,11 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.exemption.ExemptionListBuilder;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
@@ -27,9 +29,12 @@ public class ExemptionServiceImpl implements ExemptionService {
     @NonNull
     private ComplytIdHandler<Exemption> complytIdHandler;
 
+    @NonNull
+    private ExemptionListBuilder exemptionListBuilder;
+
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
-        return exemptionRepository.findByClientCustomerAndState(transaction);
+        return exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
     }
 
     @Override
@@ -87,6 +92,11 @@ public class ExemptionServiceImpl implements ExemptionService {
     @Override
     public Mono<Exemption> checkExemptionNotHavingComplytId(@NonNull Exemption newExemption) {
         return complytIdHandler.checkNewDontHaveComplytId(newExemption);
+    }
+
+    @Override
+    public Flux<Exemption> updateMany(ExemptionWrapper exemptionWrapper) {
+        return null;
     }
 
     private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {

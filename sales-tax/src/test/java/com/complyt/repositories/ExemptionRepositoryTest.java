@@ -67,7 +67,7 @@ public class ExemptionRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.just(exemption));
 
         // Then
-        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
+        Mono<Exemption> exemptionMono = exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
         StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
     }
 
@@ -75,13 +75,26 @@ public class ExemptionRepositoryTest {
     @Test
     void findByClientCustomerAndState_NullIdPassed_ThrowsException() {
         // Given
-        Transaction transactionNull = null;
+        UUID nullCustomerId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByClientCustomerAndState(transactionNull));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByCustomerAndState(nullCustomerId, transaction.getShippingAddress().state()));
 
         // Then
-        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+        assertEquals(nullPointerException.getMessage(), "customerId is marked non-null but is null");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    void findByClientCustomerAndState_NullStatePassed_ThrowsException() {
+        // Given
+        String nullState = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), nullState));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
     @Test
@@ -97,7 +110,7 @@ public class ExemptionRepositoryTest {
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
 
         // Then
-        Mono<Exemption> exemptionMono = exemptionRepository.findByClientCustomerAndState(transaction);
+        Mono<Exemption> exemptionMono = exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state());
         StepVerifier.create(exemptionMono).verifyComplete();
     }
 
