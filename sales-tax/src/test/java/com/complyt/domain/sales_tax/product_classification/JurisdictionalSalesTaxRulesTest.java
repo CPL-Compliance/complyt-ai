@@ -101,4 +101,28 @@ public class JurisdictionalSalesTaxRulesTest {
         assertTrue(isEquals);
     }
 
+    @Test
+    void getCalculationValue_CalculationValueIsNull_ReturnsZero() {
+        // Given
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithNullManualTaxRate = jurisdictionalSalesTaxRules.withCalculationValue(null);
+
+        // When
+        BigDecimal actualTotalPrice = jurisdictionalSalesTaxRulesWithNullManualTaxRate.getCalculationValue();
+
+        // Then
+        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+    }
+
+    @Test
+    void getCalculationValue_CalculationValueIs10_ReturnsBigDecimalOf10() {
+        // Given
+        JurisdictionalSalesTaxRules jurisdictionalSalesTaxRulesWithManualTaxRateOf10 = jurisdictionalSalesTaxRules.withCalculationValue(new BigDecimal("10"));
+
+        // When
+        BigDecimal actualTotalPrice = jurisdictionalSalesTaxRulesWithManualTaxRateOf10.getCalculationValue();
+
+        // Then
+        assertEquals(new BigDecimal("10"), actualTotalPrice);
+    }
+
 }
