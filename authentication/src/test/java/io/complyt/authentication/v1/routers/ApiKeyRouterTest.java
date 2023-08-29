@@ -24,7 +24,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.TestUtilities;
 import testUtils.unitTests.templates.endpoints.PostCreatedRouterMonoTest;
-import testUtils.unitTests.templates.endpoints.PostOkRouterMonoTest;
 import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,8 +34,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {ApiKeyRouter.class, ApiKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalExceptionHandler.class, GlobalErrorAttributes.class,
-        CredentialsDtoQueryParamsExtractor.class
-})
+        CredentialsDtoQueryParamsExtractor.class})
 class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
