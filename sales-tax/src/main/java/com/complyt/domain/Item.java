@@ -28,8 +28,20 @@ public class Item implements Taxable {
     private TaxableCategory taxableCategory;
 
     @Override
-    public BigDecimal getTotalPrice() {
+    public final BigDecimal getTotalPrice() {
         return totalPrice != null ? totalPrice : BigDecimal.ZERO;
     }
 
+    @Override
+    public final BigDecimal getManualSalesTaxRate() {
+        return manualSalesTaxRate != null ? manualSalesTaxRate : BigDecimal.ZERO;
+    }
+
+    public final BigDecimal getQuantity() {
+        return quantity != null ? quantity : BigDecimal.ZERO;
+    }
+
+    public final BigDecimal getUnitPrice() {
+        return unitPrice != null ? unitPrice : BigDecimal.ZERO;
+    }
 }
