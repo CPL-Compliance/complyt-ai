@@ -92,4 +92,52 @@ public class ShippingFeeTest {
         assertEquals(expectedString, actualString);
     }
 
+    @Test
+    void getTotalPrice_TotalPriceIsNull_ReturnsZero() {
+        // Given
+        ShippingFee shippingFeeWithNullTotalPrice = shippingFee.withTotalPrice(null);
+
+        // When
+        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.getTotalPrice();
+
+        // Then
+        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+    }
+
+    @Test
+    void getTotalPrice_TotalPriceIs10_ReturnsBigDecimalOf10() {
+        // Given
+        ShippingFee shippingFeeWithNullTotalPrice = shippingFee.withTotalPrice(new BigDecimal("10"));
+
+        // When
+        BigDecimal actualTotalPrice = shippingFeeWithNullTotalPrice.getTotalPrice();
+
+        // Then
+        assertEquals(new BigDecimal("10"), actualTotalPrice);
+    }
+
+    @Test
+    void getManualTaxRate_ManualTaxRateIsNull_ReturnsZero() {
+        // Given
+        ShippingFee shippingFeeWithNullManualTaxRate = shippingFee.withManualSalesTaxRate(null);
+
+        // When
+        BigDecimal actualTotalPrice = shippingFeeWithNullManualTaxRate.getManualSalesTaxRate();
+
+        // Then
+        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+    }
+
+    @Test
+    void getManualTaxRate_ManualTaxRateIs10_ReturnsBigDecimalOf10() {
+        // Given
+        ShippingFee shippingFeeWithManualTaxRateOf10 = shippingFee.withManualSalesTaxRate(new BigDecimal("10"));
+
+        // When
+        BigDecimal actualTotalPrice = shippingFeeWithManualTaxRateOf10.getManualSalesTaxRate();
+
+        // Then
+        assertEquals(new BigDecimal("10"), actualTotalPrice);
+    }
+
 }

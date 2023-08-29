@@ -12,4 +12,8 @@ import java.math.BigDecimal;
 public class NexusCalculationSummary {
     private long count;
     private BigDecimal amount;
+
+    public final BigDecimal getAmount() {
+        return amount != null ? amount : BigDecimal.ZERO;
+    }
 }

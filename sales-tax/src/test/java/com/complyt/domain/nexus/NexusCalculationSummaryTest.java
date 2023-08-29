@@ -46,4 +46,28 @@ class NexusCalculationSummaryTest {
         assertTrue(isEquals);
     }
 
+    @Test
+    void getAmount_AmountIsNull_ReturnsZero() {
+        // Given
+        NexusCalculationSummary nexusCalculationSummaryWithNullManualTaxRate = nexusCalculationSummary.withAmount(null);
+
+        // When
+        BigDecimal actualTotalPrice = nexusCalculationSummaryWithNullManualTaxRate.getAmount();
+
+        // Then
+        assertEquals(BigDecimal.ZERO, actualTotalPrice);
+    }
+
+    @Test
+    void getAmount_AmountIs10_ReturnsBigDecimalOf10() {
+        // Given
+        NexusCalculationSummary nexusCalculationSummaryWithManualTaxRateOf10 = nexusCalculationSummary.withAmount(new BigDecimal("10"));
+
+        // When
+        BigDecimal actualTotalPrice = nexusCalculationSummaryWithManualTaxRateOf10.getAmount();
+
+        // Then
+        assertEquals(new BigDecimal("10"), actualTotalPrice);
+    }
+
 }
