@@ -23,6 +23,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AesSecretKeyUtilsTest {
     @Test
+    void createAesSecretKeyUtils() {
+        AesSecretKeyUtils aesSecretKeyUtils = new AesSecretKeyUtils();
+    }
+
+    @Test
     void generateKey_validData_correctAlgorithm() {
         SecretKey expectedKey = AesSecretKeyUtils.generateAesKey(256);
 

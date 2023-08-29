@@ -15,4 +15,9 @@ class ApiKeyGeneratorTest {
         System.out.println(apiKey);
         new ApiKey(apiKey);
     }
+
+    @Test
+    void createApiKeyGenerator(){
+        ApiKeyGenerator apiKeyGenerator = new ApiKeyGenerator();
+    }
 }
