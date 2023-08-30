@@ -24,4 +24,9 @@ public final class JurisdictionalSalesTaxRules implements SalesTaxRules {
         return taxable && specialTreatment && calculationType == CalculationType.PERCENTAGE;
     }
 
+    @Override
+    public BigDecimal getCalculationValue() {
+        return calculationValue != null ? calculationValue : BigDecimal.ZERO;
+    }
+
 }
