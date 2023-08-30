@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -31,7 +33,7 @@ class CredentialsRepositoryTest {
     Credentials credentials;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         credentials = TestUtilities.createCredentials();
     }
 
@@ -71,5 +73,23 @@ class CredentialsRepositoryTest {
         // Then
         Mono<Credentials> credentialsMono = credentialsRepository.save(credentials);
         StepVerifier.create(credentialsMono).expectNext(credentials).verifyComplete();
+    }
+
+    @Test
+    void findByComplytId_complytClientIdIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsRepository.findByComplytClientId(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+
+    @Test
+    void findByComplytId_credentialsIsNull_ThrowsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsRepository.save(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
     }
 }
