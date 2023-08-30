@@ -335,4 +335,12 @@ public class UnitTestUtilities {
         return matcher.matches();
     }
 
+    public static List<State> createStateList() {
+        return new ArrayList<>() {{
+            add(new State("California", "04", "CA"));
+            add(new State("New York", "05", "NY"));
+            add(new State("Arizona", "06", "AZ"));
+        }};
+    }
+
 }
