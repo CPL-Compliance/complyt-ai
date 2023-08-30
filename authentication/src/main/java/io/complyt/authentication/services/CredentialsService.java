@@ -48,7 +48,7 @@ public class CredentialsService {
                 .switchIfEmpty(Mono.empty()).flatMap(this::decrypt);
     }
 
-    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, ApiKey apiKey) {
+    public Mono<Credentials> saveCredentials(@NonNull Credentials credentials, @NonNull ApiKey apiKey) {
         return Mono.fromSupplier(() -> prepareCredentialsForSave(credentials, apiKey))
                 .flatMap(credentialsRepository::save);
     }
