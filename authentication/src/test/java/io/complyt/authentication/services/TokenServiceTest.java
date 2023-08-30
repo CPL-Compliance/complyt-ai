@@ -28,6 +28,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -429,5 +431,23 @@ class TokenServiceTest {
         Mono<Token> tokenMono = tokenService.findByApiKey(apiKey);
 
         StepVerifier.create(tokenMono).verifyComplete();
+    }
+
+    @Test
+    void findByApiKey_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.findByApiKey(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void saveToken_tokenIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenService.saveToken(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
     }
 }
