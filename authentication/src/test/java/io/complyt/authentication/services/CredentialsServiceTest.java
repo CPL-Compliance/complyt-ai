@@ -24,6 +24,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -357,5 +359,32 @@ class CredentialsServiceTest {
         Mono<Credentials> credentialsMono = credentialsService.saveCredentials(credentials, apiKey);
 
         StepVerifier.create(credentialsMono).expectError(RuntimeException.class).verify();
+    }
+
+    @Test
+    void getCredentialsByApiKey_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.getCredentialsByApiKey(null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void saveCredentials_apiKeyIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentials(TestUtilities.createCredentials(), null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "apiKey is marked non-null but is null");
+    }
+
+    @Test
+    void saveCredentials_credentialsIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            credentialsService.saveCredentials(null, TestUtilities.createApiKey());
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentials is marked non-null but is null");
     }
 }
