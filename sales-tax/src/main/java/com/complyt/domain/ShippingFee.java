@@ -5,14 +5,12 @@ import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
 @Getter
 @EqualsAndHashCode
 @ToString
-@Slf4j
 @With
 @AllArgsConstructor
 public class ShippingFee implements Taxable {

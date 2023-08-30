@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = ExemptionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = PostMultipleExemptionsApiInfo.returnedExemptionWrapperExample)
+                                                                @ExampleObject(value = PostMultipleExemptionsApiInfo.returnedExemptionsExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -124,7 +124,7 @@ public @interface PostMultipleExemptionsApiInfo {
                 ]
             }""";
 
-    String returnedExemptionWrapperExample = """
+    String returnedExemptionsExample = """
             [
                  {
                      "complytId": "5df35536-a20b-42f0-b9b3-b05322a1f9b0",
