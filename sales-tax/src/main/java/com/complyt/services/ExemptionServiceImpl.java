@@ -53,7 +53,9 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return exemptionRepository.save(exemption);
+        return checkExemptionNotHavingComplytId(exemption)
+                .flatMap(this::injectDataToNewExemption)
+                .flatMap(exemptionRepository::save);
     }
 
     @Deprecated
@@ -95,8 +97,9 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Flux<Exemption> updateMany(ExemptionWrapper exemptionWrapper) {
-        return null;
+    public Flux<Exemption> updateMany(@NonNull ExemptionWrapper exemptionWrapper) {
+        return exemptionListBuilder.build(exemptionWrapper)
+                .flatMap(this::save);
     }
 
     private Function<Exemption, Exemption> createFunctionUpdateExemption(Exemption exemption) {

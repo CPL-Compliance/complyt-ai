@@ -62,4 +62,15 @@ public class ExemptionRouter {
 
         return RouterFunctions.route(deleteExemptionRoute, exemptionHandler::delete);
     }
+
+    @Bean
+    @PostMultipleExemptionsApiInfo
+    public RouterFunction<ServerResponse> postManyRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
+        RequestPredicate putExemptionRoute = RequestPredicates
+                .POST(BASE_URL + "/batch")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(putExemptionRoute, exemptionHandler::upsertMany);
+    }
+
 }

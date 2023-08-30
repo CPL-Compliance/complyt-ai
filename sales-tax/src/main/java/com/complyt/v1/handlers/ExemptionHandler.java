@@ -88,8 +88,8 @@ public class ExemptionHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
 
-    @ExemptionUpdatePermission
-    public Mono<ServerResponse> upsertMultiple(ServerRequest serverRequest) {
+    @ExemptionCreatePermission
+    public Mono<ServerResponse> upsertMany(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Flux<ExemptionDto> exemptionWrapperDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.validate(serverRequest))
@@ -101,7 +101,7 @@ public class ExemptionHandler {
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionWrapperDtoFlux, ExemptionWrapperDto.class);
+        return ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(exemptionWrapperDtoFlux, ExemptionWrapperDto.class);
     }
 
     @ExemptionReadPermission

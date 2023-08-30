@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -27,7 +28,7 @@ public class ExemptionRepository {
     @NonNull
     private TenantResolver tenantResolver;
 
-    public Mono<Exemption> findByCustomerAndState(@NonNull UUID customerId,@NonNull String state) {
+    public Mono<Exemption> findByCustomerAndState(@NonNull UUID customerId, @NonNull String state) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
@@ -92,4 +93,5 @@ public class ExemptionRepository {
                             .then(reactiveMongoTemplate.remove(query, Exemption.class));
                 });
     }
+
 }

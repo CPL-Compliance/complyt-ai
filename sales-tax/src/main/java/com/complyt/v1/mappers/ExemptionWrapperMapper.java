@@ -1,6 +1,8 @@
 package com.complyt.v1.mappers;
 
+import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
+import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
@@ -13,4 +15,8 @@ public interface ExemptionWrapperMapper {
     ExemptionWrapper exemptionWrapperDtoToExemptionWrapper(ExemptionWrapperDto exemptionWrapperDto);
 
     ExemptionWrapperDto exemptionWrapperToExemptionWrapperDto(ExemptionWrapper exemptionWrapper);
+
+    Exemption exemptionDtoToExemption(ExemptionDto exemptionDto);
+
+    ExemptionDto exemptionToExemptionDto(Exemption exemption);
 }

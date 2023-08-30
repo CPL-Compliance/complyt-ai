@@ -23,9 +23,7 @@ public class ExemptionFacade {
     private ExemptionService exemptionService;
 
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return exemptionService.checkExemptionNotHavingComplytId(exemption)
-                .flatMap(exemptionService::injectDataToNewExemption)
-                .flatMap(exemptionService::save);
+        return exemptionService.save(exemption);
     }
 
     @Deprecated
