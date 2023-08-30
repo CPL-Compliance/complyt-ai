@@ -24,7 +24,7 @@ public class AuthorizationService {
                 .mapNotNull(accessToken -> createToken(credentials, accessToken));
     }
 
-    private Token createToken(@NonNull Credentials credentials, @NonNull AccessToken accessToken) {
+    private Token createToken(Credentials credentials, AccessToken accessToken) {
         return Token.builder()
                 .complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret())
