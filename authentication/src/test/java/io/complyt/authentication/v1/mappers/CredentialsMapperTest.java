@@ -25,7 +25,7 @@ class CredentialsMapperTest {
     }
 
     @Test
-    void credentialsDtoTocredentials() {
+    void credentialsDtoToCredentials() {
         // When
         Credentials actualCredentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(credentialsDto);
 
@@ -34,7 +34,7 @@ class CredentialsMapperTest {
     }
 
     @Test
-    void credentialsDtoTocredentials_credentialsIsNull_returnNull() {
+    void credentialsDtoToCredentials_credentialsIsNull_returnNull() {
         // When
         Credentials actualCredentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(null);
 

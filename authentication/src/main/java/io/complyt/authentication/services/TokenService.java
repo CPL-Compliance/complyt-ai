@@ -58,7 +58,7 @@ public class TokenService {
     }
 
     @NonNull
-    private Token decryptToken(@NonNull final Token token) {
+    private Token decryptToken(final Token token) {
         EncryptedData accessTokenEncryptedData = new EncryptedData(token.getAccessTokenIv(), token.getAccessToken());
         EncryptedData scopeEncryptedData = new EncryptedData(token.getScopeIv(), token.getScope());
 
@@ -76,7 +76,7 @@ public class TokenService {
     }
 
     @NonNull
-    private Token encryptToken(@NonNull final Token token) {
+    private Token encryptToken(final Token token) {
         EncryptedData accessTokenEncryptedData;
         EncryptedData scopeEncryptedData;
 
@@ -91,8 +91,8 @@ public class TokenService {
         return createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
     }
 
-    private Token createDecryptedToken(@NonNull Token token, String accessToken, String scope,
-                                       @NonNull EncryptedData scopeEncryptedData) {
+    private Token createDecryptedToken(Token token, String accessToken, String scope,
+                                       EncryptedData scopeEncryptedData) {
         return Token.builder()
                 .accessToken(accessToken)
                 .accessTokenIv(token.getAccessTokenIv())
@@ -107,8 +107,8 @@ public class TokenService {
                 .build();
     }
 
-    private Token createEncryptedToken(@NonNull Token token, @NonNull EncryptedData accessTokenEncryptedData,
-                                       @NonNull EncryptedData scopeEncryptedData) {
+    private Token createEncryptedToken(Token token, EncryptedData accessTokenEncryptedData,
+                                       EncryptedData scopeEncryptedData) {
         return Token.builder()
                 .accessToken(accessTokenEncryptedData.cipherText())
                 .accessTokenIv(accessTokenEncryptedData.iv())
