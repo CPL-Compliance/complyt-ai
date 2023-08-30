@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import testUtils.TestUtilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,5 +70,45 @@ public class Auth0AuthorizationServerWrapperTest {
 
         // Then
         StepVerifier.create(accessTokenMono).expectNext(accessToken).verifyComplete();
+    }
+
+    @Test
+    void getAccessToken_clientIdIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken(null,
+                    "Client Secret", "Audience", "Grant Type");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientId is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_clientSecretIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("client ID",
+                    null, "Audience", "Grant Type");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "clientSecret is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_audienceIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("Client ID",
+                    "Client Secret", null, "Grant Type");
+        });
+
+        assertEquals(nullPointerException.getMessage(), "audience is marked non-null but is null");
+    }
+
+    @Test
+    void getAccessToken_grantTypeIsNull_throwsNullException() {
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            auth0AuthorizationServerWrapper.getAccessToken("Client ID",
+                    "Client Secret", "audience", null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
     }
 }
