@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
@@ -36,8 +37,11 @@ class ServicesConfigTest {
         String issuerUri = "Issuer Uri";
 
         // When
-        CredentialsService expectedCredentialsService = new CredentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
-        CredentialsService actualCredentialsService = servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
+        CredentialsService expectedCredentialsService = new CredentialsService(credentialsRepository,
+                passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
+
+        CredentialsService actualCredentialsService = servicesConfig.credentialsService(credentialsRepository,
+                passwordEncoder, cryptoAesCbcPkcs5Padding, grantType, issuerUri);
 
         // Then
         assertEquals(expectedCredentialsService, actualCredentialsService);
@@ -53,10 +57,99 @@ class ServicesConfigTest {
         int tokenExpirationSafeWindowSec = 10;
 
         // When
-        TokenService expectedTokenService = new TokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
-        TokenService actualTokenService = servicesConfig.tokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+        TokenService expectedTokenService = new TokenService(tokenRepository, passwordEncoder,
+                cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+
+        TokenService actualTokenService = servicesConfig.tokenService(tokenRepository, passwordEncoder,
+                cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
 
         // Then
         assertEquals(expectedTokenService, actualTokenService);
+    }
+
+    @Test
+    void credentialsService_credentialsRepositoryIsNull_throwsNullException() {
+        // Given
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        String grantType = "Grant Type";
+        String audience = "audience";
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.credentialsService(null, passwordEncoder, cryptoAesCbcPkcs5Padding,
+                    grantType, audience);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "credentialsRepository is marked non-null but is null");
+    }
+
+    @Test
+    void credentialsService_passwordEncoderIsNull_throwsNullException() {
+        // Given
+        CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        String grantType = "Grant Type";
+        String audience = "audience";
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.credentialsService(credentialsRepository, null, cryptoAesCbcPkcs5Padding,
+                    grantType, audience);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "passwordEncoder is marked non-null but is null");
+    }
+
+    @Test
+    void credentialsService_cryptoAesCbcPkcs5PaddingIsNull_throwsNullException() {
+        // Given
+        CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        String grantType = "Grant Type";
+        String audience = "audience";
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, null,
+                    grantType, audience);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "cryptoAesCbcPkcs5Padding " +
+                "is marked non-null but is null");
+    }
+
+    @Test
+    void credentialsService_grantTypeIsNull_throwsNullException() {
+        // Given
+        CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        String audience = "audience";
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+                    null, audience);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "grantType is marked non-null but is null");
+    }
+
+    @Test
+    void credentialsService_issuerUriIsNull_throwsNullException() {
+        // Given
+        CredentialsRepository credentialsRepository = mock(CredentialsRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        String grantType = "Grant Type";
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.credentialsService(credentialsRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
+                    grantType, null);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "audience is marked non-null but is null");
     }
 }
