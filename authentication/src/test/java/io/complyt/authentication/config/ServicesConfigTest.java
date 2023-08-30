@@ -68,6 +68,57 @@ class ServicesConfigTest {
     }
 
     @Test
+    void tokenService_tokenRepositoryIsNull_throwsNullException() {
+        // Given
+        TokenRepository tokenRepository = mock(TokenRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        int tokenExpirationSafeWindowSec = 10;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.tokenService(null, passwordEncoder,
+                    cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "tokenRepository is marked non-null but is null");
+    }
+
+    @Test
+    void tokenService_passwordEncoderIsNull_throwsNullException() {
+        // Given
+        TokenRepository tokenRepository = mock(TokenRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        int tokenExpirationSafeWindowSec = 10;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.tokenService(tokenRepository, null,
+                    cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "passwordEncoder is marked non-null but is null");
+    }
+
+    @Test
+    void tokenService_cryptoAesCbcPkcs5PaddingIsNull_throwsNullException() {
+        // Given
+        TokenRepository tokenRepository = mock(TokenRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        int tokenExpirationSafeWindowSec = 10;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.tokenService(tokenRepository, passwordEncoder,
+                    null, tokenExpirationSafeWindowSec);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "cryptoAesCbcPkcs5Padding is marked non-null but is null");
+    }
+
+    @Test
     void credentialsService_credentialsRepositoryIsNull_throwsNullException() {
         // Given
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
