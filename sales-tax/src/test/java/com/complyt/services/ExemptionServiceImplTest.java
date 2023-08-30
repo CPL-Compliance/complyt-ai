@@ -1,6 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.exemption.ExemptionListBuilder;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
@@ -46,6 +47,9 @@ public class ExemptionServiceImplTest {
     @Mock
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
+    @Mock
+    ExemptionListBuilder exemptionListBuilder;
+
     Transaction transaction;
     Exemption exemption;
     Customer customer;
@@ -64,9 +68,13 @@ public class ExemptionServiceImplTest {
     void save_SavesExemption_ReturnsExemption() {
         // Given
         Exemption exemptionNoId = exemption.withId(null);
+        Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemptionWithNewComplytId);
+        Exemption exemptionWithIdAndComplytId = exemptionWithNewComplytId.withId(exemption.getId());
 
         // When
-        when(exemptionRepository.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemptionWithIdAndComplytId));
         Mono<Exemption> exemptionMono = exemptionService.save(exemptionNoId);
 
         // Then

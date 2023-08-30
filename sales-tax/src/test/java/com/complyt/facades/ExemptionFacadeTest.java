@@ -51,12 +51,9 @@ public class ExemptionFacadeTest {
     void save_ExemptionSaved_ExemptionReturned() {
         // Given
         Exemption exemptionNoId = exemption.withId(null).withComplytId(null);
-        Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
 
         // When
-        when(exemptionService.checkExemptionNotHavingComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
-        when(exemptionService.injectDataToNewExemption(exemption)).thenReturn(Mono.just(exemptionWithNewComplytId));
-        when(exemptionService.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemption));
+        when(exemptionService.save(exemptionNoId)).thenReturn(Mono.just(exemption));
         Mono<Exemption> exemptionMono = exemptionFacade.save(exemptionNoId);
 
         // Then
