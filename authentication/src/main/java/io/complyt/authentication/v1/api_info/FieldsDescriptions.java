@@ -10,9 +10,9 @@ public interface FieldsDescriptions {
      */
 
     // Resources
-    String TOKEN = "Contains the data to create an access token";
+    String TOKEN = "Contains the data about the access token";
     String CLIENT_ID = "The Client ID part of the Client Credentials";
     String CLIENT_SECRET = "The Client Secret part of the Client Credentials";
-
     String API_KEY = "The API key to get the access token";
+    String CREDENTIALS = "The client credentials to get an API key";
 }
