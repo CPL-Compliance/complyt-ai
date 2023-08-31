@@ -356,7 +356,7 @@ public class ExemptionServiceImplTest {
         when(exemptionRepository.save(secondExemptionWithComplytId)).thenReturn(Mono.just(secondExemptionWithIds));
         when(exemptionRepository.save(thirdExemptionWithComplytId)).thenReturn(Mono.just(thirdExemptionWithIds));
 
-        Flux<Exemption> exemptionFlux = exemptionService.updateMany(exemptionWrapper);
+        Flux<Exemption> exemptionFlux = exemptionService.saveMany(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -548,7 +548,7 @@ public class ExemptionServiceImplTest {
         ExemptionWrapper nullExemptionWrapper = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.updateMany(nullExemptionWrapper));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.saveMany(nullExemptionWrapper));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");

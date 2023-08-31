@@ -793,13 +793,13 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertMany_NullHandler_ThrowsNullPointerException() {
+    public void upsertMultiple_NullHandler_ThrowsNullPointerException() {
         // Given
         ExemptionHandler nullExemptionHandler = null;
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            exemptionRouter.postManyRouterFunction(nullExemptionHandler);
+            exemptionRouter.postMultipleRouterFunction(nullExemptionHandler);
         });
 
         // Then
@@ -930,14 +930,14 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertMany_UpsertsMany_Returns201() {
+    public void upsertMultiple_UpsertsMany_Returns201() {
         // Given
         List<Exemption> exemptionList = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
         List<ExemptionDto> expectedExemptions = UnitTestUtilities.createExemptionsDtoListFromWrapper(exemptionWrapperDto);
 
         // When
-        when(exemptionFacade.updateMany(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptionList));
+        when(exemptionFacade.saveMany(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptionList));
 
         // Then
         webTestClient
@@ -955,12 +955,12 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertMany_EmptyMonoReturnedFromFacade_Returns404() {
+    public void upsertMultiple_EmptyMonoReturnedFromFacade_Returns404() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
 
         // When
-        when(exemptionFacade.updateMany(exemptionWrapper)).thenReturn(Flux.empty());
+        when(exemptionFacade.saveMany(exemptionWrapper)).thenReturn(Flux.empty());
 
         // Then
         webTestClient
@@ -976,7 +976,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertMany_EmptyStatesListPassed_Returns400() {
+    public void upsertMultiple_EmptyStatesListPassed_Returns400() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
                 (exemptionWrapper.withStates(new ArrayList<>()));
@@ -1000,7 +1000,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     @Test
     @Override
     @WithMockUser
-    public void upsertMany_NullExemptionPassed_Returns400() {
+    public void upsertMultiple_NullExemptionPassed_Returns400() {
         // Given
         ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
                 (exemptionWrapper.withExemption(null));

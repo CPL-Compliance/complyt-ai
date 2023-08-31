@@ -50,7 +50,7 @@ public class ExemptionFacade {
         return exemptionService.delete(complytId);
     }
 
-    public Flux<Exemption> updateMany(@NonNull ExemptionWrapper exemptionWrapper) {
-        return exemptionService.updateMany(exemptionWrapper);
+    public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
+        return exemptionService.saveMany(exemptionWrapper);
     }
 }

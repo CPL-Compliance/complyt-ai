@@ -97,7 +97,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Flux<Exemption> updateMany(@NonNull ExemptionWrapper exemptionWrapper) {
+    public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
         return exemptionListBuilder.build(exemptionWrapper)
                 .flatMap(this::save);
     }

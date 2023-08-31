@@ -209,8 +209,8 @@ public class ExemptionFacadeTest {
         List<Exemption> expectedExemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
 
         // When
-        when(exemptionService.updateMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
-        Flux<Exemption> exemptionFlux = exemptionFacade.updateMany(exemptionWrapper);
+        when(exemptionService.saveMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
+        Flux<Exemption> exemptionFlux = exemptionFacade.saveMany(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -226,7 +226,7 @@ public class ExemptionFacadeTest {
         ExemptionWrapper nullExemptionWrapper = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.updateMany(nullExemptionWrapper));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.saveMany(nullExemptionWrapper));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");

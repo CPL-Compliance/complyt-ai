@@ -28,5 +28,5 @@ public interface ExemptionService extends CrudService<Exemption, String> {
 
     Mono<Exemption> checkExemptionNotHavingComplytId(@NonNull final Exemption newExemption);
 
-    Flux<Exemption> updateMany(ExemptionWrapper exemptionWrapper);
+    Flux<Exemption> saveMany(ExemptionWrapper exemptionWrapper);
 }
