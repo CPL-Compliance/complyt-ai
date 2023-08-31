@@ -7,6 +7,7 @@ import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
@@ -324,6 +325,47 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
     }
 
+    @Test
+    void updateMany_UpdatesMany_ReturnsExemptions() {
+        // Given
+        List<State> states = UnitTestUtilities.createStateList();
+        Exemption exemptionNoIds = exemption.withComplytId(null).withId(null);
+        ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemptionNoIds, states);
+        List<Exemption> exemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+
+        Exemption firstExemptionWithComplytId = exemptions.get(0).withComplytId(UUID.randomUUID());
+        Exemption secondExemptionWithComplytId = exemptions.get(1).withComplytId(UUID.randomUUID());
+        Exemption thirdExemptionWithComplytId = exemptions.get(2).withComplytId(UUID.randomUUID());
+
+        Exemption firstExemptionWithIds = firstExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption secondExemptionWithIds = secondExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
+
+        // When
+        when(exemptionListBuilder.build(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
+
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(1))).thenReturn(Mono.just(exemptions.get(1)));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(2))).thenReturn(Mono.just(exemptions.get(2)));
+
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(0))).thenReturn(firstExemptionWithComplytId);
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(1))).thenReturn(secondExemptionWithComplytId);
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(2))).thenReturn(thirdExemptionWithComplytId);
+
+        when(exemptionRepository.save(firstExemptionWithComplytId)).thenReturn(Mono.just(firstExemptionWithIds));
+        when(exemptionRepository.save(secondExemptionWithComplytId)).thenReturn(Mono.just(secondExemptionWithIds));
+        when(exemptionRepository.save(thirdExemptionWithComplytId)).thenReturn(Mono.just(thirdExemptionWithIds));
+
+        Flux<Exemption> exemptionFlux = exemptionService.updateMany(exemptionWrapper);
+
+        // Then
+        StepVerifier.create(exemptionFlux)
+                .expectNext(firstExemptionWithIds)
+                .expectNext(secondExemptionWithIds)
+                .expectNext(thirdExemptionWithIds)
+                .verifyComplete();
+
+    }
 
     @Test
     void delete_NullIdPassed_ThrowsException() {
@@ -498,5 +540,17 @@ public class ExemptionServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void updateMany_NullExemptionWrapperPassed_ThrowsException() {
+        // Given
+        ExemptionWrapper nullExemptionWrapper = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.updateMany(nullExemptionWrapper));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
     }
 }

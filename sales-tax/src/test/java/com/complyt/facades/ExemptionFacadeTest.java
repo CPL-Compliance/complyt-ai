@@ -2,10 +2,12 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
+import org.javatuples.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -199,6 +201,36 @@ public class ExemptionFacadeTest {
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
     }
 
+    @Test
+    void updateMany_UpdatesExemptions_ReturnsExemptions() {
+        // Given
+        List<State> states = UnitTestUtilities.createStateList();
+        ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemption, states);
+        List<Exemption> expectedExemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+
+        // When
+        when(exemptionService.updateMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
+        Flux<Exemption> exemptionFlux = exemptionFacade.updateMany(exemptionWrapper);
+
+        // Then
+        StepVerifier.create(exemptionFlux)
+                .expectNext(expectedExemptions.get(0))
+                .expectNext(expectedExemptions.get(1))
+                .expectNext(expectedExemptions.get(2))
+                .verifyComplete();
+    }
+
+    @Test
+    void updateMany_NullExemptionWrapperPassed_ThrowsException() {
+        // Given
+        ExemptionWrapper nullExemptionWrapper = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.updateMany(nullExemptionWrapper));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
+    }
 
     @Test
     void delete_NullIdPassed_ThrowsException() {

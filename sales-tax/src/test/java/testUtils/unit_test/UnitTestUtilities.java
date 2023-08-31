@@ -343,4 +343,13 @@ public class UnitTestUtilities {
         }};
     }
 
+    public static List<Exemption> createExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
+        List<Exemption> exemptionList = new ArrayList<>();
+        for (State state : exemptionWrapper.states()) {
+            exemptionList.add(exemptionWrapper.exemption().withState(state));
+        }
+
+        return exemptionList;
+    }
+
 }
