@@ -1,6 +1,6 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.v1.api_info.PostApiKeyApiInfo;
+import io.complyt.authentication.v1.api_info.PostTokenApiInfo;
 import io.complyt.authentication.v1.handlers.TokenHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ public class TokenRouter {
     public static final String BASE_URL = "/v1/token";
 
     @Bean
-    @PostApiKeyApiInfo
+    @PostTokenApiInfo
     public RouterFunction<ServerResponse> postTokenRouterFunction(@NonNull final TokenHandler tokenHandler) {
         RequestPredicate postTokenRoute = RequestPredicates
                 .POST(BASE_URL)

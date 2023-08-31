@@ -1,6 +1,5 @@
 package io.complyt.authentication.v1.routers;
 
-import io.complyt.authentication.v1.api_info.PostApiKeyApiInfo;
 import io.complyt.authentication.v1.handlers.ApiKeyHandler;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ public class ApiKeyRouter {
     public static final String BASE_URL = "/v1/api_key";
 
     @Bean
-    @PostApiKeyApiInfo
     public RouterFunction<ServerResponse> postCredentialsRouterFunction(@NonNull final ApiKeyHandler apiKeyHandler) {
         RequestPredicate postApiKeyRoute = RequestPredicates
                 .POST(BASE_URL)
