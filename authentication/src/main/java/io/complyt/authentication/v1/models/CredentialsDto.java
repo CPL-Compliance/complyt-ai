@@ -8,8 +8,16 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.With;
 
-@With
-@Schema(name = "Credentials", description = FieldsDescriptions.TOKEN)
-public record CredentialsDto(@Schema(description = FieldsDescriptions.CLIENT_ID) @NotNull(message = "clientId " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "clientId " + StringErrorMessages.MINMAX_256_ERROR) String clientId,
-                             @Schema(description = FieldsDescriptions.CLIENT_SECRET) @NotNull(message = "clientSecret " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "clientSecret " + StringErrorMessages.MINMAX_256_ERROR) String clientSecret) {
+@Schema(name = "Credentials", description = FieldsDescriptions.CREDENTIALS)
+public record CredentialsDto(@Schema(description = FieldsDescriptions.CLIENT_ID)
+                             @NotNull(message = "Credentials.clientId " + DtoErrorMessages.NOT_NULL_ERROR)
+                             @Size(min = 1, max = 256, message = "Credentials.clientId "
+                                     + StringErrorMessages.MINMAX_256_ERROR)
+                             String clientId,
+                             @Schema(description = FieldsDescriptions.CLIENT_SECRET)
+                             @NotNull(message = "Credentials.clientSecret " +
+                                     DtoErrorMessages.NOT_NULL_ERROR)
+                             @Size(min = 1, max = 256, message = "Credentials.clientSecret " +
+                                     StringErrorMessages.MINMAX_256_ERROR)
+                             String clientSecret) {
 }
