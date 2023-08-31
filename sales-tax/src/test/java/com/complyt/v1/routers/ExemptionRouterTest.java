@@ -2,6 +2,7 @@ package com.complyt.v1.routers;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.facades.ExemptionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
@@ -13,6 +14,7 @@ import com.complyt.v1.exceptions.GlobalErrorAttributes;
 import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
+import com.complyt.v1.mappers.ExemptionWrapperMapper;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.timestamps.TimestampsDto;
@@ -54,6 +56,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     Exemption exemption;
     ExemptionDto exemptionDto;
     UnitTestUtilities testUtilities;
+    ExemptionWrapper exemptionWrapper;
 
     @BeforeEach
     void setup() {
@@ -61,6 +64,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         exemptionRouter = new ExemptionRouter();
         exemptionDto = testUtilities.createExemptionDto();
         exemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(exemptionDto);
+        List<State> states = UnitTestUtilities.createStateList();
+        exemptionWrapper = new ExemptionWrapper(exemption, states);
     }
 
     @Test
@@ -899,11 +904,104 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given + When + Then
         webTestClient
                 .mutateWith(csrf())
-                .put()
+                .post()
                 .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "wrong/url").build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertMany_UpsertsMany_Returns201() {
+        // Given
+        List<Exemption> exemptionList = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+        ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
+        List<ExemptionDto> expectedExemptions = UnitTestUtilities.createExemptionsDtoListFromWrapper(exemptionWrapperDto);
+
+        // When
+        when(exemptionFacade.updateMany(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptionList));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/batch").build())
+                .bodyValue(exemptionWrapperDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBodyList(ExemptionDto.class)
+                .isEqualTo(expectedExemptions);
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertMany_EmptyMonoReturnedFromFacade_Returns404() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
+
+        // When
+        when(exemptionFacade.updateMany(exemptionWrapper)).thenReturn(Flux.empty());
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/batch").build())
+                .bodyValue(exemptionWrapperDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertMany_EmptyStatesListPassed_Returns400() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
+                (exemptionWrapper.withStates(new ArrayList<>()));
+
+        // When
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/batch").build())
+                .bodyValue(exemptionWrapperDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class).value(map -> {
+                    assertEquals("[states list cannot be empty]", map.get("message"));
+                });
+        ;
+    }
+
+    @Test
+    @Override
+    @WithMockUser
+    public void upsertMany_NullExemptionPassed_Returns400() {
+        // Given
+        ExemptionWrapperDto exemptionWrapperDto = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto
+                (exemptionWrapper.withExemption(null));
+
+        // When
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder.path(ExemptionRouter.BASE_URL + "/batch").build())
+                .bodyValue(exemptionWrapperDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class).value(map -> {
+                    assertEquals("[exemption may not be null]", map.get("message"));
+                });
     }
 
     @Test
@@ -2718,7 +2816,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
     public void upsert_NullToDateInValidationDates_Returns400ValidationError() {
         // Given
         UUID complytId = exemptionDto.complytId();
-        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto("1975-08-01",null));
+        ExemptionDto givenExemptionDto = exemptionDto.withValidationDates(new ValidationDatesDto("1975-08-01", null));
         Exemption receivedExemption = ExemptionMapper.INSTANCE.exemptionDtoToExemption(givenExemptionDto);
         ExemptionDto expectedExemption = ExemptionMapper.INSTANCE.exemptionToExemptionDto(receivedExemption);
         // When
