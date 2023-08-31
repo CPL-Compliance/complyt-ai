@@ -89,4 +89,6 @@ public interface ExemptionRouterTestTemplate extends
     void upsertMany_EmptyStatesListPassed_Returns400();
 
     void upsertMany_NullExemptionPassed_Returns400();
+
+    void upsertMany_NullHandler_ThrowsNullPointerException();
 }
