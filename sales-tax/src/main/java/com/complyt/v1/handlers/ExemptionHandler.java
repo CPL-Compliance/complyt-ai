@@ -126,4 +126,5 @@ public class ExemptionHandler {
                 .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
+
 }

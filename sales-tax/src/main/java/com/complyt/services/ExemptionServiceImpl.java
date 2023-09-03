@@ -1,7 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.exemption.ExemptionListBuilder;
+import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
@@ -30,7 +30,7 @@ public class ExemptionServiceImpl implements ExemptionService {
     private ComplytIdHandler<Exemption> complytIdHandler;
 
     @NonNull
-    private ExemptionListBuilder exemptionListBuilder;
+    private ExemptionListGenerator exemptionListGenerator;
 
     @Override
     public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
@@ -98,7 +98,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
-        return exemptionListBuilder.build(exemptionWrapper)
+        return exemptionListGenerator.build(exemptionWrapper)
                 .flatMap(this::save);
     }
 

@@ -17,9 +17,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ExemptionListBuilderTest {
+public class ExemptionListGeneratorTest {
 
-    ExemptionListBuilder exemptionListBuilder;
+    ExemptionListGenerator exemptionListGenerator;
 
     ExemptionWrapper exemptionWrapper;
 
@@ -28,7 +28,7 @@ public class ExemptionListBuilderTest {
         List<State> states = UnitTestUtilities.createStateList();
         Exemption exemption = new UnitTestUtilities(LocalDateTime.now(), null).createExemption(UUID.randomUUID().toString());
         exemptionWrapper = new ExemptionWrapper(exemption, states);
-        exemptionListBuilder = new ExemptionListBuilder();
+        exemptionListGenerator = new ExemptionListGenerator();
     }
 
 
@@ -43,7 +43,7 @@ public class ExemptionListBuilderTest {
         }});
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListBuilder.build(wrapper);
+        Flux<Exemption> exemptionFlux = exemptionListGenerator.build(wrapper);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemptions.get(0)).verifyComplete();
@@ -54,7 +54,7 @@ public class ExemptionListBuilderTest {
         // Given
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListBuilder.build(exemptionWrapper);
+        Flux<Exemption> exemptionFlux = exemptionListGenerator.build(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -70,7 +70,7 @@ public class ExemptionListBuilderTest {
         ExemptionWrapper nullExemptionWrapper = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionListBuilder.build(nullExemptionWrapper));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionListGenerator.build(nullExemptionWrapper));
 
         assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
     }

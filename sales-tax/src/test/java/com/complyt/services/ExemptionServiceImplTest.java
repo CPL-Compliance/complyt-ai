@@ -1,7 +1,7 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
-import com.complyt.business.exemption.ExemptionListBuilder;
+import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
@@ -49,7 +49,7 @@ public class ExemptionServiceImplTest {
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
     @Mock
-    ExemptionListBuilder exemptionListBuilder;
+    ExemptionListGenerator exemptionListGenerator;
 
     Transaction transaction;
     Exemption exemption;
@@ -342,7 +342,7 @@ public class ExemptionServiceImplTest {
         Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
 
         // When
-        when(exemptionListBuilder.build(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionListGenerator.build(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
 
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(1))).thenReturn(Mono.just(exemptions.get(1)));
