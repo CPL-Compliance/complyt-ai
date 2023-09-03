@@ -15,8 +15,9 @@ import java.util.List;
 @Slf4j
 public class ExemptionListGenerator {
 
-    public Flux<Exemption> build(@NonNull ExemptionWrapper exemptionWrapper) {
-        log.debug("Creating exemptions list based on: ");
+    public Flux<Exemption> generate(@NonNull ExemptionWrapper exemptionWrapper) {
+        log.debug("Creating exemptions list based on exemption: " + exemptionWrapper.exemption());
+        log.debug("With states: " + exemptionWrapper.states());
         List<Exemption> exemptionList = new ArrayList<>();
         for (State state : exemptionWrapper.states()) {
             exemptionList.add(exemptionWrapper.exemption().withState(state));

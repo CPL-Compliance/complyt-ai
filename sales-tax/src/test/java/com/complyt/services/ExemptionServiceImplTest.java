@@ -342,7 +342,7 @@ public class ExemptionServiceImplTest {
         Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
 
         // When
-        when(exemptionListGenerator.build(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
+        when(exemptionListGenerator.generate(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
 
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
         when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(1))).thenReturn(Mono.just(exemptions.get(1)));

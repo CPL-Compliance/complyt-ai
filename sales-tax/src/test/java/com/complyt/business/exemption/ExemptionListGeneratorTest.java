@@ -43,7 +43,7 @@ public class ExemptionListGeneratorTest {
         }});
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListGenerator.build(wrapper);
+        Flux<Exemption> exemptionFlux = exemptionListGenerator.generate(wrapper);
 
         // Then
         StepVerifier.create(exemptionFlux).expectNext(exemptions.get(0)).verifyComplete();
@@ -54,7 +54,7 @@ public class ExemptionListGeneratorTest {
         // Given
 
         // When
-        Flux<Exemption> exemptionFlux = exemptionListGenerator.build(exemptionWrapper);
+        Flux<Exemption> exemptionFlux = exemptionListGenerator.generate(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -70,7 +70,7 @@ public class ExemptionListGeneratorTest {
         ExemptionWrapper nullExemptionWrapper = null;
 
         // When + Then
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionListGenerator.build(nullExemptionWrapper));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionListGenerator.generate(nullExemptionWrapper));
 
         assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
     }
