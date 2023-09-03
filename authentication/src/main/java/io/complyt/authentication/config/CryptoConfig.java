@@ -14,7 +14,7 @@ import java.util.Base64;
 public class CryptoConfig {
 
     @Bean("cryptoAesCbcPkcs5Padding")
-    public Crypto cryptoAesCbcPkcs5Padding(@Value("${cryption.secret-key}") String secretKeyStr) {
+    public Crypto cryptoAesCbcPkcs5Padding(@Value("${crypto.secret-key}") String secretKeyStr) {
         SecretKey secretKey = convertStringToSecretKey(secretKeyStr);
 
         return new CryptoAesCbcPkcs5Padding(secretKey);

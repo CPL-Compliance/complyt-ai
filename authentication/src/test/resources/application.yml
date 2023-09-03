@@ -7,7 +7,7 @@ spring:
       uuid-representation: standard
 
 
-cryption:
+crypto:
   secret-key: VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug=
 
 authorization:
