@@ -82,13 +82,13 @@ public interface ExemptionRouterTestTemplate extends
 
     void upsert_NullValidationDates_Returns400ValidationError();
 
-    void upsertMultiple_UpsertsMany_Returns201();
+    void create_UpsertsMany_Returns201();
 
-    void upsertMultiple_EmptyMonoReturnedFromFacade_Returns404();
+    void create_EmptyMonoReturnedFromFacade_Returns404();
 
-    void upsertMultiple_EmptyStatesListPassed_Returns400();
+    void create_EmptyStatesListPassed_Returns400();
 
-    void upsertMultiple_NullExemptionPassed_Returns400();
+    void create_NullExemptionPassed_Returns400();
 
-    void upsertMultiple_NullHandler_ThrowsNullPointerException();
+    void create_NullHandler_ThrowsNullPointerException();
 }

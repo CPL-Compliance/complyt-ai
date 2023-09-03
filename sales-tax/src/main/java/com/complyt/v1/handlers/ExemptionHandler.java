@@ -57,20 +57,6 @@ public class ExemptionHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
     }
 
-    @ExemptionCreatePermission
-    public Mono<ServerResponse> create(ServerRequest serverRequest) {
-        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
-
-        Mono<ExemptionDto> exemptionDtoMono = ContextLogger.observeCtx(logStr, log::info).then(exemptionDtoValidationHandler.validate(serverRequest))
-                .flatMap(exemptionDto -> ContextLogger.observeCtx("--> Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
-                .map(ExemptionMapper.INSTANCE::exemptionDtoToExemption)
-                .flatMap(exemptionFacade::save)
-                .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
-                .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto));
-
-        return ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(exemptionDtoMono, ExemptionDto.class);
-    }
-
     @ExemptionUpdatePermission
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
@@ -89,13 +75,13 @@ public class ExemptionHandler {
     }
 
     @ExemptionCreatePermission
-    public Mono<ServerResponse> postMultiple(ServerRequest serverRequest) {
+    public Mono<ServerResponse> create(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         Flux<ExemptionDto> exemptionWrapperDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.validate(serverRequest))
                 .flatMapMany(exemptionWrapperDto -> {
                     ExemptionWrapper receivedExemptionWrapper = ExemptionWrapperMapper.INSTANCE.exemptionWrapperDtoToExemptionWrapper(exemptionWrapperDto);
-                    return exemptionFacade.saveMany(receivedExemptionWrapper);
+                    return exemptionFacade.save(receivedExemptionWrapper);
                 })
                 .map(ExemptionMapper.INSTANCE::exemptionToExemptionDto)
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))

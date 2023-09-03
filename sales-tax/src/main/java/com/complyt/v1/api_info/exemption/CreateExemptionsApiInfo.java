@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
                                 content = @Content(
                                         schema = @Schema(implementation = ExemptionWrapperDto.class, required = true),
                                         examples = {
-                                                @ExampleObject(value = PostMultipleExemptionsApiInfo.newExemptionWrapperExample)
+                                                @ExampleObject(value = CreateExemptionsApiInfo.newExemptionWrapperExample)
                                         })
                         ),
                         responses = {
@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = ExemptionDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = PostMultipleExemptionsApiInfo.returnedExemptionsExample)
+                                                                @ExampleObject(value = CreateExemptionsApiInfo.returnedExemptionsExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -71,7 +71,7 @@ import java.lang.annotation.Target;
                         }))
 })
 
-public @interface PostMultipleExemptionsApiInfo {
+public @interface CreateExemptionsApiInfo {
 
     String newExemptionWrapperExample = """
             {

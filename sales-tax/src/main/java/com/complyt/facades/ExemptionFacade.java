@@ -22,10 +22,6 @@ public class ExemptionFacade {
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;
 
-    public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return exemptionService.save(exemption);
-    }
-
     @Deprecated
     public Mono<Exemption> findById(@NonNull final String id) {
         return exemptionService.findById(id);
@@ -50,7 +46,8 @@ public class ExemptionFacade {
         return exemptionService.delete(complytId);
     }
 
-    public Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper) {
+    public Flux<Exemption> save(@NonNull ExemptionWrapper exemptionWrapper) {
         return exemptionService.saveMany(exemptionWrapper);
     }
+
 }

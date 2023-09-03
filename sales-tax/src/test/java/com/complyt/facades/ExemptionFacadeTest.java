@@ -50,31 +50,6 @@ public class ExemptionFacadeTest {
     }
 
     @Test
-    void save_ExemptionSaved_ExemptionReturned() {
-        // Given
-        Exemption exemptionNoId = exemption.withId(null).withComplytId(null);
-
-        // When
-        when(exemptionService.save(exemptionNoId)).thenReturn(Mono.just(exemption));
-        Mono<Exemption> exemptionMono = exemptionFacade.save(exemptionNoId);
-
-        // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
-    }
-
-    @Test
-    void save_NullExemptionPassed_ThrowsException() {
-        // Given
-        Exemption nullExemption = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.save(nullExemption));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
-    }
-
-    @Test
     void findById_FindsExemption_ReturnsExemption() {
         // Given
         String id = exemption.getId();
@@ -210,7 +185,7 @@ public class ExemptionFacadeTest {
 
         // When
         when(exemptionService.saveMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
-        Flux<Exemption> exemptionFlux = exemptionFacade.saveMany(exemptionWrapper);
+        Flux<Exemption> exemptionFlux = exemptionFacade.save(exemptionWrapper);
 
         // Then
         StepVerifier.create(exemptionFlux)
@@ -226,7 +201,7 @@ public class ExemptionFacadeTest {
         ExemptionWrapper nullExemptionWrapper = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.saveMany(nullExemptionWrapper));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.save(nullExemptionWrapper));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
