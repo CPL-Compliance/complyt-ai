@@ -13,6 +13,7 @@ import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
 import io.complyt.authentication.v1.validators.query_params.ApiKeyDtoQueryParamsExtractor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -23,9 +24,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
-import testUtils.unitTests.templates.endpoints.PostOkRouterMonoTest;
-import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
+import test_utils.unit_tests.TestUtilities;
+import test_utils.unit_tests.templates.PostOkRouterMonoTest;
+import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -210,5 +211,20 @@ class TokenRouterMonoTest implements PostOkRouterMonoTest, PostRouterTestSecurit
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatusCode.valueOf(400));
+    }
+
+    @Test
+    @WithMockUser
+    public void post_apiKeyValueIsMissing_Returns400() {
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TokenRouter.BASE_URL)
+                        .queryParam("api_key", "")
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }

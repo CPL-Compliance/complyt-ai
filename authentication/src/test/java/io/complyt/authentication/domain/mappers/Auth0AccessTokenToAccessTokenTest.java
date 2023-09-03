@@ -2,8 +2,6 @@ package io.complyt.authentication.domain.mappers;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
-import io.complyt.authentication.domain.Credentials;
-import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.TestUtilities;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 

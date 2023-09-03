@@ -1,6 +1,5 @@
 package io.complyt.authentication.repositories;
 
-import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.mockito.Mockito.when;
 

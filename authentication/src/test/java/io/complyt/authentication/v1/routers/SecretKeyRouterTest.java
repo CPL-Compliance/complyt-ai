@@ -17,8 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import testUtils.unitTests.templates.endpoints.GetRouterTestMonoTemplate;
-import testUtils.unitTests.templates.endpoints.GetRouterTestSecurityTemplate;
+import test_utils.unit_tests.templates.GetRouterTestMonoTemplate;
+import test_utils.unit_tests.templates.GetRouterTestSecurityTemplate;
 
 import javax.crypto.SecretKey;
 

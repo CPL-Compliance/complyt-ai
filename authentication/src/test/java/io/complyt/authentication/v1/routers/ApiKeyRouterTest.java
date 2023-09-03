@@ -22,9 +22,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import testUtils.TestUtilities;
-import testUtils.unitTests.templates.endpoints.PostCreatedRouterMonoTest;
-import testUtils.unitTests.templates.endpoints.PostRouterTestSecurityTemplate;
+import test_utils.unit_tests.TestUtilities;
+import test_utils.unit_tests.templates.PostCreatedRouterMonoTest;
+import test_utils.unit_tests.templates.PostRouterTestSecurityTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

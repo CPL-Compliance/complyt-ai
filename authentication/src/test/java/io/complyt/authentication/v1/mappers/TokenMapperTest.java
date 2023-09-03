@@ -2,14 +2,11 @@ package io.complyt.authentication.v1.mappers;
 
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.v1.models.TokenDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.TestUtilities;
-
-import javax.swing.text.Utilities;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

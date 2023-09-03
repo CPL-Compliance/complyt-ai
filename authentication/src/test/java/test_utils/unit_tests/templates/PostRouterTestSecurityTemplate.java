@@ -1,4 +1,4 @@
-package testUtils.unitTests.templates.endpoints;
+package test_utils.unit_tests.templates;
 
 import org.junit.jupiter.api.Test;
 
