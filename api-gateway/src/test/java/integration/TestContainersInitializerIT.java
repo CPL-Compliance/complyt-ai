@@ -36,6 +36,7 @@ public abstract class TestContainersInitializerIT {
     protected static final String SALES_TAX = "sales-tax";
     protected static final String SALES_TAX_RATES = "sales-tax-rates";
     protected static final String FILES = "files";
+    protected static final String AUTHENTICATION = "authentication";
     protected static final String API_GATEWAY = "api-gateway";
 
     // Containers
@@ -44,6 +45,7 @@ public abstract class TestContainersInitializerIT {
     protected static final GenericContainer SALES_TAX_CONTAINER;
     protected static final GenericContainer SALES_TAX_RATES_CONTAINER;
     protected static final GenericContainer FILES_CONTAINER;
+    protected static final GenericContainer AUTHENTICATION_CONTAINER;
     protected static final GenericContainer API_GATEWAY_CONTAINER;
     protected static final KeycloakContainer KEYCLOAK_CONTAINER;
 
@@ -88,6 +90,8 @@ public abstract class TestContainersInitializerIT {
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX), "/" + dumpPath(SALES_TAX), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
+        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(AUTHENTICATION), "/" + dumpPath(AUTHENTICATION), BindMode.READ_ONLY);
+
         MONGO_CONTAINER.start();
 
         // Retrieve Tokens
@@ -119,11 +123,19 @@ public abstract class TestContainersInitializerIT {
                 "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
         FILES_CONTAINER.start();
 
+        // Authentication Container
+        AUTHENTICATION_CONTAINER = initializeServiceContainer(AUTHENTICATION,
+                "java", "-Dspring.profiles.active=integration-test",
+                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
+                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
+        AUTHENTICATION_CONTAINER.start();
+
         // Restore Dump
         try {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(FILES));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX_RATES));
+            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(AUTHENTICATION));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -143,6 +155,9 @@ public abstract class TestContainersInitializerIT {
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStrategy(Wait
                                 .forHttp(TestUtilities.FILES_BASE_URL)
+                                .withHeader("Authorization", "Bearer " + TOKEN))
+                        .withStrategy(Wait
+                                .forHttp(TestUtilities.TOKEN_BASE_URL)
                                 .withHeader("Authorization", "Bearer " + TOKEN))
                         .withStartupTimeout(Duration.ofSeconds(60)));
         API_GATEWAY_CONTAINER.start();

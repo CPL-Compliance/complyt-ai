@@ -7,7 +7,10 @@ public class TestUtilities {
     public static final String SALES_TAX_TRACKING_BASE_URL = "/v1/nexus";
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String FILES_BASE_URL = "/v1/files";
+    public static final String TOKEN_BASE_URL = "/v1/token";
     public static final String NON_EXISTING_COMPLYT_ID = "11111111-1111-1111-1111-111111111111";
+    public static final String API_KEY = "e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748";
+
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
         return salesTaxTrackingJsonExample(stateName, stateAbbreviation, null, false);
