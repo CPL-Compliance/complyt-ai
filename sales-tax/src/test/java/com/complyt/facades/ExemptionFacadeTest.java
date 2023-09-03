@@ -177,7 +177,7 @@ public class ExemptionFacadeTest {
     }
 
     @Test
-    void updateMany_UpdatesExemptions_ReturnsExemptions() {
+    void save_UpdatesExemptions_ReturnsExemptions() {
         // Given
         List<State> states = UnitTestUtilities.createStateList();
         ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemption, states);
@@ -196,7 +196,7 @@ public class ExemptionFacadeTest {
     }
 
     @Test
-    void updateMany_NullExemptionWrapperPassed_ThrowsException() {
+    void save_NullExemptionWrapperPassed_ThrowsException() {
         // Given
         ExemptionWrapper nullExemptionWrapper = null;
 
