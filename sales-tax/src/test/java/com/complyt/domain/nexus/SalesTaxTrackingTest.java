@@ -40,7 +40,8 @@ class SalesTaxTrackingTest {
                 ", economicNexusTracker=" + salesTaxTracking.getEconomicNexusTracker() +
                 ", appliedDate=" + salesTaxTracking.getAppliedDate() +
                 ", approved=" + salesTaxTracking.isApproved() +
-                ", approvalDate=" + salesTaxTracking.getApprovalDate() + ")";
+                ", approvalDate=" + salesTaxTracking.getApprovalDate() +
+                ", fillingFrequency=" + salesTaxTracking.getFillingFrequency() + ")";
 
         // When
         String actualString = salesTaxTracking.toString();

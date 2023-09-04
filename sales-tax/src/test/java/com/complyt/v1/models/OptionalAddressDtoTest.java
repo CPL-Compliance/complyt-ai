@@ -1,5 +1,6 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.models.transaction.OptionalAddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

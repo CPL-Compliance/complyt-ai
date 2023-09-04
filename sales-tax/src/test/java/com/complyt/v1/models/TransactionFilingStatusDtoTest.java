@@ -1,5 +1,6 @@
 package com.complyt.v1.models;
 
+import com.complyt.v1.models.transaction.TransactionFilingStatusDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

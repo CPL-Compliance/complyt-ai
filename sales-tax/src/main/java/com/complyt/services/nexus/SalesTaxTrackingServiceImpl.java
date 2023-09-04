@@ -88,7 +88,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                         salesTaxTracking.isEnforcesSalesTax(),
                         salesTaxTracking.getPhysicalNexusTracker(), salesTaxTracking.getEconomicNexusTracker(),
                         salesTaxTracking.getAppliedDate(), salesTaxTracking.isApproved(),
-                        salesTaxTracking.getApprovalDate()
+                        salesTaxTracking.getApprovalDate(),
+                        salesTaxTracking.getFillingFrequency()
                 );
     }
 

@@ -1,4 +1,4 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.transaction;
 
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import io.swagger.v3.oas.annotations.media.Schema;

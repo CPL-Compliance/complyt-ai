@@ -22,6 +22,7 @@ public record SalesTaxTrackingDto(
         boolean enforcesSalesTax,
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
         @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
-        LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate)
+        LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate,
+        FillingFrequencyDto fillingFrequency)
         implements StateCheckable {
 }

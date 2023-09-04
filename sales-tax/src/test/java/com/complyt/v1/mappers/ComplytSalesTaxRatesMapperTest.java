@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
-import com.complyt.v1.models.ComplytSalesTaxRatesDto;
+import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

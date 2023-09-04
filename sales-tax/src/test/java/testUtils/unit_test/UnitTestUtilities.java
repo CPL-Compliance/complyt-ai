@@ -20,8 +20,10 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -288,7 +290,8 @@ public class UnitTestUtilities {
                 tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
                 new EconomicNexusTracker(false, localDateTime), localDateTime,
-                true, localDateTime);
+                true, localDateTime,
+                FillingFrequency.MONTHLY);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -297,7 +300,8 @@ public class UnitTestUtilities {
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
-                true, localDateTime);
+                true, localDateTime,
+                FillingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
     }

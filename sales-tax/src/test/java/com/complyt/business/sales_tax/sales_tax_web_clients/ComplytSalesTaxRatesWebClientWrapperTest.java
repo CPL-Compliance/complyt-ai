@@ -5,7 +5,7 @@ import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.proxies.SalesTaxRatesServiceProxy;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.ComplytSalesTaxRatesMapper;
-import com.complyt.v1.models.ComplytSalesTaxRatesDto;
+import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

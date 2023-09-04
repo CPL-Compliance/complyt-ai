@@ -1,4 +1,4 @@
-package com.complyt.v1.models.timestamps;
+package com.complyt.v1.models;
 
 import com.complyt.utils.regex.ISO8601Regex;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;

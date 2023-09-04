@@ -1,7 +1,7 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.customer.CustomerDto;

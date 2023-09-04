@@ -15,7 +15,7 @@ import com.complyt.v1.handlers.ExemptionHandler;
 import com.complyt.v1.mappers.ExemptionMapper;
 import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.*;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.mongodb.client.result.DeleteResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

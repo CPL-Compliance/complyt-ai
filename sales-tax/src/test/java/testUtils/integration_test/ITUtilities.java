@@ -1,6 +1,7 @@
 package testUtils.integration_test;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.FillingFrequency;
 import com.complyt.domain.TransactionFilingStatus;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
@@ -11,7 +12,8 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.math.BigDecimal;
@@ -42,7 +44,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
-                LocalDateTime.now(), false, LocalDateTime.now());
+                LocalDateTime.now(), false, LocalDateTime.now(), FillingFrequencyDto.MONTHLY);
     }
 
     static ItemDto stubItemDto() {

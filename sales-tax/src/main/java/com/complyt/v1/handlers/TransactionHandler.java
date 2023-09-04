@@ -7,7 +7,7 @@ import com.complyt.security.permissions.transaction.TransactionReadPermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.TransactionMapper;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

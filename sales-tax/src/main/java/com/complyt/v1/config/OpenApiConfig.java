@@ -1,9 +1,9 @@
 package com.complyt.v1.config;
 
 import com.complyt.v1.api_info.FieldsDescriptions;
-import com.complyt.v1.models.MandatoryAddressDto;
-import com.complyt.v1.models.OptionalAddressDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.OptionalAddressDto;
+import com.complyt.v1.models.TimestampsDto;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;

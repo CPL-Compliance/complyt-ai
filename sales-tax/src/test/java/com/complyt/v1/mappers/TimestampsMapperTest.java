@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;

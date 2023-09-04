@@ -1,12 +1,10 @@
 package com.complyt.v1.models;
 
-import com.complyt.domain.sales_tax.product_classification.CalculationType;
-import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
+import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

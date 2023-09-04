@@ -1,4 +1,4 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.transaction;
 
 import com.complyt.domain.TransactionFilingStatus;
 import com.complyt.v1.api_info.FieldsDescriptions;
@@ -8,7 +8,7 @@ import com.complyt.v1.models.checkables.ExternalIdCheckable;
 import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;

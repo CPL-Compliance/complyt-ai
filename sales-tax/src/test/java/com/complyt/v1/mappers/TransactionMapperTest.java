@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.Transaction;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtils.unit_test.UnitTestUtilities;
