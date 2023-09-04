@@ -15,13 +15,13 @@ public class SalesTaxWebClientWrapperConfig {
 
     @Profile({"complytTaxEngine"})
     @Bean("salesTaxWebClientWrapper")
-    public SalesTaxWebClientWrapper<ComplytSalesTaxRates> complytSalesTaxRatesClientWrapper(@Autowired SalesTaxRatesServiceProxy salesTaxRatesServiceProxy) {
+    SalesTaxWebClientWrapper<ComplytSalesTaxRates> complytSalesTaxRatesClientWrapper(@Autowired SalesTaxRatesServiceProxy salesTaxRatesServiceProxy) {
         return new ComplytSalesTaxRatesClientWrapper(salesTaxRatesServiceProxy);
     }
 
     @Profile({"complytStubTax", "default"})
     @Bean("salesTaxWebClientWrapper")
-    public SalesTaxWebClientWrapper<ComplytSalesTaxRates> stubComplytSalesTaxRatesClientWrapper() {
+    SalesTaxWebClientWrapper<ComplytSalesTaxRates> stubComplytSalesTaxRatesClientWrapper() {
         return new StubComplytSalesTaxRatesClientWrapper();
     }
 

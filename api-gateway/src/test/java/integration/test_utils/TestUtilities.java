@@ -8,8 +8,9 @@ public class TestUtilities {
     public static final String SALES_TAX_RATES_BASE_URL = "/v1/sales_tax_rates";
     public static final String FILES_BASE_URL = "/v1/files";
     public static final String TOKEN_BASE_URL = "/v1/token";
+    public static final String API_KEY_BASE_URL = "/v1/api_key";
     public static final String NON_EXISTING_COMPLYT_ID = "11111111-1111-1111-1111-111111111111";
-    public static final String API_KEY = "e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748";
+    public static final String API_KEY = "479719ff-e1f6-4dbd-9619-5c78fa41f929-0518f0fb-80d6-446b-8943-d93d8a768b33";
 
 
     public static String unvalidatedSalesTaxTrackingJsonExample(String stateName, String stateAbbreviation) {
@@ -156,5 +157,19 @@ public class TestUtilities {
                 customerId,
                 isValidated ? "\"transactionType\": \"INVOICE\"," : ""
         );
+    }
+
+    public static String getClientCredentialsJsonExample() {
+        return "{\n" +
+                "    \"clientId\": \"abc\",\n" +
+                "    \"clientSecret\": \"QWE$#@\"\n" +
+                "}";
+    }
+
+    public static String getNonExistingClientCredentialsJsonExample() {
+        return "{\n" +
+                "    \"clientId\": \"rte\",\n" +
+                "    \"clientSecret\": \"QWE$#@\"\n" +
+                "}";
     }
 }

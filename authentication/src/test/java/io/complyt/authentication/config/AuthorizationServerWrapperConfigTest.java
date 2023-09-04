@@ -1,6 +1,7 @@
 package io.complyt.authentication.config;
 
 import io.complyt.authentication.business.authorization.Auth0AuthorizationServerWrapper;
+import io.complyt.authentication.business.authorization.AuthorizationServerWrapper;
 import io.complyt.authentication.business.authorization.StubAuth0AuthorizationServerWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class AuthorizationServerWrapperConfigTest {
         WebClient webClient = WebClient.builder().build();
 
         Auth0AuthorizationServerWrapper expectedAuth0AuthorizationServerWrapper = new Auth0AuthorizationServerWrapper(webClient);
-        Auth0AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(webClient);
+        AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.auth0AuthorizationServerWrapper(webClient);
 
         assertEquals(expectedAuth0AuthorizationServerWrapper, actualAuth0AuthorizationServerWrapper);
     }
@@ -35,7 +36,7 @@ class AuthorizationServerWrapperConfigTest {
     @Test
     void authorizationServerWrapper_createStubAuth0AuthorizationServerWrapper_getStubAuth0AuthorizationServerWrapper() {
         StubAuth0AuthorizationServerWrapper expectedStubAuth0AuthorizationServerWrapper = new StubAuth0AuthorizationServerWrapper();
-        StubAuth0AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.stubAuth0AuthorizationServerWrapper();
+        AuthorizationServerWrapper actualAuth0AuthorizationServerWrapper = authorizationServerWrapperConfig.stubAuth0AuthorizationServerWrapper();
 
         assertEquals(expectedStubAuth0AuthorizationServerWrapper, actualAuth0AuthorizationServerWrapper);
     }

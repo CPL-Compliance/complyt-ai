@@ -27,6 +27,9 @@
         <module name="sales-tax" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="test-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
