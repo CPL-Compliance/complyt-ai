@@ -228,10 +228,5 @@
     <orderEntry type="library" name="Maven: org.webjars:swagger-ui:4.15.5" level="project" />
     <orderEntry type="library" name="Maven: org.webjars:webjars-locator-core:0.52" level="project" />
     <orderEntry type="library" name="Maven: io.github.classgraph:classgraph:4.8.149" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:jaxb-runtime:4.0.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:jaxb-core:4.0.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.angus:angus-activation:2.0.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jaxb:txw2:4.0.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.sun.istack:istack-commons-runtime:4.1.1" level="project" />
   </component>
 </module>

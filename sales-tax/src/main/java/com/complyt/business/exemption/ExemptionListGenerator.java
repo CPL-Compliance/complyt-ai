@@ -25,4 +25,5 @@ public class ExemptionListGenerator {
 
         return Flux.fromIterable(exemptionList);
     }
+
 }
