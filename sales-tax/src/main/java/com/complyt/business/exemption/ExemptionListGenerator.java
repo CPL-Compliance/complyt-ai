@@ -25,5 +25,4 @@ public class ExemptionListGenerator implements ListGenerator<ExemptionWrapper> {
 
         return Flux.fromIterable(exemptionList);
     }
-
 }
