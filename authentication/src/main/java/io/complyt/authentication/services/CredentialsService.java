@@ -53,7 +53,7 @@ public class CredentialsService {
                 .flatMap(credentialsRepository::save);
     }
 
-    private Credentials prepareCredentialsForSave(@NonNull Credentials credentials, ApiKey apiKey) {
+    private Credentials prepareCredentialsForSave(Credentials credentials, ApiKey apiKey) {
         EncryptedData clientIdEncryptedData;
         EncryptedData clientSecretEncryptedData;
 
@@ -72,7 +72,7 @@ public class CredentialsService {
                 clientSecretEncoded);
     }
 
-    private @NonNull Mono<Credentials> decrypt(@NonNull Credentials credentials) {
+    private @NonNull Mono<Credentials> decrypt(Credentials credentials) {
         EncryptedData encryptedClientId = new EncryptedData(credentials.getClientIdIv(), credentials.getClientId());
         EncryptedData encryptedClientSecret = new EncryptedData(credentials.getClientSecretIv(),
                 credentials.getClientSecret());
@@ -93,15 +93,15 @@ public class CredentialsService {
         return Mono.just(decryptedCreds);
     }
 
-    private static Credentials createDecryptedCredentials(@NonNull Credentials credentials, String clientId,
+    private static Credentials createDecryptedCredentials(Credentials credentials, String clientId,
                                                           String clientSecret) {
         return Credentials.builder().clientId(clientId).clientSecret(clientSecret).audience(credentials.getAudience())
                 .grantType(credentials.getGrantType()).complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret()).build();
     }
 
-    private Credentials createEncryptedCredentials(@NonNull ApiKey apiKey, @NonNull EncryptedData clientIdEncryptedData,
-                                                   @NonNull EncryptedData clientSecretEncryptedData,
+    private Credentials createEncryptedCredentials(ApiKey apiKey, EncryptedData clientIdEncryptedData,
+                                                   EncryptedData clientSecretEncryptedData,
                                                    String clientSecretEncoded) {
         return Credentials.builder().clientId(clientIdEncryptedData.cipherText())
                 .clientIdIv(clientIdEncryptedData.iv())

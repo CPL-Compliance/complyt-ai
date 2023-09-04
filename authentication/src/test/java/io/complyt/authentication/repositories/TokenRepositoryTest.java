@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -64,12 +66,34 @@ class TokenRepositoryTest {
     }
 
     @Test
-    public void save() {
+    public void save_tokenIsValid_returnsTokenFromDb() {
         // When
         when(reactiveMongoTemplate.save(token)).thenReturn(Mono.just(token));
 
         // Then
         Mono<Token> tokenMono = tokenRepository.save(token);
         StepVerifier.create(tokenMono).expectNext(token).verifyComplete();
+    }
+
+    @Test
+    void findByComplytClientId_complytClientIdIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenRepository.findByComplytClientId(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "complytClientId is marked non-null but is null");
+    }
+
+    @Test
+    void save_tokenIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            tokenRepository.save(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "token is marked non-null but is null");
     }
 }
