@@ -1,7 +1,7 @@
 package com.complyt.v1.routers;
 
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;

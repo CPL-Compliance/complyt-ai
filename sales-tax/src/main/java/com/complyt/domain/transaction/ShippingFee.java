@@ -1,5 +1,6 @@
-package com.complyt.domain;
+package com.complyt.domain.transaction;
 
+import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;

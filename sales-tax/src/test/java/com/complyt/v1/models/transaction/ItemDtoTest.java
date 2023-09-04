@@ -1,5 +1,7 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.transaction;
 
+import com.complyt.v1.models.TangibleCategoryDto;
+import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.ItemDto;
 import org.junit.jupiter.api.BeforeEach;

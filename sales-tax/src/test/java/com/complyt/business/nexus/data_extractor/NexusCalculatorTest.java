@@ -1,7 +1,7 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;

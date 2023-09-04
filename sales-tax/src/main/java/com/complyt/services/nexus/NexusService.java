@@ -2,8 +2,8 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionType;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;

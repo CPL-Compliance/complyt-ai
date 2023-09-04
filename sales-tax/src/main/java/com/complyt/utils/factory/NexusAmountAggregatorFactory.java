@@ -4,7 +4,7 @@ import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
 import com.complyt.business.nexus.data_extractor.TaxableCollectionAmountExtractor;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

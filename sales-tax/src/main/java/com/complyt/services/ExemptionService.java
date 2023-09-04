@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.services.crud.CrudService;
 import com.mongodb.client.result.DeleteResult;

@@ -1,7 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;

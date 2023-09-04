@@ -2,7 +2,7 @@ package com.complyt.business.transaction.items_amounts;
 
 import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;

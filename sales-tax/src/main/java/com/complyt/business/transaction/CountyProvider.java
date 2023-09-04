@@ -2,7 +2,7 @@ package com.complyt.business.transaction;
 
 import com.complyt.business.transaction.data_fetcher.CountyFetcher;
 import com.complyt.business.transaction.data_injector.TransactionCountyInjector;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

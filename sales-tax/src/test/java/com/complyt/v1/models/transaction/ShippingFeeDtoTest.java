@@ -1,6 +1,9 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.transaction;
 
 import com.complyt.domain.sales_tax.product_classification.CalculationType;
+import com.complyt.v1.models.JurisdictionalSalesTaxRulesDto;
+import com.complyt.v1.models.TangibleCategoryDto;
+import com.complyt.v1.models.TaxableCategoryDto;
 import com.complyt.v1.models.transaction.ShippingFeeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

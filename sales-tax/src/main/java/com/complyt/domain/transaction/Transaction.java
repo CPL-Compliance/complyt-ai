@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.domain.transaction;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.properties.ComplytIdProperty;

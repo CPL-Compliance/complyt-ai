@@ -1,4 +1,4 @@
-package com.complyt.domain;
+package com.complyt.domain.transaction;
 
 public enum TransactionType {
     SALES_ORDER,

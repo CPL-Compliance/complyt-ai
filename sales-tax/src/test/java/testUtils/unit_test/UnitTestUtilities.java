@@ -16,6 +16,7 @@ import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.domain.transaction.*;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;

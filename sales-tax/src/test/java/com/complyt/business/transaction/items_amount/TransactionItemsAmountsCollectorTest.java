@@ -4,7 +4,7 @@ import com.complyt.business.builder.CollectionBuilder;
 import com.complyt.business.transaction.items_amounts.AmountCalculator;
 import com.complyt.business.transaction.items_amounts.TransactionItemsAmountsCollector;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

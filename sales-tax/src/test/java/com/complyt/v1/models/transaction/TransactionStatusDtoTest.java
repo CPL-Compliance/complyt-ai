@@ -1,4 +1,4 @@
-package com.complyt.v1.models;
+package com.complyt.v1.models.transaction;
 
 import com.complyt.v1.models.transaction.TransactionStatusDto;
 import org.junit.jupiter.api.Test;

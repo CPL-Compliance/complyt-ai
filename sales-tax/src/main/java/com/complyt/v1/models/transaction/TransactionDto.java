@@ -1,6 +1,6 @@
 package com.complyt.v1.models.transaction;
 
-import com.complyt.domain.TransactionFilingStatus;
+import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.v1.api_info.FieldsDescriptions;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;

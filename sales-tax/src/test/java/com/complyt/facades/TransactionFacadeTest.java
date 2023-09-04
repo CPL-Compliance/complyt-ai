@@ -1,9 +1,9 @@
 package com.complyt.facades;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;

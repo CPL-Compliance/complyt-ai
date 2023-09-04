@@ -1,6 +1,6 @@
 package com.complyt.domain.customer;
 
-import com.complyt.domain.Address;
+import com.complyt.domain.transaction.Address;
 import com.complyt.domain.properties.ComplytIdProperty;
 import com.complyt.domain.timestamps.Timestamps;
 import lombok.*;

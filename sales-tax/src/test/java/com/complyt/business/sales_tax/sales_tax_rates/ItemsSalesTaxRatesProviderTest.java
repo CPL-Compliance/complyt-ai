@@ -1,7 +1,7 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;

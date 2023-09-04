@@ -1,8 +1,7 @@
 package testUtils.integration_test;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.FillingFrequency;
-import com.complyt.domain.TransactionFilingStatus;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import com.complyt.domain.sales_tax.fast_tax.FastTaxData;
