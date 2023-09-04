@@ -9,6 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test_utils.unit_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -24,5 +25,16 @@ class ApiKeyMapperTest {
         ApiKey actualApiKey = ApiKeyMapper.INSTANCE.apiKeyDtoToApiKey(apiKeyDto);
 
         assertEquals(apiKey, actualApiKey);
+    }
+
+    @Test
+    void apiKeyDtoToApiKey_apiKeyDtoIsNull_throwsNullException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            ApiKeyMapper.INSTANCE.apiKeyDtoToApiKey(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "apiKeyDto is marked non-null but is null");
     }
 }

@@ -14,6 +14,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class CryptoAesCbcPkcs5PaddingTest {
@@ -38,5 +39,27 @@ class CryptoAesCbcPkcs5PaddingTest {
 
         // Then
         assertEquals(input, decrypted);
+    }
+
+    @Test
+    void encrypt_plainTextIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            cryptoAesCbcPkcs5Padding.encrypt(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "plainText is marked non-null but is null");
+    }
+
+    @Test
+    void decrypt_encryptedDataIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            cryptoAesCbcPkcs5Padding.decrypt(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "encryptedData is marked non-null but is null");
     }
 }

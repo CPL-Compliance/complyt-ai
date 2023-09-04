@@ -14,8 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +49,28 @@ class AesSecretKeyUtilsTest {
     }
 
     @Test
+    void getKeyFromPassword_passwordIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            AesSecretKeyUtils.getKeyFromPassword(null, "salt");
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "password is marked non-null but is null");
+    }
+
+    @Test
+    void getKeyFromPassword_saltIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            AesSecretKeyUtils.getKeyFromPassword("password", null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salt is marked non-null but is null");
+    }
+
+    @Test
     void convertSecretKeyToString_validData_returnsCorrectString() {
         String secretKeyStr = "test";
 
@@ -71,5 +92,27 @@ class AesSecretKeyUtilsTest {
 
         // Then
         assertEquals(Arrays.equals(actualSecretKey.getEncoded(), expectedSecretKey), true);
+    }
+
+    @Test
+    void convertSecretKeyToString_secretKeyIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            AesSecretKeyUtils.convertSecretKeyToString(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "secretKey is marked non-null but is null");
+    }
+
+    @Test
+    void convertStringToSecretKey_encodedKeyIsNull_throwsNullPointerException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            AesSecretKeyUtils.convertStringToSecretKey(null);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "encodedKey is marked non-null but is null");
     }
 }
