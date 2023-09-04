@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class ExemptionListGenerator {
+public class ExemptionListGenerator implements ListGenerator<ExemptionWrapper> {
 
     public Flux<Exemption> generate(@NonNull ExemptionWrapper exemptionWrapper) {
         log.debug("Creating exemptions list based on exemption: " + exemptionWrapper.exemption());
