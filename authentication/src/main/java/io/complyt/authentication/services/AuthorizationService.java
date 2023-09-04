@@ -5,6 +5,7 @@ import io.complyt.authentication.business.authorization.AuthorizationServerWrapp
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthorizationService {
     @NonNull

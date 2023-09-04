@@ -9,6 +9,31 @@
   ],
   "clients": [
     {
+      "clientId": "complyt-admin",
+      "name": "complyt-admin",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "tenant_id",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "create:api_key",
+        "create:secret_key"
+      ]
+    },
+    {
       "clientId": "test-client",
       "name": "test-client",
       "clientAuthenticatorType": "client-secret",
@@ -153,11 +178,32 @@
       "protocol": "openid-connect"
     },
     {
+      "name": "create:api_key",
+      "protocol": "openid-connect"
+    },
+    {
+      "name": "create:secret_key",
+      "protocol": "openid-connect"
+    },
+    {
       "name": "dummy:dummy",
       "protocol": "openid-connect"
     }
   ],
   "users": [
+    {
+      "username": "complyt-admin-test-user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password"
+        }
+      ],
+      "attributes": {
+        "tenant_id": "it_tenant"
+      }
+    },
     {
       "username": "test-user",
       "enabled": true,

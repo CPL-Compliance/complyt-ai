@@ -106,6 +106,8 @@ public class SecurityConfig {
     @Profile({"integration-test"})
     @Bean
     public SecurityWebFilterChain integrationTestFilterChain(ServerHttpSecurity http) {
+        http.csrf().disable();
+
         // Authentication and Authorization
         http.authorizeExchange()
                 .pathMatchers("/actuator/health").permitAll()
