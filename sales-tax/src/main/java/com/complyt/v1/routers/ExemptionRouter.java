@@ -34,7 +34,6 @@ public class ExemptionRouter {
     }
 
     @Bean
-    @PostExemptionApiInfo
     public RouterFunction<ServerResponse> postExemptionRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
         RequestPredicate postExemptionRoute = RequestPredicates
                 .POST(BASE_URL)
@@ -62,4 +61,15 @@ public class ExemptionRouter {
 
         return RouterFunctions.route(deleteExemptionRoute, exemptionHandler::delete);
     }
+
+    @Bean
+    @CreateExemptionsApiInfo
+    public RouterFunction<ServerResponse> createRouterFunction(@NonNull final ExemptionHandler exemptionHandler) {
+        RequestPredicate createExemptionRoute = RequestPredicates
+                .POST(BASE_URL)
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(createExemptionRoute, exemptionHandler::create);
+    }
+
 }

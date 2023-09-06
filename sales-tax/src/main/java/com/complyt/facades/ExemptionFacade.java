@@ -1,6 +1,7 @@
 package com.complyt.facades;
 
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.services.ExemptionService;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.mongodb.client.result.DeleteResult;
@@ -20,12 +21,6 @@ public class ExemptionFacade {
     @NonNull
     @Qualifier("exemptionServiceImpl")
     private ExemptionService exemptionService;
-
-    public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return exemptionService.checkExemptionNotHavingComplytId(exemption)
-                .flatMap(exemptionService::injectDataToNewExemption)
-                .flatMap(exemptionService::save);
-    }
 
     @Deprecated
     public Mono<Exemption> findById(@NonNull final String id) {
@@ -50,4 +45,9 @@ public class ExemptionFacade {
     public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
         return exemptionService.delete(complytId);
     }
+
+    public Flux<Exemption> save(@NonNull ExemptionWrapper exemptionWrapper) {
+        return exemptionService.saveMany(exemptionWrapper);
+    }
+
 }

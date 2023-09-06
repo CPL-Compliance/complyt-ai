@@ -20,8 +20,9 @@ public class TaxableItemsAmountCalculator implements AmountCalculator<List<Taxab
             amount = item.getTaxableCategory() == TaxableCategory.TAXABLE ?
                     amount.add(item.getTotalPrice()) : amount;
         }
-        log.debug("Total Taxable items price calculated : " + amount);
+        log.debug("Total Taxable items price calculated: " + amount);
 
         return amount;
     }
+
 }

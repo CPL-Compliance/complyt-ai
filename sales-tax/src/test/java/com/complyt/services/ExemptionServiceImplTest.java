@@ -1,11 +1,13 @@
 package com.complyt.services;
 
 import com.complyt.business.complyt_id.ComplytIdHandler;
+import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.domain.State;
 import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
@@ -46,6 +48,9 @@ public class ExemptionServiceImplTest {
     @Mock
     ComplytIdHandler<Exemption> exemptionComplytIdHandler;
 
+    @Mock
+    ExemptionListGenerator exemptionListGenerator;
+
     Transaction transaction;
     Exemption exemption;
     Customer customer;
@@ -64,9 +69,13 @@ public class ExemptionServiceImplTest {
     void save_SavesExemption_ReturnsExemption() {
         // Given
         Exemption exemptionNoId = exemption.withId(null);
+        Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemption)).thenReturn(exemptionWithNewComplytId);
+        Exemption exemptionWithIdAndComplytId = exemptionWithNewComplytId.withId(exemption.getId());
 
         // When
-        when(exemptionRepository.save(exemptionNoId)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemptionWithIdAndComplytId));
         Mono<Exemption> exemptionMono = exemptionService.save(exemptionNoId);
 
         // Then
@@ -137,7 +146,7 @@ public class ExemptionServiceImplTest {
         Exemption partialExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(partialExemption));
+        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(partialExemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
@@ -149,7 +158,7 @@ public class ExemptionServiceImplTest {
         // Given
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
@@ -166,7 +175,7 @@ public class ExemptionServiceImplTest {
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.findByCustomerAndState(transactionWithDateLaterThanExemptionDate.getCustomerId(), transactionWithDateLaterThanExemptionDate.getShippingAddress().state())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
 
         // Then
@@ -183,7 +192,7 @@ public class ExemptionServiceImplTest {
                 .withExternalTimestamps(new Timestamps(createdDate, updatedDate));
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transactionWithDateLaterThanExemptionDate)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.findByCustomerAndState(transactionWithDateLaterThanExemptionDate.getCustomerId(), transactionWithDateLaterThanExemptionDate.getShippingAddress().state())).thenReturn(Mono.just(exemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transactionWithDateLaterThanExemptionDate);
 
         // Then
@@ -196,7 +205,7 @@ public class ExemptionServiceImplTest {
         Exemption exemptionWithPartiallyType = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When
-        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(exemptionWithPartiallyType));
+        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(exemptionWithPartiallyType));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         // Then
@@ -316,6 +325,47 @@ public class ExemptionServiceImplTest {
         StepVerifier.create(exemptionMono).expectNext(exemption.withComplytId(complytId)).verifyComplete();
     }
 
+    @Test
+    void saveMany_Saves3Exemptions_ReturnsExemptions() {
+        // Given
+        List<State> states = UnitTestUtilities.createStateList();
+        Exemption exemptionNoIds = exemption.withComplytId(null).withId(null);
+        ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemptionNoIds, states);
+        List<Exemption> exemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+
+        Exemption firstExemptionWithComplytId = exemptions.get(0).withComplytId(UUID.randomUUID());
+        Exemption secondExemptionWithComplytId = exemptions.get(1).withComplytId(UUID.randomUUID());
+        Exemption thirdExemptionWithComplytId = exemptions.get(2).withComplytId(UUID.randomUUID());
+
+        Exemption firstExemptionWithIds = firstExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption secondExemptionWithIds = secondExemptionWithComplytId.withId(UUID.randomUUID().toString());
+        Exemption thirdExemptionWithIds = thirdExemptionWithComplytId.withId(UUID.randomUUID().toString());
+
+        // When
+        when(exemptionListGenerator.generate(exemptionWrapper)).thenReturn(Flux.fromIterable(exemptions));
+
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(0))).thenReturn(Mono.just(exemptions.get(0)));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(1))).thenReturn(Mono.just(exemptions.get(1)));
+        when(exemptionComplytIdHandler.checkNewDontHaveComplytId(exemptions.get(2))).thenReturn(Mono.just(exemptions.get(2)));
+
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(0))).thenReturn(firstExemptionWithComplytId);
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(1))).thenReturn(secondExemptionWithComplytId);
+        when(exemptionComplytIdHandler.insertComplytIdToNew(exemptions.get(2))).thenReturn(thirdExemptionWithComplytId);
+
+        when(exemptionRepository.save(firstExemptionWithComplytId)).thenReturn(Mono.just(firstExemptionWithIds));
+        when(exemptionRepository.save(secondExemptionWithComplytId)).thenReturn(Mono.just(secondExemptionWithIds));
+        when(exemptionRepository.save(thirdExemptionWithComplytId)).thenReturn(Mono.just(thirdExemptionWithIds));
+
+        Flux<Exemption> exemptionFlux = exemptionService.saveMany(exemptionWrapper);
+
+        // Then
+        StepVerifier.create(exemptionFlux)
+                .expectNext(firstExemptionWithIds)
+                .expectNext(secondExemptionWithIds)
+                .expectNext(thirdExemptionWithIds)
+                .verifyComplete();
+
+    }
 
     @Test
     void delete_NullIdPassed_ThrowsException() {
@@ -335,7 +385,7 @@ public class ExemptionServiceImplTest {
         Exemption partiallyExemption = exemption.withExemptionType(ExemptionType.PARTIALLY);
 
         // When + Then
-        when(exemptionRepository.findByClientCustomerAndState(transaction)).thenReturn(Mono.just(partiallyExemption));
+        when(exemptionRepository.findByCustomerAndState(transaction.getCustomerId(), transaction.getShippingAddress().state())).thenReturn(Mono.just(partiallyExemption));
         Mono<Boolean> isFullyExemptedMono = exemptionService.isFullyExempted(transaction);
 
         StepVerifier.create(isFullyExemptedMono).expectNext(false).verifyComplete();
@@ -490,5 +540,17 @@ public class ExemptionServiceImplTest {
         });
 
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
+    }
+
+    @Test
+    void saveMany_NullExemptionWrapperPassed_ThrowsException() {
+        // Given
+        ExemptionWrapper nullExemptionWrapper = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.saveMany(nullExemptionWrapper));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
     }
 }
