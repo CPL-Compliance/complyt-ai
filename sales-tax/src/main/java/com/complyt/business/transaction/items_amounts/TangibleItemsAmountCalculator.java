@@ -20,7 +20,7 @@ public class TangibleItemsAmountCalculator implements AmountCalculator<List<Taxa
             amount = item.getTangibleCategory() == TangibleCategory.TANGIBLE ?
                     amount.add(item.getTotalPrice()) : amount;
         }
-        log.debug("Total Tangible items price calculated : " + amount);
+        log.debug("Total Tangible items price calculated: " + amount);
 
         return amount;
     }

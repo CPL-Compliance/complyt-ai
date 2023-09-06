@@ -1,6 +1,5 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -28,12 +28,13 @@ public class ExemptionRepository {
     @NonNull
     private TenantResolver tenantResolver;
 
-    public Mono<Exemption> findByClientCustomerAndState(@NonNull final Transaction transaction) {
+    public Mono<Exemption> findByCustomerAndState(@NonNull UUID customerId, @NonNull String state) {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
-                            .and("customerId").is(transaction.getCustomerId())
-                            .and("state.abbreviation").is(transaction.getShippingAddress().state()));
+                            .and("customerId").is(customerId)
+                            .and("state.abbreviation").is(state)
+                            .orOperator(Criteria.where("state.name").is(state)));
 
                     return ContextLogger.observeCtx("Searching for exemption by query: " + query, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));
@@ -92,4 +93,5 @@ public class ExemptionRepository {
                             .then(reactiveMongoTemplate.remove(query, Exemption.class));
                 });
     }
+
 }

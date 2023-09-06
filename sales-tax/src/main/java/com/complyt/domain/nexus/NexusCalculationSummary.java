@@ -16,4 +16,5 @@ public class NexusCalculationSummary {
     public final BigDecimal getAmount() {
         return amount != null ? amount : BigDecimal.ZERO;
     }
+
 }
