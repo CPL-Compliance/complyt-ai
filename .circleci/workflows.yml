@@ -256,6 +256,9 @@ workflows:
       - package-dependency:
           name: package-files
           service_directory: "files"
+      - package-dependency:
+          name: package-authentication
+          service_directory: "authentication"
 
       - verify:
           filters:
@@ -267,6 +270,7 @@ workflows:
             - package-sales-tax-rates
             - package-discovery-service
             - package-files
+            - package-authentication
           service_directory: "api-gateway"
 
       - release:
@@ -275,6 +279,7 @@ workflows:
             - package-sales-tax-rates
             - package-discovery-service
             - package-files
+            - package-authentication
           filters:
             branches:
               only:
