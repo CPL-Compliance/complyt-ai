@@ -2,12 +2,9 @@ package integration.services.authentication;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 
 public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     @Test
