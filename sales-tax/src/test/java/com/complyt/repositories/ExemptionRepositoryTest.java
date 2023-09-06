@@ -57,11 +57,9 @@ public class ExemptionRepositoryTest {
     @Test
     void findByClientCustomerAndState_FindsExemption_ReturnsExemption() {
         // Given
-        Query query = Query.query(Criteria
-                .where("tenantId").is(transaction.getTenantId())
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
                 .and("customerId").is(transaction.getCustomerId())
-                .and("state.abbreviation").is(transaction.getShippingAddress().state())
-                .orOperator(Criteria.where("state.name").is(transaction.getShippingAddress().state())));
+                .and("state.abbreviation").is(transaction.getShippingAddress().state()));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -101,11 +99,9 @@ public class ExemptionRepositoryTest {
     @Test
     void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
-        Query query = Query.query(Criteria
-                .where("tenantId").is(transaction.getTenantId())
+        Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
                 .and("customerId").is(transaction.getCustomerId())
-                .and("state.abbreviation").is(transaction.getShippingAddress().state())
-                .orOperator(Criteria.where("state.name").is(transaction.getShippingAddress().state())));
+                .and("state.abbreviation").is(transaction.getShippingAddress().state()));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
