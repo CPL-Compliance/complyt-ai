@@ -326,7 +326,7 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void updateMany_UpdatesMany_ReturnsExemptions() {
+    void saveMany_Saves3Exemptions_ReturnsExemptions() {
         // Given
         List<State> states = UnitTestUtilities.createStateList();
         Exemption exemptionNoIds = exemption.withComplytId(null).withId(null);
@@ -543,7 +543,7 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void updateMany_NullExemptionWrapperPassed_ThrowsException() {
+    void saveMany_NullExemptionWrapperPassed_ThrowsException() {
         // Given
         ExemptionWrapper nullExemptionWrapper = null;
 

@@ -78,7 +78,7 @@ public class ExemptionHandler {
     public Mono<ServerResponse> create(ServerRequest serverRequest) {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        Flux<ExemptionDto> exemptionWrapperDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.validate(serverRequest))
+        Flux<ExemptionDto> exemptionDtoFlux = ContextLogger.observeCtx(logStr, log::info).then(exemptionWrapperDtoValidationHandler.validate(serverRequest))
                 .flatMapMany(exemptionWrapperDto -> {
                     ExemptionWrapper receivedExemptionWrapper = ExemptionWrapperMapper.INSTANCE.exemptionWrapperDtoToExemptionWrapper(exemptionWrapperDto);
                     return exemptionFacade.save(receivedExemptionWrapper);
@@ -87,7 +87,7 @@ public class ExemptionHandler {
                 .flatMap(exemptionDto -> ContextLogger.observeCtx("<-- Returned Body: " + exemptionDto, log::info).thenReturn(exemptionDto))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
 
-        return ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(exemptionWrapperDtoFlux, ExemptionDto.class);
+        return ServerResponse.created(serverRequest.uri()).contentType(MediaType.APPLICATION_JSON).body(exemptionDtoFlux, ExemptionDto.class);
     }
 
     @ExemptionReadPermission
