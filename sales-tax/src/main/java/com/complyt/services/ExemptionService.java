@@ -2,9 +2,11 @@ package com.complyt.services;
 
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.services.crud.CrudService;
 import com.mongodb.client.result.DeleteResult;
 import lombok.NonNull;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -25,4 +27,6 @@ public interface ExemptionService extends CrudService<Exemption, String> {
     Mono<Exemption> checkComplytIdOfModifiedEqualsToOriginal(@NonNull final Exemption modifiedExemption, @NonNull final Exemption originalExemption);
 
     Mono<Exemption> checkExemptionNotHavingComplytId(@NonNull final Exemption newExemption);
+
+    Flux<Exemption> saveMany(@NonNull ExemptionWrapper exemptionWrapper);
 }

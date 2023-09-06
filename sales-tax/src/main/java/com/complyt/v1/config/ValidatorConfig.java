@@ -6,6 +6,7 @@ import com.complyt.v1.models.checkables.ComplytIdCheckable;
 import com.complyt.v1.models.checkables.StateCheckable;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
+import com.complyt.v1.models.customer.exemption.ExemptionWrapperDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
 import com.complyt.v1.validators.ValidationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,13 @@ public class ValidatorConfig {
         return new ValidationHandler<>(SalesTaxTrackingDto.class, springValidatorAdapter,
                 new DataConflictChecksProvider(Map.of(
                         "state", StateCheckable.STATE_CONFLICT_CHECK),
+                        null));
+    }
+
+    @Bean
+    ValidationHandler<ExemptionWrapperDto, SpringValidatorAdapter> exemptionWrapperDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter) {
+        return new ValidationHandler<>(ExemptionWrapperDto.class, springValidatorAdapter,
+                new DataConflictChecksProvider(Map.of(),
                         null));
     }
 }

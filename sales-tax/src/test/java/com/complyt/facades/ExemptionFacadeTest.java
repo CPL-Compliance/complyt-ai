@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.services.ExemptionServiceImpl;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 public class ExemptionFacadeTest {
 
@@ -45,34 +44,6 @@ public class ExemptionFacadeTest {
     void setUp() {
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         exemption = testUtilities.createExemption(UUID.randomUUID().toString());
-    }
-
-    @Test
-    void save_ExemptionSaved_ExemptionReturned() {
-        // Given
-        Exemption exemptionNoId = exemption.withId(null).withComplytId(null);
-        Exemption exemptionWithNewComplytId = exemptionNoId.withComplytId(exemption.getComplytId());
-
-        // When
-        when(exemptionService.checkExemptionNotHavingComplytId(exemptionNoId)).thenReturn(Mono.just(exemption));
-        when(exemptionService.injectDataToNewExemption(exemption)).thenReturn(Mono.just(exemptionWithNewComplytId));
-        when(exemptionService.save(exemptionWithNewComplytId)).thenReturn(Mono.just(exemption));
-        Mono<Exemption> exemptionMono = exemptionFacade.save(exemptionNoId);
-
-        // Then
-        StepVerifier.create(exemptionMono).expectNext(exemption).verifyComplete();
-    }
-
-    @Test
-    void save_NullExemptionPassed_ThrowsException() {
-        // Given
-        Exemption nullExemption = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.save(nullExemption));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "exemption is marked non-null but is null");
     }
 
     @Test
@@ -202,6 +173,36 @@ public class ExemptionFacadeTest {
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
     }
 
+    @Test
+    void save_UpdatesExemptions_ReturnsExemptions() {
+        // Given
+        List<State> states = UnitTestUtilities.createStateList();
+        ExemptionWrapper exemptionWrapper = new ExemptionWrapper(exemption, states);
+        List<Exemption> expectedExemptions = UnitTestUtilities.createExemptionsListFromWrapper(exemptionWrapper);
+
+        // When
+        when(exemptionService.saveMany(exemptionWrapper)).thenReturn(Flux.fromIterable(expectedExemptions));
+        Flux<Exemption> exemptionFlux = exemptionFacade.save(exemptionWrapper);
+
+        // Then
+        StepVerifier.create(exemptionFlux)
+                .expectNext(expectedExemptions.get(0))
+                .expectNext(expectedExemptions.get(1))
+                .expectNext(expectedExemptions.get(2))
+                .verifyComplete();
+    }
+
+    @Test
+    void save_NullExemptionWrapperPassed_ThrowsException() {
+        // Given
+        ExemptionWrapper nullExemptionWrapper = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.save(nullExemptionWrapper));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "exemptionWrapper is marked non-null but is null");
+    }
 
     @Test
     void delete_NullIdPassed_ThrowsException() {

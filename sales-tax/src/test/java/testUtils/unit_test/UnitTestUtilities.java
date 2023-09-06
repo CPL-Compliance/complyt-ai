@@ -340,4 +340,38 @@ public class UnitTestUtilities {
         return matcher.matches();
     }
 
+    public static List<State> createStateList() {
+        return new ArrayList<>() {{
+            add(new State("California", "04", "CA"));
+            add(new State("New York", "05", "NY"));
+            add(new State("Arizona", "06", "AZ"));
+        }};
+    }
+
+    public static List<StateDto> createStateListDto() {
+        return new ArrayList<>() {{
+            add(new StateDto("California", "04", "CA"));
+            add(new StateDto("New York", "05", "NY"));
+            add(new StateDto("Arizona", "06", "AZ"));
+        }};
+    }
+
+    public static List<Exemption> createExemptionsListFromWrapper(ExemptionWrapper exemptionWrapper) {
+        List<Exemption> exemptionList = new ArrayList<>();
+        for (State state : exemptionWrapper.states()) {
+            exemptionList.add(exemptionWrapper.exemption().withState(state));
+        }
+
+        return exemptionList;
+    }
+
+    public static List<ExemptionDto> createExemptionsDtoListFromWrapper(ExemptionWrapperDto exemptionWrapper) {
+        List<ExemptionDto> exemptionList = new ArrayList<>();
+        for (StateDto state : exemptionWrapper.states()) {
+            exemptionList.add(exemptionWrapper.exemption().withState(state));
+        }
+
+        return exemptionList;
+    }
+
 }

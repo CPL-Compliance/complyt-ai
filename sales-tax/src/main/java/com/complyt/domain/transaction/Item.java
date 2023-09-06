@@ -29,7 +29,7 @@ public class Item implements Taxable {
     private TaxableCategory taxableCategory;
 
     @Override
-    public final BigDecimal getTotalPrice() {
+    public final BigDecimal getTotalPrice(){
         return totalPrice != null ? totalPrice : BigDecimal.ZERO;
     }
 
