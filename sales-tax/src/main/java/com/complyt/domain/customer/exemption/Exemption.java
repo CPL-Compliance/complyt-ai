@@ -30,4 +30,5 @@ public class Exemption implements ComplytIdProperty {
     private final Status status;
     private final Certificate certificate;
     private final ExemptionType exemptionType;
+    private final ExemptionStatus exemptionStatus;
 }

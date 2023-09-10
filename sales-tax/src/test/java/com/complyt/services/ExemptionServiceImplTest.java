@@ -220,7 +220,7 @@ public class ExemptionServiceImplTest {
 
         // When
         when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+        Mono<DeleteResult> deleteResultMono = exemptionService.markAsCancelled(id);
 
         // Then
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
@@ -234,7 +234,7 @@ public class ExemptionServiceImplTest {
 
         // When
         when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+        Mono<DeleteResult> deleteResultMono = exemptionService.markAsCancelled(id);
 
         // Then
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
@@ -373,7 +373,7 @@ public class ExemptionServiceImplTest {
         UUID nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.delete(nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.markAsCancelled(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");

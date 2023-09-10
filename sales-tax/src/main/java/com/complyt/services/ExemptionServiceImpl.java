@@ -3,9 +3,11 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
+import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
@@ -77,8 +79,11 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
-        return exemptionRepository.delete(complytId);
+    public Mono<Exemption> markAsCancelled(@NonNull final UUID complytId) {
+        return exemptionRepository
+                .findByComplytId(complytId)
+                .map(exemption -> exemption.withExemptionStatus(ExemptionStatus.CANCELLED))
+                .flatMap(exemptionRepository::save);
     }
 
     @Override

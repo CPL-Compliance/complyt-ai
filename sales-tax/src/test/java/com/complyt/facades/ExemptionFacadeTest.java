@@ -152,8 +152,8 @@ public class ExemptionFacadeTest {
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
-        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+        when(exemptionService.markAsCancelled(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionFacade.markAsCancelled(id);
 
         // Then
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
@@ -166,8 +166,8 @@ public class ExemptionFacadeTest {
         DeleteResult deleteResult = DeleteResult.acknowledged(0);
 
         // When
-        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+        when(exemptionService.markAsCancelled(id)).thenReturn(Mono.just(deleteResult));
+        Mono<DeleteResult> deleteResultMono = exemptionFacade.markAsCancelled(id);
 
         // Then
         StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
@@ -210,7 +210,7 @@ public class ExemptionFacadeTest {
         UUID nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.delete(nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.markAsCancelled(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");

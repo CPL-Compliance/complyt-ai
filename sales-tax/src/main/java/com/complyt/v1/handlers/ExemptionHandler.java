@@ -107,7 +107,7 @@ public class ExemptionHandler {
         UUID complytId = UUID.fromString(serverRequest.pathVariable("complytId"));
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
-        return ContextLogger.observeCtx(logStr, log::info).then(exemptionFacade.delete(complytId))
+        return ContextLogger.observeCtx(logStr, log::info).then(exemptionFacade.markAsCancelled(complytId))
                 .flatMap(deleteResult -> ServerResponse.noContent().build())
                 .flatMap(serverResponse -> ContextLogger.observeCtx("<-- No Content: Status code " + serverResponse.statusCode(), log::info).thenReturn(serverResponse))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));

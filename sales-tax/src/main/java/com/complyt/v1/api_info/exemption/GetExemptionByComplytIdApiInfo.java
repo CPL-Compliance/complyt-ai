@@ -103,7 +103,9 @@ public @interface GetExemptionByComplytIdApiInfo {
                          "url": "url",
                          "name": "name"
                      },
-                     "exemptionType": "FULLY"
+                     "exemptionType": "FULLY",
+                     "exemptionStatus": "ACTIVE"
+                     
                  }
             """;
 }

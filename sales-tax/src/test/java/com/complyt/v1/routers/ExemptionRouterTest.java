@@ -19,7 +19,6 @@ import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.TimestampsDto;
 import com.mongodb.client.result.DeleteResult;
-import org.javatuples.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -644,7 +643,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.just(deleteResult));
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.just(deleteResult));
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -664,7 +663,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.empty());
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -744,7 +743,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.empty());
 
         // Then
         webTestClient.mutateWith(csrf())
