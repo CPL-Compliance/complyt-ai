@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {TimestampsMapper.class, ValidationDatesMapper.class})
+@Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL, uses = {ExemptionMapper.class})
 public interface ExemptionWrapperMapper {
     ExemptionWrapperMapper INSTANCE = Mappers.getMapper(ExemptionWrapperMapper.class);
 
