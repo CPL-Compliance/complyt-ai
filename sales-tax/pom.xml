@@ -11,12 +11,12 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:Complyt/complyt.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>sales-tax-0.22.0</tag>
   </scm>
 
     <!-- Maven Coordinates -->
     <artifactId>sales-tax</artifactId>
-    <version>0.22.0-SNAPSHOT</version>
+    <version>0.22.0</version>
     <!-- Maven Coordinates -->
 
     <name>sales-tax</name>
