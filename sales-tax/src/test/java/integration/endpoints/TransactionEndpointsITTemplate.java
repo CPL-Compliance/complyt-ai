@@ -18,4 +18,8 @@ public interface TransactionEndpointsITTemplate extends
 
     void upsertByExternalIdAndSource_ExistsAndSaleTaxTrackingDoesntExists_Returns500();
 
+    void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction();
+
+    void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction();
+
 }

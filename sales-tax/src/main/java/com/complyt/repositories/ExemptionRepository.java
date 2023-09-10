@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -32,8 +31,10 @@ public class ExemptionRepository {
         return tenantResolver.resolve()
                 .flatMap(tenantId -> {
                     Query query = Query.query(Criteria.where("tenantId").is(tenantId)
-                            .and("customerId").is(customerId)
-                            .and("state.abbreviation").is(state));
+                                    .and("customerId").is(customerId))
+                            .addCriteria(new Criteria().orOperator(
+                                    Criteria.where("state.abbreviation").is(state),
+                                    Criteria.where("state.name").is(state)));
 
                     return ContextLogger.observeCtx("Searching for exemption by query: " + query, log::info)
                             .then(reactiveMongoTemplate.findOne(query, Exemption.class));

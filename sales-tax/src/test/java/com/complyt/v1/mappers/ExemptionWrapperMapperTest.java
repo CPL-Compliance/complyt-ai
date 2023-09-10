@@ -37,7 +37,6 @@ public class ExemptionWrapperMapperTest {
 
     @Test
     void ExemptionWrapperToExemptionWrapperDto_ExemptionWrapper_returnExemptionWrapperDto() {
-
         // Given + When
         ExemptionWrapperDto exemptionWrapperDtoResult = ExemptionWrapperMapper.INSTANCE.exemptionWrapperToExemptionWrapperDto(exemptionWrapper);
 
