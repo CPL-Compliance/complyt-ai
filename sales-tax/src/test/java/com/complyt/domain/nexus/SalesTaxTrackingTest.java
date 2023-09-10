@@ -41,7 +41,7 @@ class SalesTaxTrackingTest {
                 ", appliedDate=" + salesTaxTracking.getAppliedDate() +
                 ", approved=" + salesTaxTracking.isApproved() +
                 ", approvalDate=" + salesTaxTracking.getApprovalDate() +
-                ", fillingFrequency=" + salesTaxTracking.getFillingFrequency() + ")";
+                ", filingFrequency=" + salesTaxTracking.getFilingFrequency() + ")";
 
         // When
         String actualString = salesTaxTracking.toString();

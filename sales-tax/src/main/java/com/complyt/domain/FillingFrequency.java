@@ -1,6 +1,6 @@
 package com.complyt.domain;
 
-public enum FillingFrequency {
+public enum FilingFrequency {
     MONTHLY,
     QUARTERLY,
     ANNUALLY

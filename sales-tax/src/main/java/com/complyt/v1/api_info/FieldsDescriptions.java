@@ -81,6 +81,6 @@ public interface FieldsDescriptions {
 
     // In salesTaxTracking
 
-    String FILLING_FREQUENCY = "Tracks the filling frequency determined by the state";
+    String FILING_FREQUENCY = "Tracks the filing frequency determined by the state";
 
 }

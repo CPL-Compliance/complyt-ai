@@ -82,7 +82,7 @@ public @interface GetAllSalesTaxtrackingApiInfo {
                  "appliedDate": "2015-08-02T16:12:00",
                  "approved": true,
                  "approvalDate": "2015-06-22T13:57:00",
-                 "fillingFrequency": "MONTHLY"
+                 "filingFrequency": "MONTHLY"
              }]
             """;
 }

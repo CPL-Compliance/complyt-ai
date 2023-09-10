@@ -292,7 +292,7 @@ public class UnitTestUtilities {
                 new PhysicalNexusTracker(false, localDateTime),
                 new EconomicNexusTracker(false, localDateTime), localDateTime,
                 true, localDateTime,
-                FillingFrequency.MONTHLY);
+                FilingFrequency.MONTHLY);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -302,7 +302,7 @@ public class UnitTestUtilities {
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
                 true, localDateTime,
-                FillingFrequencyDto.MONTHLY);
+                FilingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
     }

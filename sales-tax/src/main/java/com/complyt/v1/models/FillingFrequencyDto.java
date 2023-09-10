@@ -1,6 +1,6 @@
 package com.complyt.v1.models;
 
-public enum FillingFrequencyDto {
+public enum FilingFrequencyDto {
     MONTHLY,
     QUARTERLY,
     ANNUALLY

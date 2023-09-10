@@ -23,6 +23,6 @@ public record SalesTaxTrackingDto(
         @Valid @NotNull(message = "physicalNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) PhysicalNexusTrackerDto physicalNexusTracker,
         @Valid @NotNull(message = "economicNexusTracker " + DtoErrorMessages.NOT_NULL_ERROR) EconomicNexusTrackerDto economicNexusTracker,
         LocalDateTime appliedDate, boolean approved, LocalDateTime approvalDate,
-        @Schema(description = FieldsDescriptions.FILLING_FREQUENCY) FillingFrequencyDto fillingFrequency)
+        @Schema(description = FieldsDescriptions.FILING_FREQUENCY) FilingFrequencyDto filingFrequency)
         implements StateCheckable {
 }

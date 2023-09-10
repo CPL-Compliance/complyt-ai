@@ -43,7 +43,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
-                LocalDateTime.now(), false, LocalDateTime.now(), FillingFrequencyDto.MONTHLY);
+                LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
     static ItemDto stubItemDto() {

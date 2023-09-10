@@ -1,6 +1,6 @@
 package com.complyt.domain.nexus;
 
-import com.complyt.domain.FillingFrequency;
+import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
 import lombok.*;
@@ -31,5 +31,5 @@ public class SalesTaxTracking implements ComplytIdProperty {
     LocalDateTime appliedDate;
     boolean approved;
     LocalDateTime approvalDate;
-    FillingFrequency fillingFrequency;
+    FilingFrequency filingFrequency;
 }
