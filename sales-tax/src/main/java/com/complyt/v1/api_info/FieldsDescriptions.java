@@ -77,7 +77,10 @@ public interface FieldsDescriptions {
 
     String VALIDATION_DATES = "Determines the timeframe that the exemption is valid for";
 
-
     String CLASSIFICATION = "Indicates on which product classifications the the customer exempt for";
+
+    // In salesTaxTracking
+
+    String FILING_FREQUENCY = "Tracks the filing frequency determined by the state";
 
 }

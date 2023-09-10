@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
-import com.complyt.domain.Transaction;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.v1.models.transaction.TransactionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.factory.Mappers;

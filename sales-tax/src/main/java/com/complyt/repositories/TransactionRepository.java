@@ -1,6 +1,6 @@
 package com.complyt.repositories;
 
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AllArgsConstructor;

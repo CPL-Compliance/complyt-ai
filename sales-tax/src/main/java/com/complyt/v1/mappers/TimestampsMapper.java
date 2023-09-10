@@ -1,7 +1,7 @@
 package com.complyt.v1.mappers;
 
 import com.complyt.domain.timestamps.Timestamps;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueMappingStrategy;

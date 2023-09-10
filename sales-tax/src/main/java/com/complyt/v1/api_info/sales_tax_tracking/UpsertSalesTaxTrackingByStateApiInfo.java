@@ -112,7 +112,8 @@ public @interface UpsertSalesTaxTrackingByStateApiInfo {
                     },
                     "appliedDate": "2015-08-02T16:12:00",
                     "approved": true,
-                    "approvalDate": "2015-06-22T13:57:00"
+                    "approvalDate": "2015-06-22T13:57:00",
+                    "filingFrequency": "MONTHLY"
             }
             """;
 
@@ -136,7 +137,8 @@ public @interface UpsertSalesTaxTrackingByStateApiInfo {
                  },
                  "appliedDate": "2015-08-02T16:12:00",
                  "approved": true,
-                 "approvalDate": "2015-06-22T13:57:00"
+                 "approvalDate": "2015-06-22T13:57:00",
+                 "filingFrequency": "MONTHLY"
              }
             """;
 }

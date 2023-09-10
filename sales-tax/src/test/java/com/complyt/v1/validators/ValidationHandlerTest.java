@@ -2,7 +2,7 @@ package com.complyt.v1.validators;
 
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.exceptions.types.ObjectNotValidApiException;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

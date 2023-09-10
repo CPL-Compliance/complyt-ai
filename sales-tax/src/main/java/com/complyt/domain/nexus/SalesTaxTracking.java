@@ -1,5 +1,6 @@
 package com.complyt.domain.nexus;
 
+import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
 import lombok.*;
@@ -18,7 +19,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Document(collection = "sales_tax_tracking")
 public class SalesTaxTracking implements ComplytIdProperty {
-
     UUID complytId;
     @Id
     String id;
@@ -31,4 +31,5 @@ public class SalesTaxTracking implements ComplytIdProperty {
     LocalDateTime appliedDate;
     boolean approved;
     LocalDateTime approvalDate;
+    FilingFrequency filingFrequency;
 }

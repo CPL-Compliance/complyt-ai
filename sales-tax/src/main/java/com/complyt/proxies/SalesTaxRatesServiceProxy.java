@@ -1,6 +1,6 @@
 package com.complyt.proxies;
 
-import com.complyt.v1.models.ComplytSalesTaxRatesDto;
+import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactivefeign.spring.config.ReactiveFeignClient;

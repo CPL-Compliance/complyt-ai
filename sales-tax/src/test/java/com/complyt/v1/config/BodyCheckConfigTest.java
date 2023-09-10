@@ -1,6 +1,6 @@
 package com.complyt.v1.config;
 
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;

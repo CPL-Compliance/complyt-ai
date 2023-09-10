@@ -1,9 +1,9 @@
 package com.complyt.business.sales_tax.sales_tax_rates;
 
-import com.complyt.domain.Address;
-import com.complyt.domain.Item;
-import com.complyt.domain.ShippingFee;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.sales_tax.SalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package com.complyt.utils.filter;
 
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
-import com.complyt.domain.TransactionType;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
+import com.complyt.domain.transaction.TransactionType;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;

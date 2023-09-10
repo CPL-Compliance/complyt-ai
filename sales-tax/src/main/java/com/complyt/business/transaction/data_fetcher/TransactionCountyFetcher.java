@@ -1,7 +1,7 @@
 package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.SalesTaxWebClientWrapper;
-import com.complyt.domain.Address;
+import com.complyt.domain.transaction.Address;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -1,9 +1,9 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
-import com.complyt.domain.ShippingFee;
+import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusStateRule;
 import org.bson.types.ObjectId;

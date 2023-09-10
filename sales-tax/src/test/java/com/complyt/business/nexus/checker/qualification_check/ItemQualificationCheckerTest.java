@@ -1,6 +1,6 @@
 package com.complyt.business.nexus.checker.qualification_check;
 
-import com.complyt.domain.Item;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.State;
 import com.complyt.domain.customer.CustomerType;
 import com.complyt.domain.nexus.NexusStateRule;

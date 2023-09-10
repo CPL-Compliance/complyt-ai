@@ -2,7 +2,7 @@ package com.complyt.v1.config;
 
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.exemption.ExemptionDto;
 import com.complyt.v1.validators.DataConflictChecksProvider;
