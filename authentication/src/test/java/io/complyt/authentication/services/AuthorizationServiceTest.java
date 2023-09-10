@@ -35,7 +35,7 @@ class AuthorizationServiceTest {
         Credentials credentials = TestUtilities.createCredentials();
         AccessToken accessToken = TestUtilities.createAccessToken();
         Token expectedToken = TestUtilities.createToken(credentials, accessToken);
-        expectedToken = expectedToken.withAccessToken("Access Token");
+        final Token expectedTokenWithAccessToken = expectedToken.withAccessToken("Access Token");
 
         // When
         when(authorizationServerWrapper.getAccessToken(credentials.getClientId(), credentials.getClientSecret(),
@@ -44,7 +44,15 @@ class AuthorizationServiceTest {
         Mono<Token> actualToken = authorizationService.getToken(credentials);
 
         // Then
-        StepVerifier.create(actualToken).expectNext(expectedToken).verifyComplete();
+        StepVerifier
+                .create(actualToken)
+                .expectNextMatches(
+                        token -> token.getAccessToken().equals(expectedTokenWithAccessToken.getAccessToken()) &&
+                                token.getComplytClientId().equals(expectedTokenWithAccessToken.getComplytClientId()) &&
+                                token.getCreatedAt().isAfter(expectedTokenWithAccessToken.getCreatedAt()) &&
+                                token.getExpiresIn() == expectedTokenWithAccessToken.getExpiresIn() &&
+                                token.getComplytClientSecret().equals(expectedTokenWithAccessToken.getComplytClientSecret()))
+                .verifyComplete();
     }
 
     @Test
