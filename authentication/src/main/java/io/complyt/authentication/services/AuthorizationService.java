@@ -7,10 +7,11 @@ import io.complyt.authentication.domain.Token;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class AuthorizationService {
                 .scope(accessToken.getScope())
                 .expiresIn(accessToken.getExpiresIn())
                 .tokenType(accessToken.getTokenType())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

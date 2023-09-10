@@ -19,7 +19,7 @@ class TokenMapperTest {
         // Given
         Token token = TestUtilities.createToken();
         TokenDto tokenDto = new TokenDto(token.getAccessToken(), token.getScope(), token.getExpiresIn(),
-                token.getTokenType(), token.getExpireAt());
+                token.getTokenType(), token.getCreatedAt(), token.getExpireAt());
 
         // When
         TokenDto actualTokenDto = TokenMapper.INSTANCE.tokentoTokenDto(token);

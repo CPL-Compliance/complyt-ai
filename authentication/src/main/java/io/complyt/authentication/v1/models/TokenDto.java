@@ -18,6 +18,8 @@ public record TokenDto(
         int expiresIn,
         @NotNull(message = "Token.tokenType " + DtoErrorMessages.NOT_NULL_ERROR)
         String tokenType,
+        @NotNull(message = "Token.createdAt " + DtoErrorMessages.NOT_NULL_ERROR)
+        LocalDateTime createdAt,
         @NotNull(message = "Token.expireAt " + DtoErrorMessages.NOT_NULL_ERROR)
         LocalDateTime expireAt) {
 }

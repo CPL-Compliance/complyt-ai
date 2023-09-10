@@ -62,11 +62,11 @@ public class TestUtilities {
     }
 
     public static TokenDto createTokenDto() {
-        return new TokenDto("", "", 0, "", LocalDateTime.now());
+        return new TokenDto("", "", 0, "", LocalDateTime.now(), LocalDateTime.now());
     }
 
     public static TokenDto createOutputTokenDto() {
-        return new TokenDto(accessToken, scope, expiresIn, tokenType, LocalDateTime.now());
+        return new TokenDto(accessToken, scope, expiresIn, tokenType, LocalDateTime.now(), LocalDateTime.now());
     }
 
     public static AccessToken createStubAccessToken() {
@@ -107,6 +107,7 @@ public class TestUtilities {
                 .scope(accessToken.getScope())
                 .expiresIn(accessToken.getExpiresIn())
                 .tokenType(accessToken.getTokenType())
+                .createdAt(LocalDateTime.now())
                 .accessToken("")
                 .build();
     }
