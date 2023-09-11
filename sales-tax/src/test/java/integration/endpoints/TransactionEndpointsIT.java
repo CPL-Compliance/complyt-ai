@@ -5,10 +5,10 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
-import com.complyt.v1.models.MandatoryAddressDto;
-import com.complyt.v1.models.TransactionDto;
-import com.complyt.v1.models.TransactionStatusDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.transaction.MandatoryAddressDto;
+import com.complyt.v1.models.transaction.TransactionDto;
+import com.complyt.v1.models.transaction.TransactionStatusDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -29,8 +29,7 @@ import testUtils.integration_test.ITUtilities;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -116,6 +115,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         String nonExistingState = "Nilfgaard";
         TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
                 .withShippingAddress(referenceAddress.withState(nonExistingState));
+
         // Then
         webTestClient
                 .mutateWith(csrf())
@@ -560,4 +560,63 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsExemptByStateAndDate_ReturnsNonTaxableTransaction() {
+        String externalId = "nonExistingTransactionID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNull(transactionDto.salesTax()));
+    }
+
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state PA with validation dates of:
+     fromDate: 2025-01-01, toDate: 26-01-01, therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptByStateAndDate_ReturnsTaxableTransaction() {
+        String externalId = "anotherNonExistingTransactionID";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("fresno", "US", null, "PA", "st", "12345", false))
+                .withExternalTimestamps(new TimestampsDto("2024-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
 }

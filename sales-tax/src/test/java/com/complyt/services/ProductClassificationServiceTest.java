@@ -1,8 +1,8 @@
 package com.complyt.services;
 
-import com.complyt.domain.Item;
-import com.complyt.domain.ShippingFee;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import com.complyt.domain.sales_tax.SalesTaxRates;

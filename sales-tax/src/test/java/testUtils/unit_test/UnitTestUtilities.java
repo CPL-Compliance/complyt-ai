@@ -16,12 +16,15 @@ import com.complyt.domain.sales_tax.product_classification.CitySalesTaxRules;
 import com.complyt.domain.sales_tax.product_classification.JurisdictionalSalesTaxRules;
 import com.complyt.domain.sales_tax.zip_tax.Result;
 import com.complyt.domain.timestamps.Timestamps;
+import com.complyt.domain.transaction.*;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -288,7 +291,8 @@ public class UnitTestUtilities {
                 tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
                 new EconomicNexusTracker(false, localDateTime), localDateTime,
-                true, localDateTime);
+                true, localDateTime,
+                FilingFrequency.MONTHLY);
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
@@ -297,7 +301,8 @@ public class UnitTestUtilities {
                 "comment", true,
                 new PhysicalNexusTrackerDto(false, localDateTime),
                 new EconomicNexusTrackerDto(false, localDateTime), localDateTime,
-                true, localDateTime);
+                true, localDateTime,
+                FilingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
     }

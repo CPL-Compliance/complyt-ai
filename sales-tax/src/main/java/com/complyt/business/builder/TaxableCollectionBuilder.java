@@ -2,7 +2,7 @@ package com.complyt.business.builder;
 
 import com.complyt.business.sales_tax.checker.TaxableItemExistChecker;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

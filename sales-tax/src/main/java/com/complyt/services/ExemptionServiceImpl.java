@@ -3,7 +3,7 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.business.sales_tax.checker.CustomerFullyExemptionChecker;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.repositories.ExemptionRepository;

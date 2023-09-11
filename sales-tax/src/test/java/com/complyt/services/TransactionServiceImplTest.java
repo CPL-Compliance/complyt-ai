@@ -5,9 +5,9 @@ import com.complyt.business.timestamps_injection.ExistingTransactionInternalTime
 import com.complyt.business.timestamps_injection.NewTransactionInternalTimestampsInjector;
 import com.complyt.business.transaction.CountyProvider;
 import com.complyt.business.transaction.items_amounts.TransactionAmountsCollector;
-import com.complyt.domain.Item;
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.transaction.Item;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

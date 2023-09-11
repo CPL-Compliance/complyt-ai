@@ -1,7 +1,7 @@
 package com.complyt.repositories;
 
 import com.complyt.domain.State;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.security.TenantResolver;
 import com.mongodb.client.result.DeleteResult;
@@ -58,8 +58,10 @@ public class ExemptionRepositoryTest {
     void findByClientCustomerAndState_FindsExemption_ReturnsExemption() {
         // Given
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
-                .and("customerId").is(transaction.getCustomerId())
-                .and("state.abbreviation").is(transaction.getShippingAddress().state()));
+                        .and("customerId").is(transaction.getCustomerId()))
+                .addCriteria(new Criteria().orOperator(
+                        Criteria.where("state.abbreviation").is(transaction.getShippingAddress().state()),
+                        Criteria.where("state.name").is(transaction.getShippingAddress().state())));
 
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
@@ -100,9 +102,11 @@ public class ExemptionRepositoryTest {
     void findByClientCustomerAndState_ExemptionDoesNotExist_ReturnsMonoEmpty() {
         // Given
         Query query = Query.query(Criteria.where("tenantId").is(transaction.getTenantId())
-                .and("customerId").is(transaction.getCustomerId())
-                .and("state.abbreviation").is(transaction.getShippingAddress().state()));
-
+                        .and("customerId").is(transaction.getCustomerId()))
+                .addCriteria(new Criteria().orOperator(
+                        Criteria.where("state.abbreviation").is(transaction.getShippingAddress().state()),
+                        Criteria.where("state.name").is(transaction.getShippingAddress().state())));
+        
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());

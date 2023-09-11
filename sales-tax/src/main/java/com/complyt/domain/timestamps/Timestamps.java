@@ -15,4 +15,5 @@ public class Timestamps {
     private final LocalDateTime createdDate;
     @NonNull
     private final LocalDateTime updatedDate;
+
 }

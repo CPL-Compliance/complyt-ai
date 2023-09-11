@@ -1,6 +1,6 @@
 package com.complyt.business.sales_tax.checker;
 
-import com.complyt.domain.Item;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.nexus.enums.TaxableCategory;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

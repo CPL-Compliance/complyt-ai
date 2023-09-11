@@ -1,6 +1,6 @@
 package com.complyt.domain.sales_tax;
 
-import com.complyt.domain.Address;
+import com.complyt.domain.transaction.Address;
 import lombok.With;
 
 @With

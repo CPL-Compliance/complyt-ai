@@ -1,7 +1,7 @@
 package com.complyt.business.transaction.items_amount;
 
 import com.complyt.business.transaction.items_amounts.TangibleItemsAmountCalculator;
-import com.complyt.domain.Item;
+import com.complyt.domain.transaction.Item;
 import com.complyt.domain.Taxable;
 import com.complyt.domain.nexus.enums.TangibleCategory;
 import com.complyt.domain.nexus.enums.TaxableCategory;

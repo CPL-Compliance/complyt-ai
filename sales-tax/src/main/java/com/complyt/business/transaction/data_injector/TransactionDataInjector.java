@@ -1,6 +1,6 @@
 package com.complyt.business.transaction.data_injector;
 
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import reactor.core.publisher.Mono;
 
 public interface TransactionDataInjector<T> {

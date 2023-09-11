@@ -1,8 +1,8 @@
 package com.complyt.business.transaction.data_fetcher;
 
 import com.complyt.business.sales_tax.sales_tax_web_clients.StubComplytSalesTaxRatesClientWrapper;
-import com.complyt.domain.Address;
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Address;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

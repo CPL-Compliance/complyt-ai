@@ -1,6 +1,6 @@
 package com.complyt.business.complyt_id;
 
-import com.complyt.domain.Transaction;
+import com.complyt.domain.transaction.Transaction;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

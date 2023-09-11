@@ -1,7 +1,7 @@
 package com.complyt.v1.routers;
 
-import com.complyt.domain.Transaction;
-import com.complyt.domain.TransactionStatus;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.facades.TransactionFacade;
 import com.complyt.repositories.exceptions.OperationFailedException;
 import com.complyt.v1.config.ApiExceptionConfig;
@@ -20,7 +20,8 @@ import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.sales_tax.RatesMetaDataDto;
 import com.complyt.v1.models.sales_tax.SalesTaxDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
-import com.complyt.v1.models.timestamps.TimestampsDto;
+import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.transaction.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
