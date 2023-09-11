@@ -619,4 +619,33 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
     }
 
+    @Order(0)
+    @Test
+    @Override
+    @WithMockUser
+    /*
+     This transaction's customer has an exemption in state FL with Exemption Status - CANCELLED,
+     therefore transaction is NOT sales-tax exempt
+    */
+    public void upsertByExternalIdAndSource_CustomerIsNotExemptBecauseExemptionIsCancelled_ReturnsTaxableTransaction() {
+        String externalId = "ThirdNonExistingIdForExemptionChecks";
+        TransactionDto givenTransaction = ITUtilities.stubTransactionDto(externalId, customerId)
+                .withShippingAddress(new MandatoryAddressDto("Juneau", "US", null, "AK", "2285 Trout St", "99801", false))
+                .withExternalTimestamps(new TimestampsDto("2025-01-02", "2025-01-02"));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build())
+                .bodyValue(givenTransaction)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TransactionDto.class)
+                .value(transactionDto -> assertNotNull(transactionDto.salesTax()));
+    }
+
 }

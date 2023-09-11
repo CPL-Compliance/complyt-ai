@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.checker;
 
+import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
@@ -20,12 +21,14 @@ public class CustomerFullyExemptionChecker implements SalesTaxApplyChecker<Exemp
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
         boolean isExemptionInTimeFrame = !referenceDate.isBefore(exemption.getValidationDates().getFromDate()) &&
-                                         (exemption.getValidationDates().getToDate() == null || !referenceDate.isAfter(exemption.getValidationDates().getToDate()));
+                (exemption.getValidationDates().getToDate() == null || !referenceDate.isAfter(exemption.getValidationDates().getToDate()));
         boolean isFullyExemptionType = exemption.getExemptionType() == ExemptionType.FULLY;
-        boolean isExemptionActive = isExemptionInTimeFrame && isFullyExemptionType;
-        log.debug("Is exemption active returned : " + isExemptionActive);
+        boolean isExemptionActive = exemption.getExemptionStatus().equals(ExemptionStatus.ACTIVE);
 
-        return isExemptionActive;
+        boolean isExemptionValid = isExemptionInTimeFrame && isFullyExemptionType && isExemptionActive;
+        log.debug("Is exemption valid returned: " + isExemptionValid);
+
+        return isExemptionValid;
     }
 
 }
