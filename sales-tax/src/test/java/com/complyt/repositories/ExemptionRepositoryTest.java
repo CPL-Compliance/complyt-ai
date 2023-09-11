@@ -106,7 +106,7 @@ public class ExemptionRepositoryTest {
                 .addCriteria(new Criteria().orOperator(
                         Criteria.where("state.abbreviation").is(transaction.getShippingAddress().state()),
                         Criteria.where("state.name").is(transaction.getShippingAddress().state())));
-        
+
         // When
         when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
         when(reactiveMongoTemplate.findOne(query, Exemption.class)).thenReturn(Mono.empty());
@@ -222,37 +222,6 @@ public class ExemptionRepositoryTest {
         Flux<Exemption> exemptionFlux = exemptionRepository.findAll();
         StepVerifier.create(exemptionFlux).verifyComplete();
     }
-
-//    @Test
-//    void delete_DeletesExemption_ReturnsDeleteResult() {
-//        // Given
-//        UUID id = exemption.getComplytId();
-//        Query query = Query.query(Criteria.where("complytId").is(id).and("tenantId").is(transaction.getTenantId()));
-//        DeleteResult deleteResult = DeleteResult.acknowledged(1);
-//
-//        // When
-//        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-//        when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.just(deleteResult));
-//
-//        // Then
-//        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
-//        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
-//    }
-
-//    @Test
-//    void delete_ExemptionDoesNotExistInDB_ReturnsEmptyMono() {
-//        // Given
-//        UUID id = exemption.getComplytId();
-//        Query query = Query.query(Criteria.where("complytId").is(id).and("tenantId").is(transaction.getTenantId()));
-//
-//        // When
-//        when(tenantResolver.resolve()).thenReturn(Mono.just(transaction.getTenantId()));
-//        when(reactiveMongoTemplate.remove(query, Exemption.class)).thenReturn(Mono.empty());
-//
-//        // Then
-//        Mono<DeleteResult> deleteResultMono = exemptionRepository.delete(id);
-//        StepVerifier.create(deleteResultMono).verifyComplete();
-//    }
 
     @Test
     void findByComplytId_IdDoesNotExist_ReturnsEmpty() {
