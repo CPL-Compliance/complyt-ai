@@ -9,6 +9,7 @@ import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.transaction.TransactionStatus;
 import com.complyt.repositories.ExemptionRepository;
+import com.complyt.utils.observability.ContextLogger;
 import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -55,7 +56,9 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        return checkExemptionNotHavingComplytId(exemption)
+        String logStr = "Cancelling Exemption: " + exemption;
+
+        return ContextLogger.observeCtx(logStr, log::info).then(checkExemptionNotHavingComplytId(exemption))
                 .flatMap(this::injectDataToNewExemption)
                 .flatMap(exemptionRepository::save);
     }
