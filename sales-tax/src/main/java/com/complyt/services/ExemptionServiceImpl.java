@@ -56,9 +56,7 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public Mono<Exemption> save(@NonNull final Exemption exemption) {
-        String logStr = "Cancelling Exemption: " + exemption;
-
-        return ContextLogger.observeCtx(logStr, log::info).then(checkExemptionNotHavingComplytId(exemption))
+        return checkExemptionNotHavingComplytId(exemption)
                 .flatMap(this::injectDataToNewExemption)
                 .flatMap(exemptionRepository::save);
     }
@@ -85,7 +83,11 @@ public class ExemptionServiceImpl implements ExemptionService {
     public Mono<Exemption> markAsCancelled(@NonNull final UUID complytId) {
         return exemptionRepository
                 .findByComplytId(complytId)
-                .map(exemption -> exemption.withExemptionStatus(ExemptionStatus.CANCELLED))
+                .flatMap(exemption -> {
+                    String logStr = "Cancelling Exemption: " + exemption;
+                    
+                    return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(exemption.withExemptionStatus(ExemptionStatus.CANCELLED)));
+                })
                 .flatMap(exemptionRepository::save);
     }
 
