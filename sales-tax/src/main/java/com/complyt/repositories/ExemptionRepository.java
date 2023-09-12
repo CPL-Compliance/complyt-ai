@@ -84,14 +84,4 @@ public class ExemptionRepository {
                 });
     }
 
-    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
-        return tenantResolver.resolve()
-                .flatMap(tenantId -> {
-                    Query query = Query.query(Criteria.where("complytId").is(complytId).and("tenantId").is(tenantId));
-
-                    return ContextLogger.observeCtx("Deleting exemption with complyt ID " + complytId + " and tenant ID " + tenantId, log::info)
-                            .then(reactiveMongoTemplate.remove(query, Exemption.class));
-                });
-    }
-
 }

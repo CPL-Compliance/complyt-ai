@@ -242,7 +242,7 @@ public class UnitTestUtilities {
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
         return new Exemption(UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE);
     }
 
     public ExemptionDto createExemptionDto() {
@@ -256,7 +256,7 @@ public class UnitTestUtilities {
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
         return new ExemptionDto(UUID.randomUUID(), customerIdOtherDomains,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE);
     }
 
     public NexusStateRule createNexusStateRule(String id) {

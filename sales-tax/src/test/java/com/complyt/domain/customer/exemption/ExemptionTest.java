@@ -46,7 +46,8 @@ class ExemptionTest {
                 ", internalTimestamps=" + exemption.getInternalTimestamps() +
                 ", status=" + exemption.getStatus() +
                 ", certificate=" + exemption.getCertificate() +
-                ", exemptionType=" + exemption.getExemptionType() + ")";
+                ", exemptionType=" + exemption.getExemptionType() +
+                ", exemptionStatus=" + exemption.getExemptionStatus() + ")";
 
         // When
         String actualString = exemption.toString();
@@ -70,6 +71,7 @@ class ExemptionTest {
                 .status(exemption.getStatus())
                 .certificate(exemption.getCertificate())
                 .exemptionType(exemption.getExemptionType())
+                .exemptionStatus(ExemptionStatus.ACTIVE)
                 .build();
 
         // Then

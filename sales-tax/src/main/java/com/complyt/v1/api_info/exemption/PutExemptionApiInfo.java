@@ -111,7 +111,8 @@ public @interface PutExemptionApiInfo {
                     "url": "url",
                     "name": "name"
                 },
-                "exemptionType": "FULLY"
+                "exemptionType": "FULLY",
+                "exemptionStatus": "ACTIVE"
             }""";
 
     String returnedExemptionExample = """
@@ -144,7 +145,8 @@ public @interface PutExemptionApiInfo {
                          "url": "url",
                          "name": "name"
                      },
-                     "exemptionType": "FULLY"
+                     "exemptionType": "FULLY",
+                     "exemptionStatus": "ACTIVE"
                  }]
             """;
 }

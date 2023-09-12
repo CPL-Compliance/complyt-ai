@@ -19,7 +19,6 @@ import com.complyt.v1.models.StateDto;
 import com.complyt.v1.models.customer.exemption.*;
 import com.complyt.v1.models.TimestampsDto;
 import com.mongodb.client.result.DeleteResult;
-import org.javatuples.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -418,6 +417,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -641,10 +641,9 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         // Given
         UUID complytId = UUID.randomUUID();
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
-        DeleteResult deleteResult = DeleteResult.acknowledged(1);
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.just(deleteResult));
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.just(exemption));
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -664,7 +663,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.empty());
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -744,7 +743,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
         String url = ExemptionRouter.BASE_URL + "/complytId/" + complytId;
 
         // When
-        when(exemptionFacade.delete(complytId)).thenReturn(Mono.empty());
+        when(exemptionFacade.markAsCancelled(complytId)).thenReturn(Mono.empty());
 
         // Then
         webTestClient.mutateWith(csrf())
@@ -1642,6 +1641,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"internalTimestamps\": {\n" +
                         "        \"createdDate\": \"2023-02-28T02:00:00\",\n" +
                         "        \"updatedDate\": \"2023-02-28T02:00:00\"\n" +
@@ -1693,6 +1693,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -1747,7 +1748,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -1801,7 +1802,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -1856,7 +1857,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -1911,7 +1912,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -1966,7 +1967,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -2089,7 +2090,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -2144,7 +2145,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -2407,7 +2408,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -2462,7 +2463,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -2798,7 +2799,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "    \"validationDates\": {\n" +
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -2874,7 +2876,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"fromDate\": \"2023-02-28T02:00:00\",\n" +
                         "        \"toDate\": \"\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -2924,7 +2927,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"fromDate\": \"\",\n" +
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -2971,7 +2975,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2023-02-29T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -3026,7 +3030,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2023-02-29T02:00:00\"\n" +
@@ -3153,7 +3157,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"fromDate\": \"2023-02-28T02:00:00.0000000000\",\n" +
                         "        \"toDate\": \"2023-02-28T02:00:00\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -3203,7 +3208,8 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"fromDate\": \"2023-02-28T02:00:00\",\n" +
                         "        \"toDate\": \"2023-02-28T02:00:00.0000000000\"\n" +
                         "    },\n" +
-                        "    \"exemptionType\": \"FULLY\"\n" +
+                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\"\n" +
                         "}"
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -3452,7 +3458,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00+18:01\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00\"\n" +
@@ -3507,7 +3513,7 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                         "        \"name\": \"name\"\n" +
                         "    },\n" +
                         "    \"exemptionType\": \"FULLY\",\n" +
-                        "    \"exemptionType\": \"FULLY\",\n" +
+                        "    \"exemptionStatus\": \"ACTIVE\",\n" +
                         "    \"validationDates\": {\n" +
                         "       \"fromDate\": \"2022-11-01T02:00:00\",\n" +
                         "       \"toDate\": \"2022-11-01T02:00:00+18:01\"\n" +

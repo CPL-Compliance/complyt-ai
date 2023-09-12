@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.customer.exemption.Exemption;
+import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.domain.customer.exemption.Status;
 import com.complyt.services.ExemptionServiceImpl;
@@ -149,28 +150,27 @@ public class ExemptionFacadeTest {
     void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
         // Given
         UUID id = UUID.randomUUID();
-        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+        Exemption deletedExemption = exemption.withExemptionStatus(ExemptionStatus.CANCELLED);
 
         // When
-        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+        when(exemptionService.markAsCancelled(id)).thenReturn(Mono.just(deletedExemption));
+        Mono<Exemption> exemptionMono = exemptionFacade.markAsCancelled(id);
 
         // Then
-        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+        StepVerifier.create(exemptionMono).expectNext(deletedExemption).verifyComplete();
     }
 
     @Test
-    void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
+    void delete_NoExemptionFoundToDelete_ReturnMonoEmpty() {
         // Given
         UUID id = UUID.randomUUID();
-        DeleteResult deleteResult = DeleteResult.acknowledged(0);
 
         // When
-        when(exemptionService.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionFacade.delete(id);
+        when(exemptionService.markAsCancelled(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionFacade.markAsCancelled(id);
 
         // Then
-        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+        StepVerifier.create(exemptionMono).verifyComplete();
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ExemptionFacadeTest {
         UUID nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.delete(nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionFacade.markAsCancelled(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");
