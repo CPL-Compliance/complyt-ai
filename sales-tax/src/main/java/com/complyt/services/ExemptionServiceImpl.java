@@ -85,8 +85,9 @@ public class ExemptionServiceImpl implements ExemptionService {
                 .findByComplytId(complytId)
                 .flatMap(exemption -> {
                     String logStr = "Cancelling Exemption: " + exemption;
-                    
-                    return ContextLogger.observeCtx(logStr, log::info).then(Mono.just(exemption.withExemptionStatus(ExemptionStatus.CANCELLED)));
+
+                    return ContextLogger.observeCtx(logStr, log::info)
+                            .then(Mono.just(exemption.withExemptionStatus(ExemptionStatus.CANCELLED)));
                 })
                 .flatMap(exemptionRepository::save);
     }
