@@ -111,7 +111,7 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
                                 "        \"county\": null,\n" +
                                 "        \"state\": \"CA\",\n" +
                                 "        \"street\": \"944 W. Wintergreen St.\",\n" +
-                                "        \"zip\": \"95823,\"\n" +
+                                "        \"zip\": \"95823\",\n" +
                                 "        \"isPartial\": false\n" +
                                 "    },\n" +
                                 "    \"email\": \"example@some.mail.com\",\n" +
@@ -121,7 +121,6 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
                                 "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
                                 "    }\n" +
                                 "}";
-
     String returnedCustomerExample = "[{\n" +
                                      "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
                                      "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
