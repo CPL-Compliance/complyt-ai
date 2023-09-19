@@ -26,7 +26,7 @@ public interface CustomerRouterTestTemplate extends
     void upsert_LengthGreaterThen256Name_Returns400ValidationError();
 
     // Validation::email
-    void upsert_BlankEmail_Returns400ValidationError();
+    void upsert_BlankEmail_Returns201Created();
 
     void upsert_NotInFormatEmail_Returns400ValidationError();
     void upsert_LengthGreaterThen100Email_Returns400ValidationError();

@@ -555,22 +555,79 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
     @Override
     @Test
     @WithMockUser
-    public void upsert_BlankEmail_Returns400ValidationError() {
+    public void upsert_BlankEmail_Returns201Created() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        CustomerDto givenCustomer = customerDto.withEmail("");
 
+        // When
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomer);
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenCustomer)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .equals(customerDto);
     }
 
     @Override
     @Test
     @WithMockUser
     public void upsert_NotInFormatEmail_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
+        String propertyName = "jakarta.validation.constraints.Email.message";
+        Set<String> expectedErrors = Set.of(UnitTestUtilities.extractStringFromJakartaProperties(propertyName));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withEmail("dhggnfgdfrthj"))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
     @Test
     @WithMockUser
     public void upsert_LengthGreaterThen100Email_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
 
+        String propertyName = "jakarta.validation.constraints.Email.message";
+        Set<String> expectedErrors = Set.of(UnitTestUtilities.extractStringFromJakartaProperties(propertyName));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withEmail("somesomesomesomesomesomesomesomesomesomesomesomesomesomesomesomesomesome@some.com"))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
     }
 
     @Override
