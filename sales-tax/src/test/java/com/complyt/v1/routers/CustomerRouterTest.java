@@ -13,9 +13,9 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.models.transaction.OptionalAddressDto;
-import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.transaction.OptionalAddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -550,6 +550,27 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
                 .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankEmail_Returns400ValidationError() {
+
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NotInFormatEmail_Returns400ValidationError() {
+
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen100Email_Returns400ValidationError() {
+
     }
 
     @Override

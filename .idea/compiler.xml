@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="address-validation" />
       </profile>
       <profile name="Annotation profile for Complyt" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -26,6 +27,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="address-validation" target="17" />
       <module name="api-gateway" target="17" />
       <module name="complyt" target="17" />
       <module name="discovery-service" target="17" />
