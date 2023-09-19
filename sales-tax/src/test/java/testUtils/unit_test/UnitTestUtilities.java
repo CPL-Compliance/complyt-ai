@@ -46,6 +46,8 @@ public class UnitTestUtilities {
 
     String source;
 
+    static ResourceBundle validationMessages = ResourceBundle.getBundle("org.hibernate.validator.ValidationMessages", Locale.getDefault());
+
     public UnitTestUtilities(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
         this.tenantId = tenantId;
@@ -113,6 +115,7 @@ public class UnitTestUtilities {
                 "name",
                 new Address("City", "Country", "County", "CA", "Street", "Zip", false),
                 tenantId,
+                null,
                 CustomerType.RETAIL,
                 internalTimeStamps,
                 externalTimestamps
@@ -129,6 +132,7 @@ public class UnitTestUtilities {
                 source,
                 "name",
                 new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false),
+                null,
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
                 externalTimestamps
@@ -373,5 +377,10 @@ public class UnitTestUtilities {
 
         return exemptionList;
     }
+
+    public static String extractStringFromJakartaProperties(String property) {
+        return validationMessages.getString(property);
+    }
+
 
 }

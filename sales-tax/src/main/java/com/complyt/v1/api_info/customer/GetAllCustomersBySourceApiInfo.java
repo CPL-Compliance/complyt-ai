@@ -83,6 +83,7 @@ public @interface GetAllCustomersBySourceApiInfo {
             "        \"zip\": \"95823\",\n" +
             "        \"isPartial\": false\n" +
             "    },\n" +
+            "    \"email\": \"example@some.mail.com\",\n" +
             "    \"customerType\": \"RETAIL\",\n" +
             "    \"internalTimestamps\": {\n" +
             "        \"createdDate\": \"2023-01-10T17:40:44.357\",\n" +

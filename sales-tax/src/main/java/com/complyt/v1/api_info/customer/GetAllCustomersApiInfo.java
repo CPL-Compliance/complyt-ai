@@ -74,6 +74,7 @@ public @interface GetAllCustomersApiInfo {
                     "zip": "95823",
                     "isPartial": false
                 },
+                "email": "example@some.mail.com",
                 "customerType": "RETAIL",
                 "internalTimestamps": {
                     "createdDate": "2023-01-10T17:40:44.357",

@@ -13,9 +13,9 @@ import com.complyt.v1.exceptions.GlobalExceptionHandler;
 import com.complyt.v1.exceptions.types.ConflictedDataApiException;
 import com.complyt.v1.handlers.CustomerHandler;
 import com.complyt.v1.mappers.CustomerMapper;
-import com.complyt.v1.models.transaction.OptionalAddressDto;
-import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.models.customer.CustomerDto;
+import com.complyt.v1.models.transaction.OptionalAddressDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -546,6 +546,84 @@ class CustomerRouterTest implements CustomerRouterTestTemplate {
                         .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
                         .build()).contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto.withName(nameWithLengthOf257))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_BlankEmail_Returns201Created() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+        CustomerDto givenCustomer = customerDto.withEmail("");
+
+        // When
+        Customer mappedCustomer = CustomerMapper.INSTANCE.customerDtoToCustomer(givenCustomer);
+        when(customerFacade.findByExternalIdAndSource(externalId, source)).thenReturn(Mono.empty());
+        when(customerFacade.saveCustomer(mappedCustomer)).thenReturn(Mono.just(mappedCustomer));
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(givenCustomer)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .equals(customerDto);
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_NotInFormatEmail_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        String propertyName = "jakarta.validation.constraints.Email.message";
+        Set<String> expectedErrors = Set.of(UnitTestUtilities.extractStringFromJakartaProperties(propertyName));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withEmail("dhggnfgdfrthj"))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)
+                .value(map -> testUtilities.checkErrorMessages(map, expectedErrors));
+    }
+
+    @Override
+    @Test
+    @WithMockUser
+    public void upsert_LengthGreaterThen100Email_Returns400ValidationError() {
+        // Given
+        String externalId = customerDto.externalId();
+        String source = customerDto.source();
+
+        String propertyName = "jakarta.validation.constraints.Email.message";
+        Set<String> expectedErrors = Set.of(UnitTestUtilities.extractStringFromJakartaProperties(propertyName));
+
+        // When + Then
+        webTestClient
+                .mutateWith(csrf())
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                        .path(CustomerRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
+                        .build()).contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(customerDto.withEmail("somesomesomesomesomesomesomesomesomesomesomesomesomesomesomesomesomesome@some.com"))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class)

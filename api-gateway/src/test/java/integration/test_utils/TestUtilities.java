@@ -73,6 +73,7 @@ public class TestUtilities {
                                 "street": "944 W. Wintergreen St.",
                                 "zip": "95823"
                             },
+                            "email": "shtak@dope.com",
                             %s
                             "internalTimestamps": {
                                 "createdDate": "2023-01-10T17:40:44.357",

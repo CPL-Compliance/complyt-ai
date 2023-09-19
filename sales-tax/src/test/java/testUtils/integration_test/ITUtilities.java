@@ -35,7 +35,7 @@ public interface ITUtilities {
 
     static CustomerDto stubCustomerDto(String externalId) {
         return new CustomerDto(null, externalId, "1",
-                "stub customer", null, CustomerTypeDto.RETAIL,
+                "stub customer", null, "captaindope@gg.com", CustomerTypeDto.RETAIL,
                 null, new TimestampsDto(LocalDateTime.now().toString(), LocalDateTime.now().toString()));
     }
 

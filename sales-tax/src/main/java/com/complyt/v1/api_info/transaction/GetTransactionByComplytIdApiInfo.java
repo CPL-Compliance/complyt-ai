@@ -144,6 +144,7 @@ public @interface GetTransactionByComplytIdApiInfo {
                         "zip": "string",
                         "isPartial": false
                     },
+                    "email": "example@some.mail.com",
                     "customerType": "RETAIL",
                     "internalTimestamps": {
                         "createdDate": "2023-02-05T12:24:43.193Z",

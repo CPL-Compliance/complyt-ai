@@ -46,6 +46,7 @@ public class CustomerDtoTest {
                 ", source=" + customerDto.source() +
                 ", name=" + customerDto.name() +
                 ", address=" + customerDto.address() +
+                ", email=" + customerDto.email() +
                 ", customerType=" + customerDto.customerType() +
                 ", internalTimestamps=" + customerDto.internalTimestamps() +
                 ", externalTimestamps=" + customerDto.externalTimestamps() + "]";

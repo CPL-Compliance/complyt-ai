@@ -9,6 +9,7 @@ import com.complyt.v1.models.checkables.SourceCheckable;
 import com.complyt.v1.models.TimestampsDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,7 @@ public record CustomerDto(@Schema(description = FieldsDescriptions.COMPLYT_ID + 
                           @Schema(description = FieldsDescriptions.SOURCE) @NotNull(message = "source " + DtoErrorMessages.NOT_NULL_ERROR) @Pattern(regexp = "[1-9]", message = "source " + StringErrorMessages.SINGLE_DIGIT_ERROR) String source,
                           @Schema(description = FieldsDescriptions.NAME_OF_CUSTOMER) @NotNull(message = "name " + DtoErrorMessages.NOT_NULL_ERROR) @Size(min = 1, max = 256, message = "name " + StringErrorMessages.MINMAX_256_ERROR) String name,
                           @Schema(ref = "addressOfCustomer") @Valid OptionalAddressDto address,
+                          @Schema(description = FieldsDescriptions.EMAIL) @Email String email,
                           @NotNull(message = "customerType " + DtoErrorMessages.NOT_NULL_ERROR) CustomerTypeDto customerType,
                           @Schema(ref = "internalTimestamps") @Valid TimestampsDto internalTimestamps,
                           @Schema(ref = "externalTimestamps") @Valid @NotNull(message = "externalTimestamps " + DtoErrorMessages.NOT_NULL_ERROR) TimestampsDto externalTimestamps) implements SourceCheckable, ExternalIdCheckable {
