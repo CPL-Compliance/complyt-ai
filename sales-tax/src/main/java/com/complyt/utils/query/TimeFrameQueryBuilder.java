@@ -50,26 +50,14 @@ class DateRangeStrategy {
 
     private void setUpDateRange(TimeFrame timeFrame, LocalDateTime taxableDate, LocalDateTime referenceDate) {
         switch (timeFrame) {
-            case PREVIOUS_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
-                break;
+            case PREVIOUS_CALENDER_YEAR -> dateRange = DateRange.Factory.newPreviousCalenderYear(referenceDate);
+            case CURRENT_CALENDER_YEAR -> dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
+            case PREVIOUS_TWELVE_MONTHS -> dateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
+            case YEAR_FROM_SEPTEMBER_TO_SEPTEMBER -> dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
 
-            case CURRENT_CALENDER_YEAR:
-                dateRange = DateRange.Factory.newCurrentCalenderYear(referenceDate);
-                break;
-
-            case PREVIOUS_TWELVE_MONTHS:
-                dateRange = DateRange.Factory.newPreviousTwelveMonths(referenceDate);
-                break;
-
-            case YEAR_FROM_SEPTEMBER_TO_SEPTEMBER:
-                dateRange = DateRange.Factory.newYearFromSeptember(referenceDate);
-                break;
 
             //CURRENT_TAXABLE_YEAR
-            default:
-                dateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
-                break;
+            default -> dateRange = DateRange.Factory.newTaxableYear(taxableDate, referenceDate);
         }
     }
 }

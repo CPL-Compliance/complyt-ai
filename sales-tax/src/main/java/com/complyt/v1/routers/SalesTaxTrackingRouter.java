@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.*;
 
+import java.text.ParseException;
+
 @Configuration
 public class SalesTaxTrackingRouter {
 
@@ -54,6 +56,16 @@ public class SalesTaxTrackingRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(getSalesTaxTrackingRoute, salesTaxTrackingHandler::upsert);
+    }
+
+    @Bean
+//    @GetNexusSummaryApiInfo
+    public RouterFunction<ServerResponse> getNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+        RequestPredicate getNexusSummaryRoute = RequestPredicates
+                .GET(BASE_URL + "/state/{state}/date/{date}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(getNexusSummaryRoute, salesTaxTrackingHandler::getNexusSummary);
     }
 
 }
