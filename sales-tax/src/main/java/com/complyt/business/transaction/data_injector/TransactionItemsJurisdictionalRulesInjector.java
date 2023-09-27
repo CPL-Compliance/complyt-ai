@@ -34,7 +34,10 @@ public class TransactionItemsJurisdictionalRulesInjector implements TransactionD
      */
     @Override
     public Mono<Transaction> inject(Map<String, ProductClassification> mapTaxCodesToClassifications) {
-        return ContextLogger.observeCtx("Setting jurisdictional sales tax rules and taxable categories to transaction's items", log::debug)
+        String logStr = "Setting jurisdictional sales tax rules and taxable categories to transaction's items for the state: "
+                + transaction.getShippingAddress().state() + ", for the items: " + transaction.getItems();
+
+        return ContextLogger.observeCtx(logStr, log::info)
                 .then(Mono.just(transaction.withItems(createItemsWithRules(mapTaxCodesToClassifications))))
                 .flatMap(modifiedTransaction -> ContextLogger.observeCtx("Transaction with rules and taxable categories injected : " + modifiedTransaction, log::debug)
                         .thenReturn(modifiedTransaction));
