@@ -88,7 +88,7 @@ public class NexusCalculatorTest {
 
         int count = transactions.size();
         BigDecimal amount = transactions.get(0).getItems().get(0).getTotalPrice().add(transactions.get(1).getItems().get(0).getTotalPrice());
-        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
         NexusStateRule nexusStateRule = createNexusStateRule();
 
         // When
@@ -108,7 +108,7 @@ public class NexusCalculatorTest {
         List<Transaction> transactions = createTransactionsList();
         int count = 0;
         BigDecimal amount = BigDecimal.ZERO;
-        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount);
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
         List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
             add(CustomerType.RESELLER);
         }};

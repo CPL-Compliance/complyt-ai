@@ -67,7 +67,7 @@ public class NexusCheckerTest {
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(10, new BigDecimal(10000));
+        return new NexusCalculationSummary(10, new BigDecimal(10000), Definition.AMOUNT);
     }
 
     @Test

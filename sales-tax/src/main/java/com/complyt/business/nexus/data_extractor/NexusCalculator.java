@@ -34,6 +34,6 @@ public class NexusCalculator {
                 .then(nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule)
                         .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule)
                                 .flatMap(amount -> ContextLogger.observeCtx("Calculated total amount of : " + amount + ", and count : " + count, log::debug)
-                                        .thenReturn(new NexusCalculationSummary(count, amount)))));
+                                        .thenReturn(new NexusCalculationSummary(count, amount, nexusStateRule.getNexusThreshold().getDefinition())))));
     }
 }

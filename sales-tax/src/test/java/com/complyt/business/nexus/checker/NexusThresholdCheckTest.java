@@ -42,7 +42,7 @@ public class NexusThresholdCheckTest {
 
     private NexusCalculationSummary createNexusCalculationSummary() {
         return new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount(),
-                nexusStateRule.getNexusThreshold().getAmount());
+                nexusStateRule.getNexusThreshold().getAmount(), Definition.AMOUNT);
     }
 
     private NexusStateRule createNexusStateRule() {
