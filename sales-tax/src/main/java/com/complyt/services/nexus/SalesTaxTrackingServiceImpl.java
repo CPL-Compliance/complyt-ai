@@ -5,6 +5,8 @@ import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.repositories.ClientTrackingRepository;
+import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import com.complyt.utils.observability.ContextLogger;
 import lombok.AccessLevel;
@@ -32,7 +34,14 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @NonNull
     ApplicationDateCreator applicationDateCreator;
 
-    @NonNull ComplytIdHandler<SalesTaxTracking> complytIdHandler;
+    @NonNull
+    ComplytIdHandler<SalesTaxTracking> complytIdHandler;
+
+    @NonNull
+    ClientTrackingRepository clientTrackingRepository;
+
+    @NonNull
+    NexusStateRuleRepository nexusStateRuleRepository;
 
     @Override
     public Mono<SalesTaxTracking> findById(@NonNull String id) {
@@ -42,6 +51,16 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingRepository.save(salesTaxTracking);
+    }
+
+    private Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
+        return clientTrackingRepository.findClient()
+                .flatMap(clientTracking -> nexusStateRuleRepository.findByState(salesTaxTracking.getState().getName())
+                        .map(nexusStateRule -> salesTaxTracking
+                                .withClientTracking(clientTracking)
+                                .withNexusStateRule(nexusStateRule))
+                        .switchIfEmpty(Mono.error(new NotFoundException("No nexus state rule  found for " + salesTaxTracking.getState().getName()))))
+                .switchIfEmpty(Mono.error(new NotFoundException("No client details found")));
     }
 
     @Override
@@ -62,7 +81,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
-        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate);
+        LocalDateTime appliedDate = applicationDateCreator.create(stateRule.timeFrame(), referenceDate);
 
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)
@@ -76,21 +95,22 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
         return salesTaxTrackingRepository.findByState(state)
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)))
-                .map(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
+                .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(salesTaxTrackingRepository::save);
     }
 
-    private Function<SalesTaxTracking, SalesTaxTracking> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
+    private Function<SalesTaxTracking, Mono<SalesTaxTracking>> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingInfo ->
-                new SalesTaxTracking(
-                        salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTracking.getState(),
-                        salesTaxTrackingInfo.getTenantId(), salesTaxTracking.getComment(),
-                        salesTaxTracking.isEnforcesSalesTax(),
-                        salesTaxTracking.getPhysicalNexusTracker(), salesTaxTracking.getEconomicNexusTracker(),
-                        salesTaxTracking.getAppliedDate(), salesTaxTracking.isApproved(),
-                        salesTaxTracking.getApprovalDate(),
-                        salesTaxTracking.getFilingFrequency()
-                );
+                addClientAndStateDetails(salesTaxTracking).map(salesTaxTrackingWithDetails ->
+                        new SalesTaxTracking(
+                                salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTrackingWithDetails.getState(),
+                                salesTaxTrackingInfo.getTenantId(), salesTaxTrackingWithDetails.getComment(),
+                                salesTaxTrackingWithDetails.isEnforcesSalesTax(),
+                                salesTaxTrackingWithDetails.getPhysicalNexusTracker(), salesTaxTrackingWithDetails.getEconomicNexusTracker(),
+                                salesTaxTrackingWithDetails.getNexusStateRule(), salesTaxTrackingWithDetails.getClientTracking(),
+                                salesTaxTrackingWithDetails.getAppliedDate(), salesTaxTrackingWithDetails.isApproved(),
+                                salesTaxTrackingWithDetails.getApprovalDate(),
+                                salesTaxTrackingWithDetails.getFilingFrequency()));
     }
 
     @Override
@@ -105,6 +125,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
 
     @Override
     public Mono<SalesTaxTracking> injectDataToNewSalesTaxTracking(@NonNull SalesTaxTracking salesTaxTracking) {
-        return Mono.just(salesTaxTracking).map(complytIdHandler::insertComplytIdToNew);
+        return addClientAndStateDetails(salesTaxTracking)
+                .map(complytIdHandler::insertComplytIdToNew);
     }
 }

@@ -1,5 +1,6 @@
 package com.complyt.domain.nexus;
 
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.FilingFrequency;
 import com.complyt.domain.State;
 import com.complyt.domain.properties.ComplytIdProperty;
@@ -28,6 +29,8 @@ public class SalesTaxTracking implements ComplytIdProperty {
     boolean enforcesSalesTax;
     PhysicalNexusTracker physicalNexusTracker;
     EconomicNexusTracker economicNexusTracker;
+    NexusStateRule nexusStateRule;
+    ClientTracking clientTracking;
     LocalDateTime appliedDate;
     boolean approved;
     LocalDateTime approvalDate;
