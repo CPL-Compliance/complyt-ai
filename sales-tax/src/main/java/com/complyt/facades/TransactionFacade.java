@@ -1,5 +1,6 @@
 package com.complyt.facades;
 
+import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -43,7 +44,7 @@ public class TransactionFacade {
                                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                                 handleSalesTaxCalculationAndSave(setTransaction, salesTaxTrackingWithNexusInfo, customer) :
-                                                saveAndHandleNexusTrackingCalculation(setTransaction))
+                                                saveAndHandleNexusTrackingCalculation(setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
                                         .map(savedTransaction -> savedTransaction.withCustomer(customer)))));
     }
 
@@ -52,8 +53,8 @@ public class TransactionFacade {
                 .flatMap(transactionService::save);
     }
 
-    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction) {
-        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.save(transaction)
+    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking) ? transactionService.save(transaction)
                 .flatMap(savedTransaction -> nexusService.calculateNexusTracking(savedTransaction)
                         .thenReturn(savedTransaction)) : transactionService.save(transaction);
     }
@@ -70,7 +71,7 @@ public class TransactionFacade {
                                 .flatMap(setTransaction -> nexusService.hasNexus(setTransaction)
                                         .flatMap(salesTaxTrackingWithNexusInfo -> salesTaxTrackingWithNexusInfo.isHasNexus() ?
                                                 handleSalesTaxCalculationAndUpdate(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo, customer) :
-                                                updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction))
+                                                updateAndHandleNexusTrackingCalculation(externalId, source, setTransaction, salesTaxTrackingWithNexusInfo.getSalesTaxTracking()))
                                         .map(receivedTransaction -> receivedTransaction.withCustomer(customer)))));
     }
 
@@ -79,8 +80,8 @@ public class TransactionFacade {
                 .flatMap(updatedTransaction -> transactionService.update(externalId, source, updatedTransaction));
     }
 
-    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction) {
-        return nexusService.isNexusTrackingCalculationRequired(transaction) ? transactionService.update(externalId, source, transaction)
+    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking) ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.calculateNexusTracking(updatedTransaction)
                         .thenReturn(updatedTransaction)) : transactionService.update(externalId, source, transaction);
     }

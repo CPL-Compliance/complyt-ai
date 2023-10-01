@@ -78,8 +78,8 @@ public class NexusService {
                 });
     }
 
-    public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction) {
-        return transaction.getTransactionType() == TransactionType.INVOICE;
+    public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction, SalesTaxTracking salesTaxTracking) {
+        return transaction.getTransactionType() == TransactionType.INVOICE && salesTaxTracking.isEnforcesSalesTax();
     }
 
     public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
