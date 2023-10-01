@@ -187,6 +187,13 @@ spring:
             - Path=/v1/nexus/state/{state}
           filters:
             - SetPath=/v1/nexus/state/{state}
+        - id: sales-tax-refresh-nexus-by-state
+          uri: lb://sales-tax
+          predicates:
+            - Method=POST
+            - Path=/v1/nexus/refresh/state/{state}
+          filters:
+            - SetPath=/v1/nexus/state/{state}
         - id: sales-tax-get-nexus-by-complyt-id
           uri: lb://sales-tax
           predicates:

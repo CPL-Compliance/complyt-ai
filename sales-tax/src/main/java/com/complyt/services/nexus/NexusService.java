@@ -1,16 +1,19 @@
 package com.complyt.services.nexus;
 
+import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.domain.nexus.NexusCalculationSummary;
-import com.complyt.domain.transaction.Transaction;
-import com.complyt.domain.transaction.TransactionType;
+import com.complyt.domain.ClientTracking;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
 import com.complyt.services.ClientTrackingService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
+import com.complyt.utils.query.DateRangeStrategy;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
@@ -19,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -30,32 +32,27 @@ import java.util.List;
 @Slf4j
 public class NexusService {
 
+    @NonNull
+    ApplicationDateCreator applicationDateCreator;
     @Qualifier("salesTaxTrackingServiceImpl")
     @NonNull
     private SalesTaxTrackingService salesTaxTrackingService;
-
     @Qualifier("nexusStateRuleServiceImpl")
     @NonNull
     private NexusStateRuleService nexusStateRuleService;
-
     @Qualifier("customerServiceImpl")
     @NonNull
     private CustomerService customerService;
-
     @Qualifier("transactionServiceImpl")
     @NonNull
     private TransactionService transactionService;
-
     @Qualifier("clientTrackingServiceImpl")
     @NonNull
     private ClientTrackingService clientTrackingService;
-
     @NonNull
     private NexusCalculator nexusCalculator;
-
     @NonNull
     private NexusChecker nexusChecker;
-
     @NonNull
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
@@ -84,40 +81,48 @@ public class NexusService {
         return transaction.getTransactionType() == TransactionType.INVOICE;
     }
 
-    public Mono<SalesTaxTracking> calculateNexusTracking(@NonNull Transaction transaction) {
-        String state = transaction.getShippingAddress().state();
-        LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
-
-        return findRuleByState(state)
-                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
-                        .flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state)))
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+    public Mono<SalesTaxTracking> addToNexusTracking(@NonNull Transaction transaction, @NonNull SalesTaxTracking salesTaxTracking) {
+        return getNexusSummaryDate(salesTaxTracking, transaction.getExternalTimestamps().getCreatedDate()).flatMap(summaryDate ->
+                nexusCalculator.addTransactionToNexusSummary(transaction, salesTaxTracking, summaryDate)
+                        .map(modifiedSalesTaxTracking -> nexusChecker.passedThreshold(modifiedSalesTaxTracking.getNexusCalculationSummaries().get(summaryDate), salesTaxTracking.getNexusStateRule()))
+                        .flatMap(passedThreshold -> passedThreshold ?
+                                saveWithEconomicQualified(salesTaxTracking, transaction.getExternalTimestamps().getCreatedDate()) :
+                                Mono.just(salesTaxTracking)));
     }
 
-    public Mono<SalesTaxTracking> aggregateNexusInfo(List<Transaction> transactions, NexusStateRule stateRule, LocalDateTime referenceDate, String state) {
-        return nexusCalculator.calculate(transactions, stateRule)
-                .map(nexusCalculationSummary -> nexusChecker.passedThreshold(nexusCalculationSummary, stateRule))
-                .flatMap(passedThreshold -> findTrackingByState(state)
-                        .flatMap(salesTaxTracking -> passedThreshold ?
-                                salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate) :
-                                Mono.just(salesTaxTracking)
-                        ));
+    public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull LocalDateTime referenceDate) {
+        EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
+        LocalDateTime appliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate);
+
+        SalesTaxTracking modifiedTracking = salesTaxTracking
+                .withEconomicNexusTracker(newTracker)
+                .withAppliedDate(appliedDate);
+
+        return Mono.just(modifiedTracking);
     }
 
-    public Mono<List<Transaction>> extractTransactionsForCalculation(LocalDateTime referenceDate, NexusStateRule nexusStateRule) {
-        return clientTrackingService.getNexusInfo()
-                .flatMap(nexusInfo -> {
-                    Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate);
-                    return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
-                            .flatMap(singleTransaction -> customerService.findByComplytId(singleTransaction.getCustomerId())
-                                    .map(singleTransaction::withCustomer)).collectList();
-                });
+    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull SalesTaxTracking salesTaxTracking, List<Transaction> transactionList) {
+        return nexusCalculator.calculateNexusSummary(transactionList, salesTaxTracking, LocalDateTime.now());
     }
 
-    public Mono<NexusCalculationSummary> getSummary(@NonNull LocalDateTime referenceDate, @NonNull String state) {
-        return findRuleByState(state)
-                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
-                        .flatMap(transactions -> nexusCalculator.calculate(transactions, stateRule)));
+
+    public Mono<Query> getTransactionsQueryByStateRule(NexusStateRule nexusStateRule, ClientTracking clientTracking) {
+        return Mono.just(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(clientTracking.getNexus(), nexusStateRule, LocalDateTime.now()));
     }
 
+    public Mono<SalesTaxTracking> updateToNexusTracking(Transaction updatedTransaction, SalesTaxTracking salesTaxTracking) {
+        return getNexusSummaryDate(salesTaxTracking, updatedTransaction.getExternalTimestamps().getCreatedDate())
+                .flatMap(summaryDate -> nexusCalculator.subtractTransactionFromNexusSummary(updatedTransaction.getComplytId(), salesTaxTracking, summaryDate)
+                        .flatMap(nexusCalculationSummary -> nexusCalculator.addTransactionToNexusSummary(updatedTransaction, salesTaxTracking, summaryDate))
+                        .map(modifiedSalesTaxTracking -> nexusChecker.passedThreshold(modifiedSalesTaxTracking.getNexusCalculationSummaries().get(summaryDate), salesTaxTracking.getNexusStateRule()))
+                        .flatMap(passedThreshold -> passedThreshold ?
+                                saveWithEconomicQualified(salesTaxTracking, updatedTransaction.getExternalTimestamps().getCreatedDate()) :
+                                Mono.just(salesTaxTracking)));
+    }
+
+    public Mono<LocalDateTime> getNexusSummaryDate(SalesTaxTracking salesTaxTracking, LocalDateTime referenceDate) {
+        return Mono.just(new DateRangeStrategy(salesTaxTracking.getNexusStateRule().timeFrame(),
+                salesTaxTracking.getClientTracking().getNexus().getTaxableDate(),
+                referenceDate).getDateRange().getStart());
+    }
 }

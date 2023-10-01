@@ -38,7 +38,7 @@ public class NexusChecker {
     public boolean passedThreshold(@NonNull NexusCalculationSummary calculationSummary, @NonNull NexusStateRule stateRule) {
         Pair<NexusCalculationSummary, NexusStateRule> summaryAndRule = new Pair<>(calculationSummary, stateRule);
         boolean passedThreshold = nexusThresholdChecker.check(summaryAndRule);
-        log.debug("Checking if client passed nexus' threshold in state : " + stateRule.getState().getAbbreviation()
+        log.debug("Checking if client passed nexus' threshold in state : " + stateRule.state().getAbbreviation()
                 + " Has given a result of : " + passedThreshold);
 
         return passedThreshold;

@@ -3,7 +3,6 @@ package com.complyt.services.nexus;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
-import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.repositories.ClientTrackingRepository;
@@ -109,6 +108,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
                                 salesTaxTrackingWithDetails.isEnforcesSalesTax(),
                                 salesTaxTrackingWithDetails.getPhysicalNexusTracker(), salesTaxTrackingWithDetails.getEconomicNexusTracker(),
                                 salesTaxTrackingWithDetails.getNexusStateRule(), salesTaxTrackingWithDetails.getClientTracking(),
+                                salesTaxTrackingWithDetails.getNexusCalculationSummaries(), salesTaxTrackingWithDetails.getTransactionNexusSummaries(),
                                 salesTaxTrackingWithDetails.getAppliedDate(), salesTaxTrackingWithDetails.isApproved(),
                                 salesTaxTrackingWithDetails.getApprovalDate(),
                                 salesTaxTrackingWithDetails.getFilingFrequency()));

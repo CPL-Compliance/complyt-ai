@@ -96,7 +96,7 @@ public class NexusCalculatorTest {
         when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
         when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
 
-        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
 
         // Then
         StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();
@@ -118,7 +118,7 @@ public class NexusCalculatorTest {
         when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
         when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
         when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
-        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculate(transactions, nexusStateRule);
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
 
         // Then
         StepVerifier.create(actualSummary).expectNext(summary).verifyComplete();

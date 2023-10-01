@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -31,6 +32,9 @@ public class SalesTaxTracking implements ComplytIdProperty {
     EconomicNexusTracker economicNexusTracker;
     NexusStateRule nexusStateRule;
     ClientTracking clientTracking;
+
+    Map<LocalDateTime, NexusCalculationSummary> nexusCalculationSummaries;
+    Map<UUID, TransactionNexusSummary> transactionNexusSummaries;
     LocalDateTime appliedDate;
     boolean approved;
     LocalDateTime approvalDate;
