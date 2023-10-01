@@ -2,6 +2,7 @@ package com.complyt.facades;
 
 import com.complyt.domain.State;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ public class SalesTaxTrackingFacadeTest {
 
     @Mock
     SalesTaxTrackingService salesTaxTrackingService;
+
+    @Mock
+    NexusService nexusService;
 
     private SalesTaxTracking salesTaxTracking;
 

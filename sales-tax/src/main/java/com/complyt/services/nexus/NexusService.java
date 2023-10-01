@@ -2,6 +2,7 @@ package com.complyt.services.nexus;
 
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -86,15 +88,9 @@ public class NexusService {
         String state = transaction.getShippingAddress().state();
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
-        return clientTrackingService.getNexusInfo()
-                .flatMap(nexusInfo -> findRuleByState(state)
-                        .flatMap(stateRule -> {
-                            Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, stateRule, referenceDate);
-                            return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
-                                    .flatMap(singleTransaction -> customerService.findByComplytId(singleTransaction.getCustomerId())
-                                            .map(customer -> singleTransaction.withCustomer(customer)))
-                                    .collectList().flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state));
-                        }))
+        return findRuleByState(state)
+                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
+                        .flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state)))
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
@@ -106,6 +102,22 @@ public class NexusService {
                                 salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate) :
                                 Mono.just(salesTaxTracking)
                         ));
+    }
+
+    public Mono<List<Transaction>> extractTransactionsForCalculation(LocalDateTime referenceDate, NexusStateRule nexusStateRule) {
+        return clientTrackingService.getNexusInfo()
+                .flatMap(nexusInfo -> {
+                    Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate);
+                    return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
+                            .flatMap(singleTransaction -> customerService.findByComplytId(singleTransaction.getCustomerId())
+                                    .map(singleTransaction::withCustomer)).collectList();
+                });
+    }
+
+    public Mono<NexusCalculationSummary> getSummary(@NonNull LocalDateTime referenceDate, @NonNull String state) {
+        return findRuleByState(state)
+                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
+                        .flatMap(transactions -> nexusCalculator.calculate(transactions, stateRule)));
     }
 
 }

@@ -1,19 +1,13 @@
 package com.complyt.domain.nexus;
 
-import lombok.*;
+import com.complyt.domain.nexus.enums.Definition;
 
 import java.math.BigDecimal;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-@With
-@ToString
-public class NexusCalculationSummary {
-    private long count;
-    private BigDecimal amount;
+public record NexusCalculationSummary(long count, BigDecimal amount, Definition definition) {
 
-    public final BigDecimal getAmount() {
+    @Override
+    public BigDecimal amount() {
         return amount != null ? amount : BigDecimal.ZERO;
     }
 

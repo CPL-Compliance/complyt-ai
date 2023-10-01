@@ -3,12 +3,14 @@ package com.complyt.repositories;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.security.TenantResolver;
 import com.complyt.utils.observability.ContextLogger;
+import com.mongodb.client.model.Aggregates;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -113,4 +115,20 @@ public class TransactionRepository {
                             .thenMany(reactiveMongoTemplate.find(updatedQuery, Transaction.class));
                 });
     }
+
+//    public Flux<Transaction> getWithCustomer(Query query) {
+//        return tenantResolver.resolve()
+//                .flatMapMany(tenantId -> {
+//                    Query updatedQuery = query.addCriteria(Criteria.where("tenantId").is(tenantId));
+//                    AggregationOperation aggregationOperation = Aggregation.lookup("customer", "customerId", "complytId", "customer");
+//                    AggregationOperation match = Aggregation.match(Criteria.where("tenantId").is(tenantId));
+//
+//                    TypedAggregation<Transaction> aggregation = Aggregation.newAggregation(Transaction.class,
+//                            match, aggregationOperation, Aggregation.unwind("customer"));
+//
+//                    return ContextLogger.observeCtx("builtAggregation: " + aggregation, log::info)
+//                            .thenMany(reactiveMongoTemplate.aggregate(aggregation, Transaction.class));
+//                });
+//    }
+
 }

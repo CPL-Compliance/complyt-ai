@@ -1,13 +1,19 @@
 package com.complyt.v1.handlers;
 
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import com.complyt.v1.mappers.NexusCalculationSummaryMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
+import com.complyt.v1.mappers.StringToLocalDateTimeMapper;
+import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,6 +28,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
@@ -89,4 +96,20 @@ public class SalesTaxTrackingHandler {
                 ServerResponse.ok()
                         .body(salesTaxTrackingFacade.findAll().map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
     }
+
+    @NexusReadPermission
+    public Mono<ServerResponse> getNexusSummary(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        LocalDateTime date = LocalDateTime.parse(serverRequest.pathVariable("date"));
+
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        return ContextLogger.observeCtx(logStr, log::info).then(
+                salesTaxTrackingFacade.getNexusSummary(date, state)
+                        .flatMap(nexusCalculationSummary ->
+                                ServerResponse.ok()
+                                        .body(NexusCalculationSummaryMapper.INSTANCE.nexusCalculationSummaryToNexusCalculationSummaryDto(nexusCalculationSummary), NexusCalculationSummaryDto.class))
+        );
+    }
+
 }

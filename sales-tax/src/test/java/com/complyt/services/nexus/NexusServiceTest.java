@@ -4,6 +4,7 @@ import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
 import com.complyt.domain.Nexus;
 import com.complyt.domain.State;
+import com.complyt.domain.nexus.enums.Definition;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.domain.customer.Customer;
@@ -16,6 +17,7 @@ import com.complyt.services.ClientTrackingService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.v1.models.nexus.DefinitionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -120,7 +122,7 @@ class NexusServiceTest {
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() - 1,
-                nexusStateRule.getNexusThreshold().getAmount().subtract(BigDecimal.ONE));
+                nexusStateRule.getNexusThreshold().getAmount().subtract(BigDecimal.ONE), Definition.AMOUNT);
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
@@ -157,7 +159,7 @@ class NexusServiceTest {
         Flux<Transaction> transactionFlux = Flux.fromIterable(transactionList);
 
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() + 1,
-                nexusStateRule.getNexusThreshold().getAmount().add(BigDecimal.ONE));
+                nexusStateRule.getNexusThreshold().getAmount().add(BigDecimal.ONE), Definition.AMOUNT);
 
         State state = new State("CA", "02", "California");
         SalesTaxTracking salesTaxTrackingWithNoNexusEstablished = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
