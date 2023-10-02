@@ -49,7 +49,8 @@ public class CustomerDtoTest {
                 ", email=" + customerDto.email() +
                 ", customerType=" + customerDto.customerType() +
                 ", internalTimestamps=" + customerDto.internalTimestamps() +
-                ", externalTimestamps=" + customerDto.externalTimestamps() + "]";
+                ", externalTimestamps=" + customerDto.externalTimestamps() +
+                ", comment=" + customerDto.comment() + "]";
 
         // When
         String actualString = customerDto.toString();
