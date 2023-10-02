@@ -53,16 +53,18 @@ public class NexusCalculator {
     }
 
     public Mono<SalesTaxTracking> addTransactionToNexusSummary(Transaction transaction, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
-        return nexusTransactionsAmountCalculator.extract(List.of(transaction), salesTaxTracking.getNexusStateRule())
-                .flatMap(relevantAmount -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDate))
+        return nexusTransactionSummaryCalculator.extract(transaction, salesTaxTracking.getNexusStateRule())
+                .mapNotNull(transactionNexusSummary -> salesTaxTracking.getTransactionNexusSummaries().put(transaction.getComplytId(), transactionNexusSummary))
+                .flatMap(transactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDate))
                         .map(nexusCalculationSummary -> transaction.getTransactionType().equals(TransactionType.REFUND)
-                                ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(relevantAmount.negate()))
-                                : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(relevantAmount)).withCount(nexusCalculationSummary.count() + 1)))
-                .flatMap(nexusCalculationSummary -> insertNewNexusCalculationSummary(salesTaxTracking, summaryDate, nexusCalculationSummary));
+                                ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount().negate()))
+                                : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount())).withCount(nexusCalculationSummary.count() + 1))
+                        .flatMap(nexusCalculationSummary -> insertNewNexusCalculationSummary(salesTaxTracking, summaryDate, nexusCalculationSummary)))
+                .switchIfEmpty(Mono.just(salesTaxTracking));
     }
 
     public Mono<SalesTaxTracking> subtractTransactionFromNexusSummary(UUID complytId, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
-        return Mono.just(salesTaxTracking.getTransactionNexusSummaries().get(complytId))
+        return Mono.just(salesTaxTracking.getTransactionNexusSummaries().remove(complytId))
                 .flatMap(transactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDate))
                         .map(nexusCalculationSummary -> transactionNexusSummary.transactionType().equals(TransactionType.REFUND)
                                 ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount()))
