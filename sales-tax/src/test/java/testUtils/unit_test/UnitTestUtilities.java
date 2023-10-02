@@ -118,7 +118,8 @@ public class UnitTestUtilities {
                 null,
                 CustomerType.RETAIL,
                 internalTimeStamps,
-                externalTimestamps
+                externalTimestamps,
+                "comment"
         );
     }
 
@@ -135,7 +136,8 @@ public class UnitTestUtilities {
                 null,
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
-                externalTimestamps
+                externalTimestamps,
+                "comment"
         );
     }
 

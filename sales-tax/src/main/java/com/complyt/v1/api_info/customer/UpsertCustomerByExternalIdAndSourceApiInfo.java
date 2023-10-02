@@ -101,49 +101,56 @@ import java.lang.annotation.Target;
 public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
     String externalIdExample = "999444";
     String sourceExample = "1";
-    String newCustomerExample = "{\n" +
-                                "    \"externalId\": \"" + externalIdExample + "\",\n" +
-                                "    \"source\": \"" + sourceExample + "\",\n" +
-                                "    \"name\": \"Complyt\",\n" +
-                                "    \"address\": {\n" +
-                                "        \"city\": \"Sacramento\",\n" +
-                                "        \"country\": \"US\",\n" +
-                                "        \"county\": null,\n" +
-                                "        \"state\": \"CA\",\n" +
-                                "        \"street\": \"944 W. Wintergreen St.\",\n" +
-                                "        \"zip\": \"95823\",\n" +
-                                "        \"isPartial\": false\n" +
-                                "    },\n" +
-                                "    \"email\": \"example@some.mail.com\",\n" +
-                                "    \"customerType\": \"RETAIL\",\n" +
-                                "    \"externalTimestamps\": {\n" +
-                                "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
-                                "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-                                "    }\n" +
-                                "}";
-    String returnedCustomerExample = "[{\n" +
-                                     "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
-                                     "    \"id\": \"63bd86fd9c005a684b5fd2f0\",\n" +
-                                     "    \"externalId\": \"" + externalIdExample + "\",\n" +
-                                     "    \"source\": \"" + sourceExample + "\",\n" +
-                                     "    \"name\": \"Complyt\",\n" +
-                                     "    \"address\": {\n" +
-                                     "        \"city\": \"Sacramento\",\n" +
-                                     "        \"country\": \"US\",\n" +
-                                     "        \"county\": null,\n" +
-                                     "        \"state\": \"CA\",\n" +
-                                     "        \"street\": \"944 W. Wintergreen St.\",\n" +
-                                     "        \"zip\": \"95823,\"\n" +
-                                     "        \"isPartial\": false\n" +
-                                     "    },\n" +
-                                     "    \"customerType\": \"RETAIL\",\n" +
-                                     "    \"internalTimestamps\": {\n" +
-                                     "        \"createdDate\": \"2023-01-10T17:40:44.357\",\n" +
-                                     "        \"updatedDate\": \"2023-01-11T17:10:21.275\"\n" +
-                                     "    },\n" +
-                                     "    \"externalTimestamps\": {\n" +
-                                     "        \"createdDate\": \"2022-10-19T07:00:00\",\n" +
-                                     "        \"updatedDate\":\"2022-10-19T09:07:54.585\"\n" +
-                                     "    }\n" +
-                                     "}]";
+    String newCustomerExample = """
+            {
+                "externalId": "externalIdExample",\s
+                "source": "sourceExample",\s
+                "name": "Complyt",\s
+                "address": {\s
+                    "city": "Sacramento",\s
+                    "country": "US",\s
+                    "county": null,\s
+                    "state": "CA",\s
+                    "street": "944 W. Wintergreen St.",\s
+                    "zip": "95823",\s
+                    "isPartial": false\s
+                },\s
+                "email": "example@some.mail.com",\s
+                "customerType": "RETAIL",\s
+                "externalTimestamps": {\s
+                    "createdDate": "2022-10-19T07:00:00.000Z",\s
+                    "updatedDate": "2022-10-19T09:07:54.585Z"\s
+                },\s
+                "comment": "this is a customer"\s
+            }\s
+            """;
+
+    String returnedCustomerExample = """
+            {
+                "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
+                "externalId": "externalIdExample",
+                "source": "sourceExample",
+                "name": "Complyt",
+                "address": {
+                    "city": "Sacramento",
+                    "country": "US",
+                    "county": null,
+                    "state": "CA",
+                    "street": "944 W. Wintergreen St.",
+                    "zip": "95823",
+                    "isPartial": false
+                },
+                "email": "example@some.mail.com",
+                "customerType": "RETAIL",
+                "internalTimestamps": {
+                    "createdDate": "2023-01-10T17:40:44.357",
+                    "updatedDate": "2023-01-11T17:10:21.275"
+                },
+                "externalTimestamps": {
+                    "createdDate": "2022-10-19T07:00:00",
+                    "updatedDate": "2022-10-19T09:07:54.585"
+                },
+                "comment": "this is a customer"
+            }""";
+
 }
