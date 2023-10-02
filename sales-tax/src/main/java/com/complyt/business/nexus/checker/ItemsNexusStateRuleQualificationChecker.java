@@ -29,8 +29,8 @@ public class ItemsNexusStateRuleQualificationChecker implements NexusCheck<Pair<
         List<Taxable> items = itemsAndRule.getValue0();
         NexusStateRule nexusStateRule = itemsAndRule.getValue1();
         log.debug("Checking if items received should be counted into nexus aggregation, state rule info :" +
-                "taxable categories - " + nexusStateRule.getTaxableCategories() + " , tangible categories "
-                + nexusStateRule.getTangibleCategories());
+                "taxable categories - " + nexusStateRule.taxableCategories() + " , tangible categories "
+                + nexusStateRule.tangibleCategories());
 
         for (Taxable item : items) {
             if (qualificationChecker.isQualified(item, nexusStateRule)) {

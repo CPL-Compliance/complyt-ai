@@ -6,6 +6,8 @@ import com.complyt.domain.nexus.NexusStateRule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-public class TaxableCollectionAmountExtractor implements AmountExtractor {
+public class TaxableCollectionAmountExtractor {//implements AmountExtractor {
 
     @NonNull
     private QualificationChecker qualificationChecker;
@@ -24,13 +26,19 @@ public class TaxableCollectionAmountExtractor implements AmountExtractor {
     @NonNull
     private NexusStateRule nexusStateRule;
 
-    public BigDecimal extract() {
-        List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationChecker.isQualified(item, nexusStateRule)).toList();
-        BigDecimal amount = BigDecimal.ZERO;
+    public Mono<BigDecimal> extract() {
+        return Flux.fromIterable(taxables)
+                .filter(taxable -> qualificationChecker.isQualified(taxable,nexusStateRule))
+                .reduce(BigDecimal.ZERO, (amountSum, taxable) -> amountSum.add(taxable.getTotalPrice()));
 
-        for (Taxable taxable : qualifiedTaxables)
-            amount = amount.add(taxable.getTotalPrice());
 
-        return amount;
+//        return Mono.fromCallable(() -> {
+//            List<Taxable> qualifiedTaxables = taxables.stream().filter(item -> qualificationChecker.isQualified(item, nexusStateRule)).toList();
+//            BigDecimal amount = BigDecimal.ZERO;
+//
+//            for (Taxable taxable : qualifiedTaxables)
+//                amount = amount.add(taxable.getTotalPrice());
+//            return amount;
+//        }) ;
     }
 }

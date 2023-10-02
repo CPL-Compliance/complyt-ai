@@ -32,7 +32,6 @@ public class SalesTaxTracking implements ComplytIdProperty {
     EconomicNexusTracker economicNexusTracker;
     NexusStateRule nexusStateRule;
     ClientTracking clientTracking;
-
     Map<LocalDateTime, NexusCalculationSummary> nexusCalculationSummaries;
     Map<UUID, TransactionNexusSummary> transactionNexusSummaries;
     LocalDateTime appliedDate;

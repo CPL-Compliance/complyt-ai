@@ -10,8 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -28,16 +30,26 @@ public class NexusCalculator {
     private NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @NonNull
+    private NexusTransactionSummaryCalculator nexusTransactionSummaryCalculator;
+
+    @NonNull
     private TransactionsFilterByNexusRules transactionsFilterByNexusRules;
 
     public Mono<SalesTaxTracking> calculateNexusSummary(List<Transaction> transactions, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
         List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule());
 
         return ContextLogger.observeCtx("Calculating amount and count for all transactions on timeframe : " + salesTaxTracking.getNexusStateRule().timeFrame(), log::debug)
-                .then(nexusTransactionsCountCalculator.extract(filteredTransactions, salesTaxTracking.getNexusStateRule())
-                        .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, salesTaxTracking.getNexusStateRule())
-                                .flatMap(amount -> ContextLogger.observeCtx("Calculated total amount of : " + amount + ", and count : " + count, log::debug)
-                                        .then(insertNewNexusCalculationSummary(salesTaxTracking, summaryDate, new NexusCalculationSummary(count, amount))))));
+                .thenMany(Flux.fromIterable(filteredTransactions)).flatMap(transaction -> nexusTransactionSummaryCalculator.extract(transaction, salesTaxTracking.getNexusStateRule())
+                        .mapNotNull(transactionNexusSummary -> salesTaxTracking.getTransactionNexusSummaries().put(transaction.getComplytId(), transactionNexusSummary)))
+                .map(transactionNexusSummary -> transactionNexusSummary.transactionType().equals(TransactionType.REFUND)
+                        ? transactionNexusSummary.relevantAmount().negate()
+                        : transactionNexusSummary.relevantAmount())
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .flatMap(amount -> Flux.fromIterable(salesTaxTracking.getTransactionNexusSummaries().values())
+                        .reduce(0, ((integer, transactionNexusSummary) -> integer + (transactionNexusSummary.transactionType().equals(TransactionType.REFUND) ? 0 : 1)))
+                        .mapNotNull(count -> salesTaxTracking.getNexusCalculationSummaries().put(summaryDate, new NexusCalculationSummary(count, amount))))
+                .thenReturn(salesTaxTracking);
+
     }
 
     public Mono<SalesTaxTracking> addTransactionToNexusSummary(Transaction transaction, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
