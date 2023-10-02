@@ -80,11 +80,14 @@ class NexusServiceTest {
 
     String salesTaxTrackingId;
 
+    private  SalesTaxTracking salesTaxTracking;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         testUtilities = new UnitTestUtilities(LocalDateTime.now(), UUID.randomUUID().toString());
         salesTaxTrackingId = UUID.randomUUID().toString();
+        salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
         customer = testUtilities.createCustomer(UUID.randomUUID().toString());
     }
@@ -123,8 +126,6 @@ class NexusServiceTest {
         NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() - 1,
                 nexusStateRule.getNexusThreshold().getAmount().subtract(BigDecimal.ONE), Definition.AMOUNT);
 
-        State state = new State("CA", "02", "California");
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
 
         // When
@@ -187,7 +188,6 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_StateSent_FindsTracking_ReturnsTracking() {
         // Given
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
@@ -200,7 +200,6 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_TransactionSent_FindsTracking_ReturnsTracking() {
         // Given
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
 
         // When
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
@@ -227,7 +226,6 @@ class NexusServiceTest {
     @Test
     void hasNexus_HasNexus_ReturnsHasNexus() {
         // Given
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         SalesTaxTrackingWithNexusInfo salesTaxTrackingDecorator = new SalesTaxTrackingWithNexusInfo(salesTaxTracking, true);
 
         // When
@@ -244,10 +242,22 @@ class NexusServiceTest {
         // Given
 
         // When
-        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction);
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking);
 
         // Then
         assertTrue(isSalesTaxRequired);
+    }
+
+    @Test
+    void isSalesTaxTrackingCalculationRequired_StateDoesNotEnforceSalesTax_ReturnsFalse() {
+        // Given
+        SalesTaxTracking salesTaxTrackingNoSalesTaxEnforcement = salesTaxTracking.withEnforcesSalesTax(false);
+
+        // When
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTrackingNoSalesTaxEnforcement);
+
+        // Then
+        assertFalse(isSalesTaxRequired);
     }
 
     @Test
@@ -256,7 +266,7 @@ class NexusServiceTest {
 
         // When
         Transaction salesOrderTransaction = transaction.withTransactionType(TransactionType.SALES_ORDER);
-        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(salesOrderTransaction);
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(salesOrderTransaction, salesTaxTracking);
 
         // Then
         assertFalse(isSalesTaxRequired);
@@ -269,7 +279,7 @@ class NexusServiceTest {
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.isNexusTrackingCalculationRequired(nullTransaction));
+                () -> nexusService.isNexusTrackingCalculationRequired(nullTransaction, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -291,7 +301,6 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_TransactionPassed_NotFindingNexus_ThrowsException() {
         // Given
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String state = transaction.getShippingAddress().state();
 
         // When
@@ -306,7 +315,6 @@ class NexusServiceTest {
     @Test
     void findTrackingByState_StatePassed_NotFindingNexus_ThrowsException() {
         // Given
-        SalesTaxTracking salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         String state = transaction.getShippingAddress().state();
 
         // When
