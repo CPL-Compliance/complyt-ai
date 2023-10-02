@@ -17,7 +17,6 @@ import com.complyt.services.ClientTrackingService;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.v1.models.nexus.DefinitionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
