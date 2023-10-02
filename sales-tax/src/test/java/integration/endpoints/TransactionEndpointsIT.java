@@ -5,10 +5,12 @@ import com.complyt.security.TenantResolver;
 import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
+import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
 import com.complyt.v1.models.TimestampsDto;
+import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -58,6 +60,29 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Order(1)
+    @Test
+    @WithMockUser
+    public void refreshTest() {
+        String state = "CA";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state" + state )
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> {
+                    LOGGER.info(String.valueOf(salesTaxTrackingDto));
+                });
+
+        while (true);
     }
 
 

@@ -2,6 +2,7 @@ package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
 import com.complyt.utils.filter.TransactionsFilterByNexusRules;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +44,9 @@ public class NexusCalculator {
 
     public Mono<SalesTaxTracking> addTransactionToNexusSummary(Transaction transaction, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
         return nexusTransactionsAmountCalculator.extract(List.of(transaction), salesTaxTracking.getNexusStateRule())
-                .flatMap(relevantAmount -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDate))
+                .flatMap(relevantAmount -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().containsKey(summaryDate)
+                                ? salesTaxTracking.getNexusCalculationSummaries().get(summaryDate)
+                                : new NexusCalculationSummary(0, BigDecimal.ZERO))
                         .map(nexusCalculationSummary -> transaction.getTransactionType().equals(TransactionType.REFUND)
                                 ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(relevantAmount.negate()))
                                 : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(relevantAmount)).withCount(nexusCalculationSummary.count() + 1)))
@@ -50,8 +54,12 @@ public class NexusCalculator {
     }
 
     public Mono<SalesTaxTracking> subtractTransactionFromNexusSummary(UUID complytId, SalesTaxTracking salesTaxTracking, LocalDateTime summaryDate) {
-        return Mono.just(salesTaxTracking.getTransactionNexusSummaries().get(complytId))
-                .flatMap(transactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDate))
+        return !salesTaxTracking.getTransactionNexusSummaries().containsKey(complytId)
+                ? Mono.just(salesTaxTracking)
+                : Mono.just(salesTaxTracking.getTransactionNexusSummaries().get(complytId))
+                .flatMap(transactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().containsKey(summaryDate)
+                                ? salesTaxTracking.getNexusCalculationSummaries().get(summaryDate)
+                                : new NexusCalculationSummary(0, BigDecimal.ZERO))
                         .map(nexusCalculationSummary -> transactionNexusSummary.transactionType().equals(TransactionType.REFUND)
                                 ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount()))
                                 : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount().negate())).withCount(nexusCalculationSummary.count() - 1)))
