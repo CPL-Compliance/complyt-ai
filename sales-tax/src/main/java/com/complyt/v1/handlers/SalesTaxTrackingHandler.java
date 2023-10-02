@@ -100,7 +100,7 @@ public class SalesTaxTrackingHandler {
                 salesTaxTrackingFacade.refreshNexusSummary(state)
                         .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
                         .flatMap(salesTaxTrackingDto -> ServerResponse.ok()
-                                .body(salesTaxTrackingDto, NexusCalculationSummaryDto.class))
+                                .body(salesTaxTrackingDto, SalesTaxTrackingDto.class))
         );
     }
 

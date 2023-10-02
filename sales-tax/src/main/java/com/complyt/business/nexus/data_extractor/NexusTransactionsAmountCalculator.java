@@ -14,26 +14,21 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class NexusTransactionsAmountCalculator implements NexusDataExtractor<BigDecimal, List<Transaction>> {
+public class NexusTransactionsAmountCalculator implements NexusDataExtractor<BigDecimal, Transaction> {
 
     @NonNull
     private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
     @Override
-    public Mono<BigDecimal> extract(@NonNull List<Transaction> transactions, @NonNull NexusStateRule nexusStateRule) {
+    public Mono<BigDecimal> extract(@NonNull Transaction transaction, @NonNull NexusStateRule nexusStateRule) {
         return Mono.fromCallable(() -> {
-            BigDecimal totalAmount = BigDecimal.ZERO;
-
-            for (Transaction transaction : transactions) {
                 TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
                 BigDecimal amount = amountExtractor.extract();
 
                 // In case of a refund, the amount will be subtracted instead of added
                 BigDecimal currentAmount = transaction.getTransactionType() == TransactionType.REFUND ? amount.multiply(BigDecimal.valueOf(-1)) : amount;
-                totalAmount = totalAmount.add(currentAmount);
-            }
 
-            return totalAmount;
+            return currentAmount;
         });
     }
 }
