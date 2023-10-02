@@ -119,7 +119,8 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
                                 "    \"externalTimestamps\": {\n" +
                                 "        \"createdDate\": \"2022-10-19T07:00:00.000Z\",\n" +
                                 "        \"updatedDate\": \"2022-10-19T09:07:54.585Z\"\n" +
-                                "    }\n" +
+                                "    },\n" +
+                                "    \"comment\": \"this is a customer\"\n" +
                                 "}";
     String returnedCustomerExample = "[{\n" +
                                      "    \"complytId\": \"9f8ee193-1a71-42b4-801d-ee1d8a161fbe\",\n" +
@@ -144,6 +145,7 @@ public @interface UpsertCustomerByExternalIdAndSourceApiInfo {
                                      "    \"externalTimestamps\": {\n" +
                                      "        \"createdDate\": \"2022-10-19T07:00:00\",\n" +
                                      "        \"updatedDate\":\"2022-10-19T09:07:54.585\"\n" +
-                                     "    }\n" +
+                                     "    },\n" +
+                                     "    \"comment\": \"this is a customer\"\n" +
                                      "}]";
 }
