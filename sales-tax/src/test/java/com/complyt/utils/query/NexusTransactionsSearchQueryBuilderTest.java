@@ -49,7 +49,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
     private NexusStateRule createNexusStateRule() {
         State state = new State("CA", "02", "California");
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
-                TimeFrame.CURRENT_CALENDER_YEAR, null);
+                TimeFrame.CURRENT_CALENDER_YEAR, null, LocalDateTime.now());
     }
 
     private Nexus createNexusInfo() {
@@ -67,7 +67,7 @@ public class NexusTransactionsSearchQueryBuilderTest {
         Query queryToAssert = Query.query(Criteria.where("externalTimestamps.createdDate")
                 .gte(start).lte(end));
         Query expectedQuery = queryToAssert.addCriteria(new Criteria().orOperator(Criteria.where("shippingAddress.state")
-                .is(nexusStateRule.getState().getAbbreviation()), Criteria.where("shippingAddress.state").is(nexusStateRule.getState().getName())));
+                .is(nexusStateRule.state().getAbbreviation()), Criteria.where("shippingAddress.state").is(nexusStateRule.state().getName())));
 
         // When
         when(timeFrameQueryBuilder.buildNexusTimeFrame(nexus, nexusStateRule, dateReference)).thenReturn(queryToSend);

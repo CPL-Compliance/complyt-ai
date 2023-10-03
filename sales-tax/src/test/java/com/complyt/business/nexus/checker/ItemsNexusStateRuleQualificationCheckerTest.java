@@ -62,8 +62,8 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     @Test
     void check_ThereIsItemThatCountsRegardingToNexusRule_ReturnsTrue() {
         // Given
-        TangibleCategory tangibleCategory = nexusStateRule.getTangibleCategories().get(0);
-        TaxableCategory taxableCategory = nexusStateRule.getTaxableCategories().get(0);
+        TangibleCategory tangibleCategory = nexusStateRule.tangibleCategories().get(0);
+        TaxableCategory taxableCategory = nexusStateRule.taxableCategories().get(0);
         Item itemThatCounts = transaction.getItems().get(0).withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         transaction.getItems().add(itemThatCounts);
 
@@ -79,8 +79,8 @@ public class ItemsNexusStateRuleQualificationCheckerTest {
     @Test
     void check_OnlyShippingFeeQualifies_ReturnsFalse() {
         // Given
-        TangibleCategory tangibleCategory = nexusStateRule.getTangibleCategories().get(0);
-        TaxableCategory taxableCategory = nexusStateRule.getTaxableCategories().get(0);
+        TangibleCategory tangibleCategory = nexusStateRule.tangibleCategories().get(0);
+        TaxableCategory taxableCategory = nexusStateRule.taxableCategories().get(0);
         ShippingFee shippingFeeThatCounts = transaction.getShippingFee().withTangibleCategory(tangibleCategory).withTaxableCategory(taxableCategory);
         Transaction transactionWithShippingFeeThatCounts = transaction.withShippingFee(shippingFeeThatCounts);
 

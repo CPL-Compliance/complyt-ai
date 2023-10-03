@@ -84,7 +84,7 @@ public class SalesTaxTrackingServiceImplTest {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 
     @Test
@@ -192,7 +192,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.save(any())).thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
-        when(applicationDateCreator.create(stateRule.getTimeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
+        when(applicationDateCreator.create(stateRule.timeFrame(), referenceDate)).thenReturn(LocalDateTime.now());
         Mono<SalesTaxTracking> actualSalesTaxTracking = salesTaxTrackingService.saveWithEconomicQualified(salesTaxTracking, stateRule, referenceDate);
 
         // Then

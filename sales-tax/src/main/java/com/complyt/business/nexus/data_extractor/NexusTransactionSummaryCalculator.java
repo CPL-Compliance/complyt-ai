@@ -5,11 +5,15 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.utils.factory.NexusAmountAggregatorFactory;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 
+@Component
+@AllArgsConstructor
 public class NexusTransactionSummaryCalculator {
 
 //    @NonNull

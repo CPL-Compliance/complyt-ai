@@ -50,7 +50,7 @@ public class NexusStateRuleRepositoryTest {
     @Test
     void findById_FindsStateRule_ReturnsStateRule() {
         // Given
-        String id = nexusStateRule.getId();
+        String id = nexusStateRule.id();
 
         // When
         when(reactiveMongoTemplate.findById(id, NexusStateRule.class)).thenReturn(Mono.just(nexusStateRule));
@@ -76,7 +76,7 @@ public class NexusStateRuleRepositoryTest {
     @Test
     void findByState_FindsRule_ReturnsRule() {
         // Given
-        String state = nexusStateRule.getState().getAbbreviation();
+        String state = nexusStateRule.state().getAbbreviation();
         Criteria stateSearchCriteria = new Criteria()
                 .orOperator(Criteria.where("state.abbreviation").is(state),
                         Criteria.where("state.name").is(state));

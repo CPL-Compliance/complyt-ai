@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,20 +52,20 @@ class NexusStateRuleTest {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold);
+                TimeFrame.CURRENT_CALENDER_YEAR, nexusThreshold, LocalDateTime.now());
     }
 
     @Test
     void toString_ReturnString() {
         // Given
-        String expectedString = "NexusStateRule(id=" + nexusStateRule.getId() +
-                ", enforcesSalesTax=" + nexusStateRule.isEnforcesSalesTax() +
-                ", state=" + nexusStateRule.getState() +
-                ", taxableCategories=" + nexusStateRule.getTaxableCategories() +
-                ", tangibleCategories=" + nexusStateRule.getTangibleCategories() +
-                ", customerTypes=" + nexusStateRule.getCustomerTypes() +
-                ", timeFrame=" + nexusStateRule.getTimeFrame() +
-                ", nexusThreshold=" + nexusStateRule.getNexusThreshold() + ")";
+        String expectedString = "NexusStateRule(id=" + nexusStateRule.id() +
+                ", enforcesSalesTax=" + nexusStateRule.enforcesSalesTax() +
+                ", state=" + nexusStateRule.state() +
+                ", taxableCategories=" + nexusStateRule.taxableCategories() +
+                ", tangibleCategories=" + nexusStateRule.tangibleCategories() +
+                ", customerTypes=" + nexusStateRule.customerTypes() +
+                ", timeFrame=" + nexusStateRule.timeFrame() +
+                ", nexusThreshold=" + nexusStateRule.nexusThreshold() + ")";
 
         // When
         String actualString = nexusStateRule.toString();

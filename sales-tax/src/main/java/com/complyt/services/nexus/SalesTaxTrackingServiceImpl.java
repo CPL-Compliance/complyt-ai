@@ -53,7 +53,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.save(salesTaxTracking);
     }
 
-    private Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
+    @Override
+    public Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
         return clientTrackingRepository.findClient()
                 .flatMap(clientTracking -> nexusStateRuleRepository.findByState(salesTaxTracking.getState().getName())
                         .map(nexusStateRule -> salesTaxTracking
@@ -92,9 +93,9 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     }
 
     @Override
-    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull String state) {
-        return salesTaxTrackingRepository.findByState(state)
-                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + state)))
+    public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking) {
+        return salesTaxTrackingRepository.findByState(salesTaxTracking.getState().getName())
+                .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + salesTaxTracking.getState().getName())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
                 .flatMap(salesTaxTrackingRepository::save);
     }

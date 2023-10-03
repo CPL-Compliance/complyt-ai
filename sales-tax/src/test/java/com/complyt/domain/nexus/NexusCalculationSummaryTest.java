@@ -19,15 +19,15 @@ class NexusCalculationSummaryTest {
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(0L, BigDecimal.ZERO, Definition.AMOUNT);
+        return new NexusCalculationSummary(0L, BigDecimal.ZERO);
     }
 
     @Test
     void toString_ReturnsString() {
         // Given
         String expectedString = "NexusCalculationSummary(count=" + nexusCalculationSummary.count() +
-                ", amount=" + nexusCalculationSummary.amount() +
-                ", definition=" + nexusCalculationSummary.definition() + ")";
+                ", amount=" + nexusCalculationSummary.amount() + ")";
+//                ", definition=" + nexusCalculationSummary.definition() + ")";
 
         // When
         String actualString = nexusCalculationSummary.toString();

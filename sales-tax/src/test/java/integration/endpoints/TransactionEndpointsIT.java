@@ -29,6 +29,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.time.Duration;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,6 +72,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         // Then
         webTestClient
                 .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state )

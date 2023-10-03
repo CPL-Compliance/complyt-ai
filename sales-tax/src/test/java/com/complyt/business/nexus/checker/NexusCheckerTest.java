@@ -63,11 +63,11 @@ public class NexusCheckerTest {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(10), 10000, Definition.AMOUNT_OR_COUNT);
         State state = new State("CA", "02", "California");
         return new NexusStateRule(UUID.randomUUID().toString(), true, state, null, null, null,
-                null, nexusThreshold);
+                null, nexusThreshold, LocalDateTime.now());
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(10, new BigDecimal(10000), Definition.AMOUNT);
+        return new NexusCalculationSummary(10, new BigDecimal(10000));
     }
 
     @Test

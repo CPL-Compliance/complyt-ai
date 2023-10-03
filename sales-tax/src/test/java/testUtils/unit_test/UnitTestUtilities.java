@@ -280,7 +280,7 @@ public class UnitTestUtilities {
         NexusThreshold nexusThreshold = new NexusThreshold(new BigDecimal(1000), 2, Definition.AMOUNT_OR_COUNT);
 
         return new NexusStateRule(id, true, state, taxableCategories, tangibleCategories, customerTypes,
-                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold);
+                TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold, LocalDateTime.now());
     }
 
     public List<Taxable> createTaxables(Transaction transaction) {
@@ -294,9 +294,18 @@ public class UnitTestUtilities {
         return new SalesTaxTracking(UUID.randomUUID(), id, state,
                 tenantId, "comment", true,
                 new PhysicalNexusTracker(false, localDateTime),
-                new EconomicNexusTracker(false, localDateTime), localDateTime,
+                new EconomicNexusTracker(false, localDateTime),
+                createNexusStateRule(UUID.randomUUID().toString()),
+                creClientTracking(tenantId),
+                new HashMap<>(),
+                new HashMap<>(),
+                localDateTime,
                 true, localDateTime,
                 FilingFrequency.MONTHLY);
+    }
+
+    private ClientTracking creClientTracking(String tenantId) {
+        return  new ClientTracking(null, tenantId, new Nexus(LocalDateTime.now()), "client dope");
     }
 
     public SalesTaxTrackingDto createSalesTaxTrackingDto() {
