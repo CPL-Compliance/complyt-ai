@@ -23,11 +23,11 @@ import java.util.UUID;
 @Slf4j
 public class NexusCalculator {
 
-    @NonNull
-    private NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
-
-    @NonNull
-    private NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
+//    @NonNull
+//    private NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
+//
+//    @NonNull
+//    private NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @NonNull
     private NexusTransactionSummaryCalculator nexusTransactionSummaryCalculator;

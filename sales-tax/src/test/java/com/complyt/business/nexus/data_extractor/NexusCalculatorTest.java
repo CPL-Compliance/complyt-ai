@@ -35,11 +35,11 @@ public class NexusCalculatorTest {
     @InjectMocks
     NexusCalculator nexusCalculator;
 
-    @Mock
-    NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
-
-    @Mock
-    NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
+//    @Mock
+//    NexusTransactionsAmountCalculator nexusTransactionsAmountCalculator;
+//
+//    @Mock
+//    NexusTransactionsCountCalculator nexusTransactionsCountCalculator;
 
     @Mock
     TransactionsFilterByNexusRules transactionNexusFilter;

@@ -1,8 +1,10 @@
 package com.complyt.facades;
 
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.services.ClientTrackingService;
 import com.complyt.services.TransactionService;
 import com.complyt.services.nexus.NexusService;
+import com.complyt.services.nexus.NexusStateRuleService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,7 +22,12 @@ public class SalesTaxTrackingFacade {
     @NonNull
     @Qualifier("salesTaxTrackingServiceImpl")
     private SalesTaxTrackingService salesTaxTrackingService;
-
+    @Qualifier("nexusStateRuleServiceImpl")
+    @NonNull
+    private NexusStateRuleService nexusStateRuleService;
+    @Qualifier("clientTrackingServiceImpl")
+    @NonNull
+    private ClientTrackingService clientTrackingService;
     @NonNull
     private NexusService nexusService;
 
@@ -37,13 +44,23 @@ public class SalesTaxTrackingFacade {
 
     public Mono<SalesTaxTracking> update(@NonNull SalesTaxTracking salesTaxTracking, @NonNull SalesTaxTracking originalSalesTaxTracking, @NonNull String state) {
         return salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, originalSalesTaxTracking)
-                .flatMap(checkedSalesTaxTracking -> salesTaxTrackingService.update(checkedSalesTaxTracking, state));
+                .flatMap(checkedSalesTaxTracking ->
+                        nexusStateRuleService.findByState(salesTaxTracking.getState().getName())
+                                .map(checkedSalesTaxTracking::withNexusStateRule)
+                                .flatMap(salesTaxTrackingWithStateInfo -> clientTrackingService.getClientTracking()
+                                        .map(salesTaxTrackingWithStateInfo::withClientTracking))
+                                .flatMap(salesTaxTrackingWithStateAndClientInfo ->
+                                        salesTaxTrackingService.update(salesTaxTrackingWithStateAndClientInfo, state)));
     }
 
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingService.checkSalesTaxTrackingNotHavingComplytId(salesTaxTracking)
-                .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking)
-                .flatMap(salesTaxTrackingService::save);
+                .flatMap(checkedSalesTaxTracking -> nexusStateRuleService.findByState(salesTaxTracking.getState().getName())
+                        .map(checkedSalesTaxTracking::withNexusStateRule)
+                        .flatMap(salesTaxTrackingWithStateInfo -> clientTrackingService.getClientTracking()
+                                .map(salesTaxTrackingWithStateInfo::withClientTracking)
+                                .flatMap(salesTaxTrackingService::injectDataToNewSalesTaxTracking))
+                        .flatMap(salesTaxTrackingService::save));
     }
 
     public Flux<SalesTaxTracking> findAll() {
@@ -52,7 +69,7 @@ public class SalesTaxTrackingFacade {
 
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state) {
         return salesTaxTrackingService.findByState(state)
-                .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByStateRule(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking())
+                .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking())
                         .flatMapMany(transactionService::getTransactionsByQuery).collectList()
                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions))
                         .flatMap(refreshedSalesTaxTracking -> salesTaxTrackingService.update(refreshedSalesTaxTracking, state)));

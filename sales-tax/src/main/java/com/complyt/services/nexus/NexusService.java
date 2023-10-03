@@ -10,16 +10,11 @@ import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.transaction.TransactionType;
-import com.complyt.services.ClientTrackingService;
-import com.complyt.services.CustomerService;
-import com.complyt.services.TransactionService;
 import com.complyt.utils.query.DateRangeStrategy;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -34,21 +29,6 @@ public class NexusService {
 
     @NonNull
     ApplicationDateCreator applicationDateCreator;
-    @Qualifier("salesTaxTrackingServiceImpl")
-    @NonNull
-    private SalesTaxTrackingService salesTaxTrackingService;
-    @Qualifier("nexusStateRuleServiceImpl")
-    @NonNull
-    private NexusStateRuleService nexusStateRuleService;
-    @Qualifier("customerServiceImpl")
-    @NonNull
-    private CustomerService customerService;
-    @Qualifier("transactionServiceImpl")
-    @NonNull
-    private TransactionService transactionService;
-    @Qualifier("clientTrackingServiceImpl")
-    @NonNull
-    private ClientTrackingService clientTrackingService;
     @NonNull
     private NexusCalculator nexusCalculator;
     @NonNull
@@ -56,25 +36,10 @@ public class NexusService {
     @NonNull
     private NexusTransactionsSearchQueryBuilder nexusTransactionsSearchQueryBuilder;
 
-    public Mono<SalesTaxTracking> findTrackingByState(@NonNull String state) {
-        return salesTaxTrackingService.findByState(state)
-                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
-    }
 
-    public Mono<SalesTaxTracking> findTrackingByState(@NonNull Transaction transaction) {
-        return findTrackingByState(transaction.getShippingAddress().state());
-    }
-
-    public Mono<NexusStateRule> findRuleByState(String state) {
-        return nexusStateRuleService.findByState(state);
-    }
-
-    public Mono<SalesTaxTrackingWithNexusInfo> hasNexus(@NonNull Transaction transaction) {
-        return findTrackingByState(transaction)
-                .map(salesTaxTracking -> {
-                    boolean hasNexus = nexusChecker.hasNexus(salesTaxTracking);
-                    return new SalesTaxTrackingWithNexusInfo(salesTaxTracking, hasNexus);
-                });
+    public Mono<SalesTaxTrackingWithNexusInfo> hasNexus(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.fromCallable(() ->
+                new SalesTaxTrackingWithNexusInfo(salesTaxTracking, nexusChecker.hasNexus(salesTaxTracking)));
     }
 
     public boolean isNexusTrackingCalculationRequired(@NonNull Transaction transaction, SalesTaxTracking salesTaxTracking) {
@@ -106,7 +71,7 @@ public class NexusService {
     }
 
 
-    public Mono<Query> getTransactionsQueryByStateRule(NexusStateRule nexusStateRule, ClientTracking clientTracking) {
+    public Mono<Query> getTransactionsQueryByNexusCalculation(NexusStateRule nexusStateRule, ClientTracking clientTracking) {
         return Mono.just(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(clientTracking.getNexus(), nexusStateRule, LocalDateTime.now()));
     }
 

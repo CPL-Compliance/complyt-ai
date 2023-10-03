@@ -73,7 +73,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state" + state )
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state )
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
