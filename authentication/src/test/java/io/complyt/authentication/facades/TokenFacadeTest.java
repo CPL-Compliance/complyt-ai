@@ -59,7 +59,6 @@ class TokenFacadeTest {
 
         // When
         when(tokenService.findByApiKey(any())).thenReturn(Mono.just(token));
-        when(credentialsService.getCredentialsByApiKey(any())).thenReturn(Mono.just(credentials));
 
         // Then
         Mono<Token> actualtokenMono = tokenFacade.getToken(apiKey);
