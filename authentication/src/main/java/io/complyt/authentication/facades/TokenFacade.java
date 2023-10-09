@@ -27,8 +27,8 @@ public class TokenFacade {
 
     public Mono<Token> getToken(final @NonNull ApiKey apiKey) {
         return tokenService.findByApiKey(apiKey)
-                .switchIfEmpty(credentialsService.getCredentialsByApiKey(apiKey)
+                .switchIfEmpty(Mono.defer(() ->credentialsService.getCredentialsByApiKey(apiKey)
                         .flatMap(credentials -> authorizationService.getToken(credentials))
-                        .flatMap(tokenService::saveToken));
+                        .flatMap(tokenService::saveToken)));
     }
 }
