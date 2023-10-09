@@ -72,6 +72,7 @@ public interface FieldsDescriptions {
     String NAME_OF_CUSTOMER = "The customer's name";
 
     String CUSTOMER_TYPE = "Indicates whether the customer is 'retail'/'reseller'/'marketplace'";
+    String EMAIL = "An (Optional) Email address associated with the customer";
 
     // In exemption
 

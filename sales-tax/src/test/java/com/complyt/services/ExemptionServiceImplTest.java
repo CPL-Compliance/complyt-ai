@@ -3,12 +3,9 @@ package com.complyt.services;
 import com.complyt.business.complyt_id.ComplytIdHandler;
 import com.complyt.business.exemption.ExemptionListGenerator;
 import com.complyt.domain.State;
+import com.complyt.domain.customer.exemption.*;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
-import com.complyt.domain.customer.exemption.Exemption;
-import com.complyt.domain.customer.exemption.ExemptionType;
-import com.complyt.domain.customer.exemption.ExemptionWrapper;
-import com.complyt.domain.customer.exemption.Status;
 import com.complyt.domain.timestamps.Timestamps;
 import com.complyt.repositories.ExemptionRepository;
 import com.mongodb.client.result.DeleteResult;
@@ -213,31 +210,32 @@ public class ExemptionServiceImplTest {
     }
 
     @Test
-    void delete_DeletesExemption_ReturnsAcknowledgedDeleteResultWithCount1() {
+    void delete_DeletesExemption_ReturnsCancelledExemption() {
         // Given
         UUID id = UUID.randomUUID();
-        DeleteResult deleteResult = DeleteResult.acknowledged(1);
+        Exemption cancelledExemption = exemption.withExemptionStatus(ExemptionStatus.CANCELLED);
 
         // When
-        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+        when(exemptionRepository.findByComplytId(id)).thenReturn(Mono.just(exemption));
+        when(exemptionRepository.save(cancelledExemption)).thenReturn(Mono.just(cancelledExemption));
+        Mono<Exemption> deleteResultMono = exemptionService.markAsCancelled(id);
 
         // Then
-        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+        StepVerifier.create(deleteResultMono).expectNext(cancelledExemption).verifyComplete();
     }
 
     @Test
-    void delete_NoExemptionFoundToDelete_ReturnsAcknowledgedDeleteResultWithCount0() {
+    void delete_NoExemptionFoundToDelete_ReturnsMonoEmpty() {
         // Given
         UUID id = UUID.randomUUID();
         DeleteResult deleteResult = DeleteResult.acknowledged(0);
 
         // When
-        when(exemptionRepository.delete(id)).thenReturn(Mono.just(deleteResult));
-        Mono<DeleteResult> deleteResultMono = exemptionService.delete(id);
+        when(exemptionRepository.findByComplytId(id)).thenReturn(Mono.empty());
+        Mono<Exemption> exemptionMono = exemptionService.markAsCancelled(id);
 
         // Then
-        StepVerifier.create(deleteResultMono).expectNext(deleteResult).verifyComplete();
+        StepVerifier.create(exemptionMono).verifyComplete();
     }
 
     @Test
@@ -373,7 +371,7 @@ public class ExemptionServiceImplTest {
         UUID nullId = null;
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.delete(nullId));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> exemptionService.markAsCancelled(nullId));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "complytId is marked non-null but is null");

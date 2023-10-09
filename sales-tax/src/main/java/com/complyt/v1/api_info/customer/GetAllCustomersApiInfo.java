@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
                                                         mediaType = MediaType.APPLICATION_JSON_VALUE,
                                                         schema = @Schema(implementation = CustomerDto.class),
                                                         examples = {
-                                                                @ExampleObject(value = GetAllCustomersApiInfo.customerExample)
+                                                                @ExampleObject(value = GetAllCustomersApiInfo.customersExample)
                                                         })
                                         }),
                                 @ApiResponse(
@@ -59,11 +59,11 @@ import java.lang.annotation.Target;
                         }))
 })
 public @interface GetAllCustomersApiInfo {
-    String customerExample = """
+    String customersExample = """
             [{
                 "complytId": "9f8ee193-1a71-42b4-801d-ee1d8a161fbe",
-                "externalId": "999444",
-                "source": "1",
+                "externalId": "externalIdExample",
+                "source": "sourceExample",
                 "name": "Complyt",
                 "address": {
                     "city": "Sacramento",
@@ -74,6 +74,7 @@ public @interface GetAllCustomersApiInfo {
                     "zip": "95823",
                     "isPartial": false
                 },
+                "email": "example@some.mail.com",
                 "customerType": "RETAIL",
                 "internalTimestamps": {
                     "createdDate": "2023-01-10T17:40:44.357",
@@ -82,6 +83,8 @@ public @interface GetAllCustomersApiInfo {
                 "externalTimestamps": {
                     "createdDate": "2022-10-19T07:00:00",
                     "updatedDate": "2022-10-19T09:07:54.585"
-                }
+                },
+                "comment": "this is a customer"
             }]""";
+
 }

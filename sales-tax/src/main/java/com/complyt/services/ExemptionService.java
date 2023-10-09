@@ -20,7 +20,7 @@ public interface ExemptionService extends CrudService<Exemption, String> {
 
     Mono<Exemption> update(@NonNull final Exemption exemption, @NonNull final Exemption originalexemption, @NonNull final UUID complytId);
 
-    Mono<DeleteResult> delete(final UUID complytId);
+    Mono<Exemption> markAsCancelled(final UUID complytId);
 
     Mono<Exemption> injectDataToNewExemption(@NonNull Exemption exemption);
 

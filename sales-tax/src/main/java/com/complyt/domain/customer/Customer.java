@@ -24,7 +24,9 @@ public class Customer implements ComplytIdProperty {
     private final String name;
     private final Address address;
     private final String tenantId;
+    private final String email;
     private final CustomerType customerType;
     private final Timestamps internalTimestamps;
     private final Timestamps externalTimestamps;
+    private final String comment;
 }

@@ -1,5 +1,6 @@
 package com.complyt.business.sales_tax.checker;
 
+import com.complyt.domain.customer.exemption.ExemptionStatus;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionType;
@@ -112,6 +113,18 @@ public class CustomerFullyExemptionCheckTest {
 
         // Then
         assertTrue(isExempted);
+    }
+
+    @Test
+    void check_ExemptionStatusIsCANCELLED_ReturnsFalse() {
+        // Given
+        Exemption cancelledExemption = exemption.withExemptionStatus(ExemptionStatus.CANCELLED);
+
+        // When
+        boolean isExempted = customerFullyExemptionChecker.check(cancelledExemption);
+
+        // Then
+        assertFalse(isExempted);
     }
 
 }

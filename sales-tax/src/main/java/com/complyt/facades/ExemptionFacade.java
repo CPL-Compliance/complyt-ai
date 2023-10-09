@@ -4,7 +4,6 @@ import com.complyt.domain.customer.exemption.Exemption;
 import com.complyt.domain.customer.exemption.ExemptionWrapper;
 import com.complyt.services.ExemptionService;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
-import com.mongodb.client.result.DeleteResult;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,8 +41,8 @@ public class ExemptionFacade {
                 .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
-    public Mono<DeleteResult> delete(@NonNull final UUID complytId) {
-        return exemptionService.delete(complytId);
+    public Mono<Exemption> markAsCancelled(@NonNull final UUID complytId) {
+        return exemptionService.markAsCancelled(complytId);
     }
 
     public Flux<Exemption> save(@NonNull ExemptionWrapper exemptionWrapper) {

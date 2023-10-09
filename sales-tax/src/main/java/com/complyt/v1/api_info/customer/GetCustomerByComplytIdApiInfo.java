@@ -87,6 +87,7 @@ public @interface GetCustomerByComplytIdApiInfo {
                     "zip": "95823",
                     "isPartial": false
                 },
+                "email": "example@some.mail.com",
                 "customerType": "RETAIL",
                 "internalTimestamps": {
                     "createdDate": "2023-01-10T17:40:44.357",
@@ -95,6 +96,7 @@ public @interface GetCustomerByComplytIdApiInfo {
                 "externalTimestamps": {
                     "createdDate": "2022-10-19T07:00:00",
                     "updatedDate": "2022-10-19T09:07:54.585"
-                }
+                },
+                "comment": "this is a customer"
             }""";
 }

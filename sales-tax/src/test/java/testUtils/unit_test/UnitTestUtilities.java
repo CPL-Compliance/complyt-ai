@@ -46,6 +46,8 @@ public class UnitTestUtilities {
 
     String source;
 
+    static ResourceBundle validationMessages = ResourceBundle.getBundle("org.hibernate.validator.ValidationMessages", Locale.getDefault());
+
     public UnitTestUtilities(LocalDateTime localDateTime, String tenantId) {
         this.localDateTime = localDateTime;
         this.tenantId = tenantId;
@@ -113,9 +115,11 @@ public class UnitTestUtilities {
                 "name",
                 new Address("City", "Country", "County", "CA", "Street", "Zip", false),
                 tenantId,
+                null,
                 CustomerType.RETAIL,
                 internalTimeStamps,
-                externalTimestamps
+                externalTimestamps,
+                "comment"
         );
     }
 
@@ -129,9 +133,11 @@ public class UnitTestUtilities {
                 source,
                 "name",
                 new OptionalAddressDto("City", "Country", "County", "CA", "Street", "Zip", false),
+                null,
                 CustomerTypeDto.RETAIL,
                 internalTimeStamps,
-                externalTimestamps
+                externalTimestamps,
+                "comment"
         );
     }
 
@@ -242,7 +248,7 @@ public class UnitTestUtilities {
         Certificate certificate = new Certificate(certificateId, "url", "name");
 
         return new Exemption(UUID.randomUUID(), id, tenantId, customerIdOtherDomains,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionType.FULLY, ExemptionStatus.ACTIVE);
     }
 
     public ExemptionDto createExemptionDto() {
@@ -256,7 +262,7 @@ public class UnitTestUtilities {
         CertificateDto certificate = new CertificateDto(certificateId, "url", "name");
 
         return new ExemptionDto(UUID.randomUUID(), customerIdOtherDomains,
-                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY);
+                state, classification, validationDates, internalTimestamps, status, certificate, ExemptionTypeDto.FULLY, ExemptionStatusDto.ACTIVE);
     }
 
     public NexusStateRule createNexusStateRule(String id) {
@@ -373,5 +379,10 @@ public class UnitTestUtilities {
 
         return exemptionList;
     }
+
+    public static String extractStringFromJakartaProperties(String property) {
+        return validationMessages.getString(property);
+    }
+
 
 }

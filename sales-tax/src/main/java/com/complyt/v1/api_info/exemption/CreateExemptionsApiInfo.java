@@ -103,7 +103,8 @@ public @interface CreateExemptionsApiInfo {
                         "url": "url",
                         "name": "name"
                     },
-                    "exemptionType": "FULLY"
+                    "exemptionType": "FULLY",
+                    "exemptionStatus": "ACTIVE"
                 },
                 "states": [
                     {
@@ -155,7 +156,8 @@ public @interface CreateExemptionsApiInfo {
                          "url": "url",
                          "name": "name"
                      },
-                     "exemptionType": "FULLY"
+                     "exemptionType": "FULLY",
+                     "exemptionStatus": "ACTIVE"
                  },
                  {
                      "complytId": "eedb938f-b17b-4ac2-b43d-c0d888ec6df2",
@@ -186,7 +188,8 @@ public @interface CreateExemptionsApiInfo {
                          "url": "url",
                          "name": "name"
                      },
-                     "exemptionType": "FULLY"
+                     "exemptionType": "FULLY",
+                     "exemptionStatus": "ACTIVE"
                  },
                  {
                      "complytId": "9b8af56b-9c4e-4fae-8187-7327c815278c",
@@ -217,7 +220,8 @@ public @interface CreateExemptionsApiInfo {
                          "url": "url",
                          "name": "name"
                      },
-                     "exemptionType": "FULLY"
+                     "exemptionType": "FULLY",
+                     "exemptionStatus": "ACTIVE"
                  }
              ]""";
 }
