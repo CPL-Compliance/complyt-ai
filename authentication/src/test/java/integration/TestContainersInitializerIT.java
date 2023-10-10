@@ -1,7 +1,6 @@
 package integration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;

@@ -3,7 +3,6 @@ package io.complyt.authentication.v1.handlers;
 import io.complyt.authentication.facades.TokenFacade;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.validators.ValidationHandler;
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)

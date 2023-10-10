@@ -5,7 +5,6 @@ import io.complyt.authentication.utils.observability.ContextLogger;
 import io.complyt.authentication.v1.exceptions.types.ObjectNotFoundApiException;
 import io.complyt.authentication.v1.mappers.ApiKeyMapper;
 import io.complyt.authentication.v1.mappers.TokenMapper;
-import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidationHandler;
