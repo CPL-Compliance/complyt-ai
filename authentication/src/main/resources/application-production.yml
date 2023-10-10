@@ -65,7 +65,7 @@ spring:
       netty:
         http: INFO
 
-cryption.secret-key: ${secret-key}
+crypto.secret-key: ${secret-key}
 token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-sec}
 authorization:
   issuer-uri: ${issuer-uri}
