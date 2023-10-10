@@ -3,7 +3,6 @@ package io.complyt.authentication.security;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;

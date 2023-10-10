@@ -13,7 +13,6 @@ import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
 import io.complyt.authentication.v1.validators.query_params.ApiKeyDtoQueryParamsExtractor;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
