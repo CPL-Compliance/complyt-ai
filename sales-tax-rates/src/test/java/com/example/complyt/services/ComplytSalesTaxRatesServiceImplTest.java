@@ -52,7 +52,6 @@ public class ComplytSalesTaxRatesServiceImplTest {
         ComplytSalesTaxRates expectedComplytSalesTaxRates = TestUtilities.createCaliforniaComplytSalesTaxRates();
 
         // When
-        when(salesTaxWebClientWrapper.findByAddress(any())).thenReturn(Mono.empty());
         when(complytSalesTaxRatesRepository.findByAddress(califoniaAddress, collectionName)).thenReturn(Mono.just(expectedComplytSalesTaxRates));
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = complytSalesTaxRatesService.findByAddress(califoniaAddress);
 
