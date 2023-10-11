@@ -2,15 +2,19 @@ eureka:
   client:
     serviceUrl:
       defaultZone: ${discovery-service-uri}
+    should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 1
+    registry-fetch-interval-seconds: 15
   instance:
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
 
 # Spring Cloud Vault configuration
 # To understand what every field stands for visit
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
-  application-name: files-service
+  application-name: authentication-service
   host: ${VAULT_HOST}
   port: 8200
   scheme: https
@@ -60,3 +64,11 @@ logging:
     reactor:
       netty:
         http: INFO
+
+crypto.secret-key: ${secret-key}
+token-service.token-expiration-safe-window-sec: ${token-expiration-safe-window-sec}
+authorization:
+  issuer-uri: ${issuer-uri}
+  grant-type: ${grant-type}
+  audience: ${audience}
+  authorization-server-url: ${authorization-server-url}
