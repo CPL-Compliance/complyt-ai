@@ -30,10 +30,10 @@ public class AuthorizationService {
         return Token.builder()
                 .complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret())
-                .accessToken(accessToken.getAccessToken())
-                .scope(accessToken.getScope())
-                .expiresIn(accessToken.getExpiresIn())
-                .tokenType(accessToken.getTokenType())
+                .accessToken(accessToken.accessToken())
+                .scope(accessToken.scope())
+                .expiresIn(accessToken.expiresIn())
+                .tokenType(accessToken.tokenType())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
