@@ -98,10 +98,10 @@ public class TestUtilities {
         return Token.builder()
                 .complytClientId(credentials.getComplytClientId())
                 .complytClientSecret(credentials.getComplytClientSecret())
-                .accessToken(accessToken.getAccessToken())
-                .scope(accessToken.getScope())
-                .expiresIn(accessToken.getExpiresIn())
-                .tokenType(accessToken.getTokenType())
+                .accessToken(accessToken.accessToken())
+                .scope(accessToken.scope())
+                .expiresIn(accessToken.expiresIn())
+                .tokenType(accessToken.tokenType())
                 .createdAt(LocalDateTime.now())
                 .accessToken("")
                 .build();
@@ -109,6 +109,22 @@ public class TestUtilities {
 
     public static CredentialsDto createCredentialsDto() {
         return new CredentialsDto("clientId", "clientSecret", apiKeyStr);
+    }
+
+    public static CredentialsDto createCredentialsDtoMissingClientId() {
+        return new CredentialsDto(null, "clientSecret");
+    }
+
+    public static CredentialsDto createCredentialsDtoBlankClientId() {
+        return new CredentialsDto("", "clientSecret");
+    }
+
+    public static CredentialsDto createCredentialsDtoMissingClientSecret() {
+        return new CredentialsDto("clientId", null);
+    }
+
+    public static CredentialsDto createCredentialsDtoBlankClientSecret() {
+        return new CredentialsDto("clientId", "");
     }
 
     public static Credentials createCredentials(String clientId, String clientSecret) {
