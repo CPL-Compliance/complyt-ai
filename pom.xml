@@ -59,7 +59,7 @@
         <!-- Plugins -->
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <spring-boot-maven-plugin.version>2.6.6</spring-boot-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
