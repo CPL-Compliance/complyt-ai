@@ -20,10 +20,10 @@ public class ApiKey {
     String clientSecret;
 
     @NonNull
-    String apiKeyRegex = "^((?:[^-]+-){4}[^-]+)-((?:[^-]+-){4}[^-]+)$";
+    public static final String API_KEY_REGEXP = "^((?:[^-]+-){4}[^-]+)-((?:[^-]+-){4}[^-]+)$";
 
     public ApiKey(@NonNull String apiKey) {
-        Pattern pattern = Pattern.compile(apiKeyRegex);
+        Pattern pattern = Pattern.compile(API_KEY_REGEXP);
         Matcher matcher = pattern.matcher(apiKey);
 
         if (!matcher.matches()) {

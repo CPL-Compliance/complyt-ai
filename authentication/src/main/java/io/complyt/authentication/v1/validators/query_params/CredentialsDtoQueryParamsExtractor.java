@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class CredentialsDtoQueryParamsExtractor implements QueryParamsExtractor<CredentialsDto> {
 
     public Mono<CredentialsDto> extract(ServerRequest serverRequest) {
-        return ContextLogger.observeCtx("CredentialsDto doesn't has request query params", log::info)
+        return ContextLogger.observeCtx("CredentialsDto doesn't has request query params", log::debug)
                 .then(Mono.empty());
     }
 }
