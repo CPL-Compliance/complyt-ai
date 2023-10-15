@@ -2,10 +2,10 @@ package test_utils.unit_tests;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.EncryptedData;
-import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;

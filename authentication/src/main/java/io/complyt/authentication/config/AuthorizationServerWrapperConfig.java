@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class AuthorizationServerWrapperConfig {
 
-    @Profile("auth0")
+    @Profile({"auth0"})
     @Bean("authorizationServerWrapper")
     AuthorizationServerWrapper auth0AuthorizationServerWrapper(@NonNull WebClient webClient) {
         return new Auth0AuthorizationServerWrapper(webClient);

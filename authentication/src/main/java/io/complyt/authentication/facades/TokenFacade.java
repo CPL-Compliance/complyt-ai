@@ -1,10 +1,10 @@
 package io.complyt.authentication.facades;
 
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.services.AuthorizationService;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
-import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

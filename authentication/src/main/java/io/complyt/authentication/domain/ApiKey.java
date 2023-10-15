@@ -1,4 +1,4 @@
-package io.complyt.authentication.v1.models;
+package io.complyt.authentication.domain;
 
 import lombok.AccessLevel;
 import lombok.Data;

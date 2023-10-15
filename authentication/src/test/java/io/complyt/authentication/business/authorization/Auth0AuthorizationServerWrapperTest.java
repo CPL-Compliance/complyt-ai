@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class Auth0AuthorizationServerWrapperTest {
-    //    @InjectMocks
     Auth0AuthorizationServerWrapper auth0AuthorizationServerWrapper;
 
     @Mock
@@ -31,8 +30,7 @@ public class Auth0AuthorizationServerWrapperTest {
 
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersSpecMock;
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
+
     @Mock
     private WebClient.ResponseSpec responseSpecMock;
 

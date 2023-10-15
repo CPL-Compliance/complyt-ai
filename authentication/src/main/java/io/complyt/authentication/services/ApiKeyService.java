@@ -1,7 +1,7 @@
 package io.complyt.authentication.services;
 
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.security.ApiKeyGenerator;
-import io.complyt.authentication.v1.models.ApiKey;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
