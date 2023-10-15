@@ -19,7 +19,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://development-complyt.us.auth0.com/
+          issuer-uri: "https://issuer-uri.com/"
   cloud:
     vault:
       enabled: false
@@ -27,9 +27,9 @@ spring:
     mongodb:
       database: authentication
 
-crypto.secret-key: VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug=
+crypto.secret-key: "VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug="
 token-service.token-expiration-safe-window-sec: 10
 authorization:
-  grant-type: client_credentials
-  audience: https://sales-tax-service/
-  authorization-server-url: https://development-complyt.us.auth0.com/oauth/token
+  grant-type: "client_credentials"
+  audience: "https://integration-test/"
+  authorization-server-url: "https://integration-test.com/path"
