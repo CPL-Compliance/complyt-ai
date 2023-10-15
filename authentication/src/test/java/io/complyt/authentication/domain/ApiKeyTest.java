@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 class ApiKeyTest {
     @Test
-    void createApiKey_BadFormat_throwIllegalArgumentException(){
+    void createApiKey_BadFormat_throwIllegalArgumentException() {
         // When
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             new ApiKey("");
@@ -25,7 +25,7 @@ class ApiKeyTest {
     }
 
     @Test
-    void createApiKey_inputIsNull_throwNullPointerException(){
+    void createApiKey_inputIsNull_throwNullPointerException() {
         // When
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
             new ApiKey(null);
