@@ -339,7 +339,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         // When
         when(salesTaxTrackingFacade.findByState(stateName)).thenReturn(Mono.just(differentSalesTaxTracking));
-        when(salesTaxTrackingFacade.update(salesTaxTracking, differentSalesTaxTracking, stateName)).thenReturn(Mono.error(new ConflictedDataApiException()));
+        when(salesTaxTrackingFacade.update(salesTaxTracking, differentSalesTaxTracking)).thenReturn(Mono.error(new ConflictedDataApiException()));
         when(salesTaxTrackingFacade.save(salesTaxTracking)).thenReturn(Mono.empty());
 
         // Then
@@ -610,7 +610,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         // When
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
-        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
         when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.empty());
 
         // Then
@@ -644,7 +644,7 @@ public class SalesTaxTrackingRouterTest implements SalesTaxTrackingRouterTestTem
 
         // When
         when(salesTaxTrackingFacade.findByState(state)).thenReturn(Mono.just(originalSalesTaxTracking));
-        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
+        when(salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking)).thenReturn(Mono.just(receivedSalesTaxTrackingWithId));
         when(salesTaxTrackingFacade.save(newSalesTaxTracking)).thenReturn(Mono.empty());
 
         // Then

@@ -4,9 +4,7 @@ import com.complyt.domain.Nexus;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.utils.factory.DateRange;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,7 +31,7 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
         DateRange dateRange = dateRangeStrategy.getDateRange();
 
         log.debug("Building new nexus Date range object, start date : " + dateRange.getStart() +
-                " , end date : " + dateRange.getEnd());
+                  " , end date : " + dateRange.getEnd());
 
         return build(dateRange);
     }

@@ -209,7 +209,7 @@ public class SalesTaxTrackingServiceImplTest {
         // When
         when(salesTaxTrackingRepository.findByState(state)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingRepository.save(newSalesTaxTracking)).thenReturn(Mono.just(newSalesTaxTracking));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(newSalesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(newSalesTaxTracking).verifyComplete();
@@ -297,7 +297,7 @@ public class SalesTaxTrackingServiceImplTest {
 
         // When
         when(salesTaxTrackingRepository.findByState(state)).thenReturn(Mono.empty());
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(salesTaxTracking, state);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingService.update(salesTaxTracking);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectError().verify();
@@ -307,29 +307,14 @@ public class SalesTaxTrackingServiceImplTest {
     void update_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
-        String state = salesTaxTracking.getState().getName();
 
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.update(nullSalesTaxTracking, state);
+            salesTaxTrackingService.update(nullSalesTaxTracking);
         });
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
-    }
-
-    @Test
-    void update_NullStatePassed_ThrowsException() {
-        // Given
-        String nullState = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
-            salesTaxTrackingService.update(salesTaxTracking, nullState);
-        });
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
     }
 
     @Test

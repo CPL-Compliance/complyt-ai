@@ -66,13 +66,12 @@ public class SalesTaxTrackingFacadeTest {
     @Test
     void update_UpdatesSalesTaxTracking_ReturnsSalesTaxTracking() {
         // Given
-        String state = salesTaxTracking.getState().getName();
         SalesTaxTracking salesTaxTrackingWithId = salesTaxTracking.withId(UUID.randomUUID().toString());
 
         // When
         when(salesTaxTrackingService.checkComplytIdOfModifiedEqualsToOriginal(salesTaxTracking, salesTaxTrackingWithId)).thenReturn(Mono.just(salesTaxTracking));
-        when(salesTaxTrackingService.update(salesTaxTracking, state)).thenReturn(Mono.just(salesTaxTrackingWithId));
-        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTrackingWithId, state);
+        when(salesTaxTrackingService.update(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingWithId));
+        Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTrackingWithId);
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithId).verifyComplete();
@@ -129,26 +128,12 @@ public class SalesTaxTrackingFacadeTest {
     }
 
     @Test
-    void update_NullStatePassed_ThrowsException() {
-        // Given
-        String nullState = null;
-
-        // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, salesTaxTracking, nullState));
-
-        // Then
-        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
-
-    }
-
-    @Test
     void update_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
-        String state = salesTaxTracking.getState().getName();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(nullSalesTaxTracking, salesTaxTracking, state));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(nullSalesTaxTracking, salesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
@@ -194,10 +179,9 @@ public class SalesTaxTrackingFacadeTest {
     void update_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
-        String state = salesTaxTracking.getState().getName();
 
         // When
-        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, nullSalesTaxTracking, state));
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.update(salesTaxTracking, nullSalesTaxTracking));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");

@@ -16,9 +16,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class NexusTransactionSummaryCalculator {
 
-//    @NonNull
-//    private ItemsNexusStateRuleQualificationChecker itemsNexusStateRuleQualificationChecker;
-
     @NonNull
     private NexusAmountAggregatorFactory nexusAmountAggregatorFactory;
 
@@ -26,11 +23,5 @@ public class NexusTransactionSummaryCalculator {
         return Mono.just(nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction,nexusStateRule))
                 .flatMap(TaxableCollectionAmountExtractor::extract)
                 .map(amount -> new TransactionNexusSummary(amount, transaction.getExternalTimestamps().getCreatedDate(), transaction.getTransactionType()));
-
-//        return Mono.fromCallable(() -> {
-//            TaxableCollectionAmountExtractor amountExtractor = nexusAmountAggregatorFactory.createTaxableCollectionAmountExtractor(transaction, nexusStateRule);
-//            BigDecimal amount = amountExtractor.extract();
-//            return amount;
-//        });
     }
 }

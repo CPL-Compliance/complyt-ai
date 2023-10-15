@@ -1,5 +1,6 @@
 package testUtils.integration_test;
 
+import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Address;
 import com.complyt.domain.transaction.TransactionFilingStatus;
 import com.complyt.domain.sales_tax.ComplytSalesTaxRates;
@@ -10,6 +11,10 @@ import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
+import com.complyt.v1.models.nexus.DefinitionDto;
+import com.complyt.v1.models.nexus.NexusDto;
+import com.complyt.v1.models.nexus.NexusStateRuleDto;
+import com.complyt.v1.models.nexus.NexusThresholdDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.*;
@@ -43,6 +48,7 @@ public interface ITUtilities {
         return new SalesTaxTrackingDto(null, state, "comment", true,
                 new PhysicalNexusTrackerDto(false, LocalDateTime.now()),
                 new EconomicNexusTrackerDto(false, LocalDateTime.now()),
+                null,null,null,null,
                 LocalDateTime.now(), false, LocalDateTime.now(), FilingFrequencyDto.MONTHLY);
     }
 
@@ -164,5 +170,20 @@ public interface ITUtilities {
         SalesTaxRates salesTaxRates = createCaliforniaSalesTaxRates();
         LocalDateTime now = LocalDateTime.now();
         return new ComplytSalesTaxRates(address, salesTaxRates);
+    }
+
+    static ClientTrackingDto stubClientTrackingDto() {
+        return new ClientTrackingDto( new NexusDto(LocalDateTime.parse("2015-06-01T00:00")) , "it_tenant");
+    }
+
+    static NexusStateRuleDto stubAlabamaNexusStateRuleDto() {
+        return new NexusStateRuleDto(true,
+                new StateDto("AL", "01", "Alabama"),
+                List.of(TaxableCategoryDto.TAXABLE,TaxableCategoryDto.NOT_TAXABLE),
+                List.of(TangibleCategoryDto.INTANGIBLE,TangibleCategoryDto.TANGIBLE),
+                List.of(CustomerTypeDto.RETAIL),
+                TimeFrame.PREVIOUS_TWELVE_MONTHS,
+                new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
+                null);
     }
 }

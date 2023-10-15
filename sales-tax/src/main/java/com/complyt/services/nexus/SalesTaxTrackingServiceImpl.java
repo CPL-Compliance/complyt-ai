@@ -5,10 +5,12 @@ import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
+import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.repositories.ClientTrackingRepository;
 import com.complyt.repositories.NexusStateRuleRepository;
 import com.complyt.repositories.SalesTaxTrackingRepository;
 import com.complyt.utils.observability.ContextLogger;
+import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,6 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -48,20 +51,29 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findById(id);
     }
 
+    @Deprecated
     @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return salesTaxTrackingRepository.save(salesTaxTracking);
+        return saveWithoutNexusSummaryIfNeeded(salesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> saveWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking) {
+        return Mono.just(salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
+                        ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
+                        : salesTaxTracking)
+                .flatMap(salesTaxTrackingRepository::save)
+                .map(upsertedSalesTaxTracking -> upsertedSalesTaxTracking.withNexusCalculationSummaries(salesTaxTracking.getNexusCalculationSummaries()));
     }
 
     @Override
     public Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking) {
         return clientTrackingRepository.findClient()
-                .flatMap(clientTracking -> nexusStateRuleRepository.findByState(salesTaxTracking.getState().getName())
-                        .map(nexusStateRule -> salesTaxTracking
-                                .withClientTracking(clientTracking)
-                                .withNexusStateRule(nexusStateRule))
-                        .switchIfEmpty(Mono.error(new NotFoundException("No nexus state rule  found for " + salesTaxTracking.getState().getName()))))
-                .switchIfEmpty(Mono.error(new NotFoundException("No client details found")));
+                .map(salesTaxTracking::withClientTracking)
+                .flatMap(salesTaxTrackingWithClient -> nexusStateRuleRepository.findByState(salesTaxTracking.getState().getName())
+                        .map(salesTaxTrackingWithClient::withNexusStateRule)
+                        .switchIfEmpty(Mono.error(new ObjectNotFoundApiException())))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
     }
 
     @Override
@@ -79,6 +91,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findAll();
     }
 
+    @Deprecated
     @Override
     public Mono<SalesTaxTracking> saveWithEconomicQualified(@NonNull SalesTaxTracking salesTaxTracking, @NonNull NexusStateRule stateRule, @NonNull LocalDateTime referenceDate) {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
@@ -97,13 +110,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findByState(salesTaxTracking.getState().getName())
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + salesTaxTracking.getState().getName())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
-                .flatMap(salesTaxTrackingRepository::save);
+                .flatMap(this::saveWithoutNexusSummaryIfNeeded);
     }
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
         return salesTaxTrackingInfo ->
-                addClientAndStateDetails(salesTaxTracking).map(salesTaxTrackingWithDetails ->
-                        new SalesTaxTracking(
+                addClientAndStateDetails(salesTaxTracking)
+                        .map(salesTaxTrackingWithDetails -> new SalesTaxTracking(
                                 salesTaxTrackingInfo.getComplytId(), salesTaxTrackingInfo.getId(), salesTaxTrackingWithDetails.getState(),
                                 salesTaxTrackingInfo.getTenantId(), salesTaxTrackingWithDetails.getComment(),
                                 salesTaxTrackingWithDetails.isEnforcesSalesTax(),
@@ -118,6 +131,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking) {
         return complytIdHandler.checkNewDontHaveComplytId(newSalesTaxTracking);
+    }
+
+    @Override
+    public Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
+        return Mono.just(checkedSalesTaxTracking
+                .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries() == null ? Map.of() : originalSalesTaxTracking.getTransactionNexusSummaries())
+                .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries() == null ? Map.of() : originalSalesTaxTracking.getNexusCalculationSummaries()));
     }
 
     @Override

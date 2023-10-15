@@ -65,5 +65,14 @@ public class SalesTaxTrackingRouter {
 
         return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
     }
+    @Bean
+//    @refreshNexusSummaryByDateApiInfo
+    public RouterFunction<ServerResponse> refreshNexusSummaryByDateRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+        RequestPredicate refreshNexusSummaryByDateRoute = RequestPredicates
+                .POST(BASE_URL + "/refresh/state/{state}/date/{date}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
+    }
 
 }

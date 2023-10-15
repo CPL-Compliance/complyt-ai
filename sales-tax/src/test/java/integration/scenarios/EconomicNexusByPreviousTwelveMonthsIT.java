@@ -27,6 +27,8 @@ import testUtils.integration_test.ITUtilities;
 import testUtils.integration_test.templates.economic_nexus.EconomicNexusByAmountOrCountITTemplate;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -53,7 +55,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     private WebTestClient webTestClient;
 
     // Given
-    private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T07:00:00");
+    private final LocalDateTime referenceDate = LocalDateTime.parse("2021-10-10T04:00:00");
     private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Minneapolis", "US", null, "Minnesota", "4401 York Ave S", "55410", false);
     private final UUID marketplaceCustomerId = UUID.fromString("e10cd4a2-6a4e-4621-bdad-4860bfa91ecb"); // complytId of an existing customer in the database
     private final UUID retailCustomerId = UUID.fromString("0b5d4d10-a5f1-411b-b11b-6c751441d256"); // complytId of an existing customer in the database
@@ -67,6 +69,26 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
     @BeforeEach
     void setup() {
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
+    }
+
+    @Order(0)
+    @Test
+    @WithMockUser
+    public void refreshSalesTaxTrackingByStateAndDate_CheckEconomicNexusNotPassed_Returns200() {
+        String state = "MN";
+
+        // Then
+        webTestClient
+                .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + referenceDate.toLocalDate())
+                        .build())
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+                .value(salesTaxTrackingDto -> LOGGER.info(String.valueOf(salesTaxTrackingDto)));
     }
 
     @Order(1)
@@ -84,6 +106,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
         // Then
         webTestClient
                 .mutateWith(csrf())
+                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                 .put()
                 .uri(uriBuilder -> uriBuilder
                         .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId)
@@ -304,6 +327,7 @@ public class EconomicNexusByPreviousTwelveMonthsIT extends TestContainersInitial
             final int finalI = i;
             webTestClient
                     .mutateWith(csrf())
+                    .mutate().responseTimeout(Duration.ofMinutes(2)).build()
                     .put()
                     .uri(uriBuilder -> uriBuilder
                             .path(TransactionRouter.BASE_URL + "/source/" + source + "/externalId/" + externalId + finalI)

@@ -6,6 +6,7 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.models.StateDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import integration.TestContainersInitializerIT;
 import org.junit.jupiter.api.*;
@@ -24,7 +25,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,13 +44,12 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT implements SalesTaxTrackingEndpointsITTemplate {
 
+    private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
+    private final StateDto newState = new StateDto("AL", "01", "Alabama");
     @MockBean
     TenantResolver tenantResolver;
     @Autowired
     private WebTestClient webTestClient;
-
-    private final StateDto existingState = new StateDto("AZ", "04", "Arizona");
-    private final StateDto newState = new StateDto("AL", "01", "Alabama");
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -233,7 +236,12 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isCreated()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(resultSalesTaxTrackingDto -> assertEquals(
-                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()),
+                        salesTaxTrackingDto
+                                .withComplytId(resultSalesTaxTrackingDto.complytId())
+                                .withTransactionNexusSummaries(Map.of())
+                                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
+                                .withClientTracking(ITUtilities.stubClientTrackingDto())
+                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
                         resultSalesTaxTrackingDto)
                 );
     }
@@ -259,7 +267,13 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                 .expectStatus().isOk()
                 .expectBody(SalesTaxTrackingDto.class)
                 .value(resultSalesTaxTrackingDto -> assertEquals(
-                        salesTaxTrackingDto.withComplytId(resultSalesTaxTrackingDto.complytId()).withComment("a new comment"),
+                        salesTaxTrackingDto.
+                                withComplytId(resultSalesTaxTrackingDto.complytId())
+                                .withComment("a new comment")
+                                .withTransactionNexusSummaries(Map.of())
+                                .withNexusCalculationSummaries(Map.of(LocalDate.now(), new NexusCalculationSummaryDto(0, BigDecimal.ZERO)))
+                                .withClientTracking(ITUtilities.stubClientTrackingDto())
+                                .withNexusStateRule(ITUtilities.stubAlabamaNexusStateRuleDto()),
                         resultSalesTaxTrackingDto)
                 );
     }

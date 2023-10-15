@@ -104,7 +104,7 @@ class NexusServiceTest {
         Transaction nullTransaction = null;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.addToNexusTracking(nullTransaction, null));
+                () -> nexusService.upsertToNexusTracking(nullTransaction, null));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
@@ -138,7 +138,7 @@ class NexusServiceTest {
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(false);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.addToNexusTracking(transaction, salesTaxTracking);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTracking).verifyComplete();
@@ -173,13 +173,13 @@ class NexusServiceTest {
         when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
         when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
         when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
-        when(nexusCalculator.calculateNexusSummary(transactionList, salesTaxTracking, LocalDateTime.now())).thenReturn(Mono.just(salesTaxTracking));
+//        when(nexusCalculator.calculateNexusSummary(transactionList, salesTaxTracking, LocalDateTime.now())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(true);
         when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
         when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished, nexusStateRule, referenceDate))
                 .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
 
-        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.addToNexusTracking(transaction, salesTaxTracking);
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();

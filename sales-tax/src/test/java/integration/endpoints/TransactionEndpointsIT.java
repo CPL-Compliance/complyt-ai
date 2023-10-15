@@ -6,10 +6,10 @@ import com.complyt.v1.config.error_messages.DtoErrorMessages;
 import com.complyt.v1.config.error_messages.GenericErrorMessages;
 import com.complyt.v1.config.error_messages.StringErrorMessages;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.MandatoryAddressDto;
 import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.models.transaction.TransactionStatusDto;
-import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.routers.SalesTaxTrackingRouter;
 import com.complyt.v1.routers.TransactionRouter;
 import integration.TestContainersInitializerIT;
@@ -30,6 +30,8 @@ import reactor.core.publisher.Mono;
 import testUtils.integration_test.ITUtilities;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,6 +58,7 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", () -> MONGO_CONTAINER.getReplicaSetUrl("sales_tax"));
+//        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/sales_tax");
     }
 
     @BeforeEach
@@ -63,29 +66,72 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
         when(tenantResolver.resolve()).thenReturn(Mono.just("it_tenant"));
     }
 
-    @Order(1)
-    @Test
-    @WithMockUser
-    public void refreshTest() {
-        String state = "CA";
+//    @Order(1)
+//    @Test
+//    @WithMockUser
+//    public void refreshTest() {
+//        String state = "MN";
+//
+//        // Then
+//        webTestClient
+//                .mutateWith(csrf())
+//                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+//                .post()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + LocalDateTime.now().toLocalDate())
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+//                .value(salesTaxTrackingDto -> {
+//                    LOGGER.info(String.valueOf(salesTaxTrackingDto));
+//                });
+//
+//    }
 
-        // Then
-        webTestClient
-                .mutateWith(csrf())
-                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state )
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
-                .value(salesTaxTrackingDto -> {
-                    LOGGER.info(String.valueOf(salesTaxTrackingDto));
-                });
-
-        while (true);
-    }
+//    @Order(1)
+//    @Test
+//    @WithMockUser
+//    public void refreshTest2() {
+//
+//        webTestClient
+//                .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+//                .get()
+//                .uri(uriBuilder -> uriBuilder
+//                        .path(SalesTaxTrackingRouter.BASE_URL)
+//                        .build())
+//                .accept(MediaType.APPLICATION_JSON)
+//                .exchange()
+//                .expectStatus().isOk().expectBodyList(SalesTaxTrackingDto.class)
+//                .value(salesTaxTrackingDtoList -> {
+//                    List<LocalDate> localDateList = List.of(
+//                            LocalDate.of(2020, 9, 30),
+//                            LocalDate.of(2021, 9, 30),
+//                            LocalDate.of(2022, 9, 30),
+//                            LocalDate.of(2023, 9, 30));
+//                    for (LocalDate localDate : localDateList) {
+//                        for (SalesTaxTrackingDto salesTaxTrackingDto : salesTaxTrackingDtoList) {
+//                            String state = salesTaxTrackingDto.state().abbreviation();
+//
+//                            webTestClient
+//                                    .mutateWith(csrf())
+//                                    .mutate().responseTimeout(Duration.ofMinutes(2)).build()
+//                                    .post()
+//                                    .uri(uriBuilder -> uriBuilder
+//                                            .path(SalesTaxTrackingRouter.BASE_URL + "/refresh/state/" + state + "/date/" + localDate)
+//                                            .build())
+//                                    .accept(MediaType.APPLICATION_JSON)
+//                                    .exchange()
+//                                    .expectStatus().isOk().expectBody(SalesTaxTrackingDto.class)
+//                                    .value(givebSalesTaxTrackingDto -> {
+//                                        LOGGER.info(String.valueOf(givebSalesTaxTrackingDto));
+//                                    });
+//                        }
+//                    }
+//                });
+//
+//        while (true) ;
+//    }
 
 
     @Order(2)

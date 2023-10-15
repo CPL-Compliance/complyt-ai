@@ -8,7 +8,6 @@ import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
-import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,6 +22,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
@@ -72,7 +73,7 @@ public class SalesTaxTrackingHandler {
                 .flatMap(salesTaxTrackingDto -> {
                     SalesTaxTracking receivedSalesTaxTracking = SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingDtoToSalesTaxTracking(salesTaxTrackingDto);
                     return salesTaxTrackingFacade.findByState(state)
-                            .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking, state))
+                            .flatMap(originalSalesTaxTracking -> salesTaxTrackingFacade.update(receivedSalesTaxTracking, originalSalesTaxTracking))
                             .flatMap(updatedSalesTaxTracking ->
                                     ServerResponse.status(HttpStatus.OK).bodyValue(SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(updatedSalesTaxTracking)))
                             .switchIfEmpty(salesTaxTrackingFacade.save(receivedSalesTaxTracking)
@@ -97,11 +98,20 @@ public class SalesTaxTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         return ContextLogger.observeCtx(logStr, log::info).then(
-                salesTaxTrackingFacade.refreshNexusSummary(state)
-                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                        .flatMap(salesTaxTrackingDto -> ServerResponse.ok()
-                                .body(salesTaxTrackingDto, SalesTaxTrackingDto.class))
-        );
+                salesTaxTrackingFacade.refreshNexusSummary(state, LocalDate.now())
+                        .flatMap(salesTaxTracking -> ServerResponse.ok().bodyValue(
+                                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
     }
 
+    @NexusUpdatePermission
+    public Mono<ServerResponse> refreshNexusSummaryByDate(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        LocalDate date = LocalDate.parse(serverRequest.pathVariable("date"));
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        return ContextLogger.observeCtx(logStr, log::info).then(
+                salesTaxTrackingFacade.refreshNexusSummary(state, date)
+                        .flatMap(salesTaxTracking -> ServerResponse.ok().bodyValue(
+                                SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
+    }
 }

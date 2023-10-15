@@ -1,6 +1,5 @@
 package com.complyt.services.nexus;
 
-import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.crud.CrudService;
@@ -10,11 +9,14 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.function.Function;
 
 
 public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, String> {
 
     Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking);
+
+    Mono<SalesTaxTracking> saveWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking);
 
@@ -34,4 +36,5 @@ public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, S
 
     Mono<SalesTaxTracking> checkSalesTaxTrackingNotHavingComplytId(@NonNull final SalesTaxTracking newSalesTaxTracking);
 
+    Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking);
 }
