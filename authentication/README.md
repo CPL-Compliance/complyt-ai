@@ -17,10 +17,10 @@ Authentication is a service that manages access tokens.
 ## Environment Variables
 - CLUSTER_ID - Not relevant for production. The ID of the DB cluster
 - VAULT_DB_ROLE - The DB role
-- VAULT_HOST= The host of the vault cluster
-- VAULT_ROLE= The 
-- VAULT_ROLE_ID=ae5cef06-ab2e-c87a-312b-d083ee7931b6
-- VAULT_SECRET_ID=880c4015-88dc-7b95-23fb-c1ba2823ae21
+- VAULT_HOST - The host of the vault cluster
+- VAULT_ROLE - The vault role name
+- VAULT_ROLE_ID - Vault role ID
+- VAULT_SECRET_ID - Vault secret ID
 ## Environment Variables
 
 ## Build and Test
@@ -44,7 +44,7 @@ java -Dspring.profiles.active=development,auth0 \
 -jar target/{{application-file.jar}} 
 ```
 
-### Producrion
+### Production
 ```bash
 java -Dspring.profiles.active=production,auth0 \
 -DVAULT_DB_ROLE={{vault-role}} \
