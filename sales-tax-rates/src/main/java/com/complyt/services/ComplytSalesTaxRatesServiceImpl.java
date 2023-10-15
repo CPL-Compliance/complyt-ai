@@ -36,9 +36,9 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
         String collection = StatesMap.statesToCollections.get(address.state());
 
         return complytSalesTaxRatesRepository.findByAddress(address, collection)
-                .switchIfEmpty(salesTaxWebClientWrapper.findByAddress(address)
+                .switchIfEmpty(Mono.defer(() -> salesTaxWebClientWrapper.findByAddress(address)
                         .flatMap(salesTaxData -> setBeforeSave(address, salesTaxData))
-                        .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection)));
+                        .flatMap(complytSalesTaxRates -> save(complytSalesTaxRates, collection))));
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
