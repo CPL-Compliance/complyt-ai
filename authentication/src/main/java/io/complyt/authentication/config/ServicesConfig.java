@@ -5,6 +5,7 @@ import io.complyt.authentication.repositories.TokenRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.services.CredentialsService;
 import io.complyt.authentication.services.TokenService;
+import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,9 @@ public class ServicesConfig {
     TokenService tokenService(@NonNull TokenRepository tokenRepository,
                               @NonNull PasswordEncoder passwordEncoder,
                               @NonNull Crypto cryptoAesCbcPkcs5Padding,
-                              @Value("${token-service.token-expiration-safe-window-sec}") int tokenExpirationSafeWindowSec) {
+                              @Value("${token-service.token-expiration-safe-window-sec}")
+                              @Positive(message = "tokenExpirationSafeWindowSec must be positive")
+                              int tokenExpirationSafeWindowSec) {
         return new TokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
                 tokenExpirationSafeWindowSec);
     }

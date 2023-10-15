@@ -85,6 +85,23 @@ class ServicesConfigTest {
     }
 
     @Test
+    void tokenService_cryptoAesCbcPkcs5PaddingIsNegative_throwsNullException() {
+        // Given
+        TokenRepository tokenRepository = mock(TokenRepository.class);
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+        Crypto cryptoAesCbcPkcs5Padding = mock(Crypto.class);
+        int tokenExpirationSafeWindowSec = 0;
+
+        // Then
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            servicesConfig.tokenService(tokenRepository, passwordEncoder,
+                    cryptoAesCbcPkcs5Padding, tokenExpirationSafeWindowSec);
+        });
+
+        assertEquals(nullPointerException.getMessage(), "tokenExpirationSafeWindowSec must be positive");
+    }
+
+    @Test
     void tokenService_passwordEncoderIsNull_throwsNullException() {
         // Given
         TokenRepository tokenRepository = mock(TokenRepository.class);
