@@ -29,7 +29,6 @@ public class ServicesConfig {
                               @NonNull PasswordEncoder passwordEncoder,
                               @NonNull Crypto cryptoAesCbcPkcs5Padding,
                               @Value("${token-service.token-expiration-safe-window-sec}")
-                              @Positive(message = "tokenExpirationSafeWindowSec must be positive")
                               int tokenExpirationSafeWindowSec) {
         return new TokenService(tokenRepository, passwordEncoder, cryptoAesCbcPkcs5Padding,
                 tokenExpirationSafeWindowSec);
