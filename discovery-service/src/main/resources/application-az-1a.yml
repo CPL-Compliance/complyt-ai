@@ -4,7 +4,7 @@ spring:
   cloud:
     vault:
       enabled: true
-      application-name: discovery-service
+      application-name: discovery-service${ecs_cluster_name:}
       host: ${VAULT_HOST}
       port: 8200
       scheme: https

@@ -13,7 +13,7 @@ eureka:
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
-  application-name: files-service
+  application-name: files-service${ecs_cluster_name:}
   host: ${VAULT_HOST}
   port: 8200
   scheme: https
