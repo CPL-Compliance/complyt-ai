@@ -23,4 +23,15 @@ class ApiKeyTest {
         // Then
         assertEquals("Invalid API key format", exception.getMessage());
     }
+
+    @Test
+    void createApiKey_inputIsNull_throwNullPointerException(){
+        // When
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            new ApiKey(null);
+        });
+
+        // Then
+        assertEquals("apiKey is marked non-null but is null", exception.getMessage());
+    }
 }
