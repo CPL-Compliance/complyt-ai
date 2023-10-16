@@ -1,0 +1,14 @@
+spring.application.name: authentication
+server.port: ${PORT:9880}
+
+spring.profiles.active:
+  - @activeEnv@
+
+# Observability
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.tracing.sampling.probability: 1.0
+
+spring:
+  data:
+    mongodb:
+      uuid-representation: standard
