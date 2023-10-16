@@ -49,9 +49,8 @@ public class NexusCalculator {
     public Mono<SalesTaxTracking> addTransactionToNexusSummary(Transaction transaction, SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
         return nexusTransactionSummaryCalculator.extract(transaction, salesTaxTracking.getNexusStateRule())
                 .flatMap(transactionNexusSummary -> insertNewTransactionNexusSummary(salesTaxTracking, transaction.getComplytId(), transactionNexusSummary))
-                .flatMap(transactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().containsKey(summaryDateRange.getEnd().toLocalDate())
-                                ? salesTaxTracking.getNexusCalculationSummaries().get(summaryDateRange.getEnd().toLocalDate())
-                                : new NexusCalculationSummary(0, BigDecimal.ZERO))
+                .flatMap(transactionNexusSummary -> Mono.justOrEmpty(salesTaxTracking.getNexusCalculationSummaries().get(summaryDateRange.getEnd().toLocalDate()))
+                        .defaultIfEmpty(new NexusCalculationSummary(0, BigDecimal.ZERO))
                         .map(nexusCalculationSummary -> transaction.getTransactionType().equals(TransactionType.REFUND)
                                 ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount().negate()))
                                 : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(transactionNexusSummary.relevantAmount())).withCount(nexusCalculationSummary.count() + 1))
@@ -60,14 +59,13 @@ public class NexusCalculator {
     }
 
     public Mono<SalesTaxTracking> subtractTransactionFromNexusSummary(UUID complytId, SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
-        return salesTaxTracking.getTransactionNexusSummaries().containsKey(complytId)
-                ? Mono.just(salesTaxTracking.getTransactionNexusSummaries().remove(complytId))
+        return Mono.justOrEmpty(salesTaxTracking.getTransactionNexusSummaries().remove(complytId))
                 .flatMap(oldTransactionNexusSummary -> Mono.just(salesTaxTracking.getNexusCalculationSummaries().get(summaryDateRange.getEnd().toLocalDate()))
                         .map(nexusCalculationSummary -> oldTransactionNexusSummary.transactionType().equals(TransactionType.REFUND)
                                 ? nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(oldTransactionNexusSummary.relevantAmount()))
                                 : nexusCalculationSummary.withAmount(nexusCalculationSummary.amount().add(oldTransactionNexusSummary.relevantAmount().negate())).withCount(nexusCalculationSummary.count() - 1)))
                 .map(nexusCalculationSummary -> insertNewNexusCalculationSummary(salesTaxTracking, summaryDateRange, nexusCalculationSummary))
-                : Mono.just(salesTaxTracking);
+                .defaultIfEmpty(salesTaxTracking);
     }
 
     private SalesTaxTracking insertNewNexusCalculationSummary(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange, NexusCalculationSummary nexusCalculationSummary) {
@@ -82,7 +80,7 @@ public class NexusCalculator {
 
     public Mono<SalesTaxTracking> calculateNexusSummaryFromTransactionSummaries(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
         return Flux.fromIterable(salesTaxTracking.getTransactionNexusSummaries().values())
-                .filter(transactionNexusSummary -> transactionNexusSummary.externalCreatedDate().isAfter(summaryDateRange.getStart()) &&
+                .filter(transactionNexusSummary -> transactionNexusSummary.externalCreatedDate().isAfter(summaryDateRange.getStart().minusNanos(1)) &&
                                                    transactionNexusSummary.externalCreatedDate().isBefore(summaryDateRange.getEnd().plusNanos(1)))
                 .collectList().map(transactionNexusSummaries -> transactionNexusSummaries)
                 .flatMapMany(Flux::fromIterable)

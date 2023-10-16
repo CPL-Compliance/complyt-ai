@@ -22,6 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -51,14 +52,13 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findById(id);
     }
 
-    @Deprecated
     @Override
     public Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking) {
-        return saveWithoutNexusSummaryIfNeeded(salesTaxTracking);
+        return upsertWithoutNexusSummaryIfNeeded(salesTaxTracking);
     }
 
     @Override
-    public Mono<SalesTaxTracking> saveWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking) {
         return Mono.just(salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
                         ? salesTaxTracking.withNexusCalculationSummaries(Map.of())
                         : salesTaxTracking)
@@ -110,7 +110,7 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
         return salesTaxTrackingRepository.findByState(salesTaxTracking.getState().getName())
                 .switchIfEmpty(Mono.error(new NotFoundException("No salesTaxTracking with state " + salesTaxTracking.getState().getName())))
                 .flatMap(createFunctionUpdateSalesTaxTracking(salesTaxTracking))
-                .flatMap(this::saveWithoutNexusSummaryIfNeeded);
+                .flatMap(this::upsertWithoutNexusSummaryIfNeeded);
     }
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> createFunctionUpdateSalesTaxTracking(SalesTaxTracking salesTaxTracking) {
@@ -136,8 +136,8 @@ public class SalesTaxTrackingServiceImpl implements SalesTaxTrackingService {
     @Override
     public Mono<SalesTaxTracking> insertSummariesFromOriginal(@NonNull final SalesTaxTracking checkedSalesTaxTracking, @NonNull final SalesTaxTracking originalSalesTaxTracking) {
         return Mono.just(checkedSalesTaxTracking
-                .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries() == null ? Map.of() : originalSalesTaxTracking.getTransactionNexusSummaries())
-                .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries() == null ? Map.of() : originalSalesTaxTracking.getNexusCalculationSummaries()));
+                .withTransactionNexusSummaries(originalSalesTaxTracking.getTransactionNexusSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getTransactionNexusSummaries())
+                .withNexusCalculationSummaries(originalSalesTaxTracking.getNexusCalculationSummaries() == null ? new HashMap<>() : originalSalesTaxTracking.getNexusCalculationSummaries()));
     }
 
     @Override

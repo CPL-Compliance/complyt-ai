@@ -974,7 +974,6 @@ public class ExemptionRouterTest implements ExemptionRouterTestTemplate {
                 .expectStatus().isBadRequest().expectBody(LinkedHashMap.class).value(map -> {
                     assertEquals("[states list cannot be empty]", map.get("message"));
                 });
-        ;
     }
 
     @Test

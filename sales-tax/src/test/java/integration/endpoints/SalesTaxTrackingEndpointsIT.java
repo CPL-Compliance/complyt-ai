@@ -354,7 +354,6 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                         assertTrue(expectedErrors.contains(err));
                     }
                 });
-        ;
     }
 
     @Override

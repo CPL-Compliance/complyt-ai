@@ -65,7 +65,7 @@ public class SalesTaxTrackingFacade {
 
     private Function<SalesTaxTracking, Mono<SalesTaxTracking>> recalculateCurrentNexusSummaryIfNeeded() {
         return salesTaxTracking -> salesTaxTracking.getNexusStateRule() != null
-                ? nexusService.isRecalculationOfNexusSummaryRequired(salesTaxTracking,
+                ? nexusService.recalculationOfNexusSummaryIfRequired(salesTaxTracking,
                 nexusService.getNexusSummaryDate(salesTaxTracking, LocalDateTime.now())
                         .flatMap(dateRangeSummary -> nexusService.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, dateRangeSummary)))
                 : Mono.just(salesTaxTracking) ;

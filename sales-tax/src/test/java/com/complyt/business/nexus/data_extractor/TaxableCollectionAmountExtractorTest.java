@@ -1,12 +1,11 @@
 package com.complyt.business.nexus.data_extractor;
 
 import com.complyt.business.nexus.checker.qualification_check.QualificationChecker;
-import com.complyt.domain.transaction.ShippingFee;
 import com.complyt.domain.Taxable;
-import com.complyt.domain.transaction.Transaction;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusStateRule;
-import org.bson.types.ObjectId;
+import com.complyt.domain.transaction.ShippingFee;
+import com.complyt.domain.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import testUtils.unit_test.UnitTestUtilities;
 
 import java.math.BigDecimal;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +38,6 @@ public class TaxableCollectionAmountExtractorTest {
     Transaction transaction;
     NexusStateRule nexusStateRule;
     Customer customer;
-    ObjectId customerId;
     String nexusStateRuleId;
 
     UnitTestUtilities testUtilities;
@@ -64,10 +63,23 @@ public class TaxableCollectionAmountExtractorTest {
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
         BigDecimal expectedAmount = transactionWithNoShippingFee.getItems().get(0).getTotalPrice();
-//        BigDecimal amount = taxableCollectionAmountExtractor.extract();
+        Mono<BigDecimal> bigDecimalMono = taxableCollectionAmountExtractor.extract();
 
-        // Then
-//        assertEquals(expectedAmount, amount);
+        StepVerifier.create(bigDecimalMono).expectNext(expectedAmount).verifyComplete();
+    }
+
+    @Test
+    void extract_ExtractsTransactionItemsAmountAllItemsNotIncluded_ReturnsAmount() {
+        // Given
+        ShippingFee nullShippingFee = null;
+        Transaction transactionWithNoShippingFee = transaction.withShippingFee(nullShippingFee);
+
+        // When
+        when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(0), nexusStateRule)).thenReturn(false);
+        when(qualificationChecker.isQualified(transactionWithNoShippingFee.getItems().get(1), nexusStateRule)).thenReturn(false);
+        Mono<BigDecimal> bigDecimalMono = taxableCollectionAmountExtractor.extract();
+
+        StepVerifier.create(bigDecimalMono).expectNextCount(0).verifyComplete();
     }
 
     @Test
@@ -78,11 +90,11 @@ public class TaxableCollectionAmountExtractorTest {
         when(qualificationChecker.isQualified(transaction.getItems().get(0), nexusStateRule)).thenReturn(true);
         when(qualificationChecker.isQualified(transaction.getItems().get(1), nexusStateRule)).thenReturn(false);
         when(qualificationChecker.isQualified(transaction.getShippingFee(), nexusStateRule)).thenReturn(true);
-//        BigDecimal amount = taxableCollectionAmountExtractor.extract();
+        Mono<BigDecimal> bigDecimalMono = taxableCollectionAmountExtractor.extract();
         BigDecimal expectedAmount = transaction.getItems().get(0).getTotalPrice().add(transaction.getShippingFee().getTotalPrice());
 
         // Then
-//        assertEquals(amount, expectedAmount);
+        StepVerifier.create(bigDecimalMono).expectNext(expectedAmount).verifyComplete();
     }
 
     @Test

@@ -17,7 +17,7 @@ public record NexusStateRuleDto(
         List<TaxableCategoryDto> taxableCategories,
         List<TangibleCategoryDto> tangibleCategories,
         List<CustomerTypeDto> customerTypes,
-        TimeFrame timeFrame,
+        TimeFrameDto timeFrame,
         NexusThresholdDto nexusThreshold,
         LocalDateTime appliedDate
 ) {

@@ -21,6 +21,7 @@ import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
 import com.complyt.v1.models.customer.exemption.*;
+import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.ComplytSalesTaxRatesDto;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.transaction.*;
@@ -37,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UnitTestUtilities {
 
     static ResourceBundle validationMessages = ResourceBundle.getBundle("org.hibernate.validator.ValidationMessages", Locale.getDefault());
+    public final String tenantId;
     LocalDateTime localDateTime;
-    String tenantId;
     UUID customerIdOtherDomains;
     String certificateId;
     String source;
@@ -325,6 +326,26 @@ public class UnitTestUtilities {
                 TimeFrame.PREVIOUS_TWELVE_MONTHS, nexusThreshold, localDateTime);
     }
 
+    public NexusStateRuleDto createNexusStateRuleDto() {
+        StateDto state = new StateDto("CA", "02", "California");
+
+        List<TaxableCategoryDto> taxableCategories = new ArrayList<>() {{
+            add(TaxableCategoryDto.TAXABLE);
+        }};
+
+        List<TangibleCategoryDto> tangibleCategories = new ArrayList<>() {{
+            add(TangibleCategoryDto.TANGIBLE);
+        }};
+
+        List<CustomerTypeDto> customerTypes = new ArrayList<>() {{
+            add(CustomerTypeDto.RETAIL);
+        }};
+
+        NexusThresholdDto nexusThreshold = new NexusThresholdDto(new BigDecimal(1000), 2, DefinitionDto.AMOUNT_OR_COUNT);
+
+        return new NexusStateRuleDto(true, state, taxableCategories, tangibleCategories, customerTypes, TimeFrameDto.PREVIOUS_TWELVE_MONTHS, nexusThreshold, localDateTime);
+    }
+
     public List<Taxable> createTaxables(Transaction transaction) {
         List<Taxable> taxables = new ArrayList<>(transaction.getItems());
         taxables.add(transaction.getShippingFee());
@@ -338,7 +359,7 @@ public class UnitTestUtilities {
                 new PhysicalNexusTracker(false, localDateTime),
                 new EconomicNexusTracker(false, localDateTime),
                 createNexusStateRule(id + "nsr"),
-                creClientTracking(tenantId),
+                createClientTracking(tenantId),
                 new HashMap<>(),
                 new HashMap<>(),
                 localDateTime,
@@ -346,7 +367,7 @@ public class UnitTestUtilities {
                 FilingFrequency.MONTHLY);
     }
 
-    private ClientTracking creClientTracking(String tenantId) {
+    public ClientTracking createClientTracking(String tenantId) {
         return new ClientTracking(null, tenantId, new Nexus(localDateTime), "client dope");
     }
 
@@ -358,13 +379,17 @@ public class UnitTestUtilities {
                 new EconomicNexusTrackerDto(false, localDateTime),
                 Map.of(),
                 Map.of(),
-                null,
-                null,
+                createNexusStateRuleDto(),
+                createClientTrackingDto(),
                 localDateTime,
                 true, localDateTime,
                 FilingFrequencyDto.MONTHLY);
 
         return salesTaxTrackingDto;
+    }
+
+    public ClientTrackingDto createClientTrackingDto() {
+        return new ClientTrackingDto(new NexusDto(localDateTime), "client dope");
     }
 
     public Result createResult() {

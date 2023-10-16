@@ -51,9 +51,9 @@ public class TransactionEndpointsIT extends TestContainersInitializerIT implemen
     private WebTestClient webTestClient;
 
     // Given
-    private UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
-    private MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "85034", false);
-    private String source = "1";
+    private final UUID customerId = UUID.fromString("4cfbbf0b-d3e5-4954-8a90-c9c2e832e5f5"); // complytId of an existing customer in the database
+    private final MandatoryAddressDto referenceAddress = new MandatoryAddressDto("Phoenix", "US", null, "AZ", "3400 E Sky Harbor Blvd", "85034", false);
+    private final String source = "1";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {

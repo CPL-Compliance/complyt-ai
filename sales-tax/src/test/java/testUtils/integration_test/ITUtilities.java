@@ -11,10 +11,7 @@ import com.complyt.domain.sales_tax.fast_tax.TaxInfoItem;
 import com.complyt.v1.models.*;
 import com.complyt.v1.models.customer.CustomerDto;
 import com.complyt.v1.models.customer.CustomerTypeDto;
-import com.complyt.v1.models.nexus.DefinitionDto;
-import com.complyt.v1.models.nexus.NexusDto;
-import com.complyt.v1.models.nexus.NexusStateRuleDto;
-import com.complyt.v1.models.nexus.NexusThresholdDto;
+import com.complyt.v1.models.nexus.*;
 import com.complyt.v1.models.sales_tax.SalesTaxRatesDto;
 import com.complyt.v1.models.TimestampsDto;
 import com.complyt.v1.models.transaction.*;
@@ -149,7 +146,7 @@ public interface ITUtilities {
                         "read:exemption create:nexus read:nexus delete:nexus update:nexus read:link");
     }
 
-    public static Address createAddressInCalifornia() {
+    static Address createAddressInCalifornia() {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
@@ -182,7 +179,7 @@ public interface ITUtilities {
                 List.of(TaxableCategoryDto.TAXABLE,TaxableCategoryDto.NOT_TAXABLE),
                 List.of(TangibleCategoryDto.INTANGIBLE,TangibleCategoryDto.TANGIBLE),
                 List.of(CustomerTypeDto.RETAIL),
-                TimeFrame.PREVIOUS_TWELVE_MONTHS,
+                TimeFrameDto.PREVIOUS_TWELVE_MONTHS,
                 new NexusThresholdDto(BigDecimal.valueOf(250000), 0, DefinitionDto.AMOUNT),
                 null);
     }

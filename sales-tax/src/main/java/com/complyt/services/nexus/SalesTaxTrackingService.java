@@ -9,14 +9,13 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.function.Function;
 
 
 public interface SalesTaxTrackingService extends CrudService<SalesTaxTracking, String> {
 
     Mono<SalesTaxTracking> save(@NonNull SalesTaxTracking salesTaxTracking);
 
-    Mono<SalesTaxTracking> saveWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking);
+    Mono<SalesTaxTracking> upsertWithoutNexusSummaryIfNeeded(@NonNull SalesTaxTracking salesTaxTracking);
 
     Mono<SalesTaxTracking> addClientAndStateDetails(@NonNull SalesTaxTracking salesTaxTracking);
 

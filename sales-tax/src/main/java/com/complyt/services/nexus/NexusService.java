@@ -69,10 +69,11 @@ public class NexusService {
     }
 
     public Mono<SalesTaxTracking> calculateNexusSummaryFromTransactionSummaries(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
-        return nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange);
+        return salesTaxTrackingMono;
     }
 
-    public Mono<SalesTaxTracking> isRecalculationOfNexusSummaryRequired(SalesTaxTracking salesTaxTracking, Mono<SalesTaxTracking> calculationMono) {
+    public Mono<SalesTaxTracking> recalculationOfNexusSummaryIfRequired(SalesTaxTracking salesTaxTracking, Mono<SalesTaxTracking> calculationMono) {
         return hasNexus(salesTaxTracking)
                 .flatMap(salesTaxTrackingWithNexusInfo -> !salesTaxTrackingWithNexusInfo.isHasNexus() &&
                                                           salesTaxTracking.getNexusStateRule().timeFrame().equals(TimeFrame.PREVIOUS_TWELVE_MONTHS)
@@ -86,9 +87,9 @@ public class NexusService {
                 clientTracking.getNexus(), nexusStateRule, LocalDateTime.of(referenceDate, LocalTime.of(23, 59, 59))));
     }
 
-    public Mono<SalesTaxTracking> upsertToNexusTracking(Transaction updatedTransaction, SalesTaxTracking salesTaxTracking) {
+    public Mono<SalesTaxTracking> upsertToNexusTracking(@NonNull Transaction updatedTransaction, @NonNull SalesTaxTracking salesTaxTracking) {
         return getNexusSummaryDate(salesTaxTracking, updatedTransaction.getExternalTimestamps().getCreatedDate())
-                .flatMap(summaryDateRange -> isRecalculationOfNexusSummaryRequired(salesTaxTracking, calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange))
+                .flatMap(summaryDateRange -> recalculationOfNexusSummaryIfRequired(salesTaxTracking, calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange))
                         .flatMap(salesTaxTrackingWithNexusSummary -> nexusCalculator.subtractTransactionFromNexusSummary(updatedTransaction.getComplytId(), salesTaxTrackingWithNexusSummary, summaryDateRange)
                                 .flatMap(salesTaxTrackingAfterSubtraction -> nexusCalculator.addTransactionToNexusSummary(updatedTransaction, salesTaxTrackingAfterSubtraction, summaryDateRange))
                                 .flatMap(salesTaxTrackingAfterUpsertion -> Mono.just(nexusChecker.passedThreshold(salesTaxTrackingAfterUpsertion.getNexusCalculationSummaries().get(summaryDateRange.getEnd().toLocalDate()), salesTaxTrackingAfterUpsertion.getNexusStateRule()))

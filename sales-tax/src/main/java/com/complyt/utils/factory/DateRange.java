@@ -1,9 +1,6 @@
 package com.complyt.utils.factory;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.With;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 @Getter
 @ToString
 @With
+@EqualsAndHashCode
 public class DateRange {
 
     private final LocalDateTime start;
