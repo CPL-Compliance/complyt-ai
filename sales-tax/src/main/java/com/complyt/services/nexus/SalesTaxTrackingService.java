@@ -1,5 +1,6 @@
 package com.complyt.services.nexus;
 
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.NexusStateRule;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.services.crud.CrudService;

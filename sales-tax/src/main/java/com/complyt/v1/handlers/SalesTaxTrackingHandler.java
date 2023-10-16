@@ -1,5 +1,6 @@
 package com.complyt.v1.handlers;
 
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
 import com.complyt.facades.SalesTaxTrackingFacade;
 import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
@@ -7,6 +8,7 @@ import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
+import com.complyt.v1.mappers.StringToLocalDateTimeMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
@@ -22,7 +24,10 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -92,6 +97,7 @@ public class SalesTaxTrackingHandler {
                         .body(salesTaxTrackingFacade.findAll().map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto), SalesTaxTrackingDto.class));
     }
 
+<<<<<<< HEAD
     @NexusUpdatePermission
     public Mono<ServerResponse> refreshNexusSummary(ServerRequest serverRequest) {
         String state = serverRequest.pathVariable("state");
@@ -115,3 +121,18 @@ public class SalesTaxTrackingHandler {
                                 SalesTaxTrackingMapper.INSTANCE.salesTaxTrackingToSalesTaxTrackingDto(salesTaxTracking))));
     }
 }
+=======
+    @NexusReadPermission
+    public Mono<ServerResponse> getNexusSummary(ServerRequest serverRequest) {
+        String state = serverRequest.pathVariable("state");
+        LocalDateTime date = LocalDateTime.parse(serverRequest.pathVariable("date"));
+
+        String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
+
+        return ContextLogger.observeCtx(logStr, log::info).then(
+                ServerResponse.ok()
+                        .body(salesTaxTrackingFacade.getNexusSummary(date, state), NexusCalculationSummary.class));
+    }
+
+}
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)

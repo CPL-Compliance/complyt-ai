@@ -1,8 +1,12 @@
 package com.complyt.facades;
 
+import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
+<<<<<<< HEAD
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
+=======
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import lombok.AllArgsConstructor;
@@ -12,7 +16,10 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
+=======
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.function.Function;
@@ -31,6 +38,9 @@ public class SalesTaxTrackingFacade {
 
     @NonNull
     private TransactionService transactionService;
+
+    @NonNull
+    private NexusService nexusService;
 
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
         return salesTaxTrackingService.findByState(state)
@@ -81,6 +91,10 @@ public class SalesTaxTrackingFacade {
                             .collectList()
                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
                         .flatMap(salesTaxTrackingService::update));
+    }
+
+    public Mono<NexusCalculationSummary> getNexusSummary(@NonNull LocalDateTime referenceDate, @NonNull String state) {
+        return nexusService.getSummary(referenceDate, state);
     }
 
 }

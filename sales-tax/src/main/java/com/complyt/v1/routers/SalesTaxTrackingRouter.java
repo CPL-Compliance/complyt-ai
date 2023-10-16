@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.*;
 
+import java.text.ParseException;
+
 @Configuration
 public class SalesTaxTrackingRouter {
 
@@ -57,6 +59,7 @@ public class SalesTaxTrackingRouter {
     }
 
     @Bean
+<<<<<<< HEAD
 //    @refreshNexusSummaryApiInfo
     public RouterFunction<ServerResponse> refreshNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate refreshNexusSummaryRoute = RequestPredicates
@@ -73,6 +76,15 @@ public class SalesTaxTrackingRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
+=======
+//    @GetNexusSummaryApiInfo
+    public RouterFunction<ServerResponse> getNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
+        RequestPredicate getNexusSummaryRoute = RequestPredicates
+                .GET(BASE_URL + "/state/{state}/date/{date}")
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(getNexusSummaryRoute, salesTaxTrackingHandler::getNexusSummary);
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
     }
 
 }

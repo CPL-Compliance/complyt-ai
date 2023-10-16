@@ -3,7 +3,13 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+<<<<<<< HEAD
 import com.complyt.domain.ClientTracking;
+=======
+import com.complyt.domain.nexus.NexusCalculationSummary;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.EconomicNexusTracker;
 import com.complyt.domain.nexus.NexusStateRule;
@@ -19,6 +25,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -56,11 +63,18 @@ public class NexusService {
         EconomicNexusTracker newTracker = new EconomicNexusTracker(true, referenceDate);
         LocalDateTime appliedDate = applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate);
 
+<<<<<<< HEAD
         SalesTaxTracking modifiedTracking = salesTaxTracking
                 .withEconomicNexusTracker(newTracker)
                 .withAppliedDate(appliedDate);
 
         return Mono.just(modifiedTracking);
+=======
+        return findRuleByState(state)
+                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
+                        .flatMap(transactions -> aggregateNexusInfo(transactions, stateRule, referenceDate, state)))
+                .switchIfEmpty(Mono.error(new ObjectNotFoundApiException()));
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
     }
 
     public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull SalesTaxTracking salesTaxTracking, List<Transaction> transactionList, LocalDate refreshDate) {
@@ -68,6 +82,7 @@ public class NexusService {
                 .flatMap(summaryDateRange -> nexusCalculator.calculateNexusSummary(transactionList, salesTaxTracking, summaryDateRange));
     }
 
+<<<<<<< HEAD
     public Mono<SalesTaxTracking> calculateNexusSummaryFromTransactionSummaries(SalesTaxTracking salesTaxTracking, DateRange summaryDateRange) {
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDateRange);
         return salesTaxTrackingMono;
@@ -103,4 +118,22 @@ public class NexusService {
                 salesTaxTracking.getClientTracking().getNexus().getTaxableDate(),
                 referenceDate).getDateRange());
     }
+=======
+    public Mono<List<Transaction>> extractTransactionsForCalculation(LocalDateTime referenceDate, NexusStateRule nexusStateRule) {
+        return clientTrackingService.getNexusInfo()
+                .flatMap(nexusInfo -> {
+                    Query nexusTransactionsSearchQuery = nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate);
+                    return transactionService.getTransactionsByQuery(nexusTransactionsSearchQuery)
+                            .flatMap(singleTransaction -> customerService.findByComplytId(singleTransaction.getCustomerId())
+                                    .map(singleTransaction::withCustomer)).collectList();
+                });
+    }
+
+    public Mono<NexusCalculationSummary> getSummary(@NonNull LocalDateTime referenceDate, @NonNull String state) {
+        return findRuleByState(state)
+                .flatMap(stateRule -> extractTransactionsForCalculation(referenceDate, stateRule)
+                        .flatMap(transactions -> nexusCalculator.calculate(transactions, stateRule)));
+    }
+
+>>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 }
