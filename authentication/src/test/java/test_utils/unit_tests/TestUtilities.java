@@ -2,10 +2,15 @@ package test_utils.unit_tests;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Credentials;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.security.EncryptedData;
+<<<<<<< HEAD
 import io.complyt.authentication.v1.models.ApiKey;
+=======
+import io.complyt.authentication.v1.models.ApiKeyDto;
+>>>>>>> 776d9dce (ApiKey class packge was changed)
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import lombok.NonNull;

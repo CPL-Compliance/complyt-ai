@@ -1,10 +1,10 @@
 package io.complyt.authentication.services;
 
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.repositories.TokenRepository;
 import io.complyt.authentication.security.Crypto;
 import io.complyt.authentication.security.EncryptedData;
-import io.complyt.authentication.v1.models.ApiKey;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;

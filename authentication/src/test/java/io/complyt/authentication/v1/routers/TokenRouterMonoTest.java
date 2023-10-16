@@ -1,6 +1,7 @@
 package io.complyt.authentication.v1.routers;
 
 import io.complyt.authentication.config.ApiExceptionConfig;
+import io.complyt.authentication.domain.ApiKey;
 import io.complyt.authentication.domain.Token;
 import io.complyt.authentication.facades.TokenFacade;
 import io.complyt.authentication.repositories.exceptions.OperationFailedException;
@@ -8,7 +9,6 @@ import io.complyt.authentication.v1.exceptions.GlobalErrorAttributes;
 import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.TokenHandler;
 import io.complyt.authentication.v1.mappers.TokenMapper;
-import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
 import io.complyt.authentication.v1.validators.query_params.ApiKeyQueryParamsExtractor;

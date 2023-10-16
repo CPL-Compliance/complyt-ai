@@ -1,6 +1,6 @@
 package io.complyt.authentication.security;
 
-import io.complyt.authentication.v1.models.ApiKey;
+import io.complyt.authentication.domain.ApiKey;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
