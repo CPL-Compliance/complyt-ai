@@ -9,10 +9,14 @@ import io.complyt.authentication.v1.models.ApiKey;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import lombok.NonNull;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class TestUtilities {
+    String tenantId = UUID.randomUUID().toString();
+
     public static String apiKeyStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec-3572db2e-486b-480a-995b-2e4d2b9104fa";
     public static String invalidApiKeyStr = "9a62acdf-cc85-4009-a57b-cf77c3eba1ec-3572db2e-486b-480a-995b-";
 
@@ -35,6 +39,12 @@ public class TestUtilities {
             "read:sales_tax_rates";
     public static int expiresIn = 86400;
     static String tokenType = "Bearer";
+
+
+    public static Jwt.Builder stubJwt() {
+        return Jwt.withTokenValue("token").header("typ", "JWT")
+                .claim("tenant_id", "it_tenant");
+    }
 
     public static Token createOutputToken() {
         return new Token("", "", "", "", "", "",
