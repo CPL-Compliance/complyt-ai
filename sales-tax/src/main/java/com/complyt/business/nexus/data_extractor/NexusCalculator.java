@@ -33,6 +33,7 @@ public class NexusCalculator {
     public Mono<SalesTaxTracking> calculateNexusSummary(@NonNull List<Transaction> transactions, @NonNull SalesTaxTracking salesTaxTracking, @NonNull DateRange summaryDateRange) {
         List<Transaction> filteredTransactions = transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule());
 
+<<<<<<< HEAD
         return ContextLogger.observeCtx("Calculating amount and count for all transactions on timeframe : " + salesTaxTracking.getNexusStateRule().timeFrame(), log::debug)
                 .thenMany(Flux.fromIterable(filteredTransactions)).flatMap(transaction -> nexusTransactionSummaryCalculator.extract(transaction, salesTaxTracking.getNexusStateRule())
                         .flatMap(transactionNexusSummary -> insertNewTransactionNexusSummary(salesTaxTracking, transaction.getComplytId(), transactionNexusSummary)))
@@ -88,5 +89,12 @@ public class NexusCalculator {
                         ? nexusCalculationSummaryBuilder.setAmount(nexusCalculationSummaryBuilder.getAmount().add(transactionNexusSummary.relevantAmount().negate()))
                         : nexusCalculationSummaryBuilder.setAmount(nexusCalculationSummaryBuilder.getAmount().add(transactionNexusSummary.relevantAmount())).setCount(nexusCalculationSummaryBuilder.getCount() + 1))
                 .map(nexusCalculationSummaryBuilder -> insertNewNexusCalculationSummary(salesTaxTracking, summaryDateRange, nexusCalculationSummaryBuilder.build()));
+=======
+        return ContextLogger.observeCtx("Calculating amount and count for all transactions on timeframe : " + nexusStateRule.getTimeFrame(), log::debug)
+                .then(nexusTransactionsCountCalculator.extract(filteredTransactions, nexusStateRule)
+                        .flatMap(count -> nexusTransactionsAmountCalculator.extract(filteredTransactions, nexusStateRule)
+                                .flatMap(amount -> ContextLogger.observeCtx("Calculated total amount of : " + amount + ", and count : " + count, log::debug)
+                                        .thenReturn(new NexusCalculationSummary(count, amount, nexusStateRule.getNexusThreshold().getDefinition())))));
+>>>>>>> 91047832 (added summaryDto and mapper)
     }
 }

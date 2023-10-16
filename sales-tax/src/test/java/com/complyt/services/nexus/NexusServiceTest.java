@@ -3,6 +3,14 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
+<<<<<<< HEAD
+=======
+import com.complyt.domain.Nexus;
+import com.complyt.domain.State;
+import com.complyt.domain.nexus.enums.Definition;
+import com.complyt.domain.transaction.Transaction;
+import com.complyt.domain.transaction.TransactionType;
+>>>>>>> 91047832 (added summaryDto and mapper)
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
@@ -12,6 +20,7 @@ import com.complyt.domain.transaction.TransactionType;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.query.DateRangeStrategy;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
+import com.complyt.v1.models.nexus.DefinitionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,6 +100,11 @@ class NexusServiceTest {
         NexusCalculationSummary summary = new NexusCalculationSummary(salesTaxTracking.getNexusStateRule().nexusThreshold().getCount() - 1,
                 salesTaxTracking.getNexusStateRule().nexusThreshold().getAmount().subtract(BigDecimal.ONE));
 
+<<<<<<< HEAD
+=======
+        NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() - 1,
+                nexusStateRule.getNexusThreshold().getAmount().subtract(BigDecimal.ONE), Definition.AMOUNT);
+>>>>>>> 91047832 (added summaryDto and mapper)
 
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
         DateRange summaryDate = nexusService.getNexusSummaryDate(salesTaxTracking, referenceDate).block();
@@ -116,6 +130,11 @@ class NexusServiceTest {
         NexusCalculationSummary summary = new NexusCalculationSummary(salesTaxTracking.getNexusStateRule().nexusThreshold().getCount() + 1,
                 salesTaxTracking.getNexusStateRule().nexusThreshold().getAmount().add(BigDecimal.ONE));
 
+<<<<<<< HEAD
+=======
+        NexusCalculationSummary summary = new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount() + 1,
+                nexusStateRule.getNexusThreshold().getAmount().add(BigDecimal.ONE), Definition.AMOUNT);
+>>>>>>> 91047832 (added summaryDto and mapper)
 
         LocalDateTime referenceDate = transaction.getExternalTimestamps().getCreatedDate();
         DateRange summaryDate = nexusService.getNexusSummaryDate(salesTaxTracking, referenceDate).block();

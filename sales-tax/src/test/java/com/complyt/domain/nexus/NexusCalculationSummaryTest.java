@@ -19,14 +19,20 @@ class NexusCalculationSummaryTest {
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-        return new NexusCalculationSummary(0L, BigDecimal.ZERO);
+        return new NexusCalculationSummary(0L, BigDecimal.ZERO, Definition.AMOUNT);
     }
 
     @Test
     void toString_ReturnsString() {
         // Given
+<<<<<<< HEAD
         String expectedString = "NexusCalculationSummary[count=" + nexusCalculationSummary.count() +
                 ", amount=" + nexusCalculationSummary.amount() + "]";
+=======
+        String expectedString = "NexusCalculationSummary(count=" + nexusCalculationSummary.count() +
+                ", amount=" + nexusCalculationSummary.amount() +
+                ", definition=" + nexusCalculationSummary.definition() + ")";
+>>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
         String actualString = nexusCalculationSummary.toString();

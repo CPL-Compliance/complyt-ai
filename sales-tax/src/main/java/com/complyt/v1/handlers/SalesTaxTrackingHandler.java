@@ -7,9 +7,13 @@ import com.complyt.security.permissions.sales_tax_tracking.NexusReadPermission;
 import com.complyt.security.permissions.sales_tax_tracking.NexusUpdatePermission;
 import com.complyt.utils.observability.ContextLogger;
 import com.complyt.v1.exceptions.types.ObjectNotFoundApiException;
+import com.complyt.v1.mappers.NexusCalculationSummaryMapper;
 import com.complyt.v1.mappers.SalesTaxTrackingMapper;
 import com.complyt.v1.mappers.StringToLocalDateTimeMapper;
+import com.complyt.v1.mappers.TransactionMapper;
 import com.complyt.v1.models.SalesTaxTrackingDto;
+import com.complyt.v1.models.nexus.NexusCalculationSummaryDto;
+import com.complyt.v1.models.transaction.TransactionDto;
 import com.complyt.v1.validators.ValidationHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -130,9 +134,16 @@ public class SalesTaxTrackingHandler {
         String logStr = String.format("--> Request Received; Method -> %s, Path -> %s", serverRequest.method(), serverRequest.path());
 
         return ContextLogger.observeCtx(logStr, log::info).then(
-                ServerResponse.ok()
-                        .body(salesTaxTrackingFacade.getNexusSummary(date, state), NexusCalculationSummary.class));
+                salesTaxTrackingFacade.getNexusSummary(date, state)
+                        .flatMap(nexusCalculationSummary ->
+                                ServerResponse.ok()
+                                        .body(NexusCalculationSummaryMapper.INSTANCE.nexusCalculationSummaryToNexusCalculationSummaryDto(nexusCalculationSummary), NexusCalculationSummaryDto.class))
+        );
     }
 
+<<<<<<< HEAD
 }
 >>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
+=======
+}
+>>>>>>> 91047832 (added summaryDto and mapper)

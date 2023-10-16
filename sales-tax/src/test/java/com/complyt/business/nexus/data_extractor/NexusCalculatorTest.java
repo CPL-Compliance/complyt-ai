@@ -79,6 +79,13 @@ public class NexusCalculatorTest {
                 transaction1, transaction2, refundTransaction);
         NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(2, BigDecimal.valueOf(1200));
 
+<<<<<<< HEAD
+=======
+        int count = transactions.size();
+        BigDecimal amount = transactions.get(0).getItems().get(0).getTotalPrice().add(transactions.get(1).getItems().get(0).getTotalPrice());
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
+        NexusStateRule nexusStateRule = createNexusStateRule();
+>>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(transactions);
@@ -96,10 +103,21 @@ public class NexusCalculatorTest {
     @Test
     void calculateNexusSummary_AllTransactionsFiltered_ReturnsSummaryOf0() {
         // Given
+<<<<<<< HEAD
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, transaction3);
         NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(0, BigDecimal.valueOf(0));
 
+=======
+        List<Transaction> transactions = createTransactionsList();
+        int count = 0;
+        BigDecimal amount = BigDecimal.ZERO;
+        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
+        List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
+            add(CustomerType.RESELLER);
+        }};
+        NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
+>>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(List.of());
