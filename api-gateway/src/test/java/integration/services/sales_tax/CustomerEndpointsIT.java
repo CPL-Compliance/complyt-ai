@@ -462,7 +462,7 @@ public class CustomerEndpointsIT extends TestContainersInitializerIT implements 
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
                 .exchange()
-                .expectStatus().isForbidden();
+                .expectStatus().isUnauthorized();
     }
 
     @Order(1)

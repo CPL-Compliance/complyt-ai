@@ -51,5 +51,7 @@ springdoc:
         url: /v3/api-docs/sales-tax
       - name: sales-tax-rates
         url: /v3/api-docs/sales-tax-rates
+      - name: authentication
+        url: /v3/api-docs/authentication
   api-docs:
     version: openapi_3_0

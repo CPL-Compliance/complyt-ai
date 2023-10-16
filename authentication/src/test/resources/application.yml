@@ -1,0 +1,23 @@
+eureka.client.enabled: false
+spring.cloud.vault.enabled: false
+
+spring:
+  data:
+    mongodb:
+      uuid-representation: standard
+
+
+crypto:
+  secret-key: VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug=
+
+authorization:
+  grant-type: client-credentials
+  audience: test
+  authorization-server-url: https://test.com
+
+token-service:
+  token-expiration-safe-window-sec: 60
+
+
+
+
