@@ -20,7 +20,6 @@ import com.complyt.domain.transaction.TransactionType;
 import com.complyt.utils.factory.DateRange;
 import com.complyt.utils.query.DateRangeStrategy;
 import com.complyt.utils.query.NexusTransactionsSearchQueryBuilder;
-import com.complyt.v1.models.nexus.DefinitionDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,7 +87,11 @@ class NexusServiceTest {
         Transaction nullTransaction = null;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+<<<<<<< HEAD
                 () -> nexusService.upsertToNexusTracking(nullTransaction, null));
+=======
+                () -> nexusService.addToNexusTracking(nullTransaction));
+>>>>>>> 1b610118 (merged main)
 
         // Then
         assertEquals("updatedTransaction is marked non-null but is null", nullPointerException.getMessage());
@@ -112,6 +115,7 @@ class NexusServiceTest {
         SalesTaxTracking salesTaxTrackingAfterCalculation = salesTaxTracking.withNexusCalculationSummaries(Map.of(summaryDate.getEnd().toLocalDate(), summary));
 
         // When
+<<<<<<< HEAD
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(false);
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
@@ -119,6 +123,18 @@ class NexusServiceTest {
         when(nexusChecker.passedThreshold(summary, salesTaxTracking.getNexusStateRule())).thenReturn(false);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
+=======
+        when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
+        when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
+        when(nexusCalculator.calculateNexusSummary(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
+        when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(false);
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
+
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.addToNexusTracking(transaction);
+>>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingAfterCalculation).verifyComplete();
@@ -144,6 +160,7 @@ class NexusServiceTest {
                 .withEconomicNexusTracker(salesTaxTrackingAfterCalculation.getEconomicNexusTracker().withEstablished(true).withEstablishedDate(referenceDate));
 
         // When
+<<<<<<< HEAD
         when(nexusChecker.hasNexus(salesTaxTracking)).thenReturn(false);
         when(nexusCalculator.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
         when(nexusCalculator.subtractTransactionFromNexusSummary(transaction.getComplytId(), salesTaxTracking, summaryDate)).thenReturn(Mono.just(salesTaxTracking));
@@ -152,6 +169,20 @@ class NexusServiceTest {
         when(applicationDateCreator.create(salesTaxTracking.getNexusStateRule().timeFrame(), referenceDate)).thenReturn(referenceDate);
 
         Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.upsertToNexusTracking(transaction, salesTaxTracking);
+=======
+        when(clientTrackingService.getNexusInfo()).thenReturn(Mono.just(nexusInfo));
+        when(nexusStateRuleService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(nexusStateRule));
+        when(nexusTransactionsSearchQueryBuilder.buildNexusTransactionsSearch(nexusInfo, nexusStateRule, referenceDate)).thenReturn(query);
+        when(transactionService.getTransactionsByQuery(query)).thenReturn(transactionFlux);
+        when(customerService.findByComplytId(any())).thenReturn(Mono.just(customer));
+        when(nexusCalculator.calculateNexusSummary(transactionList, nexusStateRule)).thenReturn(Mono.just(summary));
+        when(nexusChecker.passedThreshold(summary, nexusStateRule)).thenReturn(true);
+        when(salesTaxTrackingService.findByState(transaction.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTrackingWithNoNexusEstablished));
+        when(salesTaxTrackingService.saveWithEconomicQualified(salesTaxTrackingWithNoNexusEstablished, nexusStateRule, referenceDate))
+                .thenReturn(Mono.just(salesTaxTrackingWithNexusEstablished));
+
+        Mono<SalesTaxTracking> actualSalesTaxTracking = nexusService.addToNexusTracking(transaction);
+>>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(actualSalesTaxTracking).expectNext(salesTaxTrackingWithNexusEstablished).verifyComplete();

@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.*;
 
-import java.text.ParseException;
-
 @Configuration
 public class SalesTaxTrackingRouter {
 
@@ -60,10 +58,14 @@ public class SalesTaxTrackingRouter {
 
     @Bean
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1b610118 (merged main)
 //    @refreshNexusSummaryApiInfo
     public RouterFunction<ServerResponse> refreshNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate refreshNexusSummaryRoute = RequestPredicates
                 .POST(BASE_URL + "/refresh/state/{state}")
+<<<<<<< HEAD
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
@@ -85,6 +87,11 @@ public class SalesTaxTrackingRouter {
 
         return RouterFunctions.route(getNexusSummaryRoute, salesTaxTrackingHandler::getNexusSummary);
 >>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
+=======
+                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
+
+        return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
+>>>>>>> 1b610118 (merged main)
     }
 
 }

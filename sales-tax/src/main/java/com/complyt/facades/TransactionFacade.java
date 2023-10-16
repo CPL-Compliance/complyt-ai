@@ -2,7 +2,10 @@ package com.complyt.facades;
 
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
+<<<<<<< HEAD
 import com.complyt.domain.nexus.SalesTaxTracking;
+=======
+>>>>>>> 1b610118 (merged main)
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.CustomerService;
 import com.complyt.services.SalesTaxService;
@@ -60,6 +63,7 @@ public class TransactionFacade {
                 .flatMap(transactionService::save);
     }
 
+<<<<<<< HEAD
     private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction, SalesTaxTracking salesTaxTracking) {
         return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking)
                 ? transactionService.save(transaction)
@@ -67,6 +71,16 @@ public class TransactionFacade {
                         .flatMap(salesTaxTrackingService::update)
                         .thenReturn(savedTransaction))
                 : transactionService.save(transaction);
+=======
+    private Mono<Transaction> saveAndHandleNexusTrackingCalculation(Transaction transaction) {
+        return nexusService.isNexusTrackingCalculationRequired(transaction) ?
+                transactionService.save(transaction)
+                        .flatMap(savedTransaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
+                                .flatMap(salesTaxTracking -> nexusService.addToNexusTracking(savedTransaction, salesTaxTracking)
+                                        .flatMap(updatedSalesTaxTracking -> salesTaxTrackingService.update(salesTaxTracking, salesTaxTracking.getState().getName()))
+                                        .thenReturn(savedTransaction))) :
+                transactionService.save(transaction);
+>>>>>>> 1b610118 (merged main)
     }
 
     public Mono<Transaction> updateIfModified(@NonNull String externalId, @NonNull String source, @NonNull Transaction newTransaction, @NonNull Transaction originalTransaction) {
@@ -91,6 +105,7 @@ public class TransactionFacade {
                 .flatMap(updatedTransaction -> transactionService.update(externalId, source, updatedTransaction));
     }
 
+<<<<<<< HEAD
     private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction, SalesTaxTracking salesTaxTracking) {
         return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking)
                 ? transactionService.update(externalId, source, transaction)
@@ -98,6 +113,16 @@ public class TransactionFacade {
                         .flatMap(salesTaxTrackingService::update)
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
+=======
+    private Mono<Transaction> updateAndHandleNexusTrackingCalculation(String externalId, String source, Transaction transaction) {
+        return nexusService.isNexusTrackingCalculationRequired(transaction) ?
+                transactionService.update(externalId, source, transaction)
+                        .flatMap(updatedTransaction -> salesTaxTrackingService.findByState(transaction.getShippingAddress().state())
+                                .flatMap(salesTaxTracking -> nexusService.updateToNexusTracking(updatedTransaction, salesTaxTracking)
+                                        .flatMap(updatedSalesTaxTracking -> salesTaxTrackingService.update(salesTaxTracking, salesTaxTracking.getState().getName()))
+                                        .thenReturn(updatedTransaction))) :
+                transactionService.update(externalId, source, transaction);
+>>>>>>> 1b610118 (merged main)
     }
 
     public Mono<Transaction> findByExternalIdAndSource(String externalId, String source) {

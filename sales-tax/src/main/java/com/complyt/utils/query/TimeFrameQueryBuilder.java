@@ -38,6 +38,7 @@ public class TimeFrameQueryBuilder implements QueryBuilder<DateRange> {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 @Getter
 @ToString
@@ -62,3 +63,5 @@ class DateRangeStrategy {
     }
 }
 >>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
+=======
+>>>>>>> 1b610118 (merged main)

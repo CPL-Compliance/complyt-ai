@@ -134,9 +134,14 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.findByState(transactionWithInjectedData.getShippingAddress().state())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.save(transactionWithCustomer)).thenReturn(Mono.just(transactionWithInjectedDataAndId));
+<<<<<<< HEAD
         when(nexusService.isNexusTrackingCalculationRequired(transactionWithCustomer, salesTaxTracking)).thenReturn(true);
         when(nexusService.upsertToNexusTracking(transactionWithInjectedDataAndId, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.update(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+=======
+        when(nexusService.isNexusTrackingCalculationRequired(transactionWithCustomer)).thenReturn(true);
+        when(nexusService.addToNexusTracking(transactionWithInjectedDataAndId)).thenReturn(Mono.just(salesTaxTracking));
+>>>>>>> 1b610118 (merged main)
 
         Mono<Transaction> actualTransaction = transactionFacade.saveTransaction(transactionNoId);
 
@@ -390,9 +395,14 @@ public class TransactionFacadeTest {
         when(salesTaxTrackingService.findByState(newShippingAddress.state())).thenReturn(Mono.just(salesTaxTracking));
         when(nexusService.hasNexus(salesTaxTracking)).thenReturn(Mono.just(salesTaxTrackingDecorator));
         when(transactionService.update(modifiedTransaction.getExternalId(), source, modifiedTransaction)).thenReturn(Mono.just(modifiedTransaction));
+<<<<<<< HEAD
         when(nexusService.isNexusTrackingCalculationRequired(modifiedTransaction, salesTaxTracking)).thenReturn(true);
         when(nexusService.upsertToNexusTracking(modifiedTransaction, salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
         when(salesTaxTrackingService.update(salesTaxTracking)).thenReturn(Mono.just(salesTaxTracking));
+=======
+        when(nexusService.isNexusTrackingCalculationRequired(modifiedTransaction)).thenReturn(true);
+        when(nexusService.addToNexusTracking(modifiedTransaction)).thenReturn(Mono.just(salesTaxTracking));
+>>>>>>> 1b610118 (merged main)
         Mono<Transaction> transactionMono = transactionFacade.updateIfModified(transactionWithNewAddress.getExternalId(), source, transactionWithNewAddress, transaction);
 
         // Then

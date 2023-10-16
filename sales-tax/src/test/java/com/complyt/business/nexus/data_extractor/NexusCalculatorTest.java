@@ -88,11 +88,19 @@ public class NexusCalculatorTest {
 >>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
+<<<<<<< HEAD
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(transactions);
         when(nexusTransactionSummaryCalculator.extract(transaction1, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(transaction2, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(refundTransaction, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary.withTransactionType(TransactionType.REFUND)));
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+=======
+        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
+
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
+>>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
@@ -120,8 +128,15 @@ public class NexusCalculatorTest {
 >>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
+<<<<<<< HEAD
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(List.of());
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
+=======
+        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
+        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
+        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
+        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
+>>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->

@@ -1,12 +1,15 @@
 package com.complyt.facades;
 
-import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
+<<<<<<< HEAD
 <<<<<<< HEAD
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
 =======
 >>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
+=======
+import com.complyt.services.TransactionService;
+>>>>>>> 1b610118 (merged main)
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import lombok.AllArgsConstructor;
@@ -17,10 +20,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.time.LocalDate;
 =======
 >>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
 import java.time.LocalDateTime;
+=======
+>>>>>>> 1b610118 (merged main)
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -41,6 +47,9 @@ public class SalesTaxTrackingFacade {
 
     @NonNull
     private NexusService nexusService;
+
+    @NonNull
+    private TransactionService transactionService;
 
     public Mono<SalesTaxTracking> findByState(@NonNull String state) {
         return salesTaxTrackingService.findByState(state)
@@ -93,8 +102,12 @@ public class SalesTaxTrackingFacade {
                         .flatMap(salesTaxTrackingService::update));
     }
 
-    public Mono<NexusCalculationSummary> getNexusSummary(@NonNull LocalDateTime referenceDate, @NonNull String state) {
-        return nexusService.getSummary(referenceDate, state);
+    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state) {
+        return salesTaxTrackingService.findByState(state)
+                .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByStateRule(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking())
+                        .flatMapMany(transactionService::getTransactionsByQuery).collectList()
+                        .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions))
+                        .flatMap(refreshedSalesTaxTracking -> salesTaxTrackingService.update(refreshedSalesTaxTracking, state)));
     }
 
 }

@@ -10,10 +10,12 @@ import java.math.BigDecimal;
 public record NexusCalculationSummary(long count, BigDecimal amount) {
 =======
 import com.complyt.domain.nexus.enums.Definition;
+import lombok.With;
 
 import java.math.BigDecimal;
 
-public record NexusCalculationSummary(long count, BigDecimal amount, Definition definition) {
+@With
+public record NexusCalculationSummary(long count, BigDecimal amount) {
 
 >>>>>>> 91047832 (added summaryDto and mapper)
     @Override
