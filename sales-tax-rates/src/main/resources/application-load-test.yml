@@ -14,7 +14,11 @@ eureka:
 # https://cloud.spring.io/spring-cloud-vault/reference/html/
 spring.cloud.vault:
   enabled: true
+<<<<<<< HEAD
   application-name: sales-tax-rates-service${ecs_cluster_name:}
+=======
+  application-name: sales-tax-rates-service{ecs_cluster_name:}
+>>>>>>> 142c5389 (feat: added mono.defer to rates)
   host: ${VAULT_HOST}
   port: 8200
   scheme: https
