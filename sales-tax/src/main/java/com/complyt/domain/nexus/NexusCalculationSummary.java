@@ -1,6 +1,5 @@
 package com.complyt.domain.nexus;
 
-<<<<<<< HEAD
 import lombok.Getter;
 import lombok.With;
 
@@ -8,16 +7,6 @@ import java.math.BigDecimal;
 
 @With
 public record NexusCalculationSummary(long count, BigDecimal amount) {
-=======
-import com.complyt.domain.nexus.enums.Definition;
-import lombok.With;
-
-import java.math.BigDecimal;
-
-@With
-public record NexusCalculationSummary(long count, BigDecimal amount) {
-
->>>>>>> 91047832 (added summaryDto and mapper)
     @Override
     public BigDecimal amount() {
         return amount != null ? amount : BigDecimal.ZERO;

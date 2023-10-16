@@ -4,14 +4,11 @@ import com.complyt.domain.State;
 import com.complyt.domain.customer.Customer;
 import com.complyt.domain.nexus.NexusCalculationSummary;
 import com.complyt.domain.nexus.SalesTaxTracking;
-<<<<<<< HEAD
 import com.complyt.domain.nexus.TransactionNexusSummary;
 import com.complyt.domain.nexus.enums.TimeFrame;
 import com.complyt.domain.transaction.Transaction;
 import com.complyt.services.CustomerService;
 import com.complyt.services.TransactionService;
-=======
->>>>>>> 91047832 (added summaryDto and mapper)
 import com.complyt.services.nexus.NexusService;
 import com.complyt.services.nexus.SalesTaxTrackingService;
 import com.complyt.utils.factory.DateRange;
@@ -50,7 +47,6 @@ public class SalesTaxTrackingFacadeTest {
 
     @Mock
     SalesTaxTrackingService salesTaxTrackingService;
-<<<<<<< HEAD
     @Mock
     TransactionService transactionService;
     @Mock
@@ -58,12 +54,6 @@ public class SalesTaxTrackingFacadeTest {
     @Mock
     NexusService nexusService;
     UnitTestUtilities testUtilities;
-=======
-
-    @Mock
-    NexusService nexusService;
-
->>>>>>> 91047832 (added summaryDto and mapper)
     private SalesTaxTracking salesTaxTracking;
 
     private final DateRange dateRange = new DateRangeStrategy(TimeFrame.PREVIOUS_TWELVE_MONTHS, LocalDateTime.now(), LocalDateTime.now()).getDateRange();

@@ -42,13 +42,8 @@ public class NexusThresholdCheckTest {
     }
 
     private NexusCalculationSummary createNexusCalculationSummary() {
-<<<<<<< HEAD
         return new NexusCalculationSummary(nexusStateRule.nexusThreshold().getCount(),
                 nexusStateRule.nexusThreshold().getAmount());
-=======
-        return new NexusCalculationSummary(nexusStateRule.getNexusThreshold().getCount(),
-                nexusStateRule.getNexusThreshold().getAmount(), Definition.AMOUNT);
->>>>>>> 91047832 (added summaryDto and mapper)
     }
 
     private NexusStateRule createNexusStateRule() {

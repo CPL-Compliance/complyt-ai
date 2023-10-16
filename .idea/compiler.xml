@@ -24,7 +24,6 @@
         <module name="sales-tax-rates" />
         <module name="discovery-service" />
         <module name="sales-tax" />
-        <module name="authentication" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

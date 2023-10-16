@@ -57,15 +57,10 @@ public class SalesTaxTrackingRouter {
     }
 
     @Bean
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 1b610118 (merged main)
 //    @refreshNexusSummaryApiInfo
     public RouterFunction<ServerResponse> refreshNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
         RequestPredicate refreshNexusSummaryRoute = RequestPredicates
                 .POST(BASE_URL + "/refresh/state/{state}")
-<<<<<<< HEAD
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
@@ -78,20 +73,6 @@ public class SalesTaxTrackingRouter {
                 .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
 
         return RouterFunctions.route(refreshNexusSummaryByDateRoute, salesTaxTrackingHandler::refreshNexusSummaryByDate);
-=======
-//    @GetNexusSummaryApiInfo
-    public RouterFunction<ServerResponse> getNexusSummaryRouterFunction(@NonNull final SalesTaxTrackingHandler salesTaxTrackingHandler) {
-        RequestPredicate getNexusSummaryRoute = RequestPredicates
-                .GET(BASE_URL + "/state/{state}/date/{date}")
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(getNexusSummaryRoute, salesTaxTrackingHandler::getNexusSummary);
->>>>>>> c9ecc4a6 (eyal/com-303-nexus-tracking-details-add-thresholds)
-=======
-                .and(RequestPredicates.accept(MediaType.APPLICATION_JSON));
-
-        return RouterFunctions.route(refreshNexusSummaryRoute, salesTaxTrackingHandler::refreshNexusSummary);
->>>>>>> 1b610118 (merged main)
     }
 
 }

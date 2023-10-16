@@ -358,7 +358,7 @@ public class SalesTaxTrackingEndpointsIT extends TestContainersInitializerIT imp
                     headers.setContentType(MediaType.APPLICATION_JSON);
                 })
                 .exchange()
-                .expectStatus().isUnauthorized();
+                .expectStatus().isForbidden();
     }
 
     @Order(1)

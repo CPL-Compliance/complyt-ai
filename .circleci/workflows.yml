@@ -33,6 +33,9 @@ parameters:
   run-discovery-service-workflow:
     type: boolean
     default: false
+  run-address-validation-workflow:
+    type: boolean
+    default: false
   run-sales-tax-rates-workflow:
     type: boolean
     default: false
@@ -241,6 +244,34 @@ workflows:
             - release
           service_name: "files"
 
+  address-validation-workflow:
+    when: << pipeline.parameters.run-address-validation-workflow >>
+    jobs:
+      - verify:
+          filters:
+            branches:
+              only:
+                - /^(main.+|(?!main).*)$/
+          service_directory: "address-validation"
+
+      - release:
+          service_directory: "address-validation"
+          filters:
+            branches:
+              only:
+                - main
+
+      - send-test-coverage-reports:
+          requires:
+            - verify
+            - release
+          service_directory: "address-validation"
+
+      - update-ecs-service:
+          requires:
+            - release
+          service_name: "address-validation"
+
   api-gateway-workflow:
     when: << pipeline.parameters.run-api-gateway-workflow >>
     jobs:
@@ -251,14 +282,14 @@ workflows:
           name: package-sales-tax-rates
           service_directory: "sales-tax-rates"
       - package-dependency:
+          name: package-address-validation
+          service_directory: "address-validation"
+      - package-dependency:
           name: package-discovery-service
           service_directory: "discovery-service"
       - package-dependency:
           name: package-files
           service_directory: "files"
-      - package-dependency:
-          name: package-authentication
-          service_directory: "authentication"
 
       - verify:
           filters:
@@ -268,21 +299,21 @@ workflows:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
+            - package-address-validation
             - package-discovery-service
             - package-files
-            - package-authentication
           service_directory: "api-gateway"
 
       - release:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
+            - package-address-validation
             - package-discovery-service
             - package-files
-            - package-authentication
           filters:
             branches:
-              only:
+              only:  
                 - main
           service_directory: "api-gateway"
 

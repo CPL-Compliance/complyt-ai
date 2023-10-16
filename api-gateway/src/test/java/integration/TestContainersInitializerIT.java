@@ -36,7 +36,6 @@ public abstract class TestContainersInitializerIT {
     protected static final String SALES_TAX = "sales-tax";
     protected static final String SALES_TAX_RATES = "sales-tax-rates";
     protected static final String FILES = "files";
-    protected static final String AUTHENTICATION = "authentication";
     protected static final String API_GATEWAY = "api-gateway";
 
     // Containers
@@ -45,12 +44,10 @@ public abstract class TestContainersInitializerIT {
     protected static final GenericContainer SALES_TAX_CONTAINER;
     protected static final GenericContainer SALES_TAX_RATES_CONTAINER;
     protected static final GenericContainer FILES_CONTAINER;
-    protected static final GenericContainer AUTHENTICATION_CONTAINER;
     protected static final GenericContainer API_GATEWAY_CONTAINER;
     protected static final KeycloakContainer KEYCLOAK_CONTAINER;
 
     // Tokens
-    protected static String TOKEN_COMPLYT_ADMIN;
     protected static String TOKEN;
     protected static String TOKEN_NO_SCOPES;
     protected static String TOKEN_DIFFERENT_TENANT;
@@ -91,26 +88,15 @@ public abstract class TestContainersInitializerIT {
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX), "/" + dumpPath(SALES_TAX), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(SALES_TAX_RATES), "/" + dumpPath(SALES_TAX_RATES), BindMode.READ_ONLY);
         MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(FILES), "/" + dumpPath(FILES), BindMode.READ_ONLY);
-        MONGO_CONTAINER.addFileSystemBind("../mongodump/" + dumpPath(AUTHENTICATION), "/" + dumpPath(AUTHENTICATION), BindMode.READ_ONLY);
-
         MONGO_CONTAINER.start();
 
         // Retrieve Tokens
-        getToken("complyt-admin", "complyt-admin-test-user",
-                receivedToken -> TOKEN_COMPLYT_ADMIN = receivedToken);
         getToken("test-client", "test-user",
                 receivedToken -> TOKEN = receivedToken);
         getToken("test-client-no-scope", "test-user",
                 receivedToken -> TOKEN_NO_SCOPES = receivedToken);
         getToken("test-client", "test-user-different-tenant",
                 receivedToken -> TOKEN_DIFFERENT_TENANT = receivedToken);
-
-        // Authentication Container
-        AUTHENTICATION_CONTAINER = initializeServiceContainer(AUTHENTICATION,
-                "java", "-Dspring.profiles.active=integration-test, stubAuth0",
-                mongoUriEntrypoint, discoveryUrlEntrypoint, oauthUriEntrypoint, discoveryHostEntrypoint, jwkUriEntrypoint,
-                "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar");
-        AUTHENTICATION_CONTAINER.start();
 
         //Sales Tax Container
         SALES_TAX_CONTAINER = initializeServiceContainer(SALES_TAX,
@@ -138,7 +124,6 @@ public abstract class TestContainersInitializerIT {
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(FILES));
             MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(SALES_TAX_RATES));
-            MONGO_CONTAINER.execInContainer("/usr/bin/mongorestore", "--archive=" + dumpPath(AUTHENTICATION));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -162,8 +147,7 @@ public abstract class TestContainersInitializerIT {
                         .withStartupTimeout(Duration.ofSeconds(60)));
         API_GATEWAY_CONTAINER.start();
 
-        WEB_TEST_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + API_GATEWAY_CONTAINER
-                .getMappedPort(8765) + "/").build();
+        WEB_TEST_CLIENT = WebTestClient.bindToServer().baseUrl("http://localhost:" + API_GATEWAY_CONTAINER.getMappedPort(8765) + "/").build();
     }
 
     private static void fetchJarFile(String service) {

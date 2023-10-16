@@ -1,4 +1,4 @@
-package integration.services.files;
+package integration.services;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;

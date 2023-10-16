@@ -79,28 +79,13 @@ public class NexusCalculatorTest {
                 transaction1, transaction2, refundTransaction);
         NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(2, BigDecimal.valueOf(1200));
 
-<<<<<<< HEAD
-=======
-        int count = transactions.size();
-        BigDecimal amount = transactions.get(0).getItems().get(0).getTotalPrice().add(transactions.get(1).getItems().get(0).getTotalPrice());
-        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
-        NexusStateRule nexusStateRule = createNexusStateRule();
->>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
-<<<<<<< HEAD
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(transactions);
         when(nexusTransactionSummaryCalculator.extract(transaction1, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(transaction2, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary));
         when(nexusTransactionSummaryCalculator.extract(refundTransaction, salesTaxTracking.getNexusStateRule())).thenReturn(Mono.just(transactionNexusSummary.withTransactionType(TransactionType.REFUND)));
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
-=======
-        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
-        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
-
-        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
->>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->
@@ -111,32 +96,14 @@ public class NexusCalculatorTest {
     @Test
     void calculateNexusSummary_AllTransactionsFiltered_ReturnsSummaryOf0() {
         // Given
-<<<<<<< HEAD
         List<Transaction> transactions = List.of(
                 transaction1, transaction2, transaction3);
         NexusCalculationSummary nexusCalculationSummary = new NexusCalculationSummary(0, BigDecimal.valueOf(0));
 
-=======
-        List<Transaction> transactions = createTransactionsList();
-        int count = 0;
-        BigDecimal amount = BigDecimal.ZERO;
-        NexusCalculationSummary summary = new NexusCalculationSummary(count, amount, Definition.AMOUNT_OR_COUNT);
-        List<CustomerType> resellerCustomerOnly = new ArrayList<>() {{
-            add(CustomerType.RESELLER);
-        }};
-        NexusStateRule nexusStateRule = createNexusStateRule().withCustomerTypes(resellerCustomerOnly);
->>>>>>> 91047832 (added summaryDto and mapper)
 
         // When
-<<<<<<< HEAD
         when(transactionsFilterByNexusRules.filter(transactions, salesTaxTracking.getNexusStateRule())).thenReturn(List.of());
         Mono<SalesTaxTracking> salesTaxTrackingMono = nexusCalculator.calculateNexusSummary(transactions, salesTaxTracking, dateRange);
-=======
-        when(transactionNexusFilter.filter(transactions, nexusStateRule)).thenReturn(transactions);
-        when(nexusTransactionsCountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(count));
-        when(nexusTransactionsAmountCalculator.extract(transactions, nexusStateRule)).thenReturn(Mono.just(amount));
-        Mono<NexusCalculationSummary> actualSummary = nexusCalculator.calculateNexusSummary(transactions, nexusStateRule);
->>>>>>> 1b610118 (merged main)
 
         // Then
         StepVerifier.create(salesTaxTrackingMono).consumeNextWith(recievedSalesTaxTracking ->

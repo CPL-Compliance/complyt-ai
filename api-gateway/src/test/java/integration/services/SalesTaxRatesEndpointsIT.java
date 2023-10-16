@@ -1,4 +1,4 @@
-package integration.services.sales_tax_rates;
+package integration.services;
 
 import integration.TestContainersInitializerIT;
 import integration.test_utils.TestUtilities;
