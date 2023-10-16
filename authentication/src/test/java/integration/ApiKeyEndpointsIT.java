@@ -16,9 +16,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import testUtils.TestUtilities;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -42,7 +41,7 @@ public class ApiKeyEndpointsIT extends TestContainersInitializerIT {
     public void post_Exists_Returns201() {
         CredentialsDto credentialsDto = TestUtilities.createCredentialsDto();
 
-        EntityExchangeResult<ApiKeyDto> apiKeyDtoEntityExchangeResult = webTestClient
+        webTestClient
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder

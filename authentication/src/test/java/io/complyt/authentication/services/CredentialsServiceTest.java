@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import testUtils.TestUtilities;
+import test_utils.unit_tests.TestUtilities;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

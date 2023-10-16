@@ -1,4 +1,4 @@
-package testUtils;
+package test_utils.unit_tests;
 
 import io.complyt.authentication.business.authorization.AccessToken;
 import io.complyt.authentication.business.authorization.Auth0AccessToken;

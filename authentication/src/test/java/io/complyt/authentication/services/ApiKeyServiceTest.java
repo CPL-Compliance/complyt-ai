@@ -1,6 +1,5 @@
 package io.complyt.authentication.services;
 
-import io.complyt.authentication.security.AesSecretKeyUtils;
 import io.complyt.authentication.security.ApiKeyGenerator;
 import io.complyt.authentication.v1.models.ApiKey;
 import lombok.experimental.FieldDefaults;
@@ -11,10 +10,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import testUtils.TestUtilities;
-
-import javax.crypto.KeyGenerator;
-import java.security.NoSuchAlgorithmException;
+import test_utils.unit_tests.TestUtilities;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

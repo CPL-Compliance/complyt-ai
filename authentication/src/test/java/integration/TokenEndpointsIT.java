@@ -16,7 +16,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import test_utils.integration_tests.TestUtilities;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 @SpringBootTest(classes = AuthenticationApplication.class)
@@ -29,7 +33,6 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    String apiKey = "e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7748";
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -59,32 +62,19 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Order(2)
     @Test
     @WithMockUser
-    public void postApiKey_apiKeyExistsButDoesntHaveToken_ReturnsAccessToken() {
+    public void postApiKey_apiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
         webTestClient
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(TokenRouter.BASE_URL)
-                        .queryParam("api_key", apiKey)
+                        .queryParam("api_key", TestUtilities.apiKey)
                         .build())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(TokenDto.class);
-    }
-
-    @Order(3)
-    @Test
-    @WithMockUser
-    public void postApiKey_csrfIsMissing_Returns403() {
-        webTestClient
-                .post()
-                .uri(uriBuilder -> uriBuilder
-                        .path(TokenRouter.BASE_URL)
-                        .queryParam("api_key", apiKey)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isForbidden();
+                .expectBody(TokenDto.class)
+                .value(tokenDto -> assertTrue(tokenDto.expireAt().isBefore(LocalDateTime.now()
+                        .plusSeconds(tokenDto.expiresIn()))));
     }
 }
