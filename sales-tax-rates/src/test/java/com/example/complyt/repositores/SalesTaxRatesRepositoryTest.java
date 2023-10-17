@@ -3,6 +3,7 @@ package com.example.complyt.repositores;
 import com.complyt.domain.Address;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.repositories.ComplytSalesTaxRatesRepository;
+import com.complyt.repositories.QueryBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,6 +28,9 @@ public class SalesTaxRatesRepositoryTest {
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @Mock
+    QueryBuilder<Address> addressQueryBuilder;
+
     @Test
     void findByAddress_FindsComplytSalesTaxRates_ReturnsComplytSalesTaxRates() {
         // Given
@@ -37,6 +41,7 @@ public class SalesTaxRatesRepositoryTest {
 
         // When
         when(reactiveMongoTemplate.findOne(query, ComplytSalesTaxRates.class, state)).thenReturn(Mono.just(complytSalesTaxRates));
+        when(addressQueryBuilder.build(address)).thenReturn(query);
         Mono<ComplytSalesTaxRates> complytSalesTaxRatesMono = salesTaxRatesRepository.findByAddress(address, state);
 
         // Then
