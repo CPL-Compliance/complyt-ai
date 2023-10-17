@@ -254,9 +254,6 @@ workflows:
           name: package-sales-tax-rates
           service_directory: "sales-tax-rates"
       - package-dependency:
-          name: package-address-validation
-          service_directory: "address-validation"
-      - package-dependency:
           name: package-discovery-service
           service_directory: "discovery-service"
       - package-dependency:
@@ -274,7 +271,6 @@ workflows:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
-            - package-address-validation
             - package-discovery-service
             - package-files
             - package-authentication
@@ -284,13 +280,12 @@ workflows:
           requires:
             - package-sales-tax
             - package-sales-tax-rates
-            - package-address-validation
             - package-discovery-service
             - package-files
             - package-authentication
           filters:
             branches:
-              only:  
+              only:
                 - main
           service_directory: "api-gateway"
 
