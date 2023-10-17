@@ -1,0 +1,125 @@
+package io.complyt.authentication.services;
+
+import io.complyt.authentication.domain.ApiKey;
+import io.complyt.authentication.domain.Token;
+import io.complyt.authentication.repositories.TokenRepository;
+import io.complyt.authentication.security.Crypto;
+import io.complyt.authentication.security.EncryptedData;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import reactor.core.publisher.Mono;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Slf4j
+@EqualsAndHashCode
+public class TokenService {
+    @NonNull
+    TokenRepository tokenRepository;
+
+    @NonNull
+    PasswordEncoder passwordEncoder;
+
+    @NonNull
+    Crypto cryptoAesCbcPkcs5Padding;
+
+    int tokenExpirationSafeWindowSec;
+
+    public Mono<Token> findByApiKey(final @NonNull ApiKey apiKey) {
+        return tokenRepository.findByComplytClientId(apiKey.getClientId())
+                .filter(token -> passwordEncoder.matches(apiKey.getClientSecret(), token.getComplytClientSecret()))
+                .map(this::decryptToken);
+    }
+
+    public Mono<Token> saveToken(@NonNull Token token) {
+        return Mono.just(createDocumentExpirationDateTime(token.getExpiresIn()))
+                .map(token::withExpireAt)
+                .map(this::encryptToken)
+                .flatMap(tokenRepository::save)
+                .map(this::decryptToken);
+    }
+
+    @NonNull
+    private LocalDateTime createDocumentExpirationDateTime(int expiresIn) {
+        return LocalDateTime.now().plusSeconds(expiresIn).minusSeconds(tokenExpirationSafeWindowSec);
+    }
+
+    @NonNull
+    private Token decryptToken(final Token token) {
+        EncryptedData accessTokenEncryptedData = new EncryptedData(token.getAccessTokenIv(), token.getAccessToken());
+        EncryptedData scopeEncryptedData = new EncryptedData(token.getScopeIv(), token.getScope());
+
+        String scope;
+        String accessToken;
+        try {
+            scope = cryptoAesCbcPkcs5Padding.decrypt(scopeEncryptedData);
+            accessToken = cryptoAesCbcPkcs5Padding.decrypt(accessTokenEncryptedData);
+        } catch (IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to decrypt data");
+        }
+
+        return createDecryptedToken(token, accessToken, scope, scopeEncryptedData);
+    }
+
+    @NonNull
+    private Token encryptToken(final Token token) {
+        EncryptedData accessTokenEncryptedData;
+        EncryptedData scopeEncryptedData;
+
+        try {
+            accessTokenEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getAccessToken());
+            scopeEncryptedData = cryptoAesCbcPkcs5Padding.encrypt(token.getScope());
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException |
+                 InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return createEncryptedToken(token, accessTokenEncryptedData, scopeEncryptedData);
+    }
+
+    private Token createDecryptedToken(Token token, String accessToken, String scope,
+                                       EncryptedData scopeEncryptedData) {
+        return Token.builder()
+                .accessToken(accessToken)
+                .accessTokenIv(token.getAccessTokenIv())
+                .tokenType(token.getTokenType())
+                .complytClientSecret(token.getComplytClientSecret())
+                .complytClientId(token.getComplytClientId())
+                .expiresIn(token.getExpiresIn())
+                .scope(scope)
+                .scopeIv(scopeEncryptedData.iv())
+                .expireAt(token.getExpireAt())
+                .createdAt(token.getCreatedAt())
+                .build();
+    }
+
+    private Token createEncryptedToken(Token token, EncryptedData accessTokenEncryptedData,
+                                       EncryptedData scopeEncryptedData) {
+        return Token.builder()
+                .accessToken(accessTokenEncryptedData.cipherText())
+                .accessTokenIv(accessTokenEncryptedData.iv())
+                .tokenType(token.getTokenType())
+                .complytClientSecret(token.getComplytClientSecret())
+                .complytClientId(token.getComplytClientId())
+                .expiresIn(token.getExpiresIn())
+                .scope(scopeEncryptedData.cipherText())
+                .scopeIv(scopeEncryptedData.iv())
+                .expireAt(token.getExpireAt())
+                .createdAt(token.getCreatedAt())
+                .build();
+    }
+}

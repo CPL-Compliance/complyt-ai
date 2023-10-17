@@ -1,0 +1,35 @@
+auth0.audience: null
+
+eureka:
+  client:
+    should-unregister-on-shutdown: true
+    initial-instance-info-replication-interval-seconds: 1
+    registry-fetch-interval-seconds: 15
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 30
+
+logging:
+  level:
+    root: info
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "https://issuer-uri.com/"
+  cloud:
+    vault:
+      enabled: false
+  data:
+    mongodb:
+      database: authentication
+
+crypto.secret-key: "VtrmN9T8f1v0lGsrzYzbFib2CAPHwDpQV9vCuOlOgug="
+token-service.token-expiration-safe-window-sec: 10
+authorization:
+  grant-type: "client_credentials"
+  audience: "https://integration-test/"
+  authorization-server-url: "https://integration-test.com/path"

@@ -20,7 +20,7 @@ spring:
     # https://cloud.spring.io/spring-cloud-vault/reference/html/
     vault:
       enabled: true
-      application-name: api-gateway-service
+      application-name: api-gateway-service${ecs_cluster_name:}
       host: ${VAULT_HOST}
       port: 8200
       scheme: https
@@ -51,6 +51,8 @@ springdoc:
         url: /v3/api-docs/sales-tax
       - name: sales-tax-rates
         url: /v3/api-docs/sales-tax-rates
+      - name: authentication
+        url: /v3/api-docs/authentication
   api-docs:
     version: openapi_3_0
 

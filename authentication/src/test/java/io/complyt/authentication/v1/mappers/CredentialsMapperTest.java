@@ -1,0 +1,45 @@
+package io.complyt.authentication.v1.mappers;
+
+import io.complyt.authentication.domain.Credentials;
+import io.complyt.authentication.v1.models.CredentialsDto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import test_utils.unit_tests.TestUtilities;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+class CredentialsMapperTest {
+    Credentials credentials;
+    CredentialsDto credentialsDto;
+
+    @BeforeEach
+    void setUp() {
+        credentials = TestUtilities.createCredentials();
+        credentialsDto = TestUtilities.createCredentialsDto();
+        credentials = TestUtilities.createCredentials(credentialsDto.clientId(), credentialsDto.clientSecret());
+    }
+
+    @Test
+    void credentialsDtoToCredentials() {
+        // When
+        Credentials actualCredentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(credentialsDto);
+
+        // Then
+        assertEquals(credentials, actualCredentials);
+    }
+
+    @Test
+    void credentialsDtoToCredentials_credentialsIsNull_returnNull() {
+        // When
+        Credentials actualCredentials = CredentialsMapper.INSTANCE.credentialsDtoTocredentials(null);
+
+        // Then
+        assertNull(actualCredentials);
+    }
+}
