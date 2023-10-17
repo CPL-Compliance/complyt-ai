@@ -128,7 +128,7 @@ public class SalesTaxTrackingFacadeTest {
         when(transactionService.getTransactionsByQuery(query)).thenReturn(Flux.just(transaction));
         when(customerService.findByComplytId(transaction.getCustomerId())).thenReturn(Mono.just(customer));
         when(nexusService.refreshNexusSummary(salesTaxTrackingWithId, transactionsWithCustomers, referenceDate)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
-        when(salesTaxTrackingService.update(salesTaxTrackingWithSummary)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
+        when(salesTaxTrackingService.save(salesTaxTrackingWithSummary)).thenReturn(Mono.just(salesTaxTrackingWithSummary));
 
         Mono<SalesTaxTracking> salesTaxTrackingMono = salesTaxTrackingFacade.refreshNexusSummary(salesTaxTracking.getState().getName(), referenceDate);
 

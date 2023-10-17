@@ -80,7 +80,7 @@ public class SalesTaxTrackingFacade {
                                     .map(transaction::withCustomer))
                             .collectList()
                         .flatMap(transactions -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, refreshDate))
-                        .flatMap(salesTaxTrackingService::update));
+                        .flatMap(salesTaxTrackingService::save));
     }
 
 }

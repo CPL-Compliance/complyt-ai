@@ -64,7 +64,7 @@ public class TransactionFacade {
         return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking)
                 ? transactionService.save(transaction)
                 .flatMap(savedTransaction -> nexusService.upsertToNexusTracking(savedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::update)
+                        .flatMap(salesTaxTrackingService::save)
                         .thenReturn(savedTransaction))
                 : transactionService.save(transaction);
     }
@@ -95,7 +95,7 @@ public class TransactionFacade {
         return nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTracking)
                 ? transactionService.update(externalId, source, transaction)
                 .flatMap(updatedTransaction -> nexusService.upsertToNexusTracking(updatedTransaction, salesTaxTracking)
-                        .flatMap(salesTaxTrackingService::update)
+                        .flatMap(salesTaxTrackingService::save)
                         .thenReturn(updatedTransaction))
                 : transactionService.update(externalId, source, transaction);
     }
