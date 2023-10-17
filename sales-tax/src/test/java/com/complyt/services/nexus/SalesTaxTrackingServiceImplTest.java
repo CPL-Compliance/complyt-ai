@@ -401,6 +401,62 @@ public class SalesTaxTrackingServiceImplTest {
     }
 
     @Test
+    void upsertWithoutNexusSummaryIfNeeded_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.upsertWithoutNexusSummaryIfNeeded(nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void addClientAndStateDetails_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.addClientAndStateDetails(nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void insertSummariesFromOriginal_NullNewSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.insertSummariesFromOriginal(nullSalesTaxTracking, salesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "checkedSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void insertSummariesFromOriginal_NullOriginalSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> {
+            salesTaxTrackingService.insertSummariesFromOriginal(salesTaxTracking, nullSalesTaxTracking);
+        });
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
     void saveWithEconomicQualified_NullSalesTaxTrackingPassed_ThrowsException() {
         // Given
         SalesTaxTracking nullSalesTaxTracking = null;
