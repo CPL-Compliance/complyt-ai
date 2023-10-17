@@ -270,4 +270,28 @@ public class SalesTaxTrackingFacadeTest {
         assertEquals(nullPointerException.getMessage(), "originalSalesTaxTracking is marked non-null but is null");
     }
 
+    @Test
+    void refresh_NullStatePassed_ThrowsException() {
+        // Given
+        String state = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary(state, LocalDate.now()));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "state is marked non-null but is null");
+    }
+
+ @Test
+    void refresh_NullDatePassed_ThrowsException() {
+        // Given
+        LocalDate date = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> salesTaxTrackingFacade.refreshNexusSummary("state", date));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "refreshDate is marked non-null but is null");
+    }
+
 }

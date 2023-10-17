@@ -71,7 +71,7 @@ public class SalesTaxTrackingFacade {
                 : Mono.just(salesTaxTracking) ;
     }
 
-    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state, LocalDate refreshDate) {
+    public Mono<SalesTaxTracking> refreshNexusSummary(@NonNull String state, @NonNull LocalDate refreshDate) {
             return salesTaxTrackingService.findByState(state)
                     .flatMap(salesTaxTrackingService::addClientAndStateDetails)
                     .flatMap(salesTaxTracking -> nexusService.getTransactionsQueryByNexusCalculation(salesTaxTracking.getNexusStateRule(), salesTaxTracking.getClientTracking(), refreshDate)

@@ -3,7 +3,6 @@ package com.complyt.services.nexus;
 import com.complyt.business.nexus.ApplicationDateCreator;
 import com.complyt.business.nexus.checker.NexusChecker;
 import com.complyt.business.nexus.data_extractor.NexusCalculator;
-import com.complyt.domain.customer.Customer;
 import com.complyt.domain.decorator.SalesTaxTrackingWithNexusInfo;
 import com.complyt.domain.nexus.*;
 import com.complyt.domain.nexus.enums.TimeFrame;
@@ -54,7 +53,6 @@ class NexusServiceTest {
     @Mock
     private NexusChecker nexusChecker;
     private Transaction transaction;
-    private Customer customer;
     private SalesTaxTracking salesTaxTracking;
 
     @BeforeEach
@@ -64,13 +62,6 @@ class NexusServiceTest {
         salesTaxTrackingId = UUID.randomUUID().toString();
         salesTaxTracking = testUtilities.createSalesTaxTracking(salesTaxTrackingId);
         transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
-        customer = testUtilities.createCustomer(UUID.randomUUID().toString());
-    }
-
-    private SalesTaxTracking createSalesTaxTrackingWithNexusEstablished(String id) {
-
-        return testUtilities.createSalesTaxTracking(id)
-                .withEconomicNexusTracker(new EconomicNexusTracker(true, LocalDateTime.now()));
     }
 
     @Test
@@ -79,10 +70,22 @@ class NexusServiceTest {
         Transaction nullTransaction = null;
 
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
-                () -> nexusService.upsertToNexusTracking(nullTransaction, null));
+                () -> nexusService.upsertToNexusTracking(nullTransaction, salesTaxTracking));
 
         // Then
         assertEquals("updatedTransaction is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void upsertToNexusTracking_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.upsertToNexusTracking(transaction, nullSalesTaxTracking));
+
+        // Then
+        assertEquals("salesTaxTracking is marked non-null but is null", nullPointerException.getMessage());
     }
 
     @Test
@@ -229,6 +232,25 @@ class NexusServiceTest {
     }
 
     @Test
+    void recalculationOfNexusSummaryIfRequired_SalesTaxTrackingHasNexus_ReturnsWithoutCalculation() {
+        // Given
+        SalesTaxTracking salesTaxTrackingWithNexus = salesTaxTracking
+                .withTransactionNexusSummaries(Map.of(UUID.randomUUID(),
+                        new TransactionNexusSummary(BigDecimal.valueOf(4500),
+                                LocalDateTime.now().minusDays(1),
+                                TransactionType.INVOICE)))
+                .withNexusStateRule(salesTaxTracking.getNexusStateRule().withTimeFrame(TimeFrame.PREVIOUS_TWELVE_MONTHS));
+
+        // When
+        when(nexusChecker.hasNexus(salesTaxTrackingWithNexus)).thenReturn(true);
+        Mono<SalesTaxTracking> salesTaxTrackingMono = nexusService.recalculationOfNexusSummaryIfRequired(salesTaxTrackingWithNexus, Mono.empty());
+
+        // Then
+        StepVerifier.create(salesTaxTrackingMono).expectNext(salesTaxTrackingWithNexus).verifyComplete();
+    }
+
+
+    @Test
     void isSalesTaxTrackingCalculationRequired_TransactionIsOfTypeInovice_ReturnsTrue() {
         // Given
 
@@ -246,6 +268,19 @@ class NexusServiceTest {
 
         // When
         boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTrackingNoSalesTaxEnforcement);
+
+        // Then
+        assertFalse(isSalesTaxRequired);
+    }
+ @Test
+    void isSalesTaxTrackingCalculationRequired_CustomerTypeNotInStateRule_ReturnsFalse() {
+        // Given
+        SalesTaxTracking salesTaxTrackingWithNoCustomerTypesInStateRule = salesTaxTracking
+                .withNexusStateRule(salesTaxTracking.getNexusStateRule()
+                        .withCustomerTypes(List.of()));
+
+        // When
+        boolean isSalesTaxRequired = nexusService.isNexusTrackingCalculationRequired(transaction, salesTaxTrackingWithNoCustomerTypesInStateRule);
 
         // Then
         assertFalse(isSalesTaxRequired);
@@ -284,6 +319,129 @@ class NexusServiceTest {
         // When
         NullPointerException nullPointerException = assertThrows(NullPointerException.class,
                 () -> nexusService.hasNexus(nullSalesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void refresh_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        SalesTaxTracking nullSalesTaxTracking = null;
+        List<Transaction> transactions = List.of(transaction);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.refreshNexusSummary(nullSalesTaxTracking, transactions, LocalDate.now()));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void refresh_NullTransactionListPassed_ThrowsException() {
+        // Given
+        List<Transaction> transactions = null;
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, LocalDate.now()));
+
+        // Then
+        assertEquals("transactionList is marked non-null but is null", nullPointerException.getMessage());
+    }
+
+    @Test
+    void refresh_NullDatePassed_ThrowsException() {
+        // Given
+        List<Transaction> transactions = List.of(transaction);
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.refreshNexusSummary(salesTaxTracking, transactions, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "refreshDate is marked non-null but is null");
+    }
+
+    @Test
+    void recalculationOfNexusSummaryIfRequired_NullTransactionPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.isNexusTrackingCalculationRequired(null, salesTaxTracking));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "transaction is marked non-null but is null");
+    }
+
+    @Test
+    void recalculationOfNexusSummaryIfRequired_NullSalesTaxTrackingPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.isNexusTrackingCalculationRequired(transaction, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void getNexusSummaryDate_NullSalesTaxTrackingPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.getNexusSummaryDate(null, LocalDateTime.now()));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void calculateNexusSummaryFromTransactionSummaries_NullSalesTaxTrackingPassed_ThrowsException() {
+        // Given
+        DateRange dateRange = DateRange.Factory.newPreviousTwelveMonths(LocalDateTime.now());
+
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.calculateNexusSummaryFromTransactionSummaries(null, dateRange));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
+    }
+
+    @Test
+    void calculateNexusSummaryFromTransactionSummaries_NullDateRangePassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.calculateNexusSummaryFromTransactionSummaries(salesTaxTracking, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "summaryDateRange is marked non-null but is null");
+    }
+
+    @Test
+    void getNexusSummaryDate_NullReferenceDatePassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.getNexusSummaryDate(salesTaxTracking, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void economicNexusQualified_NullDateTimePassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.economicNexusQualified(salesTaxTracking, null));
+
+        // Then
+        assertEquals(nullPointerException.getMessage(), "referenceDate is marked non-null but is null");
+    }
+
+    @Test
+    void economicNexusQualified_NullSalesTaxTrackingPassed_ThrowsException() {
+        // When
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class,
+                () -> nexusService.economicNexusQualified(null, LocalDateTime.now()));
 
         // Then
         assertEquals(nullPointerException.getMessage(), "salesTaxTracking is marked non-null but is null");
