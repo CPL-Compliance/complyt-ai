@@ -12,8 +12,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.Optional;
-
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
