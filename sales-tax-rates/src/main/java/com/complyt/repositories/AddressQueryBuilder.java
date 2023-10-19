@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
@@ -29,7 +29,15 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
     }
 
     public static Query buildPartialAddressQuery(Address address) {
-        return Query.query(Criteria.where("address.zip").is(address.zip()));
+        Query query = Query.query(Criteria.where("address.zip").is(address.zip()));
+        Optional.ofNullable(address.city())
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.city").is(value)));
+        Optional.ofNullable(address.street())
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.street").is(value)));
+        Optional.ofNullable(address.county())
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.county").is(value)));
+
+        return query;
     }
 
     public static Query buildFullAddressQuery(Address address) {

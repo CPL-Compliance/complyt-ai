@@ -9,6 +9,7 @@ import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.RatesMetaDataDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -47,9 +48,9 @@ public interface TestUtilities {
 
     static Query createAddressSearchQuery(Address address) {
         return Query.query(Criteria
-                .where("address.city").is(address.city())
-                .and("address.street").is(address.street())
-                .and("address.zip").is(address.zip()));
+                        .where("address.city").is(address.city())
+                        .and("address.street").is(address.street())
+                        .and("address.zip").is(address.zip()));
     }
 
     static FastTaxData createFastTaxData() {
@@ -84,7 +85,7 @@ public interface TestUtilities {
         BigDecimal cityDistrictRate = BigDecimal.ZERO;
         BigDecimal countyDistrictRate = new BigDecimal("0.029");
         RatesMetaDataDto ratesMetaDataDto = new RatesMetaDataDto(cityDistrictRate, countyDistrictRate);
-        return new SalesTaxRatesDto(new BigDecimal("0.0"),new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
+        return new SalesTaxRatesDto(new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.011"), new BigDecimal("0.04"), cityDistrictRate.add(countyDistrictRate), ratesMetaDataDto);
     }
 
     static String stringWithLength(int length) {
