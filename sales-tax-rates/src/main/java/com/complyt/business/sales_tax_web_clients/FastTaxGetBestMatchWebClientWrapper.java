@@ -21,8 +21,8 @@ public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrappe
     }
 
     @Override
-    public Mono<SalesTaxData> findByAddress(String city, String county, String state, String zip) {
-        URI uri = buildUri(city, county, state, zip);
+    public Mono<SalesTaxData> findByAddress(String zip, String address, String city, String state) {
+        URI uri = buildUri(zip, address, city, state);
 
         return webClient
                 .get()
@@ -35,17 +35,17 @@ public class FastTaxGetBestMatchWebClientWrapper extends SalesTaxWebClientWrappe
 
     @Override
     public Mono<SalesTaxData> findByAddress(Address address) {
-        return findByAddress(address.city(), address.county(), address.state(), address.zip());
+        return findByAddress(address.zip(), address.street(), address.city(), address.state());
     }
 
-    protected URI buildUri(String city, String county, String state, String zip) {
+    protected URI buildUri(String zip, String address, String city, String state) {
         return UriComponentsBuilder.newInstance()
                 .scheme(scheme)
                 .host(host)
                 .path(path)
                 .queryParam(licenseKey.getValue0(), licenseKey.getValue1())
+                .queryParam("address", address)
                 .queryParam("city", city)
-                .queryParam("county", county)
                 .queryParam("state", state)
                 .queryParam("zip", zip)
                 .queryParam("taxtype", "sales")
