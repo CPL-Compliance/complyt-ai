@@ -1,6 +1,7 @@
 package integration;
 
 import io.complyt.authentication.AuthenticationApplication;
+import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.TokenDto;
 import io.complyt.authentication.v1.routers.TokenRouter;
 import org.junit.jupiter.api.MethodOrderer;
@@ -44,15 +45,15 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void postApiKey_apiKeyNotExists_Returns404() {
-        String apiKeyNotExistsInDb = "e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7747";
+        ApiKeyDto apiKeyDto = new ApiKeyDto("e2019b6f-a8c1-415c-b8b0-3fd6725c9a67-e25f4d90-1051-44f7-89fb-4c6097af7747");
 
         webTestClient
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(TokenRouter.BASE_URL)
-                        .queryParam("api_key", apiKeyNotExistsInDb)
                         .build())
+                .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound()
@@ -63,13 +64,15 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
     @Test
     @WithMockUser
     public void postApiKey_apiKeyExistsButDoesntHaveToken_ReturnsAccessTokenWithExpirationDateTimeLessThenNowPlusExpiresIn() {
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.apiKey);
+
         webTestClient
                 .mutateWith(csrf())
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(TokenRouter.BASE_URL)
-                        .queryParam("api_key", TestUtilities.apiKey)
                         .build())
+                .bodyValue(apiKeyDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()

@@ -11,17 +11,18 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 @Configuration
 public class ValidatorConfig {
     @Bean
-    ValidationHandler<CredentialsDto, SpringValidatorAdapter> credentialsDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                              @Autowired QueryParamsExtractor credentialsDtoQueryParamsExtractor) {
+    ValidationHandler<CredentialsDto, SpringValidatorAdapter>
+    credentialsDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
+                                    @Autowired QueryParamsExtractor<CredentialsDto> queryParamsExtractorEmpty) {
         return new ValidationHandler<>(CredentialsDto.class, springValidatorAdapter,
-                credentialsDtoQueryParamsExtractor);
+                queryParamsExtractorEmpty);
     }
 
     @Bean
-    public ValidationHandler<ApiKeyDto, SpringValidatorAdapter> apiKeyDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
-                                                                                           @Autowired QueryParamsExtractor apiKeyDtoQueryParamsExtractor) {
-        return new ValidationHandler<>(ApiKeyDto.class,
-                springValidatorAdapter,
-                apiKeyDtoQueryParamsExtractor);
+    public ValidationHandler<ApiKeyDto, SpringValidatorAdapter>
+    apiKeyDtoValidationHandler(@Autowired SpringValidatorAdapter springValidatorAdapter,
+                               @Autowired QueryParamsExtractor<ApiKeyDto> queryParamsExtractorEmpty) {
+        return new ValidationHandler<>(ApiKeyDto.class, springValidatorAdapter,
+                queryParamsExtractorEmpty);
     }
 }

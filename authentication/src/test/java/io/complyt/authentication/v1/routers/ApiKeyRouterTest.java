@@ -11,7 +11,7 @@ import io.complyt.authentication.v1.mappers.CredentialsMapper;
 import io.complyt.authentication.v1.models.ApiKeyDto;
 import io.complyt.authentication.v1.models.CredentialsDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
-import io.complyt.authentication.v1.validators.query_params.CredentialsDtoQueryParamsExtractor;
+import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {ApiKeyRouter.class, ApiKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalExceptionHandler.class, GlobalErrorAttributes.class,
-        CredentialsDtoQueryParamsExtractor.class})
+        QueryParamsExtractorEmpty.class})
 class ApiKeyRouterTest implements PostCreatedRouterMonoTest, PostRouterTestSecurityTemplate {
     @Autowired
     ApiKeyRouter apiKeyRouter;
