@@ -4,14 +4,27 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class WebClientWrapperPropertiesConfig {
 
+
+    @Primary
     @Profile("fastTax")
-    @Bean("fastTaxWebClientWrapperProperties")
-    public WebClientWrapperProperties fastTaxWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
+    @Bean("fastTaxGetByCityCountyStateWebClientWrapperProperties")
+    public WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
+        return WebClientWrapperProperties.builder()
+                .scheme("https")
+                .host("ws.serviceobjects.com")
+                .path("FT/web.svc/json/GetTaxInfoByCityCountyState")
+                .key(new Pair<>("licensekey", licenseKey)).build();
+    }
+
+    @Profile("fastTax")
+    @Bean("fastTaxGetBestMatchWebClientWrapperProperties")
+    public WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties(@Value("${fast-tax-api-key}") String licenseKey) {
         return WebClientWrapperProperties.builder()
                 .scheme("https")
                 .host("ws.serviceobjects.com")

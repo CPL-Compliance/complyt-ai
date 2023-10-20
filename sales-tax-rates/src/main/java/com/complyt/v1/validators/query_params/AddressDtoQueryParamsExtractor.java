@@ -22,7 +22,25 @@ public class AddressDtoQueryParamsExtractor implements QueryParamsExtractor<Addr
                 .map(Boolean::valueOf)
                 .orElse(false);
 
-        AddressDto address = new AddressDto(city, country, county, state, street, zip, isPartial);
+//        AddressDto address = new AddressDto(
+//                city != null ? city.toUpperCase() : null,
+//                country != null ? country.toUpperCase() : null,
+//                county != null ? county.toUpperCase() : null,
+//                state != null ? state.toUpperCase() : null,
+//                street != null ? street.toUpperCase() : null,
+//                zip != null ? zip.toUpperCase() : null,
+//                isPartial
+//        );
+
+        AddressDto address = new AddressDto(
+                city,
+                country,
+                county,
+                state,
+                street,
+                zip,
+                isPartial
+        );
 
         return ContextLogger.observeCtx("Address extracted from request query params: " + address, log::info)
                 .then(Mono.just(address));

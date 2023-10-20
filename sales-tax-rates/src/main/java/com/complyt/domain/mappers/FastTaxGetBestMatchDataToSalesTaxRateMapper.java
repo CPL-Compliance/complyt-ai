@@ -2,7 +2,7 @@ package com.complyt.domain.mappers;
 
 import com.complyt.domain.SalesTaxData;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,8 +12,8 @@ import org.mapstruct.factory.Mappers;
 import java.math.BigDecimal;
 
 @Mapper(nullValueMappingStrategy = NullValueMappingStrategy.RETURN_NULL)
-public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
-    FastTaxDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxDataToSalesTaxRateMapper.class);
+public interface FastTaxGetBestMatchDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxRateMapper {
+    FastTaxGetBestMatchDataToSalesTaxRateMapper INSTANCE = Mappers.getMapper(FastTaxGetBestMatchDataToSalesTaxRateMapper.class);
 
     @Mapping(target = "ratesMetaData.cityDistrictRate", source = "cityDistrictRate")
     @Mapping(target = "ratesMetaData.countyDistrictRate", source = "countyDistrictRate")
@@ -30,8 +30,8 @@ public interface FastTaxDataToSalesTaxRateMapper extends SalesTaxDataToSalesTaxR
 
     @Override
     default SalesTaxRates map(SalesTaxData salesTaxData) {
-        FastTaxData fastTaxData = ((FastTaxData) salesTaxData);
-        TaxInfoItem taxInfoItem = fastTaxData.getTaxInfoItems().get(0);
+        FastTaxGetBestMatchData fastTaxGetBestMatchData = ((FastTaxGetBestMatchData) salesTaxData);
+        TaxInfoItem taxInfoItem = fastTaxGetBestMatchData.getTaxInfoItems().get(0);
 
         return map(taxInfoItem);
     }

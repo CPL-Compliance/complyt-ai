@@ -1,14 +1,12 @@
 package com.complyt.config.web_clients;
 
-import com.complyt.business.sales_tax_web_clients.FastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.StubFastTaxWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.TaxJarWebClientWrapper;
-import com.complyt.business.sales_tax_web_clients.ZipTaxWebClientWrapper;
+import com.complyt.business.sales_tax_web_clients.*;
 import com.taxjar.Taxjar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -16,7 +14,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class SalesTaxWebClientWrapperConfig {
 
     @Autowired
-    private WebClientWrapperProperties fastTaxWebClientWrapperProperties;
+    private WebClientWrapperProperties fastTaxGetBestMatchWebClientWrapperProperties;
+
+    @Autowired
+    private WebClientWrapperProperties fastTaxGetByCityCountyStateWebClientWrapperProperties;
 
     @Autowired
     private WebClientWrapperProperties zipTaxWebClientWrapperProperties;
@@ -27,14 +28,25 @@ public class SalesTaxWebClientWrapperConfig {
     @Autowired
     private WebClientWrapperProperties taxJarWebClientWrapperProperties;
 
+    @Primary
     @Profile({"fastTax"})
     @Bean("salesTaxWebClientWrapper")
-    public FastTaxWebClientWrapper fastTaxWebClientWrapper(WebClient webClient) {
-        return new FastTaxWebClientWrapper(webClient,
-                fastTaxWebClientWrapperProperties.getScheme(),
-                fastTaxWebClientWrapperProperties.getHost(),
-                fastTaxWebClientWrapperProperties.getPath(),
-                fastTaxWebClientWrapperProperties.getKey());
+    public FastTaxGetByCityCountyStateWebClientWrapper fastTaxGetByCityCountyStateWebClientWrapper(WebClient webClient) {
+        return new FastTaxGetByCityCountyStateWebClientWrapper(webClient,
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getScheme(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getHost(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getPath(),
+                fastTaxGetByCityCountyStateWebClientWrapperProperties.getKey());
+    }
+
+    @Profile({"fastTax"})
+    @Bean("salesTaxWebClientWrapper")
+    public FastTaxGetBestMatchWebClientWrapper fastTaxWebClientWrapper(WebClient webClient) {
+        return new FastTaxGetBestMatchWebClientWrapper(webClient,
+                fastTaxGetBestMatchWebClientWrapperProperties.getScheme(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getHost(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getPath(),
+                fastTaxGetBestMatchWebClientWrapperProperties.getKey());
     }
 
     @Profile({"zipTax"})

@@ -1,15 +1,15 @@
 package testUtils;
 
 import com.complyt.domain.Address;
+import com.complyt.domain.CityCountyState;
 import com.complyt.domain.ComplytSalesTaxRates;
 import com.complyt.domain.SalesTaxRates;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.complyt.domain.fast_tax.TaxInfoItem;
 import com.complyt.domain.zip_tax.Result;
 import com.complyt.v1.model.AddressDto;
 import com.complyt.v1.model.RatesMetaDataDto;
 import com.complyt.v1.model.SalesTaxRatesDto;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -31,6 +31,10 @@ public interface TestUtilities {
         return new Address("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
 
+    static CityCountyState createCityCountyStateInCalifornia() {
+        return new CityCountyState("Fresno", "Fresno", "CA");
+    }
+
     static AddressDto createAddressDtoInCalifornia() {
         return new AddressDto("Fresno", "US", null, "CA", "7498 N Remington Ave", "93711-5508", false);
     }
@@ -48,16 +52,16 @@ public interface TestUtilities {
 
     static Query createAddressSearchQuery(Address address) {
         return Query.query(Criteria
-                        .where("address.city").is(address.city())
-                        .and("address.street").is(address.street())
-                        .and("address.zip").is(address.zip()));
+                .where("address.city").is(address.city())
+                .and("address.street").is(address.street())
+                .and("address.zip").is(address.zip()));
     }
 
-    static FastTaxData createFastTaxData() {
+    static FastTaxGetBestMatchData createFastTaxGetBestMatchData() {
         String matchLevel = "Address";
         TaxInfoItem taxInfoItem = new TaxInfoItem("Fresno", "0.00375", "0", "Fresno", "0.00725", "0.0125", null, "", "", "0", "CA", "California", "0.06", "0.0835", "LABOR/FREIGHT/SERVICES", "93711-5508");
         List<TaxInfoItem> taxInfoItems = List.of(taxInfoItem);
-        return new FastTaxData(matchLevel, taxInfoItems, "1");
+        return new FastTaxGetBestMatchData(matchLevel, taxInfoItems, "1");
     }
 
     static AddressDto createStubFastTaxAddressDto() {

@@ -34,7 +34,7 @@ public class AddressQueryBuilderTest {
     @Test
     void build_PartialAddressPassed_ReturnsPartialAddressQuery() {
         // Given
-        Query expectedQuery = Query.query(Criteria.where("address.zip").is(partialAddress.zip()));
+        Query expectedQuery = Query.query(Criteria.where("address.zip").regex(partialAddress.zip(), "i"));
 
         // When
         Query actualQuery = addressQueryBuilder.build(partialAddress);
@@ -47,9 +47,9 @@ public class AddressQueryBuilderTest {
     void build_FullyAddressPassed_ReturnsFullyAddressQuery() {
         // Given
         Query expectedQuery = Query.query(Criteria
-                .where("address.city").is(fullAddress.city())
-                .and("address.street").is(fullAddress.street())
-                .and("address.zip").is(fullAddress.zip()));
+                .where("address.city").regex(fullAddress.city(), "i")
+                .and("address.street").regex(fullAddress.street(), "i")
+                .and("address.zip").regex(fullAddress.zip(), "i"));
 
         // When
         Query actualQuery = addressQueryBuilder.build(fullAddress);

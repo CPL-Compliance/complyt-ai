@@ -15,10 +15,10 @@ import reactor.core.publisher.Mono;
 public class CountyProvider implements SalesTaxDataProvider<Transaction> {
 
     @NonNull
-    private CountyFetcher countyFetcher;
+    private CountyFetcher addressFetcher;
 
     public Mono<Transaction> provide(Transaction transaction) {
-        return countyFetcher.fetch(transaction.getShippingAddress())
+        return addressFetcher.fetch(transaction.getShippingAddress())
                 .flatMap(county -> new TransactionCountyInjector(transaction).inject(county));
     }
 }

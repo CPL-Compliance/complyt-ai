@@ -1,19 +1,28 @@
 package com.complyt.config;
 
-import com.complyt.domain.mappers.FastTaxDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.FastTaxGetBestMatchDataToSalesTaxRateMapper;
+import com.complyt.domain.mappers.FastTaxGetByCityCountyStateDataToSalesTaxRateMapper;
 import com.complyt.domain.mappers.TaxJarDataToSalesTaxRateMapper;
 import com.complyt.domain.mappers.ZipTaxDataToSalesTaxRateMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class MappersConfig {
 
+    @Primary
+    @Profile({"fastTax"})
+    @Bean("salesTaxDataToSalesTaxRateMapper")
+    public FastTaxGetByCityCountyStateDataToSalesTaxRateMapper fastTaxGetByCityCountyStateDataToSalesTaxRateMapper() {
+        return FastTaxGetByCityCountyStateDataToSalesTaxRateMapper.INSTANCE;
+    }
+
     @Profile({"fastTax", "stubFastTax", "default"})
     @Bean("salesTaxDataToSalesTaxRateMapper")
-    public FastTaxDataToSalesTaxRateMapper fastTaxDataToSalesTaxRateMapper() {
-        return FastTaxDataToSalesTaxRateMapper.INSTANCE;
+    public FastTaxGetBestMatchDataToSalesTaxRateMapper fastTaxGetBestMatchDataGetBestMatchToSalesTaxRateMapper() {
+        return FastTaxGetBestMatchDataToSalesTaxRateMapper.INSTANCE;
     }
 
     @Profile({"zipTax"})

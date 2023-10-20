@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonFormat(with = JsonFormat.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-public class FastTaxData implements SalesTaxData {
+public class FastTaxGetBestMatchData implements SalesTaxData {
     String matchLevel;
     List<TaxInfoItem> taxInfoItems;
     String UNINCORPORATED_CODE = "1";

@@ -28,7 +28,7 @@ public class AddressProviderTest {
     CountyProvider addressProvider;
 
     @Mock
-    CountyFetcher countyFetcher;
+    CountyFetcher addressFetcher;
 
     UnitTestUtilities testUtilities;
 
@@ -44,7 +44,7 @@ public class AddressProviderTest {
         Transaction transaction = testUtilities.createTransaction(UUID.randomUUID().toString());
 
         // When
-        when(countyFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(transaction.getShippingAddress().county()));
+        when(addressFetcher.fetch(transaction.getShippingAddress())).thenReturn(Mono.just(transaction.getShippingAddress().county()));
         Mono<Transaction> transactionMono = addressProvider.provide(transaction);
 
         // Then

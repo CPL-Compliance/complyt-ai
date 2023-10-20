@@ -29,22 +29,22 @@ public class AddressQueryBuilder implements QueryBuilder<Address> {
     }
 
     public static Query buildPartialAddressQuery(Address address) {
-        Query query = Query.query(Criteria.where("address.zip").is(address.zip()));
+        Query query = Query.query(Criteria.where("address.zip").regex(address.zip(), "i"));
         Optional.ofNullable(address.city())
-                .ifPresent(value -> query.addCriteria(Criteria.where("address.city").is(value)));
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.city").regex(value, "i")));
         Optional.ofNullable(address.street())
-                .ifPresent(value -> query.addCriteria(Criteria.where("address.street").is(value)));
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.street").regex(value, "i")));
         Optional.ofNullable(address.county())
-                .ifPresent(value -> query.addCriteria(Criteria.where("address.county").is(value)));
+                .ifPresent(value -> query.addCriteria(Criteria.where("address.county").regex(value, "i")));
 
         return query;
     }
 
     public static Query buildFullAddressQuery(Address address) {
         return Query.query(Criteria
-                .where("address.city").is(address.city())
-                .and("address.street").is(address.street())
-                .and("address.zip").is(address.zip()));
+                .where("address.city").regex(address.city(), "i")
+                .and("address.street").regex(address.street(), "i")
+                .and("address.zip").regex(address.zip(), "i"));
     }
 
 }

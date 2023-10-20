@@ -3,7 +3,7 @@ package com.complyt.business.sales_tax_web_clients;
 import com.complyt.annotations.Generated;
 import com.complyt.domain.Address;
 import com.complyt.domain.SalesTaxData;
-import com.complyt.domain.fast_tax.FastTaxData;
+import com.complyt.domain.fast_tax.FastTaxGetBestMatchData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -26,9 +26,9 @@ public final class StubFastTaxWebClientWrapper extends SalesTaxWebClientWrapperB
         return Mono.fromCallable(() -> {
             String json = "{\"MatchLevel\": \"Address\",\"TaxInfoItems\": [{\"City\": \"Englewood\",\"CityDistrictRate\": \"0\",\"CityRate\": \"0.0\",\"County\": \"Arapahoe\",\"CountyDistrictRate\": \"0.029\",\"CountyRate\": \"0.0\",\"InformationComponents\": [{\"Name\": \"CountyFIPS\",\"Value\": \"005\"}],\"NotesCodes\": \"0\",\"NotesDesc\": \"None\",\"SpecialDistrictRate\": \"0\",\"StateAbbreviation\": \"CO\",\"StateName\": \"Colorado\",\"StateRate\": \"0.011\",\"TaxRate\": \"0.04\",\"TotalTaxExempt\": \"LABOR/SERVICES\",\"Zip\": \"80112\"}]}";
             ObjectMapper objectMapper = new ObjectMapper();
-            FastTaxData fastTaxData = objectMapper.readValue(json, FastTaxData.class);
+            FastTaxGetBestMatchData fastTaxGetBestMatchData = objectMapper.readValue(json, FastTaxGetBestMatchData.class);
 
-            return fastTaxData;
+            return fastTaxGetBestMatchData;
         });
     }
 }

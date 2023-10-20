@@ -1,6 +1,6 @@
 package com.complyt.services;
 
-import com.complyt.business.data_fetcher.CountyFetcher;
+import com.complyt.business.data_fetcher.CityCountyStateAddressFetcher;
 import com.complyt.business.mapper.SalesTaxDataToSalesTaxRate;
 import com.complyt.business.sales_tax_web_clients.SalesTaxWebClientWrapper;
 import com.complyt.domain.Address;
@@ -29,7 +29,7 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     SalesTaxDataToSalesTaxRate salesTaxDataToSalesTaxRate;
 
     @NonNull
-    CountyFetcher countyFetcher;
+    CityCountyStateAddressFetcher cityCountyStateAddressFetcher;
 
     @Override
     public Mono<ComplytSalesTaxRates> findByAddress(@NonNull Address address) {
@@ -42,11 +42,11 @@ public class ComplytSalesTaxRatesServiceImpl implements ComplytSalesTaxRatesServ
     }
 
     private Mono<ComplytSalesTaxRates> setBeforeSave(Address address, SalesTaxData salesTaxData) {
-        return countyFetcher.fetch(salesTaxData)
-                .flatMap(county -> salesTaxDataToSalesTaxRate.map(salesTaxData)
+        return cityCountyStateAddressFetcher.fetch(salesTaxData)
+                .flatMap(cityCountyState -> salesTaxDataToSalesTaxRate.map(salesTaxData)
                         .map(salesTaxRates -> {
-                            Address addressWithCounty = address.withCounty(county);
-                            return new ComplytSalesTaxRates(null, addressWithCounty, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusWeeks(2));
+                            Address modifiedAddress = address.withCity(cityCountyState.city()).withCounty(cityCountyState.county()).withState(cityCountyState.state());
+                            return new ComplytSalesTaxRates(null, modifiedAddress, salesTaxRates, LocalDateTime.now(), LocalDateTime.now().plusMonths(2));
                         }));
     }
 
