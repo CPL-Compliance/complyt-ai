@@ -19,8 +19,11 @@ public class TokenEndpointsIT extends TestContainersInitializerIT {
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path(TestUtilities.TOKEN_BASE_URL)
-                        .queryParam("api_key", API_KEY)
                         .build())
+                .headers(headers -> {
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                })
+                .bodyValue("{\"apiKey\": \"479719ff-e1f6-4dbd-9619-5c78fa41f929-0518f0fb-80d6-446b-8943-d93d8a768b33\"}")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
