@@ -12,8 +12,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import test_utils.unit_tests.TestUtilities;
 
-import java.util.Optional;
-
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -102,7 +100,6 @@ class ValidationHandlerTest {
         ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
 
         // When
-        when(serverRequest.queryParam("api_key")).thenReturn(Optional.of(TestUtilities.apiKeyStr));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -111,12 +108,11 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void handle_missingApiKey_returnApiKeyDto() {
+    void handle_missingApiKey_throwsError() {
         // Given
-        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+        ApiKeyDto apiKeyDto = new ApiKeyDto("");
 
         // When
-        when(serverRequest.queryParam("api_key")).thenReturn(Optional.of(""));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 
@@ -125,12 +121,11 @@ class ValidationHandlerTest {
     }
 
     @Test
-    void handle_invalidFormatApiKey_returnApiKeyDto() {
+    void handle_invalidFormatApiKey_throwsError() {
         // Given
-        ApiKeyDto apiKeyDto = TestUtilities.createApiKeyDto();
+        ApiKeyDto apiKeyDto = new ApiKeyDto(TestUtilities.invalidApiKeyStr);
 
         // When
-        when(serverRequest.queryParam("api_key")).thenReturn(Optional.of(TestUtilities.invalidApiKeyStr));
         when(serverRequest.bodyToMono(ApiKeyDto.class)).thenReturn(Mono.just(apiKeyDto));
         Mono<ApiKeyDto> apiKeyDtoMono = apiKeyDtoValidationHandler.handle(serverRequest);
 

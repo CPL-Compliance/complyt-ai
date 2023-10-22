@@ -8,7 +8,7 @@ import io.complyt.authentication.v1.exceptions.GlobalExceptionHandler;
 import io.complyt.authentication.v1.handlers.SecretKeyHandler;
 import io.complyt.authentication.v1.models.SecretKeyDto;
 import io.complyt.authentication.v1.validators.ValidatorConfig;
-import io.complyt.authentication.v1.validators.query_params.ApiKeyDtoQueryParamsExtractor;
+import io.complyt.authentication.v1.validators.query_params.QueryParamsExtractorEmpty;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -30,7 +30,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @WebFluxTest
 @ContextConfiguration(classes = {SecretKeyRouter.class, SecretKeyHandler.class, ApiExceptionConfig.class,
         ValidatorConfig.class, GlobalErrorAttributes.class, GlobalExceptionHandler.class,
-        ApiKeyDtoQueryParamsExtractor.class})
+        QueryParamsExtractorEmpty.class})
 class SecretKeyRouterTest implements GetRouterTestMonoTemplate, GetRouterTestSecurityTemplate {
 
     @Autowired
