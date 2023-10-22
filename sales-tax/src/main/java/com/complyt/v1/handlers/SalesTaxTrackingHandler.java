@@ -102,10 +102,10 @@ public class SalesTaxTrackingHandler {
 
         Mono<SalesTaxTrackingDto> salesTaxTrackingDtoMono = ContextLogger.observeCtx(logStr, log::info).then(
                 dateWrapperDtoValidationHandler.validate(serverRequest)
-                        .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate).flatMap(date ->
-                                salesTaxTrackingFacade.refreshNexusSummary(state, date)
-                                        .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
-                                        .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
+                        .map(DateWrapperToLocalDateMapper.INSTANCE::dateWrapperToLocalDate)
+                        .flatMap(date -> salesTaxTrackingFacade.refreshNexusSummary(state, date)
+                                .map(SalesTaxTrackingMapper.INSTANCE::salesTaxTrackingToSalesTaxTrackingDto)
+                                .switchIfEmpty(Mono.error(ObjectNotFoundApiException::new))));
 
         return ServerResponse.ok().body(salesTaxTrackingDtoMono, SalesTaxTrackingDto.class);
     }
